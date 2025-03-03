@@ -29,7 +29,6 @@ public:
 
     bool checkAttackChance() { return field_0x2740 != 0; }
 
-private:
     /* 0x05AC */ request_of_phase_process_class mPhaseReq;
     /* 0x05B4 */ request_of_phase_process_class mHorsePhaseReq;
     /* 0x05BC */ s16 field_0x05bc;
@@ -38,7 +37,7 @@ private:
     /* 0x05C0 */ cXyz field_0x05c0;
     /* 0x05CC */ s16 field_0x05cc;
     /* 0x05CE */ u8 field_0x05CE[0x05D0 - 0x05CE];
-    /* 0x05D0 */ mDoExt_McaMorfSO* mpMorf;
+    /* 0x05D0 */ mDoExt_McaMorfSO* mpModelMorf;
     /* 0x05D4 */ mDoExt_McaMorfSO* mpHorseMorf;
     /* 0x05D8 */ mDoExt_McaMorf* field_0x05d8;
     /* 0x05DC */ Z2CreatureEnemy mZ2Creature;
@@ -57,7 +56,8 @@ private:
     /* 0x0764 */ u8 field_0x0764[0x0768 - 0x0764];
     /* 0x0768 */ J3DModel* field_0x0768;
     /* 0x076C */ J3DModel* field_0x076c;
-    /* 0x0770 */ u8 field_0x0770[0x0772 - 0x0770];
+    /* 0x0770 */ u8 field_0x0770;
+    /* 0x0771 */ u8 field_0x0771;
     /* 0x0772 */ s16 field_0x0772;
     /* 0x0774 */ dKy_tevstr_c field_0x0774;
     /* 0x0AFC */ s16 field_0x0afc;

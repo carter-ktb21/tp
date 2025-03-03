@@ -920,13 +920,41 @@ SECTION_RODATA static u8 const lit_3904[8] = {
 COMPILER_STRIP_GATE(0x80602684, &lit_3904);
 
 /* 805F4C00-805F4DCC 0002A0 01CC+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
-static void nodeCallBack(J3DJoint* param_0, int param_1) {
-    // NONMATCHING
+static int nodeCallBack(J3DJoint* i_joint, int param_1) {
+    if (param_1 == 0) {
+        int jnt_no = i_joint->getJntNo();
+        J3DModel* model = j3dSys.getModel();
+        
+        b_gnd_class* a_this = (b_gnd_class*)model->getUserArea();
+        if (a_this != NULL) {
+            MTXCopy(model->getAnmMtx(jnt_no), *calc_mtx);
+        }
+    }
+
+    return 1;
 }
 
 /* 805F4DCC-805F4F38 00046C 016C+00 1/1 0/0 0/0 .text            h_nodeCallBack__FP8J3DJointi */
-static void h_nodeCallBack(J3DJoint* param_0, int param_1) {
-    // NONMATCHING
+static void h_nodeCallBack(J3DJoint* param_1, int param_2) {
+    J3DModel* model = j3dSys.getModel();
+    if (param_2 == 0) {
+        u16 uVar3 = param_1->getJntNo();
+        switch (uVar3) {
+            case 4:
+            case 5:
+                mDoMtx_ZrotM(*calc_mtx, 0); // Temporary 0
+                break;
+            case 8:
+            case 9:
+                mDoMtx_YrotM(*calc_mtx, 0); // Temporary 0
+                break;
+            case 28:
+            case 29:
+                mDoMtx_YrotM(*calc_mtx, 0); // Temporary 0
+                break;
+        }
+    }
+    return;
 }
 
 /* ############################################################################################## */
@@ -945,8 +973,57 @@ COMPILER_STRIP_GATE(0x80602690, &lit_4103);
 #pragma pop
 
 /* 805F4F38-805F53A4 0005D8 046C+00 1/0 0/0 0/0 .text            daB_GND_Draw__FP11b_gnd_class */
-static void daB_GND_Draw(b_gnd_class* param_0) {
-    // NONMATCHING
+static int daB_GND_Draw(b_gnd_class* i_this) {
+    fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
+    if (i_this->field_0x2738 == 0) {
+
+        g_env_light.settingTevStruct(0, &a_this->current.pos, &a_this->tevStr);
+
+        J3DModel* model = i_this->mpModelMorf->getModel();
+        i_this->field_0x0728[i_this->field_0x0748]->entry(model->getModelData());
+        i_this->field_0x0724->entry(model->getModelData());
+        i_this->field_0x0744->entry(model->getModelData());
+
+        g_env_light.setLightTevColorType_MAJI(model, &a_this->tevStr);
+        i_this->mpModelMorf->entryDL();
+        g_env_light.settingTevStruct(5, &a_this->current.pos, &i_this->field_0x0774);
+        g_env_light.setLightTevColorType_MAJI(i_this->field_0x0768, &i_this->field_0x0774);
+        mDoExt_modelUpdateDL(i_this->field_0x0768);
+        if (10 < i_this->field_0x0c24) {
+            g_env_light.setLightTevColorType_MAJI(i_this->field_0x0c2c[i_this->field_0x0c26], &a_this->tevStr);
+            model->getModelData()->getMaterialNodePointer(0);
+            J3DGXColor* pJVar4 = model->getModelData()->getMaterialNodePointer(0)->getTevKColor(3);
+            pJVar4->a = i_this->field_0x0c24;
+            mDoExt_modelUpdateDL(i_this->field_0x0c2c[i_this->field_0x0c26]);
+        }
+        
+        if (i_this->field_0x0771 == 0) {
+            g_env_light.setLightTevColorType_MAJI(i_this->field_0x076c->getModelData(), &a_this->tevStr);
+            mDoExt_modelUpdateDL(i_this->field_0x076c);
+        }
+
+        if (i_this->field_0x0754 != 0) {
+            g_env_light.setLightTevColorType_MAJI(i_this->field_0x05d8->getModel()->getModelData(), &a_this->tevStr);
+            i_this->field_0x0750->entry(i_this->field_0x05d8->getModel()->getModelData());
+            i_this->field_0x074c->entry(i_this->field_0x05d8->getModel()->getModelData());
+            i_this->field_0x05d8->entryDL();
+        }
+
+        if (i_this->field_0x26c4 < 60) {
+            for (int i = 0; i < 36; i++) {
+                g_env_light.setLightTevColorType_MAJI(i_this->field_0x0b94[i], &a_this->tevStr);
+                mDoExt_modelUpdateDL(i_this->field_0x0b94[i]);
+            }
+            if (i_this->field_0x1fc4 != 0) {
+                g_env_light.setLightTevColorType_MAJI(i_this->mpHorseMorf->getModel(), &a_this->tevStr);
+                i_this->mpHorseMorf->entryDL();
+            }
+            cXyz cStack_34;
+            cStack_34.set(i_this->current.pos.x, i_this->current.pos.y + 100.0f, i_this->current.pos.z);
+            dDlst_shadowControl_c::getSimpleTex();
+        }
+    }
+    
 }
 
 /* 805F53A4-805F53E0 000A44 003C+00 6/6 0/0 0/0 .text            __dt__4cXyzFv */

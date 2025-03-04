@@ -4,6 +4,7 @@
 */
 
 #include "d/actor/d_a_b_gnd.h"
+#include "d/d_com_inf_game.h"
 #include "dol2asm.h"
 #include "d/d_camera.h"
 
@@ -300,11 +301,11 @@ extern "C" extern void* __vt__9cCcD_Stts[8];
 extern "C" extern void* __vt__16Z2SoundObjSimple[8];
 extern "C" u8 m_cpadInfo__8mDoCPd_c[256];
 extern "C" u8 now__14mDoMtx_stack_c[48];
-extern "C" extern u8 g_dComIfG_gameInfo[122384];
+// extern "C" extern u8 g_dComIfG_gameInfo[122384];
 extern "C" u8 mSimpleTexObj__21dDlst_shadowControl_c[32];
 extern "C" u8 mCurrentMtx__6J3DSys[48];
 extern "C" u8 sincosTable___5JMath[65536];
-extern "C" extern u32 g_blackColor;
+// extern "C" extern u32 g_blackColor;
 extern "C" u8 m_midnaActor__9daPy_py_c[4];
 extern "C" extern u8 pauseTimer__9dScnPly_c[4];
 extern "C" u8 mAudioMgrPtr__10Z2AudioMgr[4 + 4 /* padding */];
@@ -975,6 +976,7 @@ COMPILER_STRIP_GATE(0x80602690, &lit_4103);
 /* 805F4F38-805F53A4 0005D8 046C+00 1/0 0/0 0/0 .text            daB_GND_Draw__FP11b_gnd_class */
 static int daB_GND_Draw(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
+    double in_f6 = 0.0f, in_f8 = 0.0f, in_f10 = 0.0f;
     if (i_this->field_0x2738 == 0) {
 
         g_env_light.settingTevStruct(0, &a_this->current.pos, &a_this->tevStr);
@@ -1021,9 +1023,24 @@ static int daB_GND_Draw(b_gnd_class* i_this) {
             cXyz cStack_34;
             cStack_34.set(i_this->current.pos.x, i_this->current.pos.y + 100.0f, i_this->current.pos.z);
             dDlst_shadowControl_c::getSimpleTex();
+            
+            cXyz shadow_pos;
+            shadow_pos.set(i_this->current.pos.x, i_this->current.pos.y, i_this->current.pos.z);
+            i_this->mShadowID = dComIfGd_setShadow(i_this->mShadowID, 1, model,
+                                &shadow_pos, 0.0f, i_this->field_0x0cd4.GetGroundH(),
+                                (float)in_f6, (float)in_f8, i_this->field_0x0cd4.m_gnd,
+                                &a_this->tevStr, 0, (float)in_f10, dDlst_shadowControl_c::getSimpleTex());
+            dComIfGd_addRealShadow(i_this->mShadowID, i_this->field_0x0768);
+            if (i_this->field_0x1fc4 == 0) {
+                for (int i = 0; i < 36; i++) {
+                    dComIfGd_addRealShadow(i_this->mShadowID, i_this->field_0x0b94[i * 4]);
+                }
+            } else {
+                dComIfGd_addRealShadow(i_this->mShadowID, i_this->mpHorseMorf->getModel());
+            }
         }
     }
-    
+    return 0;
 }
 
 /* 805F53A4-805F53E0 000A44 003C+00 6/6 0/0 0/0 .text            __dt__4cXyzFv */
@@ -2899,12 +2916,12 @@ extern "C" void getTrigA__8mDoCPd_cFUl() {
     // NONMATCHING
 }
 
-/* 80602384-80602404 00DA24 0080+00 2/2 0/0 0/0 .text
- * dComIfGp_particle_set__FUlUsPC4cXyzPC5csXyzPC4cXyz           */
-static void dComIfGp_particle_set(u32 param_0, u16 param_1, cXyz const* param_2,
-                                      csXyz const* param_3, cXyz const* param_4) {
-    // NONMATCHING
-}
+// /* 80602384-80602404 00DA24 0080+00 2/2 0/0 0/0 .text
+//  * dComIfGp_particle_set__FUlUsPC4cXyzPC5csXyzPC4cXyz           */
+// static void dComIfGp_particle_set(u32 param_0, u16 param_1, cXyz const* param_2,
+//                                       csXyz const* param_3, cXyz const* param_4) {
+//     // NONMATCHING
+// }
 
 /* 80602404-80602418 00DAA4 0014+00 1/1 0/0 0/0 .text            getAnmMtx__8J3DModelFi */
 // void J3DModel::getAnmMtx(int param_0) {
@@ -2912,17 +2929,17 @@ extern "C" void getAnmMtx__8J3DModelFi() {
     // NONMATCHING
 }
 
-/* 80602418-80602478 00DAB8 0060+00 1/1 0/0 0/0 .text
- * dComIfGp_setHitMark__FUsP10fopAc_ac_cPC4cXyzPC5csXyzPC4cXyzUl */
-static void dComIfGp_setHitMark(u16 param_0, fopAc_ac_c* param_1, cXyz const* param_2,
-                                    csXyz const* param_3, cXyz const* param_4, u32 param_5) {
-    // NONMATCHING
-}
+// /* 80602418-80602478 00DAB8 0060+00 1/1 0/0 0/0 .text
+//  * dComIfGp_setHitMark__FUsP10fopAc_ac_cPC4cXyzPC5csXyzPC4cXyzUl */
+// static void dComIfGp_setHitMark(u16 param_0, fopAc_ac_c* param_1, cXyz const* param_2,
+//                                     csXyz const* param_3, cXyz const* param_4, u32 param_5) {
+//     // NONMATCHING
+// }
 
-/* 80602478-8060248C 00DB18 0014+00 1/1 0/0 0/0 .text            dComIfGp_setDoStatusForce__FUcUc */
-static void dComIfGp_setDoStatusForce(u8 param_0, u8 param_1) {
-    // NONMATCHING
-}
+// /* 80602478-8060248C 00DB18 0014+00 1/1 0/0 0/0 .text            dComIfGp_setDoStatusForce__FUcUc */
+// static void dComIfGp_setDoStatusForce(u8 param_0, u8 param_1) {
+//     // NONMATCHING
+// }
 
 /* 8060248C-8060249C 00DB2C 0010+00 1/1 0/0 0/0 .text            __ct__4cXyzFfff */
 // cXyz::cXyz(f32 param_0, f32 param_1, f32 param_2) {
@@ -2930,10 +2947,10 @@ extern "C" void __ct__4cXyzFfff() {
     // NONMATCHING
 }
 
-/* 8060249C-806024AC 00DB3C 0010+00 1/1 0/0 0/0 .text            daPy_getPlayerActorClass__Fv */
-static void daPy_getPlayerActorClass() {
-    // NONMATCHING
-}
+// /* 8060249C-806024AC 00DB3C 0010+00 1/1 0/0 0/0 .text            daPy_getPlayerActorClass__Fv */
+// static void daPy_getPlayerActorClass() {
+//     // NONMATCHING
+// }
 
 /* 806024AC-806024EC 00DB4C 0040+00 1/1 0/0 0/0 .text            setFrame__13mDoExt_morf_cFf */
 // void mDoExt_morf_c::setFrame(f32 param_0) {
@@ -2947,12 +2964,12 @@ extern "C" void isStop__13mDoExt_morf_cFv() {
     // NONMATCHING
 }
 
-/* 8060251C-80602590 00DBBC 0074+00 2/2 0/0 0/0 .text
- * dComIfGp_particle_set__FUsPC4cXyzPC5csXyzPC4cXyz             */
-static void dComIfGp_particle_set(u16 param_0, cXyz const* param_1, csXyz const* param_2,
-                                      cXyz const* param_3) {
-    // NONMATCHING
-}
+// /* 8060251C-80602590 00DBBC 0074+00 2/2 0/0 0/0 .text
+//  * dComIfGp_particle_set__FUsPC4cXyzPC5csXyzPC4cXyz             */
+// static void dComIfGp_particle_set(u16 param_0, cXyz const* param_1, csXyz const* param_2,
+//                                       cXyz const* param_3) {
+//     // NONMATCHING
+// }
 
 /* 80602590-806025A4 00DC30 0014+00 1/1 0/0 0/0 .text            changeDemoMode__9daPy_py_cFUliis */
 // void daPy_py_c::changeDemoMode(u32 param_0, int param_1, int param_2, s16 param_3) {
@@ -2990,15 +3007,15 @@ extern "C" void changeOriginalDemo__9daHorse_cFv() {
     // NONMATCHING
 }
 
-/* 80602604-8060261C 00DCA4 0018+00 1/1 0/0 0/0 .text            dComIfGp_getCamera__Fi */
-static void dComIfGp_getCamera(int param_0) {
-    // NONMATCHING
-}
+// /* 80602604-8060261C 00DCA4 0018+00 1/1 0/0 0/0 .text            dComIfGp_getCamera__Fi */
+// static void dComIfGp_getCamera(int param_0) {
+//     // NONMATCHING
+// }
 
-/* 8060261C-80602638 00DCBC 001C+00 1/1 0/0 0/0 .text            dComIfGp_getPlayerCameraID__Fi */
-static void dComIfGp_getPlayerCameraID(int param_0) {
-    // NONMATCHING
-}
+// /* 8060261C-80602638 00DCBC 001C+00 1/1 0/0 0/0 .text            dComIfGp_getPlayerCameraID__Fi */
+// static void dComIfGp_getPlayerCameraID(int param_0) {
+//     // NONMATCHING
+// }
 
 /* 80602638-80602650 00DCD8 0018+00 1/1 0/0 0/0 .text            dComIfGp_getPlayer__Fi */
 // static void dComIfGp_getPlayer(int param_0) {

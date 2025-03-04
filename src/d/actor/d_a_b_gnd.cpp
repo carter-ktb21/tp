@@ -367,16 +367,14 @@ SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
 #pragma pop
 
 /* 806029F0-806029F4 000020 0004+00 1/1 0/0 0/0 .data            l_color$3983 */
-SECTION_DATA static u8 l_color[4] = {
-    0x14,
-    0x0F,
-    0x00,
-    0xFF,
+SECTION_DATA static _GXColor l_color = {
+    20, 15, 0, -1
 };
 
 /* 806029F4-80602A04 000024 0010+00 1/1 0/0 0/0 .data            chk_x$4163 */
-SECTION_DATA static u8 chk_x[16] = {
-    0x46, 0x5D, 0x5C, 0x00, 0x47, 0x07, 0xD7, 0x00, 0xC6, 0xBC, 0xC8, 0x00, 0xC6, 0x35, 0xAC, 0x00,
+SECTION_DATA static int chk_x[4][4] = {
+    {0x46, 0x5D, 0x5C, 0x00}, {0x47, 0x07, 0xD7, 0x00}, {0xC6, 0xBC, 0xC8, 0x00}, {0xC6, 0x35, 0xAC, 0x00}
+    // 0x46, 0x5D, 0x5C, 0x00, 0x47, 0x07, 0xD7, 0x00, 0xC6, 0xBC, 0xC8, 0x00, 0xC6, 0x35, 0xAC, 0x00,
 };
 
 /* 80602A04-80602A14 000034 0010+00 1/1 0/0 0/0 .data            chk_z$4164 */
@@ -975,13 +973,13 @@ COMPILER_STRIP_GATE(0x80602690, &lit_4103);
 
 /* 805F4F38-805F53A4 0005D8 046C+00 1/0 0/0 0/0 .text            daB_GND_Draw__FP11b_gnd_class */
 static int daB_GND_Draw(b_gnd_class* i_this) {
-    fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
-    double in_f6 = 0.0f, in_f8 = 0.0f, in_f10 = 0.0f;
-    if (i_this->field_0x2738 == 0) {
-
+    if (!i_this->field_0x2738) {
+        fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
+        double in_f6 = 0, in_f8 = 0, in_f10 = 0;
+        J3DModel* model = i_this->mpModelMorf->getModel();
         g_env_light.settingTevStruct(0, &a_this->current.pos, &a_this->tevStr);
 
-        J3DModel* model = i_this->mpModelMorf->getModel();
+        
         i_this->field_0x0728[i_this->field_0x0748]->entry(model->getModelData());
         i_this->field_0x0724->entry(model->getModelData());
         i_this->field_0x0744->entry(model->getModelData());
@@ -1033,60 +1031,74 @@ static int daB_GND_Draw(b_gnd_class* i_this) {
             dComIfGd_addRealShadow(i_this->mShadowID, i_this->field_0x0768);
             if (i_this->field_0x1fc4 == 0) {
                 for (int i = 0; i < 36; i++) {
-                    dComIfGd_addRealShadow(i_this->mShadowID, i_this->field_0x0b94[i * 4]);
+                    dComIfGd_addRealShadow(i_this->mShadowID, i_this->field_0x0b94[i]);
                 }
-            } else {
-                dComIfGd_addRealShadow(i_this->mShadowID, i_this->mpHorseMorf->getModel());
+            }
+
+            if (i_this->field_0x1fc4 != 0) {
+                i_this->field_0x2170[0].update(16, l_color, &a_this->tevStr);
+                dComIfGd_set3DlineMat(&i_this->field_0x2170[0]);
+                i_this->field_0x2170[1].update(16, l_color, &a_this->tevStr);
+                dComIfGd_set3DlineMat(&i_this->field_0x2170[1]);
+                i_this->field_0x21e8.update(2, l_color, &a_this->tevStr);
+                dComIfGd_set3DlineMat(&i_this->field_0x21e8);
             }
         }
     }
-    return 0;
+    return 1;
 }
 
-/* 805F53A4-805F53E0 000A44 003C+00 6/6 0/0 0/0 .text            __dt__4cXyzFv */
-// cXyz::~cXyz() {
-extern "C" void __dt__4cXyzFv() {
-    // NONMATCHING
-}
+// /* 805F53A4-805F53E0 000A44 003C+00 6/6 0/0 0/0 .text            __dt__4cXyzFv */
+// // cXyz::~cXyz() {
+// extern "C" void __dt__4cXyzFv() {
+//     // NONMATCHING
+// }
 
-/* ############################################################################################## */
-/* 80602694-8060269C 000030 0008+00 0/3 0/0 0/0 .rodata          @4154 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const lit_4154[8] = {
-    0x3F, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x80602694, &lit_4154);
-#pragma pop
+// /* ############################################################################################## */
+// /* 80602694-8060269C 000030 0008+00 0/3 0/0 0/0 .rodata          @4154 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static u8 const lit_4154[8] = {
+//     0x3F, 0xE0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+// };
+// COMPILER_STRIP_GATE(0x80602694, &lit_4154);
+// #pragma pop
 
-/* 8060269C-806026A4 000038 0008+00 0/3 0/0 0/0 .rodata          @4155 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const lit_4155[8] = {
-    0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x8060269C, &lit_4155);
-#pragma pop
+// /* 8060269C-806026A4 000038 0008+00 0/3 0/0 0/0 .rodata          @4155 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static u8 const lit_4155[8] = {
+//     0x40, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+// };
+// COMPILER_STRIP_GATE(0x8060269C, &lit_4155);
+// #pragma pop
 
-/* 806026A4-806026AC 000040 0008+00 0/3 0/0 0/0 .rodata          @4156 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const lit_4156[8] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x806026A4, &lit_4156);
-#pragma pop
+// /* 806026A4-806026AC 000040 0008+00 0/3 0/0 0/0 .rodata          @4156 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static u8 const lit_4156[8] = {
+//     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+// };
+// COMPILER_STRIP_GATE(0x806026A4, &lit_4156);
+// #pragma pop
 
-/* 806026AC-806026B0 000048 0004+00 0/4 0/0 0/0 .rodata          @4157 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4157 = 1000.0f;
-COMPILER_STRIP_GATE(0x806026AC, &lit_4157);
-#pragma pop
+// /* 806026AC-806026B0 000048 0004+00 0/4 0/0 0/0 .rodata          @4157 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4157 = 1000.0f;
+// COMPILER_STRIP_GATE(0x806026AC, &lit_4157);
+// #pragma pop
 
 /* 805F53E0-805F5574 000A80 0194+00 1/1 0/0 0/0 .text            shot_s_sub__FPvPv */
-static void shot_s_sub(void* param_0, void* param_1) {
-    // NONMATCHING
+static void* shot_s_sub(void* i_actor, void* i_data) {
+    if (fopAcM_IsActor(i_actor) && (fopAcM_GetName(i_actor) == PROC_ARROW) &&
+        ((fopAcM_GetParam(i_actor) == 1) || (fopAcM_GetParam(i_actor) == 2))) {
+            cXyz vec = ((fopAc_ac_c*)i_data)->current.pos - ((fopAc_ac_c*)i_actor)->current.pos;
+            if (vec.abs() < 1000.0f) {
+                return i_actor;
+            }
+    }
+    return NULL;
 }
 
 /* ############################################################################################## */
@@ -1274,8 +1286,25 @@ static u8 k_pos[12];
 #pragma pop
 
 /* 805F5574-805F5BE8 000C14 0674+00 1/1 0/0 0/0 .text            gake_check__FP11b_gnd_class */
-static void gake_check(b_gnd_class* param_0) {
-    // NONMATCHING
+static void gake_check(b_gnd_class* i_this) {
+    dBgS_GndChk dStack_94;
+    cXyz local_70;
+    cXyz local_7c;
+    if (i_this->current.pos.y < -5000.0f) {
+        i_this->current.pos.x = i_this->home.pos.x;
+        i_this->current.pos.y = i_this->home.pos.y;
+        i_this->current.pos.z = i_this->home.pos.z;
+        i_this->old.pos.x = i_this->current.pos.x;
+        i_this->old.pos.y = i_this->current.pos.y;
+        i_this->old.pos.z = i_this->current.pos.z;
+    }
+    int local_98 = 0;
+    while (true) {
+        if (3 < local_98) {
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.GetY());
+
+        }
+    }
 }
 
 /* ############################################################################################## */

@@ -2081,8 +2081,46 @@ COMPILER_STRIP_GATE(0x80602768, &lit_5211);
 #pragma pop
 
 /* 805F76C4-805F7A10 002D64 034C+00 1/1 0/0 0/0 .text            b_gnd_h_end__FP11b_gnd_class */
-static void b_gnd_h_end(b_gnd_class* param_0) {
+static void b_gnd_h_end(b_gnd_class* i_this) {
     // NONMATCHING
+    fopAc_ac_c* actor = fopAcM_SearchByID(i_this->mMantChild->parentActorID);
+    cXyz local_24;
+    int iVar1 = i_this->mpHorseMorf->getFrame();
+    switch (i_this->field_0x26c4) {
+        case 0:
+
+            break;
+        case 2:
+            if (i_this->field_0x26c4 < 34) {
+                if (iVar1 == 39) {
+                    local_24.x = 4.0f;
+                    local_24.y = 4.0f;
+                    local_24.z = 4.0f;
+                    dComIfGp_particle_set(0x8c21, &i_this->current.pos, &i_this->shape_angle, &local_24);   
+                }
+                    
+                if (iVar1 > 61) {
+                    cLib_addCalc0(&i_this->speedF, 1.0f, 1.2f);
+                    cLib_addCalcAngleS2(&i_this->shape_angle.y, i_this->current.angle.y + 0x1000, 8, 130);
+                    i_this->field_0x2688 = dComIfGp_particle_set(i_this->field_0x2688, 0x8b9a, 
+                                                        &i_this->current.pos, 0, 0);
+                    if (i_this->speedF > 14.0f) {
+                        i_this->mZ2Creature.startCreatureSoundLevel(Z2SE_EN_HG_SLIP, 0, -1);
+                    }
+                }
+            
+                if (i_this->speedF < 1.0f) {
+                    // actor[10].mTevStr.field_0x1fd = 1; // Not sure what goes here
+                }
+            } else {
+                i_this->mpModelMorf->setFrame(0.0f);
+                i_this->mpHorseMorf->setFrame(0.0f);
+                i_this->speedF = 0.0f;
+                i_this->current.pos.x = 1000.0f;
+            }
+
+
+    }
 }
 
 /* ############################################################################################## */

@@ -1527,6 +1527,11 @@ static cXyz b_path[96 + 4 /* padding */];
 /* 805F6290-805F6FA4 001930 0D14+00 2/1 0/0 0/0 .text            b_gnd_h_run_a__FP11b_gnd_class */
 static void b_gnd_h_run_a(b_gnd_class* i_this) {
     // NONMATCHING
+    /*
+        Likely handles Ganondorf's horse's running.
+        Not sure yet of difference between
+        b_gnd_h_run_a and b_gnd_h_run_p.
+    */
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
     float fVar19 = i_this->field_0x0c38;
     float fVar18;
@@ -1981,24 +1986,55 @@ static void b_gnd_h_run_p(b_gnd_class* param_0) {
     // NONMATCHING
 }
 
-/* ############################################################################################## */
-/* 8060274C-80602750 0000E8 0004+00 0/4 0/0 0/0 .rodata          @5137 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_5137 = 55.0f;
-COMPILER_STRIP_GATE(0x8060274C, &lit_5137);
-#pragma pop
+// /* ############################################################################################## */
+// /* 8060274C-80602750 0000E8 0004+00 0/4 0/0 0/0 .rodata          @5137 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_5137 = 55.0f;
+// COMPILER_STRIP_GATE(0x8060274C, &lit_5137);
+// #pragma pop
 
-/* 80602750-80602754 0000EC 0004+00 0/3 0/0 0/0 .rodata          @5138 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_5138 = 1.5f;
-COMPILER_STRIP_GATE(0x80602750, &lit_5138);
-#pragma pop
+// /* 80602750-80602754 0000EC 0004+00 0/3 0/0 0/0 .rodata          @5138 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_5138 = 1.5f;
+// COMPILER_STRIP_GATE(0x80602750, &lit_5138);
+// #pragma pop
 
 /* 805F74F4-805F76C4 002B94 01D0+00 1/1 0/0 0/0 .text            b_gnd_h_jump__FP11b_gnd_class */
-static void b_gnd_h_jump(b_gnd_class* param_0) {
+static void b_gnd_h_jump(b_gnd_class* i_this) {
     // NONMATCHING
+    switch (i_this->field_0x05bc) {
+        case 0:
+            i_this->field_0x05bc = 1;
+            anm_init(i_this, 71, 2.0f, 0, 1.0f);
+            h_anm_init(i_this, 8, 2.0f, 0, 1.0f);
+            i_this->speed.y = 55.0f;
+            break;
+        case 1:
+            if (i_this->mpModelMorf->isStop()) {
+                i_this->field_0x05bc = 2;
+                anm_init(i_this, 70, 2.0f, 0, 1.0f);
+                h_anm_init(i_this, 7, 2.0f, 0, 1.0f);
+            }
+            break;
+        case 2:
+            if (i_this->field_0x0cd4.ChkGroundHit()) {
+                i_this->field_0x05bc = 3;
+                anm_init(i_this, 69, 2.0f, 0, 1.0f);
+                h_anm_init(i_this, 6, 2.0f, 0, 1.0f);
+                i_this->field_0x2699 = 1;
+            }
+            break;
+        case 3:
+            if (i_this->mpModelMorf->isStop()) {
+                i_this->mActionID = i_this->field_0x0b00;
+                i_this->field_0x05bc = 0;
+                i_this->field_0x0760 = 1.5f;
+                anm_init(i_this, 73, 2.0f, 2, 1.5f);
+                h_anm_init(i_this, 9, 2.0f, 2, 1.5f);
+            }
+    }
 }
 
 /* ############################################################################################## */

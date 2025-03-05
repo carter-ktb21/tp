@@ -5,6 +5,8 @@
 
 #include "d/actor/d_a_b_gnd.h"
 #include "d/d_com_inf_game.h"
+#include "d/actor/d_a_player.h"
+#include "d/actor/d_a_horse.h"
 #include "dol2asm.h"
 #include "d/d_camera.h"
 
@@ -307,7 +309,7 @@ extern "C" u8 mCurrentMtx__6J3DSys[48];
 extern "C" u8 sincosTable___5JMath[65536];
 // extern "C" extern u32 g_blackColor;
 extern "C" u8 m_midnaActor__9daPy_py_c[4];
-extern "C" extern u8 pauseTimer__9dScnPly_c[4];
+extern "C" extern s8 pauseTimer__9dScnPly_c;
 extern "C" u8 mAudioMgrPtr__10Z2AudioMgr[4 + 4 /* padding */];
 extern "C" void __register_global_object();
 
@@ -372,8 +374,8 @@ SECTION_DATA static _GXColor l_color = {
 };
 
 /* 806029F4-80602A04 000024 0010+00 1/1 0/0 0/0 .data            chk_x$4163 */
-SECTION_DATA static int chk_x[4][4] = {
-    {0x46, 0x5D, 0x5C, 0x00}, {0x47, 0x07, 0xD7, 0x00}, {0xC6, 0xBC, 0xC8, 0x00}, {0xC6, 0x35, 0xAC, 0x00}
+SECTION_DATA static int chk_x[16] = {
+    0x46, 0x5D, 0x5C, 0x00, 0x47, 0x07, 0xD7, 0x0, 0xC6, 0xBC, 0xC8, 0x00, 0xC6, 0x35, 0xAC, 0x00
     // 0x46, 0x5D, 0x5C, 0x00, 0x47, 0x07, 0xD7, 0x00, 0xC6, 0xBC, 0xC8, 0x00, 0xC6, 0x35, 0xAC, 0x00,
 };
 
@@ -920,6 +922,7 @@ COMPILER_STRIP_GATE(0x80602684, &lit_3904);
 
 /* 805F4C00-805F4DCC 0002A0 01CC+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
+     // NONMATCHING
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
         J3DModel* model = j3dSys.getModel();
@@ -935,6 +938,7 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
 
 /* 805F4DCC-805F4F38 00046C 016C+00 1/1 0/0 0/0 .text            h_nodeCallBack__FP8J3DJointi */
 static void h_nodeCallBack(J3DJoint* param_1, int param_2) {
+     // NONMATCHING
     J3DModel* model = j3dSys.getModel();
     if (param_2 == 0) {
         u16 uVar3 = param_1->getJntNo();
@@ -973,6 +977,7 @@ COMPILER_STRIP_GATE(0x80602690, &lit_4103);
 
 /* 805F4F38-805F53A4 0005D8 046C+00 1/0 0/0 0/0 .text            daB_GND_Draw__FP11b_gnd_class */
 static int daB_GND_Draw(b_gnd_class* i_this) {
+     // NONMATCHING
     if (!i_this->field_0x2738) {
         fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
         double in_f6 = 0, in_f8 = 0, in_f10 = 0;
@@ -1091,6 +1096,7 @@ static int daB_GND_Draw(b_gnd_class* i_this) {
 
 /* 805F53E0-805F5574 000A80 0194+00 1/1 0/0 0/0 .text            shot_s_sub__FPvPv */
 static void* shot_s_sub(void* i_actor, void* i_data) {
+     // NONMATCHING
     if (fopAcM_IsActor(i_actor) && (fopAcM_GetName(i_actor) == PROC_ARROW) &&
         ((fopAcM_GetParam(i_actor) == 1) || (fopAcM_GetParam(i_actor) == 2))) {
             cXyz vec = ((fopAc_ac_c*)i_data)->current.pos - ((fopAc_ac_c*)i_actor)->current.pos;
@@ -1287,24 +1293,46 @@ static u8 k_pos[12];
 
 /* 805F5574-805F5BE8 000C14 0674+00 1/1 0/0 0/0 .text            gake_check__FP11b_gnd_class */
 static void gake_check(b_gnd_class* i_this) {
-    dBgS_GndChk dStack_94;
-    cXyz local_70;
-    cXyz local_7c;
-    if (i_this->current.pos.y < -5000.0f) {
-        i_this->current.pos.x = i_this->home.pos.x;
-        i_this->current.pos.y = i_this->home.pos.y;
-        i_this->current.pos.z = i_this->home.pos.z;
-        i_this->old.pos.x = i_this->current.pos.x;
-        i_this->old.pos.y = i_this->current.pos.y;
-        i_this->old.pos.z = i_this->current.pos.z;
-    }
-    int local_98 = 0;
-    while (true) {
-        if (3 < local_98) {
-            cMtx_YrotS(*calc_mtx, i_this->shape_angle.GetY());
+     // NONMATCHING
+    // bool bVar1;
+    // dBgS_GndChk dStack_94;
+    // float fVar10;
+    // cXyz local_70;
+    // cXyz local_ac;
+    // cXyz local_a0;
+    
+    // if (i_this->current.pos.y < -5000.0f) {
+    //     i_this->current.pos.x = i_this->home.pos.x;
+    //     i_this->current.pos.y = i_this->home.pos.y;
+    //     i_this->current.pos.z = i_this->home.pos.z;
+    //     i_this->old.pos.x = i_this->current.pos.x;
+    //     i_this->old.pos.y = i_this->current.pos.y;
+    //     i_this->old.pos.z = i_this->current.pos.z;
+    // }
 
-        }
-    }
+    // int local_98 = 0;
+    // int iVar8 = 0;
+    // while (true) {
+    //     local_a0.x = (float)(chk_x[iVar8] - i_this->current.pos.x);
+    //     local_a0.z = (float)(chk_z[iVar8] - i_this->current.pos.z);
+    //     int iVar5 = cM_atan2s(local_a0.x, local_a0.z);
+    //     s16 sVar4 = (s16)iVar5 - i_this->shape_angle.GetY();
+    //     fVar10 = local_a0.x * local_a0.x + local_a0.z * local_a0.z;
+    //     if (fVar10 > 0.0f) {
+    //         fVar10 = (1.0f / sqrt(fVar10)) * fVar10;
+    //     }
+
+    //     if ((fVar10 < 6000.0f && sVar4 < 0x4000) && sVar4 > -0x4000) break;
+
+    //     if (3 < local_98) {
+    //         cMtx_YrotS(*calc_mtx, i_this->shape_angle.GetY());
+    //         bVar1 = false;
+    //         local_a0.x = 200.0f;
+    //         local_a0.y = 1000.0f;
+    //         local_a0.z = 200.0f;
+    //         MtxPosition(&local_a0, &local_ac);
+    //     }
+    // }
 }
 
 /* ############################################################################################## */
@@ -1341,20 +1369,46 @@ static void saku_jump_check(b_gnd_class* param_0) {
     // NONMATCHING
 }
 
-/* 805F5EF4-805F5F3C 001594 0048+00 1/0 0/0 0/0 .text            __dt__8cM3dGPlaFv */
-// cM3dGPla::~cM3dGPla() {
-extern "C" void __dt__8cM3dGPlaFv() {
-    // NONMATCHING
-}
+// /* 805F5EF4-805F5F3C 001594 0048+00 1/0 0/0 0/0 .text            __dt__8cM3dGPlaFv */
+// // cM3dGPla::~cM3dGPla() {
+// extern "C" void __dt__8cM3dGPlaFv() {
+//     // NONMATCHING
+// }
 
 /* ############################################################################################## */
-/* 806026E8-806026EC 000084 0004+00 2/13 0/0 0/0 .rodata          @4460 */
-SECTION_RODATA static f32 const lit_4460 = 2.0f;
-COMPILER_STRIP_GATE(0x806026E8, &lit_4460);
+// /* 806026E8-806026EC 000084 0004+00 2/13 0/0 0/0 .rodata          @4460 */
+// SECTION_RODATA static f32 const lit_4460 = 2.0f;
+// COMPILER_STRIP_GATE(0x806026E8, &lit_4460);
 
 /* 805F5F3C-805F6068 0015DC 012C+00 1/1 0/0 0/0 .text            b_gnd_h_wait__FP11b_gnd_class */
-static void b_gnd_h_wait(b_gnd_class* param_0) {
+static void b_gnd_h_wait(b_gnd_class* i_this) {
     // NONMATCHING
+    s16 sVar1 = i_this->field_0x0c3c;
+    s16 sVar2 = i_this->field_0x05bc;
+
+    switch (sVar2) {
+        case -1:
+            Z2GetAudioMgr()->bgmStart(0x200005d, 0, 0);
+        case 0:
+            anm_init(i_this, 75, 10.0f, 2, 1.0f);
+            h_anm_init(i_this, 15, 10.0f, 2, 1.0f);
+            i_this->field_0x05bc = 1;
+            if (i_this->field_0x0c44[0] == 0) {
+                i_this->field_0x05bc = 2;
+            }
+            break;
+        case 2:
+            cLib_addCalcAngleS2(&i_this->current.angle.y, sVar1, 8, 0x200);
+            sVar2 = sVar1 - i_this->current.angle.y;
+            if ((sVar2 < 0x800) && (sVar2 > -0x800)) {
+                i_this->mActionID = 2; // ACT_HWAIT_2
+                i_this->field_0x05bc = 0;
+            }
+            break;
+        default:
+            break;
+    }
+    cLib_addCalc0(&i_this->speedF, 1.0f, 2.0f);
 }
 
 /* ############################################################################################## */
@@ -1365,66 +1419,444 @@ SECTION_RODATA static f32 const lit_4503 = 0.5f;
 COMPILER_STRIP_GATE(0x806026EC, &lit_4503);
 #pragma pop
 
-/* 806026F0-806026F4 00008C 0004+00 0/11 0/0 0/0 .rodata          @4504 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4504 = 3.0f;
-COMPILER_STRIP_GATE(0x806026F0, &lit_4504);
-#pragma pop
+// /* 806026F0-806026F4 00008C 0004+00 0/11 0/0 0/0 .rodata          @4504 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4504 = 3.0f;
+// COMPILER_STRIP_GATE(0x806026F0, &lit_4504);
+// #pragma pop
 
-/* 806026F4-806026F8 000090 0004+00 0/1 0/0 0/0 .rodata          @4505 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4505 = 4000.0f;
-COMPILER_STRIP_GATE(0x806026F4, &lit_4505);
-#pragma pop
+// /* 806026F4-806026F8 000090 0004+00 0/1 0/0 0/0 .rodata          @4505 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4505 = 4000.0f;
+// COMPILER_STRIP_GATE(0x806026F4, &lit_4505);
+// #pragma pop
 
-/* 806026F8-806026FC 000094 0004+00 0/1 0/0 0/0 .rodata          @4506 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4506 = 7500.0f;
-COMPILER_STRIP_GATE(0x806026F8, &lit_4506);
-#pragma pop
+// /* 806026F8-806026FC 000094 0004+00 0/1 0/0 0/0 .rodata          @4506 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4506 = 7500.0f;
+// COMPILER_STRIP_GATE(0x806026F8, &lit_4506);
+// #pragma pop
 
 /* 805F6068-805F6290 001708 0228+00 1/1 0/0 0/0 .text            b_gnd_h_wait2__FP11b_gnd_class */
-static void b_gnd_h_wait2(b_gnd_class* param_0) {
+static void b_gnd_h_wait2(b_gnd_class* i_this) {
     // NONMATCHING
+    s16 sVar2 = i_this->field_0x0c3c;
+    float fVar1 = i_this->mpHorseMorf->getFrame();
+    s16 sVar3 = i_this->field_0x05bc;
+    
+    switch (sVar3) {
+        case 0:
+            if (i_this->field_0x0c76 == 0) {
+                float fVar5 = cM_rndF(1.0f);
+                if (fVar5 >= 0.5f) {
+                    i_this->field_0x05cc = sVar2 + -0x2000;
+                } else {
+                    i_this->field_0x05cc = sVar2 + 0x2000;
+                }
+            } else {
+                i_this->field_0x05cc = i_this->current.angle.y + -0x8000;
+            }
+
+            if ((s16)i_this->field_0x05cc - i_this->current.angle.y < 1) {
+                anm_init(i_this, 68, 3.0f, 0, 1.0f);
+                h_anm_init(i_this, 13, 3.0f, 0, 1.0f);
+            } else {
+                anm_init(i_this, 67, 3.0f, 0, 1.0f);
+                h_anm_init(i_this, 12, 3.0f, 0, 1.0f);
+            }
+
+            i_this->field_0x05bc = 1;
+            i_this->field_0x0c68 = 0x100;
+        case 2:
+            break;
+        default:
+            if (fVar1 > 11) {
+                cLib_addCalcAngleS2(&i_this->current.angle.y, i_this->field_0x05cc, 4, i_this->field_0x0c68);
+                cLib_addCalcAngleS2(&i_this->field_0x0c68, 0x400, 1, 0x80);
+            }
+            
+            if (i_this->mpModelMorf->isStop()) {
+                anm_init(i_this, 75, 10.0f, 2, 1.0f);
+                h_anm_init(i_this, 15, 10.0f, 2, 1.0f);
+                i_this->field_0x05bc = 2;
+            }
+            break;
+    }
+    if (i_this->field_0x0c38 < 4000.0f || i_this->field_0x0c38 > 7500.0f) {
+        i_this->mActionID = 4; // ACT_HRUN_P
+        i_this->field_0x05bc = 0;
+        i_this->field_0x0c44[3] = 100;
+    }
+    cLib_addCalc0(&i_this->speedF, 1.0f, 1.0f);
 }
 
-/* ############################################################################################## */
-/* 806026FC-80602700 000098 0004+00 0/7 0/0 0/0 .rodata          @4960 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4960 = 30.0f;
-COMPILER_STRIP_GATE(0x806026FC, &lit_4960);
-#pragma pop
+// /* ############################################################################################## */
+// /* 806026FC-80602700 000098 0004+00 0/7 0/0 0/0 .rodata          @4960 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4960 = 30.0f;
+// COMPILER_STRIP_GATE(0x806026FC, &lit_4960);
+// #pragma pop
 
-/* 80602700-80602704 00009C 0004+00 0/6 0/0 0/0 .rodata          @4961 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4961 = 5.0f;
-COMPILER_STRIP_GATE(0x80602700, &lit_4961);
-#pragma pop
+// /* 80602700-80602704 00009C 0004+00 0/6 0/0 0/0 .rodata          @4961 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4961 = 5.0f;
+// COMPILER_STRIP_GATE(0x80602700, &lit_4961);
+// #pragma pop
 
-/* 80602704-80602708 0000A0 0004+00 0/2 0/0 0/0 .rodata          @4962 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_4962 = 5000.0f;
-COMPILER_STRIP_GATE(0x80602704, &lit_4962);
-#pragma pop
+// /* 80602704-80602708 0000A0 0004+00 0/2 0/0 0/0 .rodata          @4962 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_4962 = 5000.0f;
+// COMPILER_STRIP_GATE(0x80602704, &lit_4962);
+// #pragma pop
 
-/* 80602FEC-80602FF8 00008C 000C+00 0/1 0/0 0/0 .bss             @4509 */
-#pragma push
-#pragma force_active on
-static u8 lit_4509[12];
-#pragma pop
+// /* 80602FEC-80602FF8 00008C 000C+00 0/1 0/0 0/0 .bss             @4509 */
+// #pragma push
+// #pragma force_active on
+// static u8 lit_4509[12];
+// #pragma pop
 
 /* 80602FF8-8060305C 000098 0060+04 2/4 0/0 0/0 .bss             b_path */
-static u8 b_path[96 + 4 /* padding */];
+static cXyz b_path[96 + 4 /* padding */];
 
 /* 805F6290-805F6FA4 001930 0D14+00 2/1 0/0 0/0 .text            b_gnd_h_run_a__FP11b_gnd_class */
-static void b_gnd_h_run_a(b_gnd_class* param_0) {
+static void b_gnd_h_run_a(b_gnd_class* i_this) {
     // NONMATCHING
+    fopAc_ac_c* player = dComIfGp_getPlayer(0);
+    float fVar19 = i_this->field_0x0c38;
+    float fVar18;
+    float fVar20 = 0.0f;
+    float fVar1 = 1.0f;
+    float fVar6;
+    float fVar7;
+    bool bVar8 = false;
+    int iVar13 = daPy_getPlayerActorClass()->checkHorseRide();
+    int iVar14;
+    int iVar16;
+    cXyz local_104;
+    cXyz local_f8;
+    cXyz local_e0;
+    cXyz local_bc;
+    cXyz local_b0;
+    if (iVar13 && dComIfGp_getHorseActor()->speedF >= 30.0f) {
+        bVar8 = true;
+    }
+
+    s16 sVar12 = i_this->current.angle.y;
+    float fVar2 = 1.0f;
+    bool bVar4 = false;
+    s16 sVar11 = (i_this->field_0x0c3c + 0x7fff) - player->shape_angle.y;
+    if (sVar11 < 0x4000 && sVar11 > -0x4000) {
+        bVar4 = true;
+    }
+
+    bool bVar3 = false;
+    s16 sVar15 = 128;
+
+    long local_a0;
+
+    switch (i_this->field_0x05bc) {
+        case 0:
+        case 1:
+            if (i_this->mAnmID != 73) {
+                anm_init(i_this, 73, 5.0f, 2, 1.0f);
+                h_anm_init(i_this, 9, 5.0f, 2, 1.0f);
+                i_this->field_0x0760 = 1.0f;
+            }
+
+            i_this->field_0x05bc = 2;
+            i_this->field_0x0c68 = 0;
+            iVar13 = 0;
+            iVar14 = 1;
+            iVar16 = 12;
+            
+            for (int i = 0; i < 8; i++) {
+                local_e0 = b_path[iVar13] - i_this->current.pos;
+                if (fVar6 < fVar7) {
+                    iVar13 = iVar14;
+                }
+            }
+
+            i_this->field_0x0c60 = iVar13;
+            fVar18 = cM_rndF(100.0f);
+            local_a0 = (long)(int)(fVar18 + 100.0f);
+            i_this->field_0x0c44[2] = (s16)(int)(fVar18 + 100.0f);
+        case 2:
+            if (i_this->field_0x0c44[2] == 0 && bVar8) {
+                i_this->field_0x05bc = 3;
+            } else if (fVar19 > 5000.0f && i_this->field_0x0c44[3] == 0) {
+                if (bVar4) {
+                    i_this->field_0x05bc = 20;
+                    i_this->field_0x0c44[0] = 10;
+                } else {
+                    i_this->mActionID = 4; // ACT_HRUN_P
+                    i_this->field_0x05bc = 0;
+                    i_this->field_0x0c44[3] = 100;
+                }
+            }
+
+            i_this->field_0x0c6a = 1;
+            break;
+        case 3:
+            anm_init(i_this, 56, 3.0f, 0, 1.0f);
+            i_this->field_0x05bc = 4;
+            i_this->field_0x1e0f = 1;
+            i_this->field_0x1e10 = 0.0f;
+        case 4:
+            bVar4 = true;
+            if (i_this->mpModelMorf->isStop()) {
+                bVar4 = false;
+            }
+            if (bVar4) {
+                anm_init(i_this, 57, 3.0f, 2, 1.0f);
+                i_this->field_0x0c44[0] = 20;
+                i_this->field_0x05bc = 5;
+            }
+            break;
+        case 5:
+            if (i_this->field_0x0c44[0] == 0) {
+                anm_init(i_this, 58, 3.0f, 0, 1.0f);
+                i_this->field_0x05bc = 6;
+                i_this->field_0x0c44[0] = 15;
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_ATTACK02C, -1);
+            }
+            break;
+        case 6:
+            if (i_this->field_0x0c44[0] == 1) {
+                i_this->field_0x1e50.y = i_this->shape_angle.y + 0x4000;
+                i_this->field_0x1e50.x = 0;
+                i_this->field_0x1e0f = 2;
+                i_this->field_0x1e4c = 40.0f;
+                i_this->field_0x1e0e = 0;
+            }
+
+            bVar4 = true;
+            if (i_this->mpModelMorf->isStop()) {
+                bVar4 = false;
+            }
+
+            if (bVar4) {
+                i_this->field_0x05bc = 2;
+                fVar19 = cM_rndF(100.0f);
+                local_a0 = (long)(int)(fVar19 + 100.0f);
+                i_this->field_0x0c44[2] = (s16)(int)(fVar19 + 100.0f);
+            }
+            break;
+        case 7:
+            if (i_this->mHorseAnmID != 9) {
+                h_anm_init(i_this, 9, 5.0f, 2, 1.0f);
+            }
+            anm_init(i_this, 60, 1.0f, 0, 1.0f);
+            i_this->field_0x05bc = 8;
+            i_this->field_0x0c44[0] = 300;
+        case 8:
+            i_this->field_0x1e08 = 10;
+            bVar4 = true;
+            if (i_this->mpModelMorf->isStop()) {
+                bVar4 = false;
+            }
+
+            if (bVar4) {
+                anm_init(i_this, 61, 2.0f, 2, 1.0f);
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_DAMAGE01, -1);
+                i_this->field_0x05bc = 9;
+            }
+            break;
+        case 9:
+            i_this->field_0x1e08 = 10;
+            if (i_this->field_0x0c44[0] == 0) {
+                anm_init(i_this, 72, 3.0f, 0, 1.0f);
+                i_this->field_0x05bc = 10;
+            }
+            break;
+        case 10:
+            i_this->field_0x0c58 = 10;
+            bVar4 = true;
+            if (i_this->mpModelMorf->isStop()) {
+                bVar4 = false;
+            }
+
+            if (bVar4) {
+                i_this->field_0x05bc = 0;
+            }
+            break;
+        case 11:
+            if (sVar11 < 1) {
+                anm_init(i_this, 63, 2.0f, 0, 1.0f);
+            } else {
+                anm_init(i_this, 62, 2.0f, 0, 1.0f);
+            }
+            i_this->field_0x05bc = 12;
+        case 12:
+            i_this->field_0x0c58 = 10;
+            bVar4 = true;
+            if (i_this->mpModelMorf->isStop()) {
+                bVar4 = false;
+            }
+
+            if (bVar4) {
+                i_this->field_0x05bc = 0;
+            }
+            break;
+        case 20:
+            fVar1 = 2.0f;
+            if (i_this->field_0x0c44[0] == 0) {
+                i_this->field_0x05bc = 21;
+                anm_init(i_this, 59, 3.0f, 0, 1.0f);
+                h_anm_init(i_this, 14, 3.0f, 0, 1.0f);
+            }
+
+            i_this->field_0x0c6a = 1;
+            fVar20 = fVar18;
+            break;
+        case 21:
+            fVar1 = 2.0f;
+            if (i_this->speedF > 15.0f) {
+                i_this->field_0x0c6a = 2;
+                i_this->mZ2Creature.startCreatureSoundLevel(Z2SE_EN_HG_SLIP, 0, -1);
+            }
+
+            if (i_this->speedF < 2.0f) {
+                i_this->mActionID = 2; // ACT_HWAIT_2
+                i_this->field_0x05bc = 0;
+            }
+    }
+
+    if (i_this->field_0x05bc < 20) {
+        // Some sort of cXyz - operator
+        // Some sort of cXyz = operator
+        fVar19 = JMAFastSqrt(local_f8.x * local_f8.x + local_f8.z + local_f8.z);
+        if (fVar19 < 800.0f) {
+            // Some sort of cXyz - operator
+            // Some sort of cXyz = operator
+            iVar13 = cM_atan2s(local_104.x, local_104.z);
+            sVar11 = i_this->current.angle.y - (s16)iVar13;
+            if (sVar11 < 0x4000 && sVar11 > -0x4000) {
+                i_this->field_0x0c64 = 1;
+            } else {
+                i_this->field_0x0c64 = -1;
+            }
+            i_this->field_0x0c60 = i_this->field_0x0c60 + i_this->field_0x0c64;
+            i_this->field_0x0c60 = i_this->field_0x0c60 & 7;
+            bVar3 = true;
+            i_this->field_0x0c68 = 0;
+        }
+
+        iVar13 = cM_atan2s(local_b0.x, local_b0.z);
+        i_this->field_0x05cc = (s16)iVar13;
+        if (i_this->field_0x1e0a != 0 && i_this->field_0x05bc < 3) {
+            fVar20 = (fVar19 - 800.0f) * 2.0f;
+            fVar19 = 7000.0f;
+            if (fVar20 <= 7000.0f && fVar19 < 0.0f) {
+                fVar19 = 0.0f;
+            }
+
+            i_this->field_0x0c90 = i_this->field_0x0c90 + i_this->field_0x0c92;
+            if ((i_this->field_0x0afc & 63U) == 0) {
+                fVar20 = cM_rndF(600.0f);
+                i_this->field_0x0c92 = (s16)(int)(fVar20 + 300.0f);
+            }
+
+            fVar20 = cM_ssin((s16)i_this->field_0x0c90);
+            i_this->field_0x05cc = i_this->field_0x05cc + (fVar19 * fVar20);
+        }
+
+        if (i_this->field_0x0c72 != 0) {
+            i_this->field_0x05cc = i_this->field_0x0c74;
+        }
+
+        if (i_this->field_0x1e08 != 0) {
+            i_this->field_0x0c68 = 128;
+        }
+
+        cLib_addCalcAngleS2(&i_this->current.angle.y, i_this->field_0x05cc, 8, i_this->field_0x0c68);
+        if (i_this->field_0x0c76 != 0) {
+            sVar15 = 0x100;
+        }
+
+        cLib_addCalcAngleS2(&i_this->field_0x0c68, 0x400, 1, sVar15);
+        if (i_this->field_0x1e08 == 0) {
+            if (bVar8) {
+                fVar19 = player->speedF;
+                fVar20 = l_HIO[10]; // Not sure if l_HIO usage is correct
+                if (fVar19 <= fVar20 && fVar19 <= l_HIO[12]) {
+                    fVar20 = l_HIO[10];
+                }
+
+                if (fopAcM_searchActorDistanceXZ((fopAc_ac_c*)i_this, player) < 2000.0f) {
+                    fVar20 = fVar20 * 1.2f;
+                }
+
+                fVar2 = i_this->speedF;
+                if (l_HIO[12] <= fVar2) {
+                    fVar1 = 2.0f;
+                } else {
+                    fVar1 = 2.5f;
+                }
+                
+                fVar2 = fVar2 / 40.0f;
+            } else {
+                fVar1 = 2.0f;
+                fVar20 = l_HIO[12];
+            }
+        } else {
+            fVar1 = 0.5f;
+            fVar20 = l_HIO[24];
+        }
+    }
+
+    if (fVar2 < 1.0f) {
+        fVar2 = 1.0f;
+    }
+
+    if (fVar2 > 1.3f) {
+        fVar2 = 1.3f;
+    }
+
+    cLib_addCalc2(&i_this->speedF, fVar20, 1.0f, fVar1);
+    if (fVar20 > 10.0f) {
+        sVar12 = (i_this->current.angle.y - sVar12) * -8;
+        if (sVar12 < 0x7d1) {
+            if (sVar12 < -2000) {
+                sVar12 = -2000;
+            }
+        } else {
+            sVar12 = 2000;
+        }
+        cLib_addCalcAngleS2((s16 *)&i_this->field_0x0c5c, sVar12, 4, 0x300);
+    }
+
+    if (i_this->mAnmID == 73) {
+        i_this->mpModelMorf->setPlaySpeed(i_this->field_0x0760);
+        i_this->mpHorseMorf->setPlaySpeed(i_this->field_0x0760);
+    }
+
+    cLib_addCalc2(&i_this->field_0x0760, fVar2, 1.0f, 0.1f);
+    if (bVar3) {
+        local_b0.x = 0.0f;
+        local_b0.y = 1000.0f;
+        iVar16 = 0;
+        iVar13 = 0;
+        sVar12 = 0;
+        for (int i = 0; i < 8; i++) {
+            cMtx_YrotS(*calc_mtx, (int)(short)(i << 13));
+            local_b0.z = cM_rndF(3000.0f);
+            local_b0.z = local_b0.z + 12000.0f;
+            MtxPosition(&local_b0, &local_bc);
+            local_bc.x = local_bc.x + -2989.0f;
+            local_bc.z = local_bc.z + 1364.0f;
+            // Something with b_path
+            iVar16++;
+            iVar13 += 12;
+            sVar12 += 0x2000;
+        }
+    }
+    return;
 }
 
 /* ############################################################################################## */
@@ -2902,10 +3334,10 @@ daB_GND_HIO_c::~daB_GND_HIO_c() {
     // NONMATCHING
 }
 
-/* 80602278-806022F0 00D918 0078+00 0/0 1/0 0/0 .text            __sinit_d_a_b_gnd_cpp */
-void __sinit_d_a_b_gnd_cpp() {
-    // NONMATCHING
-}
+// /* 80602278-806022F0 00D918 0078+00 0/0 1/0 0/0 .text            __sinit_d_a_b_gnd_cpp */
+// void __sinit_d_a_b_gnd_cpp() {
+    
+// }
 
 #pragma push
 #pragma force_active on

@@ -135,7 +135,8 @@ public:
     /* 0x1E98 */ cXyz field_0x1e98[5];
     /* 0x1ED4 */ cXyz field_0x1ed4[5];
     /* 0x1F10 */ Z2SoundObjSimple field_0x1f10[5];
-    /* 0x1FB0 */ u8 field_0x1FB0[0x1FB4 - 0x1FB0];
+    /* 0x1FB0 */ u8 mInitHIO;
+    /* 0x1FB0 */ u8 field_0x1FB1[0x1FB4 - 0x1FB1];
     /* 0x1FB4 */ fopAc_ac_c* mMantChild;
     /* 0x1FB8 */ cXyz field_0x1fb8;
     /* 0x1FC4 */ int field_0x1fc4;

@@ -9,6 +9,7 @@
 #include "d/actor/d_a_horse.h"
 #include "dol2asm.h"
 #include "d/d_camera.h"
+#include "d/d_s_play.h"
 
 // #define ACTION_HWAIT_2    2
 // #define ACTION_HRUN_P     4
@@ -24,6 +25,8 @@ enum daB_GND_ACTION {
     ACTION_ATTACK = 11,
     ACTION_JUMP = 13,
     ACTION_TUBA = 19,
+    ACTION_DAMAGE = 20,
+    ACTION_DOWN = 21,
     ACTION_END = 22,
 };
 
@@ -3162,11 +3165,88 @@ static void b_gnd_g_down(b_gnd_class* i_this) {
 /* 805F98A0-805F98F8 004F40 0058+00 1/1 0/0 0/0 .text            b_gnd_g_end__FP11b_gnd_class */
 static void b_gnd_g_end(b_gnd_class* i_this) {
     // NONMATCHING
+    i_this->field_0x0c58 = 10;
+    b_gnd_class* actor = (b_gnd_class*)fopAcM_SearchByID(i_this->mMantChild);
+    // *(undefined1 *)((int)&actor[1].field249_0x1174[0].mBase.mGObjAt.mBase.mHitCallback + 1) = 1; - ???
 }
 
 /* 805F98F8-805F9BE4 004F98 02EC+00 1/1 0/0 0/0 .text            damage_check__FP11b_gnd_class */
 static void damage_check(b_gnd_class* i_this) {
     // NONMATCHING
+    bool bVar1;
+    cXyz cStack_44;
+    daPy_py_c* player = daPy_getPlayerActorClass();
+    i_this->field_0x1654.Move();
+    if (i_this->field_0x1e09 != 0) {
+        i_this->field_0x1e09 -= 1;
+    }
+
+    if (i_this->field_0x0c58 == 0) {
+        b_gnd_class* actor = (b_gnd_class*)fopAcM_SearchByID(i_this->mMantChild);
+        for (int i = 0; i < 3; i++) {
+            if (i_this->field_0x1690[0].ChkTgHit()) {
+                i_this->mAtInfo.mpCollider = i_this->field_0x1690[0].GetTgHitObj();
+                cc_at_check((fopAc_ac_c*)i_this, &i_this->mAtInfo);
+                if (i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
+                    actor->field_0x1174[0].GetObjAt().SetSPrm(0x3fa66666);
+                    i_this->field_0x0c58 = 6;
+                    i_this->mZ2Creature.startCreatureSound(Z2SE_EN_GND_MANTEAU, 0, -1);
+                    return;
+                }
+
+                bVar1 = i_this->field_0x1e09 != 0;
+                if (i_this->health < 0 || 3 < i_this->field_0x1e0a && 4 < player->getCutCount()) {
+                    bVar1 = true;
+                } else {
+                    i_this->mActionID = ACTION_DAMAGE;
+                    i_this->field_0x05bc = 0;
+                    i_this->field_0x2698 = 1;
+                    if (i_this->mAtInfo.mHitStatus == 0) {
+                        actor->field_0x1174[0].SetAtSPrm(3);
+                    } else {
+                        actor->field_0x1174[0].SetAtSPrm(2);
+                    }
+
+                    if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
+                        i_this->field_0x0c58 = 3;
+                        i_this->field_0x1e09 = 10;
+                    } else {
+                        i_this->field_0x0c58 = 10;
+                        i_this->field_0x1e0a += 1;
+                        if (i_this->field_0x0c7c == 0 && 3 < i_this->field_0x1e0a) {
+                            i_this->field_0x0c58 = 100;
+                        }
+                    }
+                }
+
+                cXyz local_38;
+                local_38.setall(1.0f);
+                u8 uVar1 = 1;
+                if (bVar1) {
+                    uVar1 = 3;
+                }
+                
+                PSMTXCopy(i_this->mpModelMorf->getModel()->getAnmMtx(2), *calc_mtx);
+                cXyz local_50;
+                local_50.x = cM_rndFX(10.0f);
+                local_50.y = cM_rndFX(10.0f) + 50.0f;
+                local_50.z = cM_rndFX(10.0f);
+                MtxPosition(&local_50, &cStack_44);
+                dComIfGp_setHitMark(uVar1, (fopAc_ac_c*)i_this, &cStack_44, NULL, &local_38, 0);
+                if (!bVar1) {
+                    return;
+                }
+
+                i_this->mActionID = ACTION_DOWN;
+                i_this->field_0x05bc = 0;
+                i_this->field_0x0c58 = 10;
+                i_this->field_0x0c7c = 0;
+                dScnPly_c::setPauseTimer(7);
+                i_this->health = 100;
+                return;
+            }
+        }
+    }
 }
 
 /* 805F9BE4-805FA2FC 005284 0718+00 1/1 0/0 0/0 .text            eff_set_h__FP11b_gnd_class */

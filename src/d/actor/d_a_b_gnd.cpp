@@ -19,11 +19,17 @@
 // #define ACTION_TUBA       19
 
 enum daB_GND_ACTION {
+    ACTION_HWAIT_1 = 1,
     ACTION_HWAIT_2 = 2,
+    ACTION_HRUN_A = 3,
     ACTION_HRUN_P = 4,
+    ACTION_HJUMP = 5,
+    ACTION_HEND = 6,
     ACTION_WAIT = 10,
     ACTION_ATTACK = 11,
+    ACTION_DEFENCE = 12,
     ACTION_JUMP = 13,
+    ACTION_SIDE = 14,
     ACTION_TUBA = 19,
     ACTION_DAMAGE = 20,
     ACTION_DOWN = 21,
@@ -3286,29 +3292,229 @@ static void eff_set(b_gnd_class* i_this) {
 }
 
 /* 805FA3E4-805FA430 005A84 004C+00 2/2 0/0 0/0 .text            s_fkdel_sub__FPvPv */
-static int s_fkdel_sub(void* param_1, void* param_2) { // Unused second parameter necessary for matching
+static void* s_fkdel_sub(void* param_1, void* param_2) { // Unused second parameter necessary for matching
     if (fopAc_IsActor(param_1) && fopAcM_GetName(param_1) == 486) {
         fopAcM_delete((fopAc_ac_c*)param_1);
     }
-    return 0;
+    return NULL;
 }
 
 /* 805FA430-805FA47C 005AD0 004C+00 1/1 0/0 0/0 .text            s_objgbdel_sub__FPvPv */
-static int s_objgbdel_sub(void* param_1, void* param_2) { // Unused second parameter necessary for matching
+static void* s_objgbdel_sub(void* param_1, void* param_2) { // Unused second parameter necessary for matching
     if (fopAc_IsActor(param_1) && fopAcM_GetName(param_1) == 45) {
         fopAcM_delete((fopAc_ac_c*)param_1);
     }
-    return 0;
+    return NULL;
 }
 
 /* 805FA47C-805FA758 005B1C 02DC+00 1/1 0/0 0/0 .text            h_damage_check__FP11b_gnd_class */
-static void h_damage_check(b_gnd_class* param_0) {
+static void h_damage_check(b_gnd_class* i_this) {
     // NONMATCHING
+    BOOL bVar1;
+    daPy_py_c* player = daPy_getPlayerActorClass();
+    u16 uVar1;
+    cXyz local_44;
+    cXyz cStack_38;
+    cXyz local_2c;
+    i_this->field_0x1654.Move();
+    if (i_this->field_0x0c58 == 0) {
+        b_gnd_class* actor = (b_gnd_class*)fopAcM_SearchByID(i_this->mMantChild);
+        for (int i = 0; i < 3; i++) {
+            if (actor->field_0x1690[i].ChkTgHit()) {
+                i_this->mAtInfo.mpCollider = actor->field_0x1690[i].GetTgHitObj();
+                cc_at_check((fopAc_ac_c*)i_this, &i_this->mAtInfo);
+                i_this->field_0x0c58 = 10;
+                if (i_this->field_0x1e08 != 0) {
+                    i_this->field_0x1e08 += 1;
+                    actor->field_0x1174[0].SetAtSPrm(1);
+                    i_this->field_0x0c58 = 30;
+                    if (i_this->health < 1) {
+                        i_this->mActionID = ACTION_HEND;
+                        i_this->field_0x05bc = 0;
+                        fpcM_Search(s_fkdel_sub, i_this);
+                        i_this->field_0x1e0a = 0;
+                    } else {
+                        i_this->field_0x05bc = 11;
+                    }
+
+                    bVar1 = true;
+                    break;
+                }
+
+                if (i_this->mAtInfo.mpCollider->GetObjTg().getRPrm() == 4) {
+                    if (i_this->field_0x1e0f == 1) {
+                        i_this->field_0x1e0f = 0;
+                        i_this->field_0x1e10 = 0.0f;
+                    }
+
+                    i_this->mActionID = ACTION_HRUN_A;
+                    i_this->field_0x05bc = 7;
+                    bVar1 = true;
+                    break;
+                }
+            }
+        }
+
+        if (!bVar1) {
+            for (int i = 0; i < 2; i++) {
+                if (actor->field_0x1690[i].ChkTgHit()) {
+                    i_this->mAtInfo.mpCollider = actor->field_0x1690[i].GetTgHitObj();
+                    actor->field_0x1690[i].ClrTgHit();
+                    if (i_this->field_0x1fc4 != 0 && i_this->field_0x1e08 == 0 &&
+                        i_this->mAtInfo.mpCollider->GetObjTg().getRPrm() == 4) {
+                            i_this->field_0x0c58 = 10;
+                            if (i_this->field_0x1e0f == 1) {
+                                i_this->field_0x1e0f = 0;
+                                i_this->field_0x1e10 = 0.0f;
+                            }
+
+                            i_this->mActionID = ACTION_HRUN_A;
+                            i_this->field_0x05bc = 7;
+                            bVar1 = true;
+                            break;
+                        }
+                }
+            }
+        }
+
+        if (bVar1) {
+            local_2c.x = 1.0f;
+            local_2c.y = 1.0f;
+            local_2c.z = 1.0f;
+            if (i_this->mAtInfo.mHitStatus != 0) {
+                uVar1 = 3;
+            } else {
+                uVar1 = 1;
+            }
+
+            PSMTXCopy(i_this->mpModelMorf->getModel()->getAnmMtx(2), *calc_mtx);
+            local_44.x = cM_rndFX(10.0f);
+            local_44.y = cM_rndFX(10.0f) + 50.0f;
+            local_44.z = cM_rndFX(10.0f);
+            MtxPosition(&local_44, &cStack_38);
+            dComIfGp_setHitMark(uVar1, (fopAc_ac_c*)i_this, &cStack_38, NULL, &local_2c, 0);
+        }
+    }
 }
 
 /* 805FA758-805FAFF0 005DF8 0898+00 2/1 0/0 0/0 .text            action__FP11b_gnd_class */
-static void action(b_gnd_class* param_0) {
+static void action(b_gnd_class* i_this) {
     // NONMATCHING
+    base_process_class* process;
+    daPy_py_c* player = daPy_getPlayerActorClass();
+    char cVar1;
+    char cVar2;
+    f32 distanceFromPlayer = fopAcM_searchActorDistanceXZ(i_this, player);
+    i_this->field_0x0c38 = distanceFromPlayer;
+    s16 actorAngle = fopAcM_searchPlayerAngleY(i_this);
+    cXyz cStack_5c;
+    i_this->field_0x0c3c = actorAngle;
+    if (i_this->field_0x1e08 != 0) {
+        i_this->field_0x1e08 += 1;
+    }
+
+    int iVar1 = 1;
+    bool bVar2 = false;
+    b_gnd_class* pbVar8 = NULL;
+    bool bVar1 = true;
+    i_this->field_0x0c7d = 1;
+    i_this->field_0x2740 = 0;
+
+    switch (i_this->mActionID) {
+        case ACTION_HWAIT_1:
+            b_gnd_h_wait(i_this);
+            break;
+        case ACTION_HWAIT_2:
+            b_gnd_h_wait2(i_this);
+            break;
+        case ACTION_HRUN_A:
+            b_gnd_h_run_a(i_this);
+            bVar2 = true;
+            break;
+        case ACTION_HRUN_P:
+            b_gnd_h_run_p(i_this);
+            bVar2 = true;
+            break;
+        case ACTION_HJUMP:
+            b_gnd_h_jump(i_this);
+            break;
+        case ACTION_HEND:
+            b_gnd_h_end(i_this);
+            bVar1 = false;
+            iVar1 = 0;
+            i_this->field_0x0c7d = 0;
+            break;
+        case ACTION_WAIT:
+            b_gnd_g_wait(i_this);
+            pbVar8 = i_this; // pbVar8 = (b_gnd_class *)&DAT_00000001; - ???
+            break;
+        case ACTION_ATTACK:
+            pbVar8 = i_this;
+            b_gnd_g_attack(i_this);
+            break;
+        case ACTION_DEFENCE:
+            b_gnd_g_defence(i_this);
+            break;
+        case ACTION_JUMP:
+            iVar1 = b_gnd_g_jump(i_this);
+            bVar1 = false;
+            break;
+        case ACTION_SIDE:
+            b_gnd_g_side(i_this);
+            bVar1 = false;
+            break;
+        case ACTION_TUBA:
+            b_gnd_g_tuba(i_this);
+            break;
+        case ACTION_DAMAGE:
+            b_gnd_g_damage(i_this);
+            i_this->field_0x0c7d = 0;
+            break;
+        case ACTION_DOWN:
+            b_gnd_g_down(i_this);
+            bVar1 = false;
+            i_this->field_0x0c7d = 0;
+            break;
+        case ACTION_END:
+            b_gnd_g_end(i_this);
+            bVar1 = false;
+            i_this->field_0x0c7d = 0;
+    }
+
+    i_this->mZ2Creature.setLinkSearch(true);
+    if (iVar1 == 0) {
+        i_this->actor_status = i_this->actor_status;
+        i_this->attention_info.flags = 0;
+    } else {
+        i_this->attention_info.flags = 4;
+    }
+
+    if (i_this->field_0x1fc4 == 0) {
+        bVar2 = player->checkMasterSwordEquip();
+        if (!bVar2) {
+            i_this->field_0x0c58 = 10;
+        }
+
+        if (i_this->field_0x0c5a != 0) {
+            pbVar8 = NULL;
+        }
+
+        if (pbVar8) {
+            process = fpcM_Search(shot_s_sub, i_this);
+            cVar1 = process != NULL;
+            if (player->checkHookshotShootReturnMode() && player->checkHookshotReturnMode()) {
+                cVar1 = 2;
+            }
+
+            cXyz* ppos = player->getIronBallCenterPos();
+            if (ppos != NULL) {
+                // cStack_5c = player->current.pos - ppos;
+                if (ppos->absXZ(player->current.pos) > 300.0f) {
+                    bVar2 = true;
+                }
+            }
+        }
+    }
 }
 
 /* 805FAFF0-805FB0F0 006690 0100+00 1/1 0/0 0/0 .text            ball_bg_check__FP11b_gnd_classi */

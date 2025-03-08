@@ -10,6 +10,8 @@
 #include "dol2asm.h"
 #include "d/d_camera.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_msg_mng.h"
+#include "m_Do/m_Do_graphic.h"
 
 // #define ACTION_HWAIT_2    2
 // #define ACTION_HRUN_P     4
@@ -3401,6 +3403,12 @@ static void h_damage_check(b_gnd_class* i_this) {
 static void action(b_gnd_class* i_this) {
     // NONMATCHING
     base_process_class* process;
+    cXyz local_80;
+    cXyz local_74;
+    cXyz cStack_68;
+    f32 local_50;
+    f32 local_4c;
+    f32 local_48;
     daPy_py_c* player = daPy_getPlayerActorClass();
     char cVar1;
     char cVar2;
@@ -3408,15 +3416,18 @@ static void action(b_gnd_class* i_this) {
     i_this->field_0x0c38 = distanceFromPlayer;
     s16 actorAngle = fopAcM_searchPlayerAngleY(i_this);
     cXyz cStack_5c;
+    f32 fVar13;
+    BOOL isMasterSwordEquipped = FALSE;
     i_this->field_0x0c3c = actorAngle;
     if (i_this->field_0x1e08 != 0) {
         i_this->field_0x1e08 += 1;
     }
 
     int iVar1 = 1;
-    bool bVar2 = false;
     b_gnd_class* pbVar8 = NULL;
-    bool bVar1 = true;
+    BOOL bVar1 = TRUE;
+    s16 sVar4;
+    s16 sVar5;
     i_this->field_0x0c7d = 1;
     i_this->field_0x2740 = 0;
 
@@ -3429,18 +3440,18 @@ static void action(b_gnd_class* i_this) {
             break;
         case ACTION_HRUN_A:
             b_gnd_h_run_a(i_this);
-            bVar2 = true;
+            isMasterSwordEquipped = true;
             break;
         case ACTION_HRUN_P:
             b_gnd_h_run_p(i_this);
-            bVar2 = true;
+            isMasterSwordEquipped = true;
             break;
         case ACTION_HJUMP:
             b_gnd_h_jump(i_this);
             break;
         case ACTION_HEND:
             b_gnd_h_end(i_this);
-            bVar1 = false;
+            bVar1 = FALSE;
             iVar1 = 0;
             i_this->field_0x0c7d = 0;
             break;
@@ -3457,11 +3468,11 @@ static void action(b_gnd_class* i_this) {
             break;
         case ACTION_JUMP:
             iVar1 = b_gnd_g_jump(i_this);
-            bVar1 = false;
+            bVar1 = FALSE;
             break;
         case ACTION_SIDE:
             b_gnd_g_side(i_this);
-            bVar1 = false;
+            bVar1 = FALSE;
             break;
         case ACTION_TUBA:
             b_gnd_g_tuba(i_this);
@@ -3472,12 +3483,12 @@ static void action(b_gnd_class* i_this) {
             break;
         case ACTION_DOWN:
             b_gnd_g_down(i_this);
-            bVar1 = false;
+            bVar1 = FALSE;
             i_this->field_0x0c7d = 0;
             break;
         case ACTION_END:
             b_gnd_g_end(i_this);
-            bVar1 = false;
+            bVar1 = FALSE;
             i_this->field_0x0c7d = 0;
     }
 
@@ -3490,8 +3501,8 @@ static void action(b_gnd_class* i_this) {
     }
 
     if (i_this->field_0x1fc4 == 0) {
-        bVar2 = player->checkMasterSwordEquip();
-        if (!bVar2) {
+        isMasterSwordEquipped = player->checkMasterSwordEquip();
+        if (!isMasterSwordEquipped) {
             i_this->field_0x0c58 = 10;
         }
 
@@ -3509,12 +3520,115 @@ static void action(b_gnd_class* i_this) {
             cXyz* ppos = player->getIronBallCenterPos();
             if (ppos != NULL) {
                 // cStack_5c = player->current.pos - ppos;
-                if (ppos->absXZ(player->current.pos) > 300.0f) {
-                    bVar2 = true;
+                fVar13 = ppos->absXZ(player->current.pos);
+                if (fVar13 > 300.0f) {
+                    isMasterSwordEquipped = TRUE;
                 }
+
+            //     if ((((fVar3 < 400.0) &&
+            //     ((d_com_inf_game::g_dComIfG_gameInfo.play.mPlayerStatus[0] & 0x400) == 0)) &&
+            //    (cVar9 = (*(code *)(((d_com_inf_game::g_dComIfG_gameInfo.play.mPlayer)->base).vtable )
+            //                       ->checkIronBallReturn)(), cVar9 == '\0')) &&
+            //   (cVar9 = (*(code *)(((d_com_inf_game::g_dComIfG_gameInfo.play.mPlayer)->base).vtable) ->
+            //                      checkIronBallGroundStop)(), cVar9 == '\0')) {
+            //  cVar12 = '\x02';
+            // }
+            }
+
+            fVar13 = 0.0f;
+            if (player->mCutType == daPy_py_c::CUT_TYPE_LARGE_TURN_RIGHT || player->mCutType == daPy_py_c::CUT_TYPE_LARGE_TURN_LEFT) {
+                fVar13 = 150.0f;
+            }
+
+            u16 uVar7 = cc_pl_cut_bit_get();
+            if (uVar7 == 0) {
+                uVar7 = player->mCutType;
+            }
+
+            if (uVar7 == 0x400 || (uVar7 == 0x100 && player->speed.y > 5.0f)) {
+                uVar7 = 0;
+            }
+
+            if (fopAcM_plAngleCheck((fopAc_ac_c*)i_this, 0x4000) == 0) {
+                uVar7 = 0;
+            }
+
+            isMasterSwordEquipped = player->checkMasterSwordEquip();
+            if (!isMasterSwordEquipped) {
+                uVar7 = 0;
+            }
+
+            if (uVar7 != 0) {
+
             }
         }
+    } else if (isMasterSwordEquipped && saku_jump_check(i_this) != 0) {
+        i_this->field_0x0b00 = i_this->mActionID;
+        i_this->mActionID = ACTION_HJUMP;
+        i_this->field_0x05bc = 0;
     }
+
+    sVar4 = 0;
+    sVar5 = 0;
+    if (i_this->field_0x0c7d != 0) {
+        if (i_this->field_0x0c7d == 1) {
+            local_74 = player->eyePos - i_this->current.pos;
+            local_50 = local_74.x;
+            local_4c = local_74.y;
+            local_48 = local_74.z;
+        } else {
+            local_80 = i_this->field_0x0c80 - i_this->current.pos;
+            local_50 = local_80.x;
+            local_4c = local_80.y;
+            local_48 - local_80.z;
+        }
+
+        if (i_this->field_0x1fc4 == 0) {
+            local_4c += -200.0f;
+        } else {
+            local_4c += -450.0f;
+        }
+
+        sVar4 = cM_atan2s(local_50, local_48) - i_this->shape_angle.y;
+        f32 fVar12 = JMAFastSqrt(local_50 * local_50 + local_48 * local_48);
+        sVar5 = i_this->shape_angle.x + cM_atan2s(local_4c, fVar12);
+        if (sVar4 < 0x2af9) {
+            if (sVar4 < -11000) {
+                sVar4 = -11000;
+            }
+        } else {
+            sVar4 = 11000;
+        }
+
+        if (sVar5 < 0xbb9) {
+            if (sVar5 < -3000) {
+                sVar5 = -3000;
+            }
+        } else {
+            sVar5 = 3000;
+        }
+    }
+
+    cLib_addCalcAngleS2(&i_this->field_0x0c8c, sVar4, 2, 0x1000);
+    cLib_addCalcAngleS2(&i_this->field_0x0c8e, sVar5, 2, 0x1000);
+
+    if (bVar1) {
+        cLib_addCalcAngleS2(&i_this->shape_angle.y, i_this->current.angle.y, 2, 0x1000);
+    }
+
+    if (i_this->field_0x0c70 == 0) {
+        i_this->field_0x0c6c = 0.0f;
+        i_this->field_0x0c70 = (s16)(cM_rndF(200.0f) + 200.0f);
+    } else {
+        i_this->field_0x0c70 += -1;
+        i_this->field_0x0c6c = (f32)i_this->field_0x0c70;
+        if (i_this->field_0x0c6c > 7.0f) {
+            i_this->field_0x0c6c = 0.0f;
+        }
+    }
+
+    cLib_addCalcAngleS2(&i_this->field_0x26c0, i_this->field_0x26c2, 2, 0x600);
+    i_this->field_0x26c2 = 0;
 }
 
 /* 805FAFF0-805FB0F0 006690 0100+00 1/1 0/0 0/0 .text            ball_bg_check__FP11b_gnd_classi */
@@ -3536,42 +3650,172 @@ static BOOL ball_bg_check(b_gnd_class* i_this, int param_1) {
 }
 
 /* ############################################################################################## */
-/* 806027A8-806027AC 000144 0004+00 0/0 0/0 0/0 .rodata          @6508 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_6508 = 380.0f;
-COMPILER_STRIP_GATE(0x806027A8, &lit_6508);
-#pragma pop
+// /* 806027A8-806027AC 000144 0004+00 0/0 0/0 0/0 .rodata          @6508 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_6508 = 380.0f;
+// COMPILER_STRIP_GATE(0x806027A8, &lit_6508);
+// #pragma pop
 
-/* 806027AC-806027B0 000148 0004+00 0/0 0/0 0/0 .rodata          @6509 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_6509 = -450.0f;
-COMPILER_STRIP_GATE(0x806027AC, &lit_6509);
-#pragma pop
+// /* 806027AC-806027B0 000148 0004+00 0/0 0/0 0/0 .rodata          @6509 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_6509 = -450.0f;
+// COMPILER_STRIP_GATE(0x806027AC, &lit_6509);
+// #pragma pop
 
-/* 806027B0-806027B4 00014C 0004+00 0/2 0/0 0/0 .rodata          @6510 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_6510 = 7.0f;
-COMPILER_STRIP_GATE(0x806027B0, &lit_6510);
-#pragma pop
+// /* 806027B0-806027B4 00014C 0004+00 0/2 0/0 0/0 .rodata          @6510 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_6510 = 7.0f;
+// COMPILER_STRIP_GATE(0x806027B0, &lit_6510);
+// #pragma pop
 
-/* 806027B4-806027B8 000150 0004+00 0/1 0/0 0/0 .rodata          @6631 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_6631 = 2.0f / 5.0f;
-COMPILER_STRIP_GATE(0x806027B4, &lit_6631);
-#pragma pop
+// /* 806027B4-806027B8 000150 0004+00 0/1 0/0 0/0 .rodata          @6631 */
+// #pragma push
+// #pragma force_active on
+// SECTION_RODATA static f32 const lit_6631 = 2.0f / 5.0f;
+// COMPILER_STRIP_GATE(0x806027B4, &lit_6631);
+// #pragma pop
 
 /* 805FB0F0-805FB414 006790 0324+00 1/1 0/0 0/0 .text himo_control1__FP11b_gnd_classP4cXyziSc */
-static void himo_control1(b_gnd_class* param_0, cXyz* param_1, int param_2, s8 param_3) {
+static void himo_control1(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 param_4) {
     // NONMATCHING
+    f32 fVar1;
+    f32 y;
+    f32 x;
+    int iVar2;
+    int iVar3;
+    g_himo_s *pgVar4;
+    g_himo_s *pgVar5 = &i_this->field_0x1ff0[param_3];
+    int iVar6;
+    int iVar7;
+    f32 dVar8;
+    cXyz local_c8;
+    cXyz local_bc;
+    f32 local_b0;
+    f32 local_ac;
+    f32 local_a8;
+    cXyz local_a4;
+    cXyz local_98;
+    cXyz local_8c;
+
+    pgVar5->field_0x0[0].x = param_2->x;
+    pgVar5->field_0x0[0].y = param_2->y;
+    pgVar5->field_0x0[0].z = param_2->z;
+
+    cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+    cMtx_XrotS(*calc_mtx, i_this->shape_angle.x);
+
+    local_8c.x = 20.0f;
+    if (param_3 == 0) {
+        local_8c.x = -20.0f;
+    }
+    local_8c.y = 0.0f;
+    local_8c.z = 0.0f;
+    MtxPosition(&local_8c, &local_a4);
+
+    local_8c.x = 0.0f;
+    local_8c.y = i_this->field_0x1fd0;
+    local_8c.z = local_8c.y;
+    MtxPosition(&local_8c, &local_bc);
+
+    if (i_this->speedF <= 20.0f) {
+        local_8c.x = i_this->field_0x1fd0 * 0.1f;
+    } else {
+        local_8c.x = i_this->field_0x1fd0 * 0.4f;
+    }
+    if (param_3 == 0) {
+        local_8c *= -1.0f;
+    }
+    local_8c.y = 0.0f;
+    local_8c.z = 0.0f;
+    MtxPosition(&local_8c, &local_c8);
+
+    local_8c.x = 0.0f;
+    local_8c.y = 0.0f;
+    if (param_4 == 0) {
+        local_8c.z = 20.0f;
+    } else {
+        local_8c.z = 15.0f;
+    }
+    
+    for (int i = 1; i < 16; i++) {
+        // local_a8 = *(float *)((int)&JMath::sincosTable_[0].first + (i_this->field287_0x1fd4 + iVar7 & 0xfff8U)); - ???
+        local_b0 = local_bc.x * local_a8;
+        local_ac = local_bc.y * local_a8;
+        local_a8 = local_bc.z * local_a8;
+        fVar1 = local_c8.x + local_b0 + (pgVar4->field_0x0[0].x - pgVar5->field_0x0[0].x) + local_a4.x * 1.0f;
+        y = local_ac + ((pgVar5->field_0x0[1].y - pgVar5->field_0x0[0].y) - 20.0f);
+        x = local_c8.z + local_a8 + (pgVar5->field_0x0[1].z - pgVar5->field_0x0[0].z) + local_a4.z * 1.0f;
+        iVar2 = cM_atan2s(fVar1, x);
+        fVar1 = JMAFastSqrt(fVar1 * fVar1 + x * x);
+        iVar3 = cM_atan2s(y, fVar1);
+        cMtx_YrotS(*calc_mtx, (s16)iVar2);
+        cMtx_XrotM(*calc_mtx, (s16)iVar3);
+        MtxPosition(&local_8c, &local_98);
+        pgVar4->field_0x0[0].x = pgVar5->field_0x0[0].x + local_98.x;
+        pgVar5->field_0x0[1].y = pgVar5->field_0x0[0].y + local_98.y;
+        dVar8 = pgVar5->field_0x0[0].z;
+        pgVar5->field_0x0[1].z = dVar8 + local_98.z;
+    }
 }
 
 /* 805FB414-805FB620 006AB4 020C+00 1/1 0/0 0/0 .text himo_control2__FP11b_gnd_classP4cXyziSc */
-static void himo_control2(b_gnd_class* param_0, cXyz* param_1, int param_2, s8 param_3) {
+static void himo_control2(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 param_4) {
     // NONMATCHING
+    f32 fVar1;
+    f32 fVar2;
+    f32 fVar3;
+    cXyz *pcVar6;
+    g_himo_s *pgVar7;
+    cXyz local_88;
+    cXyz local_7c;
+
+    pgVar7 = &i_this->field_0x1ff0[param_3];
+    pgVar7->field_0x0[15].x = param_2->x;
+    pgVar7->field_0x0[15].y = param_2->y;
+    pgVar7->field_0x0[15].z = param_2->z;
+    local_7c.x = 0.0f;
+    local_7c.y = 0.0f;
+    if (param_4 == 0) {
+        local_7c.z = 20.0f;
+    } else {
+        local_7c.z = 15.0f;
+    }
+    pcVar6 = &pgVar7->field_0x0[14];
+
+    for (int i = 14; i > 0; i--) {
+        fVar3 = pcVar6->x - pcVar6[3].x;
+        fVar1 = pcVar6->y;
+        fVar2 = pcVar6[1].y;
+        f32 x = pcVar6->z - pcVar6[1].z;
+        u32 iVar4 = cM_atan2s(fVar3, x);
+        fVar3 = JMAFastSqrt(fVar3 * fVar3 + x * x);
+        u32 iVar5 = cM_atan2s(fVar1 - fVar2, fVar3);
+        cMtx_YrotS(*calc_mtx, iVar4);
+        cMtx_XrotM(*calc_mtx, iVar5);
+        MtxPosition(&local_88, &local_7c);
+
+        pcVar6->x = pcVar6[1].x + local_88.x;
+        pcVar6->y = pcVar6[1].y + local_88.y;
+        fVar1 = pcVar6[1].z;
+        pcVar6->z = fVar1 + local_88.z;
+    }
+
+    pcVar6 = i_this->field_0x2170[param_3].getPos(0);
+    for (int i = 0; i < 16; i++) {
+        pcVar6->x = pgVar7->field_0x0[0].x;
+        pcVar6->y = pgVar7->field_0x0[0].y;
+        pcVar6->z = pgVar7->field_0x0[0].z;
+        pcVar6 += 1;
+        pgVar7 += 1;
+    }
+
+    pcVar6 = i_this->field_0x2170[param_3].getPos(0);
+    pcVar6[param_3].x = i_this->field_0x1ff0[param_3].field_0x0[15].x;
+    pcVar6[param_3].y = i_this->field_0x1ff0[param_3].field_0x0[15].y;
+    pcVar6[param_3].z = i_this->field_0x1ff0[param_3].field_0x0[15].z;
 }
 
 /* 805FB620-805FB704 006CC0 00E4+00 1/1 0/0 0/0 .text            cam_3d_morf__FP11b_gnd_classf */
@@ -3607,8 +3851,875 @@ SECTION_DEAD static char const* const stringBase_806029C3 = "force_end";
 #pragma pop
 
 /* 805FB7A4-805FDAE0 006E44 233C+00 2/1 0/0 0/0 .text            demo_camera__FP11b_gnd_class */
-static void demo_camera(b_gnd_class* param_0) {
+static void demo_camera(b_gnd_class* i_this) {
     // NONMATCHING
+    short sVar1;
+    s16 sVar2;
+    BOOL bVar3;
+    daPy_py_c *pdVar8;
+    Mtx *src;
+    u32 uVar7;
+    BOOL bVar9;
+    int extraout_r4;
+    int extraout_r4_00;
+    int uVar10;
+    _GXColor *src_b;
+    _GXColor *extraout_r4_01;
+    int iVar11;
+    int iVar12;
+    u32 in_register_00004808;
+    f32 rndF32;
+    u32 local_124;
+    u32 local_120;
+    u32 local_11c;
+    u32 local_118;
+    u32 local_114;
+    u32 local_110;
+    u32 local_10c;
+    u32 local_108;
+    u32 local_104;
+    cXyz cStack_100;
+    cXyz cStack_f4;
+    cXyz cStack_e8;
+    cXyz cStack_dc;
+    cXyz cStack_d0;
+    cXyz cStack_c4;
+    cXyz cStack_b8;
+    cXyz cStack_ac;
+    cXyz cStack_a0;
+    cXyz cStack_94;
+    cXyz cStack_88;
+    cXyz cStack_7c;
+    cXyz cStack_70;
+    cXyz local_64;
+    cXyz cStack_58;
+    cXyz local_4c;
+    cXyz local_40;
+    double local_30;
+
+    daPy_py_c* player = daPy_getPlayerActorClass();
+    camera_class* camera1 = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
+    camera_class* camera2 = dComIfGp_getCamera(0);
+    b_gnd_class* actor = (b_gnd_class*)fopAcM_SearchByID(i_this->mMantChild);
+
+    daHorse_c* horseActor;
+    if (i_this->field_0x26c4 != 0) {
+        horseActor = dComIfGp_getHorseActor();
+    }
+
+    bVar3 = false;
+    switch (i_this->field_0x26c4) {
+        case 30:
+            if (i_this->eventInfo.checkCommandDemoAccrpt() == 0) {
+                fopAcM_orderPotentialEvent(i_this, 2, 0xffff, 0);
+                i_this->eventInfo.mCondition |= 2;
+                break;
+            }
+
+            camera1->mCamera.Stop();
+            i_this->field_0x26c4 = 31;
+            i_this->field_0x26c6 = 0;
+            i_this->field_0x2710.x = 55.0f;
+            horseActor->changeOriginalDemo();
+            player->changeOriginalDemo();
+            camera1->mCamera.SetTrimSize(3);
+            local_4c = i_this->current.pos;
+            local_4c.x -= 5000.0f;
+            horseActor->setHorsePosAndAngle(&local_4c, 1);
+            i_this->field_0x26ec.set(0.0f, 0.0f, 0.0f);
+            i_this->field_0x2704.set(0.0f, 0.0f, 0.0f);
+            i_this->field_0x0c44[9] = 0;
+            Z2GetAudioMgr()->setDemoName("force_start");
+            break;
+        case 31:
+        case 32:
+        case 33:
+            if (i_this->field_0x26c4 < 33) {
+                if (i_this->field_0x0c44[9] == 0) {
+                    rndF32 = cM_rndF(10.0f);
+                    i_this->field_0x0c44[9] = (s16)(rndF32 + 5.0f);
+                    rndF32 = cM_rndFX(40.0f);
+                    i_this->field_0x2704.x = rndF32;
+                    i_this->field_0x2704.y = rndF32;
+                    i_this->field_0x2704.z = rndF32;
+                }
+
+                cLib_addCalc2(&i_this->field_0x26ec.x, i_this->field_0x2704.x, 0.3f, 30.0f);
+                cLib_addCalc2(&i_this->field_0x26ec.y, i_this->field_0x2704.y, 0.3f, 30.0f);
+                cLib_addCalc2(&i_this->field_0x26ec.z, i_this->field_0x2704.z, 0.3f, 30.0f);
+
+                i_this->field_0x26d4.x = i_this->current.pos.x + i_this->field_0x26ec.x;
+                i_this->field_0x26d4.y = i_this->current.pos.y + 300.0f + i_this->field_0x26ec.y;
+                i_this->field_0x26d4.z = i_this->current.pos.z + i_this->field_0x26ec.z;
+            } else {
+                i_this->field_0x26d4 = i_this->eyePos;
+            }
+
+            cMtx_YrotS(*calc_mtx, i_this->current.angle.y);
+            switch (i_this->field_0x26c4) {
+                case 31:
+                    local_40.x = 300.0f;
+                    local_40.y = 300.0f;
+                    local_40.z = -500.0f;
+                    break;
+                case 32:
+                    local_40.x = -300.0f;
+                    local_40.y = 300.0f;
+                    local_40.z = 400.0f;
+                    break;
+                case 33:
+                    local_40.x = i_this->field_0x2710.z;
+                    local_40.y = 300.0f;
+                    local_40.z = -1000.0f;
+                    cLib_addCalc2(&i_this->field_0x2710.z, 100.0f, 0.1f, 5.0f);
+            }
+
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            i_this->field_0x26c8 += i_this->current.pos;
+            if (i_this->field_0x26c4 == 33) {
+                if (i_this->field_0x26c6 == 140) {
+                    local_4c.set(0.0f, 1100.0f, -2000.0f);
+                    horseActor->setHorsePosAndAngle(&local_4c, 3);
+                    horseActor->changeDemoMode(1, 0);
+                    player->changeDemoMode(93, 0, 0, 0);
+                }
+
+                if (i_this->field_0x26c6 == 160) {
+                    i_this->field_0x26c4 = 35;
+                    i_this->field_0x26c6 = 0;
+                    i_this->field_0x05bc = 3;
+                    Z2GetAudioMgr()->bgmStreamPrepare(0x2000063);
+                    Z2GetAudioMgr()->bgmStreamPlay();
+                }
+            }
+            break;
+        case 34:
+            if (i_this->field_0x26c6 == 0) {
+                i_this->field_0x2710.z = -400.0f;
+                horseActor->changeDemoMode(8, 0);
+            } else {
+                if (i_this->field_0x26c6 == 1) {
+                    i_this->field_0x26d4 = player->current.pos;
+                    i_this->field_0x26c8.set(200.0f, 1318.0f, -1355.0f);
+                }
+
+                cLib_addCalc2(&i_this->field_0x26d4.x, player->current.pos.x, 0.2f, 50.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.y, player->current.pos.y, 0.2f, 50.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.z, player->current.pos.z, 0.2f, 50.0f);
+            }
+            local_4c.set(0.0f, 1100.0f, i_this->field_0x2710.z + -1500.0f);
+            horseActor->setHorsePosAndAngle(&local_4c, 3);
+            cLib_addCalc0(&i_this->field_0x2710.z, 0.5f, 20.0f);
+            if (i_this->field_0x26c6 == 55) {
+                i_this->field_0x26c4 = 33;
+                i_this->field_0x26c6 = 0;
+                i_this->speedF = 50.0f;
+                i_this->field_0x2710.z = -300.0f;
+                i_this->current.pos.x = 0.0f;
+                local_4c.set(0.0f, 1100.0f, -4000.0f);
+                horseActor->setHorsePosAndAngle(&local_4c, 3);
+            }
+            break;
+        case 35:
+            i_this->field_0x26d4.set(-286.0f, 1364.0f, -1780.0f);
+            i_this->field_0x26c8.set(389.0f, 1326.0f, -2356.0f);
+            if (i_this->field_0x26c6 < 2) {
+                i_this->field_0x2710.x = 25.0f;
+            } else {
+                cLib_addCalc2(&i_this->field_0x2710.x, 20.0f, 0.03f, 0.1f);
+            }
+
+            if (i_this->field_0x26c6 == 70) {
+                i_this->field_0x1fc4 = 0;
+                anm_init(i_this, 92, 0.0f, 2, 1.0f);
+                i_this->shape_angle.y = i_this->field_0x0c3c;
+                i_this->current.angle.y = i_this->field_0x0c3c;
+                i_this->field_0x0771 = 0;
+                i_this->field_0x0770 = 1;
+                for (int i = 0; i < 2; i++) {
+                    dComIfGp_particle_set(0x8b9c + i, &i_this->current.pos, &i_this->shape_angle,
+                        NULL);
+                }
+            }
+
+            if (i_this->field_0x26c6 == 80) {
+                i_this->field_0x26c4 = 40;
+                i_this->field_0x26c6 = 0;
+                i_this->field_0x26d4.set(79.0f, 1305.0f, -1029.0f);
+                i_this->field_0x26c8.set(86.0f, 1321.0f, -1277.0f);
+                i_this->field_0x2710.x = 55.0f;
+                local_4c.set(0.0f, 1100.0f, -2000.0f);
+                horseActor->setHorsePosAndAngle(&local_4c, -0x2000);
+            }
+            break;
+        case 40:
+            if (i_this->field_0x26c6 != 110) break;
+            i_this->field_0x26c4 = 41;
+            i_this->field_0x26c6 = 0;
+            anm_init(i_this, 82, 1.0f, 0, 1.0f);
+            i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_STANDUP, -1);
+            i_this->field_0x0748 = 1;
+            horseActor->changeDemoMode(1, 0);
+            player->changeDemoMode(1, 0, 0, 0);
+        case 41:
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+            local_40.x = -50.0f;
+            local_40.y = 200.0f;
+            local_40.z = 300.0f;
+            MtxPosition(&local_4c, &local_40);
+            i_this->field_0x26c8.x = local_4c.x + i_this->current.pos.x;
+            i_this->field_0x26c8.z = local_4c.z + i_this->current.pos.z;
+            cStack_58.y = i_this->current.pos.y;
+            cStack_58.y += (i_this->eyePos.y - cStack_58.y) * 0.55f;
+            i_this->field_0x26d4.x = i_this->current.pos.x;
+            i_this->field_0x26d4.z = i_this->current.pos.z;
+            local_64.y = i_this->eyePos.y - 50.0f;
+            if (i_this->field_0x26c6 == 0) {
+                i_this->field_0x26d4.y = local_64.y;
+                i_this->field_0x26c8.y = cStack_58.y;
+            } else {
+                cLib_addCalc2(&i_this->field_0x26d4.y, local_64.y, 0.1f, 10.0f);
+                cLib_addCalc2(&i_this->field_0x26c8.y, cStack_58.y, 0.1f, 10.0f);
+            }
+
+            if (i_this->mAnmID == 82 && i_this->mpModelMorf->isStop()) {
+                anm_init(i_this, 50, 0.0f, 2, 1.0f);
+                i_this->field_0x0748 = 2;
+            }
+
+            if (i_this->field_0x26c6 == 250) {
+                i_this->field_0x26c4 = 42;
+                i_this->field_0x26c6 = 0;
+                anm_init(i_this, 51, 0.0f, 0, 1.0f);
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_LOOK, -1);
+                i_this->field_0x0748 = 3;
+                player->onForceHorseGetOff();
+            }
+        case 42:
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+            local_40.x = 80.0f;
+            local_40.y = 280.0f;
+            local_40.z = 40.0f;
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            i_this->field_0x26c8 += i_this->current.pos;
+            i_this->field_0x26d4.x = i_this->current.pos.x;
+            i_this->field_0x26d4.z = i_this->current.pos.z - 20.0f;
+            i_this->field_0x26d4.y = i_this->eyePos.y + 10.0f;
+            if (i_this->field_0x26c6 < 70) {
+                i_this->field_0x0c70 = 8;
+            }
+
+            if (i_this->mpModelMorf->isStop()) {
+                anm_init(i_this, 77, 0.0f, 0, 1.0f);
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_SAYAOPEN, -1);
+                i_this->field_0x0748 = 4;
+                i_this->field_0x26c4 = 43;
+                i_this->field_0x26c6 = 0;
+                local_4c.set(0.0f, 1100.0f, -1000.0f);
+                player->setPlayerPosAndAngle(&local_4c, 1, 0);
+                // actor->field_0x1174[0].SetAtHitApid(1);
+            }
+        case 43:
+            if (i_this->mpModelMorf->checkFrame(212.0f)) {
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_SAYAOPEN, -1);
+            }
+
+            if (i_this->field_0x26c6 > 9) {
+                if (i_this->field_0x26c6 == 10) {
+                    i_this->mMsgFlow.init((fopAc_ac_c*)i_this, 0xbca, 0, NULL);
+                }
+                i_this->mMsgFlow.doFlow((fopAc_ac_c*)i_this, NULL, 0);
+            }
+
+            if (i_this->mpModelMorf->getFrame() <= 340.0f) {
+                cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+                local_40.x = 20.0f;
+                local_40.y = 180.0f;
+                local_40.z = 260.0f;
+                MtxPosition(&i_this->field_0x26c8, &local_40);
+                i_this->field_0x26c8 += i_this->current.pos;
+            } else {
+                cLib_addCalc2(&i_this->speedF, 4.3f, 1.0f, 0.7f);
+                // actor->field_0x1174[0].SetAtHitApid(3);
+            }
+
+            if (i_this->field_0x26c6 == 211) {
+                i_this->field_0x0770 = 0;
+                // actor[1].field249_0x1174[0].mBase.mGObjAt.mBase.mGFlag = 0x3f666666; - ???
+            }
+
+            if (i_this->field_0x26c6 == 215) {
+                i_this->field_0x2739 = 1;
+                i_this->field_0x273c = 0.0f;
+                g_env_light.mThunderEff.field_0x2 = 1;
+            }
+
+            if (i_this->field_0x26c6 == 0x186) {
+                anm_init(i_this, 93, 0.0f, 2, 1.0f);
+                i_this->mpModelMorf->setFrame(20.0f);
+                i_this->field_0x26c4 = 44;
+                i_this->field_0x26c6 = 0;
+                i_this->field_0x0748 = 0;
+                i_this->field_0x26d4.set(792.0f, 1595.0f, 1160.0f);
+                i_this->field_0x26c8.set(938.0f, 1675.0f, 1337.0f);
+                local_4c.set(0.0f, 1100.0f, -500.0f);
+                player->setPlayerPosAndAngle(&local_4c, 1, 0);
+            }
+            break;
+        case 44:
+            i_this->mMsgFlow.doFlow((fopAc_ac_c*)i_this, NULL, 0);
+            if (i_this->field_0x26c6 == 125) {
+                g_env_light.mThunderEff.field_0x2 = 1;
+            }
+
+            if (i_this->field_0x26c6 < 100) {
+                // cLib_addCalc2(&i_this->speedF, 4.3f, 1.0f, 0.7f);
+            } else {
+                if (i_this->field_0x26c6 == 100) {
+                    anm_init(i_this, 90, 12.0f, 2, 1.0f);
+                }
+
+                if (i_this->field_0x26c6 == 135) {
+                    i_this->field_0x26c4 = 45;
+                    i_this->field_0x26c6 = 0;
+                    local_4c.set(0.0f, 1100.0f, 0.0f);
+                    fopAcM_create(PROC_OBJ_GB, 0xf0069600, &local_4c, 
+                        fopAcM_GetRoomNo((fopAc_ac_c*)i_this), 0, 0, -1);
+                }
+
+                cLib_addCalc0(&i_this->speedF, 1.0f, 0.7f);
+            }
+            break;
+        case 45:
+            if (i_this->field_0x26c6 == 1) {
+                horseActor->changeDemoMode(9, 0);
+                i_this->field_0x26d4.set(-81.0f, 1391.0f, -2144.0f);
+                i_this->field_0x26c8.set(37.0f, 1366.0f, -1865.0f);
+                i_this->field_0x26ec.set(76.0f, 1352.0f, -1866.0f);
+                i_this->field_0x26e0.set(129.0f, 1358.0f, -2165.0f);
+                cam_spd_set(i_this);
+            }
+
+            if (i_this->field_0x26c6 == 15) {
+                g_env_light.mThunderEff.field_0x2 = 1;
+            }
+
+            if (i_this->field_0x26c6 > 24) {
+                cam_3d_morf(i_this, 0.2f);
+                cLib_addCalc2(&i_this->field_0x2710.y, 0.07f, 1.0f, 0.002f);
+            }
+
+            if (i_this->field_0x26c6 == 120) {
+                i_this->field_0x26c4 = 46;
+                i_this->field_0x26c6 = 200;
+                i_this->field_0x26d4.set(101.0f, 1206.0f, -582.0f);
+                i_this->field_0x26c8.set(154.0f, 1199.0f, -819.0f);
+            }
+            break;
+        case 46:
+            cLib_addCalc2(&i_this->field_0x2710.x, 30.0f, 0.1f, 0.2f);
+            if (i_this->field_0x26c6 > 0x130) {
+                // actor->field_0x1174[0].SetAtHitApid(2);
+            }
+
+            if (i_this->field_0x26c6 == 255) {
+                daPy_getPlayerActorClass()->changeDemoMode(23, 1, 2, 0);
+            }
+
+            if (i_this->field_0x26c6 == 0x122) {
+                anm_init(i_this, 47, 3.0f, 0, 1.0f);
+                i_this->field_0x0748 = 5;
+                Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_04, 0, 0);
+                g_env_light.field_0x12cc = 3;
+            }
+
+            if (i_this->field_0x26c6 == 0x140) {
+                fopMsgM_messageSetDemo(0x487);
+            }
+
+            if (i_this->mAnmID == 47 && i_this->mpModelMorf->isStop()) {
+                anm_init(i_this, 91, 3.0f, 2, 1.0f);
+                g_env_light.mThunderEff.field_0x2 = 1;
+            }
+
+            if (i_this->field_0x26c6 == 0x19a) {
+                i_this->mActionID = ACTION_WAIT;
+                i_this->field_0x05bc = 2;
+                i_this->field_0x0c44[0] = (s16)(cM_rndF(50.0f) + 30.0f);
+                i_this->field_0x0c44[8] = 100;
+                bVar3 = true;
+                dComIfGs_onOneZoneSwitch(15, -1);
+                dComIfGs_onSaveDunSwitch(1);
+                Z2GetAudioMgr()->setDemoName("force_end");
+                g_env_light.field_0x12cc = 1;
+            }
+            break;
+        case 50:
+            if (i_this->eventInfo.checkCommandDemoAccrpt() == 0) {
+                fopAcM_orderPotentialEvent(i_this, 2, 0xffff, 0);
+                i_this->eventInfo.mCondition |= 2;
+                break;
+            }
+
+            camera1->mCamera.Stop();
+            i_this->field_0x26c4 = 51;
+            i_this->field_0x26c6 = 0;
+            i_this->field_0x2710.x = 55.0f;
+            i_this->field_0x2720 = player->current.pos;
+            i_this->field_0x272c = player->shape_angle.y;
+            i_this->field_0x2734 = 0.0f;
+            i_this->field_0x2730 = 0.0f;
+            daPy_getPlayerActorClass()->changeOriginalDemo();
+            daPy_getPlayerActorClass()->changeDemoMode(89, 0, 0, 0);
+            Z2GetAudioMgr()->changeBgmStatus(1);
+        case 51:
+            /* I believe this case is handling the closeup dueling with Ganondorf */
+            // actor->field_0x1174[0].SetAtHitApid(1);
+            i_this->field_0x0c70 = 20;
+            if (i_this->field_0x26c6 > 4) {
+                // cStack_a0.set(0.0f, 1.0f, 0.0f);
+                dComIfGp_getVibration().StartQuake(2, 1, cXyz(0.0f, 1.0f, 0.0f));
+            }
+
+            dComIfGp_setDoStatusForce(100, 4);
+            cMtx_YrotS(*calc_mtx, player->shape_angle.y);
+            local_40.x = 0.0f;
+            local_40.y = 0.0f;
+            local_40.z = i_this->field_0x2734 * 1.3f;
+            MtxPosition(&local_4c, &local_40);
+            local_4c += i_this->field_0x2720;
+            local_4c.y = player->current.pos.y;
+            player->setPlayerPosAndAngle(&local_4c, i_this->field_0x272c, 0);
+            local_40.x = 0.0f;
+            local_40.y = 0.0f;
+            local_40.z = 135.0f;
+            MtxPosition(&local_4c, &local_40);
+            // i_this->current.pos.x = local_4c.x + player->getViewerCurrentPosP().x;
+            // i_this->current.pos.z = local_4c.z + player->getViewerCurrentPosP().z;
+            i_this->current.angle.y = player->shape_angle.y + -0x8000;
+
+            // cStack_ac = player->getViewerCurrentPosP() - i_this->current.pos;
+            cStack_b8 = cStack_ac * 0.5f;
+            local_64 = cStack_c4;
+            local_64.y += 150.0f;
+            local_40.x = 200.0f;
+            local_40.y = 0.0f;
+            local_40.z = 0.0f;
+            MtxPosition(&cStack_58, &local_40);
+
+            cStack_58 += local_64;
+            if (i_this->field_0x26c6 == 0) {
+                i_this->field_0x26d4 = local_64;
+                i_this->field_0x26c8 = cStack_58;
+                dComIfGp_setHitMark(2, (fopAc_ac_c *)i_this, 
+                    &local_64, NULL, &cXyz(2.0f, 2.0f, 2.0f), 0);
+                i_this->mZ2Creature.startCollisionSE(Z2SE_HIT_SWORD, 40);
+            } else {
+                C_MTXCopy(i_this->mpModelMorf->getModel()->getAnmMtx(33), *calc_mtx);
+                local_40.set(10.0f, 20.0f, 0.0f);
+                MtxPosition(&local_4c, &local_40);
+                for (int i = 0; i < 2; i++) {
+                    i_this->field_0x268c[i - 12] = dComIfGp_particle_set((i_this->field_0x268c[i + 4 - 12]), 
+                    (0x8b98 + i + 2), &local_4c, NULL, NULL);
+                }
+
+                i_this->mZ2Creature.startCreatureExtraSoundLevel(Z2SE_EN_GND_TUBAZERI_EFF, 0 , -1);
+
+                if (i_this->field_0x0c44[3] == 0) {
+                    i_this->field_0x0c44[3] = (s16)(cM_rndF(10.0f) + 3.0f);
+                    i_this->field_0x26ec.x = cM_rndFX(20.0f);
+                    i_this->field_0x26ec.y = cM_rndFX(20.0f);
+                    i_this->field_0x26ec.z = cM_rndFX(20.0f);
+                }
+
+                cLib_addCalc2(&i_this->field_0x26d4.x, local_64.x + i_this->field_0x26ec.x, 
+                    0.1f, 5.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.y, local_64.y + i_this->field_0x26ec.y, 
+                    0.1f, 5.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.z, local_64.z + i_this->field_0x26ec.z, 
+                    0.1f, 5.0f);
+            }
+
+            if (mDoCPd_c::getTrigA(0) == 0) {
+                i_this->field_0x2730 -= 0.02f;
+                if (i_this->field_0x2730 < -1.0f) {
+                    i_this->field_0x2730 = -1.0f;
+                }
+            } else {
+                i_this->field_0x2730 += 0.1f;
+                if (i_this->field_0x2730 > 1.0f) {
+                    i_this->field_0x2730 = 1.0f;
+                }
+            }
+
+            cLib_addCalc2(&i_this->field_0x2734, i_this->field_0x2730 * 50.0f, 0.1f, 2.0f);
+            if (i_this->field_0x2734 > -49.9f) {
+                if (i_this->field_0x2734 < 48.0f) {
+                    if (i_this->field_0x2730 >= -0.4f) {
+                        if (i_this->field_0x2730 <= 0.4f) {
+                            i_this->mZ2Creature.startCreatureVoiceLevel(Z2SE_EN_GND_V_TUBAZERI_A, -1);
+                            if (i_this->mAnmID != 85 && i_this->field_0x0c44[2] == 0) {
+                                anm_init(i_this, 85, 3.0f, 2, 1.0f);
+                                daPy_getPlayerActorClass()->changeDemoMode(89, 0, 0, 0);
+                                i_this->field_0x0c44[2] = 30;
+                                Z2GetAudioMgr()->changeBgmStatus(6);
+                            }
+                        } else {
+                            i_this->mZ2Creature.startCreatureVoiceLevel(Z2SE_EN_GND_V_TUBAZERI_C, -1);
+                            if (i_this->mAnmID != 87 && i_this->field_0x0c44[2] == 0) {
+                                anm_init(i_this, 87, 3.0f, 2, 1.0f);
+                                daPy_getPlayerActorClass()->changeDemoMode(89, 2, 0, 0);
+                                i_this->field_0x0c44[2] = 30;
+                                Z2GetAudioMgr()->changeBgmStatus(5);
+                            }
+                        }
+                    } else {
+                        i_this->mZ2Creature.startCreatureVoiceLevel(Z2SE_EN_GND_V_TUBAZERI_B, -1);
+                        if (i_this->mAnmID != 86 && i_this->field_0x0c44[2] == 0) {
+                            anm_init(i_this, 86, 3.0f, 2, 1.0f);
+                            daPy_getPlayerActorClass()->changeDemoMode(89, 1, 0, 0);
+                            i_this->field_0x0c44[2] = 30;
+                            Z2GetAudioMgr()->changeBgmStatus(4);
+                        }
+                    }
+                } else {
+                    i_this->field_0x26c4 = 55;
+                    i_this->field_0x26c6 = 0;
+                    anm_init(i_this, 88, 3.0f, 0, 1.0f);
+                    daPy_getPlayerActorClass()->changeDemoMode(89, 3, 0, 0);
+                    dComIfGp_getVibration().StopQuake(31);
+                    Z2GetAudioMgr()->changeBgmStatus(3);
+                }
+            } else {
+                i_this->field_0x26c4 = 52;
+                i_this->field_0x26c6 = 0;
+                anm_init(i_this, 89, 3.0f, 0, 1.0f);
+                daPy_getPlayerActorClass()->changeDemoMode(89, 4, 0, 0);
+                dComIfGp_getVibration().StopQuake(31);
+                Z2GetAudioMgr()->changeBgmStatus(2);
+            }
+            break;
+        case 52:
+            i_this->field_0x0c70 = 20;
+            if (i_this->mpModelMorf->isStop()) {
+                i_this->mActionID = ACTION_ATTACK;
+                i_this->field_0x05bc = 2;
+                i_this->field_0x26c4 = 53;
+                i_this->field_0x26c6 = 0;
+            }
+
+            if (i_this->field_0x26c6 == 20) {
+                cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+                local_40.x = -200.0f;
+                local_40.y = 50.0f;
+                local_40.z = 500.0f;
+                MtxPosition(&i_this->field_0x26c8, &local_40);
+                i_this->field_0x26c8 += i_this->current.pos;
+                i_this->field_0x26d4 = player->current.pos;
+                i_this->field_0x26d4.y += 80.0f;
+                // actor[1].field249_0x1174[0].mBase.mGObjAt.mBase.mGFlag = 0x3f99999a; - ???
+            }
+            break;
+        case 53:
+            i_this->field_0x0c70 = 20;
+            if (i_this->field_0x26c6 > 19) {
+                local_64 = player->current.pos;
+                local_64.y += 80.0f;
+                cLib_addCalc2(&i_this->field_0x26d4.x, local_64.x, 0.15f, 200.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.y, local_64.y, 0.15f, 200.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.z, local_64.z, 0.15f, 200.0f);
+            }
+
+            if (i_this->field_0x26c6 == 18) {
+                daPy_getPlayerActorClass()->setThrowDamage(0x4049000000000000,
+                    0x403e000000000000, i_this->shape_angle.y, 8, 1, 0);
+                daPy_getPlayerActorClass()->changeDemoMode(1, 0, 0, 0);
+                cStack_7c = player->current.pos;
+                cStack_7c.y += 150.0f;
+                dComIfGp_setHitMark(3, NULL, &cStack_7c, &player->shape_angle, NULL, 0);
+            }
+
+            if (i_this->field_0x26c6 == 92) {
+                bVar3 = TRUE;
+            }
+            break;
+        case 55:
+            i_this->field_0x0c70 = 20;
+            if (i_this->field_0x26c6 == 20) { 
+                cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+                local_40.x = 200.0f;
+                local_40.y = 50.0f;
+                local_40.z = 500.0f;
+                MtxPosition(&i_this->field_0x26c8, &local_40);
+                i_this->field_0x26c8 += i_this->current.pos;
+                i_this->field_0x26d4 = player->current.pos;
+                i_this->field_0x26d4.y += 80.0f;
+                // actor[1].field249_0x1174[0].mBase.mGObjAt.mBase.mGFlag = 0x3f99999a; - ???
+            }
+
+            if (i_this->field_0x26c6 > 42) {
+                bVar3 = true;
+                i_this->mActionID = ACTION_JUMP;
+                i_this->field_0x05bc = 5;
+                i_this->field_0x0c44[0] = 50;
+                i_this->field_0x0c7c = 1;
+            }
+
+            break;
+        case 60:
+            if (i_this->eventInfo.checkCommandDemoAccrpt() == 0) {
+                fopAcM_orderPotentialEvent(i_this, 2, 0xffff, 0);
+                i_this->eventInfo.mCondition |= 2;
+                break;
+            }
+            
+            camera1->mCamera.Stop();
+            i_this->field_0x26c4 = 61;
+            i_this->field_0x26c6 = 0;
+            i_this->field_0x2710.x = 55.0f;
+            daPy_getPlayerActorClass()->changeOriginalDemo();
+            daPy_getPlayerActorClass()->changeDemoMode(90, 0, 0, 0);
+            local_4c.set(0.0f, 1100.0f, 0.0f);
+            daPy_getPlayerActorClass()->setPlayerPosAndAngle(&local_4c, 0xffffe000, 0);
+            i_this->current.pos.set(0.0f, 1100.0f, 0.0f);
+            i_this->old.pos = i_this->current.pos;
+            i_this->shape_angle.y = -0x2000;
+            i_this->current.angle.y = -0x2000;
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+            local_40.x = -300.0f;
+            local_40.y = 150.0f;
+            local_40.z = 200.0f;
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            i_this->field_0x26c8 += i_this->current.pos;
+            i_this->field_0x26d4 = i_this->current.pos;
+        case 61:
+            i_this->field_0x0c70 = 20;
+            if (i_this->field_0x26c6 > 0) {
+                cLib_addCalc2(&i_this->field_0x26d4.x, player->eyePos.x, 0.3f, 50.0f);
+                local_64.y = player->eyePos.y;
+                if (local_64.y > 1400.0f) {
+                    local_64.y = 1400.0f;
+                }
+
+                cLib_addCalc2(&i_this->field_0x26d4.y, local_64.y, 0.3f, 50.0f);
+                cLib_addCalc2(&i_this->field_0x26d4.z, player->eyePos.z, 0.3f, 50.0f);
+            }
+
+            if (i_this->field_0x26c6 == 31) {
+                i_this->field_0x26c4 = 62;
+                i_this->field_0x26c6 = 0;
+                anm_init(i_this, 84, 0.0f, 0, 1.0f);
+                dComIfGp_getVibration().StartShock(7, 1, cXyz(0.0f, 1.0f, 0.0f));
+                fpcM_Search(s_objgbdel_sub, i_this);
+                i_this->field_0x2739 = 2;
+                Z2GetAudioMgr()->seMoveVolumeAll(0.0f, 0);
+                i_this->mZ2Creature.startCreatureVoice(Z2SE_EN_GND_V_END, -1);
+            }
+            break;
+        case 62:
+            i_this->field_0x0c70 = 20;
+            i_this->field_0x2710.x = 25.0f;
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+            local_40.set(55.7f, 1146.0f, -151.0f);
+            MtxPosition(&i_this->field_0x26d4, &local_40);
+            local_40.set(-131.0f, 1146.0f, -156.0f);
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            if (i_this->mpModelMorf->isStop()) {
+                anm_init(i_this, 48, 10.0f, 2, 1.0f);
+            }
+
+            if (i_this->field_0x26c6 == 80) {
+                i_this->field_0x26c4 = 63;
+                i_this->field_0x26c6 = 0;
+                Z2GetAudioMgr()->seMoveVolumeAll(1.0f, 37);
+                i_this->field_0x2739 = 3;
+            }
+
+            local_4c.set(0.0f, 1100.0f, -2000.0f);
+            horseActor->setHorsePosAndAngle(&local_4c, -0x2000);
+            break;
+        case 63:
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y);
+            local_40.set(90.0f, 1250.0f, -57.0f);
+            MtxPosition(&i_this->field_0x26d4, &local_40);
+            local_40.set(-80.0f, 1188.0f, -106.0f);
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+
+            if (i_this->field_0x26c6 == 80) {
+                i_this->field_0x26c4 = 64;
+                i_this->field_0x26c6 = 0;
+                i_this->field_0x0754 = 0;
+                i_this->field_0x2739 = 4;
+            }
+            break;
+        case 64:
+            i_this->field_0x0c70 = 20;
+            i_this->field_0x0754 = 1;
+            mDoMtx_stack_c::transS(0.0f, 1430.0f, -2000.0f);
+            mDoMtx_stack_c::YrotM(-0x2000);
+            i_this->mpModelMorf->getModel()->setBaseTRMtx(mDoMtx_stack_c::get());
+            i_this->field_0x0750->play();
+            i_this->field_0x074c->play();
+            i_this->field_0x05d8->play(NULL, 0, 0);
+            i_this->field_0x05d8->modelCalc();
+            i_this->field_0x26d4.set(25.0f, 1603.0f, -2033.0f);
+            i_this->field_0x26c8.set(-70.0f, 1564.0f, -1884.0f);
+            if (i_this->field_0x26c6 == 88) {
+                i_this->field_0x26c4 = 65;
+                i_this->field_0x26c6 = 0;
+                i_this->field_0x271c = 3000;
+                i_this->field_0x2710.z = 1.0f;
+                i_this->field_0x2710.y = 0.0f;
+                i_this->field_0x2739 = 5;
+            }
+            break;
+        case 65:
+            i_this->field_0x0c70 = 20;
+            i_this->field_0x26d4 = i_this->eyePos;
+            i_this->field_0x26d4.z += -5.0f;
+            cMtx_YrotS(*calc_mtx, i_this->shape_angle.y + i_this->field_0x271c);
+            local_40.x = 0.0f;
+            local_40.y = local_40.z * 150.0f;
+            local_40.z *= 50.0f;
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            i_this->field_0x26c8 += i_this->field_0x26d4;
+
+            if (i_this->field_0x26c6 > 80) {
+                cLib_addCalc2(&i_this->field_0x2710.y, 1.0f, 1.0f, 0.05f);
+                i_this->field_0x271c += (int)(i_this->field_0x2710.y * 200.0f);
+                cLib_addCalc2(&i_this->field_0x2710.z, 500.0f, 1.0f, i_this->field_0x2710.y * 0.5f);
+                if (i_this->field_0x26c6 == 150) {
+                    daPy_getPlayerActorClass()->changeDemoMode(16, 0, 0, 0);
+                }
+
+                if (i_this->field_0x26c6 == 230) {
+                    mDoGph_gInf_c::fadeOut(0.1f, g_blackColor);
+                }
+
+                if (i_this->field_0x26c6 == 330) {
+                    dStage_changeScene(0, 0.0f, 0, i_this->current.roomNo, 0, -1);
+                }
+            }
+            break;
+        case 90:
+            if (i_this->eventInfo.checkCommandDemoAccrpt() == 0) {
+                fopAcM_orderPotentialEvent(i_this, 2, 0xffff, 0);
+                i_this->eventInfo.mCondition |= 2;
+                break;
+            }
+
+            camera1->mCamera.Stop();
+            i_this->field_0x26c4 = 91;
+            i_this->field_0x26c6 = 0;
+            i_this->field_0x2710.x = 55.0f;
+
+            daPy_getPlayerActorClass()->changeOriginalDemo();
+            horseActor->changeOriginalDemo();
+
+            i_this->field_0x26d4 = player->current.pos;
+            i_this->field_0x26c8 = player->current.pos;
+
+            i_this->field_0x26c8.x += 100.0f;
+            break;
+        case 91:
+            local_4c.set(0.0f, 1100.0f, -2000.0f);
+            horseActor->setHorsePosAndAngle(&local_4c, -0x2000);
+            if (i_this->field_0x26c6 == 2) {
+                player->onForceHorseGetOff();
+            }
+
+            if (i_this->field_0x26c6 == 5) {
+                i_this->field_0x26c4 = 92;
+                i_this->field_0x26c6 = 0;
+            }
+            break;
+        case 92:
+            if (i_this->field_0x26c6 == 1) {
+                local_4c.set(0.0f, 1100.0f, 0.0f);
+                fopAcM_create(PROC_OBJ_GB, 0xf0069600, &local_4c, 
+                    i_this->current.roomNo, NULL, NULL, -1);
+            }
+
+            if (i_this->field_0x26c6 == 5) {
+                local_4c.set(600.0f, 1100.0f, 0.0f);
+                player->setPlayerPosAndAngle(&local_4c, 0xffffb7fe, 0);
+                i_this->current.pos.set(-600.0f, 1100.0f, 0.0f);
+                i_this->old.pos = i_this->current.pos;
+                i_this->current.angle.y = 0x37fe;
+                i_this->shape_angle.y = 0x37fe;
+                bVar3 = TRUE;
+            }
+            break;
+        case 95:
+            if (i_this->eventInfo.checkCommandDemoAccrpt() == 0) {
+                fopAcM_orderPotentialEvent(i_this, 2, 0xffff, 0);
+                i_this->eventInfo.onCondition(2);
+                return;
+            }
+
+            i_this->field_0x26c4 = 96;
+            i_this->field_0x26c6 = 0;
+
+            daPy_getPlayerActorClass()->changeOriginalDemo();
+            horseActor->changeOriginalDemo();
+
+            local_4c.set(0.0f, 1100.0f, -2000.0f);
+            horseActor->setHorsePosAndAngle(&local_4c, -0x2000);
+
+            local_4c.set(600.0f, 1100.0f, 0.0f);
+            player->setPlayerPosAndAngle(&local_4c, 0xffffb7fe, 0);
+
+            i_this->old.pos = i_this->current.pos;
+            i_this->current.angle.y = 0x37fe;
+            i_this->shape_angle.y = 0x37fe;
+
+            local_4c.set(0.0f, 1100.0f, 0.0f);
+            fopAcM_create(PROC_OBJ_GB, 0xf0069600, &local_4c, 
+                i_this->current.roomNo, NULL, NULL, -1);
+            break;
+        case 96:
+            i_this->field_0x26c6 += 1;
+            if (i_this->field_0x26c6 != 2) {
+                return;
+            }
+
+            dComIfGp_event_reset();
+            bVar3 = TRUE;
+    }
+
+    if (bVar3) {
+        if (bVar3) {
+            cMtx_YrotS(*calc_mtx, player->shape_angle.y);
+            local_40.x = 0.0f;
+            local_40.y = 100.0f;
+            local_40.z = -250.0f;
+            MtxPosition(&i_this->field_0x26c8, &local_40);
+            i_this->field_0x26c8 += player->current.pos;
+            i_this->field_0x26d4 = player->current.pos;
+            i_this->field_0x26d4.y += 120.0f;
+        }
+        
+        camera1->mCamera.Reset(cStack_dc, cStack_e8);
+        camera1->mCamera.Start();
+        camera1->mCamera.SetTrimSize(0);
+
+        dComIfGp_event_reset();
+
+        daPy_getPlayerActorClass()->cancelOriginalDemo();
+
+        i_this->field_0x26c4 = 0;
+    }
+
+    if (i_this->field_0x26c4 > 0) {
+        cStack_88 = i_this->field_0x26d4;
+        cStack_94 = i_this->field_0x26c8;
+        
+        camera1->mCamera.Set(cStack_f4, cStack_100, i_this->field_0x2710.x, 0);
+        i_this->field_0x26c6 += 1;
+        if (i_this->field_0x26c6 > 1000) {
+            i_this->field_0x26c6 = 1000;
+        }
+    }
 }
 
 /* ############################################################################################## */

@@ -371,7 +371,8 @@ def JSystemLib(lib_name: str, objects: List[Object], progress_category: str="thi
 
 Matching = True                   # Object matches and should be linked
 NonMatching = False               # Object does not match and should not be linked
-Equivalent = config.non_matching  # Object should be linked when configured with --non-matching
+Equivalent = False                # Object should be linked when configured with --non-matching
+Modded = config.non_matching
 
 
 # Object is only matching for specific versions
@@ -1582,7 +1583,7 @@ config.libs = [
     ActorRel(NonMatching, "d_a_b_ds"),
     ActorRel(NonMatching, "d_a_b_gg"),
     ActorRel(NonMatching, "d_a_b_gm"),
-    ActorRel(NonMatching, "d_a_b_gnd"),
+    ActorRel(Modded, "d_a_b_gnd"), # Modded audio
     ActorRel(MatchingFor("GZ2E01"), "d_a_b_go"),
     ActorRel(MatchingFor("GZ2E01"), "d_a_b_gos"),
     ActorRel(NonMatching, "d_a_b_mgn"),

@@ -1587,7 +1587,7 @@ config.libs = [
     ActorRel(Modded, "d_a_b_gnd"), # Modded audio
     ActorRel(MatchingFor("GZ2E01"), "d_a_b_go"),
     ActorRel(MatchingFor("GZ2E01"), "d_a_b_gos"),
-    ActorRel(Equivalent, "d_a_b_mgn"),
+    ActorRel(Modded, "d_a_b_mgn"), # Modded audio
     ActorRel(NonMatching, "d_a_b_ob"),
     ActorRel(NonMatching, "d_a_b_oh"),
     ActorRel(MatchingFor("GZ2E01"), "d_a_b_oh2"),

@@ -4852,7 +4852,7 @@ static int daB_GND_Create(fopAc_ac_c* a_this) {
 
         i_this->mMantChildID = fopAcM_createChild(PROC_MANT, fopAcM_GetID(a_this),
                 0, &a_this->current.pos, fopAcM_GetRoomNo(a_this), NULL, NULL, -1, 0);
-        a_this->health = 0; // Horseback Ganondorf Health
+        a_this->health = 24; // Horseback Ganondorf Health
         i_this->field_0x560 = 24;
 
         i_this->mGndCcStts.Init(254, 0, a_this);

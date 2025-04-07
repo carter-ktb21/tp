@@ -77,9 +77,9 @@ gcm.changed_files["files/RELS.arc"] = rels_arc.data
 with open(decomp_build_path / "framework.dol", "rb") as f:
   gcm.changed_files["sys/main.dol"] = BytesIO(f.read())
 
-with open(decomp_build_path / "framework.elf", "rb") as f:
-  gcm.changed_files["files/map/Final/Release/frameworkF"] = BytesIO(f.read())
-shutil.copy(decomp_build_path / "framework.elf", args.map)
+with open(decomp_build_path / "framework.elf.MAP", "rb") as f:
+  gcm.changed_files["files/map/Final/Release/frameworkF.map"] = BytesIO(f.read())
+shutil.copy(decomp_build_path / "framework.elf.MAP", args.map)
 
 for _ in gcm.export_disc_to_iso_with_changed_files(args.output_iso_path): pass
 

@@ -4,6 +4,7 @@
 //
 
 #include "Z2AudioLib/Z2SeqMgr.h"
+#include "Z2AudioLib/Z2AudioMgr.h"
 #include "Z2AudioLib/Z2LinkMgr.h"
 #include "Z2AudioLib/Z2Param.h"
 #include "Z2AudioLib/Z2SceneMgr.h"
@@ -1833,47 +1834,47 @@ void Z2SeqMgr::setBattleLastHit(u8 param_0) {
 
 /* 802B4BD0-802B4EB0 2AF510 02E0+00 1/1 0/0 0/0 .text            battleBgmFramework__8Z2SeqMgrFv */
 void Z2SeqMgr::battleBgmFramework() {
-    if (getSubBgmID() == Z2BGM_BATTLE_NORMAL || getSubBgmID() == Z2BGM_BATTLE_TWILIGHT) {
-        if (mBattleSeqCount != 0) {
-            mBattleSeqCount--;
-            if (mBattleSeqCount == 0) {
-                mSubBgmHandle->stop();
-                mBattleSeqState = 0;
-            }
-        }
-    }
-    if (!mFlags.mBattleBgmOff && Z2GetSceneMgr()->isSceneExist()) {
-        Z2GetSoundObjMgr()->searchEnemy();
-        switch (getSubBgmID()) {
-        case Z2BGM_BATTLE_TWILIGHT:
-            break;
-        case Z2BGM_BATTLE_NORMAL:
-            if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
-                return;
-            }
-            if (field_0xc1 != 0) {
-                field_0xc1--;
-                if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
-                    mSubBgmMaster.fadeIn(struct_8045086A);
-                }
-                if (field_0xc1 == 0) {
-                    setBattleDistIgnore(false);
-                    if (Z2GetSoundObjMgr()->checkBattleFinish()) {
-                        setBattleSeqState(3);
-                    } else if (mSubBgmMaster.getDest() != 1.0f) {
-                        mSubBgmMaster.fadeIn(struct_8045086A);
-                    }
-                }
-            }
-            break;
-        default:
-            mBattleSeqState = 0;
-            setBattleDistIgnore(false);
-            mFlags.mBattleSearched = 0;
-            field_0xc1 = 0;
-            mBattleLastHit = struct_80450869;
-        }
-    }
+    // if (getSubBgmID() == Z2BGM_BATTLE_NORMAL || getSubBgmID() == Z2BGM_BATTLE_TWILIGHT) {
+    //     if (mBattleSeqCount != 0) {
+    //         mBattleSeqCount--;
+    //         if (mBattleSeqCount == 0) {
+    //             mSubBgmHandle->stop();
+    //             mBattleSeqState = 0;
+    //         }
+    //     }
+    // }
+    // if (!mFlags.mBattleBgmOff && Z2GetSceneMgr()->isSceneExist()) {
+    //     Z2GetSoundObjMgr()->searchEnemy();
+    //     switch (getSubBgmID()) {
+    //     case Z2BGM_BATTLE_TWILIGHT:
+    //         break;
+    //     case Z2BGM_BATTLE_NORMAL:
+    //         if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
+    //             return;
+    //         }
+    //         if (field_0xc1 != 0) {
+    //             field_0xc1--;
+    //             if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
+    //                 mSubBgmMaster.fadeIn(struct_8045086A);
+    //             }
+    //             if (field_0xc1 == 0) {
+    //                 setBattleDistIgnore(false);
+    //                 if (Z2GetSoundObjMgr()->checkBattleFinish()) {
+    //                     setBattleSeqState(3);
+    //                 } else if (mSubBgmMaster.getDest() != 1.0f) {
+    //                     mSubBgmMaster.fadeIn(struct_8045086A);
+    //                 }
+    //             }
+    //         }
+    //         break;
+    //     default:
+    //         mBattleSeqState = 0;
+    //         setBattleDistIgnore(false);
+    //         mFlags.mBattleSearched = 0;
+    //         field_0xc1 = 0;
+    //         mBattleLastHit = struct_80450869;
+    //     }
+    // }
 }
 
 /* 802B4EB0-802B5204 2AF7F0 0354+00 1/1 0/0 0/0 .text            startBattleBgm__8Z2SeqMgrFb */
@@ -1970,18 +1971,20 @@ void Z2SeqMgr::stopBattleBgm(u8 param_0, u8 param_1) {
 void Z2SeqMgr::fieldBgmStart() {
     if (Z2GetSceneMgr()->isSceneExist() && mFlags.mFieldBgmPlay) {
         if (Z2GetStatusMgr()->checkDayTime()) {
-            Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
-            changeBgmStatus(0);
-            field_0xc4 = 0;
-            if (Z2GetLink()->isRiding()) {
-                mFlags.mRiding = true;
-                mRideCount = 0;
-                fieldRidingMute();
-            } else {
-                mFlags.mRiding = false;
-                mRideCount = 0;
-                fieldRidingMute();
-            }
+            Z2GetAudioMgr()->bgmStreamPrepare(0x200007F);
+            Z2GetAudioMgr()->bgmStreamPlay();
+        //     Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
+        //     changeBgmStatus(0);
+        //     field_0xc4 = 0;
+        //     if (Z2GetLink()->isRiding()) {
+        //         mFlags.mRiding = true;
+        //         mRideCount = 0;
+        //         fieldRidingMute();
+        //     } else {
+        //         mFlags.mRiding = false;
+        //         mRideCount = 0;
+        //         fieldRidingMute();
+        //     }
         } else {
             Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_NIGHT, &mMainBgmHandle, NULL);
             mBgmStatus = 0;
@@ -2050,129 +2053,130 @@ void Z2SeqMgr::fieldBgmFramework() {
         if (mRideCount != 0) {
             mRideCount--;
         }
-        if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY) {
-            field_0xc4 = Z2GetSoundStarter()->getPortData(&mMainBgmHandle, 10, -1);
-            if (Z2GetStatusMgr()->isPaused()) {
-                changeBgmStatus(13);
-            } else {
-                if (field_0xc4 != 16) {
-                    if (mFlags.mRiding != Z2GetLink()->isRiding()) {
-                        mFlags.mRiding = Z2GetLink()->isRiding();
-                        mRideCount = 50;
-                        fieldRidingMute();
-                    }
-                }
-                if (field_0xc4 == 0 || field_0xc4 == 21 || field_0xc4 == 22
-                                    || field_0xc4 == 23 || field_0xc4 == 24) {
-                    return;
-                }
-                if (Z2GetStatusMgr()->getDemoStatus() == 10) {
-                    switch (field_0xc4) {
-                    case 7:
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 17:
-                    case 18:
-                    case 19:
-                    case 20:
-                        changeBgmStatus(2);
-                        break;
-                    default:
-                        changeBgmStatus(13);
-                        break;
-                    }
-                } else if (mBattleDistState <= 2) {
-                    if ((field_0xc4 < 7 || field_0xc4 > 15) && mBattleDistState <= 1) {
-                        switch (field_0xc4) {
-                        case 2:
-                            changeBgmStatus(7);
-                            break;
-                        case 3:
-                            changeBgmStatus(6);
-                            break;
-                        case 4:
-                            changeBgmStatus(5);
-                            break;
-                        case 0:
-                        case 1:
-                        case 5:
-                        case 7:
-                        case 19:
-                        case 20:
-                        default:
-                            changeBgmStatus(4);
-                            break;
-                        }
-                    }
-                } else if (Z2GetStatusMgr()->checkDayTime()) {
-                    if (Z2GetLink()->getMovingTime() < 150) {
-                        switch (field_0xc4) {
-                        case 3:
-                            if (mFlags.mRiding
-                                        && Z2GetSoundObjMgr()->getEnemyNumVeryFar() == 0) {
-                                changeBgmStatus(3);
-                            }
-                            break;
-                        case 7:
-                        case 8:
-                        case 9:
-                        case 10:
-                        case 11:
-                        case 12:
-                        case 13:
-                        case 14:
-                        case 15:
-                        case 17:
-                        case 18:
-                        case 19:
-                        case 20:
-                            changeBgmStatus(2);
-                            break;
-                        default:
-                            changeBgmStatus(13);
-                            break;
-                        }
-                    } else {
-                        switch (field_0xc4) {
-                        case 2:
-                        case 3:
-                            changeBgmStatus(13);
-                            break;
-                        default:
-                            changeBgmStatus(12);
-                            break;
-                        }
-                    }
-                } else {
-                    if (field_0xc4 >= 7 && field_0xc4 <= 15
-                                        && Z2GetStatusMgr()->getHour() >= 20) {
-                        mMainBgmHandle->stop(60);
-                        mMainBgmHandle.releaseSound();
-                    } else {
-                        switch (field_0xc4) {
-                        case 2:
-                        case 3:
-                            break;
-                        case 17:
-                        case 18:
-                        case 19:
-                        case 20:
-                            changeBgmStatus(11);
-                            break;
-                        default:
-                            changeBgmStatus(10);
-                            break;
-                        }
-                    }
-                }
-            }
-        } else if (getMainBgmID() == Z2BGM_FIELD_LINK_NIGHT) {
+        // if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY) {
+        //     field_0xc4 = Z2GetSoundStarter()->getPortData(&mMainBgmHandle, 10, -1);
+        //     if (Z2GetStatusMgr()->isPaused()) {
+        //         changeBgmStatus(13);
+        //     } else {
+        //         if (field_0xc4 != 16) {
+        //             if (mFlags.mRiding != Z2GetLink()->isRiding()) {
+        //                 mFlags.mRiding = Z2GetLink()->isRiding();
+        //                 mRideCount = 50;
+        //                 fieldRidingMute();
+        //             }
+        //         }
+        //         if (field_0xc4 == 0 || field_0xc4 == 21 || field_0xc4 == 22
+        //                             || field_0xc4 == 23 || field_0xc4 == 24) {
+        //             return;
+        //         }
+        //         if (Z2GetStatusMgr()->getDemoStatus() == 10) {
+        //             switch (field_0xc4) {
+        //             case 7:
+        //             case 8:
+        //             case 9:
+        //             case 10:
+        //             case 11:
+        //             case 12:
+        //             case 13:
+        //             case 14:
+        //             case 15:
+        //             case 17:
+        //             case 18:
+        //             case 19:
+        //             case 20:
+        //                 changeBgmStatus(2);
+        //                 break;
+        //             default:
+        //                 changeBgmStatus(13);
+        //                 break;
+        //             }
+        //         } else if (mBattleDistState <= 2) {
+        //             if ((field_0xc4 < 7 || field_0xc4 > 15) && mBattleDistState <= 1) {
+        //                 switch (field_0xc4) {
+        //                 case 2:
+        //                     changeBgmStatus(7);
+        //                     break;
+        //                 case 3:
+        //                     changeBgmStatus(6);
+        //                     break;
+        //                 case 4:
+        //                     changeBgmStatus(5);
+        //                     break;
+        //                 case 0:
+        //                 case 1:
+        //                 case 5:
+        //                 case 7:
+        //                 case 19:
+        //                 case 20:
+        //                 default:
+        //                     changeBgmStatus(4);
+        //                     break;
+        //                 }
+        //             }
+        //         } else if (Z2GetStatusMgr()->checkDayTime()) {
+        //             if (Z2GetLink()->getMovingTime() < 150) {
+        //                 switch (field_0xc4) {
+        //                 case 3:
+        //                     if (mFlags.mRiding
+        //                                 && Z2GetSoundObjMgr()->getEnemyNumVeryFar() == 0) {
+        //                         changeBgmStatus(3);
+        //                     }
+        //                     break;
+        //                 case 7:
+        //                 case 8:
+        //                 case 9:
+        //                 case 10:
+        //                 case 11:
+        //                 case 12:
+        //                 case 13:
+        //                 case 14:
+        //                 case 15:
+        //                 case 17:
+        //                 case 18:
+        //                 case 19:
+        //                 case 20:
+        //                     changeBgmStatus(2);
+        //                     break;
+        //                 default:
+        //                     changeBgmStatus(13);
+        //                     break;
+        //                 }
+        //             } else {
+        //                 switch (field_0xc4) {
+        //                 case 2:
+        //                 case 3:
+        //                     changeBgmStatus(13);
+        //                     break;
+        //                 default:
+        //                     changeBgmStatus(12);
+        //                     break;
+        //                 }
+        //             }
+        //         } else {
+        //             if (field_0xc4 >= 7 && field_0xc4 <= 15
+        //                                 && Z2GetStatusMgr()->getHour() >= 20) {
+        //                 mMainBgmHandle->stop(60);
+        //                 mMainBgmHandle.releaseSound();
+        //             } else {
+        //                 switch (field_0xc4) {
+        //                 case 2:
+        //                 case 3:
+        //                     break;
+        //                 case 17:
+        //                 case 18:
+        //                 case 19:
+        //                 case 20:
+        //                     changeBgmStatus(11);
+        //                     break;
+        //                 default:
+        //                     changeBgmStatus(10);
+        //                     break;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // } else 
+        if (getMainBgmID() == Z2BGM_FIELD_LINK_NIGHT) {
             if (!Z2GetStatusMgr()->isPaused()) {
                 u8 hour = Z2GetStatusMgr()->getHour();
                 if (hour >= 5 && hour < 20) {
@@ -2183,24 +2187,24 @@ void Z2SeqMgr::fieldBgmFramework() {
         } else if (getMainBgmID() == -1 && !Z2GetStatusMgr()->isPaused() && mBattleSeqState == 0) {
             u8 hour = Z2GetStatusMgr()->getHour();
             if (hour >= 6 && hour < 19) {
-                if (hour >= 8) {
-                    Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
-                    changeBgmStatus(9);
-                    field_0xc4 = 24;
-                } else {
-                    Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
-                    changeBgmStatus(8);
-                    field_0xc4 = 23;
-                }
-                if (Z2GetLink()->isRiding()) {
-                    mFlags.mRiding = true;
-                    mRideCount = 0;
-                    fieldRidingMute();
-                } else {
-                    mFlags.mRiding = false;
-                    mRideCount = 0;
-                    fieldRidingMute();
-                }
+                // if (hour >= 8) {
+                //     Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
+                //     changeBgmStatus(9);
+                //     field_0xc4 = 24;
+                // } else {
+                //     Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
+                //     changeBgmStatus(8);
+                //     field_0xc4 = 23;
+                // }
+                // if (Z2GetLink()->isRiding()) {
+                //     mFlags.mRiding = true;
+                //     mRideCount = 0;
+                //     fieldRidingMute();
+                // } else {
+                //     mFlags.mRiding = false;
+                //     mRideCount = 0;
+                //     fieldRidingMute();
+                // }
             } else if (hour >= 20 || hour < 5) {
                 Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_NIGHT, &mMainBgmHandle, NULL);
             }

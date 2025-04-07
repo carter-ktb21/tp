@@ -2613,7 +2613,7 @@ void daB_MGN_c::executeOpening() {
             dComIfGp_event_reset();
 
             // Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_02, 0, 0);
-            Z2GetAudioMgr()->bgmStreamPrepare(0x2000063);
+            Z2GetAudioMgr()->bgmStreamPrepare(0x2000063); // ZREO mgn Reorch Replacement File
             Z2GetAudioMgr()->bgmStreamPlay();
             return;
         }

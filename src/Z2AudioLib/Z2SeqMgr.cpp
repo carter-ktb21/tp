@@ -1973,18 +1973,18 @@ void Z2SeqMgr::fieldBgmStart() {
         if (Z2GetStatusMgr()->checkDayTime()) {
             Z2GetAudioMgr()->bgmStreamPrepare(0x200007F);
             Z2GetAudioMgr()->bgmStreamPlay();
-        //     Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
-        //     changeBgmStatus(0);
-        //     field_0xc4 = 0;
-        //     if (Z2GetLink()->isRiding()) {
-        //         mFlags.mRiding = true;
-        //         mRideCount = 0;
-        //         fieldRidingMute();
-        //     } else {
-        //         mFlags.mRiding = false;
-        //         mRideCount = 0;
-        //         fieldRidingMute();
-        //     }
+            // Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
+            // changeBgmStatus(0);
+            field_0xc4 = 0;
+            if (Z2GetLink()->isRiding()) {
+                mFlags.mRiding = true;
+                mRideCount = 0;
+                fieldRidingMute();
+            } else {
+                mFlags.mRiding = false;
+                mRideCount = 0;
+                fieldRidingMute();
+            }
         } else {
             Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_NIGHT, &mMainBgmHandle, NULL);
             mBgmStatus = 0;

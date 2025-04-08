@@ -223,7 +223,9 @@ public:
         bool mHeightVolMod : 1;
         bool mTimeProcVolMod : 1;
     } mFlags;
-};  // Size = 0xD4
+
+    /* 0xD4 */ bool inHyruleFieldLight; // Modded in boolean to simplify playing audio stream in hyrule field instead of bms
+};  // Size = 0xD5 (Original is 0xD4)
 
 inline Z2SeqMgr* Z2GetSeqMgr() {
     return JASGlobalInstance<Z2SeqMgr>::getInstance();

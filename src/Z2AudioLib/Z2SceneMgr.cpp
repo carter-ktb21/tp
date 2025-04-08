@@ -204,119 +204,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
     bool bVar2 = false;
     field_0x1b = false;
     f32 fVar1 = -1.0f;
-
-    if (spotName != NULL) {
-        for (spot = 0; spot < (int)ARRAY_SIZE(sSpotName); spot++) {
-            if (!strcmp(spotName, sSpotName[spot])) {
-                break;
-            }
-        }
-        if (spot == (int)ARRAY_SIZE(sSpotName)) {
-            spot = SPOT_NONE;
-        }
-    }
-    if (spot == SPOT_HYRULE_FIELD) {
-        se_wave1 = 0x4a;
-        if (room == 10 && layer == 11) {
-            demo_wave = 0x74;
-            fVar1 = 0.7f;
-        } else if (layer == 9 || layer == 10) {
-            se_wave1 = 0;
-            se_wave2 = 0;
-            demo_wave = 0x7f;
-        } else if (layer == 2 || layer == 3) {
-            bgm_id = Z2BGM_HORSE_BATTLE;
-            bgm_wave1 = 0xd;
-            se_wave1 = 0x54;
-            se_wave2 = 0x4e;
-            field_0x1b = true;
-            fVar1 = 1.0f;
-            Z2GetSoundObjMgr()->setForceBattleArea(true, 700, 1100, 1500);
-        } else {
-            field_bgm_play = true;
-            if (Z2GetStatusMgr()->checkDayTime()) {
-                bgm_id = Z2BGM_FIELD_LINK_DAY;
-            } else {
-                bgm_id = Z2BGM_FIELD_LINK_NIGHT;
-            }
-            bgm_wave1 = 0x19;
-            switch (room) {
-            case 2:
-            case 3:
-            case 4:
-                se_wave2 = 0x5e;
-                break;
-            case 0:
-            case 5:
-            case 7:
-                se_wave2 = 0x5f;
-                break;
-            case 9:
-            case 10:
-            case 11:
-                se_wave2 = 0x60;
-                break;
-            case 12:
-            case 13:
-            case 14:
-                se_wave2 = 0x61;
-                break;
-            case 1:
-            case 6:
-            case 15:
-                se_wave2 = 0x4b;
-                break;
-            }
-            switch (room) {
-            case 0:
-            case 3:
-            case 6:
-            case 10:
-            case 13:
-                fVar1 = 1.0f;
-                break;
-            case 1:
-            case 2:
-            case 4:
-            case 5:
-            case 14:
-            case 15:
-                fVar1 = 0.7f;
-                break;
-            case 7:
-            case 9:
-            case 11:
-            case 12:
-                fVar1 = 0.8f;
-                break;
-            }
-        }
-
-        Z2GetSeqMgr()->setFieldBgmPlay(field_bgm_play);
-
-        if (bgm_id != BGM_ID)
-        {
-            sceneNum = spot;
-            sceneChange(bgm_id, se_wave1, se_wave2, bgm_wave1, bgm_wave2, demo_wave, false);
-        }
-        roomNum = room;
-        return;
-    }
-    // JAISoundID bgm_id = -1;
-    // JAISound* sound;
-    // int spot = 0;
-    // u8 se_wave1 = 0;
-    // u8 se_wave2 = 0;
-    // u8 bgm_wave1 = 0;
-    // u8 bgm_wave2 = 0;
-    // u8 demo_wave = 0;
-    // bool bVar6 = false;
-    // bool height_vol_mod = false;
-    // bool field_bgm_play = false;
-    // bool time_proc_vol_mod = false;
-    // bool bVar2 = false;
-    // field_0x1b = false;
-    // f32 fVar1 = -1.0f;
     
     Z2GetSeqMgr()->resetBattleBgmParams();
     Z2GetSeqMgr()->setWindStoneVol(1.0f, 0);
@@ -327,6 +214,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
     if (Z2GetStatusMgr()->getDemoStatus() == 8) {
         Z2GetStatusMgr()->setDemoName("force_end");
     }
+
+    // Modded Line:
+    // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
+    // exiting Hyrule Field.
+    Z2GetSeqMgr()->inHyruleFieldLight = false;
 
     if (spotName != NULL) {
         for (spot = 0; spot < (int)ARRAY_SIZE(sSpotName); spot++) {
@@ -1229,6 +1121,13 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_HYRULE_FIELD:
+        // Modded Line:
+        // Sets the inHyruleFieldLight boolean to true.
+        // This is done so that certain functions dealing with the bms specifically
+        // while in Hyrule Field can be ignored, since the audio is replaced
+        // with an audio stream.
+        Z2GetSeqMgr()->inHyruleFieldLight = true;
+
         se_wave1 = 0x4a;
         if (room == 10 && layer == 11) {
             demo_wave = 0x74;
@@ -1246,6 +1145,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             fVar1 = 1.0f;
             Z2GetSoundObjMgr()->setForceBattleArea(true, 700, 1100, 1500);
         } else if (inDarkness) {
+            // Modded Line:
+            // Sets the inHyruleFieldLight boolean to false.
+            Z2GetSeqMgr()->inHyruleFieldLight = false;
+
             if (layer == 12) {
                 demo_wave = 0x6a;
             } else {
@@ -1315,6 +1218,29 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
                 break;
             }
         }
+
+        // Modded Block -------------------------------------------
+        // The block below is similar to the logic towards the bottom of this function.
+        // The reason for copying that logic here (with some tweaks as will be explained) is that
+        // it allows the audio stream now playing in Hyrule Field to continue to play
+        // across the room changes of Hyrule Field if it is daytime.
+        //
+        // The key difference in logic is that it firstly ensures it is daytime (so it doesn't mess with the night theme)
+        // and the player is not in twilight. It secondly only calls the sceneChange function if the bgm_id has changed from what 
+        // it previously was, i.e. Z2BGM_FIELD_LINK_DAY. This doesn't change across Hyrule Field,
+        // ensuring the audio continues to play across room changes.
+        if (Z2GetStatusMgr()->checkDayTime() && !inDarkness) {
+            Z2GetSeqMgr()->setFieldBgmPlay(field_bgm_play);
+
+            if (bgm_id != BGM_ID) {
+                sceneNum = spot;
+                sceneChange(bgm_id, se_wave1, se_wave2, bgm_wave1, bgm_wave2, demo_wave, false);
+            }
+            roomNum = room;
+            return;
+        }
+        // --------------------------------------------------------
+
         break;
 
     case SPOT_CASTLE_TOWN_GATES:
@@ -1884,10 +1810,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
  * sceneChange__10Z2SceneMgrF10JAISoundIDUcUcUcUcUcb            */
 void Z2SceneMgr::sceneChange(JAISoundID bgm, u8 seWave1, u8 seWave2, u8 bgmWave1, u8 bgmWave2,
                              u8 demoWave, bool param_6) {
-    if (Z2GetSeqMgr()->getMainBgmID() == Z2BGM_FIELD_LINK_DAY) { // For reorch testing
-        return;
-    }
-
     if (bgm != BGM_ID) {
         if (Z2GetSeqMgr()->getMainBgmID() == bgm) {
             field_0x1a = false;

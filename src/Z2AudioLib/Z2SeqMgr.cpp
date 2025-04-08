@@ -374,6 +374,15 @@ void Z2SeqMgr::subBgmStart(u32 i_bgmID) {
         break;
     }
 
+    // Modded block ----------------
+    // I unfortunately haven't found a way to incorporate the postman theme into the
+    // Hyrule Field re-orchestration. So instead of the audio going silent, it would be better
+    // to have the field theme just continue playing.
+    if (i_bgmID == Z2BGM_POSTMAN) {
+        return;
+    }
+    // -----------------------------
+
     if (i_bgmID == getSubBgmID()) {
         if (i_bgmID == Z2BGM_SUMO || i_bgmID == Z2BGM_COWBOY_GAME) {
             mSubBgmHandle->stop(0);
@@ -553,7 +562,7 @@ void Z2SeqMgr::subBgmStopInner() {
 
 /* 802AFB94-802AFDEC 2AA4D4 0258+00 1/1 3/3 46/46 .text            bgmStreamPrepare__8Z2SeqMgrFUl */
 void Z2SeqMgr::bgmStreamPrepare(u32 i_bgmID) {
-    if (mStreamBgmHandle) {
+    if (mStreamBgmHandle && !inHyruleFieldLight) { // Modded Expression "&& !inHyruleFieldLight"
         bgmStreamStop(0);
     }
     Z2GetSoundMgr()->startSound(i_bgmID, &mStreamBgmHandle, NULL);
@@ -1834,47 +1843,47 @@ void Z2SeqMgr::setBattleLastHit(u8 param_0) {
 
 /* 802B4BD0-802B4EB0 2AF510 02E0+00 1/1 0/0 0/0 .text            battleBgmFramework__8Z2SeqMgrFv */
 void Z2SeqMgr::battleBgmFramework() {
-    // if (getSubBgmID() == Z2BGM_BATTLE_NORMAL || getSubBgmID() == Z2BGM_BATTLE_TWILIGHT) {
-    //     if (mBattleSeqCount != 0) {
-    //         mBattleSeqCount--;
-    //         if (mBattleSeqCount == 0) {
-    //             mSubBgmHandle->stop();
-    //             mBattleSeqState = 0;
-    //         }
-    //     }
-    // }
-    // if (!mFlags.mBattleBgmOff && Z2GetSceneMgr()->isSceneExist()) {
-    //     Z2GetSoundObjMgr()->searchEnemy();
-    //     switch (getSubBgmID()) {
-    //     case Z2BGM_BATTLE_TWILIGHT:
-    //         break;
-    //     case Z2BGM_BATTLE_NORMAL:
-    //         if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
-    //             return;
-    //         }
-    //         if (field_0xc1 != 0) {
-    //             field_0xc1--;
-    //             if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
-    //                 mSubBgmMaster.fadeIn(struct_8045086A);
-    //             }
-    //             if (field_0xc1 == 0) {
-    //                 setBattleDistIgnore(false);
-    //                 if (Z2GetSoundObjMgr()->checkBattleFinish()) {
-    //                     setBattleSeqState(3);
-    //                 } else if (mSubBgmMaster.getDest() != 1.0f) {
-    //                     mSubBgmMaster.fadeIn(struct_8045086A);
-    //                 }
-    //             }
-    //         }
-    //         break;
-    //     default:
-    //         mBattleSeqState = 0;
-    //         setBattleDistIgnore(false);
-    //         mFlags.mBattleSearched = 0;
-    //         field_0xc1 = 0;
-    //         mBattleLastHit = struct_80450869;
-    //     }
-    // }
+    if (getSubBgmID() == Z2BGM_BATTLE_NORMAL || getSubBgmID() == Z2BGM_BATTLE_TWILIGHT) {
+        if (mBattleSeqCount != 0) {
+            mBattleSeqCount--;
+            if (mBattleSeqCount == 0) {
+                mSubBgmHandle->stop();
+                mBattleSeqState = 0;
+            }
+        }
+    }
+    if (!mFlags.mBattleBgmOff && Z2GetSceneMgr()->isSceneExist() && !inHyruleFieldLight) { // Modded expression "&& !inHyruleFieldLight"
+        Z2GetSoundObjMgr()->searchEnemy(); // This also fades the current music playing if an enemy is near
+        switch (getSubBgmID()) {
+        case Z2BGM_BATTLE_TWILIGHT:
+            break;
+        case Z2BGM_BATTLE_NORMAL:
+            if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
+                return;
+            }
+            if (field_0xc1 != 0) {
+                field_0xc1--;
+                if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
+                    mSubBgmMaster.fadeIn(struct_8045086A);
+                }
+                if (field_0xc1 == 0) {
+                    setBattleDistIgnore(false);
+                    if (Z2GetSoundObjMgr()->checkBattleFinish()) {
+                        setBattleSeqState(3);
+                    } else if (mSubBgmMaster.getDest() != 1.0f) {
+                        mSubBgmMaster.fadeIn(struct_8045086A);
+                    }
+                }
+            }
+            break;
+        default:
+            mBattleSeqState = 0;
+            setBattleDistIgnore(false);
+            mFlags.mBattleSearched = 0;
+            field_0xc1 = 0;
+            mBattleLastHit = struct_80450869;
+        }
+    }
 }
 
 /* 802B4EB0-802B5204 2AF7F0 0354+00 1/1 0/0 0/0 .text            startBattleBgm__8Z2SeqMgrFb */

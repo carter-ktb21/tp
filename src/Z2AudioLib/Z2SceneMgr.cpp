@@ -215,10 +215,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         Z2GetStatusMgr()->setDemoName("force_end");
     }
 
-    // Modded Line:
-    // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
-    // exiting Hyrule Field.
-    Z2GetSeqMgr()->inHyruleFieldLight = false;
+    // // Modded Line:
+    // // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
+    // // exiting Hyrule Field.
+    // Z2GetSeqMgr()->inHyruleFieldLight = false;
 
     if (spotName != NULL) {
         for (spot = 0; spot < (int)ARRAY_SIZE(sSpotName); spot++) {
@@ -229,6 +229,13 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         if (spot == (int)ARRAY_SIZE(sSpotName)) {
             spot = SPOT_NONE;
         }
+    }
+
+    // Modded Line:
+    // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
+    // exiting Hyrule Field.
+    if (spot != SPOT_HYRULE_FIELD && spot != SPOT_CASTLE_TOWN_GATES) {
+        Z2GetSeqMgr()->inHyruleFieldLight = false;
     }
 
     switch (spot) {
@@ -925,6 +932,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_CASTLE_TOWN:
+        // // Modded Line:
+        // // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
+        // // exiting Hyrule Field.
+        // Z2GetSeqMgr()->inHyruleFieldLight = false;
+
         se_wave1 = 0x42;
         if (layer == 8) {
             demo_wave = 0x68;
@@ -1121,12 +1133,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_HYRULE_FIELD:
-        // Modded Line:
-        // Sets the inHyruleFieldLight boolean to true.
-        // This is done so that certain functions dealing with the bms specifically
-        // while in Hyrule Field can be ignored, since the audio is replaced
-        // with an audio stream.
-        Z2GetSeqMgr()->inHyruleFieldLight = true;
+        // Modded Line
+        // if (Z2GetSeqMgr()->inHyruleFieldLight) {
+        //     return;
+        // }
 
         se_wave1 = 0x4a;
         if (room == 10 && layer == 11) {
@@ -1163,6 +1173,13 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             field_bgm_play = true;
             if (Z2GetStatusMgr()->checkDayTime()) {
                 bgm_id = Z2BGM_FIELD_LINK_DAY;
+
+                // Modded Line:
+                // Sets the inHyruleFieldLight boolean to true.
+                // This is done so that certain functions dealing with the bms specifically
+                // while in Hyrule Field can be ignored, since the audio is replaced
+                // with an audio stream.
+                // Z2GetSeqMgr()->inHyruleFieldLight = true;
             } else {
                 bgm_id = Z2BGM_FIELD_LINK_NIGHT;
             }
@@ -1244,6 +1261,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_CASTLE_TOWN_GATES:
+        // Modded Line:
+        if (Z2GetSeqMgr()->inHyruleFieldLight) {
+            return;
+        }
+
         se_wave1 = 0x4a;
         if (layer == 8) {
             demo_wave = 0x73;
@@ -1256,6 +1278,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             se_wave2 = 0;
             demo_wave = 0x7f;
         } else if (inDarkness) {
+            // Modded Line:
+            // Sets the inHyruleFieldLight boolean to false.
+            Z2GetSeqMgr()->inHyruleFieldLight = false;
+            
             bgm_id = Z2BGM_TWILIGHT;
             bgm_wave1 = 0xe;
             se_wave2 = 0x4c;
@@ -1273,11 +1299,40 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             field_bgm_play = true;
             if (Z2GetStatusMgr()->checkDayTime()) {
                 bgm_id = Z2BGM_FIELD_LINK_DAY;
+
+                // Modded Line:
+                // Sets the inHyruleFieldLight boolean to true.
+                // This is done so that certain functions dealing with the bms specifically
+                // while in Hyrule Field can be ignored, since the audio is replaced
+                // with an audio stream.
+                // Z2GetSeqMgr()->inHyruleFieldLight = true;
             } else {
                 bgm_id = Z2BGM_FIELD_LINK_NIGHT;
             }
             bgm_wave1 = 0x19;
         }
+
+        // Modded Block -------------------------------------------
+        // The block below is similar to the logic towards the bottom of this function.
+        // The reason for copying that logic here (with some tweaks as will be explained) is that
+        // it allows the audio stream now playing in Hyrule Field to continue to play
+        // across the room changes of Hyrule Field if it is daytime.
+        //
+        // The key difference in logic is that it firstly ensures it is daytime (so it doesn't mess with the night theme)
+        // and the player is not in twilight. It secondly only calls the sceneChange function if the bgm_id has changed from what 
+        // it previously was, i.e. Z2BGM_FIELD_LINK_DAY. This doesn't change across Hyrule Field,
+        // ensuring the audio continues to play across room changes.
+        if (Z2GetStatusMgr()->checkDayTime() && !inDarkness) {
+            Z2GetSeqMgr()->setFieldBgmPlay(field_bgm_play);
+
+            if (bgm_id != BGM_ID) {
+                sceneNum = spot;
+                sceneChange(bgm_id, se_wave1, se_wave2, bgm_wave1, bgm_wave2, demo_wave, false);
+            }
+            roomNum = room;
+            return;
+        }
+        // --------------------------------------------------------
         break;
 
     case SPOT_HYLIA_BRIDGE_BATTLE:
@@ -2000,6 +2055,10 @@ void Z2SceneMgr::sceneBgmStart() {
     Z2GetStatusMgr()->setPauseFlag(0);
 
     if (!field_0x1a && Z2GetSeqMgr()->checkBgmIDPlaying(BGM_ID)) {
+        return;
+    }
+
+    if (Z2GetSeqMgr()->inHyruleFieldLight) {
         return;
     }
 

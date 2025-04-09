@@ -564,6 +564,10 @@ void Z2SeqMgr::subBgmStopInner() {
 
 /* 802AFB94-802AFDEC 2AA4D4 0258+00 1/1 3/3 46/46 .text            bgmStreamPrepare__8Z2SeqMgrFUl */
 void Z2SeqMgr::bgmStreamPrepare(u32 i_bgmID) {
+    if (inHyruleFieldLight) {
+        return;
+    }
+
     if (mStreamBgmHandle && !inHyruleFieldLight) { // Modded Expression "&& !inHyruleFieldLight"
         bgmStreamStop(0);
     }
@@ -1988,6 +1992,7 @@ void Z2SeqMgr::fieldBgmStart() {
         if (Z2GetStatusMgr()->checkDayTime()) {
             Z2GetAudioMgr()->bgmStreamPrepare(0x200007F);
             Z2GetAudioMgr()->bgmStreamPlay();
+            inHyruleFieldLight = true;
             // Z2GetSoundMgr()->startSound(Z2BGM_FIELD_LINK_DAY, &mMainBgmHandle, NULL);
             // changeBgmStatus(0);
             field_0xc4 = 0;

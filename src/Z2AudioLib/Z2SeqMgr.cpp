@@ -459,7 +459,10 @@ void Z2SeqMgr::subBgmStop() {
             field_0xb8 = 0;
             break;
         case Z2BGM_HIDDEN_VIL_D1:
-            bgmStart(Z2BGM_HIDDEN_VILLAGE, 0, 0);
+            // Modded block to play added ast "zb-hidden_village.ast" (Not the intro)
+            bgmStreamPrepare(0x2000082);
+            bgmStreamPlay();
+            // bgmStart(Z2BGM_HIDDEN_VILLAGE, 0, 0);
             // fallthrough
         case Z2BGM_BOSSBABA_0:
         case Z2BGM_MAGNE_GORON:
@@ -564,13 +567,10 @@ void Z2SeqMgr::subBgmStopInner() {
 
 /* 802AFB94-802AFDEC 2AA4D4 0258+00 1/1 3/3 46/46 .text            bgmStreamPrepare__8Z2SeqMgrFUl */
 void Z2SeqMgr::bgmStreamPrepare(u32 i_bgmID) {
-    if (inHyruleFieldLight) {
-        return;
-    }
-
-    if (mStreamBgmHandle && !inHyruleFieldLight) { // Modded Expression "&& !inHyruleFieldLight"
+    if (mStreamBgmHandle) {
         bgmStreamStop(0);
     }
+
     Z2GetSoundMgr()->startSound(i_bgmID, &mStreamBgmHandle, NULL);
     mStreamBgmHandle->lockWhenPrepared();
 
@@ -1859,39 +1859,35 @@ void Z2SeqMgr::battleBgmFramework() {
         }
     }
     if (!mFlags.mBattleBgmOff && Z2GetSceneMgr()->isSceneExist() && !inHyruleFieldLight) { // Modded expression "&& !inHyruleFieldLight"
-        // Modded Line
-        // If not in Midna's Desperate Hour
-        if (!dComIfGs_isEventBit(dSv_event_flag_c::M_071) && dComIfGs_isEventBit(dSv_event_flag_c::F_0250)) {
-            Z2GetSoundObjMgr()->searchEnemy(); // This also fades the current music playing if an enemy is near
-            switch (getSubBgmID()) {
-            case Z2BGM_BATTLE_TWILIGHT:
-                break;
-            case Z2BGM_BATTLE_NORMAL:
-                if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
-                    return;
+        Z2GetSoundObjMgr()->searchEnemy(); // This also fades the current music playing if an enemy is near
+        switch (getSubBgmID()) {
+        case Z2BGM_BATTLE_TWILIGHT:
+            break;
+        case Z2BGM_BATTLE_NORMAL:
+            if (getMainBgmID() == Z2BGM_FIELD_LINK_DAY && !Z2GetSoundObjMgr()->isTwilightBattle()) {
+                return;
+            }
+            if (field_0xc1 != 0) {
+                field_0xc1--;
+                if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
+                    mSubBgmMaster.fadeIn(struct_8045086A);
                 }
-                if (field_0xc1 != 0) {
-                    field_0xc1--;
-                    if (field_0xc1 < mBattleLastHit && mSubBgmMaster.getDest() != 1.0f) {
+                if (field_0xc1 == 0) {
+                    setBattleDistIgnore(false);
+                    if (Z2GetSoundObjMgr()->checkBattleFinish()) {
+                        setBattleSeqState(3);
+                    } else if (mSubBgmMaster.getDest() != 1.0f) {
                         mSubBgmMaster.fadeIn(struct_8045086A);
                     }
-                    if (field_0xc1 == 0) {
-                        setBattleDistIgnore(false);
-                        if (Z2GetSoundObjMgr()->checkBattleFinish()) {
-                            setBattleSeqState(3);
-                        } else if (mSubBgmMaster.getDest() != 1.0f) {
-                            mSubBgmMaster.fadeIn(struct_8045086A);
-                        }
-                    }
                 }
-                break;
-            default:
-                mBattleSeqState = 0;
-                setBattleDistIgnore(false);
-                mFlags.mBattleSearched = 0;
-                field_0xc1 = 0;
-                mBattleLastHit = struct_80450869;
             }
+            break;
+        default:
+            mBattleSeqState = 0;
+            setBattleDistIgnore(false);
+            mFlags.mBattleSearched = 0;
+            field_0xc1 = 0;
+            mBattleLastHit = struct_80450869;
         }
     }
 }

@@ -645,7 +645,7 @@ config.libs = [
             Object(NonMatching, "d/d_npc_lib.cpp"),
             Object(MatchingFor("GZ2E01"), "d/d_ovlp_fade.cpp"),
             Object(NonMatching, "d/d_ovlp_fade2.cpp"),
-            Object(NonMatching, "d/d_ovlp_fade3.cpp"),
+            Object(Modded, "d/d_ovlp_fade3.cpp"),
             Object(MatchingFor("GZ2E01"), "d/d_pane_class.cpp"),
             Object(MatchingFor("GZ2E01"), "d/d_pane_class_alpha.cpp"),
             Object(MatchingFor("GZ2E01"), "d/d_pane_class_ex.cpp", extra_cflags=['-pragma "nosyminline on"']),

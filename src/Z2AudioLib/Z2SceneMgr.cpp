@@ -215,11 +215,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         Z2GetStatusMgr()->setDemoName("force_end");
     }
 
-    // // Modded Line:
-    // // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
-    // // exiting Hyrule Field.
-    // Z2GetSeqMgr()->inHyruleFieldLight = false;
-
     if (spotName != NULL) {
         for (spot = 0; spot < (int)ARRAY_SIZE(sSpotName); spot++) {
             if (!strcmp(spotName, sSpotName[spot])) {
@@ -236,6 +231,13 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
     // exiting Hyrule Field.
     if (spot != SPOT_HYRULE_FIELD && spot != SPOT_CASTLE_TOWN_GATES) {
         Z2GetSeqMgr()->inHyruleFieldLight = false;
+    }
+
+    // Modded Line:
+    // Sets the inFaronWoodsLight boolean to false in order to reset the value upon
+    // exiting Faron Woods.
+    if (spot != SPOT_FARON_WOODS) {
+        Z2GetSeqMgr()->inFaronWoodsLight = false;
     }
 
     switch (spot) {
@@ -519,17 +521,33 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_CORO_SHOP:
+        if (Z2GetSeqMgr()->inFaronWoodsLight) {
+            return;
+        }
+
         se_wave1 = 0x31;
         if (inDarkness) {
+            // Modded Line:
+            // Sets the inFaronWoodsLight boolean to false.
+            Z2GetSeqMgr()->inFaronWoodsLight = false;
+
             bgm_id = Z2BGM_TWILIGHT;
             bgm_wave1 = 0xe;
             se_wave2 = 0x33;
         } else {
             if (layer == 1) {
+                // Modded Line:
+                // Sets the inFaronWoodsLight boolean to false.
+                Z2GetSeqMgr()->inFaronWoodsLight = false;
+                
                 bgm_id = Z2BGM_EVENT05;
                 bgm_wave1 = 0x55;
                 se_wave2 = 0x32;
             } else {
+                // Modded Line:
+                // Sets the inFaronWoodsLight boolean to true.
+                Z2GetSeqMgr()->inFaronWoodsLight = true;
+
                 bgm_id = Z2BGM_FILONE_FOREST;
                 bgm_wave1 = 0xf;
                 time_proc_vol_mod = true;
@@ -540,6 +558,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_FARON_WOODS:
+        if (Z2GetSeqMgr()->inFaronWoodsLight) {
+            return;
+        }
+
         se_wave1 = 0x31;
         if (layer == 11) {
             demo_wave = 0x6c;
@@ -547,6 +569,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         } else if (layer == 9) {
             demo_wave = 0x6a;
         } else if (inDarkness) {
+            // Modded Line:
+            // Sets the inFaronWoodsLight boolean to false.
+            Z2GetSeqMgr()->inFaronWoodsLight = false;
+
             if (layer == 7) {
                 demo_wave = 0x78;
             } else if (layer == 8) {
@@ -574,6 +600,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
                 demo_wave = 0x5c;
                 break;
             case 1:
+                // Modded Line:
+                // Sets the inFaronWoodsLight boolean to false.
+                Z2GetSeqMgr()->inFaronWoodsLight = false;
+
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[18])
                     && !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[625]))
                 {
@@ -582,6 +612,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
                 }
                 break;
             default:
+                // Modded Line:
+                // Sets the inFaronWoodsLight boolean to true.
+                Z2GetSeqMgr()->inFaronWoodsLight = true;
+
                 bgm_id = Z2BGM_FILONE_FOREST;
                 bgm_wave1 = 0xf;
                 time_proc_vol_mod = true;
@@ -932,11 +966,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_CASTLE_TOWN:
-        // // Modded Line:
-        // // Sets the inHyruleFieldLight boolean to false in order to reset the value upon
-        // // exiting Hyrule Field.
-        // Z2GetSeqMgr()->inHyruleFieldLight = false;
-
         se_wave1 = 0x42;
         if (layer == 8) {
             demo_wave = 0x68;
@@ -1133,11 +1162,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_HYRULE_FIELD:
-        // Modded Line
-        // if (Z2GetSeqMgr()->inHyruleFieldLight) {
-        //     return;
-        // }
-
         se_wave1 = 0x4a;
         if (room == 10 && layer == 11) {
             demo_wave = 0x74;
@@ -1173,13 +1197,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             field_bgm_play = true;
             if (Z2GetStatusMgr()->checkDayTime()) {
                 bgm_id = Z2BGM_FIELD_LINK_DAY;
-
-                // Modded Line:
-                // Sets the inHyruleFieldLight boolean to true.
-                // This is done so that certain functions dealing with the bms specifically
-                // while in Hyrule Field can be ignored, since the audio is replaced
-                // with an audio stream.
-                // Z2GetSeqMgr()->inHyruleFieldLight = true;
             } else {
                 bgm_id = Z2BGM_FIELD_LINK_NIGHT;
             }
@@ -1299,13 +1316,6 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             field_bgm_play = true;
             if (Z2GetStatusMgr()->checkDayTime()) {
                 bgm_id = Z2BGM_FIELD_LINK_DAY;
-
-                // Modded Line:
-                // Sets the inHyruleFieldLight boolean to true.
-                // This is done so that certain functions dealing with the bms specifically
-                // while in Hyrule Field can be ignored, since the audio is replaced
-                // with an audio stream.
-                // Z2GetSeqMgr()->inHyruleFieldLight = true;
             } else {
                 bgm_id = Z2BGM_FIELD_LINK_NIGHT;
             }
@@ -2058,11 +2068,8 @@ void Z2SceneMgr::sceneBgmStart() {
         return;
     }
 
-    if (Z2GetSeqMgr()->inHyruleFieldLight) {
-        return;
-    }
-
-    if (!BGM_ID.isAnonymous() && Z2GetStatusMgr()->getDemoStatus() != 11) {
+    if (!BGM_ID.isAnonymous() && Z2GetStatusMgr()->getDemoStatus() != 11 && 
+            !Z2GetSeqMgr()->inHyruleFieldLight && !Z2GetSeqMgr()->inFaronWoodsLight) {
         bool var;
         switch (BGM_ID.mId.mBytes.b0) {
         case 1:
@@ -2135,6 +2142,13 @@ void Z2SceneMgr::sceneBgmStart() {
             Z2GetSeqMgr()->bgmStreamPlay();
             break;
         }
+    }
+
+    if (Z2GetSeqMgr()->inFaronWoodsLight) {
+        // Modded block to play added ast "zb-faron_woods.ast"
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000081);
+        Z2GetSeqMgr()->bgmStreamPlay();
+        // return;
     }
 
     Z2GetSeqMgr()->bgmAllUnMute(0);

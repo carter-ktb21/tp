@@ -224,8 +224,9 @@ public:
         bool mTimeProcVolMod : 1;
     } mFlags;
 
-    /* 0xD4 */ bool inHyruleFieldLight; // Modded in boolean to simplify playing audio stream in hyrule field instead of bms
-};  // Size = 0xD5 (Original is 0xD4)
+    /* 0xD4 */ bool inHyruleFieldLight; // Modded boolean to simplify playing audio stream in Hyrule Field instead of bms
+    /* 0xD5 */ bool inFaronWoodsLight; // Modded boolean to play audio stream throughout Faron Woods
+};  // Size = 0xD6 (Original is 0xD4)
 
 inline Z2SeqMgr* Z2GetSeqMgr() {
     return JASGlobalInstance<Z2SeqMgr>::getInstance();

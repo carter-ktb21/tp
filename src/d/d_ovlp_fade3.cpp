@@ -9,9 +9,6 @@
 #include "m_Do/m_Do_audio.h"
 #include "m_Do/m_Do_graphic.h"
 
-extern "C" u8 func_80141AE8(u8*);
-extern "C" s8 func_80252E70(s8*);
-
 /* 80252ED4-80252F28 24D814 0054+00 1/0 0/0 0/0 .text            draw__16dDlst_snapShot_cFv */
 void dDlst_snapShot_c::draw() {
     GXSetTexCopySrc(0, 0, 608, 448);
@@ -115,7 +112,7 @@ void dOvlpFd3_dlst_c::draw() {
 
 /* 8025343C-80253518 24DD7C 00DC+00 1/1 0/0 0/0 .text            __ct__10dOvlpFd3_cFv */
 dOvlpFd3_c::dOvlpFd3_c() {
-    setExecute(&execFirstSnap);
+    setExecute(&dOvlpFd3_c::execFirstSnap);
     dComIfGp_2dShowOff();
 
     mTimer = 2;
@@ -130,9 +127,9 @@ dOvlpFd3_c::dOvlpFd3_c() {
 
 /* 80253518-802535AC 24DE58 0094+00 1/0 0/0 0/0 .text            execFirstSnap__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execFirstSnap() {
-    if (func_80141AE8(&field_0x11f) == 0 && field_0x11c != 0) {
-        if (func_80252E70(&mTimer) == 0) {
-            setExecute(&execFadeOut);
+    if (cLib_calcTimer(&field_0x11f) == 0 && field_0x11c != 0) {
+        if (cLib_calcTimer(&mTimer) == 0) {
+            setExecute(&dOvlpFd3_c::execFadeOut);
             fopOvlpM_Done(this);
             mTimer = 0xFF;
         }
@@ -148,7 +145,7 @@ void dOvlpFd3_c::execFadeOut() {
     if (mTimer == 0) {
         if (fopOvlpM_IsOutReq(this)) {
             fopOvlpM_SceneIsStart();
-            setExecute(&execNextSnap);
+            setExecute(&dOvlpFd3_c::execNextSnap);
             field_0x110 = -0x4000;
             mTimer = 1;
         }
@@ -161,19 +158,19 @@ void dOvlpFd3_c::execFadeOut() {
             mDoAud_setFadeOutStart(0);
         }
     } else {
-        func_80252E70(&mTimer);
+        cLib_calcTimer(&mTimer);
     }
 }
 
 /* 8025368C-80253730 24DFCC 00A4+00 1/0 0/0 0/0 .text            execNextSnap__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execNextSnap() {
-    if (func_80252E70(&mTimer) == 0) {
+    if (cLib_calcTimer(&mTimer) == 0) {
         if (!JFWDisplay::getManager()->getFader()->startFadeIn(XREG_S(4) + 26)) {
             mDoAud_setFadeInStart(0);
             field_0x110 += field_0x112;
 
             dComIfGp_setWindowNum(1);
-            setExecute(&execFadeIn);
+            setExecute(&dOvlpFd3_c::execFadeIn);
         }
     }
 }

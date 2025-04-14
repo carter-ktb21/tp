@@ -240,6 +240,13 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         Z2GetSeqMgr()->inFaronWoodsLight = false;
     }
 
+    // Modded Line:
+    // Sets the inLakeHyliaLight boolean to false in order to reset the value upon
+    // exiting Lake Hylia.
+    if (spot != SPOT_LAKE_HYLIA) {
+        Z2GetSeqMgr()->inLakeHyliaLight = false;
+    }
+
     switch (spot) {
     case SPOT_ENEMY_TEST:
         bgm_wave2 = 2;
@@ -873,6 +880,9 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             }
         } else {
             if (room == 0) {
+                // Modded Line: Sets inLakeHyliaLight boolean to true
+                Z2GetSeqMgr()->inLakeHyliaLight = true;
+
                 bgm_id = Z2BGM_LAKE;
                 bgm_wave1 = 0x34;
                 height_vol_mod = true;
@@ -2069,7 +2079,8 @@ void Z2SceneMgr::sceneBgmStart() {
     }
 
     if (!BGM_ID.isAnonymous() && Z2GetStatusMgr()->getDemoStatus() != 11 && 
-            !Z2GetSeqMgr()->inHyruleFieldLight && !Z2GetSeqMgr()->inFaronWoodsLight) {
+            !Z2GetSeqMgr()->inHyruleFieldLight && !Z2GetSeqMgr()->inFaronWoodsLight &&
+            !Z2GetSeqMgr()->inLakeHyliaLight) {
         bool var;
         switch (BGM_ID.mId.mBytes.b0) {
         case 1:
@@ -2148,7 +2159,12 @@ void Z2SceneMgr::sceneBgmStart() {
         // Modded block to play added ast "zb-faron_woods.ast"
         Z2GetSeqMgr()->bgmStreamPrepare(0x2000081);
         Z2GetSeqMgr()->bgmStreamPlay();
-        // return;
+    }
+
+    if (Z2GetSeqMgr()->inLakeHyliaLight) {
+        // Modded block to play added ast "zb-lake_hylia.ast"
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000083);
+        Z2GetSeqMgr()->bgmStreamPlay();
     }
 
     Z2GetSeqMgr()->bgmAllUnMute(0);

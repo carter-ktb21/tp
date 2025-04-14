@@ -226,7 +226,8 @@ public:
 
     /* 0xD4 */ bool inHyruleFieldLight; // Modded boolean to simplify playing audio stream in Hyrule Field instead of bms
     /* 0xD5 */ bool inFaronWoodsLight; // Modded boolean to play audio stream throughout Faron Woods
-};  // Size = 0xD6 (Original is 0xD4)
+    /* 0xD6 */ bool inLakeHyliaLight; // Modded boolean to play Lake Hylia reorch
+};  // Size = 0xD7 (Original is 0xD4)
 
 inline Z2SeqMgr* Z2GetSeqMgr() {
     return JASGlobalInstance<Z2SeqMgr>::getInstance();

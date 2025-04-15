@@ -210,7 +210,11 @@ static void e_hzelda_wait(e_hzelda_class* i_this) {
 
     switch (i_this->mMode) {
     case -1:
-        Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_01, 0, 0);
+        // Modded Block
+        Z2GetAudioMgr()->bgmStreamPrepare(0x2000088);
+        Z2GetAudioMgr()->bgmStreamPlay();
+        
+        // Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_01, 0, 0);
     case 0:
         anm_init(i_this, ANM_FWAIT, 10.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
         i_this->mMode = 1;

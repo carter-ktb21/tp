@@ -186,6 +186,8 @@ void Z2SceneMgr::setFadeInStart(u8 param_0) {
     inGame = true;
 }
 
+static bool inKakarikoVillageLight;
+
 /* 802B6AF8-802B995C 2B1438 2E64+00 8/0 1/1 0/0 .text            setSceneName__10Z2SceneMgrFPcll */
 // NONMATCHING JSULink<JAIStream>::getNext() inlining
 void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
@@ -238,6 +240,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
     // exiting Faron Woods.
     if (spot != SPOT_FARON_WOODS) {
         Z2GetSeqMgr()->inFaronWoodsLight = false;
+    }
+
+    if (spot != SPOT_KAKARIKO_VILLAGE || !Z2GetStatusMgr()->checkDayTime()) {
+        inKakarikoVillageLight = false;
     }
 
     // Modded Line:
@@ -637,6 +643,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_KAKARIKO_VILLAGE:
+        // Modded Block
+        if (inKakarikoVillageLight) {
+            return;
+        }
+
         se_wave1 = 0x34;
         if (layer == 8) {
             demo_wave = 0x6e;
@@ -672,6 +683,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
                 bgm_wave1 = 0x2c;
                 break;
             case 0:
+                // Modded Block
+                if (Z2GetStatusMgr()->checkDayTime()) {
+                    inKakarikoVillageLight = true;
+                }
+
                 bgm_id = Z2BGM_KAKARIKO;
                 bgm_wave1 = 0x10;
                 bgm_wave2 = 0x18;
@@ -689,6 +705,11 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
                 bgm_wave1 = 0x2c;
                 break;
             default:
+                // Modded Block
+                if (Z2GetStatusMgr()->checkDayTime()) {
+                    inKakarikoVillageLight = true;
+                }
+
                 bgm_id = Z2BGM_KAKARIKO;
                 bgm_wave1 = 0x10;
                 bgm_wave2 = 0x23;
@@ -755,6 +776,10 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             case 4:
             case 5:
             case 6:
+                // Modded Block
+                if (Z2GetStatusMgr()->checkDayTime()) {
+                    inKakarikoVillageLight = true;
+                }
                 break;
             }
             se_wave2 = 0x86;
@@ -2080,7 +2105,7 @@ void Z2SceneMgr::sceneBgmStart() {
 
     if (!BGM_ID.isAnonymous() && Z2GetStatusMgr()->getDemoStatus() != 11 && 
             !Z2GetSeqMgr()->inHyruleFieldLight && !Z2GetSeqMgr()->inFaronWoodsLight &&
-            !Z2GetSeqMgr()->inLakeHyliaLight) {
+            !Z2GetSeqMgr()->inLakeHyliaLight && !inKakarikoVillageLight) {
         bool var;
         switch (BGM_ID.mId.mBytes.b0) {
         case 1:
@@ -2161,9 +2186,15 @@ void Z2SceneMgr::sceneBgmStart() {
         Z2GetSeqMgr()->bgmStreamPlay();
     }
 
+    if (inKakarikoVillageLight) {
+        // Modded block to play added ast "zb-kakariko_village.ast"
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000083);
+        Z2GetSeqMgr()->bgmStreamPlay();
+    }
+
     if (Z2GetSeqMgr()->inLakeHyliaLight) {
         // Modded block to play added ast "zb-lake_hylia.ast"
-        Z2GetSeqMgr()->bgmStreamPrepare(0x2000083);
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000084);
         Z2GetSeqMgr()->bgmStreamPlay();
     }
 

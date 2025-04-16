@@ -2182,19 +2182,19 @@ void Z2SceneMgr::sceneBgmStart() {
 
     if (Z2GetSeqMgr()->inFaronWoodsLight) {
         // Modded block to play added ast "zb-faron_woods.ast"
-        Z2GetSeqMgr()->bgmStreamPrepare(0x2000081);
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000084);
         Z2GetSeqMgr()->bgmStreamPlay();
     }
 
     if (inKakarikoVillageLight) {
         // Modded block to play added ast "zb-kakariko_village.ast"
-        Z2GetSeqMgr()->bgmStreamPrepare(0x2000083);
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000086);
         Z2GetSeqMgr()->bgmStreamPlay();
     }
 
     if (Z2GetSeqMgr()->inLakeHyliaLight) {
         // Modded block to play added ast "zb-lake_hylia.ast"
-        Z2GetSeqMgr()->bgmStreamPrepare(0x2000084);
+        Z2GetSeqMgr()->bgmStreamPrepare(0x2000087);
         Z2GetSeqMgr()->bgmStreamPlay();
     }
 

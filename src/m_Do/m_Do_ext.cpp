@@ -69,8 +69,12 @@ static void mDoExt_setJ3DData(Mtx mtx, const J3DTransformInfo* transformInfo, u1
 }
 
 static BOOL isCurrentSolidHeap() {
-    /* Nonmatching */
-    return FALSE;
+    JKRHeap* heap = JKRGetCurrentHeap();
+    if (heap->getHeapType() != 'SLID') {
+        OS_REPORT_ERROR("ソリッドヒープちゃうがな！\n");
+        return FALSE;
+    }
+    return TRUE;
 }
 
 /* 8000D320-8000D428 007C60 0108+00 6/6 0/0 0/0 .text            initPlay__14mDoExt_baseAnmFsifss */
@@ -616,6 +620,14 @@ JKRExpHeap* mDoExt_createZeldaHeap(u32 heapSize, JKRHeap* i_heap) {
 JKRExpHeap* mDoExt_getZeldaHeap() {
     return zeldaHeap;
 }
+
+#if VERSION == VERSION_SHIELD_DEBUG
+s32 safeZeldaHeapSize = -1;
+
+s32 mDoExt_getSafeZeldaHeapSize() {
+    return safeZeldaHeapSize;
+}
+#endif
 
 /* 80450C30-80450C34 000130 0004+00 2/1 1/1 0/0 .sbss            commandHeap */
 JKRExpHeap* commandHeap;

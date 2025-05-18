@@ -274,7 +274,7 @@ int dEvt_control_c::catchCheck(dEvt_order_c* p_order) {
     fopAc_ac_c* actor2 = p_order->mActor2;
     fopAc_ac_c* actor1 = p_order->mActor1;
 
-    if (actor1 == NULL || (actor2 != NULL && !actor2->eventInfo.chkCondition(0x40))) {
+    if (actor1 == NULL || (actor2 != NULL && !actor2->eventInfo.chkCondition(dEvtCnd_40_e))) {
         return 0;
     }
 
@@ -1129,9 +1129,9 @@ dStage_MapEvent_dt_c* dEvt_control_c::searchMapEventData(u8 mapToolID, s32 roomN
         dStage_MapEventInfo_c* roomInfo = room_dt->getMapEventInfo();
 
         if (roomInfo != NULL) {
-            for (int i = 0; i < roomInfo->mCount; i++) {
-                if (mapToolID == roomInfo->mData[i].field_0x4) {
-                    return &roomInfo->mData[i];
+            for (int i = 0; i < roomInfo->num; i++) {
+                if (mapToolID == roomInfo->m_entries[i].field_0x4) {
+                    return &roomInfo->m_entries[i];
                 }
             }
         }
@@ -1139,9 +1139,9 @@ dStage_MapEvent_dt_c* dEvt_control_c::searchMapEventData(u8 mapToolID, s32 roomN
 
     dStage_MapEventInfo_c* stageInfo = dComIfGp_getStage()->getMapEventInfo();
     if (stageInfo != NULL) {
-        for (int i = 0; i < stageInfo->mCount; i++) {
-            if (mapToolID == stageInfo->mData[i].field_0x4) {
-                return &stageInfo->mData[i];
+        for (int i = 0; i < stageInfo->num; i++) {
+            if (mapToolID == stageInfo->m_entries[i].field_0x4) {
+                return &stageInfo->m_entries[i];
             }
         }
     }

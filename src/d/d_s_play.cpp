@@ -90,12 +90,18 @@ dScnPly_env_otherHIO_c::dScnPly_env_otherHIO_c() {
     mDispTransCylinder = false;
 }
 
+void dScnPly_env_otherHIO_c::genMessage(JORMContext* ctx) {
+}
+
 /* 80259468-802594AC 253DA8 0044+00 1/1 0/0 0/0 .text            __ct__22dScnPly_env_debugHIO_cFv */
 dScnPly_env_debugHIO_c::dScnPly_env_debugHIO_c() {
     mBoxCullMinSize.set(-100.0f, -100.0f, -100.0f);
     mBoxCullMaxSize.set(100.0f, 100.0f, 100.0f);
     mSphereCullCenter.set(0.0f, 0.0f, 0.0f);
     mSphereCullRadius = 100.0f;
+}
+
+void dScnPly_env_debugHIO_c::genMessage(JORMContext* ctx) {
 }
 
 /* 802594AC-802597B8 253DEC 030C+00 1/0 0/0 0/0 .text            dScnPly_Draw__FP9dScnPly_c */
@@ -573,6 +579,10 @@ dScnPly_reg_HIO_c g_regHIO;
 
 /* 8043079C-804307E0 05D4BC 0044+00 1/2 3/3 0/0 .bss             g_envHIO */
 dScnPly_env_HIO_c g_envHIO;
+
+#ifdef DEBUG
+dScnPly_preset_HIO_c g_presetHIO;
+#endif
 
 /* 8025A654-8025A9F4 254F94 03A0+00 1/0 0/0 0/0 .text            phase_4__FP9dScnPly_c */
 static int phase_4(dScnPly_c* i_this) {

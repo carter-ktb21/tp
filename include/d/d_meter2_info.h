@@ -152,11 +152,11 @@ public:
     u8 getGameOverType() { return mGameOverType; }
     void setGameOverType(u8 i_gameoverType) { mGameOverType = i_gameoverType; }
     void setMsgKeyWaitTimer(s16 i_waitTimer) { mMsgKeyWaitTimer = i_waitTimer; }
-    u32 getMsgTimeMs() { return mMsgTimeMs; }
-    void setMsgTimeMs(u32 msgTime) { mMsgTimeMs = msgTime; }
+    s32 getMsgTimeMs() { return mMsgTimeMs; }
+    void setMsgTimeMs(s32 msgTime) { mMsgTimeMs = msgTime; }
     void setTimeMs(s32 i_time) { mTimeMs = i_time; }
-    u32 getTimeMs() { return mTimeMs; }
-    int getNowCount() { return mNowCount; }
+    s32 getTimeMs() { return mTimeMs; }
+    u8 getNowCount() { return mNowCount; }
     int getMaxCount() { return mMaxCount; }
     void setScopeZoomPointer(u8 param_0) { mScopeZoomPointer = param_0; }
     u8 getItemExplainWindowStatus() { return mItemExplainWindowStatus; }
@@ -179,6 +179,8 @@ public:
         mCollectCursorPosY = y;
     }
     void setMapDrugFlag(u8 flag) { mMapDrugFlag = flag; }
+    void offTempBit(int i_bit) { mTempBits &= ~(1 << i_bit); }
+    void onTempBit(int i_bit) { mTempBits |= (1 << i_bit); }
     bool isTempBit(int bit) { return mTempBits & (1 << bit); }
     void offSub2DStatus(int bit) { mSub2DStatus &= ~(1 << bit); }
     void onSub2DStatus(int bit) { mSub2DStatus |= 1 << bit; }
@@ -218,7 +220,7 @@ public:
     /* 0x7C */ f32 m2DPosV;
     /* 0x80 */ f32 unk128;
     /* 0x84 */ s32 mTimeMs;
-    /* 0x88 */ u32 mMsgTimeMs;
+    /* 0x88 */ s32 mMsgTimeMs;
     /* 0x8C */ s32 mMeterString;
     /* 0x90 */ u32 mTempBits;
     /* 0x94 */ s16 mMsgKeyWaitTimer;
@@ -285,8 +287,7 @@ void dMeter2Info_setCloth(u8 i_clothId, bool param_1);
 void dMeter2Info_setShield(u8 i_itemId, bool param_1);
 void dMeter2Info_set2DVibration();
 void dMeter2Info_set2DVibrationM();
-static void dMeter2Info_setFloatingMessage(u16 pMessageID, s16 pMessageTimer, bool pWakuVisible);
-static void dMeter2Info_offUseButton(int pButton);
+void dMeter2Info_offUseButton(int pButton);
 bool dMeter2Info_is2DActiveTouchArea();
 u8 dMeter2Info_getRecieveLetterNum();
 bool dMeter2Info_getPixel(f32 param_0, f32 param_1, f32 param_2, f32 param_3, f32 param_4,
@@ -618,15 +619,15 @@ inline void dMeter2Info_setMsgKeyWaitTimer(s16 i_waitTimer) {
     g_meter2_info.setMsgKeyWaitTimer(i_waitTimer);
 }
 
-inline u32 dMeter2Info_getMsgTimeMs() {
+inline s32 dMeter2Info_getMsgTimeMs() {
     return g_meter2_info.getMsgTimeMs();
 }
 
-inline u32 dMeter2Info_getTimeMs() {
+inline s32 dMeter2Info_getTimeMs() {
     return g_meter2_info.getTimeMs();
 }
 
-inline void dMeter2Info_setMsgTimeMs(u32 msgTime) {
+inline void dMeter2Info_setMsgTimeMs(s32 msgTime) {
     g_meter2_info.setMsgTimeMs(msgTime);
 }
 
@@ -634,7 +635,7 @@ inline void dMeter2Info_setTimeMs(s32 i_time) {
     g_meter2_info.setTimeMs(i_time);
 }
 
-inline int dMeter2Info_getNowCount() {
+inline u8 dMeter2Info_getNowCount() {
     return g_meter2_info.getNowCount();
 }
 
@@ -797,6 +798,26 @@ inline bool dMeter2Info_isWindowAccept(int param_0) {
 
 inline void dMeter2Info_setHorseLifeCount(s16 i_count) {
     g_meter2_info.setHorseLifeCount(i_count);
+}
+
+inline void dMeter2Info_offTempBit(int i_bit) {
+    g_meter2_info.offTempBit(i_bit);
+}
+
+inline void dMeter2Info_onTempBit(int i_bit) {
+    g_meter2_info.onTempBit(i_bit);
+}
+
+inline bool dMeter2Info_isNextStage(const char*, s16, s16, s16) {
+    return false;
+}
+
+inline void dMeter2Info_setFloatingMessage(u16 pMessageID, s16 pMessageTimer, bool pWakuVisible) {
+    g_meter2_info.setFloatingMessage(pMessageID, pMessageTimer, pWakuVisible);
+}
+
+inline void dMeter2Info_setMiniGameCount(s8 i_count) {
+    g_meter2_info.setMiniGameCount(i_count);
 }
 
 const char* dMeter2Info_getPlusTextureName();

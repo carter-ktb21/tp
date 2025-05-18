@@ -69,12 +69,10 @@ public:
     /* 0x1C vtable */
 
     struct Shape {
-        /* 80167BBC */ ~Shape();
+        /* 80167BBC */ ~Shape() {}
 
         /* 0x00 */ int _0;
-        /* 0x04 */ f32 _4;
-        /* 0x08 */ f32 _8;
-        /* 0x0C */ f32 _C;
+        /* 0x04 */ cXyz _4;
         /* 0x10 */ f32 _10;
         /* 0x14 */ f32 _14;
     };
@@ -524,6 +522,8 @@ public:
     void OnTgSetBit() { mObjTg.OnSPrmBit(1); }
     void OffTgSetBit() { mObjTg.ClrSet(); }
     void OnCoSetBit() { mObjCo.OnSPrmBit(1); }
+    void OffAtVsEnemyBit() { mObjAt.OffSPrmBit(0x2); }
+    void OnAtVsEnemyBit() { mObjAt.OnSPrmBit(0x2); }
     void OffAtVsPlayerBit() { mObjAt.OffSPrmBit(0xC); }
     void OnAtVsPlayerBit() { mObjAt.OnSPrmBit(0xC); }
     void OnCoSPrmBit(u32 flag) { mObjCo.OnSPrmBit(flag); }

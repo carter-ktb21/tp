@@ -36,7 +36,7 @@ inline void cMtx_scale(Mtx m, f32 x, f32 y, f32 z) {
     MTXScale(m, x, y, z);
 }
 
-inline void mDoMtx_multVec(Mtx m, const Vec* src, Vec* dst) {
+inline void mDoMtx_multVec(CMtxP m, const Vec* src, Vec* dst) {
     MTXMultVec(m, src, dst);
 }
 
@@ -80,7 +80,7 @@ inline void cMtx_lookAt(Mtx param_0, const Vec* param_1, const Vec* param_2, s16
     mDoMtx_lookAt(param_0, param_1, param_2, param_3);
 }
 
-inline void cMtx_multVec(Mtx mtx, const Vec* src, Vec* dst) {
+inline void cMtx_multVec(const Mtx mtx, const Vec* src, Vec* dst) {
     mDoMtx_multVec(mtx, src, dst);
 }
 
@@ -343,6 +343,10 @@ public:
 
     static void rotAxisRadS(const Vec* axis, f32 rad) {
         MTXRotAxisRad(now, axis, rad);
+    }
+
+    static void identity() {
+        MTXIdentity(now);
     }
 
     static Mtx now;

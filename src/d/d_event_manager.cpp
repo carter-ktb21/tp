@@ -38,7 +38,7 @@ const char* dEvent_exception_c::getEventName() {
         "PORTALWARP_START", "PORTALWARP_START_B",
     };
 
-    s32 roomNo = dComIfGp_roomControl_getStayNo();
+    int roomNo = dComIfGp_roomControl_getStayNo();
     dStage_roomDt_c* roomDt = dComIfGp_roomControl_getStatusRoomDt(roomNo);
     dStage_MapEventInfo_c* eventInfo = roomDt->getMapEventInfo();
     if (mEventInfoIdx == -1) {
@@ -60,11 +60,11 @@ const char* dEvent_exception_c::getEventName() {
             return "(!NO INFO!)";
         }
 
-        if (mEventInfoIdx < 0 || mEventInfoIdx > eventInfo->mCount) {
+        if (mEventInfoIdx < 0 || mEventInfoIdx > eventInfo->num) {
             return "(!BAD NUMBER!)";
         }
 
-        dStage_MapEvent_dt_c* revt = &eventInfo->mData[mEventInfoIdx];
+        dStage_MapEvent_dt_c* revt = &eventInfo->m_entries[mEventInfoIdx];
         switch (revt->mType) {
         case 1:
         case 2:

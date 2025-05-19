@@ -116,6 +116,9 @@ public:
     /* 0x1397 */ s8 mSetDeadColor;
     /* 0x1398 */ f32 mDeadColor;
     /* 0x139C */ u8 mInitHIO;
+
+    // // Modded Variable
+    // /* 0x139D */ bool playDiababaAfterVulnerable;
 };
 
 STATIC_ASSERT(sizeof(b_bq_class) == 0x13A0);
@@ -123,7 +126,7 @@ STATIC_ASSERT(sizeof(b_bq_class) == 0x13A0);
 class daB_BQ_HIO_c {
 public:
     /* 805B356C */ daB_BQ_HIO_c();
-    /* 805B9FFC */ virtual ~daB_BQ_HIO_c();
+    /* 805B9FFC */ virtual ~daB_BQ_HIO_c() {};
 
     /* 0x04 */ s8 field_0x4;
     /* 0x08 */ f32 mModelSize;

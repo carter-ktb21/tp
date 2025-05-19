@@ -53,6 +53,8 @@ Z2SeqMgr::Z2SeqMgr() : JASGlobalInstance<Z2SeqMgr>(this) {
     mFlags.mBattleBgmOff = true;
     mFlags.mHeightVolMod = false;
     mFlags.mTimeProcVolMod = false;
+
+    playDiababaAfterVulnerable = false;
 }
 
 /* 802AF010-802AF408 2A9950 03F8+00 3/3 5/5 38/38 .text            bgmStart__8Z2SeqMgrFUlUll */
@@ -574,7 +576,11 @@ void Z2SeqMgr::subBgmStopInner() {
 /* 802AFB94-802AFDEC 2AA4D4 0258+00 1/1 3/3 46/46 .text            bgmStreamPrepare__8Z2SeqMgrFUl */
 void Z2SeqMgr::bgmStreamPrepare(u32 i_bgmID) {
     if (mStreamBgmHandle) {
-        bgmStreamStop(0);
+        if (i_bgmID == 0x2000089 && playDiababaAfterVulnerable) {
+            bgmStreamStop(10);
+        } else {
+            bgmStreamStop(0);
+        }
     }
 
     Z2GetSoundMgr()->startSound(i_bgmID, &mStreamBgmHandle, NULL);

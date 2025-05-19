@@ -234,8 +234,9 @@ public:
     } mFlags;
 
     /* 0xD4 */ bool inHyruleFieldLight; // Modded boolean to simplify playing audio stream in Hyrule Field instead of bms
-    /* 0xD5 */ bool inFaronWoodsLight; // Modded boolean to play audio stream throughout Faron Woods
-    /* 0xD6 */ bool inLakeHyliaLight; // Modded boolean to play Lake Hylia reorch
+    // /* 0xD5 */ bool inFaronWoodsLight; // Modded boolean to play audio stream throughout Faron Woods
+    /* 0xD5 */ bool inLakeHyliaLight; // Modded boolean to play Lake Hylia reorch
+    /* 0xD6 */ bool playDiababaAfterVulnerable;
 };  // Size = 0xD7 (Original is 0xD4)
 
 inline Z2SeqMgr* Z2GetSeqMgr() {

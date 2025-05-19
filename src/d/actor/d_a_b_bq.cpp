@@ -625,7 +625,11 @@ static void b_bq_damage(b_bq_class* i_this) {
                 a_this->health = 50;
             }
 
-            Z2GetAudioMgr()->changeBgmStatus(2);
+            // Z2GetAudioMgr()->changeBgmStatus(2);
+
+            // Modded block
+            Z2GetAudioMgr()->bgmStreamPrepare(0x200008A);
+            Z2GetAudioMgr()->bgmStreamPlay();
         }
 
         if (i_this->mpMorf->isStop()) {
@@ -704,7 +708,12 @@ static void b_bq_damage(b_bq_class* i_this) {
         i_this->field_0x6f6 = 0;
         i_this->mTimers[0] = 0;
         i_this->mTimers[2] = 80;
-        Z2GetAudioMgr()->changeBgmStatus(1);
+        // Z2GetAudioMgr()->changeBgmStatus(1);
+
+        // Modded block
+        Z2GetSeqMgr()->playDiababaAfterVulnerable = true;
+        Z2GetAudioMgr()->bgmStreamPrepare(0x2000089);
+        Z2GetAudioMgr()->bgmStreamPlay();
     }
 
     MTXCopy(i_this->mpMorf->getModel()->getAnmMtx(YREG_S(0) + 53), mDoMtx_stack_c::get());
@@ -911,6 +920,9 @@ static void b_bq_end(b_bq_class* i_this) {
     case 1:
         break;
     }
+
+    // Modded Line
+    Z2GetSeqMgr()->playDiababaAfterVulnerable = false;
 }
 
 /* 805B559C-805B58C8 00211C 032C+00 1/1 0/0 0/0 .text            action__FP10b_bq_class */
@@ -1413,7 +1425,7 @@ static void demo_camera(b_bq_class* i_this) {
 
         if (i_this->mDemoModeTimer == 430) {
             i_this->mDemoMode = 100;
-            Z2GetAudioMgr()->bgmStart(Z2BGM_BOSSBABA_2, 0, 0);
+            Z2GetAudioMgr()->bgmStart(Z2BGM_BOSSBABA_2, 0, 0); // Start Phase 2 Music
             i_this->field_0x1392 = 3;
         }
         break;
@@ -1523,7 +1535,7 @@ static void demo_camera(b_bq_class* i_this) {
             i_this->field_0x129c = 0.0f;
 
             mDoAud_seStart(Z2SE_EN_BH_JINARI, NULL, 0, 0);
-            Z2GetAudioMgr()->subBgmStart(Z2BGM_BOSSBABA_0);
+            Z2GetAudioMgr()->subBgmStart(Z2BGM_BOSSBABA_0); // Pre-Phase 1 Music
         }
         break;
     case 13:
@@ -1623,7 +1635,7 @@ static void demo_camera(b_bq_class* i_this) {
             i_this->mDemoMode = 100;
             i_this->field_0x6f9 = 2;
 
-            Z2GetAudioMgr()->bgmStart(Z2BGM_BOSSBABA_1, 0, 0);
+            Z2GetAudioMgr()->bgmStart(Z2BGM_BOSSBABA_1, 0, 0); // Phase 1 Music
             i_this->field_0x1392 = 2;
         }
         break;
@@ -1713,7 +1725,7 @@ static void demo_camera(b_bq_class* i_this) {
 
         daPy_getPlayerActorClass()->changeOriginalDemo();
         daPy_getPlayerActorClass()->changeDemoMode(1, 1, 0, 0);
-        Z2GetAudioMgr()->changeBgmStatus(1);
+        Z2GetAudioMgr()->changeBgmStatus(1); // Ook Comes To The Rescue
         dComIfGs_onOneZoneSwitch(7, -1);
         // fallthrough
     case 31:
@@ -1805,6 +1817,7 @@ static void demo_camera(b_bq_class* i_this) {
             i_this->mDemoMode = 100;
         }
         break;
+
     case 50:
         if (!a_this->eventInfo.checkCommandDemoAccrpt()) {
             fopAcM_orderPotentialEvent(a_this, 2, 0xFFFF, 0);
@@ -2194,6 +2207,13 @@ static void demo_camera(b_bq_class* i_this) {
 
     if (i_this->mSetDeadColor) {
         cLib_addCalc2(&i_this->mDeadColor, -20.0f, 1.0f, 0.16667f);
+    }
+
+    // Modded Block
+    if (i_this->mDemoMode == 35) {
+        Z2GetAudioMgr()->bgmStop(42, 0);
+        Z2GetAudioMgr()->bgmStreamPrepare(0x2000089);
+        Z2GetAudioMgr()->bgmStreamPlay();
     }
 }
 

@@ -186,6 +186,7 @@ void Z2SceneMgr::setFadeInStart(u8 param_0) {
     inGame = true;
 }
 
+static bool inFaronWoodsLight; // Modded boolean to play audio stream throughout Faron Woods
 static bool inKakarikoVillageLight;
 
 /* 802B6AF8-802B995C 2B1438 2E64+00 8/0 1/1 0/0 .text            setSceneName__10Z2SceneMgrFPcll */
@@ -239,7 +240,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
     // Sets the inFaronWoodsLight boolean to false in order to reset the value upon
     // exiting Faron Woods.
     if (spot != SPOT_FARON_WOODS) {
-        Z2GetSeqMgr()->inFaronWoodsLight = false;
+        inFaronWoodsLight = false;
     }
 
     if (spot != SPOT_KAKARIKO_VILLAGE || !Z2GetStatusMgr()->checkDayTime()) {
@@ -534,7 +535,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_CORO_SHOP:
-        if (Z2GetSeqMgr()->inFaronWoodsLight) {
+        if (inFaronWoodsLight) {
             return;
         }
 
@@ -542,7 +543,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         if (inDarkness) {
             // Modded Line:
             // Sets the inFaronWoodsLight boolean to false.
-            Z2GetSeqMgr()->inFaronWoodsLight = false;
+            inFaronWoodsLight = false;
 
             bgm_id = Z2BGM_TWILIGHT;
             bgm_wave1 = 0xe;
@@ -551,7 +552,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             if (layer == 1) {
                 // Modded Line:
                 // Sets the inFaronWoodsLight boolean to false.
-                Z2GetSeqMgr()->inFaronWoodsLight = false;
+                inFaronWoodsLight = false;
                 
                 bgm_id = Z2BGM_EVENT05;
                 bgm_wave1 = 0x55;
@@ -559,7 +560,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             } else {
                 // Modded Line:
                 // Sets the inFaronWoodsLight boolean to true.
-                Z2GetSeqMgr()->inFaronWoodsLight = true;
+                inFaronWoodsLight = true;
 
                 bgm_id = Z2BGM_FILONE_FOREST;
                 bgm_wave1 = 0xf;
@@ -571,7 +572,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         break;
 
     case SPOT_FARON_WOODS:
-        if (Z2GetSeqMgr()->inFaronWoodsLight) {
+        if (inFaronWoodsLight) {
             return;
         }
 
@@ -584,7 +585,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
         } else if (inDarkness) {
             // Modded Line:
             // Sets the inFaronWoodsLight boolean to false.
-            Z2GetSeqMgr()->inFaronWoodsLight = false;
+            inFaronWoodsLight = false;
 
             if (layer == 7) {
                 demo_wave = 0x78;
@@ -615,7 +616,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             case 1:
                 // Modded Line:
                 // Sets the inFaronWoodsLight boolean to false.
-                Z2GetSeqMgr()->inFaronWoodsLight = false;
+                inFaronWoodsLight = false;
 
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[18])
                     && !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[625]))
@@ -627,7 +628,7 @@ void Z2SceneMgr::setSceneName(char* spotName, s32 room, s32 layer) {
             default:
                 // Modded Line:
                 // Sets the inFaronWoodsLight boolean to true.
-                Z2GetSeqMgr()->inFaronWoodsLight = true;
+                inFaronWoodsLight = true;
 
                 bgm_id = Z2BGM_FILONE_FOREST;
                 bgm_wave1 = 0xf;
@@ -2104,7 +2105,7 @@ void Z2SceneMgr::sceneBgmStart() {
     }
 
     if (!BGM_ID.isAnonymous() && Z2GetStatusMgr()->getDemoStatus() != 11 && 
-            !Z2GetSeqMgr()->inHyruleFieldLight && !Z2GetSeqMgr()->inFaronWoodsLight &&
+            !Z2GetSeqMgr()->inHyruleFieldLight && !inFaronWoodsLight &&
             !Z2GetSeqMgr()->inLakeHyliaLight && !inKakarikoVillageLight) {
         bool var;
         switch (BGM_ID.mId.mBytes.b0) {
@@ -2180,7 +2181,7 @@ void Z2SceneMgr::sceneBgmStart() {
         }
     }
 
-    if (Z2GetSeqMgr()->inFaronWoodsLight) {
+    if (inFaronWoodsLight) {
         // Modded block to play added ast "zb-faron_woods.ast"
         Z2GetSeqMgr()->bgmStreamPrepare(0x2000084);
         Z2GetSeqMgr()->bgmStreamPlay();

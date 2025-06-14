@@ -163,10 +163,10 @@ void daNpc_FairySeirei_c::reset() {
 void daNpc_FairySeirei_c::setParam() {
     selectAction();
     srchActors();
-    dComIfGp_getAttention().getDistTable(0x28).mDistMax = daNpc_FairySeirei_Param_c::m[36];
-    dComIfGp_getAttention().getDistTable(0x28).mDistMaxRelease = daNpc_FairySeirei_Param_c::m[36];
-    dComIfGp_getAttention().getDistTable(0x27).mDistMax = daNpc_FairySeirei_Param_c::m[36];
-    dComIfGp_getAttention().getDistTable(0x27).mDistMaxRelease = daNpc_FairySeirei_Param_c::m[36];
+    dComIfGp_getAttention()->getDistTable(0x28).mDistMax = daNpc_FairySeirei_Param_c::m[36];
+    dComIfGp_getAttention()->getDistTable(0x28).mDistMaxRelease = daNpc_FairySeirei_Param_c::m[36];
+    dComIfGp_getAttention()->getDistTable(0x27).mDistMax = daNpc_FairySeirei_Param_c::m[36];
+    dComIfGp_getAttention()->getDistTable(0x27).mDistMaxRelease = daNpc_FairySeirei_Param_c::m[36];
     attention_info.distances[fopAc_attn_LOCK_e] = 0x27;
     attention_info.distances[fopAc_attn_TALK_e] = 0x27;
     attention_info.distances[fopAc_attn_SPEAK_e] = 0x27;
@@ -372,11 +372,11 @@ int daNpc_FairySeirei_c::talk(int param_0) {
             }
             int itemNo;
             if ((int)mFlow.getEventId(&itemNo) == 1) {
-                if (mItemId == -1) {
-                    mItemId = fopAcM_createItemForPresentDemo(&current.pos, itemNo, 0, -1, -1, NULL,
+                if (mItemPartnerId == fpcM_ERROR_PROCESS_ID_e) {
+                    mItemPartnerId = fopAcM_createItemForPresentDemo(&current.pos, itemNo, 0, -1, -1, NULL,
                                                               NULL);
                 }
-                if (fopAcM_IsExecuting(mItemId)) {
+                if (fopAcM_IsExecuting(mItemPartnerId)) {
                     mTalking = TRUE;
                     evtChange();
                 }

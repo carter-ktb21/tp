@@ -330,7 +330,7 @@ public:
         FLG0_UNK_100000 = 0x100000,
         FLG0_UNK_80000 = 0x80000,
         FLG0_UNK_40000 = 0x40000,
-        FLG0_UNK_20000 = 0x20000,
+        FLG0_DK_CAUGHT = 0x20000,
         FLG0_UNK_10000 = 0x10000,
         FLG0_UNK_8000 = 0x8000,
         FLG0_UNK_4000 = 0x4000,
@@ -347,13 +347,14 @@ public:
         FLG0_MIDNA_RIDE = 4,
         FLG0_UNK_2 = 2,
 
-        FLG0_HVY_STATE = FLG0_UNK_40000000 | FLG0_EQUIP_HVY_BOOTS | FLG0_UNK_20000,
+        FLG0_HVY_STATE = FLG0_UNK_40000000 | FLG0_EQUIP_HVY_BOOTS | FLG0_DK_CAUGHT,
         FLG0_UNK_14000 = 0x14000,
         FLG0_UNK_10400 = 0x10400,
         FLG0_UNK_18 = FLG0_UNK_10 | FLG0_UNK_8,
     };
 
     enum daPy_FLG1 {
+        FLG1_UNK_80000000 = 0x80000000,
         FLG1_ICE_FREEZE = 0x40000000,
         FLG1_UNK_20000000 = 0x20000000,
         FLG1_UNK_10000000 = 0x10000000,
@@ -382,7 +383,7 @@ public:
         FLG1_UNK_8 = 8,
         FLG1_UNK_4 = 4,
         FLG1_UNK_2 = 2,
-        FLG1_UNK_1 = 1,
+        FLG1_DK_CAUGHT = 1,
 
         FLG1_UNK_1800 = 0x1800,
         FLG1_UNK_10100000 = FLG1_UNK_10000000 | FLG1_UNK_100000,
@@ -454,7 +455,7 @@ public:
         FLG3_UNK_100 = 0x100,
         FLG3_UNK_80 = 0x80,
         FLG3_UNK_40 = 0x40,
-        FLG3_UNK_20 = 0x20,
+        FL3_TRANING_CUT_BACK = 0x20,
         FLG3_UNK_10 = 0x10,
         FLG3_UNK_8 = 8,
         FLG3_UNK_4 = 4,
@@ -499,7 +500,7 @@ public:
         ERFLG1_UNK_40000000 = 0x40000000,
         ERFLG1_UNK_20000000 = 0x20000000,
         ERFLG1_UNK_10000000 = 0x10000000,
-        ERFLG1_UNK_8000000 = 0x8000000,
+        ERFLG1_LARGE_DAMAGE_UP_STOP = 0x8000000,
         ERFLG1_UNK_4000000 = 0x4000000,
         ERFLG1_UNK_2000000 = 0x2000000,
         ERFLG1_UNK_1000000 = 0x1000000,
@@ -571,7 +572,7 @@ public:
     };
 
     enum daPy_RFLG1 {
-        RFLG1_UNK_400 = 0x400,
+        RFLG1_DAMAGE_IMPACT = 0x400,
         RFLG1_UNK_200 = 0x200,
         RFLG1_UNK_100 = 0x100,
         RFLG1_UNK_80 = 0x80,
@@ -703,6 +704,8 @@ public:
     cXyz getRightHandPos() const { return mRightHandPos; }
     const cXyz getLeftHandPos() const { return mLeftHandPos; }
     const cXyz getItemPos() const { return mItemPos; }
+    bool getDkCaught() const { return checkNoResetFlg1(FLG1_DK_CAUGHT); }
+    bool getStCaught() const { return checkNoResetFlg1(FLG1_UNK_80000000); }
 
     virtual cXyz* getMidnaAtnPos() const { return NULL; }
     virtual void setMidnaMsgNum(fopAc_ac_c*, u16) {}
@@ -911,6 +914,7 @@ public:
     bool checkWolfAttackReverse() const { return checkResetFlg1(RFLG1_WOLF_ATTACK_REVERSE); }
     bool checkFreezeDamage() const { return checkNoResetFlg1(FLG1_ICE_FREEZE); }
     bool checkWolfTagLockJumpReady() const { return checkResetFlg0(RFLG0_UNK_20000); }
+    bool checkDamageImpact() const { return checkResetFlg1(RFLG1_DAMAGE_IMPACT); }
     bool getGrabUpEnd() const { return checkResetFlg0(RFLG0_GRAB_UP_END); }
     bool getGrabPutStart() const { return checkResetFlg0(RFLG0_GRAB_PUT_START); }
     bool checkSwimUp() const { return checkNoResetFlg0(FLG0_SWIM_UP); }
@@ -1043,11 +1047,14 @@ public:
     void onDoExchangePutIn() { onEndResetFlg1(ERFLG1_UNK_4000000); }
     void onNsScream() { onEndResetFlg1(ERFLG1_UNK_1); }
     void onNsScreamAnm() { onEndResetFlg1(daPy_ERFLG1(ERFLG1_UNK_1 | ERFLG1_UNK_2)); }
+    void onLargeDamageUpStop() { onEndResetFlg1(ERFLG1_LARGE_DAMAGE_UP_STOP); }
+    void onTraningCutBack() { onNoResetFlg3(FL3_TRANING_CUT_BACK); }
     void onNeckSearchWide() { onEndResetFlg0(ERFLG0_UNK_400); }
     void offPressedDamage() { offNoResetFlg2(FLG2_PRESSED_DAMAGE); }
     void onForceSubjectCancel() { onEndResetFlg0(ERFLG0_FORCE_SUBJECT_CANCEL); }
     void onEnemyDead() { onEndResetFlg0(ERFLG0_ENEMY_DEAD); }
-    void offDkCaught2() { offNoResetFlg0(FLG0_UNK_20000); }
+    void offDkCaught() { offNoResetFlg1(FLG1_DK_CAUGHT); }
+    void offDkCaught2() { offNoResetFlg0(FLG0_DK_CAUGHT); }
     void onWaterFallFrontHit() { onEndResetFlg1(ERFLG1_UNK_800); }
     void onCanoeItemCancel() { onEndResetFlg1(ERFLG1_UNK_20000000); }
 
@@ -1066,7 +1073,7 @@ public:
         mDemo.setParam2(i_param2);
     }
 
-    void changeDemoParam0(s16 i_param1) {
+    void changeDemoParam0(int i_param1) {
         mDemo.setParam0(i_param1);
     }
 
@@ -1144,14 +1151,24 @@ public:
         onEndResetFlg2(ERFLG2_UNK_2);
     }
 
+    s16 getFishingRodAngleY() const {
+        return shape_angle.y + mBodyAngle.y;
+    }
+
     void onFishingRelease() {
-        this->mEndResetFlg0 |= 0x4000000;
+        onEndResetFlg0(ERFLG0_UNK_4000000);
     }
 
     static daMidna_c* m_midnaActor;
 
     void setGiantPuzzle() { mSpecialMode = SMODE_WOLF_PUZZLE; }
     void setGiantPuzzleEnd() { mSpecialMode = 0; }
+
+    BOOL checkAutoJumpStart() const { return checkResetFlg0(RFLG0_UNK_100); }
+
+    void onForceGrabRebound() {
+        onEndResetFlg2(ERFLG2_UNK_8);
+    }
 };
 
 int daPy_addCalcShort(s16* param_0, s16 param_1, s16 param_2, s16 param_3, s16 param_4);

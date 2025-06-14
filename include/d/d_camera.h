@@ -10,7 +10,7 @@
 #include "d/d_stage.h"
 #include "f_op/f_op_actor.h"
 
-dAttention_c& dComIfGp_getAttention();
+dAttention_c* dComIfGp_getAttention();
 
 struct dCamMapToolData {
     dCamMapToolData() { Clr(); }
@@ -419,9 +419,9 @@ public:
     }
 
     void Att() {
-        dAttention_c& attn = dComIfGp_getAttention();
-        mpLockonTarget = attn.LockonTruth() ? attn.LockonTarget(0) : NULL;
-        attn.LockSoundOn();
+        dAttention_c* attn = dComIfGp_getAttention();
+        mpLockonTarget = attn->LockonTruth() ? attn->LockonTarget(0) : NULL;
+        attn->LockSoundOn();
     }
 
     void SetWindow(f32 param_0, f32 param_1) {
@@ -444,14 +444,17 @@ public:
 
     static engine_fn engine_tbl[];
 
-#if VERSION == VERSION_SHIELD_DEBUG
-    // In the debug rom, there's D8 bytes preceeding all other members.
-    //  The following is a stopgap:
-    u8 mFillerBytes[0xD8];
-#endif
     /* 0x000 */ camera_class* field_0x0;
-    /* 0x004 */ int mRoomNo;
-    /* 0x008 */ u8 field_0x8[0x20 - 0x8];
+#if VERSION == VERSION_SHIELD_DEBUG
+    cXyz dbg_field_0x04[16];
+    u8 dbg_field_c4[0xDC - 0xC4];
+#endif
+    struct {
+        /* 0x00 */ int mRoomNo;
+        /* 0x04 */ cXyz field_0x04;
+        /* 0x10 */ cXyz field_0x10;
+    }
+    /* 0x004 */ field_0x004;
     /* 0x020 */ u8 field_0x20;
     /* 0x021 */ u8 field_0x21;
     /* 0x022 */ u8 field_0x22[2];
@@ -975,7 +978,8 @@ public:
             /* 0x03C */ cSGlobe field_0x3c;
             /* 0x044 */ cXyz field_0x44;
             /* 0x050 */ cXyz field_0x50;
-            /* 0x100 */ cSGlobe field_0x100;
+            /* 0x05C */ u8 field_0x5C[8];
+            /* 0x064 */ cSGlobe field_0x64;
         } getItem;
         struct possessed {
             /* 0x00 */ int field_0x0;
@@ -991,12 +995,13 @@ public:
             /* 0x24 */ fopAc_ac_c* mTargetActor;
             /* 0x28 */ cSGlobe field_0x28;
         } possessed;
-        struct {
+        struct fixedFrames {
             /* 0x00 */ bool field_0x0;
             /* 0x04 */ cXyz field_0x4;
             /* 0x10 */ cXyz field_0x10;
             /* 0x1C */ cXyz* field_0x1c[2];
-            /* 0x24 */ f32* field_0x24[2];
+            /* 0x24 */ f32* field_0x24;
+            /* 0x28 */ f32 field_0x28;
             /* 0x2C */ fopAc_ac_c* mRelActor;
             /* 0x30 */ char mRelUseMask;
             /* 0x31 */ char field_0x31;
@@ -1014,7 +1019,7 @@ public:
             /* 0x18 */ u8 field_0x18[4];
             /* 0x1c */ bool field_0x1c;
         } bSpline;
-        struct {
+        struct twoActor0 {
             /* 0x00 */ fopAc_ac_c* mActor1;
             /* 0x04 */ fopAc_ac_c* mActor2;
             /* 0x08 */ u8 field_0x8[4];
@@ -1044,7 +1049,7 @@ public:
             /* 0x04 */ int mType;
             /* 0x08 */ int field_0x8;
             /* 0x0C */ f32 field_0xc;
-            /* 0x10 */ s8 field_0x10;
+            /* 0x10 */ u8 field_0x10;
             /* 0x11 */ u8 field_0x11[3];
             /* 0x14 */ cXyz field_0x14;
             /* 0x20 */ cXyz field_0x20;

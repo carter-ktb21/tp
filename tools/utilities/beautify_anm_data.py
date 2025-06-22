@@ -5,9 +5,11 @@
 # Used for decompiling d_a_npc_ETC TUs.
 #
 
+import fire
 import os
 import re
 import sys
+import struct
 
 
 FACE_MOTION_TYPE = "daNpcT_faceMotionAnmData_c l_faceMotionAnmData"
@@ -29,6 +31,11 @@ PARAM_TYPE = "::m"
 PARAM_PATTERN = r'SECTION_RODATA u8 const (\w+_Param_c)::m\[\d+\] = {'
 
 
+def unsigned_val(hexstr):
+    value = int(hexstr, 16)
+    return value
+
+
 def twos_complement(hexstr, bits):
     # https://stackoverflow.com/questions/6727875/hex-string-to-signed-int-in-python
     value = int(hexstr, 16)
@@ -38,7 +45,178 @@ def twos_complement(hexstr, bits):
     return value
 
 
-def build_anm_struct(byte_collection, anm_type, param_name):
+def prm_is_float(hex_str):
+    value = int(hex_str, 16)
+    exponent_raw = (value >> 23) & 0xFF  # Get bits 30-23
+    exponent_actual = exponent_raw - 127  # Remove bias
+    # print(exponent_actual)
+    EXP_TOLERANCE = 10
+    if exponent_actual < EXP_TOLERANCE * -1:
+        return False
+
+    if exponent_actual > EXP_TOLERANCE:
+        return False
+
+    return True
+
+
+# Expects NO leading "0x":
+def hex_to_float(hex_str):
+    return struct.unpack('!f', bytes.fromhex(hex_str))[0]
+
+
+def float_to_hex(f):
+    [d] = struct.unpack(">I", struct.pack(">f", f))
+    return f"{d:08X}"
+
+
+def handle_npc_param(byte_collection, param_name, type):
+    my_len = len(byte_collection)
+    if my_len % 4 != 0:
+        print(f"Error: len() = '{my_len}' isn't divisble by 4")
+        sys.exit(1)
+
+    # Special handling.
+    instr_arr = []
+    common_name = ""
+    if type is None:
+        print("ERROR: --type <type> must be specified")
+        sys.exit(1)
+    elif type == "daNpcT":
+        common_name = "daNpcT_HIOParam"
+        instr_arr = [
+            "f4",  # attention_offset;
+            "f4",  # gravity;
+            "f4",  # scale;
+            "f4",  # real_shadow_size;
+            "f4",  # weight;
+            "f4",  # height;
+            "f4",  # knee_length;
+            "f4",  # width;
+            "f4",  # body_angleX_max;
+            "f4",  # body_angleX_min;
+            "f4",  # body_angleY_max;
+            "f4",  # body_angleY_min;
+            "f4",  # head_angleX_max;
+            "f4",  # head_angleX_min;
+            "f4",  # head_angleY_max;
+            "f4",  # head_angleY_min;
+            "f4",  # neck_rotation_ratio;
+            "f4",  # morf_frame;
+            "s2",  # talk_distance;
+            "s2",  # talk_angle;
+            "s2",  # attention_distance;
+            "s2",  # attention_angle;
+            "f4",  # fov;
+            "f4",  # search_distance;
+            "f4",  # search_height;
+            "f4",  # search_depth;
+            "s2",  # attention_time;
+            "s2",  # damage_time;
+            "s2",  # face_expression;
+            "s2",  # motion;
+            "s2",  # look_mode;
+            "u1",  # debug_mode_ON;
+            "u1",  # debug_info_ON;
+            "f4",  # expression_morf_frame;
+            "f4",  # box_min_x;
+            "f4",  # box_min_y;
+            "f4",  # box_min_z;
+            "f4",  # box_max_x;
+            "f4",  # box_max_y;
+            "f4",  # box_max_z;
+            "f4",  # box_offset;
+        ]
+    elif type == "daNpcF":
+        # TODO
+        print("ERROR: --type daNpcF is currently unsupported.")
+        print("    You can try to implement it yourself.")
+        print("    If you need help with this, please seek the help of yunatasavior on Discord.")
+        sys.exit(1)
+    else:
+        print(f"ERROR: --type {type} is unsupported. Please review the script to see which are supported.")
+        sys.exit(1)
+
+    ptr = 0
+    cur_instr = 0
+    hexstr = ""
+    res_array = []
+    common_size = 0
+    while ptr < my_len:
+        curbyte = byte_collection[ptr]
+        ptr += 1
+        if curbyte[:2] != "0x" or len(curbyte) != 4:
+            print(f"Error: '{curbyte}' isn't formatted as a byte")
+            sys.exit(1)
+
+        hexstr += curbyte[-2:]
+        my_type = "h"
+        exp_bytes = 4
+        if cur_instr < len(instr_arr):
+            my_type = instr_arr[cur_instr][0]
+            exp_bytes = int(instr_arr[cur_instr][1])
+
+        if len(hexstr) / 2 == exp_bytes:
+            if my_type == 'u':
+                val = unsigned_val(hexstr)
+                res_array.append(val)
+            elif my_type == 's':
+                val = twos_complement(hexstr, exp_bytes*8)
+                res_array.append(val)
+            elif my_type == 'h':
+                res_array.append("0x" + hexstr)
+            elif my_type == 'f':
+                fvalue = hex_to_float(hexstr)
+                fvalue = round(fvalue, 6)
+                chk_val = float_to_hex(fvalue)
+                assert chk_val == hexstr, f"fvalue({fvalue}): chk_val {chk_val} != hexstr {hexstr}"
+                res_array.append(fvalue)
+            else:
+                print(f"Error: unknown type '{my_type}'")
+                sys.exit(1)
+
+            hexstr = ""
+            if common_size == 0:
+                cur_instr += 1
+
+            if cur_instr == len(instr_arr):
+                if common_size == 0:
+                    common_size = ptr
+
+    assert common_size != 0, "Param array is too short for specified type"
+    hio_name = re.sub(r'_Param_c$', '_HIOParam', param_name)
+    res_str = "// Must be put OUTSIDE {}:\n".format(param_name)
+    res_str += "struct {} {{\n".format(hio_name)
+    idx = common_size
+    res_str += "    /* 0x00 */ {} common;\n".format(common_name)
+    while idx < my_len:
+        upper = f'{idx:02X}'
+        lower = f'{idx:02x}'
+        res_str += "    /* 0x{} */ u32 field_0x{};\n".format(upper, lower)
+        idx += 4
+
+    res_str += "};\n\n"
+    res_str += "// Must be put INSIDE {}:\n".format(param_name)
+    res_str += "static const {} m;\n\n".format(hio_name)
+    res_str += "const {} {}::m".format(hio_name, param_name)
+
+    res_str += " = {\n"
+    for value in res_array:
+        res_str += "    "
+
+        if isinstance(value, int):
+            res_str += str(value)
+        elif isinstance(value, float):
+            res_str += str(value) + "f"
+        else:
+            res_str += value
+        res_str += ",\n"
+
+    res_str += "};\n"
+    print(res_str)
+
+
+def build_anm_struct(byte_collection, anm_type):
     my_len = len(byte_collection)
     piece_size = 1
     instr_arr = []
@@ -66,7 +244,7 @@ def build_anm_struct(byte_collection, anm_type, param_name):
             is_array = True
         elif anm_type is HEAP_SIZE_TYPE:
             piece_size = 4
-            instr_arr = ["s4"]
+            instr_arr = ["h4"]
 
         if my_len % piece_size != 0:
             print(f"Error: len() = '{my_len}' isn't divisble by '{piece_size}'")
@@ -92,6 +270,9 @@ def build_anm_struct(byte_collection, anm_type, param_name):
                 val = twos_complement(hexstr, exp_bytes*8)
                 pos_arr.append(val)
             elif my_type == 'h':
+                if anm_type is HEAP_SIZE_TYPE:
+                    trimmed = hexstr.lstrip('0')
+                    hexstr = trimmed if trimmed else '0'
                 pos_arr.append("0x" + hexstr)
             else:
                 print(f"Error: unknown type '{my_type}'")
@@ -105,32 +286,19 @@ def build_anm_struct(byte_collection, anm_type, param_name):
                 pos_arr.clear()
 
     res_str = ""
-    if anm_type is PARAM_TYPE:
-        res_str += "struct Data {\n"
-        idx = 0
-        while idx < my_len:
-            upper = f'{idx:02X}'
-            lower = f'{idx:02x}'
-            res_str += "    /* 0x{} */ u32 field_0x{};\n".format(upper, lower)
-            idx += 4
-        res_str += "};\n"
-        res_str += "static const Data m;\n\n"
-        res_str += "{}::Data const {}::m".format(param_name, param_name)
-    else:
-        res_str += "static {}".format(anm_type)
+    res_str += "static {}".format(anm_type)
 
     res_len = my_len / piece_size
     cutoff_num = 1
     if anm_type is SEQ_FACE_MOTION_TYPE or anm_type is SEQ_MOTION_TYPE:
         cutoff_num = 8
     elif anm_type is HEAP_SIZE_TYPE:
-        cutoff_num = 12
+        cutoff_num = 4
 
-    if anm_type is not PARAM_TYPE:
-        res_str += "[{}]".format(int(res_len))
-
+    res_str += "[{}]".format(int(res_len))
     res_str += " = {\n"
     cur_in_line = 0
+    cur_idx = 0
     for my_arr in full_res_arr:
         if cur_in_line == 0:
             res_str += "    "
@@ -163,6 +331,8 @@ def build_anm_struct(byte_collection, anm_type, param_name):
         else:
             res_str += " "
 
+        cur_idx += 1
+
     if cur_in_line != 0:
         res_str += "\n"
 
@@ -170,7 +340,12 @@ def build_anm_struct(byte_collection, anm_type, param_name):
     print(res_str)
 
 
-def run_beautify_anm_data(in_file):
+def run_beautify_anm_data(in_file, type=None):
+    # Check if the file exists
+    if not os.path.isfile(in_file):
+        print(f"Error: File '{in_file}' not found.")
+        sys.exit(1)
+
     fDesc = open(in_file, 'r')
     fConts = fDesc.read()
     lines = fConts.splitlines()
@@ -209,7 +384,10 @@ def run_beautify_anm_data(in_file):
                     param_name = match.group(1)
         else:
             if words[0] == '};':
-                build_anm_struct(byte_collection, anm_type, param_name)
+                if anm_type == PARAM_TYPE:
+                    handle_npc_param(byte_collection, param_name, type)
+                else:
+                    build_anm_struct(byte_collection, anm_type)
                 in_byte_array = False
                 byte_collection.clear()
             else:
@@ -224,15 +402,4 @@ def run_beautify_anm_data(in_file):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 beautify_anm_data.py <filename>")
-        sys.exit(1)
-
-    in_file = sys.argv[1]
-
-    # Check if the file exists
-    if not os.path.isfile(in_file):
-        print(f"Error: File '{in_file}' not found.")
-        sys.exit(1)
-
-    run_beautify_anm_data(in_file)
+    fire.Fire(run_beautify_anm_data)

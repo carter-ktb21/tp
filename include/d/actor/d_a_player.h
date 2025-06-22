@@ -685,7 +685,7 @@ public:
     f32 getSpinnerRideSpeed() const;
     bool checkSpinnerReflectEffect();
     static bool checkBoomerangCharge();
-    int checkBoomerangChargeTime();
+    static u8 checkBoomerangChargeTime();
     static daBoomerang_c* getThrowBoomerangActor();
     static void cancelBoomerangLockActor(fopAc_ac_c*);
     static void setPlayerDamage(int, int);
@@ -972,6 +972,10 @@ public:
         if (checkGoronSideMove()) {
             mSpecialMode = 0;
         }
+    }
+
+    void offGoronUpStopCancel() {
+        offNoResetFlg0(FLG0_UNK_200000);
     }
 
     s16 getBodyAngleX() const { return mBodyAngle.x; }

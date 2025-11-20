@@ -18,7 +18,7 @@ m_Do/m_Do_main.cpp:
 	.ctors      start:0x8062F7C4 end:0x8062F7C8
 	.data       start:0x8065FFA0 end:0x80660CF8
 	.sdata      start:0x8073F140 end:0x8073F264
-	.sbss       start:0x8074C268 end:0x8074C2A0
+	.sbss       start:0x8074C260 end:0x8074C298
 	.sdata2     start:0x8074D740 end:0x8074D768
 	.bss        start:0x80753500 end:0x80753980
 
@@ -26,7 +26,7 @@ m_Do/m_Do_printf.cpp:
 	.text       start:0x8000AF00 end:0x8000B8A0
 	.data       start:0x80660CF8 end:0x80660DE8
 	.sdata      start:0x8073F264 end:0x8073F268
-	.sbss       start:0x8074C2A0 end:0x8074C2C4
+	.sbss       start:0x8074C298 end:0x8074C2C4
 	.bss        start:0x80753980 end:0x807541A0
 
 m_Do/m_Do_audio.cpp:
@@ -47,16 +47,16 @@ m_Do/m_Do_graphic.cpp:
 	.text       start:0x8000DBD0 end:0x800163A0
 	.ctors      start:0x8062F7CC end:0x8062F7D0
 	.data       start:0x80661190 end:0x80661890
-	.sdata      start:0x8073F2F0 end:0x8073F364
-	.sbss       start:0x8074C310 end:0x8074C388
+	.sdata      start:0x8073F2F0 end:0x8073F360
+	.sbss       start:0x8074C310 end:0x8074C380
 	.sdata2     start:0x8074D780 end:0x8074D870
 	.bss        start:0x80755780 end:0x80755868
 
 m_Do/m_Do_machine.cpp:
 	.text       start:0x800163A0 end:0x80017DE0
 	.data       start:0x80661890 end:0x80661ED0
-	.sdata      start:0x8073F364 end:0x8073F3E8
-	.sbss       start:0x8074C388 end:0x8074C3B0
+	.sdata      start:0x8073F360 end:0x8073F3E8
+	.sbss       start:0x8074C380 end:0x8074C3B0
 	.sdata2     start:0x8074D870 end:0x8074D878
 	.bss        start:0x80755868 end:0x807558E0
 
@@ -360,7 +360,7 @@ f_pc/f_pc_priority.cpp:
 
 f_pc/f_pc_profile.cpp:
 	.text       start:0x800476C0 end:0x800476F0
-	.sbss       start:0x8074C560 end:0x8074C570
+	.sbss       start:0x8074C560 end:0x8074C568
 
 f_pc/f_pc_searcher.cpp:
 	.text       start:0x800476F0 end:0x80047730
@@ -402,7 +402,7 @@ d/d_stage.cpp:
 	.ctors      start:0x8062F7F4 end:0x8062F7F8
 	.data       start:0x8066D6A8 end:0x80671F60
 	.sdata      start:0x80740298 end:0x80740598
-	.sbss       start:0x8074C570 end:0x8074C5A0
+	.sbss       start:0x8074C568 end:0x8074C5A0
 	.sdata2     start:0x8074DA28 end:0x8074DA38
 	.bss        start:0x80782228 end:0x807938E0
 
@@ -1676,7 +1676,7 @@ SSystem/SComponent/c_API.cpp:
 
 SSystem/SComponent/c_malloc.cpp:
 	.text       start:0x803FFF10 end:0x803FFFC0
-	.sbss       start:0x8074CB18 end:0x8074CB28
+	.sbss       start:0x8074CB18 end:0x8074CB20
 
 SSystem/SComponent/c_API_controller_pad.cpp:
 	.text       start:0x803FFFC0 end:0x80400010
@@ -1697,6 +1697,7 @@ SSystem/SComponent/c_cc_s.cpp:
 	.text       start:0x80402AF0 end:0x80405100
 	.data       start:0x806EC248 end:0x806ECFE0
 	.sdata      start:0x80747608 end:0x80747618
+	.sbss       start:0x8074CB20 end:0x8074CB28
 	.sdata2     start:0x807515D0 end:0x807515F0
 	.bss        start:0x807C7B40 end:0x807C7B50
 

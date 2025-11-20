@@ -2,6 +2,8 @@
  * @file d_a_obj_waterfall.cpp
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_waterfall.h"
 #include "d/actor/d_a_arrow.h"
 #include "d/d_com_inf_game.h"
@@ -260,7 +262,7 @@ extern actor_process_profile_definition g_profile_Obj_WaterFall = {
 
 /* 80D2F5A0-80D2F6DC 000A00 013C+00 1/1 0/0 0/0 .text            create__16daObjWaterFall_cFv */
 cPhs__Step daObjWaterFall_c::create() {
-    fopAcM_SetupActor(this, daObjWaterFall_c);
+    fopAcM_ct(this, daObjWaterFall_c);
 
     if(Create() == cPhs_INIT_e) {
         return cPhs_ERROR_e;

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_chkpoint.h"
 #include <cmath.h>
 #include "d/actor/d_a_player.h"
@@ -67,7 +69,7 @@ int daTag_Chk_c::execute() {
 
     if (set_attention) {
         daPy_getPlayerActorClass()->setLookPos(&attention_info.position);
-        attention_info.flags = 0x100;
+        attention_info.flags = fopAc_AttnFlag_CHECK_e;
     }
 
     return 1;

@@ -1,14 +1,14 @@
 /**
- * @file d_a_obj_sword.cpp
+* @file d_a_obj_sword.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_sword.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item_data.h"
-
-UNK_REL_DATA;
 
 /* 80CFDEB4-80CFDECC 000020 0018+00 1/1 0/0 0/0 .data            l_cull_box */
 static Vec l_cull_box[2] = {{-200.0f, 0.0f, -200.0f}, {200.0f, 100.0f, 200.0f}};
@@ -40,7 +40,7 @@ int daObjSword_c::Create() {
 
 /* 80CFD67C-80CFD848 00019C 01CC+00 1/1 0/0 0/0 .text            create__12daObjSword_cFv */
 cPhs__Step daObjSword_c::create() {
-    fopAcM_SetupActor(this, daObjSword_c);
+    fopAcM_ct(this, daObjSword_c);
     m_itemNo = 0x28;
     if (fopAcM_isItem(this, getItemBit())) {
         return cPhs_ERROR_e;
@@ -62,13 +62,13 @@ cPhs__Step daObjSword_c::create() {
 int daObjSword_c::actionWait() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     if (fopAcM_checkCarryNow(this)) {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         if (player->getGrabUpStart()) {
             fopAcM_cancelCarryNow(this);
             initActionOrderGetDemo();
         }
     } else {
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
     return 1;
 }

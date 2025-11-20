@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_yousei.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
@@ -39,7 +41,7 @@ void daObjYOUSEI_c::SetCcSph() {
 
 int daObjYOUSEI_c::CreateHeap() {
     void* modelData = dComIfG_getObjectRes("Always", 0x21);
-    JUT_ASSERT(177, modelData != 0);
+    JUT_ASSERT(177, modelData != NULL);
 
     mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("Always", 0xF), 2, 0.4f, 0, -1, &mSound, 0x80000, 0x11000084);
     if (mpModelMorf == NULL) {
@@ -82,8 +84,6 @@ void daObjYOUSEI_c::SpeedSet() {
     current.pos.x += ato.x;
     current.pos.z += ato.z;
 }
-
-UNK_REL_BSS
 
 /* 804D1828-804D182C 000040 0004+00 0/0 0/0 0/0 .bss             s_dis */
 static f32 s_dis;
@@ -626,7 +626,7 @@ void daObjYOUSEI_c::CheckGround() {
     gnd_chk.SetPos(&pos);
 
     pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (pos.y != -1000000000.0f) {
+    if (pos.y != -G_CM3D_F_INF) {
         home.pos.y = pos.y;
     }
 }
@@ -638,7 +638,7 @@ bool daObjYOUSEI_c::CheckWater() {
     gnd_chk.SetPos(&pos);
     pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-    if (-1000000000.0f != pos.y && dComIfG_Bgsp().GetPolyAtt0(gnd_chk) == 7 && current.pos.y - pos.y < 50.0f+ yREG_F(0)) {
+    if (-G_CM3D_F_INF != pos.y && dComIfG_Bgsp().GetPolyAtt0(gnd_chk) == 7 && current.pos.y - pos.y < 50.0f+ yREG_F(0)) {
         return true;
     }
 
@@ -803,7 +803,7 @@ static int daObjYOUSEI_Execute(daObjYOUSEI_c* i_this) {
 
 /* 804D111C-804D149C 002A5C 0380+00 1/1 0/0 0/0 .text            create__13daObjYOUSEI_cFv */
 int daObjYOUSEI_c::create() {
-    fopAcM_SetupActor(this, daObjYOUSEI_c);
+    fopAcM_ct(this, daObjYOUSEI_c);
 
     OS_REPORT("YOUSEI PARAM %x\n", fopAcM_GetParam(this));
     if (!fopAcM_entrySolidHeap(this, useHeapInit, 0x1100)) {
@@ -816,6 +816,7 @@ int daObjYOUSEI_c::create() {
         mPrm = 0;
         break;
     case 1:
+             /* dSv_event_flag_c::F_0501 - sub-dungeon - Cave of Ordeals - B10 first arrival */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[501])) {
             return cPhs_ERROR_e;
         }
@@ -823,18 +824,21 @@ int daObjYOUSEI_c::create() {
         break;
     case 2:
         mPrm = 2;
+             /* dSv_event_flag_c::F_0502 - sub-dungeon - Cave of Ordeals - B20 first arrival */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[502])) {
             return cPhs_ERROR_e;
         }
         break;
     case 3:
         mPrm = 3;
+             /* dSv_event_flag_c::F_0503 - sub-dungeon - Cave of Ordeals - B30 first arrival */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[503])) {
             return cPhs_ERROR_e;
         }
         break;
     case 4:
         mPrm = 4;
+             /* dSv_event_flag_c::F_0504 - sub-dungeon - Cave of Ordeals - B40 first arrival */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[504])) {
             return cPhs_ERROR_e;
         }

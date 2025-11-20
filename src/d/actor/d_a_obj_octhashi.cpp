@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_octhashi.h"
 #include "d/d_cc_d.h"
 #include "SSystem/SComponent/c_math.h"
@@ -185,8 +187,8 @@ void daObjOCTHASHI_c::SphAction() {
     f32 fvals_3888[2] = {2.125f, 0.0f};
     f32 fvals_3889[2] = {0.0f, 0.0f};
     f32 fval_3890[1] = {2000.0f};
-    f32 fval_3903[1] = {608.0f};
-    f32 fval_3904[1] = {448.0f};
+    f32 fval_3903[1] = {FB_WIDTH};
+    f32 fval_3904[1] = {FB_HEIGHT};
     for (int idx = 0; idx < mPieceNum; ++idx) {
         if (mColliders[idx].ChkCoHit()) {
             fopAc_ac_c* hit_actor = dCc_GetAc(mColliders[idx].GetCoHitObj()->GetAc());
@@ -302,7 +304,7 @@ static int daObjOCTHASHI_Execute(daObjOCTHASHI_c* i_this) {
 /* 80CA5AE0-80CA5B98 000FA0 00B8+00 1/0 0/0 0/0 .text            CreateHeap__15daObjOCTHASHI_cFv */
 int daObjOCTHASHI_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], "S_octhashi00.bmd");
-    JUT_ASSERT(84, modelData != 0);
+    JUT_ASSERT(84, modelData != NULL);
 
     int idx = 0;
     while (idx < mPieceNum) {
@@ -318,7 +320,7 @@ int daObjOCTHASHI_c::CreateHeap() {
 
 /* 80CA5B98-80CA5EE4 001058 034C+00 1/1 0/0 0/0 .text            create__15daObjOCTHASHI_cFv */
 int daObjOCTHASHI_c::create() {
-    fopAcM_SetupActor(this, daObjOCTHASHI_c);
+    fopAcM_ct(this, daObjOCTHASHI_c);
     mPieceNum = fopAcM_GetParam(this) & 0xff;
     if (mPieceNum == 0xff) {
         mPieceNum = 0;
@@ -359,6 +361,10 @@ int daObjOCTHASHI_c::create() {
  */
 static int daObjOCTHASHI_IsDelete(daObjOCTHASHI_c* param_0) {
     return 1;
+}
+
+static void dummy() {
+    delete (cCcD_GStts*)NULL;
 }
 
 /* 80CA62A4-80CA62F8 001764 0054+00 1/0 0/0 0/0 .text            Create__15daObjOCTHASHI_cFv */

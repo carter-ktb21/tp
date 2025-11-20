@@ -3,9 +3,39 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_waterPillar.h"
 #include "d/d_com_inf_game.h"
 #include "SSystem/SComponent/c_math.h"
+
+struct daWtPillar_HIO_c : public mDoHIO_entry_c {
+    /* 80D2C6CC */ daWtPillar_HIO_c();
+    /* 80D2DF34 */ virtual ~daWtPillar_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ cXyz field_0x04;
+    /* 0x10 */ csXyz field_0x10;
+    /* 0x16 */ s8 mForTesting;                      // "----------- テスト用 ----------" "----------- For Testing ----------" | Checkbox
+    /* 0x17 */ s8 mDisableDrawing;                  // "モデル描画ＯＦＦ" "Model Drawing OFF" | Checkbox
+    /* 0x18 */ s8 mStopTime;                        // "停止時間" "Stop time" | Slider
+    /* 0x19 */ u8 mUpFirstWaitFrames;               // "待ち時間" "Waiting time" | Slider
+    /* 0x1A */ u8 field_0x1A[6];
+    /* 0x20 */ f32 field_0x20;                      // "速度" "Velocity" | Slider
+    /* 0x24 */ u8 field_0x24[4];
+    /* 0x28 */ f32 field_0x28;                      // mColliderUpdateScaleFactor?
+    /* 0x2C */ u8 mUpWaitFrames;                    // "待ち時間" "Waiting time" | Slider
+    /* 0x2D */ u8 field_0x2D[4];
+    /* 0x34 */ f32 field_0x34;                      // "速度" "Velocity" | Slider
+    /* 0x38 */ u8 field_0x38[8];
+    /* 0x40 */ f32 mDownwardSpeedUnitsPerSecond;    // "速度" "Velocity" | Slider
+    /* 0x44 */ f32 mEffectOscillationAngle;         // "振幅Ｙ" "Y Amplitude" | Slider
+    /* 0x48 */ f32 mEffectOscillationAmplitude;     // "移動強さ" "Moving strength" | Slider
+    /* 0x4C */ f32 mEffectOscillationDampingScale;  // "揺れ減衰" "Sway damping" | Slider
+    /* 0x50 */ f32 mEffectOscillationMaxDecay;      // "最大減衰量" "Maximum decay" | Slider
+    /* 0x54 */ f32 mEffectOscillationMinDecay;      // "最小減衰量" "Minimum decay" | Slider
+};
 
 typedef void (daWtPillar_c::*actionFunc)();
 
@@ -50,8 +80,8 @@ int daWtPillar_c::createHeapCallBack(fopAc_ac_c* i_this) {
 /* 80D2C858-80D2C960 000278 0108+00 1/1 0/0 0/0 .text            CreateHeap__12daWtPillar_cFv */
 int daWtPillar_c::CreateHeap() {
     J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("efWater", 8));
-    JUT_ASSERT(369, modelData != 0);
-    mpModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_Unk80000, 0x11000284);
+    JUT_ASSERT(369, modelData != NULL);
+    mpModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_DifferedDLBuffer, 0x11000284);
 
     if(!mpModel)
         return 0;
@@ -66,9 +96,6 @@ int daWtPillar_c::CreateHeap() {
 
     return 1;
 }
-
-/* 80D2E84C-80D2E858 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-UNK_REL_DATA
 
 /* 80D2E86C-80D2E884 000020 0018+00 0/1 0/0 0/0 .data            l_cull_box */
 Vec l_cull_box[2] = {
@@ -103,7 +130,7 @@ dCcD_SrcCyl daWtPillar_c::mCcDCyl = {daWtPillar_c::mCcDObjCoInfo};
 
 /* 80D2C960-80D2CC0C 000380 02AC+00 1/1 0/0 0/0 .text            create__12daWtPillar_cFv */
 cPhs__Step daWtPillar_c::create() {
-    fopAcM_SetupActor(this, daWtPillar_c);
+    fopAcM_ct(this, daWtPillar_c);
     const cPhs__Step phase = static_cast<cPhs__Step>(dComIfG_resLoad(&mPhase, "efWater"));
 
     if(phase == cPhs_COMPLEATE_e) {
@@ -201,8 +228,8 @@ int daWtPillar_c::execute() {
     effectSet();
     effectSet2();
 
-    mScaleX = scale.x;
-    mScaleZ = scale.z;
+    mScale.x = scale.x;
+    mScale.z = scale.z;
 
     cXyz currentHeightVector(0.0f, 1.0f, 0.0f);
     currentHeightVector.y *= mCurrentHeight;
@@ -577,12 +604,6 @@ int daWtPillar_Delete(daWtPillar_c* i_this) {
  */
 int daWtPillar_Create(fopAc_ac_c* i_this) {
     return static_cast<daWtPillar_c*>(i_this)->create();
-}
-
-/* 80D2E054-80D2E21C 001A74 01C8+00 1/1 0/0 0/0 .text            __ct__12daWtPillar_cFv */
-daWtPillar_c::daWtPillar_c() : dEvLib_callback_c(this) {
-    // Empty
-    // Having this in the header file results in inlining...
 }
 
 /* 80D2EA14-80D2EA34 -00001 0020+00 1/0 0/0 0/0 .data            l_daWtPillar_Method */

@@ -13,10 +13,11 @@
  *
  * @details Water columns that can carry broken stalactites (see d_a_obj_syrock)
  *
- */
+*/
+
 class daWtPillar_c : public fopAc_ac_c, public request_of_phase_process_class, public dEvLib_callback_c {
 public:
-    daWtPillar_c();
+    daWtPillar_c() : dEvLib_callback_c(this) {}
     ~daWtPillar_c() {}
 
     /* 80D2C7B0 */ void setBaseMtx();
@@ -83,10 +84,9 @@ private:
     /* 0x7DC */ dCcD_Stts mStts;
     /* 0x818 */ dCcD_Cps mCapsuleCollider;
     /* 0x95C */ dCcD_Cyl mCylinderCollider;
-    /* 0xA98 */ u8 pad0[0x3C];
-    /* 0xAD4 */ f32 mScaleX;    // Modified but never read; unused?
-    /* 0xAD8 */ u8 pad1[0x4];
-    /* 0xADC */ f32 mScaleZ;    // Modified but never read; unused?
+    /* 0xA98 */ u8 pad0[0x30];
+    /* 0xAC8 */ cXyz field_0xAC8;   // unused.
+    /* 0xAD4 */ cXyz mScale;    // Modified but never read; unused?
     /* 0xAE0 */ f32 mCurrentHeight;
     /* 0xAE4 */ cM3dGCpsS mCapsuleSource;
     /* 0xB00 */ u8 mAction;
@@ -141,34 +141,5 @@ private:
 
 
 STATIC_ASSERT(sizeof(daWtPillar_c) == 0xb7c);
-
-struct daWtPillar_HIO_c : public mDoHIO_entry_c {
-    /* 80D2C6CC */ daWtPillar_HIO_c();
-    /* 80D2DF34 */ ~daWtPillar_HIO_c() {};
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ cXyz field_0x04;
-    /* 0x10 */ csXyz field_0x10;
-    /* 0x16 */ s8 mForTesting;                      // "----------- テスト用 ----------" "----------- For Testing ----------" | Checkbox
-    /* 0x17 */ s8 mDisableDrawing;                  // "モデル描画ＯＦＦ" "Model Drawing OFF" | Checkbox
-    /* 0x18 */ s8 mStopTime;                        // "停止時間" "Stop time" | Slider
-    /* 0x19 */ u8 mUpFirstWaitFrames;               // "待ち時間" "Waiting time" | Slider
-    /* 0x1A */ u8 field_0x1A[6];
-    /* 0x20 */ f32 field_0x20;                      // "速度" "Velocity" | Slider
-    /* 0x24 */ u8 field_0x24[4];
-    /* 0x28 */ f32 field_0x28;                      // mColliderUpdateScaleFactor?
-    /* 0x2C */ u8 mUpWaitFrames;                    // "待ち時間" "Waiting time" | Slider
-    /* 0x2D */ u8 field_0x2D[4];
-    /* 0x34 */ f32 field_0x34;                      // "速度" "Velocity" | Slider
-    /* 0x38 */ u8 field_0x38[8];
-    /* 0x40 */ f32 mDownwardSpeedUnitsPerSecond;    // "速度" "Velocity" | Slider
-    /* 0x44 */ f32 mEffectOscillationAngle;         // "振幅Ｙ" "Y Amplitude" | Slider
-    /* 0x48 */ f32 mEffectOscillationAmplitude;     // "移動強さ" "Moving strength" | Slider
-    /* 0x4C */ f32 mEffectOscillationDampingScale;  // "揺れ減衰" "Sway damping" | Slider
-    /* 0x50 */ f32 mEffectOscillationMaxDecay;      // "最大減衰量" "Maximum decay" | Slider
-    /* 0x54 */ f32 mEffectOscillationMinDecay;      // "最小減衰量" "Minimum decay" | Slider
-};
-
 
 #endif /* D_A_OBJ_WATERPILLAR_H */

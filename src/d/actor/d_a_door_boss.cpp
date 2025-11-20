@@ -3,27 +3,14 @@
  * Boss Door
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_boss.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
 #include "d/d_door_param2.h"
 #include "SSystem/SComponent/c_math.h"
-
-/* 80670A20-80670A2C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80670A2C-80670A40 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 8066F418-8066F424 000078 000C+00 4/4 0/0 0/0 .text            getArcName__9daBdoor_cFv */
 char* daBdoor_c::getArcName() {
@@ -113,7 +100,7 @@ int daBdoor_c::CreateInit() {
     setAction(ACT_CLOSE_WAIT);
     attention_info.position.y += 250.0f;
     eyePos.y += 250.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     mpBgW->Move();
     u32 swbit = door_param2_c::getSwbit(this);
@@ -128,7 +115,7 @@ int daBdoor_c::CreateInit() {
 
 /* 8066F8E4-8066F9D8 000544 00F4+00 1/1 0/0 0/0 .text            create__9daBdoor_cFv */
 cPhs__Step daBdoor_c::create() {
-    fopAcM_SetupActor(this, daBdoor_c);
+    fopAcM_ct(this, daBdoor_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, getArcName());
     if (step == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, CheckCreateHeap, 0xa000)) {
@@ -370,12 +357,12 @@ BOOL daBdoor_c::actionEnd() {
 int daBdoor_c::execute() {
     typedef BOOL (daBdoor_c::*daBdoor_action)();
     static daBdoor_action l_action[4] = {
-        &actionWait,
-        &actionCloseWait,
-        &actionOpen,
-        &actionEnd,
+        &daBdoor_c::actionWait,
+        &daBdoor_c::actionCloseWait,
+        &daBdoor_c::actionOpen,
+        &daBdoor_c::actionEnd,
     };
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         mStaffID = dComIfGp_evmng_getMyStaffId(l_staff_name, NULL, 0);
         demoProc();
     } else {

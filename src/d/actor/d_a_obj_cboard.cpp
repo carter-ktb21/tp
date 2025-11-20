@@ -3,6 +3,8 @@
  * Clear (Invisible) Wall
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cboard.h"
 #include "d/d_bg_w.h"
 #include "d/d_procname.h"
@@ -144,7 +146,7 @@ int daObjBoard_c::Delete() {
 
 /* 8057BCFC-8057BD5C 00041C 0060+00 1/0 0/0 0/0 .text daObjBoard_create1st__FP12daObjBoard_c */
 static int daObjBoard_create1st(daObjBoard_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjBoard_c);
+    fopAcM_ct(i_this, daObjBoard_c);
 
     return i_this->create1st();
 }

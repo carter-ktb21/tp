@@ -50,14 +50,14 @@ public:
                                daNpcT_MotionSeqMngr_c::sequenceStepData_c const*, int,
                                daNpcT_MotionSeqMngr_c::sequenceStepData_c const*, int,
                                daNpcT_evtData_c const*, char**);
-    /* 809D5F98 */ s32 getEyeballMaterialNo();
+    /* 809D5F98 */ u16 getEyeballMaterialNo();
     /* 809D5FA0 */ s32 getHeadJointNo();
     /* 809D5FA8 */ s32 getNeckJointNo();
     /* 809D5FB0 */ bool getBackboneJointNo();
     /* 809D5FB8 */ void checkChangeJoint(int);
     /* 809D5FC8 */ void checkRemoveJoint(int);
 
-    static void* mCutNameList[2];
+    static char* mCutNameList[2];
     static u8 mCutList[24];
 
 private:

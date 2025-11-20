@@ -3,11 +3,14 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_firewall.h"
 #include "cmath.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_bomb.h"
+#include "d/d_camera.h"
 
 struct Tag_FWall_n {
     static dCcD_SrcSph cc_sph_src;
@@ -177,7 +180,7 @@ static int daTag_FWall_Delete(daTag_FWall_c* i_this) {
 
 /* 80D590A8-80D592D0 0007E8 0228+00 1/1 0/0 0/0 .text            create__13daTag_FWall_cFv */
 int daTag_FWall_c::create() {
-    fopAcM_SetupActor(this, daTag_FWall_c);
+    fopAcM_ct(this, daTag_FWall_c);
 
     if (fire_num == 0) {
         field_0x568 = 0xFF;

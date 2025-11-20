@@ -3,6 +3,8 @@
  * Spider Web (Floor)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_web1.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -251,7 +253,7 @@ static daObj_Web1_HIO_c l_HIO;
 /* 80D35CE4-80D35F98 000A24 02B4+00 1/0 0/0 0/0 .text            daObj_Web1_Create__FP10fopAc_ac_c
  */
 static int daObj_Web1_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, obj_web1_class);
+    fopAcM_ct(i_this, obj_web1_class);
     obj_web1_class* _this = static_cast<obj_web1_class*>(i_this);
 
     static dCcD_SrcCyl cc_cyl_src = {

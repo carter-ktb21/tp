@@ -3,6 +3,8 @@
  * Z Shake Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag15.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "d/d_com_inf_game.h"
@@ -106,7 +108,7 @@ static int daKytag15_Create(fopAc_ac_c* i_this) {
         a_this->field_0x58c = 0;
     }
 
-    fopAcM_SetupActor(a_this, kytag15_class);
+    fopAcM_ct(a_this, kytag15_class);
 
     if (a_this->field_0x58c == 0) {
         if (!dKy_daynight_check()) {

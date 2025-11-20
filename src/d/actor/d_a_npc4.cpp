@@ -165,6 +165,12 @@ void daNpcF_Path_c::initialize() {
     field_0x10 = 0.0f;
 }
 
+#if DEBUG
+void daNpcF_Path_c::drawDbgInfoXyz() {
+    // UNFINISHED
+}
+#endif
+
 /* 8015095C-80150A24 14B29C 00C8+00 0/0 0/0 12/12 .text setPathInfo__13daNpcF_Path_cFUcScUc */
 int daNpcF_Path_c::setPathInfo(u8 i_pathNo, s8 i_roomNo, u8 i_isReversed) {
     mPathInfo = NULL;
@@ -431,7 +437,7 @@ void daNpcF_Lookat_c::initCalc(fopAc_ac_c* i_actor, Mtx i_baseTransformMtx, cXyz
         mDoMtx_stack_c::multVec(&local_90, &param_2[i]);
     }
 
-    JUT_ASSERT(1244, 0 != mAttnPos_p);
+    JUT_ASSERT(1244, NULL != mAttnPos_p);
 
     local_90 = *mAttnPos_p - i_actor->current.pos;
     mDoMtx_stack_c::multVec(&local_90, &param_5);
@@ -553,7 +559,7 @@ BOOL daNpcF_c::execute() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1000000000.0f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             field_0x998 = daNpcF_getGroundAngle(&mGndChk, mCurAngle.y);
             setEnvTevColor();
             setRoomNo();
@@ -573,8 +579,8 @@ BOOL daNpcF_c::execute() {
     setCollisions();
 
     if (mTwilight) {
-        attention_info.flags |= 0x400000;
-        attention_info.flags |= 0x800000;
+        attention_info.flags |= fopAc_AttnFlag_UNK_0x400000;
+        attention_info.flags |= fopAc_AttnFlag_UNK_0x800000;
         setHitodamaPrtcl();
     }
 
@@ -605,7 +611,7 @@ BOOL daNpcF_c::execute() {
 int daNpcF_c::draw(BOOL i_isTest, BOOL param_1, f32 i_shadowDepth, _GXColorS10* i_fogColor,
                    BOOL i_hideDamage) {
     f32 damage_ratio, frame;
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     J3DModelData* modelData = model->getModelData();
     field_0x9f3 = 1;
 
@@ -658,10 +664,10 @@ int daNpcF_c::draw(BOOL i_isTest, BOOL param_1, f32 i_shadowDepth, _GXColorS10* 
 
             if (mTwilight) {
                 dComIfGd_setListDark();
-                mpMorf->entryDL();
+                mAnm_p->entryDL();
                 dComIfGd_setList();
             } else {
-                mpMorf->entryDL();
+                mAnm_p->entryDL();
             }
 
             if (mAnmFlags & ANM_PLAY_BTP) {
@@ -735,41 +741,41 @@ void* daNpcF_c::srchActor(void* i_proc, void* i_this) {
 
 /* 8015276C-801527FC 14D0AC 0090+00 2/0 0/0 40/9 .text            setMtx__8daNpcF_cFv */
 void daNpcF_c::setMtx() {
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(mCurAngle);
     mDoMtx_stack_c::scaleM(scale);
     model->setBaseTRMtx(mDoMtx_stack_c::get());
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     if (mAnmFlags & 0x100) {
         mBckAnm.getBckAnm()->setFrame(mBckAnm.getFrame());
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     } else {
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     }
 }
 
 /* 801527FC-801528C8 14D13C 00CC+00 2/0 0/0 38/0 .text            setMtx2__8daNpcF_cFv */
 void daNpcF_c::setMtx2() {
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(mCurAngle);
     mDoMtx_stack_c::scaleM(scale);
     model->setBaseTRMtx(mDoMtx_stack_c::get());
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     if (cM3d_IsZero_inverted(mExpressionMorf)) {
-        mpMorf->onMorfNone();
+        mAnm_p->onMorfNone();
     } else {
-        mpMorf->offMorfNone();
+        mAnm_p->offMorfNone();
     }
 
     if (mAnmFlags & 0x100) {
         mBckAnm.getBckAnm()->setFrame(mBckAnm.getFrame());
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     } else {
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     }
 }
 
@@ -889,7 +895,7 @@ J3DAnmTevRegKey* daNpcF_c::getTevRegKeyAnmP(char* i_arcName, int i_resIdx) {
  * setMcaMorfAnm__8daNpcF_cFP18J3DAnmTransformKeyffiii          */
 BOOL daNpcF_c::setMcaMorfAnm(J3DAnmTransformKey* i_anm, f32 i_speed, f32 i_morf, int i_mode,
                              int i_start, int i_end) {
-    mpMorf->setAnm(i_anm, i_mode, i_morf, i_speed, (f32)i_start, (f32)i_end);
+    mAnm_p->setAnm(i_anm, i_mode, i_morf, i_speed, (f32)i_start, (f32)i_end);
     return true;
 }
 
@@ -936,12 +942,12 @@ void daNpcF_c::setRoomNo() {
 
 /* 80152E24-80152EC4 14D764 00A0+00 1/1 0/0 0/0 .text            chkEndAnm__8daNpcF_cFf */
 BOOL daNpcF_c::chkEndAnm(f32 param_0) {
-    switch (mpMorf->getPlayMode()) {
+    switch ((u8)mAnm_p->getPlayMode()) {
     case J3DFrameCtrl::EMode_LOOP:
-        return mpMorf->isLoop();
+        return mAnm_p->isLoop();
     case J3DFrameCtrl::EMode_NONE:
     case J3DFrameCtrl::EMode_RESET:
-        return mpMorf->isStop() && mpMorf->getPlaySpeed() == 0.0f && param_0 != 0.0f;
+        return mAnm_p->isStop() && mAnm_p->getPlaySpeed() == 0.0f && param_0 != 0.0f;
     case J3DFrameCtrl::EMode_REVERSE:
     default:
         return false;
@@ -1013,13 +1019,13 @@ BOOL daNpcF_c::playAllAnm() {
     }
 
     if (mAnmFlags & ANM_PLAY_MORF) {
-        rate = mpMorf->getPlaySpeed();
+        rate = mAnm_p->getPlaySpeed();
         if (mAnmFlags & ANM_PAUSE_MORF) {
-            mpMorf->setPlaySpeed(0.0f);
-            mpMorf->play(mPolySound, mReverb);
-            mpMorf->setPlaySpeed(rate);
+            mAnm_p->setPlaySpeed(0.0f);
+            mAnm_p->play(mPolySound, mReverb);
+            mAnm_p->setPlaySpeed(rate);
         } else {
-            mpMorf->play(mPolySound, mReverb);
+            mAnm_p->play(mPolySound, mReverb);
             if (chkEndAnm(rate)) {
                 mMotionLoops++;
             }
@@ -1059,7 +1065,6 @@ BOOL daNpcF_c::playAllAnm() {
  *  an animation index for that phase of the expression, the number of interpolation frames, and
  *  the number of loops before moving on to the next phase (or 0 for the last phase).
  */
-// NONMATCHING - regalloc, matches debug
 void daNpcF_c::playExpressionAnm(daNpcF_c::daNpcF_anmPlayData*** anm) {
     daNpcF_anmPlayData* playData = NULL;
     f32 morf;
@@ -1083,7 +1088,7 @@ void daNpcF_c::playExpressionAnm(daNpcF_c::daNpcF_anmPlayData*** anm) {
                 morf = mExpressionMorfOverride;
             }
             mExpressionMorf = morf;
-            mpMorf->setMorf(morf);
+            mAnm_p->setMorf(morf);
         }
     }
 
@@ -1099,7 +1104,6 @@ void daNpcF_c::playExpressionAnm(daNpcF_c::daNpcF_anmPlayData*** anm) {
  *  an animation index for that phase of the motion, the number of interpolation frames, and the
  *  number of loops before moving on to the next phase (or 0 for the last phase).
  */
-// NONMATCHING - regalloc, matches debug
 void daNpcF_c::playMotionAnm(daNpcF_c::daNpcF_anmPlayData*** anm) {
     daNpcF_anmPlayData* playData = NULL;
     f32 morf;
@@ -1123,7 +1127,7 @@ void daNpcF_c::playMotionAnm(daNpcF_c::daNpcF_anmPlayData*** anm) {
                 morf = mMotionMorfOverride;
             }
             mExpressionMorf = 0.0f;
-            mpMorf->setMorf(morf);
+            mAnm_p->setMorf(morf);
         }
     }
 
@@ -1235,7 +1239,7 @@ int daNpcF_c::ctrlMsgAnm(int& o_expression, int& o_motion, fopAc_ac_c* param_2, 
         fopAc_ac_c* talkPartner = dComIfGp_event_getTalkPartner();
         if (talkPartner == param_2) {
             msg_class* msg_p = dMsgObject_c::getActor();
-            JUT_ASSERT(2780, 0 != msg_p);
+            JUT_ASSERT(2780, NULL != msg_p);
 
             if (msg_p->mode == 2 || msg_p->mode == 3) {
                 field_0x9a4 = -1;
@@ -1281,7 +1285,7 @@ void daNpcF_c::orderEvent(int i_speak, char* i_evtName, u16 param_2, u16 i_prior
         mEventIdx = dComIfGp_getEventManager().getEventIdx(this, i_evtName, 0xff);
         fopAcM_orderOtherEventId(this, mEventIdx, i_mapToolID, param_2, i_priority, i_flag);
     } else if (!mTwilight || daPy_py_c::checkNowWolfEyeUp()) {
-        if ((attention_info.flags & 8) || (attention_info.flags & 2)) {
+        if ((attention_info.flags & fopAc_AttnFlag_SPEAK_e) || (attention_info.flags & fopAc_AttnFlag_TALK_e)) {
             eventInfo.onCondition(dEvtCnd_CANTALK_e);
             if (i_speak) {
                 fopAcM_orderSpeakEvent(this, 0, 0);
@@ -1298,7 +1302,7 @@ void daNpcF_c::changeEvent(char* i_arcName, char* i_evtName, u16 param_2, u16 pa
         dComIfGp_getEventManager().setObjectArchive(eventInfo.getArchiveName());
     }
 
-    JUT_ASSERT(2887, 0 != i_evtName);
+    JUT_ASSERT(2887, NULL != i_evtName);
 
     mEventIdx = dComIfGp_getEventManager().getEventIdx(this, i_evtName, 0xFF);
     dComIfGp_getEvent().reset(this);
@@ -1509,16 +1513,16 @@ u8 daNpcF_c::getDistTableIdx(int param_0, int param_1) {
 }
 
 /* 801542A0-8015436C 14EBE0 00CC+00 0/0 0/0 6/6 .text            getEvtAreaTagP__8daNpcF_cFii */
-// NONMATCHING regalloc
 fopAc_ac_c* daNpcF_c::getEvtAreaTagP(int i_type, int i_no) {
+    int r29 = 0;
+    f32 f31 = G_CM3D_F_INF;
     mFindCount = 0;
     mSrchActorName = PROC_TAG_EVTAREA;
     fpcM_Search(this->srchActor, this);
 
     for (int i = 0; i < mFindCount; i++) {
-        daTag_EvtArea_c* evt_area = static_cast<daTag_EvtArea_c*>(mFindActorPList[i]);
-        if (i_type == evt_area->getType() && i_no == evt_area->getNo()) {
-            return evt_area;
+        if (i_type == static_cast<daTag_EvtArea_c*>(mFindActorPList[i])->getType() && i_no == static_cast<daTag_EvtArea_c*>(mFindActorPList[i])->getNo()) {
+            return static_cast<daTag_EvtArea_c*>(mFindActorPList[i]);
         }
     }
 
@@ -1536,7 +1540,7 @@ fopAc_ac_c* daNpcF_c::getAttnActorP(BOOL i_playerAttn, fpcLyIt_JudgeFunc i_searc
     int sp38 = 0;
     int sp34;
 
-    f32 minDistance = 1000000000.0f;
+    f32 minDistance = G_CM3D_F_INF;
     f32 var_f30 = i_radius;
 
     if (mAttnChangeTimer != 0) {
@@ -1886,8 +1890,7 @@ void daNpcF_offTmpBit(u32 i_no) {
     dComIfGs_offTmpBit(dSv_event_tmp_flag_c::tempBitLabels[i_no]);
 }
 
-/* 80155774-80155854 1500B4 00E0+00 0/0 2/2 5/5 .text
- * daNpcF_getPlayerInfoFromPlayerList__FiiR4cXyzR5csXyz         */
+/* 80155774-80155854 1500B4 00E0+00 0/0 2/2 5/5 .text            daNpcF_getPlayerInfoFromPlayerList__FiiR4cXyzR5csXyz */
 int daNpcF_getPlayerInfoFromPlayerList(int param_0, int i_roomNo, cXyz& param_2, csXyz& param_3) {
     int rv = 0;
 
@@ -1907,8 +1910,8 @@ int daNpcF_getPlayerInfoFromPlayerList(int param_0, int i_roomNo, cXyz& param_2,
 }
 
 /* 80155854-80155968 150194 0114+00 0/0 0/0 1/1 .text daNpcF_chkDoBtnEqSpeak__FP10fopAc_ac_c */
-bool daNpcF_chkDoBtnEqSpeak(fopAc_ac_c* i_actor_p) {
-    bool ret = FALSE;
+BOOL daNpcF_chkDoBtnEqSpeak(fopAc_ac_c* i_actor_p) {
+    BOOL ret = FALSE;
 
     if (daPy_getPlayerActorClass()->checkPriActorOwn(i_actor_p)) {
         for (int i = 0; i < dComIfGp_getAttention()->GetActionCount(); i++) {
@@ -1962,6 +1965,16 @@ BOOL daNpcF_chkPointInArea(cXyz i_point, cXyz i_center, cXyz i_bounds, s16 i_ang
 u8 daNpcF_getDistTableIdx(int param_0, int param_1) {
     return param_0 + param_1 * 0x14 + 0x5e;
 }
+
+#if DEBUG
+void daNpcF_commonListenPropertyEvent(char*, int*, daNpcF_HIOParam*) {
+    // TODO.
+}
+
+void daNpcF_commonGenMessage(JORMContext*, daNpcF_HIOParam*) {
+    // TODO
+}
+#endif
 
 /* 80155AE8-80155B54 150428 006C+00 0/0 0/0 6/6 .text            daNpcF_clearMessageTmpBit__Fv */
 void daNpcF_clearMessageTmpBit() {

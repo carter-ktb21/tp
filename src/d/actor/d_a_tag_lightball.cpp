@@ -1,5 +1,7 @@
 // Translation Unit: d_a_tag_lightball
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_lightball.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -48,7 +50,7 @@ int daTagLightBall_c::Create() {
 
 /* 80D5A9B8-80D5AA20 000238 0068+00 1/1 0/0 0/0 .text   create__16daTagLightBall_cFv */
 int daTagLightBall_c::create() {
-    fopAcM_SetupActor(this, daTagLightBall_c);
+    fopAcM_ct(this, daTagLightBall_c);
 
     if (!Create()) {
         return cPhs_ERROR_e;

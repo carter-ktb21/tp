@@ -3,6 +3,8 @@
  * @brief Actor - Various carriable objects
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_carry.h"
 #include "d/actor/d_a_player.h"
 #include <cmath.h>
@@ -716,8 +718,6 @@ const static dCcD_SrcCyl l_tg_cyl = {
 /* 8047A350-8047A354 000A44 0004+00 0/0 0/0 0/0 .rodata          l_light_color */
 static const GXColor l_light_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
-UNK_REL_DATA;
-
 /* 8047A670-8047A6A8 -00001 0038+00 1/1 0/0 0/0 .data            l_arcName */
 static char* l_arcName[] = {
     "J_tubo_00", "J_tubo_01", "Kkiba_00",  "Y_ironbal", "J_taru00", "J_doku00", "Obj_bkl",
@@ -946,7 +946,7 @@ void daObjCarry_c::setBaseMtx() {
 
 /* 8046FACC-8046FB78 000B4C 00AC+00 1/1 0/0 0/0 .text            preInit__12daObjCarry_cFv */
 int daObjCarry_c::preInit() {
-    fopAcM_SetupActor(this, daObjCarry_c);
+    fopAcM_ct(this, daObjCarry_c);
 
     if (!mInitParams) {
         mItemNo = home.angle.x;
@@ -1080,10 +1080,10 @@ int daObjCarry_c::Create() {
         }
     }
 
-    fopAcM_SetCullSize(this, fopAc_CULLSPHERE_8_e);
+    fopAcM_SetCullSize(this, fopAc_CULLSPHERE_CUSTOM_e);
     fopAcM_setCullSizeSphere(this, data().m_cullsph_min_x, data().m_cullsph_min_y, data().m_cullsph_min_z, mpModel->getModelData()->getJointNodePointer(0)->getRadius() * data().scale);
 
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     attention_info.distances[fopAc_attn_CARRY_e] = data().m_carry_attn_dist;
 
     if (checkFlag(4)) {
@@ -1330,9 +1330,9 @@ int daObjCarry_c::CreateInit_Lv8Ball() {
 /* 80470B5C-80470BF4 001BDC 0098+00 1/1 0/0 0/0 .text            CreateHeap__12daObjCarry_cFv */
 int daObjCarry_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(getArcName(), getBmdName());
-    JUT_ASSERT(2813, modelData != 0);
+    JUT_ASSERT(2813, modelData != NULL);
 
-    u32 mdl_flags = prm_chk_type_ironball() ? J3DMdlFlag_None : J3DMdlFlag_Unk80000;
+    u32 mdl_flags = prm_chk_type_ironball() ? J3DMdlFlag_None : J3DMdlFlag_DifferedDLBuffer;
     mpModel = mDoExt_J3DModel__create(modelData, mdl_flags, 0x11000084);
     if (mpModel == 0) {
         return 0;
@@ -1389,21 +1389,31 @@ int daObjCarry_c::checkCreate_LightBallA() {
     fopAc_ac_c* var_r29 = NULL;
 
     if (daPy_py_c::checkCarryStartLightBallA()) {
+        /* Palace of Twilight - Palace of Twilight use 1 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0311);
+        /* Palace of Twilight - Palace of Twilight use 3 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0313);
+        /* Palace of Twilight - Palace of Twilight use 5 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0315);
+        /* Palace of Twilight - Palace of Twilight use 7 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0317);
+        /* Palace of Twilight - Palace of Twilight use 9 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0319);
 
         if (dComIfGp_roomControl_getStayNo() == 51) {
+            /* Palace of Twilight - Palace of Twilight use 5 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0315);
         } else if (dComIfGp_roomControl_getStayNo() == 52) {
+            /* Palace of Twilight - Palace of Twilight use 9 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0319);
         } else if (dComIfGp_roomControl_getStayNo() == 0) {
+            /* Palace of Twilight - Palace of Twilight use 1 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0311);
         } else if (dComIfGp_roomControl_getStayNo() == 1 || dComIfGp_roomControl_getStayNo() == 2) {
+            /* Palace of Twilight - Palace of Twilight use 3 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0313);
         } else {
+            /* Palace of Twilight - Palace of Twilight use 7 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0317);
         }
 
@@ -1415,13 +1425,19 @@ int daObjCarry_c::checkCreate_LightBallA() {
                 return cPhs_INIT_e;
             }
         }
-    } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0313) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0315) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0317) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0319))
+                /* Palace of Twilight - Palace of Twilight use 1 */
+    } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)
+                   /* Palace of Twilight - Palace of Twilight use 3 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0313)
+                   /* Palace of Twilight - Palace of Twilight use 5 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0315)
+                   /* Palace of Twilight - Palace of Twilight use 7 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0317)
+                   /* Palace of Twilight - Palace of Twilight use 9 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0319))
     {
         if (dComIfGp_roomControl_getStayNo() != 51) {
+                 /* Palace of Twilight - Palace of Twilight use 1 */
             if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)) {
                 resetIconPosForLightBallA();
             }
@@ -1430,12 +1446,23 @@ int daObjCarry_c::checkCreate_LightBallA() {
             OS_REPORT("\x1B[33m光球Ａ：玉とリンクの位置が違うので消します<0>\n\x1B[m");
             return cPhs_ERROR_e;
         }
-    } else if ((dComIfGs_isEventBit(dSv_event_flag_c::F_0311) && dComIfGp_roomControl_getStayNo()) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0313) && dComIfGp_roomControl_getStayNo() != 1 && dComIfGp_roomControl_getStayNo() != 2) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0315) && dComIfGp_roomControl_getStayNo() != 51) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0319) && dComIfGp_roomControl_getStayNo() != 52) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0317) && dComIfGp_roomControl_getStayNo() != 4 && dComIfGp_roomControl_getStayNo() != 5))
+                /* Palace of Twilight - Palace of Twilight use 1 */
+    } else if ((dComIfGs_isEventBit(dSv_event_flag_c::F_0311)
+                && dComIfGp_roomControl_getStayNo()) ||
+                /* Palace of Twilight - Palace of Twilight use 3 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0313)
+                && dComIfGp_roomControl_getStayNo() != 1 && dComIfGp_roomControl_getStayNo() != 2) ||
+                /* Palace of Twilight - Palace of Twilight use 5 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0315)
+                && dComIfGp_roomControl_getStayNo() != 51) ||
+                /* Palace of Twilight - Palace of Twilight use 9 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0319)
+                && dComIfGp_roomControl_getStayNo() != 52) ||
+                /* Palace of Twilight - Palace of Twilight use 7 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0317)
+                && dComIfGp_roomControl_getStayNo() != 4 && dComIfGp_roomControl_getStayNo() != 5))
     {
+             /* Palace of Twilight - Palace of Twilight use 1 */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)) {
             resetIconPosForLightBallA();
         } else {
@@ -1455,12 +1482,12 @@ int daObjCarry_c::checkCreate_LightBallA() {
 
             for (int i = 0; i < 6; i++) {
                 static const u16 l_event_bitA[] = {
-                    dSv_event_flag_c::F_0551,
-                    dSv_event_flag_c::F_0552,
-                    dSv_event_flag_c::F_0553,
-                    dSv_event_flag_c::F_0554,
-                    dSv_event_flag_c::F_0555,
-                    dSv_event_flag_c::F_0556
+                    dSv_event_flag_c::F_0551, /* Palace of Twilight - Palace of Twilight control use 1 */
+                    dSv_event_flag_c::F_0552, /* Palace of Twilight - Palace of Twilight control use 2 */
+                    dSv_event_flag_c::F_0553, /* Palace of Twilight - Palace of Twilight control use 3 */
+                    dSv_event_flag_c::F_0554, /* Palace of Twilight - Palace of Twilight control use 4 */
+                    dSv_event_flag_c::F_0555, /* Palace of Twilight - Palace of Twilight control use 5 */
+                    dSv_event_flag_c::F_0556, /* Palace of Twilight - Palace of Twilight control use 6 */
                 };
 
                 if (dComIfGs_isEventBit(l_event_bitA[i])) {
@@ -1506,21 +1533,31 @@ BOOL daObjCarry_c::checkCreate_LightBallB() {
     fopAc_ac_c* var_r29 = NULL;
 
     if (daPy_py_c::checkCarryStartLightBallB()) {
+        /* Palace of Twilight - Palace of Twilight use 2 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0312);
+        /* Palace of Twilight - Palace of Twilight use 4 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0314);
+        /* Palace of Twilight - Palace of Twilight use 6 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0316);
+        /* Palace of Twilight - Palace of Twilight use 8 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0318);
+        /* Palace of Twilight - Palace of Twilight use 10 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0320);
 
         if (dComIfGp_roomControl_getStayNo() == 51) {
+            /* Palace of Twilight - Palace of Twilight use 6 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0316);
         } else if (dComIfGp_roomControl_getStayNo() == 52) {
+            /* Palace of Twilight - Palace of Twilight use 10 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0320);
         } else if (dComIfGp_roomControl_getStayNo() == 0) {
+            /* Palace of Twilight - Palace of Twilight use 2 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0312);
         } else if (dComIfGp_roomControl_getStayNo() == 1 || dComIfGp_roomControl_getStayNo() == 2) {
+            /* Palace of Twilight - Palace of Twilight use 4 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0314);
         } else {
+            /* Palace of Twilight - Palace of Twilight use 8 */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0318);
         }
 
@@ -1532,13 +1569,19 @@ BOOL daObjCarry_c::checkCreate_LightBallB() {
                 return cPhs_INIT_e;
             }
         }
-    } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0314) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0316) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0318) &&
-               !dComIfGs_isEventBit(dSv_event_flag_c::F_0320))
+                /* Palace of Twilight - Palace of Twilight use 2 */
+    } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312)
+                   /* Palace of Twilight - Palace of Twilight use 4 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0314)
+                   /* Palace of Twilight - Palace of Twilight use 6 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0316)
+                   /* Palace of Twilight - Palace of Twilight use 8 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0318)
+                   /* Palace of Twilight - Palace of Twilight use 10 */
+               && !dComIfGs_isEventBit(dSv_event_flag_c::F_0320))
     {
         if (dComIfGp_roomControl_getStayNo() != 52) {
+                 /* Castle Town - Showed reciept to town doctor */
             if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0321)) {
                 resetIconPosForLightBallB();
             }
@@ -1547,12 +1590,23 @@ BOOL daObjCarry_c::checkCreate_LightBallB() {
             OS_REPORT("\x1B[33m光球Ｂ：玉とリンクの位置が違うので消します<2>\n\x1B[m");
             return cPhs_ERROR_e;
         }
-    } else if ((dComIfGs_isEventBit(dSv_event_flag_c::F_0312) && dComIfGp_roomControl_getStayNo()) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0314) && dComIfGp_roomControl_getStayNo() != 1 && dComIfGp_roomControl_getStayNo() != 2) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0316) && dComIfGp_roomControl_getStayNo() != 51) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0320) && dComIfGp_roomControl_getStayNo() != 52) ||
-               (dComIfGs_isEventBit(dSv_event_flag_c::F_0318) && dComIfGp_roomControl_getStayNo() != 4 && dComIfGp_roomControl_getStayNo() != 5))
+                /* Palace of Twilight - Palace of Twilight use 2 */
+    } else if ((dComIfGs_isEventBit(dSv_event_flag_c::F_0312)
+               && dComIfGp_roomControl_getStayNo()) ||
+                /* Palace of Twilight - Palace of Twilight use 4 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0314)
+               && dComIfGp_roomControl_getStayNo() != 1 && dComIfGp_roomControl_getStayNo() != 2) ||
+                /* Palace of Twilight - Palace of Twilight use 6 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0316)
+               && dComIfGp_roomControl_getStayNo() != 51) ||
+                /* Palace of Twilight - Palace of Twilight use 10 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0320)
+               && dComIfGp_roomControl_getStayNo() != 52) ||
+                /* Palace of Twilight - Palace of Twilight use 8 */
+               (dComIfGs_isEventBit(dSv_event_flag_c::F_0318)
+               && dComIfGp_roomControl_getStayNo() != 4 && dComIfGp_roomControl_getStayNo() != 5))
     {
+             /* Palace of Twilight - Palace of Twilight use 2 */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312)) {
             resetIconPosForLightBallB();
         } else {
@@ -1572,12 +1626,12 @@ BOOL daObjCarry_c::checkCreate_LightBallB() {
 
             for (int i = 0; i < 6; i++) {
                 static const u16 l_event_bitB[] = {
-                    dSv_event_flag_c::F_0557,
-                    dSv_event_flag_c::F_0558,
-                    dSv_event_flag_c::F_0559,
-                    dSv_event_flag_c::F_0560,
-                    dSv_event_flag_c::F_0561,
-                    dSv_event_flag_c::F_0562,
+                    dSv_event_flag_c::F_0557, /* Palace of Twilight - Palace of Twilight control use 7 */
+                    dSv_event_flag_c::F_0558, /* Palace of Twilight - Palace of Twilight control use 8 */
+                    dSv_event_flag_c::F_0559, /* Palace of Twilight - Palace of Twilight control use 9 */
+                    dSv_event_flag_c::F_0560, /* Palace of Twilight - Palace of Twilight control use 10 */
+                    dSv_event_flag_c::F_0561, /* Palace of Twilight - Palace of Twilight control use 11 */
+                    dSv_event_flag_c::F_0562, /* Palace of Twilight - Palace of Twilight control use 12 */
                 };
 
                 if (dComIfGs_isEventBit(l_event_bitB[i])) {
@@ -1636,15 +1690,13 @@ BOOL daObjCarry_c::checkCreate_Lv8Ball() {
     return cPhs_NEXT_e;
 }
 
-/* 80471680-804716D4 002700 0054+00 1/1 0/0 0/0 .text resetIconPosForLightBallA__12daObjCarry_cFv
- */
+/* 80471680-804716D4 002700 0054+00 1/1 0/0 0/0 .text            resetIconPosForLightBallA__12daObjCarry_cFv */
 void daObjCarry_c::resetIconPosForLightBallA() {
     cXyz pos(0.0f, 100.0f, -3930.0f);
     dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 51);
 }
 
-/* 804716D4-804717B4 002754 00E0+00 1/1 0/0 0/0 .text
- * setIconPosForLightBallAAtR00__12daObjCarry_cFv               */
+/* 804716D4-804717B4 002754 00E0+00 1/1 0/0 0/0 .text            setIconPosForLightBallAAtR00__12daObjCarry_cFv */
 void daObjCarry_c::setIconPosForLightBallAAtR00() {
     cXyz pos;
 
@@ -1659,8 +1711,7 @@ void daObjCarry_c::setIconPosForLightBallAAtR00() {
     dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 0);
 }
 
-/* 804717B4-80471894 002834 00E0+00 1/1 0/0 0/0 .text
- * setIconPosForLightBallBAtR00__12daObjCarry_cFv               */
+/* 804717B4-80471894 002834 00E0+00 1/1 0/0 0/0 .text           setIconPosForLightBallBAtR00__12daObjCarry_cFv */
 void daObjCarry_c::setIconPosForLightBallBAtR00() {
     cXyz pos;
 
@@ -1675,8 +1726,7 @@ void daObjCarry_c::setIconPosForLightBallBAtR00() {
     dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 0);
 }
 
-/* 80471894-804718E8 002914 0054+00 1/1 0/0 0/0 .text resetIconPosForLightBallB__12daObjCarry_cFv
- */
+/* 80471894-804718E8 002914 0054+00 1/1 0/0 0/0 .text resetIconPosForLightBallB__12daObjCarry_cFv */
 void daObjCarry_c::resetIconPosForLightBallB() {
     cXyz pos(0.0f, 100.0f, -3930.0f);
     dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 52);
@@ -1742,7 +1792,7 @@ int daObjCarry_c::execute() {
     }
 
     if (mType == TYPE_DOKURO && getSwbit() != 0xFF && !fopAcM_isSwitch(this, getSwbit())) {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         return 1;
     }
 
@@ -1758,7 +1808,7 @@ int daObjCarry_c::execute() {
             mode_init_wait();
         }
 
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         calc_rot_call();
         setBaseMtx();
         field_0xdb9 = mCtrl;
@@ -2068,31 +2118,48 @@ int daObjCarry_c::_delete() {
     }
 
     if (mType == TYPE_BALL_S) {
-        if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311) || (player != NULL && player->getGrabActorID() != fopAcM_GetID(this))) {
+             /* Palace of Twilight - Palace of Twilight use 1 */
+        if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)
+            || (player != NULL && player->getGrabActorID() != fopAcM_GetID(this))) {
+            /* Palace of Twilight - Palace of Twilight use 3 */
             dComIfGs_offEventBit(dSv_event_flag_c::F_0313);
+            /* Palace of Twilight - Palace of Twilight use 5 */
             dComIfGs_offEventBit(dSv_event_flag_c::F_0315);
+            /* Palace of Twilight - Palace of Twilight use 7 */
             dComIfGs_offEventBit(dSv_event_flag_c::F_0317);
+            /* Palace of Twilight - Palace of Twilight use 9 */
             dComIfGs_offEventBit(dSv_event_flag_c::F_0319);
 
+                 /* Palace of Twilight - Palace of Twilight use 1 */
             if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)) {
                 cXyz pos(0.0f, 100.0f, -3930.0f);
                 dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 51);
             }
         }
 
-        if (fopAcM_isSwitch(this, 90) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0311) && player != NULL) {
+        if (fopAcM_isSwitch(this, 90)
+                /* Palace of Twilight - Palace of Twilight use 1 */
+            && !dComIfGs_isEventBit(dSv_event_flag_c::F_0311)
+            && player != NULL) {
             if (player->getGrabActorID() != fopAcM_GetID(this)) {
                 fopAcM_onSwitch(this, 170);
                 // "Midna Hint Switch set!\n"
                 OSReport_Error("ミドナヒント用スイッチ立てました！\n");
             }
         }
-    } else if (mType == TYPE_BALL_S_2 && (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312) || (player != NULL && player->getGrabActorID() != fopAcM_GetID(this)))) {
+                                           /* Palace of Twilight - Palace of Twilight use 2 */
+    } else if (mType == TYPE_BALL_S_2 && (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312)
+               || (player != NULL && player->getGrabActorID() != fopAcM_GetID(this)))) {
+        /* Palace of Twilight - Palace of Twilight use 4 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0314);
+        /* Palace of Twilight - Palace of Twilight use 6 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0316);
+        /* Palace of Twilight - Palace of Twilight use 8 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0318);
+        /* Palace of Twilight - Palace of Twilight use 10 */
         dComIfGs_offEventBit(dSv_event_flag_c::F_0320);
 
+             /* Palace of Twilight - Palace of Twilight use 2 */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312)) {
             cXyz pos(0.0f, 100.0f, -3930.0f);
             dTres_c::setIconPositionOfCarryLight(getTrboxBit(), &pos, 52);
@@ -2100,7 +2167,7 @@ int daObjCarry_c::_delete() {
     }
 
     if (prm_chk_type_ironball()) {
-        if (-1000000000.0f != mAcch.GetGroundH()) {
+        if (-G_CM3D_F_INF != mAcch.GetGroundH()) {
             savePos(getSaveID(), current.pos);
             setRoomNo(getSaveID(), fopAcM_GetRoomNo(this));
         } else {
@@ -2238,7 +2305,7 @@ BOOL daObjCarry_c::checkRollAngle() {
     bool valid_plane = fopAcM_gc_c::getTriPla(&plane);
     f32 ground_y = fopAcM_gc_c::getGroundY();
 
-    if (gnd_chk && ground_y != -1000000000.0f && valid_plane) {
+    if (gnd_chk && ground_y != -G_CM3D_F_INF && valid_plane) {
         f32 roll_threshold = cM_scos(cM_deg2s(roll_angle - 0.5f));
         cXyz normal(plane.mNormal);
         if (normal.y < roll_threshold) {
@@ -2321,8 +2388,7 @@ void daObjCarry_c::mode_proc_call() {
     }
 }
 
-/* 804733E8-804734B0 004468 00C8+00 15/15 0/0 0/0 .text            mode_init_wait__12daObjCarry_cFv
- */
+/* 804733E8-804734B0 004468 00C8+00 15/15 0/0 0/0 .text            mode_init_wait__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_wait() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2331,7 +2397,7 @@ void daObjCarry_c::mode_init_wait() {
     mCyl.OnTgSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     field_0xda8 = 0;
 
     speedF = 0.0f;
@@ -2392,8 +2458,7 @@ int daObjCarry_c::mode_proc_wait() {
     return 1;
 }
 
-/* 80473718-804737CC 004798 00B4+00 5/5 0/0 0/0 .text            mode_init_walk__12daObjCarry_cFUc
- */
+/* 80473718-804737CC 004798 00B4+00 5/5 0/0 0/0 .text            mode_init_walk__12daObjCarry_cFUc */
 void daObjCarry_c::mode_init_walk(u8 unused) {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2425,7 +2490,7 @@ int daObjCarry_c::mode_proc_walk() {
 
     if (gnd_hit) {
         field_0xcec = current.pos.y;
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
         if (0.0f == speedF && 0.0f == speed.y) {
             mode_init_wait();
@@ -2433,13 +2498,13 @@ int daObjCarry_c::mode_proc_walk() {
 
         if (mType == TYPE_IRON_BALL) {
             if (speedF > 25.0f) {
-                cLib_offBit<u32>(attention_info.flags, 0x10);
+                cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
             } else {
-                cLib_onBit<u32>(attention_info.flags, 0x10);
+                cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
             }
         }
     } else {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 
     f32 var_f29 = data().m_rollAngle;
@@ -2457,7 +2522,7 @@ int daObjCarry_c::mode_proc_walk() {
     f32 var_f31 = data().m_slopeInfluence;
     f32 temp_f25 = fopAcM_gc_c::getGroundY();
 
-    if (gnd_check && -1000000000.0f != temp_f25 && gnd_hit && !gnd_landing) {
+    if (gnd_check && -G_CM3D_F_INF != temp_f25 && gnd_hit && !gnd_landing) {
         bool var_r27 = 1;
         if (fopAcM_gc_c::getPolyAtt0() == 3) {
             var_r27 = 0;
@@ -2517,8 +2582,7 @@ int daObjCarry_c::mode_proc_walk() {
     return 1;
 }
 
-/* 80473ED8-804741A8 004F58 02D0+00 2/2 0/0 0/0 .text            mode_init_carry__12daObjCarry_cFv
- */
+/* 80473ED8-804741A8 004F58 02D0+00 2/2 0/0 0/0 .text            mode_init_carry__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_carry() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2556,15 +2620,35 @@ void daObjCarry_c::mode_init_carry() {
     }
 
     if (prm_chk_type_lightball()) {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
         daPy_py_c* player = daPy_getPlayerActorClass();
         if (player->getGrabActorID() == fopAcM_GetID(this)) {
             if (mType == TYPE_BALL_S) {
-                if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0313) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0315) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0317) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0319)) {
+                     /* Palace of Twilight - Palace of Twilight use 1 */
+                if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0311)
+                        /* Palace of Twilight - Palace of Twilight use 3 */
+                    && !dComIfGs_isEventBit(dSv_event_flag_c::F_0313)
+                        /* Palace of Twilight - Palace of Twilight use 5 */
+                    && !dComIfGs_isEventBit(dSv_event_flag_c::F_0315)
+                        /* Palace of Twilight - Palace of Twilight use 7 */
+                    && !dComIfGs_isEventBit(dSv_event_flag_c::F_0317)
+                        /* Palace of Twilight - Palace of Twilight use 9 */
+                    && !dComIfGs_isEventBit(dSv_event_flag_c::F_0319)) {
+                    /* Palace of Twilight - Palace of Twilight use 5 */
                     dComIfGs_onEventBit(dSv_event_flag_c::F_0315);
                 }
-            } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0314) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0316) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0318) && !dComIfGs_isEventBit(dSv_event_flag_c::F_0320)) {
+                        /* Palace of Twilight - Palace of Twilight use 2 */
+            } else if (!dComIfGs_isEventBit(dSv_event_flag_c::F_0312)
+                           /* Palace of Twilight - Palace of Twilight use 4 */
+                       && !dComIfGs_isEventBit(dSv_event_flag_c::F_0314)
+                           /* Palace of Twilight - Palace of Twilight use 6 */
+                       && !dComIfGs_isEventBit(dSv_event_flag_c::F_0316)
+                           /* Palace of Twilight - Palace of Twilight use 8 */
+                       && !dComIfGs_isEventBit(dSv_event_flag_c::F_0318)
+                           /* Palace of Twilight - Palace of Twilight use 10 */
+                       && !dComIfGs_isEventBit(dSv_event_flag_c::F_0320)) {
+                /* Palace of Twilight - Palace of Twilight use 10 */
                 dComIfGs_onEventBit(dSv_event_flag_c::F_0320);
             }
         }
@@ -2646,8 +2730,7 @@ int daObjCarry_c::mode_proc_carry() {
     return 1;
 }
 
-/* 80474448-80474540 0054C8 00F8+00 3/3 0/0 1/1 .text            mode_init_drop__12daObjCarry_cFUc
- */
+/* 80474448-80474540 0054C8 00F8+00 3/3 0/0 1/1 .text            mode_init_drop__12daObjCarry_cFUc */
 void daObjCarry_c::mode_init_drop(u8 param_0) {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2657,7 +2740,7 @@ void daObjCarry_c::mode_init_drop(u8 param_0) {
     mCyl.OnCoSPrmBit(0x10);
     mCyl.OffAtSPrmBit(0xC);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     mStts.SetWeight(data().m_colliderWeight);
     field_0xda8 = 0;
@@ -2700,8 +2783,7 @@ int daObjCarry_c::mode_proc_drop() {
     return 1;
 }
 
-/* 80474618-80474734 005698 011C+00 2/2 0/0 0/0 .text            mode_init_float__12daObjCarry_cFv
- */
+/* 80474618-80474734 005698 011C+00 2/2 0/0 0/0 .text            mode_init_float__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_float() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2710,7 +2792,7 @@ void daObjCarry_c::mode_init_float() {
     mCyl.OnTgSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     field_0xda8 = 0;
     field_0xdc4 = 0;
@@ -2806,7 +2888,7 @@ void daObjCarry_c::mode_init_sink() {
     mCyl.OnTgSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     field_0xda8 = 0;
     mStts.SetWeight(data().m_colliderWeight);
@@ -2864,17 +2946,16 @@ int daObjCarry_c::mode_proc_sink() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
 
     if (mAcch.ChkGroundHit()) {
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     } else {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 
     field_0xcec = current.pos.y;
     return 1;
 }
 
-/* 80474D64-80474E08 005DE4 00A4+00 1/1 0/0 0/0 .text            mode_init_yogan__12daObjCarry_cFv
- */
+/* 80474D64-80474E08 005DE4 00A4+00 1/1 0/0 0/0 .text            mode_init_yogan__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_yogan() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2882,7 +2963,7 @@ void daObjCarry_c::mode_init_yogan() {
     mCyl.OffAtSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     mStts.SetWeight(data().m_colliderWeight);
 
@@ -2933,7 +3014,7 @@ void daObjCarry_c::mode_init_boomCarry() {
     mCyl.OnCoSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCanCrashRoll = false;
 
     gravity = calc_gravity();
@@ -2969,8 +3050,7 @@ int daObjCarry_c::mode_proc_boomCarry() {
     return 1;
 }
 
-/* 80475014-804750C8 006094 00B4+00 1/1 0/0 0/0 .text            mode_init_growth__12daObjCarry_cFv
- */
+/* 80475014-804750C8 006094 00B4+00 1/1 0/0 0/0 .text            mode_init_growth__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_growth() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -2980,7 +3060,7 @@ void daObjCarry_c::mode_init_growth() {
     mCyl.OnCoSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     field_0xdb0 = 1;
 
     scale.setall(0.0f);
@@ -3010,8 +3090,7 @@ int daObjCarry_c::mode_proc_end() {
     return 1;
 }
 
-/* 80475164-80475210 0061E4 00AC+00 1/1 0/0 0/0 .text            mode_init_dbDrop__12daObjCarry_cFUc
- */
+/* 80475164-80475210 0061E4 00AC+00 1/1 0/0 0/0 .text            mode_init_dbDrop__12daObjCarry_cFUc */
 void daObjCarry_c::mode_init_dbDrop(u8 param_0) {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -3020,7 +3099,7 @@ void daObjCarry_c::mode_init_dbDrop(u8 param_0) {
     mCyl.OnCoSPrmBit(0x10);
     mCyl.OffTgSPrmBit(1);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     fopAcM_SetMaxFallSpeed(this, -100.0f);
     mStts.SetWeight(data().m_colliderWeight);
@@ -3031,14 +3110,13 @@ void daObjCarry_c::mode_init_dbDrop(u8 param_0) {
     mMode = MODE_DB_DROP;
 }
 
-/* 80475210-80475238 006290 0028+00 1/0 0/0 0/0 .text            mode_proc_dbDrop__12daObjCarry_cFv
- */
+/* 80475210-80475238 006290 0028+00 1/0 0/0 0/0 .text            mode_proc_dbDrop__12daObjCarry_cFv */
 int daObjCarry_c::mode_proc_dbDrop() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
     return 1;
 }
 
-/* 80475238-80475354 0062B8 011C+00 1/1 0/0 0/0 .text mode_init_hookCarry__12daObjCarry_cFv */
+/* 80475238-80475354 0062B8 011C+00 1/1 0/0 0/0 .text            mode_init_hookCarry__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_hookCarry() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -3048,7 +3126,7 @@ void daObjCarry_c::mode_init_hookCarry() {
     mCyl.OnCoSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCanCrashRoll = false;
 
     gravity = calc_gravity();
@@ -3067,7 +3145,7 @@ void daObjCarry_c::mode_init_hookCarry() {
     mMode = MODE_HOOK_CARRY;
 }
 
-/* 80475354-80475384 0063D4 0030+00 1/0 0/0 0/0 .text mode_proc_hookCarry__12daObjCarry_cFv */
+/* 80475354-80475384 0063D4 0030+00 1/0 0/0 0/0 .text            mode_proc_hookCarry__12daObjCarry_cFv */
 int daObjCarry_c::mode_proc_hookCarry() {
     if (!fopAcM_checkHookCarryNow(this)) {
         mode_init_wait();
@@ -3085,7 +3163,7 @@ void daObjCarry_c::mode_init_fit() {
     mCyl.OnTgSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     fopAcM_OffStatus(this, 0x80000);
     field_0xda8 = 0;
 
@@ -3107,7 +3185,7 @@ int daObjCarry_c::mode_proc_fit() {
     return 1;
 }
 
-/* 80475478-804754D0 0064F8 0058+00 1/0 0/0 0/0 .text mode_proc_controled__12daObjCarry_cFv */
+/* 80475478-804754D0 0064F8 0058+00 1/0 0/0 0/0 .text            mode_proc_controled__12daObjCarry_cFv */
 int daObjCarry_c::mode_proc_controled() {
     calc_rot_call();
     setBaseMtx();
@@ -3116,8 +3194,7 @@ int daObjCarry_c::mode_proc_controled() {
     return 1;
 }
 
-/* 804754D0-80475598 006550 00C8+00 1/1 0/0 0/0 .text mode_init_resetLightBall__12daObjCarry_cFv
- */
+/* 804754D0-80475598 006550 00C8+00 1/1 0/0 0/0 .text            mode_init_resetLightBall__12daObjCarry_cFv */
 void daObjCarry_c::mode_init_resetLightBall() {
     mAcch.ClrMoveBGOnly();
     mAcch.ClrGrndNone();
@@ -3126,7 +3203,7 @@ void daObjCarry_c::mode_init_resetLightBall() {
     mCyl.OffTgSPrmBit(1);
     mCyl.OnCoSPrmBit(0x10);
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     field_0xda8 = 0;
 
     speedF = 0.0f;
@@ -3172,7 +3249,6 @@ BOOL daObjCarry_c::chkSinkObj() {
 }
 
 /* 8047573C-80476618 0067BC 0EDC+00 1/1 0/0 0/0 .text            bg_check__12daObjCarry_cFv */
-// NONMATCHING - regalloc, equivalent?
 void daObjCarry_c::bg_check() {
     bool roof_hit = mAcch.ChkRoofHit();
     bool wall_hit = mAcch.ChkWallHit();
@@ -3497,13 +3573,13 @@ bool daObjCarry_c::bg_damage_proc_bokkuri() {
     return rt;
 }
 
-/* 80476930-80476938 0079B0 0008+00 2/0 0/0 0/0 .text bg_damage_proc_LightBall__12daObjCarry_cFv
+/* 80476930-80476938 0079B0 0008+00 2/0 0/0 0/0 .text            bg_damage_proc_LightBall__12daObjCarry_cFv
  */
 bool daObjCarry_c::bg_damage_proc_LightBall() {
     return false;
 }
 
-/* 80476938-80476940 0079B8 0008+00 1/0 0/0 0/0 .text bg_damage_proc_Lv8Ball__12daObjCarry_cFv */
+/* 80476938-80476940 0079B8 0008+00 1/0 0/0 0/0 .text            bg_damage_proc_Lv8Ball__12daObjCarry_cFv */
 bool daObjCarry_c::bg_damage_proc_Lv8Ball() {
     return false;
 }
@@ -3772,8 +3848,8 @@ void daObjCarry_c::eff_break_tuboBmd(u16 param_0, cXyz param_1) {
     J3DModelData* tubo_bmd = (J3DModelData*)dComIfG_getObjectRes("Always", 0x20);
     J3DAnmTexPattern* tubo_btp = (J3DAnmTexPattern*)dComIfG_getObjectRes("Always", 0x42);
     
-    JUT_ASSERT(6963, tubo_bmd != 0);
-    JUT_ASSERT(6964, tubo_btp != 0);
+    JUT_ASSERT(6963, tubo_bmd != NULL);
+    JUT_ASSERT(6964, tubo_btp != NULL);
     
     JPABaseEmitter* emitter = dComIfGp_particle_set(0x15C, &current.pos, NULL, NULL, 0xFF, &dPa_modelEcallBack::getEcallback(), fopAcM_GetRoomNo(this), NULL, NULL, &param_1);
 
@@ -3787,7 +3863,7 @@ void daObjCarry_c::eff_break_kibakoBmd(cXyz i_size) {
     cXyz pos(current.pos);
 
     J3DModelData* kibako_bmd = (J3DModelData*)dComIfG_getObjectRes("Always", "BreakWoodBox.bmd");
-    JUT_ASSERT(7005, kibako_bmd != 0);
+    JUT_ASSERT(7005, kibako_bmd != NULL);
     
     JPABaseEmitter* emitter = dComIfGp_particle_set(0x82AF, &pos, NULL, NULL, 0xFF, &dPa_modelEcallBack::getEcallback(), fopAcM_GetRoomNo(this), NULL, NULL, &i_size);
 
@@ -3851,8 +3927,8 @@ void daObjCarry_c::eff_break_bokkuri() {
     J3DModelData* tubo_bmd = (J3DModelData*)dComIfG_getObjectRes("Always", 0x20);
     J3DAnmTexPattern* tubo_btp = (J3DAnmTexPattern*)dComIfG_getObjectRes("Always", 0x42);
     
-    JUT_ASSERT(7108, tubo_bmd != 0);
-    JUT_ASSERT(7109, tubo_btp != 0);
+    JUT_ASSERT(7108, tubo_bmd != NULL);
+    JUT_ASSERT(7109, tubo_btp != NULL);
     
     JPABaseEmitter* emitter = dComIfGp_particle_set(0x15C, &current.pos, NULL, NULL, 0xFF, &dPa_modelEcallBack::getEcallback(), fopAcM_GetRoomNo(this), NULL, NULL, &scale);
 
@@ -4172,7 +4248,7 @@ void daObjCarry_c::exec_proc_kibako() {}
 
 /* 8047884C-804788C4 0098CC 0078+00 1/0 0/0 0/0 .text exec_proc_ironball__12daObjCarry_cFv */
 void daObjCarry_c::exec_proc_ironball() {
-    if (mAcch.GetGroundH() != -1000000000.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
         savePos(getSaveID(), current.pos);
         setRoomNo(getSaveID(), fopAcM_GetRoomNo(this));
     }

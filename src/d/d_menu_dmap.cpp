@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_dmap.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -27,11 +29,6 @@
 #else
 #define POINTER_OPT 0
 #endif
-
-/* 803BC7E0-803BC7EC 019900 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_Dmap_c::*ProcFunc)();
 
@@ -100,15 +97,15 @@ dMenu_DmapBg_c::dMenu_DmapBg_c(JKRExpHeap* i_heap, STControl* i_stick) {
     field_0xdd8 = 1;
 
     mString = new dMsgString_c();
-    JUT_ASSERT(621, mString != 0);
+    JUT_ASSERT(621, mString != NULL);
 
     mpTalkHeap = JKRCreateExpHeap(0x32000, mpHeap, false);
-    JUT_ASSERT(624, mpTalkHeap != 0);
+    JUT_ASSERT(624, mpTalkHeap != NULL);
 
     mpItemExplain = NULL;
 
     mpMeterHaihai = new dMeterHaihai_c(2);
-    JUT_ASSERT(630, mpMeterHaihai != 0);
+    JUT_ASSERT(630, mpMeterHaihai != NULL);
 
     field_0xdda = 0;
 
@@ -144,7 +141,7 @@ dMenu_DmapBg_c::dMenu_DmapBg_c(JKRExpHeap* i_heap, STControl* i_stick) {
 void dMenu_DmapBg_c::mapScreenInit() {
     for (int i = 0; i < 2; i++) {
         mMapScreen[i] = new J2DScreen();
-        JUT_ASSERT(689, mMapScreen[i] != 0);
+        JUT_ASSERT(689, mMapScreen[i] != NULL);
 
         bool fg = mMapScreen[i]->setPriority("zelda_dungeon_map_map.blo", 0x20000, dComIfGp_getDmapResArchive());
         JUT_ASSERT(693, fg != false);
@@ -154,7 +151,7 @@ void dMenu_DmapBg_c::mapScreenInit() {
     
     #if (PLATFORM_WII || PLATFORM_SHIELD)
     mpBlack = new CPaneMgrAlpha(mMapScreen[0], 'm_black', 2, NULL);
-    JUT_ASSERT(699, mpBlack != 0);
+    JUT_ASSERT(699, mpBlack != NULL);
     mpBlack->setAlphaRate(0.0f);
     #else
     mpBlack = NULL;
@@ -185,11 +182,11 @@ void dMenu_DmapBg_c::mapScreenInit() {
 
     for (int i = 0; i < 2; i++) {
         mpMapRoot[i] = new CPaneMgrAlphaMorf(mMapScreen[i], 'ROOT', 2, NULL);
-        JUT_ASSERT(751, mpMapRoot[i] != 0);
+        JUT_ASSERT(751, mpMapRoot[i] != NULL);
     }
 
     void* btk0 = JKRGetNameResource("zelda_dungeon_map_map.btk", dComIfGp_getDmapResArchive());
-    JUT_ASSERT(766, btk0 != 0);
+    JUT_ASSERT(766, btk0 != NULL);
 
     field_0xd28[0] = (J2DAnmTextureSRTKey*)J2DAnmLoaderDataBase::load(btk0);
     field_0xd28[0]->searchUpdateMaterialID(mMapScreen[0]);
@@ -219,7 +216,7 @@ void dMenu_DmapBg_c::mapScreenInit() {
 
     for (int i = 0; i < 2; i++) {
         mpMapSpace[i] = new CPaneMgr(mMapScreen[i], 'mapspace', 0, NULL);
-        JUT_ASSERT(817, mpMapSpace[i] != 0);
+        JUT_ASSERT(817, mpMapSpace[i] != NULL);
 
         mpMapSpace[i]->paneTrans(0.0f, -15.0f);
     }
@@ -301,7 +298,7 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     static u64 const c_tag[2] = {'f_text_s', 'f_text'};
 
     mButtonScreen = new J2DScreen();
-    JUT_ASSERT(916, mButtonScreen != 0);
+    JUT_ASSERT(916, mButtonScreen != NULL);
 
     bool fg = mButtonScreen->setPriority("zelda_dungeon_map_spot_button.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(922, fg != false);
@@ -309,14 +306,14 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
 
     #if (PLATFORM_WII || PLATFORM_SHIELD)
     mDecorateScreen = new J2DScreen();
-    JUT_ASSERT(926, mDecorateScreen != 0);
+    JUT_ASSERT(926, mDecorateScreen != NULL);
 
     fg = mDecorateScreen->setPriority("zelda_dungeon_map_decoration_revo.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(930, fg != false);
     dPaneClass_showNullPane(mDecorateScreen);
 
     mpDecorateRoot = new CPaneMgrAlphaMorf(mDecorateScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(934, mpDecorateRoot != 0);
+    JUT_ASSERT(934, mpDecorateRoot != NULL);
     #else
     mDecorateScreen = NULL;
     mpDecorateRoot = NULL;
@@ -326,7 +323,7 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     #endif
 
     mpButtonRoot = new CPaneMgrAlphaMorf(mButtonScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(952, mpButtonRoot != 0);
+    JUT_ASSERT(952, mpButtonRoot != NULL);
 
     for (int i = 0; i < 2; i++) {
         mpButtonAB[i] = NULL;
@@ -334,7 +331,7 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     }
 
     mpCButton = new CPaneMgrAlpha(mButtonScreen, 'c_btn', 2, NULL);
-    JUT_ASSERT(978, mpCButton != 0);
+    JUT_ASSERT(978, mpCButton != NULL);
     mpJButton = NULL;
 
     for (int i = 0; i < 5; i++) {
@@ -436,7 +433,7 @@ void dMenu_DmapBg_c::createExplain() {
     if (mpItemExplain == NULL) {
         JKRHeap* prevHeap = mDoExt_setCurrentHeap(mpTalkHeap);
         mpItemExplain = new dMenu_ItemExplain_c(mpTalkHeap, dComIfGp_getDmapResArchive(), mpStick, true);
-        JUT_ASSERT(1308, mpItemExplain != 0);
+        JUT_ASSERT(1308, mpItemExplain != NULL);
 
         mDoExt_setCurrentHeap(prevHeap);
     }
@@ -457,14 +454,14 @@ void dMenu_DmapBg_c::deleteExplain() {
  */
 void dMenu_DmapBg_c::baseScreenInit() {
     mBaseScreen = new J2DScreen();
-    JUT_ASSERT(1336, mBaseScreen != 0);
+    JUT_ASSERT(1336, mBaseScreen != NULL);
 
     bool fg = mBaseScreen->setPriority("zelda_dungeon_map_base.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(1347, fg != false);
     dPaneClass_showNullPane(mBaseScreen);
 
     mFloorScreen = new J2DScreen();
-    JUT_ASSERT(1351, mFloorScreen != 0);
+    JUT_ASSERT(1351, mFloorScreen != NULL);
 
     fg = mFloorScreen->setPriority("zelda_dungeon_map_floor_parts.blo", 0x20000,
                                    dComIfGp_getDmapResArchive());
@@ -474,13 +471,13 @@ void dMenu_DmapBg_c::baseScreenInit() {
     mBaseScreen->search('w_btn_n')->hide();
 
     mpBaseRoot = new CPaneMgrAlphaMorf(mBaseScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(1396, mpBaseRoot != 0);
+    JUT_ASSERT(1396, mpBaseRoot != NULL);
 
     mpFloorRoot = new CPaneMgrAlphaMorf(mFloorScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(1399, mpFloorRoot != 0);
+    JUT_ASSERT(1399, mpFloorRoot != NULL);
 
     mpDrawCursor = new dSelect_cursor_c(2, 1.0f, NULL);
-    JUT_ASSERT(1403, mpDrawCursor != 0);
+    JUT_ASSERT(1403, mpDrawCursor != NULL);
 
     mpDrawCursor->setAlphaRate(1.0f);
     mpDrawCursor->setParam(0.95f, 0.9f, 0.1f, 0.6f, 0.5f);
@@ -853,14 +850,14 @@ void dMenu_DmapBg_c::draw() {
     grafContext->setup2D();
 
     GXGetScissor(&scissor_left, &scissor_top, &scissor_width, &scissor_height);
-    grafContext->scissor(field_0xd94, 0.0f, 608.0f, 448.0f);
+    grafContext->scissor(field_0xd94, 0.0f, FB_WIDTH, FB_HEIGHT);
     grafContext->setScissor();
 
     mBaseScreen->draw(field_0xd94, field_0xd98, grafContext);
     dMenu_Dmap_c::myclass->drawFloorScreenBack(mFloorScreen, field_0xd94, field_0xd98, grafContext);
 
-    f32 dVar21 = mDoGph_gInf_c::getWidthF() / 608.0f;
-    f32 dVar16 = mDoGph_gInf_c::getHeightF() / 448.0f;
+    f32 dVar21 = mDoGph_gInf_c::getWidthF() / FB_WIDTH;
+    f32 dVar16 = mDoGph_gInf_c::getHeightF() / FB_HEIGHT;
     mMapScreen[0]->draw(field_0xd94, field_0xd98, grafContext);
 
     if (mpBackTexture != NULL) {
@@ -953,10 +950,10 @@ void dMenu_DmapBg_c::update() {
             mpArchiveMount = NULL;
 
             ResTIMG* mp_image = (ResTIMG*)mpArchive->getResource("tex/bg.bti");
-            JUT_ASSERT(2321, mp_image != 0);
+            JUT_ASSERT(2321, mp_image != NULL);
 
             mpBackTexture = new J2DPicture(mp_image);
-            JUT_ASSERT(2323, mpBackTexture != 0);
+            JUT_ASSERT(2323, mpBackTexture != NULL);
 
             void* spec = mpArchive->getResource("spec/spec.dat");
             memcpy(&field_0xd80, spec, 20);
@@ -1072,16 +1069,16 @@ void dMenu_Dmap_c::screenInit() {
     for (int i = 0; i < 8; i++) {
         field_0x114[i] = 0.0f;
         mSelFloor[i] = new CPaneMgr(mpDrawBg->mFloorScreen, floor_tag[i], 3, NULL);
-        JUT_ASSERT(2654, mSelFloor[i] != 0);
+        JUT_ASSERT(2654, mSelFloor[i] != NULL);
         mIconLinkPos[i] = new CPaneMgr(mpDrawBg->mFloorScreen, icon_tag[i], 0, NULL);
-        JUT_ASSERT(2657, mIconLinkPos[i] != 0);
+        JUT_ASSERT(2657, mIconLinkPos[i] != NULL);
         mIconBossPos[i] = new CPaneMgr(mpDrawBg->mFloorScreen, boss_tag[i], 0, NULL);
-        JUT_ASSERT(2660, mIconBossPos[i] != 0);
+        JUT_ASSERT(2660, mIconBossPos[i] != NULL);
     }
 
     for (int i = 0; i < 2; i++) {
         mStayIcon[i] = new CPaneMgr(mpDrawBg->mFloorScreen, stay_tag[i], 0, NULL);
-        JUT_ASSERT(2665, mStayIcon[i] != 0);
+        JUT_ASSERT(2665, mStayIcon[i] != NULL);
         mStayIcon[i]->hide();
 
         field_0x14c[i] = mStayIcon[i]->getGlobalVtxCenter(false, 0);
@@ -1208,9 +1205,13 @@ void dMenu_Dmap_c::screenInit() {
             if (dComIfGs_isDungeonItemBossKey()) {
                 itemNo = fpcNm_ITEM_LV5_BOSS_KEY;
                 field_0x174[2] = (u8)dComIfGs_isDungeonItemBossKey() ? fpcNm_ITEM_LV5_BOSS_KEY : 0;
+                                                                    /* dSv_event_flag_c::F_0003 - Snowpeak Ruins - Handed over 
+                                                                                                  tomato puree and left room */
             } else if (checkItemGet(fpcNm_ITEM_TOMATO_PUREE, 1) && !dComIfGs_isEventBit(2)) {
                 itemNo = fpcNm_ITEM_TOMATO_PUREE;
                 field_0x174[2] = fpcNm_ITEM_TOMATO_PUREE;
+                                                             /* dSv_event_flag_c::F_0004 - Snowpeak Ruins - Handed over secret 
+                                                                                           ingredient and left room */
             } else if (checkItemGet(fpcNm_ITEM_TASTE, 1) && !dComIfGs_isEventBit(1)) {
                 itemNo = fpcNm_ITEM_TASTE;
                 field_0x174[2] = fpcNm_ITEM_TASTE;
@@ -1634,12 +1635,12 @@ void dMenu_Dmap_c::_create() {
     OS_REPORT("MenuDmap create前================> %d bytes remain\n", sp30);
 
     mDmapHeap = JKRCreateExpHeap(field_0xe8->getFreeSize() - 0x10, field_0xe8, false);
-    JUT_ASSERT(3732, mDmapHeap != 0);
+    JUT_ASSERT(3732, mDmapHeap != NULL);
     JKRHeap* heap = mDoExt_setCurrentHeap(mDmapHeap);
     u32 sp28 = mDmapHeap->getTotalFreeSize();
     
     mMapCtrl = new dMenu_DmapMapCtrl_c();
-    JUT_ASSERT(3739, mMapCtrl != 0);
+    JUT_ASSERT(3739, mMapCtrl != NULL);
 
     mCMessageNum = 0;
     mJMessageNum = 0;
@@ -1650,15 +1651,15 @@ void dMenu_Dmap_c::_create() {
     }
 
     mSelStick = new STControl(5, 2, 1, 1, 0.9f, 0.5f, 0, 0x800);
-    JUT_ASSERT(3753, mSelStick != 0);
+    JUT_ASSERT(3753, mSelStick != NULL);
     mSelStick->setFirstWaitTime(8);
 
     u32 sp24 = field_0xe8->getTotalFreeSize();
     mpDrawBg = new dMenu_DmapBg_c(mDmapHeap, mpStick);
-    JUT_ASSERT(3763, mpDrawBg != 0);
+    JUT_ASSERT(3763, mpDrawBg != NULL);
 
     mItemTexBuf = (u8*)mDmapHeap->alloc(0xC00, 0x20);
-    JUT_ASSERT(3766, mItemTexBuf != 0);
+    JUT_ASSERT(3766, mItemTexBuf != NULL);
 
     if (mZoomState) {
         if (POINTER_OPT == 0) {
@@ -1904,7 +1905,7 @@ bool dMenu_Dmap_c::isOpen() {
             mpDresArchiveMount = NULL;
 
             mpBinData = mpDresArchive->getResource("dat/data.dat");
-            JUT_ASSERT(4377, mpBinData != 0);
+            JUT_ASSERT(4377, mpBinData != NULL);
 
             _create();
         } else {

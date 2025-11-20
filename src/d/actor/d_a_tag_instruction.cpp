@@ -3,12 +3,14 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_instruction.h"
 #include "d/d_procname.h"
 
 /* 80D59AF8-80D59B48 000078 0050+00 1/0 0/0 0/0 .text            daTagInst_Create__FP10fopAc_ac_c */
 static int daTagInst_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, daTagInst_c);
+    fopAcM_ct(i_this, daTagInst_c);
     return cPhs_COMPLEATE_e;
 }
 

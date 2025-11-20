@@ -3,7 +3,10 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_doc.h"
+#include "Z2AudioLib/Z2Instances.h"
 #include "dol2asm.h"
 
 //
@@ -94,7 +97,7 @@ extern "C" void changeBtk__8daNpcT_cFPiPi();
 extern "C" void __sinit_d_a_npc_doc_cpp();
 extern "C" void
 __ct__11daNpc_Doc_cFPC26daNpcT_faceMotionAnmData_cPC22daNpcT_motionAnmData_cPCQ222daNpcT_MotionSeqMngr_c18sequenceStepData_ciPCQ222daNpcT_MotionSeqMngr_c18sequenceStepData_ciPC16daNpcT_evtData_cPPc();
-extern "C" s32 getEyeballMaterialNo__11daNpc_Doc_cFv();
+extern "C" u16 getEyeballMaterialNo__11daNpc_Doc_cFv();
 extern "C" s32 getHeadJointNo__11daNpc_Doc_cFv();
 extern "C" s32 getNeckJointNo__11daNpc_Doc_cFv();
 extern "C" bool getBackboneJointNo__11daNpc_Doc_cFv();
@@ -264,45 +267,22 @@ SECTION_DEAD static char const* const stringBase_809AA435 = "Doc";
 SECTION_DEAD static char const* const stringBase_809AA439 = "Doc1";
 #pragma pop
 
-/* 809AA440-809AA44C 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 809AA44C-809AA460 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 809AA460-809AA468 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 SECTION_DATA static u8 l_bmdData[8] = {
     0x00, 0x00, 0x00, 0x0E, 0x00, 0x00, 0x00, 0x01,
 };
 
 /* 809AA468-809AA478 -00001 0010+00 0/1 0/0 0/0 .data            l_evtList */
-#pragma push
-#pragma force_active on
-SECTION_DATA static void* l_evtList[4] = {
-    (void*)&d_a_npc_doc__stringBase0,
-    (void*)NULL,
-    (void*)(((char*)&d_a_npc_doc__stringBase0) + 0x1),
-    (void*)NULL,
+static daNpcT_evtData_c l_evtList[2] = {
+    {"", 0},
+    {"NO_RESPONSE", 0},
 };
-#pragma pop
 
 /* 809AA478-809AA484 -00001 000C+00 2/3 0/0 0/0 .data            l_resNameList */
-SECTION_DATA static void* l_resNameList[3] = {
-    (void*)&d_a_npc_doc__stringBase0,
-    (void*)(((char*)&d_a_npc_doc__stringBase0) + 0xD),
-    (void*)(((char*)&d_a_npc_doc__stringBase0) + 0x11),
+static char* l_resNameList[3] = {
+    "",
+    "Doc",
+    "Doc1",
 };
 
 /* 809AA484-809AA488 000044 0003+01 1/0 0/0 0/0 .data            l_loadResPtrn0 */
@@ -416,7 +396,7 @@ SECTION_DATA static u8 l_motionSequenceData[208] = {
 #pragma pop
 
 /* 809AA8A4-809AA8A8 -00001 0004+00 1/1 0/0 0/0 .data            mCutNameList__11daNpc_Doc_c */
-SECTION_DATA void* daNpc_Doc_c::mCutNameList = (void*)&d_a_npc_doc__stringBase0;
+char* daNpc_Doc_c::mCutNameList[1] = {""};
 
 /* 809AA8A8-809AA8B4 000468 000C+00 2/2 0/0 0/0 .data            mCutList__11daNpc_Doc_c */
 SECTION_DATA u8 daNpc_Doc_c::mCutList[12] = {
@@ -706,7 +686,7 @@ COMPILER_STRIP_GATE(0x809AA3C4, &lit_4037);
 /* 809AA3C8-809AA3CC 0000AC 0004+00 0/1 0/0 0/0 .rodata          @4038 */
 #pragma push
 #pragma force_active on
-SECTION_RODATA static f32 const lit_4038 = -1000000000.0f;
+SECTION_RODATA static f32 const lit_4038 = -G_CM3D_F_INF;
 COMPILER_STRIP_GATE(0x809AA3C8, &lit_4038);
 #pragma pop
 
@@ -949,99 +929,6 @@ SECTION_RODATA static u8 const lit_4775[8] = {
     0x43, 0x30, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
 };
 COMPILER_STRIP_GATE(0x809AA3FC, &lit_4775);
-
-/* 809AAAD0-809AAAD4 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 809AAAD4-809AAAD8 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAD8-809AAADC 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAADC-809AAAE0 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAE0-809AAAE4 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAE4-809AAAE8 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAE8-809AAAEC 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAEC-809AAAF0 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAF0-809AAAF4 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAF4-809AAAF8 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAF8-809AAAFC 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAAFC-809AAB00 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAB00-809AAB04 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAB04-809AAB08 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAB08-809AAB0C 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 809AAB0C-809AAB10 000044 0001+03 0/0 0/0 0/0 .bss             @1009 */
-#pragma push
-#pragma force_active on
-static u8 lit_1009[1 + 3 /* padding */];
-#pragma pop
 
 /* 809AAB10-809AAB1C 000048 000C+00 1/1 0/0 0/0 .bss             @3816 */
 static u8 lit_3816[12];
@@ -1430,7 +1317,7 @@ daNpc_Doc_c::daNpc_Doc_c(daNpcT_faceMotionAnmData_c const* param_0,
 }
 
 /* 809AA24C-809AA254 0036AC 0008+00 1/0 0/0 0/0 .text getEyeballMaterialNo__11daNpc_Doc_cFv */
-s32 daNpc_Doc_c::getEyeballMaterialNo() {
+u16 daNpc_Doc_c::getEyeballMaterialNo() {
     return 4;
 }
 
@@ -1492,176 +1379,4 @@ static void func_809AA300() {
     // NONMATCHING
 }
 
-/* ############################################################################################## */
-/* 809AAB3C-809AAB40 000074 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB3C[4];
-#pragma pop
-
-/* 809AAB40-809AAB44 000078 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB40[4];
-#pragma pop
-
-/* 809AAB44-809AAB48 00007C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB44[4];
-#pragma pop
-
-/* 809AAB48-809AAB4C 000080 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB48[4];
-#pragma pop
-
-/* 809AAB4C-809AAB50 000084 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB4C[4];
-#pragma pop
-
-/* 809AAB50-809AAB54 000088 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB50[4];
-#pragma pop
-
-/* 809AAB54-809AAB58 00008C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB54[4];
-#pragma pop
-
-/* 809AAB58-809AAB5C 000090 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB58[4];
-#pragma pop
-
-/* 809AAB5C-809AAB60 000094 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB5C[4];
-#pragma pop
-
-/* 809AAB60-809AAB64 000098 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB60[4];
-#pragma pop
-
-/* 809AAB64-809AAB68 00009C 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB64[4];
-#pragma pop
-
-/* 809AAB68-809AAB6C 0000A0 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB68[4];
-#pragma pop
-
-/* 809AAB6C-809AAB70 0000A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB6C[4];
-#pragma pop
-
-/* 809AAB70-809AAB74 0000A8 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB70[4];
-#pragma pop
-
-/* 809AAB74-809AAB78 0000AC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB74[4];
-#pragma pop
-
-/* 809AAB78-809AAB7C 0000B0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB78[4];
-#pragma pop
-
-/* 809AAB7C-809AAB80 0000B4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB7C[4];
-#pragma pop
-
-/* 809AAB80-809AAB84 0000B8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB80[4];
-#pragma pop
-
-/* 809AAB84-809AAB88 0000BC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB84[4];
-#pragma pop
-
-/* 809AAB88-809AAB8C 0000C0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB88[4];
-#pragma pop
-
-/* 809AAB8C-809AAB90 0000C4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB8C[4];
-#pragma pop
-
-/* 809AAB90-809AAB94 0000C8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB90[4];
-#pragma pop
-
-/* 809AAB94-809AAB98 0000CC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB94[4];
-#pragma pop
-
-/* 809AAB98-809AAB9C 0000D0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB98[4];
-#pragma pop
-
-/* 809AAB9C-809AABA0 0000D4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_809AAB9C[4];
-#pragma pop
-
-/* 809AA428-809AA428 00010C 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
+AUDIO_INSTANCES;

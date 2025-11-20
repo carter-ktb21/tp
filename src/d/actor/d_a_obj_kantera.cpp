@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kantera.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_math.h"
@@ -27,8 +29,6 @@ const static dCcD_SrcCyl l_cyl_src = {
         40.0f                // mHeight
     }                        // mCyl
 };
-
-UNK_REL_DATA
 
 /* 80C38678-80C38974 000078 02FC+00 1/1 0/0 0/0 .text            Reflect__FP4cXyzRC13cBgS_PolyInfof
  */
@@ -70,7 +70,7 @@ int daItemKantera_c::Create() {
     mCcCyl.SetStts(&mCcStts);
     mCcCyl.SetR(dItem_data::getR(m_itemNo));
     mCcCyl.SetH(dItem_data::getH(m_itemNo));
-    fopAcM_SetCullSize(this, 0xF);
+    fopAcM_SetCullSize(this, fopAc_CULLSPHERE_0_e);
     actionWaitInit();
     fopAcM_SetGravity(this, -6.0f);
     fopAcM_OnCarryType(this, fopAcM_CARRY_ITEM);
@@ -85,7 +85,7 @@ int daItemKantera_c::__CreateHeap() {
 
 /* 80C38BB0-80C38DAC 0005B0 01FC+00 1/1 0/0 0/0 .text            create__15daItemKantera_cFv */
 int daItemKantera_c::create() {
-    fopAcM_SetupActor(this, daItemKantera_c);
+    fopAcM_ct(this, daItemKantera_c);
 
     if (field_0x937 == 0) {
         field_0x938 = home.angle.x;
@@ -150,7 +150,7 @@ int daItemKantera_c::actionInit() {
 int daItemKantera_c::actionWaitInit() {
     mCcCyl.OffTgSPrmBit(1);
     mCcCyl.OffCoSPrmBit(1);
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     attention_info.distances[fopAc_attn_CARRY_e] = 16;
     attention_info.position = current.pos;
     show();
@@ -164,23 +164,23 @@ int daItemKantera_c::actionWait() {
     mAcch.CrrPos(dComIfG_Bgsp());
     bg_check();
     if (mAcch.ChkGroundHit()) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         speedF *= 0.9f;
         if (speedF < 1.0f) {
             speedF = 0.0f;
         }
     } else {
-        cLib_offBit(attention_info.flags, 0x10UL);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
     daPy_py_c* player = daPy_getPlayerActorClass();
     if (fopAcM_checkCarryNow(this)) {
-        cLib_offBit(attention_info.flags, 0x10UL);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         if (player->getGrabUpStart()) {
             fopAcM_cancelCarryNow(this);
             initActionOrderGetDemo();
         }
     } else {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
     attention_info.position = current.pos;
     return 1;
@@ -189,7 +189,7 @@ int daItemKantera_c::actionWait() {
 /* 80C39234-80C392D0 000C34 009C+00 1/1 0/0 0/0 .text initActionOrderGetDemo__15daItemKantera_cFv
  */
 int daItemKantera_c::initActionOrderGetDemo() {
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCcCyl.OffTgSPrmBit(1);
     mCcCyl.OffCoSPrmBit(1);
     hide();

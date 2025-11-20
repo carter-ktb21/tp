@@ -4,6 +4,7 @@
 #include "JSystem/JGadget/std-memory.h"
 #include <algorithm.h>
 #include <msl_memory.h>
+#include <stdint.h>
 
 namespace JGadget {
 namespace vector {
@@ -105,7 +106,7 @@ struct TVector {
     }
 
     T* insert(T* pos, const T& val) {
-        u32 diff = (int)((u32)pos - (u32)begin()) / 4;
+        u32 diff = (int)((uintptr_t)pos - (uintptr_t)begin()) / 4;
         insert(pos, 1, val);
         return pBegin_ + diff;
     }
@@ -118,13 +119,13 @@ struct TVector {
         if (pBegin_ == 0) {
             return 0;
         }
-        return (int)((u32)pEnd_ - (u32)pBegin_) / 4;
+        return (int)((uintptr_t)pEnd_ - (uintptr_t)pBegin_) / 4;
     }
 
     u32 capacity() { return mCapacity; }
 
     u32 GetSize_extend_(u32 count) {
-        JUT_ASSERT(0x22B, pfnExtend_!=0);
+        JUT_ASSERT(0x22B, pfnExtend_!=NULL);
 
         u32 oldSize = size();
         u32 neededNewSpace = oldSize + count;
@@ -169,7 +170,7 @@ struct TVector_pointer_void : public TVector<void*, TAllocator<void*> > {
     void** erase(void**, void**);
 
     void clear() { erase(begin(), end()); }
-    void push_back(const void*& value) { insert(end(), (void* const&)value); }
+    void push_back(void* const& value) { insert(end(), (void* const&)value); }
 };
 
 template <typename T>
@@ -184,7 +185,7 @@ struct TVector_pointer : TVector_pointer_void {
     T* end() { return (T*)TVector_pointer_void::end(); }
 
     void push_back(const T& ref) {
-        static_cast<TVector_pointer_void*>(this)->push_back((const void*&)ref);
+        static_cast<TVector_pointer_void*>(this)->push_back((void* const&)ref);
     }
 };
 

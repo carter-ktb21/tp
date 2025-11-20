@@ -49,7 +49,6 @@ public:
     /* 804C6FD8 */ int searchEnemy(fopAc_ac_c*);
     /* 804C7114 */ int createHeap();
     /* 804C7324 */ int create();
-    /* 804C7B44 */ daNbomb_c();
     /* 804C7EB4 */ ~daNbomb_c();
     /* 804C8294 */ bool checkTimerStop();
     /* 804C82D8 */ BOOL checkExplode();
@@ -76,7 +75,7 @@ public:
     /* 804CAEE8 */ int execute();
     /* 804CBC60 */ int draw();
 
-    virtual BOOL checkExplodeNow() { return field_0xb51 != 0; }
+    virtual u8 checkExplodeNow() { return field_0xb51 != 0; }
     virtual void deleteBombAndEffect() {
         fopAcM_delete(this);
         onStateFlg0(FLG0_UNK_40);

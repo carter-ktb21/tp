@@ -3,8 +3,11 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_arrow.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
+#include "JSystem/JAudio2/JAUSectionHeap.h"
 #include "SSystem/SComponent/c_math.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "f_op/f_op_kankyo_mng.h"
@@ -403,23 +406,6 @@ void daArrow_c::setNormalMatrix() {
     mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
-
 /* 8049AF18-8049AFEC 001398 00D4+00 3/3 0/0 0/0 .text            setSmokePos__9daArrow_cFv */
 void daArrow_c::setSmokePos() {
     static cXyz localOffset(-3.3f, -3.0f, 94.0f);
@@ -511,8 +497,6 @@ bool daArrow_c::checkReget() {
     }
 }
 
-UNK_REL_DATA
-
 /* 8049B45C-8049B764 0018DC 0308+00 1/0 0/0 0/0 .text            procWait__9daArrow_cFv */
 int daArrow_c::procWait() {
     setKeepMatrix();
@@ -552,7 +536,7 @@ int daArrow_c::procWait() {
         JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(field_0x964);
         if (emitter != NULL) {
             emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-            emitter->setUserWork((u32)&mSmokePos);
+            emitter->setUserWork((uintptr_t)&mSmokePos);
 
             if (field_0x942 != 0) {
                 emitter->stopDrawParticle();
@@ -1026,7 +1010,7 @@ int daArrow_c::procSlingHitInit(cXyz* param_0, dCcD_GObjInf* param_1) {
 
     if (!daAlink_c::notSwordHitVibActor(hit_ac)) {
         u16 hitmark;
-        if (hit_ac != NULL && fopAcM_checkStatus(hit_ac, 0x10000) != 0) {
+        if (hit_ac != NULL && fopAcM_CheckStatus(hit_ac, 0x10000) != 0) {
             hitmark = 1;
         } else {
             hitmark = 9;
@@ -1121,7 +1105,6 @@ static int daArrow_execute(daArrow_c* i_this) {
 }
 
 /* 8049D0CC-8049D40C 00354C 0340+00 1/1 0/0 0/0 .text            draw__9daArrow_cFv */
-// NONMATCHING regalloc
 int daArrow_c::draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
 
@@ -1129,7 +1112,7 @@ int daArrow_c::draw() {
         return TRUE;
     }
     
-    GXColorS10 tmpColor = {0, 0, 0};
+    static const GXColorS10 tmpColor = {0, 0, 0};
     J3DGXColorS10 color = (tmpColor);
 
     daAlink_c* link = daAlink_getAlinkActorClass();
@@ -1150,7 +1133,7 @@ int daArrow_c::draw() {
             if (field_0x950 > explode_time >> 1) {
                 r = fabsf(cM_fsin((field_0x950 - (explode_time >> 1)) * M_PI / (explode_time >> 2)));
             } else if (field_0x950 > explode_time >> 2) {
-                r = fabsf(cM_fsin((field_0x950 - (explode_time >> 1)) * M_PI / (explode_time >> 3)));
+                r = fabsf(cM_fsin((field_0x950 - (explode_time >> 2)) * M_PI / (explode_time >> 3)));
             } else {
                 r = fabsf(cM_fsin((field_0x950 - (explode_time >> 3)) * M_PI / (explode_time >> 4)));
             }
@@ -1197,7 +1180,7 @@ static void* daAlink_searchHorseZelda(fopAc_ac_c* param_0, void* param_1) {
 
 /* 8049D440-8049D808 0038C0 03C8+00 1/1 0/0 0/0 .text            create__9daArrow_cFv */
 cPhs__Step daArrow_c::create() {
-    fopAcM_SetupActor(this, daArrow_c);
+    fopAcM_ct(this, daArrow_c);
 
     mArrowType = fopAcM_GetParamBit(this, 8, 8);
     fopAcM_SetParam(this, (u8)fopAcM_GetParam(this));
@@ -1276,6 +1259,8 @@ static int daArrow_delete(daArrow_c* i_this) {
 }
 
 AUDIO_INSTANCES;
+template<>
+JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;
 
 /* 8049DE8C-8049DEAC -00001 0020+00 1/0 0/0 0/0 .data            l_daArrowMethodTable */
 static actor_method_class l_daArrowMethodTable = {

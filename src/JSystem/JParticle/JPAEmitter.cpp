@@ -3,28 +3,14 @@
 // Translation Unit: JPAEmitter
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JParticle/JPAEmitter.h"
 #include "JSystem/JParticle/JPAEmitterManager.h"
 #include "JSystem/JParticle/JPAParticle.h"
 #include "JSystem/JParticle/JPAResourceManager.h"
 #include "JSystem/JParticle/JPABaseShape.h"
 #include "dolphin/types.h"
-
-//
-// Types:
-//
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* 8027E6A4-8027E6EC 278FE4 0048+00 0/0 14/14 16/16 .text            __dt__18JPAEmitterCallBackFv */
 JPAEmitterCallBack::~JPAEmitterCallBack() {

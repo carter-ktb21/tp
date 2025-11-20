@@ -9,11 +9,13 @@ class JKRArchive;
 class JKRExpHeap;
 
 s32 dTimer_createStockTimer();
-s32 dTimer_createTimer(s32 i_mode, u32 i_limitMs, u8 i_type, u8 param_3, f32 param_4, f32 param_5,
+fpc_ProcID dTimer_createTimer(s32 i_mode, u32 i_limitMs, u8 i_type, u8 param_3, f32 param_4, f32 param_5,
                        f32 param_6, f32 param_7);
 u32 dTimer_createGetIn2D(s32 param_0, cXyz i_pos);
 int dTimer_getRestTimeMs();
-u8 dTimer_isStart();
+bool dTimer_isStart();
+void dTimer_show();
+void dTimer_hide();
 u8 dTimer_isReadyFlag();
 
 class dDlst_TimerScrnDraw_c : public dDlst_base_c {
@@ -50,6 +52,9 @@ public:
     /* 80260574 */ s32 createStart(u16);
     /* 80260AA8 */ bool checkStartAnimeEnd();
     /* 80260AD4 */ void playBckAnimation(f32);
+#if VERSION == VERSION_GCN_JPN
+    bool isLeadByte(int);
+#endif
     /* 80260B54 */ void drawPikari(int);
 
     /* 80260690 */ virtual void draw();
@@ -127,7 +132,7 @@ public:
     /* 8025D9F0 */ int getTimeMs();
     /* 8025DA54 */ int getLimitTimeMs();
     /* 8025DA9C */ int getRestTimeMs();
-    /* 8025DB10 */ u8 isStart();
+    /* 8025DB10 */ bool isStart();
     /* 802613DC */ int createGetIn(cXyz);
 
     s32 createStart(u16 param_0) { return mp_tm_scrn->createStart(param_0); }

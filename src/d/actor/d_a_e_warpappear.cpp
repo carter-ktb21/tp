@@ -1,12 +1,15 @@
 /**
- * @file d_a_e_warpappear.cpp
+* @file d_a_e_warpappear.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_warpappear.h"
 #include "d/actor/d_a_e_s1.h"
 #include "d/actor/d_a_horse.h"
 #include "d/actor/d_a_obj_ihasi.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 807CF7D8-807CF8BC 000078 00E4+00 1/0 0/0 0/0 .text daE_Warpappear_Draw__FP18e_warpappear_class */
 static int daE_Warpappear_Draw(e_warpappear_class* i_this) {
@@ -216,8 +219,9 @@ static void action(e_warpappear_class* i_this) {
                 fpcM_Search(s_s1entry_sub, i_this);
             }
 
-            if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x40]) &&
-                dComIfGs_isSwitch(18, fopAcM_GetRoomNo(a_this)))
+                /* dSv_event_flag_c::M_031 - Goron Mines - Goron Mines clear */
+            if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x40])
+                && dComIfGs_isSwitch(18, fopAcM_GetRoomNo(a_this)))
             {
                 i_this->field_0x596 = 1;
                 i_this->field_0x59e = 20;
@@ -475,6 +479,7 @@ static void demo_camera(e_warpappear_class* i_this) {
             i_this->field_0x5f8 = 0.0f;
         }
 
+        // TODO: gameInfo fake match to force reuse of pointer
         play = &g_dComIfG_gameInfo.play;
         play->getEvent().onHindFlag(15);
 
@@ -510,6 +515,7 @@ static void demo_camera(e_warpappear_class* i_this) {
             daPy_getPlayerActorClass()->cancelOriginalDemo();
             fopAcM_delete(i_this);
             fpcM_Search(s_s1fight_sub, i_this);
+            /* dSv_event_flag_c::F_0053 - Faron Woods - Saw night stalker appearance cutscene */
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[151]);
         }
         break;
@@ -830,7 +836,7 @@ static int useHeapInit(fopAc_ac_c* actor) {
     e_warpappear_class* i_this = (e_warpappear_class*)actor;
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Kytag04", 5);
-    JUT_ASSERT(1535, modelData != 0);
+    JUT_ASSERT(1535, modelData != NULL);
 
     i_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (i_this->mpModel == NULL) {
@@ -870,7 +876,7 @@ static int useHeapInit(fopAc_ac_c* actor) {
 
 /* 807D1F40-807D206C 0027E0 012C+00 1/0 0/0 0/0 .text daE_Warpappear_Create__FP10fopAc_ac_c */
 static int daE_Warpappear_Create(fopAc_ac_c* actor) {
-    fopAcM_SetupActor(actor, e_warpappear_class);
+    fopAcM_ct(actor, e_warpappear_class);
     e_warpappear_class* i_this = (e_warpappear_class*)actor;
 
     int phase = dComIfG_resLoad(&i_this->mPhase, "Kytag04");
@@ -881,6 +887,7 @@ static int daE_Warpappear_Create(fopAc_ac_c* actor) {
         i_this->field_0x570 = fopAcM_GetParam(i_this);
         if (i_this->field_0x570 != 53) {
             if (i_this->field_0x570 == 0xff) {
+                    /* dSv_event_flag_c::F_0053 - Faron Woods - Saw night stalker appearance cutscene */
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x97])) {
                     return cPhs_ERROR_e;
                 }

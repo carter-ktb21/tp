@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_crystal.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -76,7 +78,7 @@ int daObjCrystal_c::CreateHeap() {
 
 /* 80BD6664-80BD6718 000344 00B4+00 1/1 0/0 0/0 .text            create__14daObjCrystal_cFv */
 int daObjCrystal_c::create() {
-    fopAcM_SetupActor(this, daObjCrystal_c);
+    fopAcM_ct(this, daObjCrystal_c);
 
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {

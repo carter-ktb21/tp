@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_howl.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -10,7 +12,7 @@
 
 /* 8048D958-8048D9BC 000078 0064+00 1/1 0/0 0/0 .text            create__12daTag_Howl_cFv */
 int daTag_Howl_c::create() {
-    fopAcM_SetupActor(this, daTag_Howl_c);
+    fopAcM_ct(this, daTag_Howl_c);
     getParam();
     return cPhs_COMPLEATE_e;
 }
@@ -26,7 +28,7 @@ int daTag_Howl_c::execute() {
     attention_info.flags = 0;
 
     if (isAreaCheck()) {
-        attention_info.flags |= 0x80;
+        attention_info.flags |= fopAc_AttnFlag_ETC_e;
         attention_info.distances[fopAc_attn_ETC_e] = 0x41;
     }
 

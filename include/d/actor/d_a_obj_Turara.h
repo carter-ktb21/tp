@@ -41,9 +41,9 @@ public:
     /* 80B9E388 */ int Draw();
     /* 80B9E478 */ int Delete();
 
-    u8 getSwBit1() { return fopAcM_GetParamBit(this, 0, 8); }
-    u8 getSwBit2() { return fopAcM_GetParamBit(this, 8, 8); }
-    u8 getSwBit3() { return fopAcM_GetParamBit(this, 16, 8); }
+    int getSwBit1() { return fopAcM_GetParamBit(this, 0, 8); }
+    int getSwBit2() { return fopAcM_GetParamBit(this, 8, 8); }
+    int getSwBit3() { return fopAcM_GetParamBit(this, 16, 8); }
 
     s32 getEvetID() {
         return fopAcM_GetParamBit(this, 0x18, 8);
@@ -51,6 +51,7 @@ public:
 
     u8 getWaitTime() { return shape_angle.z; }
     int getItemTbleNum() { return shape_angle.x >> 8 & 0xff; }
+    int getState() { return shape_angle.x; }
 
     static const dCcD_SrcGObjInf mCcDObjInfo;
     static dCcD_SrcCyl mCcDCyl;
@@ -76,31 +77,12 @@ private:
     /* 0x7a8 */ dBgS_ObjAcch mAcch;
     /* 0x980 */ dBgW* field_0x980;
     /* 0x984 */ u8 field_0x984;
-    /* 0x988 */ u32 field_0x988;
+    /* 0x988 */ u32 mEmID;
     /* 0x98c */ u8 field_0x98c;
     /* 0x98d */ u8 field_0x98d[0x994 - 0x98d];
     /* 0x994 */ u8 field_0x994;
 };
 
 STATIC_ASSERT(sizeof(daTurara_c) == 0x998);
-
-class daTurara_HIO_c : public fOpAcm_HIO_entry_c {
-public:
-    /* 80B9CB8C */ daTurara_HIO_c();
-    /* 80B9E5B4 */ virtual ~daTurara_HIO_c() {}
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ f32 field_0x04;
-    /* 0x08 */ f32 mGravity;
-    /* 0x0c */ f32 mMaxGravity;
-    /* 0x10 */ u8 mWaitTime;
-    /* 0x11 */ u8 mShockStrength;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-    /* 0x1c */ f32 field_0x1c;
-};
-
-STATIC_ASSERT(sizeof(daTurara_HIO_c) == 0x20);
 
 #endif /* D_A_OBJ_TURARA_H */

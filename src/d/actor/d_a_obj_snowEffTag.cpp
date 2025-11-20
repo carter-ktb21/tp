@@ -3,6 +3,8 @@
  * Snow Effect Generator Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_snowEffTag.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -25,7 +27,7 @@ void daSnowEffTag_c::setBaseMtx() {
 
 /* 80CDF184-80CDF2B8 0001C4 0134+00 1/1 0/0 0/0 .text            create__14daSnowEffTag_cFv */
 int daSnowEffTag_c::create() {
-    fopAcM_SetupActor(this, daSnowEffTag_c);
+    fopAcM_ct(this, daSnowEffTag_c);
 
     mMaxSize = scale.x * 100.0f;
 
@@ -62,14 +64,13 @@ bool daSnowEffTag_c::playerAreaCheck() {
     if (player_p->current.pos.y < current.pos.y ||
         player_p->current.pos.y > current.pos.y + scale.y * 100.0f)
     {
-        return false;
+        return in_area;
     } else {
         cXyz pos_diff = current.pos - player_p->current.pos;
         f32 dist_to_player = pos_diff.absXZ();
 
-        // supposed to be std::fabs, but it changes regalloc
         if (dist_to_player <=
-            mMaxSize - field_0x574 * fabsf(player_p->current.pos.y - current.pos.y))
+            mMaxSize - field_0x574 * std::fabs(player_p->current.pos.y - current.pos.y))
         {
             in_area = true;
         } else {

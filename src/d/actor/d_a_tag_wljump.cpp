@@ -1,13 +1,14 @@
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_wljump.h"
 #include "d/d_path.h"
 #include "d/d_procname.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_midna.h"
 
-
 /* 80D64EB8-80D64FE4 000078 012C+00 1/1 0/0 0/0 .text            create__13daTagWljump_cFv */
 int daTagWljump_c::create() {
-    fopAcM_SetupActor(this, daTagWljump_c);
+    fopAcM_ct(this, daTagWljump_c);
 
     field_0x571 = (fopAcM_GetParam(this) >> 8) & 0xFF;
 
@@ -62,7 +63,6 @@ static int daTagWljump_Delete(daTagWljump_c* i_this) {
 }
 
 /* 80D65090-80D6587C 000250 07EC+00 1/1 0/0 0/0 .text            execute__13daTagWljump_cFv */
-// NONMATCHING - reg swap (regs match on debug, probably an inline issue)
 int daTagWljump_c::execute() {
     attention_info.flags = 0;
 
@@ -83,7 +83,7 @@ int daTagWljump_c::execute() {
         if (!midna->checkShadowModeTalkWait()) {
             if (shape_angle.x != 0 && (field_0x571 == 0xff || !fopAcM_isSwitch(this, field_0x571))) {
                 if (field_0x56f == 0) {
-                    mMsgFlow.init(this, shape_angle.x & 0xFFFF, 0, NULL);
+                    mMsgFlow.init(this, (u16)shape_angle.x, 0, NULL);
                     field_0x56f = 1;
                     mDoAud_seStart(Z2SE_NAVI_TALK_START, NULL, 0, 0);
                 } else {
@@ -182,7 +182,7 @@ int daTagWljump_c::execute() {
 
             mLandArea = point_p->mArg0 * 10.0f;
 
-            if (point_p->field_0x1 == 1) {
+            if (point_p->mArg2 == 1) {
                 shape_angle.z = 1;
             } else {
                 shape_angle.z = 0;
@@ -207,7 +207,7 @@ int daTagWljump_c::execute() {
                 field_0x570 = field_0x568;
                 field_0x568 = -1;
             } else {
-                attention_info.flags |= 0x81;
+                attention_info.flags |= fopAc_AttnFlag_ETC_e | fopAc_AttnFlag_LOCK_e;
             }
         } else {
             field_0x572 = 0;

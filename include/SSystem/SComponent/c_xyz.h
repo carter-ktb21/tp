@@ -13,17 +13,23 @@ struct cXyz : Vec {
     static const cXyz BaseXZ;
     static const cXyz BaseYZ;
     static const cXyz BaseXYZ;
-    /* 80009184 */ ~cXyz() {}
-    /* inlined  */ cXyz() {}
+#ifdef __MWERKS__
+    cXyz() {}
+    ~cXyz() {}
+    cXyz(const cXyz& vec) {
+        x = vec.x;
+        y = vec.y;
+        z = vec.z;
+    }
+#else
+    cXyz() = default;
+    ~cXyz() = default;
+    cXyz(const cXyz& vec) = default;
+#endif
     cXyz(f32 x, f32 y, f32 z) {
         this->x = x;
         this->y = y;
         this->z = z;
-    }
-    cXyz(const cXyz& vec) {
-        this->x = vec.x;
-        this->y = vec.y;
-        this->z = vec.z;
     }
     cXyz(const Vec& vec) {
         this->x = vec.x;
@@ -58,13 +64,22 @@ struct cXyz : Vec {
         z *= other.z;
     }
 
-    void operator-=(const Vec& other) { VECSubtract(this, &other, this); }
-    cXyz* operator+=(const Vec& other) {
-        VECAdd(this, &other, this);
+    cXyz* operator-=(const Vec& other) {
+        PSVECSubtract(this, &other, this);
         return this;
     }
-    void operator*=(f32 scale) { VECScale(this, this, scale); }
-    void operator/=(f32 scale) { VECScale(this, this, 1.0f / scale); }
+    cXyz* operator+=(const Vec& other) {
+        PSVECAdd(this, &other, this);
+        return this;
+    }
+    cXyz* operator*=(f32 scale) {
+        PSVECScale(this, this, scale);
+        return this;
+    }
+    cXyz* operator/=(f32 scale) {
+        PSVECScale(this, this, 1.0f / scale);
+        return this;
+    }
     /* 80266C6C */ cXyz getCrossProduct(Vec const&) const;
     /* 80266CBC */ cXyz outprod(Vec const&) const;
     /* 80266CE4 */ cXyz norm() const;
@@ -99,8 +114,8 @@ struct cXyz : Vec {
 
     void zero() { set(0.0f, 0.0f, 0.0f); }
 
-    f32 getSquareMag() const { return VECSquareMag(this); }
-    f32 getSquareDistance(const Vec& other) const { return VECSquareDistance(this, &other); }
+    f32 getSquareMag() const { return PSVECSquareMag(this); }
+    f32 getSquareDistance(const Vec& other) const { return PSVECSquareDistance(this, &other); }
 
     static f32 getNearZeroValue() { return 8e-11f; }
 

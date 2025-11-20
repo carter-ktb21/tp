@@ -3,12 +3,15 @@
  * Object - Golden Ant
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ari.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80BA55E0-80BA55E4 000008 0004+00 2/2 0/0 0/0 .bss             None */
 static bool hioInit;
@@ -24,7 +27,7 @@ daObj_AriHIO_c::daObj_AriHIO_c() {
 }
 
 /* 80BA5410-80BA5414 000008 0002+02 1/2 0/0 0/0 .rodata          l_ari_itemno */
-static u8 const l_ari_itemno[2] = {0xD4, 0xD5};
+static u8 const l_ari_itemno[2] = {fpcNm_ITEM_M_ANT, fpcNm_ITEM_F_ANT};
 
 /* 80BA26BC-80BA2728 00011C 006C+00 1/1 0/0 0/0 .text            InitCcSph__10daObjARI_cFv */
 void daObjARI_c::InitCcSph() {
@@ -256,7 +259,7 @@ void daObjARI_c::Action() {
 
 /* 80BA33F8-80BA3408 000E58 0010+00 1/0 0/0 0/0 .text            Insect_Release__10daObjARI_cFv */
 void daObjARI_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = 1;
 }
 
@@ -528,7 +531,7 @@ void daObjARI_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -592,7 +595,11 @@ static int daObjARI_Execute(daObjARI_c* i_this) {
 }
 
 /* 80BA54F8-80BA54FC 0000F0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x01A5, 0x01A6};
+static u16 const l_musiya_num[2] = {
+    0x01A5, /* dSv_event_flag_c::F_0421 - Misc. - Ant (M) */
+    0x01A6, /* dSv_event_flag_c::F_0422 - Misc. - Ant (F) */
+};
+
 
 /* 80BA483C-80BA49E8 00229C 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjARI_cFv */
 bool daObjARI_c::CreateChk() {
@@ -631,13 +638,13 @@ bool daObjARI_c::CreateChk() {
 
 /* 80BA49E8-80BA5258 002448 0870+00 1/1 0/0 0/0 .text            create__10daObjARI_cFv */
 cPhs__Step daObjARI_c::create() {
-    fopAcM_SetupActor(this, daObjARI_c);
+    fopAcM_ct(this, daObjARI_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "I_Ari");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
         } else {
@@ -722,7 +729,7 @@ cPhs__Step daObjARI_c::create() {
         }
 
         J3DModel* model = mpMorf->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
         for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
             if (i != 0) {
                 model->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBack);

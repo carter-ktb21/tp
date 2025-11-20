@@ -3,6 +3,8 @@
 // City in the Sky Gate
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_Lv7Gate.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_path.h"
@@ -50,7 +52,7 @@ static int daTagLv7Gate_Create(fopAc_ac_c* i_this) {
 int daTagLv7Gate_c::create() {
     int phase;
 
-    fopAcM_SetupActor(this, daTagLv7Gate_c);
+    fopAcM_ct(this, daTagLv7Gate_c);
 
     if (fopAcM_GetPosition_p(daPy_getPlayerActorClass())->y < 7500.0f) {
         return cPhs_ERROR_e;

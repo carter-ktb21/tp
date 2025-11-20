@@ -3,6 +3,8 @@
  * Wind Column
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_tornado.h"
 #include "d/d_kankyo_rain.h"
 #include "d/d_s_play.h"
@@ -152,7 +154,7 @@ int daObjTrnd_c::Create() {
 
 /* 80D1BFB0-80D1C0A8 000690 00F8+00 1/1 0/0 0/0 .text            create__11daObjTrnd_cFv */
 int daObjTrnd_c::create() {
-    fopAcM_SetupActor(this, daObjTrnd_c);
+    fopAcM_ct(this, daObjTrnd_c);
     if (!Create()) {
         return cPhs_ERROR_e;
     }

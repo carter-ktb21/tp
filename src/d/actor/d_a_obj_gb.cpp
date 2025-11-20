@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_gb.h"
 #include "SSystem/SComponent/c_lib.h"
 #include "SSystem/SComponent/c_math.h"
@@ -111,25 +113,6 @@ static int daObj_Gb_Delete(obj_gb_class* i_this) {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 80BF6DFC-80BF6E08 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BF6E08-80BF6E1C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80BF6E1C-80BF6E24 000020 0008+00 0/1 0/0 0/0 .data            bmd$3914 */
 static int bmd[2] = {
     6, 7,
@@ -154,7 +137,7 @@ static int dzb[2] = {
 static int useHeapInit(fopAc_ac_c* actor) {
     obj_gb_class* i_this = (obj_gb_class*)actor;
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes("Obj_gb", bmd[i_this->field_0x57c]);
-    JUT_ASSERT(324, modelData != 0);
+    JUT_ASSERT(324, modelData != NULL);
     i_this->mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (i_this->mModel == NULL) {
         return 0;
@@ -188,7 +171,7 @@ static int useHeapInit(fopAc_ac_c* actor) {
 
 /* 80BF6AE0-80BF6DB0 000840 02D0+00 1/0 0/0 0/0 .text            daObj_Gb_Create__FP10fopAc_ac_c */
 static int daObj_Gb_Create(fopAc_ac_c* actor) {
-    fopAcM_SetupActor(actor, obj_gb_class);
+    fopAcM_ct(actor, obj_gb_class);
     obj_gb_class* i_this = (obj_gb_class*)actor;
     int rv = dComIfG_resLoad(&i_this->mPhase, "Obj_gb");
     

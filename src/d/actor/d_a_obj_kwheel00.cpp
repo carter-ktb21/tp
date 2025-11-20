@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kwheel00.h"
 #include "JSystem/JHostIO/JORMContext.h"
 #include "d/actor/d_a_obj_lv3Water.h"
@@ -117,7 +119,7 @@ void daObjKWheel00_c::setMtx() {
 /* 80C4D9B8-80C4DA38 000338 0080+00 1/0 0/0 0/0 .text            CreateHeap__15daObjKWheel00_cFv */
 int daObjKWheel00_c::CreateHeap() {
     J3DModelData* const model_data = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName[m_type], l_bmdidx[m_type]));
-    JUT_ASSERT(206, model_data != 0);
+    JUT_ASSERT(206, model_data != NULL);
 
     mpModel = mDoExt_J3DModel__create(model_data, (1 << 19), 0x11000084);
     return !mpModel ? 0 : 1;
@@ -167,7 +169,7 @@ int daObjKWheel00_c::Create() {
     if(m_type == TYPE_SMALL_PLATINUM)
         fopAcM_SetStatus(this, 0);
 
-    mStts.Init(254, 0, this);
+    mStts.Init(0xFE, 0, this);
 
     for(int i = 0; i < 4; i++) {
         mLargeGearTeethSphereColliders[i].SetStts(&mStts);
@@ -395,7 +397,7 @@ extern actor_process_profile_definition g_profile_Obj_KWheel00 = {
 /* 80C4E2C0-80C4E394 000C40 00D4+00 1/0 0/0 0/0 .text daObjKWheel00_create1st__FP15daObjKWheel00_c
  */
 static int daObjKWheel00_create1st(daObjKWheel00_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKWheel00_c);
+    fopAcM_ct(i_this, daObjKWheel00_c);
     return i_this->create1st();
 }
 

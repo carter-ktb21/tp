@@ -3,6 +3,8 @@
  * Collection Menu
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_collect.h"
 #include "JSystem/J3DGraphLoader/J3DModelLoader.h"
 #include "JSystem/J3DGraphLoader/J3DAnmLoader.h"
@@ -32,11 +34,6 @@
 #include "JSystem/J2DGraph/J2DGrafContext.h"
 #include "d/d_menu_window.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
-
-/* 803BC380-803BC38C 0194A0 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_Collect2D_c::*initFunc)();
 static initFunc init[] = {
@@ -237,12 +234,19 @@ bool dMenu_Collect2D_c::isFishIconVisible() {
 
 /* 801B061C-801B071C 1AAF5C 0100+00 2/2 0/0 0/0 .text isSkillIconVisible__17dMenu_Collect2D_cFv */
 bool dMenu_Collect2D_c::isSkillIconVisible() {
+        /* dSv_event_flag_c::F_0338 - Secret techniques - Obtained 1 secret techinques - Shield attack */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[338]) ||
+        /* dSv_event_flag_c::F_0339 - Secret techniques - Obtained 2 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[339]) ||
+        /* dSv_event_flag_c::F_0340 - Secret techniques - Obtained 3 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[340]) ||
+        /* dSv_event_flag_c::F_0341 - Secret techniques - Obtained 4 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[341]) ||
+        /* dSv_event_flag_c::F_0342 - Secret techniques - Obtained 5 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[342]) ||
+        /* dSv_event_flag_c::F_0343 - Secret techniques - Obtained 6 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[343]) ||
+        /* dSv_event_flag_c::F_0344 - Secret techniques - Obtained 7 secret techinques */
         dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[344]))
     {
         return true;
@@ -321,7 +325,9 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x22d[1][0] = 0;
     field_0x22d[2][0] = 0;
     field_0x22d[3][0] = dComIfGs_isItemFirstBit(0x28) ||
-                                (dComIfGs_isItemFirstBit(0x3F) && !dComIfGs_isEventBit(0x302)) ?
+                        (dComIfGs_isItemFirstBit(0x3F)
+                            /* dSv_event_flag_c::F_0026 - Ordon Village - gave wooden sword to talo on 3rd day */
+                        && !dComIfGs_isEventBit(0x302)) ?
                             true :
                             false;
 
@@ -329,7 +335,9 @@ void dMenu_Collect2D_c::screenSet() {
         if (dComIfGs_isItemFirstBit(0x28)) {
             mpScreen->search('ken_00')->hide();
             mpScreen->search('ken_01')->show();
-        } else if (dComIfGs_isItemFirstBit(0x3F) && !dComIfGs_isEventBit(0x302)) {
+        } else if (dComIfGs_isItemFirstBit(0x3F)
+                       /* dSv_event_flag_c::F_0026 - Ordon Village - gave wooden sword to talo on 3rd day */
+                   && !dComIfGs_isEventBit(0x302)) {
             mpScreen->search('ken_00')->show();
             mpScreen->search('ken_01')->hide();
         }
@@ -546,6 +554,7 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x1d8[5][3] = 0;
     field_0x1d8[6][3] = 0;
     field_0x1d8[0][4] = dMsgObject_getSmellTypeMessageID() + 0x100;
+        /* dSv_event_flag_c::F_0456 - Castle Town - First time meeting with Jovani */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[456])) {
         field_0x1d8[1][4] = 0x12d8;
     } else {
@@ -720,8 +729,7 @@ void dMenu_Collect2D_c::setBackAlpha() {
 
 /* 801B1FAC-801B27EC 1AC8EC 0840+00 1/1 0/0 0/0 .text            cursorMove__17dMenu_Collect2D_cFv
  */
-// NONMATCHING
-// goto logic is wrong
+// Not sure if this works without gotos
 void dMenu_Collect2D_c::cursorMove() {
     u8 dVar1 = mCursorX;
     u8 dVar2 = mCursorY;
@@ -788,30 +796,27 @@ void dMenu_Collect2D_c::cursorMove() {
 LAB_802ba744:
     if (mpStick->checkUpTrigger()) {
         if (mCursorY != 0) {
-            bool bVar3;
-            restart_loop:
-            do {
-                mCursorY--;
-                if (mCursorY == 2) {
-                    u8 local_3c[9] = {3,3,4,3,4,5,4,5,5};
-                    u8 local_48[9] = {2,1,2,0,1,2,0,1,0};
-                    for (int i = 0; i < 9; i++) {
-                        if (getItemTag(local_3c[i], local_48[i], true)) {
-                            mCursorX = local_3c[i];
-                            mCursorY = local_48[i];
-                            break;
-                        }
+        begin:
+            mCursorY--;
+            if (mCursorY == 2) {
+                u8 local_3c[9] = {3,3,4,3,4,5,4,5,5};
+                u8 local_48[9] = {2,1,2,0,1,2,0,1,0};
+                for (int i = 0; i < 9; i++) {
+                    if (getItemTag(local_3c[i], local_48[i], true)) {
+                        mCursorX = local_3c[i];
+                        mCursorY = local_48[i];
+                        break;
                     }
                 }
-                if (dVar2 == 5) {
-
-                    if (dVar1 == 0) {
-                        if (field_0x25a < 5) {
-                            mCursorX = field_0x259;
-                            mCursorY = field_0x25a;
-                            break;
-                        }
-                        bVar3 = false;
+            }
+            if (dVar2 == 5) {
+                if (dVar1 == 0) {
+                    if (field_0x25a < 5) {
+                        mCursorX = field_0x259;
+                        mCursorY = field_0x25a;
+                        goto LAB_802bab54;
+                    } else {
+                        bool bVar3 = false;
                         for (int i = 0; i < 4; i++) {
                             if (getItemTag(i, mCursorY, true)) {
                                 mCursorX = i;
@@ -825,73 +830,77 @@ LAB_802ba744:
                             bVar3 = true;
                         }
                         if (bVar3) {
-                            break;
+                            goto LAB_802bab54;
                         }
-                        goto restart_loop;
                     }
-                    if (field_0x25a < 5) {
-                        mCursorX = field_0x259;
-                        mCursorY = field_0x25a;
-                        break;
-                    }
-                    bVar3 = false;
+                } else if (field_0x25a < 5) {
+                    mCursorX = field_0x259;
+                    mCursorY = field_0x25a;
+                    goto LAB_802bab54;
+                } else {
+                    bool bVar4 = false;
                     for (int i = 3; i < 7; i++) {
                         if (getItemTag(i, mCursorY, true)) {
                             mCursorX = i;
-                            bVar3 = true;
+                            bVar4 = true;
                             break;
                         }
                     }
                     if (mCursorY == 0) {
                         mCursorX = dVar1;
                         mCursorY = dVar2;
-                        bVar3 = true;
+                        bVar4 = true;
                     }
-                }
-            } while (!bVar3);
-            if (!getItemTag(mCursorX, mCursorY, true)) {
-                if (mCursorY != 0) {
-                    goto restart_loop;
-                }
-            }
-            mCursorY = dVar2;
-        }
-    } else {
-        if (mpStick->checkDownTrigger()) {
-            if (mCursorY < 4) {
-                do {
-                    mCursorY++;
-                    if (mCursorY == 3) {
-                        u8 local_50[8] = {3, 2, 3, 1, 2, 0, 1, 0};
-                        u8 local_58[8] = {3, 3, 4, 3, 4, 3, 4, 4};
-                        for (int i = 0; i < 8; i++) {
-                            if (getItemTag(local_50[i], local_58[i], true)) {
-                                mCursorX = local_50[i];
-                                mCursorY = local_58[i];
-                                break;
-                            }
-                        }
-                    }
-                    if (getItemTag(mCursorX, mCursorY, true)) {
+                    if (bVar4) {
                         goto LAB_802bab54;
                     }
-                } while (mCursorY < 4);
-                mCursorY = 5;
-                if (mCursorX <= 2) {
-                    mCursorX = 0;
-                } else {
-                    mCursorX = 1;
                 }
-            } else if (mCursorY == 4) {
-                mCursorY = 5;
-                if (mCursorX <= 3) {
-                    mCursorX = 0;
-                } else {
-                    mCursorX = 1;
+                goto begin;
+            } else {
+                if (getItemTag(mCursorX, mCursorY, true)) {
+                    goto LAB_802bab54;
                 }
+                if (mCursorY != 0) {
+                    goto begin;
+                }
+                mCursorY = dVar2;
+            }
+        }
+    } else if (mpStick->checkDownTrigger()) {
+        if (mCursorY < 4) {
+            do {
+                mCursorY++;
+                if (mCursorY == 3) {
+                    u8 local_50[8] = {3, 2, 3, 1, 2, 0, 1, 0};
+                    u8 local_58[8] = {3, 3, 4, 3, 4, 3, 4, 4};
+                    for (int i = 0; i < 8; i++) {
+                        if (getItemTag(local_50[i], local_58[i], true)) {
+                            mCursorX = local_50[i];
+                            mCursorY = local_58[i];
+                            break;
+                        }
+                    }
+                }
+                if (getItemTag(mCursorX, mCursorY, true)) {
+                    goto LAB_802bab54;
+                }
+            } while (mCursorY < 4);
+            mCursorY = 5;
+            if (mCursorX <= 2) {
+                mCursorX = 0;
+            } else {
+                mCursorX = 1;
+            }
+        } else if (mCursorY == 4) {
+            mCursorY = 5;
+            if (mCursorX <= 3) {
+                mCursorX = 0;
+            } else {
+                mCursorX = 1;
             }
         }
     }
+
 LAB_802bab54:
     if (mCursorX != dVar1 || mCursorY != dVar2) {
         field_0x259 = dVar1;
@@ -2556,7 +2565,9 @@ u8 dMenu_Collect3D_c::getMirrorNum() {
 /* 801B7504-801B75E8 1B1E44 00E4+00 4/4 0/0 0/0 .text getMaskMdlVisible__17dMenu_Collect3D_cFv */
 u8 dMenu_Collect3D_c::getMaskMdlVisible() {
     if ((getCrystalNum() == 0 && getMirrorNum() == 0) ||
+         /* dSv_event_flag_c::M_071 - Cutscene - [cutscene: 20] Zant appears (during Midna's desperate hour) */
         (dComIfGs_isEventBit(0xC01) && !dComIfGs_isCollectMirror(0)) ||
+         /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
         (dComIfGs_isEventBit(0x2B08) && !dComIfGs_isCollectCrystal(3)))
     {
         return 0;
@@ -2573,7 +2584,7 @@ f32 dMenu_Collect3D_c::mViewOffsetY = -100.0f;
 
 /* 801B75E8-801B7660 1B1F28 0078+00 0/0 1/1 0/0 .text setupItem3D__17dMenu_Collect3D_cFPA4_f */
 void dMenu_Collect3D_c::setupItem3D(Mtx param_0) {
-    GXSetViewport(0.0f, mViewOffsetY, 608.0f, 448.0f, 0.0f, 1.0f);
+    GXSetViewport(0.0f, mViewOffsetY, FB_WIDTH, FB_HEIGHT, 0.0f, 1.0f);
     mViewOffsetY = -100.0f;
     Mtx44 projection;
     C_MTXPerspective(projection, 45.0f, mDoGph_gInf_c::getAspect(), 1.0f, 100000.0f);
@@ -2583,21 +2594,20 @@ void dMenu_Collect3D_c::setupItem3D(Mtx param_0) {
 
 /* 801B7660-801B774C 1B1FA0 00EC+00 1/1 0/0 0/0 .text toItem3Dpos__17dMenu_Collect3D_cFfffP4cXyz
  */
-// This is mostly matching like this using O2 but still regalloc (f29/f31). The main issue is the use of dVar12
 #pragma push
 #pragma optimization_level 2
 void dMenu_Collect3D_c::toItem3Dpos(f32 param_0, f32 param_1, f32 param_2, cXyz* param_3) {
     Mtx adStack_98;
     Mtx auStack_c8;
-    f32 dVar7 =
+    param_0 =
         (2.0f * ((param_0 - mDoGph_gInf_c::getMinXF()) / mDoGph_gInf_c::getWidthF()) - 1.0f);
-    f32 dVar11 = (2.0f * ((param_1 - -100.0f) / 448.0f) - 1.0f);
+    param_1 = (2.0f * ((param_1 - -100.0f) / 448.0f) - 1.0f);
     calcViewMtx(adStack_98);
     MTXInverse(adStack_98, auStack_c8);
     f32 tangent = tan(0.39269909262657166);
     f32 dVar12 = -param_2;
-    cXyz cStack_d4((dVar7 * param_2) * (mDoGph_gInf_c::getAspect() * tangent),
-                   (tangent * (dVar11 * dVar12)), dVar12);
+    cXyz cStack_d4((param_0 * param_2) * (mDoGph_gInf_c::getAspect() * tangent),
+                   (tangent * (param_1 * dVar12)), dVar12);
     MTXMultVec(auStack_c8, &cStack_d4, param_3);
 }
 #pragma pop

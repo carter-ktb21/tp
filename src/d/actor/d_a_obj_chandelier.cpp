@@ -3,35 +3,22 @@
  * Object - Chandelier (Hyrule Castle)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_chandelier.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
 
-/* 80BC8D44-80BC8D50 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BC8D50-80BC8D64 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-
 static char* l_arcName = "L9Chand";
 
 /* 80BC8DA4-80BC8DE0 000060 003C+00 1/2 0/0 0/0 .data            s_exeProc__17daObjChandelier_c */
 daObjChandelier_proc daObjChandelier_c::s_exeProc[5] = {
-    &exeModeWait,
-    &exeModeStartSwg,
-    &exeModeDown,
-    &exeModeEndSwg,
-    &exeModeHookSwg,
+    &daObjChandelier_c::exeModeWait,
+    &daObjChandelier_c::exeModeStartSwg,
+    &daObjChandelier_c::exeModeDown,
+    &daObjChandelier_c::exeModeEndSwg,
+    &daObjChandelier_c::exeModeHookSwg,
 };
 
 /* 80BC7F38-80BC7F74 000078 003C+00 2/2 0/0 0/0 .text            __ct__17daObjChandelier_cFv */
@@ -57,7 +44,7 @@ int daObjChandelier_c::CreateHeap() {
 
 /* 80BC8078-80BC8160 0001B8 00E8+00 1/0 0/0 0/0 .text            create1st__17daObjChandelier_cFv */
 cPhs__Step daObjChandelier_c::create1st() {
-    fopAcM_SetupActor(this, daObjChandelier_c);
+    fopAcM_ct(this, daObjChandelier_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(this, l_arcName);
     if (step == cPhs_COMPLEATE_e) {
         step = (cPhs__Step)MoveBGCreate(l_arcName, 7, dBgS_MoveBGProc_TypicalRotY, 0x4500, &mMtx);
@@ -89,7 +76,7 @@ int daObjChandelier_c::Draw() {
 }
 
 /* 80BC8238-80BC82C0 000378 0088+00 1/0 0/0 0/0 .text Execute__17daObjChandelier_cFPPA3_A4_f */
-int daObjChandelier_c::Execute(f32 (**param_0)[3][4]) {
+int daObjChandelier_c::Execute(Mtx** param_0) {
     if (s_exeProc[mMode] != NULL) {
         (this->*s_exeProc[mMode])();
     }
@@ -270,7 +257,7 @@ void daObjChandelier_c::hookSwingInitParm() {
 /* 80BC8B7C-80BC8BDC 000CBC 0060+00 1/0 0/0 0/0 .text
  * daObjChandelier_create1st__FP17daObjChandelier_c             */
 static cPhs__Step daObjChandelier_create1st(daObjChandelier_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjChandelier_c);
+    fopAcM_ct(i_this, daObjChandelier_c);
     return i_this->create1st();
 }
 

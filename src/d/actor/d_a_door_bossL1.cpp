@@ -2,6 +2,8 @@
 // Translation Unit: Boss Door L1
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_bossL1.h"
 #include "d/actor/d_a_obj_keyhole.h"
 #include "d/d_door_param2.h"
@@ -11,24 +13,6 @@
 #include "d/d_meter2_info.h"
 #include "SSystem/SComponent/c_math.h"
 #include "f_op/f_op_actor_mng.h"
-
-/* 804E4DF8-804E4E04 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 804E4E04-804E4E18 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 804E4E18-804E4E68 -00001 0050+00 1/1 0/0 0/0 .data            l_stageName$3673 */
 static char* l_stageName[20] = {
@@ -198,7 +182,7 @@ const char* daBdoorL1_c::getDzb() {
  */
 J3DModelData* daBdoorL1_c::getDoorModelData() {
     J3DModelData* door_model = static_cast<J3DModelData*>(dComIfG_getObjectRes(getArcName(), getBmd()));
-    JUT_ASSERT(256, door_model != 0)
+    JUT_ASSERT(256, door_model != NULL)
     return door_model;
 }
 
@@ -221,7 +205,7 @@ static u32 const l_heap_size[11] = {
 int daBdoorL1_c::CreateHeap() {
     int nowLevel = getNowLevel();
     J3DModelData* modelData = getDoorModelData();
-    JUT_ASSERT(313, modelData != 0);
+    JUT_ASSERT(313, modelData != NULL);
     u32 dlistFlag = 0x11000084;
     if (nowLevel == 8) {
         dlistFlag |= 0x200;
@@ -241,14 +225,14 @@ int daBdoorL1_c::CreateHeap() {
     }
     if (nowLevel == 8) {
         J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(getArcName(), "door_shutterBoss.btk");
-        JUT_ASSERT(341, pbtk != 0);
+        JUT_ASSERT(341, pbtk != NULL);
         field_0x58c = new mDoExt_btkAnm();
         if (field_0x58c == NULL || !field_0x58c->init(field_0x580->getModelData(), pbtk, 1, 0, 1.0f, 0, -1)) {
             return 0;
         }
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(354, anm != 0);
+    JUT_ASSERT(354, anm != NULL);
     field_0x588 = new mDoExt_bckAnm();
     if (field_0x588 == NULL || !field_0x588->init(anm, 1, 0, 1.0f, 0, -1,false)) {
         return 0;
@@ -326,7 +310,7 @@ void daBdoorL1_c::calcMtx() {
         MTXCopy(mDoMtx_stack_c::get(), field_0x7ec);
         break;
     default:
-        JUT_ASSERT(442, 0);
+        JUT_ASSERT(442, FALSE);
         break;
     }
 }
@@ -342,7 +326,7 @@ int daBdoorL1_c::CreateInit() {
     setAction(ACTION_CLOSE_WAIT);
     attention_info.position.y += 250.0f;
     eyePos.y += 250.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     if (checkFront()) {
         field_0x5a8 = -60.0f;
     } else {
@@ -362,7 +346,7 @@ int daBdoorL1_c::CreateInit() {
 
 /* 804E28E4-804E2A98 000BC4 01B4+00 1/1 0/0 0/0 .text            create__11daBdoorL1_cFv */
 int daBdoorL1_c::create() {
-    fopAcM_SetupActor(this, daBdoorL1_c);
+    fopAcM_ct(this, daBdoorL1_c);
     int rv = dComIfG_resLoad(&mPhase1, getArcName());
     if (rv != cPhs_COMPLEATE_e) {
         return rv;
@@ -576,7 +560,7 @@ int daBdoorL1_c::openInit() {
         dComIfG_Bgsp().Release(field_0x590);
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(811, anm != 0);
+    JUT_ASSERT(811, anm != NULL);
     int rt = field_0x588->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(813, rt == 0);
     if (field_0x59b != 0) {
@@ -681,7 +665,7 @@ int daBdoorL1_c::openEnd() {
 /* 804E3850-804E3A2C 001B30 01DC+00 1/1 0/0 0/0 .text            closeInit__11daBdoorL1_cFv */
 int daBdoorL1_c::closeInit() {
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getCloseAnm());
-    JUT_ASSERT(1020, anm != 0);
+    JUT_ASSERT(1020, anm != NULL);
     int rt = field_0x588->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(1022, rt == 0);
     switch(getNowLevel()) {
@@ -756,7 +740,7 @@ int daBdoorL1_c::unlockInit() {
     obj_keyhole_class* keyhole = (obj_keyhole_class*)fopAcM_SearchByID(mKeyHoleId);
     if (keyhole != NULL) {
         keyhole->setOpen();
-        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN, &keyhole->current.pos, 0, 0);
+        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN, &keyhole->actor.current.pos, 0, 0);
     }
     field_0x59b = 1;
     return 1;
@@ -971,7 +955,7 @@ int daBdoorL1_c::actionEnd() {
 /* 804E464C-804E476C 00292C 0120+00 1/1 0/0 0/0 .text            execute__11daBdoorL1_cFv */
 int daBdoorL1_c::execute() {
     static actionFunc l_action[4] = {&daBdoorL1_c::actionWait, &daBdoorL1_c::actionCloseWait, &daBdoorL1_c::actionOpen, &daBdoorL1_c::actionEnd};
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         field_0x5a0 = dComIfGp_evmng_getMyStaffId(l_staff_name, 0, 0);
         dMeter2Info_onGameStatus(2);
         demoProc();

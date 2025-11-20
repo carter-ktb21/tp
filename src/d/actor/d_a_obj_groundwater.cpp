@@ -3,27 +3,11 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_groundwater.h"
 #include "d/d_com_inf_game.h"
 #include "m_Do/m_Do_graphic.h"
-
-/* 80C149FC-80C14A08 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C14A08-80C14A1C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80C14B44-80C14B58 000014 0014+00 1/1 0/0 0/0 .bss             l_HIO */
 static daGrdWater_HIO_c l_HIO;
@@ -63,7 +47,7 @@ void daGrdWater_c::setBaseMtx() {
 /* 80C13618-80C139E4 000258 03CC+00 1/0 0/0 0/0 .text            CreateHeap__12daGrdWater_cFv */
 int daGrdWater_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Water", 18);
-    JUT_ASSERT(189, modelData != 0);
+    JUT_ASSERT(189, modelData != NULL);
     mModel2 = mDoExt_J3DModel__create(modelData, 0x80000, 0x19000284);
     if (mModel2 == NULL) {
         return 0;
@@ -84,7 +68,7 @@ int daGrdWater_c::CreateHeap() {
     res = mBck2d.init(anmTransform, 1, 0, 1.0f, 0, -1, false);
     JUT_ASSERT(231, res == 1);
     J3DModelData* modelData2 = (J3DModelData*)dComIfG_getObjectRes("Water", 0x11);
-    JUT_ASSERT(236, modelData2 != 0);
+    JUT_ASSERT(236, modelData2 != NULL);
     mModel1 = mDoExt_J3DModel__create(modelData2, 0x80000, 0x11000284);
     if (mModel1 == NULL) {
         return 0;
@@ -115,7 +99,7 @@ int daGrdWater_c::CreateHeap() {
 
 /* 80C139E4-80C13DB0 000624 03CC+00 1/1 0/0 0/0 .text            create__12daGrdWater_cFv */
 int daGrdWater_c::create() {
-    fopAcM_SetupActor(this, daGrdWater_c);
+    fopAcM_ct(this, daGrdWater_c);
     int rv = dComIfG_resLoad(&mPhase, "Water");
     if (rv == cPhs_COMPLEATE_e) {
         if (MoveBGCreate("Water", 29, dBgS_MoveBGProc_Typical, 0x4030, NULL) == cPhs_ERROR_e) {
@@ -340,7 +324,9 @@ int daGrdWater_c::Draw() {
             Mtx afStack_50;
             C_MTXLightPerspective(afStack_50, dComIfGd_getView()->fovy, dComIfGd_getView()->aspect,
                                   1.0f, 1.0f, -0.01f, 0.0f);
+            #if WIDESCREEN_SUPPORT
             mDoGph_gInf_c::setWideZoomLightProjection(afStack_50);
+            #endif
             mtxInfo->setEffectMtx(afStack_50);
             modelData2->simpleCalcMaterial(0, (MtxP)j3dDefaultMtx);
         }

@@ -3,31 +3,46 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_ks.h"
 #include "d/actor/d_a_obj_kago.h"
-#include "d/d_cc_d.h"
 #include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_bomb.h"
-#include "d/actor/d_a_obj_so.h"
 #include "d/actor/d_a_boomerang.h"
-#include "d/d_stage.h"
-#include "d/actor/d_a_obj_sw.h"
 #include "d/actor/d_a_obj_pillar.h"
-#include "m_Do/m_Do_controller_pad.h"
 #include "c/c_damagereaction.h"
 #include "d/actor/d_a_e_fs.h"
 #include "d/actor/d_a_obj_brg.h"
 #include "d/actor/d_a_midna.h"
-#include "JSystem/JUtility/JUTReport.h"
 #include "d/d_meter2_info.h"
-#include "cmath.h"
 #include "d/actor/d_a_e_oc.h"
-#include "d/d_stage.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 
-UNK_REL_DATA;
+class daNpc_Ks_HIO_c : public JORReflexible {
+public:
+    /* 80A48F8C */ daNpc_Ks_HIO_c();
+    /* 80A5DA90 */ virtual ~daNpc_Ks_HIO_c() {};
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 field_0x8;
+    /* 0x0C */ f32 field_0xc;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+    /* 0x20 */ f32 field_0x20;
+    /* 0x24 */ f32 field_0x24;
+    /* 0x28 */ u8 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ f32 field_0x34;
+};
 
 /* 80A5E478-80A5E498 000020 0020+00 13/13 0/0 0/0 .data            saru_p */
 static npc_ks_class* saru_p[8] = {
@@ -220,13 +235,13 @@ static int daNpc_Ks_Draw(npc_ks_class* npc_ks) {
     npc_ks->mpModelMorf->entryDL();
 
     if (npc_ks->field_0xc17 != 0) {
-        g_env_light.setLightTevColorType_MAJI(npc_ks->field_0xc00, &a_this->tevStr);
-        mDoExt_modelUpdateDL(npc_ks->field_0xc00);
+        g_env_light.setLightTevColorType_MAJI(npc_ks->mpStickModel, &a_this->tevStr);
+        mDoExt_modelUpdateDL(npc_ks->mpStickModel);
     }
 
-    if (npc_ks->field_0xbfc != NULL) {
-        g_env_light.setLightTevColorType_MAJI(npc_ks->field_0xbfc, &a_this->tevStr);
-        mDoExt_modelUpdateDL(npc_ks->field_0xbfc);
+    if (npc_ks->mpRoseModel != NULL) {
+        g_env_light.setLightTevColorType_MAJI(npc_ks->mpRoseModel, &a_this->tevStr);
+        mDoExt_modelUpdateDL(npc_ks->mpRoseModel);
     }
 
     cXyz sp28;
@@ -235,7 +250,7 @@ static int daNpc_Ks_Draw(npc_ks_class* npc_ks) {
                                             npc_ks->mObjAcch.GetGroundH(), npc_ks->mObjAcch.m_gnd, &a_this->tevStr,
                                             0, 1.0f, dDlst_shadowControl_c::getSimpleTex());
     if (npc_ks->field_0xc17 != 0) {
-        dComIfGd_addRealShadow(npc_ks->mShadowKey, npc_ks->field_0xc00);
+        dComIfGd_addRealShadow(npc_ks->mShadowKey, npc_ks->mpStickModel);
     }
 
     return 1;
@@ -247,9 +262,7 @@ static void* s_resq_sub(void* i_actor, void* i_data) {
         ((npc_ks_class*)i_actor)->field_0x94c = cM_rndF(50.0f) + 220.0f;
     }
     return NULL;
-}
-
-UNK_REL_BSS;
+};
 
 /* 80A5FE94-80A5FEA0 000054 000C+00 1/5 0/0 0/0 .bss             obj_pos */
 static cXyz obj_pos;
@@ -542,13 +555,13 @@ static void npc_ks_pole_ori(npc_ks_class* i_this) {
                 a_this->current.angle.y = ((obj_so_class*)actor_p)->actor.shape_angle.y;
                 a_this->current.angle.x = ((obj_so_class*)actor_p)->actor.shape_angle.x;
                 a_this->current.pos = ((obj_so_class*)actor_p)->actor.current.pos;
-                // The following causes regswap in the debug build when uncommented...
-                //a_this->current.pos.y += TREG_F(3);
+                a_this->current.pos.y += TREG_F(3);
 
                 if (leader->field_0xb42 == 0) {
                     if (!dComIfGs_isSwitch(20, fopAcM_GetRoomNo(a_this))) {
                         cXyz sp2c(11497.0f, 3764.0f, 3810.0f);
-                        sp2c -= dComIfGp_getPlayer(0)->current.pos;
+                        daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
+                        sp2c -= player->current.pos;
                         sp2c.y = 0.0f;
                         if (sp2c.abs() < 300.0f) {
                             leader->field_0xb42 = 110;
@@ -1238,7 +1251,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
 
             if (i_this->mTimers[2] == 0 && cage_p->field_0xdc4 == 0) {
                 fopAcM_OnStatus(a_this, 0);
-                cLib_onBit<u32>(a_this->attention_info.flags, 0x2000000A);
+                cLib_onBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
                 a_this->eventInfo.onCondition(dEvtCnd_CANTALK_e);
                 a_this->attention_info.distances[1] = 2;
                 a_this->attention_info.distances[3] = 2;
@@ -3052,6 +3065,7 @@ static void demo_camera(npc_ks_class* i_this) {
             i_this->field_0xb84.y = std::fabsf(i_this->field_0xb6c.y - i_this->field_0xb60.y);
             i_this->field_0xb84.z = std::fabsf(i_this->field_0xb6c.z - i_this->field_0xb60.z);
             i_this->field_0xbc4 = 0.0f;
+            /* dSv_event_flag_c::F_0224 - Faron Woods - Flag for lantern guide monkey cutscene */
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0xE0]);
             // fallthrough
         case 201:
@@ -3208,7 +3222,8 @@ static void demo_camera(npc_ks_class* i_this) {
                 i_this->field_0xb42 = 100;
                 i_this->mMode = 302;
                 anm_init(i_this, 51, 5.0f, 2, 1.0f);
-                dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0xe1]);
+                /* dSv_event_flag_c::F_0225 - Faron Woods - Lanter guide monkey doesn't come out a second time */
+                dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0xE1]);
                 dComIfGs_offSwitch(61, fopAcM_GetRoomNo(a_this));
             }
             break;
@@ -3283,6 +3298,7 @@ static void demo_camera(npc_ks_class* i_this) {
             if (i_this->field_0xb44 == 230) {
                 i_this->field_0xb42 = 100;
                 fpcM_Search(s_fsdown_sub, i_this);
+                /* dSv_event_flag_c::F_0544 - Faron Woods - Watched cutscene of monkey girl running away after being attacked by puppet */
                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x220]);
             }
             break;
@@ -3319,7 +3335,7 @@ static void demo_camera(npc_ks_class* i_this) {
             // fallthrough
         case 361:
             sp44.set(-36540.0f, 335.0f, -20870.0f);
-            daPy_getPlayerActorClass()->setPlayerPosAndAngle(&sp44, 0xffff8000, 0);
+            daPy_getPlayerActorClass()->setPlayerPosAndAngle(&sp44, -32768, 0);
             if (i_this->field_0xb44 >= 105) {
                 if (i_this->field_0xb44 == 105) {
                     i_this->mMsgFlow.init(a_this, 116, 0, NULL);
@@ -5465,7 +5481,9 @@ static int npc_ks_mori(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
+                /* dSv_event_flag_c::F_0225 - Faron Woods - Lanter guide monkey doesn't come out a second time */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[225])) {
+                     /* dSv_event_flag_c::F_0226 - Faron Woods - Get lantern back from monkey */
                 if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[226])) {
                     i_this->mMode = 302;
                     i_this->field_0xc17 = 3;
@@ -5473,6 +5491,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
                 }
             } else {
                 i_this->field_0xaec = 1;
+                    /* dSv_event_flag_c::F_0224 - Faron Woods - Flag for lantern guide monkey cutscene */
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[224])) {
                     i_this->mMode = 3;
                     call_pt = 0;
@@ -5942,17 +5961,11 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
 
     cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x8fc.y, 2, sVar1);
 
-#if VERSION == VERSION_SHIELD_DEBUG
-    #define KS_FSDEMO_BIT 0x42UL
-#else
-    #define KS_FSDEMO_BIT 0xAUL
-#endif
-
     if (iVar1 != 0) {
         fopAcM_OnStatus(a_this, 0);
-        cLib_onBit(a_this->attention_info.flags, KS_FSDEMO_BIT);
+        cLib_onBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         a_this->eventInfo.onCondition(dEvtCnd_CANTALK_e);
-        // TODO: fake match to force reuse of pointer
+        // TODO: gameInfo fake match to force reuse of pointer
         dComIfG_play_c* play = &g_dComIfG_gameInfo.play;
         if (play->getEvent().runCheck()) {
             if (a_this->eventInfo.checkCommandTalk()) {
@@ -5971,7 +5984,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
         }
     } else {
         fopAcM_OffStatus(a_this, 0);
-        cLib_offBit(a_this->attention_info.flags, KS_FSDEMO_BIT);
+        cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         i_this->field_0xaee = 0;
     }
 
@@ -5996,6 +6009,7 @@ static void npc_ks_kago(npc_ks_class* i_this) {
     cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x5c8, 2, 0x2000);
     i_this->field_0xaec = 0;
 
+        /* dSv_event_flag_c::F_0577 - Ordon Village - 2nd Day - Retrieved basket from monkey (hit hawk) */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x241])) {
         fopAcM_delete(a_this);
     }
@@ -6160,12 +6174,7 @@ static void action(npc_ks_class* i_this) {
     cXyz sp44, sp50;
 
     fopAcM_OffStatus(a_this, 0);
-#if VERSION == VERSION_SHIELD_DEBUG
-    #define KS_ACTION_BIT 0x20000042UL
-#else
-    #define KS_ACTION_BIT 0x2000000AUL
-#endif
-    cLib_offBit(a_this->attention_info.flags, KS_ACTION_BIT);
+    cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
 
     if (i_this->field_0x5b5 != 0) {
         sp44 = player->eyePos - i_this->field_0x614;
@@ -6568,13 +6577,7 @@ static void* s_kago_sub(void* i_actor, void* i_data) {
 static void kantera_sub(npc_ks_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
     MTXCopy(i_this->mpModelMorf->getModel()->getAnmMtx(14), mDoMtx_stack_c::get());
-    i_this->field_0xc00->setBaseTRMtx(mDoMtx_stack_c::get());
-
-#if VERSION == VERSION_SHIELD_DEBUG
-    #define KANTERA_SUB_BIT 0x80UL
-#else
-    #define KANTERA_SUB_BIT 0x10UL
-#endif
+    i_this->mpStickModel->setBaseTRMtx(mDoMtx_stack_c::get());
 
     if (i_this->field_0xc17 == 2) {
         mDoMtx_stack_c::transM(44.0f + KREG_F(7), 144.5f + KREG_F(8), 11.0f + KREG_F(9));
@@ -6586,7 +6589,7 @@ static void kantera_sub(npc_ks_class* i_this) {
         daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
         if (fopAcM_checkCarryNow(a_this) != 0 && player->getGrabUpStart()) {
             fopAcM_cancelCarryNow(a_this);
-            cLib_offBit(a_this->attention_info.flags, KANTERA_SUB_BIT);
+            cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
             i_this->field_0xc17 = 0;
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0xE2] & 0xFFFF);
         } else {
@@ -6616,7 +6619,7 @@ static void kantera_sub(npc_ks_class* i_this) {
             mDoMtx_stack_c::YrotM(5000);
             daPy_getPlayerActorClass()->setKandelaarMtx(mDoMtx_stack_c::get(), 0, 0);
             fopAcM_OnCarryType(a_this, fopAcM_CARRY_ITEM);
-            cLib_onBit(a_this->attention_info.flags, KANTERA_SUB_BIT);
+            cLib_onBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
             a_this->attention_info.distances[4] = 6;
             a_this->attention_info.position.x = i_this->field_0xc04.x;
             a_this->attention_info.position.y = i_this->field_0xc04.y + 30.0f;
@@ -6723,15 +6726,15 @@ static int daNpc_Ks_Execute(npc_ks_class* i_this) {
             mDoMtx_stack_c::ZrotM(0);
             
             basket_p->setMtx(mDoMtx_stack_c::get());
-            if (i_this->fopAcM_checkHawkCarryNow(basket_p) != 0) {
+            if (fopAcM_checkHawkCarryNow(basket_p) != 0) {
                 anm_init(i_this, 39, 5.0f, 2, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP_SURPRISE, -1);
             }
         }
     }
 
-    if (i_this->field_0xbfc != NULL) {
-        i_this->field_0xbfc->setBaseTRMtx(i_this->mpModelMorf->getModel()->getAnmMtx(4));
+    if (i_this->mpRoseModel != NULL) {
+        i_this->mpRoseModel->setBaseTRMtx(i_this->mpModelMorf->getModel()->getAnmMtx(4));
     }
 
     kantera_sub(i_this);
@@ -6856,15 +6859,15 @@ static int daNpc_Ks_Delete(npc_ks_class* i_this) {
 static int useHeapInit(fopAc_ac_c* a_this) {
     npc_ks_class* i_this = (npc_ks_class*)a_this;
 
-    i_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes(i_this->mResName, 59), NULL, NULL, 
-                                               (J3DAnmTransform*)dComIfG_getObjectRes(i_this->mResName, 51), 0, 1.0f, 0, -1, 
+    i_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BMDR_SARU), NULL, NULL, 
+                                               (J3DAnmTransform*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BCK_SARU_WAIT_A), 0, 1.0f, 0, -1, 
                                                &i_this->mSound, 0x80000, 0x11020084);
     if (i_this->mpModelMorf == NULL || i_this->mpModelMorf->getModel() == NULL) {
         return 0;
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
-    model->setUserArea((u32)i_this);
+    model->setUserArea((uintptr_t)i_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
@@ -6874,7 +6877,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
         return 0;
     }
     if (i_this->mBtp1->init(i_this->mpModelMorf->getModel()->getModelData(), 
-                            (J3DAnmTexPattern*)dComIfG_getObjectRes(i_this->mResName, 64), 1, 0, 1.0f, 0, -1) == 0) {
+                            (J3DAnmTexPattern*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BTP_SARU), 1, 0, 1.0f, 0, -1) == 0) {
         return 0;
     }
 
@@ -6883,22 +6886,22 @@ static int useHeapInit(fopAc_ac_c* a_this) {
         return 0;
     }
     if (i_this->mBtp2->init(i_this->mpModelMorf->getModel()->getModelData(), 
-                            (J3DAnmTexPattern*)dComIfG_getObjectRes(i_this->mResName, 65), 1, 2, 1.0f, 0, -1) == 0) {
+                            (J3DAnmTexPattern*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BTP_SARU_RELIEF), 1, 2, 1.0f, 0, -1) == 0) {
         return 0;
     }
 
-    J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(i_this->mResName, 61);
-    JUT_ASSERT(10232, modelData != 0);
-    i_this->field_0xc00 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
-    if (i_this->field_0xc00 == NULL) {
+    J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BMDR_SARU_STICK);
+    JUT_ASSERT(10232, modelData != NULL);
+    i_this->mpStickModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
+    if (i_this->mpStickModel == NULL) {
         return 0;
     }
 
     if (i_this->mRoomMonkeyID == 0 || i_this->mRoomMonkeyID == 10 || i_this->mRoomMonkeyID == 20 || i_this->mRoomMonkeyID == 21 || i_this->mRoomMonkeyID == 22) {
-        modelData = (J3DModelData*)dComIfG_getObjectRes(i_this->mResName, 60);
-        JUT_ASSERT(10249, modelData != 0);
-        i_this->field_0xbfc = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
-        if (i_this->field_0xbfc == NULL) {
+        modelData = (J3DModelData*)dComIfG_getObjectRes(i_this->mResName, npc_ks_class::BMDR_SARU_BARA);
+        JUT_ASSERT(10249, modelData != NULL);
+        i_this->mpRoseModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
+        if (i_this->mpRoseModel == NULL) {
             return 0;
         }
     }
@@ -7251,7 +7254,7 @@ static BOOL start_check(npc_ks_class* i_this) {
         fopAcM_setStageLayer(a_this);
         if (fopAcM_GetRoomNo(a_this) == 1) {
             f32 x_pos = 6836.0f - player->current.pos.x;
-            f32 y_pos = 2585.0f - player->current.pos.z;
+            f32 y_pos = 3585.0f - player->current.pos.z;
             if (JMAFastSqrt(x_pos * x_pos + y_pos * y_pos) < 500.0f) {
                 a_this->home.pos.set(7025.0f, 3355.0f, 4500.0f);
                 a_this->home.angle.y = -0x7343;
@@ -7301,7 +7304,7 @@ static int daNpc_Ks_Create(fopAc_ac_c* a_this) {
     };
 
     npc_ks_class* i_this = (npc_ks_class*)a_this;
-    fopAcM_SetupActor(a_this, npc_ks_class);
+    fopAcM_ct(a_this, npc_ks_class);
 
     dComIfGp_getStage()->getStagInfo();
     if (dKy_darkworld_check()) {
@@ -7321,7 +7324,11 @@ static int daNpc_Ks_Create(fopAc_ac_c* a_this) {
             i_this->mRoomMonkeyID = 0;
         }
 
-        if (i_this->mRoomMonkeyID == 20 && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xE1]) && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xE2])) {
+        if (i_this->mRoomMonkeyID == 20
+               /* dSv_event_flag_c::F_0225 - Faron Woods - Lanter guide monkey doesn't come out a second time */
+            && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xE1])
+               /* dSv_event_flag_c::F_0226 - Faron Woods - Get lantern back from monkey */
+            && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xE2])) {
             return cPhs_ERROR_e;
         }
 

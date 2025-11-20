@@ -56,7 +56,13 @@ public:
     u8 getItemNo() { return fopAcM_GetParamBit(this, 0, 8); }
     int getSwNo() { return 0xFF; }
 
-    void setPos(cXyz);
+    void startCtrl() {
+        actionInitWait2();
+    }
+
+    void setPos(cXyz new_pos) {
+        current.pos = new_pos;
+    }
 
 private:
     /* 0x92C */ fpc_ProcID mItemId;

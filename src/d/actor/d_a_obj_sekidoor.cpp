@@ -3,11 +3,11 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_sekidoor.h"
 
 /* ############################################################################################## */   
-
-UNK_REL_DATA;
 
 /* 80CCDA5C-80CCDA64 000020 0008+00 2/3 0/0 0/0 .data            l_bmdData */
 static struct {
@@ -26,7 +26,7 @@ static char* l_resNameList[2] = {"", "SekiDoor"};
 
 /* 80CCD02C-80CCD154 0000EC 0128+00 1/1 0/0 0/0 .text            create__16daObj_SekiDoor_cFv */
 int daObj_SekiDoor_c::create() {
-    fopAcM_SetupActor(this, daObj_SekiDoor_c);
+    fopAcM_ct(this, daObj_SekiDoor_c);
 
     mBitSW = 0;
     

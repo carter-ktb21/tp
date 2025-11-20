@@ -3,23 +3,26 @@
 // Translation Unit: d/d_stage
 //
 
-#include "d/d_stage.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRAramArchive.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
-#include "d/d_path.h"
-#include "stdio.h"
 #include "SSystem/SComponent/c_malloc.h"
+#include "d/actor/d_a_alink.h"
+#include "d/actor/d_a_suspend.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_lib.h"
 #include "d/d_map_path_dmap.h"
 #include "d/d_map_path_fmap.h"
+#include "d/d_path.h"
 #include "d/d_save_HIO.h"
-#include "d/actor/d_a_suspend.h"
+#include "d/d_stage.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include "f_op/f_op_msg_mng.h"
 #include "f_op/f_op_scene_mng.h"
 #include "global.h"
 #include "m_Do/m_Do_Reset.h"
+#include "stdio.h"
 
 void dStage_nextStage_c::set(const char* i_stage, s8 i_roomId, s16 i_point, s8 i_layer, s8 i_wipe,
                              u8 i_speed) {
@@ -75,7 +78,7 @@ static void dStage_KeepDoorInfoProc(dStage_dt_c* i_stage, stage_tgsc_class* i_dr
         DoorInfo.mNum = 0;
         return;
     }
-    if (i_drtg->num >= (int)ARRAY_SIZE(DoorInfo.mDrTgData) || i_drtg->num < 0) {
+    if (i_drtg->num >= ARRAY_SIZE(DoorInfo.mDrTgData) || i_drtg->num < 0) {
         DoorInfo.mNum = 0;
         return;
     }
@@ -1179,7 +1182,7 @@ static int createRoomScene(int param_0) {
     }
     *ptr = param_0;
 
-    if (!fopScnM_CreateReq(PROC_ROOM_SCENE, 0x7FFF, 0, (u32)ptr)) {
+    if (!fopScnM_CreateReq(PROC_ROOM_SCENE, 0x7FFF, 0, (uintptr_t)ptr)) {
         JKRHeap::free(ptr, NULL);
         return 0;
     }
@@ -1202,14 +1205,14 @@ int dStage_roomControl_c::loadRoom(int roomCount, u8* rooms, bool param_2) {
         return 0;
     }
 
-    for (int roomNo = 0; roomNo < ARRAY_SIZE(mStatus); roomNo++) {
+    for (int roomNo = 0; roomNo < ARRAY_SIZEU(mStatus); roomNo++) {
         if (checkStatusFlag(roomNo, 0x02 | 0x04)) {
             return 0;
         }
     }
     
     BOOL r26 = TRUE;
-    for (int roomNo = 0; roomNo < (int)ARRAY_SIZE(mStatus); roomNo++) {
+    for (int roomNo = 0; roomNo < ARRAY_SIZE(mStatus); roomNo++) {
         if (dStage_roomControl_c::checkStatusFlag(roomNo, 0x01)) {
             if (!stayRoomCheck(roomCount, rooms, roomNo)) {
                 onStatusFlag(roomNo, 0xc);
@@ -1282,6 +1285,10 @@ void dStage_roomControl_c::zoneCountCheck(int i_roomNo) const {
     setStayNo(i_roomNo);
 }
 
+static void dummy1() {
+    ((dStage_stageDt_c*)dComIfGp_getStage())->getStagInfo();
+}
+
 JKRExpHeap* dStage_roomControl_c::createMemoryBlock(int i_blockIdx, u32 i_heapSize) {
     if (mMemoryBlock[i_blockIdx] == NULL) {
         mMemoryBlock[i_blockIdx] = JKRCreateExpHeap(i_heapSize, mDoExt_getArchiveHeap(), false);
@@ -1339,7 +1346,7 @@ bool dStage_roomControl_c::resetArchiveBank(int i_bank) {
 void dStage_roomControl_c::roomDzs_c::create(u8 i_num) {
     JUT_ASSERT(1112, !m_num && 0 < i_num && i_num < 64);
     m_dzs = new (mDoExt_getArchiveHeap(), -4) void*[i_num];
-    JUT_ASSERT(1114, m_dzs != 0);
+    JUT_ASSERT(1114, m_dzs != NULL);
 
     if (m_dzs != NULL) {
         u32** dzs = (u32**)m_dzs;
@@ -1386,7 +1393,7 @@ void* dStage_roomControl_c::roomDzs_c::add(u8 i_no, u8 roomNo) {
         JUT_ASSERT(1172, expandSize);
         OS_REPORT("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ <%s> <%d>\n", dzsName, expandSize);
         *dzs = mDoExt_getArchiveHeap()->alloc(expandSize, -0x20);
-        JUT_ASSERT(1179, *dzs != 0);
+        JUT_ASSERT(1179, *dzs != NULL);
 
         if (*dzs != NULL) {
             u32 readSize = dComIfGp_getFieldMapArchive2()->readResource(*dzs, expandSize, dzsName);
@@ -1485,11 +1492,16 @@ static int dStage_roomInit(int i_roomNo) {
     return 1;
 }
 
+static void dummy0() {
+    dComIfGp_roomControl_setTimePass(0);
+    ((dStage_stageDt_c*)dComIfGp_getStage())->getRoom();
+}
+
 dStage_objectNameInf* dStage_searchName(char const* objName) {
     dStage_objectNameInf* obj = l_objectName;
 
-    for (u32 i = 0; i < ARRAY_SIZE(l_objectName); i++) {
-        if (!strcmp(obj->mName, objName)) {
+    for (u32 i = 0; i < ARRAY_SIZEU(l_objectName); i++) {
+        if (!strcmp(obj->name, objName)) {
             return obj;
         }
         obj++;
@@ -1499,33 +1511,33 @@ dStage_objectNameInf* dStage_searchName(char const* objName) {
     return NULL;
 }
 
-static const char* dStage_getName(s16 procName, s8 subtype) {
+const char* dStage_getName(s16 procName, s8 argument) {
     static char tmp_name[8];
 
     dStage_objectNameInf* obj = l_objectName;
     char* tmp = NULL;
 
-    for (int i = 0; i < ARRAY_SIZE(l_objectName); i++) {
-        if (obj->mProcName == procName) {
-            if (obj->mSubtype == subtype) {
-                return obj->mName;
+    for (int i = 0; i < ARRAY_SIZEU(l_objectName); i++) {
+        if (obj->procname == procName) {
+            if (obj->argument == argument) {
+                return obj->name;
             }
             if (tmp == NULL) {
-                tmp = obj->mName;
+                tmp = obj->name;
             }
         }
         obj++;
     }
 
     if (tmp == NULL) {
-        snprintf(tmp_name, 8, "%d%+0d", procName, subtype);
+        snprintf(tmp_name, 8, "%d%+0d", procName, argument);
         tmp = tmp_name;
     }
     return tmp;
 }
 
-const char* dStage_getName2(s16 procName, s8 subtype) {
-    return dStage_getName(procName, subtype);
+const char* dStage_getName2(s16 procName, s8 argument) {
+    return dStage_getName(procName, argument);
 }
 
 /* 80450D60-80450D64 000260 0004+00 1/1 3/3 1/1 .sbss            mProcID__20dStage_roomControl_c */
@@ -1565,9 +1577,9 @@ static void dStage_actorCreate(stage_actor_data_class* i_actorData, fopAcM_prm_c
         OS_REPORT("\x1B""[43;30mStage Actor Name Nothing !! <%s>\n\x1B[m", i_actorData->name);
         JKRFree(i_actorPrm);
     } else {
-        i_actorPrm->subtype = actorInf->mSubtype;
-        if (actorInf->mProcName == PROC_SUSPEND) {
-            fopAc_ac_c* actor = (fopAc_ac_c*)fopAcM_FastCreate(actorInf->mProcName, NULL, NULL, i_actorPrm);
+        i_actorPrm->argument = actorInf->argument;
+        if (actorInf->procname == PROC_SUSPEND) {
+            fopAc_ac_c* actor = (fopAc_ac_c*)fopAcM_FastCreate(actorInf->procname, NULL, NULL, i_actorPrm);
 
             if (actor != NULL) {
                 fopAcM_delete(actor);
@@ -1575,7 +1587,7 @@ static void dStage_actorCreate(stage_actor_data_class* i_actorData, fopAcM_prm_c
             return;
         }
 
-        fopAcM_create(actorInf->mProcName, NULL, i_actorPrm);
+        fopAcM_create(actorInf->procname, NULL, i_actorPrm);
     }
 }
 
@@ -1600,11 +1612,11 @@ static int dStage_cameraCreate(stage_camera2_data_class* i_cameraData, int i_cam
     return 1;
 }
 
-static void dummy() {
+static void dummy2() {
     // Needed to fix weak function order.
     // This is likely caused by the dStage_chkPlayerId function from TWW using these functions.
     // dStage_chkPlayerId isn't used in TP, so it gets stripped out, but the effect it has on weak order remains.
-    dComIfGp_getStage()->getPlayer();
+    ((dStage_stageDt_c*)dComIfGp_getStage())->getPlayer();
     dComIfGp_roomControl_getStatusRoomDt(0)->getPlayer();
 }
 
@@ -1620,7 +1632,7 @@ static int dStage_playerInit(dStage_dt_c* i_stage, void* i_data, int num, void* 
     }
 
     fopAcM_prm_class* appen = fopAcM_CreateAppend();
-    JUT_ASSERT(1586, appen != 0);
+    JUT_ASSERT(1586, appen != NULL);
 
     int point = dComIfGp_getStartStagePoint();
     u32 roomParam = dComIfGs_getRestartRoomParam();
@@ -1674,7 +1686,7 @@ static int dStage_playerInit(dStage_dt_c* i_stage, void* i_data, int num, void* 
 
     base_process_class* stageProc =
         (base_process_class*)fopScnM_SearchByID(dStage_roomControl_c::getProcID());
-    JUT_ASSERT(1683, stageProc != 0);
+    JUT_ASSERT(1683, stageProc != NULL);
     if (fpcM_GetName(stageProc) == PROC_PLAY_SCENE) {
         if (strcmp(dComIfGp_getStartStageName(), "S_MV000")) {
             fopMsgM_Create(PROC_METER2, NULL, NULL);
@@ -1727,6 +1739,10 @@ stage_map_info_class* dStage_roomDt_c::getMapInfo2(int param_0) const {
     return NULL;
 }
 
+static void dummy3() {
+    dComIfGp_roomControl_getStatusRoomDt(0)->getMapInfoBase();
+}
+
 /* 80025404-80025490 01FD44 008C+00 1/0 0/0 0/0 .text            getMapInfo2__16dStage_stageDt_cCFi
  */
 stage_map_info_class* dStage_stageDt_c::getMapInfo2(int param_0) const {
@@ -1747,6 +1763,10 @@ stage_map_info_class* dStage_stageDt_c::getMapInfo2(int param_0) const {
     }
 
     return NULL;
+}
+
+static void dummy4() {
+    ((dStage_stageDt_c*)dComIfGp_getStage())->getMapInfoBase();
 }
 
 /* 80025498-800254CC 01FDD8 0034+00 1/0 0/0 0/0 .text dStage_paletteInfoInit__FP11dStage_dt_cPviPv
@@ -2068,8 +2088,8 @@ static int dStage_pathInfoInit(dStage_dt_c* i_stage, void* i_data, int entryNum,
     i_stage->setPathInfo(path_c);
 
     for (int i = 0; i < path_c->m_num; i++) {
-        if ((u32)path->m_points < 0x80000000) {
-            path->m_points = (dPnt*)((u32)path->m_points + i_stage->getPntInf()->m_pnt_offset);
+        if ((uintptr_t)path->m_points < 0x80000000) {
+            path->m_points = (dPnt*)((uintptr_t)path->m_points + i_stage->getPntInf()->m_pnt_offset);
         }
         path++;
     }
@@ -2092,10 +2112,10 @@ static int dStage_rpatInfoInit(dStage_dt_c* i_stage, void* i_data, int i_num, vo
 
     i_stage->setPath2Info(pStagePath);
     for (s32 i = 0; i < pStagePath->m_num; pPath++, i++, (void)0) {
-        if ((u32)pPath->m_points >= 0x80000000) {
+        if ((uintptr_t)pPath->m_points >= 0x80000000) {
             continue;
         }
-        pPath->m_points = (dPnt*)((u32)pPath->m_points + i_stage->getPnt2Inf()->m_pnt_offset);
+        pPath->m_points = (dPnt*)((uintptr_t)pPath->m_points + i_stage->getPnt2Inf()->m_pnt_offset);
     }
     return 1;
 }
@@ -2192,7 +2212,7 @@ static int dStage_memaInfoInit(dStage_dt_c* i_stage, void* i_data, int param_2, 
         JUT_ASSERT(3208, pd->m_num <= dStage_roomControl_c::MEMORY_BLOCK_MAX);
         for (int i = 0; i < pd->m_num; i++) {
             JKRExpHeap* heap = dStage_roomControl_c::createMemoryBlock(i, *entry_p + 0x380);
-            JUT_ASSERT(3216, heap != 0);
+            JUT_ASSERT(3216, heap != NULL);
             OS_REPORT("\t%02d : size=%d\n", i, *entry_p);
             entry_p++;
         }
@@ -2246,7 +2266,7 @@ static void dStage_dt_c_offsetToPtr(void* i_data) {
     for (int i = 0; i < file->m_chunkCount; i++) {
         JUT_ASSERT(3381, p_tno->m_offset != 0);
         if (p_tno->m_offset != 0 && p_tno->m_offset < 0x80000000) {
-            p_tno->m_offset += (u32)i_data;
+            p_tno->m_offset += (uintptr_t)i_data;
         }
         p_tno++;
     }
@@ -2331,10 +2351,10 @@ static void readMult(dStage_dt_c* i_stage, dStage_Multi_c* multi, bool useOldRes
             if (dzs != NULL) {
                 dStage_dt_c_offsetToPtr(dzs);
                 i_stage->setRoomNo(info->mRoomNo);
-                dStage_dt_c_decode(dzs, i_stage, l_roomFuncTable, ARRAY_SIZE(l_roomFuncTable));
-                dStage_setLayerTagName(l_layerFuncTable, ARRAY_SIZE(l_layerFuncTable),
+                dStage_dt_c_decode(dzs, i_stage, l_roomFuncTable, ARRAY_SIZEU(l_roomFuncTable));
+                dStage_setLayerTagName(l_layerFuncTable, ARRAY_SIZEU(l_layerFuncTable),
                                        dComIfG_play_c::getLayerNo(0));
-                dStage_dt_c_decode(dzs, i_stage, l_layerFuncTable, ARRAY_SIZE(l_layerFuncTable));
+                dStage_dt_c_decode(dzs, i_stage, l_layerFuncTable, ARRAY_SIZEU(l_layerFuncTable));
             }
 
             info++;
@@ -2433,7 +2453,7 @@ static void layerMemoryInfoLoader(void* i_data, dStage_dt_c* i_stage, int param_
         {"MEC0", dStage_mecoInfoInit},
     };
 
-    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTable, ARRAY_SIZE(l_layerFuncTable));
+    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTable, ARRAY_SIZEU(l_layerFuncTable));
 }
 
 /* 80026940-800269B4 021280 0074+00 1/1 0/0 0/0 .text
@@ -2443,7 +2463,7 @@ static void dStage_dt_c_stageInitLoader(void* i_data, dStage_dt_c* i_stage) {
 
     dStage_dt_c_offsetToPtr(i_data);
     i_stage->init();
-    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZE(l_funcTable));
+    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZEU(l_funcTable));
     layerMemoryInfoLoader(i_data, i_stage, -1);
 }
 
@@ -2464,22 +2484,24 @@ static void layerTableLoader(void* i_data, dStage_dt_c* i_stage, int roomNo) {
         newRoomNo = dComIfGp_getStartStageRoomNo();
     }
 
-    dStage_setLayerTagName(l_layerFuncTableA, ARRAY_SIZE(l_layerFuncTableA),
+    dStage_setLayerTagName(l_layerFuncTableA, ARRAY_SIZEU(l_layerFuncTableA),
                            dComIfG_play_c::getLayerNo(0));
-    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTableA, ARRAY_SIZE(l_layerFuncTableA));
+    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTableA, ARRAY_SIZEU(l_layerFuncTableA));
 
     dStage_Elst_c* elst = dComIfGp_getStage()->getElst();
     if (elst != NULL && newRoomNo >= 0 && elst->m_entryNum > newRoomNo) {
         dStage_Elst_dt_c* d = elst->m_entries;
         int layer = dComIfG_play_c::getLayerNo(0);
-        dStage_setLayerTagName(l_envLayerFuncTable, ARRAY_SIZE(l_envLayerFuncTable),
+        dStage_setLayerTagName(l_envLayerFuncTable, ARRAY_SIZEU(l_envLayerFuncTable),
                                d[newRoomNo].m_layerTable[layer]);
-        dStage_dt_c_decode(i_data, i_stage, l_envLayerFuncTable, ARRAY_SIZE(l_envLayerFuncTable));
+        dStage_dt_c_decode(i_data, i_stage, l_envLayerFuncTable, ARRAY_SIZEU(l_envLayerFuncTable));
     } else {
-        dStage_setLayerTagName(l_envLayerFuncTable, ARRAY_SIZE(l_envLayerFuncTable), 0);
-        dStage_dt_c_decode(i_data, i_stage, l_envLayerFuncTable, ARRAY_SIZE(l_envLayerFuncTable));
+        dStage_setLayerTagName(l_envLayerFuncTable, ARRAY_SIZEU(l_envLayerFuncTable), 0);
+        dStage_dt_c_decode(i_data, i_stage, l_envLayerFuncTable, ARRAY_SIZEU(l_envLayerFuncTable));
     }
 }
+
+dStage_Elst_c* dStage_stageDt_c::getElst(void) { return mElst; }
 
 /* 80026AF0-80026B58 021430 0068+00 2/2 0/0 0/0 .text layerActorLoader__FPvP11dStage_dt_ci */
 static void layerActorLoader(void* i_data, dStage_dt_c* i_stage, int param_2) {
@@ -2491,7 +2513,7 @@ static void layerActorLoader(void* i_data, dStage_dt_c* i_stage, int param_2) {
     };
 
     dStage_setLayerTagName(l_layerFuncTable, 4, dComIfG_play_c::getLayerNo(0));
-    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTable, ARRAY_SIZE(l_layerFuncTable));
+    dStage_dt_c_decode(i_data, i_stage, l_layerFuncTable, ARRAY_SIZEU(l_layerFuncTable));
 }
 
 /* 80026B58-80026BBC 021498 0064+00 1/1 0/0 0/0 .text dStage_dt_c_stageLoader__FPvP11dStage_dt_c
@@ -2513,7 +2535,7 @@ static void dStage_dt_c_stageLoader(void* i_data, dStage_dt_c* i_stage) {
         {"REVT", dStage_stEventInfoInit},   {"SOND", dStage_soundInfoInitCL},
     };
 
-    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZE(l_funcTable));
+    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZEU(l_funcTable));
     layerTableLoader(i_data, i_stage, -1);
     layerActorLoader(i_data, i_stage, -1);
 }
@@ -2533,7 +2555,7 @@ void dStage_dt_c_roomLoader(void* i_data, dStage_dt_c* i_stage, int param_2) {
 
     dStage_dt_c_offsetToPtr(i_data);
     i_stage->init();
-    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZE(l_funcTable));
+    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZEU(l_funcTable));
     layerTableLoader(i_data, i_stage, param_2);
 }
 
@@ -2547,7 +2569,7 @@ void dStage_dt_c_roomReLoader(void* i_data, dStage_dt_c* i_stage, int param_2) {
         {"TGDR", dStage_tgscInfoInit},         {"REVT", dStage_mapEventInfoInit},
     };
 
-    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZE(l_funcTable));
+    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZEU(l_funcTable));
     layerActorLoader(i_data, i_stage, param_2);
 }
 
@@ -2560,10 +2582,10 @@ void dStage_dt_c_fieldMapLoader(void* i_data, dStage_dt_c* i_stage) {
         {"MPAT", dStage_fieldMapMapPathInit},
     };
 
-    JUT_ASSERT(4428, i_data != 0);
+    JUT_ASSERT(4428, i_data != NULL);
 
     dStage_dt_c_offsetToPtr(i_data);
-    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZE(l_funcTable));
+    dStage_dt_c_decode(i_data, i_stage, l_funcTable, ARRAY_SIZEU(l_funcTable));
 }
 
 /* ############################################################################################## */
@@ -2580,7 +2602,7 @@ char dStage_roomControl_c::mArcBank[32][10] = {0};
 void dStage_infoCreate() {
     OS_REPORT("dStage_Create\n");
     void* stageRsrc = dComIfG_getStageRes("stage.dzs");
-    JUT_ASSERT(4451, stageRsrc != 0);
+    JUT_ASSERT(4451, stageRsrc != NULL);
 
     dComIfGp_roomControl_init();
     dStage_dt_c_stageInitLoader(stageRsrc, dComIfGp_getStage());
@@ -2592,7 +2614,7 @@ char dStage_roomControl_c::mDemoArcName[10];
 /* 80026D38-80026DF8 021678 00C0+00 0/0 1/1 0/0 .text            dStage_Create__Fv */
 void dStage_Create() {
     void* stageRsrc = dComIfG_getStageRes("stage.dzs");
-    JUT_ASSERT(4451, stageRsrc != 0);
+    JUT_ASSERT(4451, stageRsrc != NULL);
     dStage_dt_c_stageLoader(stageRsrc, dComIfGp_getStage());
     daSus_c::execute();
 
@@ -2631,7 +2653,7 @@ void dStage_Delete() {
 
         if (dStage_stagInfo_GetSTType(dComIfGp_getStage()->getStagInfo()) == ST_DUNGEON) {
             dRes_info_c* info = dComIfG_getStageResInfo("Stg_00");
-            JUT_ASSERT(4579, info != 0);
+            JUT_ASSERT(4579, info != NULL);
             *info->getArchiveName() = 'X';
             dComIfGp_setOldMulti();
         } else {
@@ -2741,6 +2763,11 @@ int dStage_changeScene(int i_exitId, f32 speed, u32 mode, s8 room_no, s16 angle,
     return 1;
 }
 
+static void dummy5() {
+    dComIfGp_roomControl_getStatusRoomDt(0)->getSclsInfo();
+    ((dStage_stageDt_c*)dComIfGp_getStage())->getSclsInfo();
+}
+
 /* 800272F0-800274B0 021C30 01C0+00 0/0 1/1 0/0 .text dStage_changeScene4Event__FiScibfUlsi */
 int dStage_changeScene4Event(int i_exitId, s8 room_no, int i_wipe, bool param_3, f32 speed,
                              u32 mode, s16 angle, int param_7) {
@@ -2793,3 +2820,11 @@ void dStage_restartRoom(u32 roomParam, u32 mode, int param_2) {
                           mode, 0, 0, 0, param_2, 0);
     dComIfGs_setRestartRoomParam(roomParam);
 }
+
+#if VERSION == VERSION_WII_USA_R0
+void dStage_escapeRestart() {
+    daAlink_c* player_p = daAlink_getAlinkActorClass();
+    dComIfGs_setTurnRestart(player_p->current.pos, player_p->shape_angle.y, fopAcM_GetRoomNo(player_p), fopAcM_GetParam(player_p));
+    dComIfGp_setNextStage(dComIfGp_getStartStageName(), -2, dComIfGs_getTurnRestartRoomNo(), -1, 0.0f, 0, 0, 9, 0, 1, 0);
+}
+#endif

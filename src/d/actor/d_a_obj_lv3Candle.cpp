@@ -3,6 +3,8 @@
 // Object - Level 3 Candle
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv3Candle.h"
 
 #include "d/d_com_inf_game.h"
@@ -58,7 +60,7 @@ int daLv3Candle_c::CreateHeap() {
 
 /* 80C57C40-80C57EDC 000260 029C+00 1/1 0/0 0/0 .text            create__13daLv3Candle_cFv */
 cPhs__Step daLv3Candle_c::create() {
-    fopAcM_SetupActor(this, daLv3Candle_c);
+    fopAcM_ct(this, daLv3Candle_c);
 
     mType = getType();
     if (mType == 0xff) {

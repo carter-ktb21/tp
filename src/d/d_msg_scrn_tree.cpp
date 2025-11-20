@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_tree.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -6,8 +8,6 @@
 #include "d/d_msg_object.h"
 #include "d/d_msg_out_font.h"
 #include "d/d_pane_class.h"
-
-extern dMsgObject_HIO_c g_MsgObject_HIO_c;
 
 /* 80248954-80248F14 243294 05C0+00 0/0 1/1 0/0 .text
  * __ct__14dMsgScrnTree_cFP7JUTFontP10JKRExpHeap                */
@@ -58,8 +58,42 @@ dMsgScrnTree_c::dMsgScrnTree_c(JUTFont* param_0, JKRExpHeap* param_1) {
     field_0xc8->getPanePtr()->setAnimation(field_0xd0);
 
     mpScreen->search('white_m')->setAnimation(field_0xd4);
+
+#if VERSION == VERSION_GCN_JPN
+    if (dComIfGs_getOptUnk0() != 0) {
+        for (int i = 0; i < 3; i++) {
+            static u64 const t_tag[3] = {'mg_3line', 't3_w', 't3_s'};
+
+            mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(field_0x54);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x210, "");
+        }
+
+        mpScreen->search('n_3line')->show();
+        mpScreen->search('n_3fline')->hide();
+        mpScreen->search('n_e4line')->hide();
+    } else {
+        for (int i = 0; i < 3; i++) {
+            static u64 const t_tag[3] = {'t3fline', 't3f_w', 't3f_s'};
+            static u64 const tr_tag[3] = {'mg_3f', 'mg_3f_w', 'mg_3f_s'};
+
+            mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(field_0x54);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x210, "");
+
+            mpTmr_c[i] = new CPaneMgr(mpScreen, tr_tag[i], 0, NULL);
+            ((J2DTextBox*)mpTmr_c[i]->getPanePtr())->setFont(field_0x54);
+            ((J2DTextBox*)mpTmr_c[i]->getPanePtr())->setString(0x210, "");
+        }
+
+        mpScreen->search('n_3line')->hide();
+        mpScreen->search('n_3fline')->show();
+        mpScreen->search('n_e4line')->hide();
+    }
+#else
     for (int i = 0; i < 3; i++) {
         static u64 const t_tag[3] = {'mg_e4lin', 'f4_w', 't4_s'};
+
         mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(field_0x54);
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x200, "");
@@ -68,6 +102,7 @@ dMsgScrnTree_c::dMsgScrnTree_c(JUTFont* param_0, JKRExpHeap* param_1) {
     mpScreen->search('n_3line')->hide();
     mpScreen->search('n_3fline')->hide();
     mpScreen->search('n_e4line')->show();
+#endif
 
     ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getFontSize(mFontSize);
     mTBoxWidth = mpTm_c[0]->getSizeX();

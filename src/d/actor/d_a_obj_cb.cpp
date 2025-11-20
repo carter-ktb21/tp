@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cb.h"
 #include "SSystem/SComponent/c_lib.h"
 #include "SSystem/SComponent/c_math.h"
@@ -179,7 +181,7 @@ static int daObj_Cb_Delete(obj_cb_class* i_this) {
 static int useHeapInit(fopAc_ac_c* actor) {
     obj_cb_class* i_this = (obj_cb_class*)actor;
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes("Obj_cb", 4);
-    JUT_ASSERT(502, modelData != 0);
+    JUT_ASSERT(502, modelData != NULL);
     i_this->mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mModel == NULL) {
         return 0;
@@ -205,7 +207,7 @@ static daObj_Cb_HIO_c l_HIO;
 
 /* 80BC5408-80BC563C 0009C8 0234+00 1/0 0/0 0/0 .text            daObj_Cb_Create__FP10fopAc_ac_c */
 static int daObj_Cb_Create(fopAc_ac_c* actor) {
-    fopAcM_SetupActor(actor, obj_cb_class);
+    fopAcM_ct(actor, obj_cb_class);
     obj_cb_class* i_this = (obj_cb_class*)actor;
     int rv = dComIfG_resLoad(&i_this->mPhase, "Obj_cb");
     if (rv == cPhs_COMPLEATE_e) {

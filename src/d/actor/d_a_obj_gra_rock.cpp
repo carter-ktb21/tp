@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_gra_rock.h"
 #include "d/actor/d_a_npc.h"
 #include "d/d_bg_w.h"
@@ -35,7 +37,7 @@ void daObjGraRock_c::setAttnPos() {
     mDoMtx_stack_c::multVec(&cStack_50, &attention_info.position);
     attention_info.position += current.pos;
     attention_info.distances[0] = daNpcF_getDistTableIdx(8, 5);
-    attention_info.flags = 1;
+    attention_info.flags = fopAc_AttnFlag_LOCK_e;
     dAttention_c* attention = dComIfGp_getAttention();
     if (attention->LockonTruth()) {
         if (attention->LockonTarget(0) == this && field_0x9bc == 0 && field_0x9b6 == 0) {
@@ -191,14 +193,14 @@ static char* l_arcName[5] = {
 /* 80C11B68-80C11C64 000AE8 00FC+00 1/0 0/0 0/0 .text            CreateHeap__14daObjGraRock_cFv */
 int daObjGraRock_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], "M_VBom_Zora.bmd");
-    JUT_ASSERT(488, modelData != 0);
+    JUT_ASSERT(488, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11020084);
     if (mModel == NULL) {
         return 0;
     }
     J3DAnmTexPattern* btp_p =
         (J3DAnmTexPattern*)dComIfG_getObjectRes(l_arcName[0], "M_VBom_Zora.btp");
-    JUT_ASSERT(501, btp_p != 0);
+    JUT_ASSERT(501, btp_p != NULL);
     if (mBtp.init(modelData, btp_p, 1, 2, 1.0f, 0, -1) == 0) {
         return 0;
     }
@@ -208,7 +210,7 @@ int daObjGraRock_c::CreateHeap() {
 
 /* 80C11C64-80C11EA8 000BE4 0244+00 1/1 0/0 0/0 .text            create__14daObjGraRock_cFv */
 int daObjGraRock_c::create() {
-    fopAcM_SetupActor(this, daObjGraRock_c);
+    fopAcM_ct(this, daObjGraRock_c);
     field_0x9c8 = fopAcM_GetParam(this);
     int i;
     int completedNum;

@@ -773,16 +773,15 @@ void daAlink_c::setWaterfallEffect() {
     }
 }
 
-/* 80453094-8045309C 001694 0006+02 1/1 0/0 0/0 .sdata2          effName$40765 */
-static const u16 effName_40765[] = {
-    0x0407,
-    0x0408,
-    0x0409,
-};
-
 /* 8012277C-801228F4 11D0BC 0178+00 1/1 0/0 0/0 .text            setMagneBootsEffect__9daAlink_cFv
  */
 void daAlink_c::setMagneBootsEffect() {
+    static const u16 effName[] = {
+        0x0407,
+        0x0408,
+        0x0409,
+    };
+
     cXyz sp20;
 
     int i, j;
@@ -801,7 +800,7 @@ void daAlink_c::setMagneBootsEffect() {
             u32* var_r28 = field_0x3228[i];
 
             for (j = 0; j < 3; j++, var_r28++) {
-                JPABaseEmitter* temp_r3 = setEmitter(var_r28, effName_40765[j], &current.pos, NULL);
+                JPABaseEmitter* temp_r3 = setEmitter(var_r28, effName[j], &current.pos, NULL);
                 if (temp_r3 != NULL) {
                     if (j == 1) {
                         temp_r3->setGlobalRTMatrix(mpLinkBootModels[i]->getAnmMtx(1));
@@ -940,26 +939,20 @@ void daAlink_c::clearCutTurnEffectID() {
     }
 }
 
-/* 804530AC-804530B0 0016AC 0004+00 1/1 0/0 0/0 .sdata2          effNameNormal$41086 */
-static const u16 effNameNormal[] = {
-    0x0159,
-    0x015A,
-};
-
-/* 804530B0-804530B8 0016B0 0008+00 1/1 0/0 0/0 .sdata2          effNameLight$41091 */
-static const u16 effNameLight[] = {
-    0x0A28, 0x0A29, 0x0A2A, 0x0A2B,
-};
-
-/* 804530B8-804530BC 0016B8 0004+00 1/1 0/0 0/0 .sdata2          effNameWater$41101 */
-static const u16 effNameWater[] = {
-    0x0C52,
-    0x0C53,
-};
-
 /* 80122F78-801233A4 11D8B8 042C+00 1/1 0/0 0/0 .text            setCutTurnEffect__9daAlink_cFv */
-// NONMATCHING - should match when data order is fixed
 void daAlink_c::setCutTurnEffect() {
+    static const u16 effNameNormal[] = {
+        0x0159,
+        0x015A,
+    };
+    static const u16 effNameLight[] = {
+        0x0A28, 0x0A29, 0x0A2A, 0x0A2B,
+    };
+    static const u16 effNameWater[] = {
+        0x0C52,
+        0x0C53,
+    };
+
     static Vec const waterEffScale = {1.5f, 1.5f, 1.5f};
 
     static Vec const leftTransNormal[] = {
@@ -1249,23 +1242,20 @@ void daAlink_c::setWolfDigEffect() {
     }
 }
 
-/* 804530D8-804530E0 0016D8 0006+02 1/1 0/0 0/0 .sdata2          name0$41422 */
-static const u16 name0[] = {
-    0x02A3,
-    0x83A2,
-    0x884F,
-};
-
-/* 804530E0-804530E8 0016E0 0006+02 1/1 0/0 0/0 .sdata2          name1$41423 */
-static const u16 name1[] = {
-    0x02A3,
-    0x83A3,
-    0x8850,
-};
-
 /* 80123BF0-80123C8C 11E530 009C+00 2/2 0/0 0/0 .text
  * setWolfSwimEndEffect__9daAlink_cFPP14JPABaseEmitterPP14JPABaseEmitter */
 void daAlink_c::setWolfSwimEndEffect(JPABaseEmitter** param_0, JPABaseEmitter** param_1) {
+    static const u16 name0[] = {
+        0x02A3,
+        0x83A2,
+        0x884F,
+    };
+    static const u16 name1[] = {
+        0x02A3,
+        0x83A3,
+        0x8850,
+    };
+
     int var_r30 = mProcVar3.field_0x300e;
     if (var_r30 >= 3 || var_r30 < 0) {
         var_r30 = 1;
@@ -1278,15 +1268,14 @@ void daAlink_c::setWolfSwimEndEffect(JPABaseEmitter** param_0, JPABaseEmitter** 
     }
 }
 
-/* 804530E8-804530F0 0016E8 0006+02 1/1 0/0 0/0 .sdata2          effID$41443 */
-static const u16 effID[] = {
-    0x0244,
-    0x0245,
-    0x0246,
-};
-
 /* 80123C8C-80123D88 11E5CC 00FC+00 1/1 0/0 0/0 .text setWolfLockAttackEffect__9daAlink_cFv */
 void daAlink_c::setWolfLockAttackEffect() {
+    static const u16 effID[] = {
+        0x0244,
+        0x0245,
+        0x0246,
+    };
+
     u8 var_r30;
     if (dComIfGp_checkPlayerStatus1(0, 0x01000000)) {
         var_r30 = 0xFF;
@@ -1354,21 +1343,18 @@ void daAlink_c::setWolfJumpAttackEffect() {
     }
 }
 
-/* 804530F0-804530F4 0016F0 0004+00 1/1 0/0 0/0 .sdata2          normalNameID$41521 */
-static const u16 normalNameID[] = {
-    0x8390,
-    0x8391,
-};
-
-/* 804530F4-804530F8 0016F4 0004+00 1/1 0/0 0/0 .sdata2          ganonNameID$41522 */
-static const u16 ganonNameID[] = {
-    0x8C2A,
-    0x8C2B,
-};
-
 /* 80123ED0-80124144 11E810 0274+00 2/2 0/0 0/0 .text
  * setWolfBarrierHitEffect__9daAlink_cFR11dBgS_LinChk           */
 void daAlink_c::setWolfBarrierHitEffect(dBgS_LinChk& param_0) {
+    static const u16 normalNameID[] = {
+        0x8390,
+        0x8391,
+    };
+    static const u16 ganonNameID[] = {
+        0x8C2A,
+        0x8C2B,
+    };
+
     cM3dGPla sp10;
     dComIfG_Bgsp().GetTriPla(param_0, &sp10);
 
@@ -1403,13 +1389,12 @@ void daAlink_c::setCutWaterDropEffect() {
     }
 }
 
-/* 804530F8-80453100 0016F8 0008+00 1/1 0/0 0/0 .sdata2          effDataTable$41650 */
-static const u16 effDataTable[] = {
-    0x02A5, 0x02A6, 0x02A7, 0x02A8,
-};
-
 /* 801241E0-801244E4 11EB20 0304+00 1/1 0/0 0/0 .text            setWaterDropEffect__9daAlink_cFv */
 void daAlink_c::setWaterDropEffect() {
+    static const u16 effDataTable[] = {
+        0x02A5, 0x02A6, 0x02A7, 0x02A8,
+    };
+
     Vec spC;
     int i;
 
@@ -1797,13 +1782,13 @@ void daAlink_c::setFirePointDamageEffect() {
                 } else {
                     if (var_r26 && temp_r28 != NULL) {
                         temp_r28->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                        temp_r28->setUserWork((u32)&var_r30->field_0x24);
+                        temp_r28->setUserWork((uintptr_t)&var_r30->field_0x24);
                     }
 
                     JPABaseEmitter* temp_r28_2 = setEmitter(&var_r30->field_0x8, 0x743, &sp24, NULL);
                     if (var_r26 && temp_r28_2 != NULL) {
                         temp_r28_2->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                        temp_r28_2->setUserWork((u32)&var_r30->field_0x24);
+                        temp_r28_2->setUserWork((uintptr_t)&var_r30->field_0x24);
                     }
 
                     var_r30->field_0xc = sp24;
@@ -1817,9 +1802,6 @@ void daAlink_c::setFirePointDamageEffect() {
         seStartOnlyReverbLevel(Z2SE_AL_BURNING);
     }
 }
-
-/* 8045310C-80453110 00170C 0004+00 1/1 0/0 0/0 .sdata2          effName$42224 */
-
 
 /* 80125338-80125524 11FC78 01EC+00 1/1 0/0 0/0 .text            setFreezeEffect__9daAlink_cFv */
 void daAlink_c::setFreezeEffect() {
@@ -1864,18 +1846,17 @@ void daAlink_c::setFreezeEffect() {
     }
 }
 
-/* 80453110-80453114 001710 0004+00 1/1 0/0 0/0 .sdata2          effName$42309 */
-static const u16 effName_42309[] = {
-    0x0814,
-    0x0815,
-};
-
 /* 80125524-801255BC 11FE64 0098+00 1/1 0/0 0/0 .text setWoodShieldBurnEffect__9daAlink_cFv */
 void daAlink_c::setWoodShieldBurnEffect() {
+    static const u16 effName[] = {
+        0x0814,
+        0x0815,
+    };
+
     if (field_0x2fcb != 0) {
         for (int i = 0; i < 2; i++) {
             JPABaseEmitter* emitter =
-                setEmitter(&field_0x3260[i], effName_42309[i], &current.pos, NULL);
+                setEmitter(&field_0x3260[i], effName[i], &current.pos, NULL);
 
             if (emitter != NULL) {
                 emitter->setGlobalRTMatrix(mShieldModel->getBaseTRMtx());
@@ -1895,16 +1876,15 @@ void daAlink_c::clearWoodShieldBurnEffect() {
     }
 }
 
-/* 80453114-80453118 001714 0004+00 1/1 0/0 0/0 .sdata2          effName$42340 */
-static const u16 effName_42340[] = {
-    0x0816,
-    0x0817,
-};
-
 /* 80125628-801256EC 11FF68 00C4+00 1/1 0/0 0/0 .text setWoodShieldBurnOutEffect__9daAlink_cFv */
 void daAlink_c::setWoodShieldBurnOutEffect() {
+    static const u16 effName[] = {
+        0x0816,
+        0x0817,
+    };
+
     for (int i = 0; i < 2; i++) {
-        JPABaseEmitter* emitter = dComIfGp_particle_setColor(effName_42340[i], &current.pos,
+        JPABaseEmitter* emitter = dComIfGp_particle_setColor(effName[i], &current.pos,
                                                              &tevStr, NULL, NULL, 0.0f, -1);
 
         if (emitter != NULL) {
@@ -1956,14 +1936,15 @@ static void setBezierPos(cXyz const* start, cXyz const* control_1, cXyz const* c
 
 /* 8012589C-80125B0C 1201DC 0270+00 1/1 0/0 0/0 .text
  * copyBlur__14daAlink_blur_cFPC4cXyzPC4cXyzPC4cXyz             */
-// NONMATCHING
 void daAlink_blur_c::copyBlur(cXyz const* param_0, cXyz const* param_1, cXyz const* param_2) {
-    for (int i = 59 - 10; i >= 0; i--) {
-        field_0x38[i + 10] = field_0x38[i];
-        field_0x308[i + 10] = field_0x308[i];
+    s32 temp = 10;
+
+    for (int i = 59 - temp; i >= 0; i--) {
+        field_0x38[i + temp] = field_0x38[i];
+        field_0x308[i + temp] = field_0x308[i];
     }
 
-    f32 temp_f30 = 1.0f / 10;
+    f32 temp_f30 = 1.0f / temp;
     f32 var_f31 = 0.0f;
 
     cXyz sp4C;
@@ -1971,14 +1952,14 @@ void daAlink_blur_c::copyBlur(cXyz const* param_0, cXyz const* param_1, cXyz con
     cXyz sp64;
     cXyz sp70;
 
-    sp58 = field_0x308[10] + (field_0x2c * 30.0f);
+    sp58 = field_0x308[temp] + (field_0x2c * 30.0f);
     sp4C = *param_1 + (*param_2 * -30.0f);
-    sp70 = field_0x38[10] + (field_0x2c * 60.0f);
+    sp70 = field_0x38[temp] + (field_0x2c * 60.0f);
     sp64 = *param_0 + (*param_2 * -60.0f);
 
-    for (int i = 0; i < 10; i++) {
-        setBezierPos(param_1, &field_0x308[10], &sp4C, &sp58, var_f31, &field_0x308[i]);
-        setBezierPos(param_0, &field_0x38[10], &sp64, &sp70, var_f31, &field_0x38[i]);
+    for (int i = 0; i < temp; i++) {
+        setBezierPos(param_1, &field_0x308[temp], &sp4C, &sp58, var_f31, &field_0x308[i]);
+        setBezierPos(param_0, &field_0x38[temp], &sp64, &sp70, var_f31, &field_0x38[i]);
 
         field_0x38[i] += (field_0x38[i] - field_0x308[i]) * field_0x24;
         var_f31 += temp_f30;
@@ -2019,7 +2000,7 @@ void daAlink_blur_c::draw() {
     GXSetNumIndStages(0);
     nColor0.a = field_0x20;
 
-    GXInitTexObj(&texObj, (void*)((u32)m_blurTex + m_blurTex->imageOffset), 0x10, 4, GX_TF_I4,
+    GXInitTexObj(&texObj, (void*)((uintptr_t)m_blurTex + m_blurTex->imageOffset), 0x10, 4, GX_TF_I4,
                  GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE,
                     GX_ANISO_1);

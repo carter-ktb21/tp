@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_avalanche.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
@@ -38,24 +40,6 @@ void daObjAvalanche_c::setBaseMtx() {
     mDoMtx_stack_c::YrotM(0);
     MTXCopy(mDoMtx_stack_c::get(), mMtx2);
 }
-
-/* 80BA7D70-80BA7D7C 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BA7D7C-80BA7D90 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BA7D90-80BA7D94 -00001 0004+00 3/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "V_Yuki";
@@ -108,14 +92,14 @@ int daObjAvalanche_c::Create() {
 /* 80BA7178-80BA7328 000318 01B0+00 1/0 0/0 0/0 .text            CreateHeap__16daObjAvalanche_cFv */
 int daObjAvalanche_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 9);
-    JUT_ASSERT(233, modelData != 0);
+    JUT_ASSERT(233, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mModel == NULL) {
         return 0;
     }
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 6);
-    JUT_ASSERT(247, anm != 0);
+    JUT_ASSERT(247, anm != NULL);
     mBckAnm = new mDoExt_bckAnm();
     if (mBckAnm == NULL || !mBckAnm->init(anm, 1, 0, 1.0, 0, -1, false)) {
         return 0;
@@ -320,7 +304,7 @@ int daObjAvalanche_c::Delete() {
 /* 80BA7C0C-80BA7C6C 000DAC 0060+00 1/0 0/0 0/0 .text
  * daObjAvalanche_create1st__FP16daObjAvalanche_c               */
 static int daObjAvalanche_create1st(daObjAvalanche_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjAvalanche_c);
+    fopAcM_ct(i_this, daObjAvalanche_c);
     return i_this->create1st();
 }
 

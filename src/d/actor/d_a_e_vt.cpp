@@ -3,6 +3,8 @@
  * Variant Enemy (Death Sword)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_vt.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
@@ -12,12 +14,35 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
 #include "d/d_camera.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+#include "Z2AudioLib/Z2Instances.h"
 
 #define WL_CUT_TYPE_SMALL 1
 #define WL_CUT_TYPE_JUMP 2
 #define WL_CUT_TYPE_LARGE 3
+
+class daE_VA_HIO_c {
+public:
+    /* 807C25EC */ daE_VA_HIO_c();
+    /* 807CE2AC */ virtual ~daE_VA_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x04;
+    /* 0x08 */ f32 mModelSize;
+    /* 0x0C */ f32 mAttackRange;
+    /* 0x10 */ f32 mBiteCount;
+    /* 0x14 */ f32 mCircleAttackRadius;
+    /* 0x18 */ f32 mFadeAwayTime;
+    /* 0x1C */ f32 mDownTime;
+    /* 0x20 */ f32 mDownHP;
+    /* 0x24 */ f32 field_0x24;
+    /* 0x28 */ f32 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 mKRegLightR;
+    /* 0x34 */ f32 mKRegLightG;
+    /* 0x38 */ f32 mKRegLightB;
+    /* 0x3C */ f32 mKRegLightA;
+};
 
 enum daE_VA_JOINT {
     JNT_ROOT,
@@ -189,103 +214,8 @@ daE_VA_HIO_c::daE_VA_HIO_c() {
     mKRegLightA = 210.0f;
 }
 
-
-/* ############################################################################################## */
-/* 807CF478-807CF47C 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 807CF47C-807CF480 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF480-807CF484 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF484-807CF488 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF488-807CF48C 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF48C-807CF490 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF490-807CF494 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF494-807CF498 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF498-807CF49C 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF49C-807CF4A0 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF4A0-807CF4A4 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF4A4-807CF4A8 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF4A8-807CF4AC 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF4AC-807CF4B0 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 807CF4B0-807CF4B4 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
 /* 807CF4B4-807CF4B8 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 807CF4B4 0001+00 data_807CF4B4 @1009 */
 /* 807CF4B5 0003+00 data_807CF4B5 None */
-#pragma push
-#pragma force_active on
-static u8 struct_807CF4B4;
-#pragma pop
-
 #pragma push
 #pragma force_active on
 static u8 init_hio;
@@ -1867,7 +1797,7 @@ void daE_VA_c::executeClearWait() {
         /* fallthrough */
     case 0:
         setBck(ANM_INVI_WAIT_e, J3DFrameCtrl::EMode_LOOP, 20.0f, 1.0f);
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         mMode = 2;
         /* fallthrough */
     case 2:
@@ -1973,7 +1903,7 @@ void daE_VA_c::executeTransWait() {
     case 0:
         Z2GetAudioMgr()->changeSubBgmStatus(2);
         mAlphaType = 1;
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         speedF = 0.0f;
         mMode = 1;
         setBck(ANM_TRANS_WAIT_e, J3DFrameCtrl::EMode_LOOP, 10.0f, 1.0f);
@@ -2330,7 +2260,7 @@ void daE_VA_c::executeOpaciWait() {
             mKankyoColBlend = 1.0f;
             mKankyoColType = 1;
             field_0x1354 = 10;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             mFadeAwayTimer = l_HIO.mFadeAwayTime;
 
             speedF = 0.0f;
@@ -2415,7 +2345,7 @@ void daE_VA_c::executeOpaciWait() {
             dComIfGp_event_reset();
 
             mFadeAwayTimer = l_HIO.mFadeAwayTime;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             setBck(ANM_SUBS_WAIT_e, J3DFrameCtrl::EMode_LOOP, 3.0f, 1.0f);
             mMode = 15;
             mDemoModeTimer = 30;
@@ -2724,7 +2654,7 @@ void daE_VA_c::executeOpaciChase() {
             } else {
                 if (abs((s16)(field_0x1334 - field_0x1330)) <= abs(field_0x1336)) {
                     mMode = 12;
-                    attention_info.flags = 4;
+                    attention_info.flags = fopAc_AttnFlag_BATTLE_e;
                 }
             }
         }
@@ -2847,7 +2777,7 @@ void daE_VA_c::executeOpaciDown() {
         mMode = 2;
         speedF = 0.0f;
         field_0x1383 = 0;
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         mSound.startCreatureVoice(Z2SE_EN_VA_V_DMG_L, -1);
         dComIfGs_onOneZoneSwitch(6, fopAcM_GetRoomNo(this));
         /* fallthrough */
@@ -3804,7 +3734,7 @@ static int daE_VA_Delete(daE_VA_c* i_this) {
 /* 807CD048-807CD600 00AB48 05B8+00 1/1 0/0 0/0 .text            CreateHeap__8daE_VA_cFv */
 int daE_VA_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_VA", 0x33);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                   (J3DAnmTransform*)dComIfG_getObjectRes("E_VA", 15), 0, 1.0f, 0,
@@ -3818,7 +3748,7 @@ int daE_VA_c::CreateHeap() {
     }
 
     J3DModel* model = mpMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     for (u16 i = 1; i < model->getModelData()->getJointNum(); i++) {
         if (i == 11 || i == 12 || i == 13 || i == 14 || i == 27 || i == 33 || i == 34) {
@@ -3827,7 +3757,7 @@ int daE_VA_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("E_VA", 0x30);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpWeaponModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpWeaponModel == NULL) {
@@ -3847,7 +3777,7 @@ int daE_VA_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("E_VA", 0x37);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpEndEfMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                        (J3DAnmTransform*)dComIfG_getObjectRes("E_VA", 7), 0, 1.0f,
@@ -3857,7 +3787,7 @@ int daE_VA_c::CreateHeap() {
     }
 
     model = mpEndEfMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     for (u16 i = 1; i < model->getModelData()->getJointNum(); i++) {
         if (i == 11 || i == 12 || i == 13 || i == 14 || i == 27 || i == 33 || i == 34) {
@@ -3914,7 +3844,7 @@ int daE_VA_c::CreateHeap() {
             break;
         }
 
-        JUT_ASSERT(0, modelData != 0);
+        JUT_ASSERT(0, modelData != NULL);
         mpCardModels[i] = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     }
 
@@ -3928,7 +3858,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 807CD668-807CDAD8 00B168 0470+00 1/1 0/0 0/0 .text            create__8daE_VA_cFv */
 int daE_VA_c::create() {
-    fopAcM_SetupActor(this, daE_VA_c);
+    fopAcM_ct(this, daE_VA_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "E_VA");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -4053,178 +3983,6 @@ static int daE_VA_Create(daE_VA_c* i_this) {
     return i_this->create();
 }
 
-/* ############################################################################################## */
-/* 807CF6E4-807CF6E8 000274 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6E4[4];
-#pragma pop
-
-/* 807CF6E8-807CF6EC 000278 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6E8[4];
-#pragma pop
-
-/* 807CF6EC-807CF6F0 00027C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6EC[4];
-#pragma pop
-
-/* 807CF6F0-807CF6F4 000280 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6F0[4];
-#pragma pop
-
-/* 807CF6F4-807CF6F8 000284 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6F4[4];
-#pragma pop
-
-/* 807CF6F8-807CF6FC 000288 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6F8[4];
-#pragma pop
-
-/* 807CF6FC-807CF700 00028C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF6FC[4];
-#pragma pop
-
-/* 807CF700-807CF704 000290 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_807CF700[4];
-#pragma pop
-
-/* 807CF704-807CF708 000294 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_807CF704[4];
-#pragma pop
-
-/* 807CF708-807CF70C 000298 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_807CF708[4];
-#pragma pop
-
-/* 807CF70C-807CF710 00029C 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_807CF70C[4];
-#pragma pop
-
-/* 807CF710-807CF714 0002A0 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_807CF710[4];
-#pragma pop
-
-/* 807CF714-807CF718 0002A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_807CF714[4];
-#pragma pop
-
-/* 807CF718-807CF71C 0002A8 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF718[4];
-#pragma pop
-
-/* 807CF71C-807CF720 0002AC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_807CF71C[4];
-#pragma pop
-
-/* 807CF720-807CF724 0002B0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_807CF720[4];
-#pragma pop
-
-/* 807CF724-807CF728 0002B4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_807CF724[4];
-#pragma pop
-
-/* 807CF728-807CF72C 0002B8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_807CF728[4];
-#pragma pop
-
-/* 807CF72C-807CF730 0002BC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF72C[4];
-#pragma pop
-
-/* 807CF730-807CF734 0002C0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_807CF730[4];
-#pragma pop
-
-/* 807CF734-807CF738 0002C4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF734[4];
-#pragma pop
-
-/* 807CF738-807CF73C 0002C8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF738[4];
-#pragma pop
-
-/* 807CF73C-807CF740 0002CC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF73C[4];
-#pragma pop
-
-/* 807CF740-807CF744 0002D0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_807CF740[4];
-#pragma pop
-
-/* 807CF744-807CF748 0002D4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_807CF744[4];
-#pragma pop
-
 /* 807CF384-807CF3A4 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_VA_Method */
 static actor_method_class l_daE_VA_Method = {
     (process_method_func)daE_VA_Create,
@@ -4251,3 +4009,5 @@ extern actor_process_profile_definition g_profile_E_VT = {
     fopAc_ENEMY_e,           // mActorType
     fopAc_CULLBOX_CUSTOM_e,  // cullType
 };
+
+AUDIO_INSTANCES;

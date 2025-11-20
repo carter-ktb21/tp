@@ -3,11 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swhang.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
+#include "d/d_s_play.h"
 
 // NONMATCHING - dEvLib_callback_c issues
 
@@ -39,7 +42,8 @@ static u32 const l_heap_size[5] = {
 /* 80CFB938-80CFB9D8 000078 00A0+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* pJoint, int param_2) {
     if (param_2 == 0) {
-        int jntNo = pJoint->getJntNo();
+        J3DJoint* my_joint = pJoint;
+        int jntNo = my_joint->getJntNo();
         J3DModel* model = j3dSys.getModel();
         daObjSwHang_c* i_this = (daObjSwHang_c*)model->getUserArea();
         cMtx_copy(model->getAnmMtx(jntNo), mDoMtx_stack_c::get());
@@ -63,14 +67,13 @@ void daObjSwHang_c::initBaseMtx() {
 
 /* 80CFBA60-80CFBAC8 0001A0 0068+00 2/2 0/0 0/0 .text            setBaseMtx__13daObjSwHang_cFv */
 void daObjSwHang_c::setBaseMtx() {
+    f32 hang_length = mHangLength + KREG_F(10);
     mDoMtx_stack_c::transS(current.pos.x,
-                           current.pos.y - mHangLength,
+                           current.pos.y - hang_length,
                            current.pos.z);
     mDoMtx_stack_c::YrotM(shape_angle.y);
     MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
 }
-
-UNK_REL_DATA
 
 /* 80CFD2D8-80CFD2EC -00001 0014+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName[5] = {
@@ -110,7 +113,6 @@ static dCcD_SrcSph l_sph_src = {
 };
 
 /* 80CFD37C-80CFD3BC 0000C4 0040+00 0/1 0/0 0/0 .data            l_sph_src2 */
-#pragma force_active on
 static dCcD_SrcSph l_sph_src2 = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x4000, 0x11}, 0x18}}, // mObj
@@ -134,7 +136,7 @@ int daObjSwHang_c::Create() {
     }
     initBaseMtx();
     if (mpBgW != NULL) {
-        dComIfG_Bgsp().Regist(mpBgW, this);
+        bool unused_r25 = dComIfG_Bgsp().Regist(mpBgW, this);
         mpBgW->Move();
     }
     fopAcM_SetMtx(this, mpModel->getBaseTRMtx());
@@ -162,7 +164,7 @@ int daObjSwHang_c::Create() {
             mpModel->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
         }
     }
-    mpModel->setUserArea((u32)this);
+    mpModel->setUserArea((uintptr_t)this);
     return 1;
 }
 
@@ -171,7 +173,7 @@ int daObjSwHang_c::CreateHeap() {
    J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(
         l_arcName[mType],
         l_bmdIdx[mType]);
-    JUT_ASSERT(445, modelData != 0);
+    JUT_ASSERT(445, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -189,7 +191,7 @@ int daObjSwHang_c::CreateHeap() {
 
 /* 80CFBDD0-80CFBF60 000510 0190+00 1/1 0/0 0/0 .text            create1st__13daObjSwHang_cFv */
 int daObjSwHang_c::create1st() {
-    fopAcM_SetupActor(this, daObjSwHang_c);
+    fopAcM_ct(this, daObjSwHang_c);
     mType = getType_private();
     int rv = dComIfG_resLoad(&mPhase, l_arcName[mType]);
     if (rv == cPhs_COMPLEATE_e) {
@@ -499,7 +501,7 @@ int daObjSwHang_c::Draw() {
 /* 80CFCD98-80CFCE0C 0014D8 0074+00 1/0 0/0 0/0 .text            Delete__13daObjSwHang_cFv */
 int daObjSwHang_c::Delete() {
     if (mpBgW != NULL && mpBgW->ChkUsed()) {
-        dComIfG_Bgsp().Release(mpBgW);
+        bool unused_r29 = dComIfG_Bgsp().Release(mpBgW);
     }
     dComIfG_resDelete(&mPhase, l_arcName[mType]);
     return 1;
@@ -507,7 +509,7 @@ int daObjSwHang_c::Delete() {
 
 /* 80CFCE0C-80CFCF20 00154C 0114+00 1/0 0/0 0/0 .text daObjSwHang_create1st__FP13daObjSwHang_c */
 static int daObjSwHang_create1st(daObjSwHang_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjSwHang_c);
+    fopAcM_ct(i_this, daObjSwHang_c);
     return i_this->create1st();
 }
 
@@ -525,7 +527,12 @@ static int daObjSwHang_MoveBGExecute(daObjSwHang_c* i_this) {
 
 /* 80CFCF60-80CFCF8C 0016A0 002C+00 1/0 0/0 0/0 .text daObjSwHang_MoveBGDraw__FP13daObjSwHang_c */
 static int daObjSwHang_MoveBGDraw(daObjSwHang_c* i_this) {
-    return i_this->Draw();
+    return i_this->MoveBGDraw();
+}
+
+static void dummy() {
+    ((dEvLib_callback_c*)NULL)->eventStart();
+    delete (cCcD_GStts*)NULL;
 }
 
 /* 80CFD3EC-80CFD40C -00001 0020+00 1/0 0/0 0/0 .data            daObjSwHang_METHODS */

@@ -2,6 +2,8 @@
 // Object wflag
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wflag.h"
 #include "d/d_com_inf_game.h"
 #include "SSystem/SComponent/c_math.h"
@@ -153,7 +155,7 @@ static int daObj_Wflag_Delete(obj_wflag_class* i_this) {
 static int useHeapInit(fopAc_ac_c* i_actor) {
     obj_wflag_class* i_this = (obj_wflag_class*)i_actor;
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Obj_wflag", 10);
-    JUT_ASSERT(409, modelData != 0);
+    JUT_ASSERT(409, modelData != NULL);
     i_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpModel == NULL) {
         return 0;
@@ -181,7 +183,7 @@ static int useHeapInit(fopAc_ac_c* i_actor) {
     }
 
     modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("Obj_wflag", 9));
-    JUT_ASSERT(479, modelData != 0);
+    JUT_ASSERT(479, modelData != NULL);
     for (int i = 0; i < 1; i++) {
         for (int j = 0; j < 19; j++) {
             i_this->mTails[i].mModels[j] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -196,7 +198,7 @@ static int useHeapInit(fopAc_ac_c* i_actor) {
 /* 80D37634-80D37720 000B14 00EC+00 1/0 0/0 0/0 .text            daObj_Wflag_Create__FP10fopAc_ac_c
  */
 static int daObj_Wflag_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, obj_wflag_class);
+    fopAcM_ct(i_this, obj_wflag_class);
     int rv = dComIfG_resLoad(&((obj_wflag_class*)i_this)->mPhaseReq, "Obj_wflag");
     if (rv == cPhs_COMPLEATE_e) {
         OS_REPORT("OBJ_WFLAG PARAM %x\n", fopAcM_GetParam(i_this));

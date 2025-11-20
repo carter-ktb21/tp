@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRFileLoader.h"
 #include "string.h"
 #include "ctype.h"
@@ -110,7 +112,7 @@ JKRFileLoader* JKRFileLoader::findVolume(const char** volumeName) {
     }
 
     char volumeNameBuffer[0x101];
-    *volumeName = fetchVolumeName(volumeNameBuffer, ARRAY_SIZE(volumeNameBuffer), *volumeName);
+    *volumeName = fetchVolumeName(volumeNameBuffer, ARRAY_SIZEU(volumeNameBuffer), *volumeName);
 
     JSUList<JKRFileLoader>& volumeList = getVolumeList();
     JSUListIterator<JKRFileLoader> iterator;

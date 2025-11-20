@@ -3,22 +3,12 @@
 // Translation Unit: JUTDirectPrint
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JUtility/JUTDirectPrint.h"
 #include "stdio.h"
 #include <dolphin/os.h>
 #include "global.h"
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* 80451528-80451530 000A28 0004+04 1/1 4/4 0/0 .sbss            sDirectPrint__14JUTDirectPrint */
 JUTDirectPrint* JUTDirectPrint::sDirectPrint;
@@ -190,7 +180,7 @@ void JUTDirectPrint::printSub(u16 position_x, u16 position_y, char const* format
         return;
     }
 
-    int buffer_length = vsnprintf(buffer, ARRAY_SIZE(buffer), format, args);
+    int buffer_length = vsnprintf(buffer, ARRAY_SIZEU(buffer), format, args);
     u16 x = position_x;
     if (buffer_length > 0) {
         if (clear) {

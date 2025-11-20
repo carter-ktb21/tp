@@ -3,11 +3,14 @@
  * Sacred Grove Mist Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag01.h"
 #include "SSystem/SComponent/c_math.h"
 #include "Z2AudioLib/Z2EnvSeMgr.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80855058-80855320 000078 02C8+00 1/1 0/0 0/0 .text            get_check_pos__FP13kytag01_class */
 static cXyz get_check_pos(kytag01_class* i_this) {
@@ -116,12 +119,12 @@ static int daKytag01_Execute(kytag01_class* i_this) {
     camera_class* camera = dComIfGp_getCamera(0);
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
 
-    if ((a_this->subtype & 0xFF) == 2) {
+    if ((a_this->argument & 0xFF) == 2) {
         if (i_this->mStartPoint == dComIfGs_getStartPoint()) {
             i_this->mStartPoint = 0xFF;
             dKy_change_colpat(i_this->field_0x59e);
         }
-    } else if ((a_this->subtype & 0xFF) == 0) {
+    } else if ((a_this->argument & 0xFF) == 0) {
         if (a_this->home.roomNo == dComIfGp_roomControl_getStayNo()) {
             if (i_this->mSwNo1 != 0xFF) {
                 if (dComIfGs_isSwitch(i_this->mSwNo1, a_this->home.roomNo)) {
@@ -173,9 +176,9 @@ static int daKytag01_Delete(kytag01_class* i_this) {
 /* 808557EC-80855984 00080C 0198+00 1/0 0/0 0/0 .text            daKytag01_Create__FP10fopAc_ac_c */
 static int daKytag01_Create(fopAc_ac_c* i_this) {
     kytag01_class* a_this = (kytag01_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag01_class);
+    fopAcM_ct(i_this, kytag01_class);
 
-    if ((a_this->subtype & 0xFF) == 2) {
+    if ((a_this->argument & 0xFF) == 2) {
         a_this->mNamiInnerRange = i_this->scale.x * 100.0f;
         a_this->field_0x59d = fopAcM_GetParam(i_this);
         a_this->mStartPoint = fopAcM_GetParam(i_this) >> 8;
@@ -194,7 +197,7 @@ static int daKytag01_Create(fopAc_ac_c* i_this) {
         a_this->mSwNo2 = (i_this->current.angle.x >> 8) & 0xFF;
         a_this->field_0x594 = 0.0f;
 
-        if ((a_this->subtype & 0xFF) == 0) {
+        if ((a_this->argument & 0xFF) == 0) {
             if (a_this->mNamiSize == 255.0f) {
                 a_this->mNamiSize = 10.0f;
             }

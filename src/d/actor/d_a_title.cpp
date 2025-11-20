@@ -1,3 +1,5 @@
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_title.h"
 #include "d/d_demo.h"
 #include "d/d_pane_class_alpha.h"
@@ -14,6 +16,22 @@
 #include "JSystem/J2DGraph/J2DTextBox.h"
 #include "m_Do/m_Do_graphic.h"
 
+class daTit_HIO_c {
+public:
+    /* 80D66B0C */ daTit_HIO_c();
+
+    /* 80D67A08 */ virtual ~daTit_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mPSScaleX;
+    /* 0x0C */ f32 mPSScaleY;
+    /* 0x10 */ f32 mPSPosX;
+    /* 0x14 */ f32 mPSPosY;
+    /* 0x18 */ u8 mAppear;
+    /* 0x19 */ u8 mArrow;
+    /* 0x1A */ u8 field_0x1a;
+};
+
 /* 80D67D8C-80D67DA8 000014 001C+00 4/4 0/0 0/0 .bss             g_daTitHIO */
 static daTit_HIO_c g_daTitHIO;
 
@@ -23,9 +41,11 @@ static u8 const lit_3772[12] = {
 };
 
 /* 80D67BE0-80D67BE8 00000C 0006+02 3/3 0/0 0/0 .rodata          l_arcName */
-static char const l_arcName[6] = "Title";
-
-UNK_REL_DATA;
+#if VERSION == VERSION_GCN_PAL
+static char const l_arcName[] = "TitlePal";
+#else
+static char const l_arcName[] = "Title";
+#endif
 
 static procFunc daTitleProc[6] = {
     &daTitle_c::loadWait_proc, &daTitle_c::logoDispWait, &daTitle_c::logoDispAnm,
@@ -36,7 +56,25 @@ static procFunc daTitleProc[6] = {
 daTit_HIO_c::daTit_HIO_c() {
     mPSScaleX = 1.0f;
     mPSScaleY = 1.0f;
+
+    #if VERSION == VERSION_GCN_PAL
+
+    switch (OSGetLanguage()) {
+    case OS_LANGUAGE_ENGLISH:
+    case OS_LANGUAGE_GERMAN:
+    case OS_LANGUAGE_SPANISH:
+    case OS_LANGUAGE_ITALIAN:
+    case OS_LANGUAGE_DUTCH:
+        mPSPosX = 303.0f;
+        break;
+    case OS_LANGUAGE_FRENCH:
+        mPSPosX = FB_WIDTH / 2;
+        break;
+    }
+    #else
     mPSPosX = 303.0f;
+    #endif
+
     mPSPosY = 347.0f;
     mAppear = 15;
     mArrow = 60;
@@ -69,7 +107,7 @@ int daTitle_c::CreateHeap() {
 
 /* 80D66CDC-80D66E7C 0002BC 01A0+00 1/1 0/0 0/0 .text            create__9daTitle_cFv */
 int daTitle_c::create() {
-    fopAcM_SetupActor(this, daTitle_c);
+    fopAcM_ct(this, daTitle_c);
     
     int phase_state = dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase_state != cPhs_COMPLEATE_e) {
@@ -241,7 +279,7 @@ void daTitle_c::nextScene_init() {
 void daTitle_c::nextScene_proc() {
     if (!fopOvlpM_IsPeek() && !mDoRst::isReset()) {
         scene_class* playScene = fopScnM_SearchByID(dStage_roomControl_c::getProcID());
-        JUT_ASSERT(706, playScene != 0);
+        JUT_ASSERT(706, playScene != NULL);
         fopScnM_ChangeReq(playScene, 13, 0, 5);
 #if VERSION != VERSION_SHIELD_DEBUG
         mDoGph_gInf_c::setFadeColor(*(JUtility::TColor*)&g_blackColor);

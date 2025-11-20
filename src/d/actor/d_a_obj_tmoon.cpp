@@ -3,6 +3,8 @@
  * Moon in Hidden Skill Scene
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_tmoon.h"
 #include "f_op/f_op_draw_tag.h"
 
@@ -45,7 +47,7 @@ int daObjTMoon_c::CreateHeap() {
 
 /* 80D12D0C-80D12DC0 0001EC 00B4+00 1/1 0/0 0/0 .text            create__12daObjTMoon_cFv */
 int daObjTMoon_c::create() {
-    fopAcM_SetupActor(this, daObjTMoon_c);
+    fopAcM_ct(this, daObjTMoon_c);
     int phase = dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, (heapCallbackFunc)CheckCreateHeap, 0x880)) {
@@ -69,7 +71,7 @@ int daObjTMoon_c::execute() {
     } else if ((field_0x574 != 0x3ff) &&
                (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[field_0x574])))
     {
-        fopDwTg_ToDrawQ(&draw_tag, fpcLf_GetPriority(this));
+        fopDwTg_ToDrawQ(&draw_tag, fpcM_DrawPriority(this));
         return 1;
     }
     return 1;

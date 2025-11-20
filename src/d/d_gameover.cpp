@@ -3,6 +3,8 @@
 // Translation Unit: d/d_gameover
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_gameover.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "d/d_com_inf_game.h"
@@ -40,11 +42,11 @@ void dDlst_Gameover_CAPTURE_c::draw() {
     GXTexObj tex_obj;
     Mtx44 m;
 
-    GXSetTexCopySrc(0, 0, 608, 448);
-    GXSetTexCopyDst(304, 224, GX_TF_RGB565, 1);
+    GXSetTexCopySrc(0, 0, FB_WIDTH, FB_HEIGHT);
+    GXSetTexCopyDst(FB_WIDTH / 2, FB_HEIGHT / 2, GX_TF_RGB565, 1);
     GXCopyTex(mDoGph_gInf_c::mZbufferTex, 0);
     GXPixModeSync();
-    GXInitTexObj(&tex_obj, mDoGph_gInf_c::mFrameBufferTex, 304, 224,
+    GXInitTexObj(&tex_obj, mDoGph_gInf_c::mFrameBufferTex, FB_WIDTH / 2, FB_HEIGHT / 2,
                  (GXTexFmt)mDoGph_gInf_c::mFrameBufferTimg->format, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&tex_obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE,
                     GX_ANISO_1);
@@ -93,14 +95,9 @@ void dDlst_Gameover_CAPTURE_c::draw() {
     GXEnd();
 }
 
-/* 803BBB50-803BBB5C 018C70 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
 /* 803BBBC8-803BBC34 018CE8 006C+00 2/3 0/0 0/0 .data            init_process */
 typedef void (dGameover_c::*initFunc)();
-initFunc init_process[] = {
+static initFunc init_process[] = {
     &dGameover_c::playerAnmWait_init, &dGameover_c::dispFadeOut_init, &dGameover_c::dispWait_init,
     &dGameover_c::demoFadeIn_init,    &dGameover_c::demoFadeOut_init, &dGameover_c::saveOpen_init,
     &dGameover_c::saveMove_init,      &dGameover_c::saveClose_init,   &dGameover_c::deleteWait_init,
@@ -108,7 +105,7 @@ initFunc init_process[] = {
 
 /* 803BBCA0-803BBD0C 018DC0 006C+00 1/2 0/0 0/0 .data            move_process */
 typedef void (dGameover_c::*moveFunc)();
-moveFunc move_process[] = {
+static moveFunc move_process[] = {
     &dGameover_c::playerAnmWait_proc, &dGameover_c::dispFadeOut_proc, &dGameover_c::dispWait_proc,
     &dGameover_c::demoFadeIn_proc,    &dGameover_c::demoFadeOut_proc, &dGameover_c::saveOpen_proc,
     &dGameover_c::saveMove_proc,      &dGameover_c::saveClose_proc,   &dGameover_c::deleteWait_proc,
@@ -149,7 +146,7 @@ int dGameover_c::_create() {
         }
 
         dRes_info_c* resInfo = dComIfG_getObjectResInfo("Gover");
-        JUT_ASSERT(0, resInfo != 0);
+        JUT_ASSERT(0, resInfo != NULL);
 
         mpHeap = (JKRHeap*)dComIfGp_getExpHeap2D();
         dComIfGp_setHeapLockFlag(6);
@@ -158,7 +155,7 @@ int dGameover_c::_create() {
 
         dgo_screen_c = new dDlst_GameOverScrnDraw_c(resInfo->getArchive());
         dMs_c = new dMenu_save_c();
-        JUT_ASSERT(0, dMs_c != 0);
+        JUT_ASSERT(0, dMs_c != NULL);
 
         if (dMeter2Info_getGameOverType() == 1) {
             if (!strcmp(dComIfGp_getLastPlayStageName(), "D_MN10A")) {
@@ -177,7 +174,7 @@ int dGameover_c::_create() {
 
         dMs_c->_create();
         dgo_capture_c = new dDlst_Gameover_CAPTURE_c();
-        JUT_ASSERT(0, dgo_capture_c != 0);
+        JUT_ASSERT(0, dgo_capture_c != NULL);
 
         OS_REPORT("game over create size ===> %d\n", temp - mpHeap->getTotalFreeSize());
 
@@ -472,7 +469,7 @@ void dDlst_GameOverScrnDraw_c::draw() {
         img_white.a = 255;
 
         mpBackImg->setBlackWhite(img_black, img_white);
-        mpBackImg->draw(0.0f, 0.0f, 608.0f, 448.0f, false, false, false);
+        mpBackImg->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, false, false, false);
     } else {
         JUtility::TColor img_black;
         JUtility::TColor img_white;
@@ -487,12 +484,12 @@ void dDlst_GameOverScrnDraw_c::draw() {
         img_white.b = l_HIO.mWhite.b;
         img_white.a = l_HIO.mWhite.a;
 
-        mpBackImg->draw(0.0f, 0.0f, 608.0f, 448.0f, false, false, false);
+        mpBackImg->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, false, false, false);
 
         static f32 offset[8] = {-138.0f, -96.0f, -56.0f, -18.0f, 42.0f, 75.0f, 110.0f, 143.0f};
 
         for (int i = 0; i < 8; i++) {
-            mpLight->draw(&field_0x10, offset[i] + 304.0f, 224.0f, l_HIO.mScale, l_HIO.mScale,
+            mpLight->draw(&field_0x10, offset[i] + (FB_WIDTH / 2.0f), (FB_HEIGHT / 2), l_HIO.mScale, l_HIO.mScale,
                           l_HIO.mAlpha, l_HIO.mAnimSpeed, img_black, img_white);
         }
     }

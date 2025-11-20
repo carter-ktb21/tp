@@ -3,6 +3,8 @@
  * Epona fence jump trigger / object
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_hjump.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_bg_w.h"
@@ -25,7 +27,7 @@ int daTagHjump_c::CreateHeap() {
 
 /* 805A3B24-805A3D80 0000E4 025C+00 1/1 0/0 0/0 .text            create__12daTagHjump_cFv */
 int daTagHjump_c::create() {
-    fopAcM_SetupActor(this, daTagHjump_c);
+    fopAcM_ct(this, daTagHjump_c);
 
     mType = (fopAcM_GetParam(this) >> 4) & 0xF;
     field_0x5ad = fopAcM_GetParam(this) & 0xF;

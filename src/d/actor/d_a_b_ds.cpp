@@ -3,19 +3,21 @@
  * Boss - Stallord
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_ds.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_s_play.h"
-#include "dol2asm.h"
 #include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg.h"
 #include "f_op/f_op_msg_mng.h"
 #include "d/actor/d_a_spinner.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
 #include "c/c_damagereaction.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "Z2AudioLib/Z2Instances.h"
 
 enum daB_DS_Joint {
     DS_JNT_BACKBONE1,
@@ -206,99 +208,6 @@ daB_DS_HIO_c::daB_DS_HIO_c() {
     mP2Health = 1080;
     mP2HealthDebugOn = false;
 }
-
-/* ############################################################################################## */
-/* 805DDA70-805DDA74 000008 0001+03 8/8 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 805DDA74-805DDA78 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA78-805DDA7C 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA7C-805DDA80 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA80-805DDA84 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA84-805DDA88 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA88-805DDA8C 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA8C-805DDA90 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA90-805DDA94 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA94-805DDA98 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA98-805DDA9C 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDA9C-805DDAA0 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDAA0-805DDAA4 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDAA4-805DDAA8 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDAA8-805DDAAC 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 805DDAAC-805DDAB0 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 805DDAAC 0001+00 data_805DDAAC @1009 */
-/* 805DDAAD 0003+00 data_805DDAAD None */
-static u8 struct_805DDAAC;
 
 static bool hioInit;
 
@@ -533,7 +442,7 @@ void daB_DS_c::mSmokeSet() {
     }
 
     if (mAcch.ChkGroundHit()) {
-        if (field_0x84d == 0 && mAcch.GetGroundH() != -1000000000.0f) {
+        if (field_0x84d == 0 && mAcch.GetGroundH() != -G_CM3D_F_INF) {
             cXyz particle_scale(1.0f, 1.0f, 1.0f);
             cXyz particle_pos(current.pos);
             csXyz particle_angle(shape_angle);
@@ -600,7 +509,7 @@ void daB_DS_c::handSPosSet(int i_hand) {
     gnd_chk.SetPos(&chk_pos);
 
     chk_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (chk_pos.y == -1000000000.0f) {
+    if (chk_pos.y == -G_CM3D_F_INF) {
         chk_pos.y = mFingerPos[i_hand].y;
     }
     particle_pos = chk_pos - mHandPos[i_hand];
@@ -617,7 +526,7 @@ void daB_DS_c::handSPosSet(int i_hand) {
     gnd_chk.SetPos(&particle_pos);
 
     particle_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (particle_pos.y == -1000000000.0f) {
+    if (particle_pos.y == -G_CM3D_F_INF) {
         particle_pos.y = mHandPos[i_hand].y;
     }
     chk_pos = particle_pos - mHandPos[i_hand];
@@ -692,7 +601,7 @@ void daB_DS_c::mZsMoveChk() {
         zs_pos.y += 2000.0f;
         gnd_chk.SetPos(&zs_pos);
 
-        if (zs_pos.y != -1000000000.0f) {
+        if (zs_pos.y != -G_CM3D_F_INF) {
             zs_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
         } else {
             zs_pos.y = current.pos.y += 800.0f;
@@ -757,7 +666,7 @@ void daB_DS_c::mZsMoveChk_Guard() {
         zs_pos.y += 2000.0f;
         gnd_chk.SetPos(&zs_pos);
 
-        if (zs_pos.y != -1000000000.0f) {
+        if (zs_pos.y != -G_CM3D_F_INF) {
             zs_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
         } else {
             zs_pos.y = current.pos.y += 800.0f;
@@ -1394,7 +1303,7 @@ void daB_DS_c::executeOpeningDemo() {
             mMode++;
         }
         break;
-    case 2:
+    case 2: {
         f32 calc_center = cLib_addCalcPos(&mCameraCenter, mOpCenterDt[1], 0.3f, 2.0f, 1.0f);
         f32 calc_eye = cLib_addCalcPos(&mCameraEye, mOpEyeDt[1], 0.3f, 2.0f, 1.0f);
         if (calc_center > 2.0f || calc_eye > 2.0f || cLib_calcTimer(&mModeTimer) != 0) {
@@ -1414,6 +1323,7 @@ void daB_DS_c::executeOpeningDemo() {
         fopAcM_OffStatus(this, 0x4000);
         mMode++;
         // fallthrough
+    }
     case 3:
         mPedestalFallTimer = l_HIO.mPedestalFallTime;
 
@@ -1610,7 +1520,7 @@ void daB_DS_c::executeOpeningDemo() {
         dComIfGp_getVibration().StartShock(4, 0x1f, cXyz(0.0f, 1.0f, 0.0f));
         mMode++;
         // fallthrough
-    case 26:
+    case 26: {
         if (!field_0x85e && mpZantMorf->isStop()) {
             mpZantMorf->setAnm(static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("B_DS", 67)),
                                J3DFrameCtrl::EMode_LOOP, 1.0f, 1.0f, 0.0f, -1.0f);
@@ -1653,6 +1563,7 @@ void daB_DS_c::executeOpeningDemo() {
         mMode = 30;
         field_0x85e = false;
         // fallthrough
+    }
     case 30:
         mCameraCenter.set(mOpCenterDt[12]);
         mCameraEye.set(mOpEyeDt[12]);
@@ -1799,7 +1710,7 @@ void daB_DS_c::executeOpeningDemo() {
             dComIfGp_event_reset();
 
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             fopAcM_SetGroup(this, 2);
             fopAcM_OnStatus(this, 0);
 
@@ -1998,7 +1909,7 @@ void daB_DS_c::damageHitCamera() {
     offset.y = 300.0f;
     MtxPosition(&offset, &pos);
     pos.x += current.pos.x;
-    if (mAcch.GetGroundH() != -1000000000.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
         pos.y += mAcch.GetGroundH();
     }
     pos.z += current.pos.z;
@@ -2008,7 +1919,7 @@ void daB_DS_c::damageHitCamera() {
     offset.z = 700.0f;
     MtxPosition(&offset, &pos);
     pos.x += current.pos.x;
-    if (mAcch.GetGroundH() != -1000000000.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
         pos.y += mAcch.GetGroundH();
     }
     pos.z += current.pos.z;
@@ -2183,7 +2094,7 @@ void daB_DS_c::executeDamage() {
                 sp1BC.z = 1000.0f;
                 MtxPosition(&sp1BC, &sp1B0);
                 sp1B0 += current.pos;
-                if (mAcch.GetGroundH() != -1000000000.0f) {
+                if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
                     sp1B0.y = mAcch.GetGroundH();
                 }
 
@@ -2416,7 +2327,7 @@ void daB_DS_c::executeDamage() {
         mMode = 100;
         mSound.startCreatureSound(Z2SE_EN_DS_MDEMO_FALL, 0, -1);
         // fallthrough
-    case 100:
+    case 100: {
         gravity = -0.2f;
         if (current.pos.y > -1600.0f) {
             if (current.pos.y <= -300.0f) {
@@ -2437,6 +2348,7 @@ void daB_DS_c::executeDamage() {
                       &p2_angle, NULL, 0xff);
         mMode = 101;
         // fallthrough
+    }
     case 101:
         cLib_addCalc2(&mCameraCenter.y, down_center_dt[4].y, 0.7f, 10.0f);
         cLib_addCalc2(&mCameraEye.y, down_eye_dt[4].y, 0.7f, 10.0f);
@@ -2955,7 +2867,7 @@ void daB_DS_c::executeBattle2OpeningDemo() {
             dComIfGs_setRestartRoom(vec, -0x664A, 50);
 
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             fopAcM_SetGroup(this, 2);
 
             Z2GetAudioMgr()->bgmStart(Z2BGM_HARAGIGANT_BTL02, 0, 0);
@@ -3421,7 +3333,7 @@ void daB_DS_c::executeBattle2Damage() {
     chk_pos.y += 300.0f;
     gnd_chk.SetPos(&chk_pos);
     chk_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (chk_pos.y == -1000000000.0f) {
+    if (chk_pos.y == -G_CM3D_F_INF) {
         chk_pos.y = current.pos.y - 200.0f;
     }
 
@@ -4240,6 +4152,7 @@ void daB_DS_c::executeBattle2Dead() {
             camera->mCamera.SetTrimSize(0);
             dComIfGp_event_reset();
             dComIfGs_onStageBossEnemy(0x13);
+            /* dSv_event_flag_c::F_0265 - Arbiter's Grounds - Arbiter's Grounds clear */
             dComIfGs_onEventBit(0x2010);
             fopAcM_delete(this);
         }
@@ -4371,7 +4284,7 @@ void daB_DS_c::executeBullet() {
             if (emitter != NULL) {
                 emitter->setGlobalTranslation(JGeometry::TVec3<f32>(current.pos));
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&field_0x724);
+                emitter->setUserWork((uintptr_t)&field_0x724);
             }
         }
     }
@@ -5344,7 +5257,7 @@ int daB_DS_c::execute() {
             chk_pos.y += 3000.0f;
             gnd_chk.SetPos(&chk_pos);
             chk_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-            if (chk_pos.y == -1000000000.0f) {
+            if (chk_pos.y == -G_CM3D_F_INF) {
                 chk_pos.y = jnt_pos.y;
             }
 
@@ -5367,7 +5280,7 @@ int daB_DS_c::execute() {
             chk_pos.y += 3000.0f;
             gnd_chk.SetPos(&chk_pos);
             chk_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-            if (chk_pos.y == -1000000000.0f) {
+            if (chk_pos.y == -G_CM3D_F_INF) {
                 chk_pos.y = jnt_pos.y;
             }
 
@@ -5467,7 +5380,7 @@ int daB_DS_c::CreateHeap() {
             current.pos.set(0.0f, 1900.0f, 0.0f);
 
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetGroup(this, 2);
             fopAcM_OnStatus(this, 0);
@@ -5482,7 +5395,7 @@ int daB_DS_c::CreateHeap() {
         anm_res = ANM_HEAD_FWAIT;
     }
 
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpMorf = new mDoExt_McaMorfSO(
         modelData, NULL, NULL, static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("B_DS", anm_res)),
@@ -5492,7 +5405,7 @@ int daB_DS_c::CreateHeap() {
     }
 
     model = mpMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         if (i != 0) {
             model->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBack);
@@ -5500,7 +5413,7 @@ int daB_DS_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_DS", 74);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpSwordMorf = new mDoExt_McaMorfSO(
         modelData, NULL, NULL, static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("B_DS", 63)), 0,
@@ -5522,7 +5435,7 @@ int daB_DS_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_DS", 75);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpZantMorf = new mDoExt_McaMorfSO(
         modelData, NULL, NULL, static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("B_DS", 66)), 2,
@@ -5532,7 +5445,7 @@ int daB_DS_c::CreateHeap() {
     }
 
     modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("B_DS", 73));
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpOpPatternModel = mDoExt_J3DModel__create(modelData, 0, 0x11000284);
     if (mpOpPatternModel == NULL) {
@@ -5564,7 +5477,7 @@ int daB_DS_c::CreateHeap() {
     }
 
     modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("B_DS", 72));
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpPatternModel = mDoExt_J3DModel__create(modelData, 0, 0x11000284);
     if (mpPatternModel == NULL) {
@@ -5605,7 +5518,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 805DB974-805DC1E8 010834 0874+00 1/1 0/0 0/0 .text            create__8daB_DS_cFv */
 cPhs__Step daB_DS_c::create() {
-    fopAcM_SetupActor(this, daB_DS_c);
+    fopAcM_ct(this, daB_DS_c);
 
     cPhs__Step phase_state = (cPhs__Step)dComIfG_resLoad(&mPhase, "B_DS");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -5653,7 +5566,7 @@ cPhs__Step daB_DS_c::create() {
 
         if (arg0 == TYPE_BULLET_A || arg0 == TYPE_BULLET_B || arg0 == TYPE_BULLET_C) {
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags &= ~4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetGroup(this, 0);
             fopAcM_OffStatus(this, 0);
@@ -5664,7 +5577,7 @@ cPhs__Step daB_DS_c::create() {
             mBreathAtSph.SetStts(&mCcStts);
 
             fopAcM_OffStatus(this, 0);
-            attention_info.flags &= ~4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
             if (arg0 == TYPE_BULLET_B || arg0 == TYPE_BULLET_C) {
                 mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1,
@@ -5696,7 +5609,7 @@ cPhs__Step daB_DS_c::create() {
             shape_angle.y = current.angle.y;
 
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetMtx(this, mpMorf->mpModel->getBaseTRMtx());
             fopAcM_SetMin(this, -40000.0f, -40000.0f, -40000.0f);
@@ -5715,7 +5628,7 @@ cPhs__Step daB_DS_c::create() {
                 gnd_chk.SetPos(&chk_pos);
 
                 chk_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-                if (chk_pos.y != -1000000000.0f) {
+                if (chk_pos.y != -G_CM3D_F_INF) {
                     current.pos.y = chk_pos.y;
                 }
             }
@@ -5798,7 +5711,7 @@ cPhs__Step daB_DS_c::create() {
                     }
 
                     attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-                    attention_info.flags &= ~4;
+                    attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
                     fopAcM_SetGroup(this, 0);
                     fopAcM_OffStatus(this, 0);
@@ -5831,7 +5744,7 @@ cPhs__Step daB_DS_c::create() {
                 gravity = -1.0f;
 
                 attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-                attention_info.flags &= ~4;
+                attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
                 fopAcM_SetGroup(this, 0);
                 fopAcM_OffStatus(this, 0);
@@ -5860,180 +5773,6 @@ static cPhs__Step daB_DS_Create(daB_DS_c* i_this) {
     return i_this->create();
 }
 
-#pragma nosyminline on
-
-/* ############################################################################################## */
-/* 805DE2AC-805DE2B0 000844 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2AC[4];
-#pragma pop
-
-/* 805DE2B0-805DE2B4 000848 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2B0[4];
-#pragma pop
-
-/* 805DE2B4-805DE2B8 00084C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2B4[4];
-#pragma pop
-
-/* 805DE2B8-805DE2BC 000850 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2B8[4];
-#pragma pop
-
-/* 805DE2BC-805DE2C0 000854 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2BC[4];
-#pragma pop
-
-/* 805DE2C0-805DE2C4 000858 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2C0[4];
-#pragma pop
-
-/* 805DE2C4-805DE2C8 00085C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2C4[4];
-#pragma pop
-
-/* 805DE2C8-805DE2CC 000860 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2C8[4];
-#pragma pop
-
-/* 805DE2CC-805DE2D0 000864 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2CC[4];
-#pragma pop
-
-/* 805DE2D0-805DE2D4 000868 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2D0[4];
-#pragma pop
-
-/* 805DE2D4-805DE2D8 00086C 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2D4[4];
-#pragma pop
-
-/* 805DE2D8-805DE2DC 000870 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2D8[4];
-#pragma pop
-
-/* 805DE2DC-805DE2E0 000874 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2DC[4];
-#pragma pop
-
-/* 805DE2E0-805DE2E4 000878 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2E0[4];
-#pragma pop
-
-/* 805DE2E4-805DE2E8 00087C 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2E4[4];
-#pragma pop
-
-/* 805DE2E8-805DE2EC 000880 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2E8[4];
-#pragma pop
-
-/* 805DE2EC-805DE2F0 000884 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2EC[4];
-#pragma pop
-
-/* 805DE2F0-805DE2F4 000888 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2F0[4];
-#pragma pop
-
-/* 805DE2F4-805DE2F8 00088C 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2F4[4];
-#pragma pop
-
-/* 805DE2F8-805DE2FC 000890 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2F8[4];
-#pragma pop
-
-/* 805DE2FC-805DE300 000894 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE2FC[4];
-#pragma pop
-
-/* 805DE300-805DE304 000898 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE300[4];
-#pragma pop
-
-/* 805DE304-805DE308 00089C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE304[4];
-#pragma pop
-
-/* 805DE308-805DE30C 0008A0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_805DE308[4];
-#pragma pop
-
-/* 805DE30C-805DE310 0008A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_805DE30C[4];
-#pragma pop
-
 /* 805DD994-805DD9B4 -00001 0020+00 1/0 0/0 0/0 .data            l_daB_DS_Method */
 static actor_method_class l_daB_DS_Method = {
     (process_method_func)daB_DS_Create,  (process_method_func)daB_DS_Delete,
@@ -6058,3 +5797,5 @@ extern actor_process_profile_definition g_profile_B_DS = {
     fopAc_ENEMY_e,
     fopAc_CULLBOX_CUSTOM_e,
 };
+
+AUDIO_INSTANCES;

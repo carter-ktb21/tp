@@ -2,6 +2,8 @@
 // Door Knob
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_knob00.h"
 #include "f_op/f_op_actor_mng.h"
 #include "d/d_com_inf_game.h"
@@ -57,24 +59,6 @@ char* daKnob20_c::getDummyBmd() {
     return "door-knobDummy.bmd";
 }
 
-/* 80460874-80460880 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80460880-80460894 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80460894-80460898 -00001 0004+00 1/1 0/0 0/0 .data            l_bmd_base_name */
 static char* l_bmd_base_name = "door-knob_";
 
@@ -100,7 +84,7 @@ static int CheckCreateHeap(fopAc_ac_c* i_this) {
 /* 8045E960-8045EBA0 000180 0240+00 1/1 0/0 0/0 .text            CreateHeap__10daKnob20_cFv */
 int daKnob20_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(getAlwaysArcName(), getDummyBmd());
-    JUT_ASSERT(201, modelData != 0);
+    JUT_ASSERT(201, modelData != NULL);
     mModel1 = mDoExt_J3DModel__create(modelData, 0, 0x11020203);
     if (mModel1 == NULL) {
         return 0;
@@ -111,14 +95,14 @@ int daKnob20_c::CreateHeap() {
     mModel1->setBaseTRMtx(mDoMtx_stack_c::get());
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), "FDoorA.bck");
-    JUT_ASSERT(222, anm != 0);
+    JUT_ASSERT(222, anm != NULL);
     if (field_0x57c.init(anm, 1, 0, 1.0f, 0, -1, false) == 0) {
         return 0;
     }
     mJoint = modelData->getJointName()->getIndex("FDoor");
     JUT_ASSERT(227, mJoint >= 0);
     modelData = getDoorModelData();
-    JUT_ASSERT(235, modelData != 0);
+    JUT_ASSERT(235, modelData != NULL);
     mModel2 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mModel2 == 0) {
         return 0;
@@ -131,7 +115,7 @@ int daKnob20_c::CreateHeap() {
     field_0x57c.entry(mModel1->getModelData());
     mModel1->calc();
     cBgD_t* bgd = (cBgD_t*)dComIfG_getObjectRes(getAlwaysArcName(), getDzb());
-    JUT_ASSERT(261, bgd != 0);
+    JUT_ASSERT(261, bgd != NULL);
     if (field_0x5a0->Set(bgd, 1, (Mtx*)mModel1->getAnmMtx(mJoint)) == 1) {
         return 0;
     } else {
@@ -157,7 +141,7 @@ int daKnob20_c::CreateInit() {
     setAction(ACTION_INIT);
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     fopAcM_SetMtx(this, mModel1->getBaseTRMtx());
     fopAcM_setCullSizeFar(this, 2.0f);
@@ -171,7 +155,7 @@ int daKnob20_c::CreateInit() {
 
 /* 8045ED1C-8045EE14 00053C 00F8+00 1/1 0/0 0/0 .text            create__10daKnob20_cFv */
 int daKnob20_c::create() {
-    fopAcM_SetupActor(this, daKnob20_c);
+    fopAcM_ct(this, daKnob20_c);
     int phase = dComIfG_resLoad(&mPhase2, getAlwaysArcName());
     if (phase != cPhs_COMPLEATE_e) {
         return phase;
@@ -519,7 +503,7 @@ static char* bck_table[4] = {
 int daKnob20_c::openInit(int param_1) {
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), bck_table[param_1]);
-    JUT_ASSERT(937, anm != 0);
+    JUT_ASSERT(937, anm != NULL);
     field_0x57c.init(anm, 1, 0, 1.0f, 0, -1, true);
     onFlag(1);
     if (param_1 >= 2) {
@@ -707,7 +691,7 @@ int daKnob20_c::execute() {
 
     setActionFromFlow();
     field_0x60f = frontCheck();
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         startDemoProc();
         demoProc();
         dMeter2Info_onGameStatus(2);

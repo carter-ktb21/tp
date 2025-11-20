@@ -3,11 +3,14 @@
  * Peahat Enemy
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_ph.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 
 #define PH_BMD 20
 
@@ -164,7 +167,7 @@ void daE_PH_c::setCcSph() {
 
 int daE_PH_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_PH", PH_BMD);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpMorf = new mDoExt_McaMorfSO(
         modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_PH", ANM_WAIT),
@@ -203,7 +206,7 @@ void daE_PH_c::SetAnm(int i_anmID, int i_attr, f32 i_morf, f32 i_speed) {
 
 /* 8073DBD4-8073DDF8 000874 0224+00 1/1 0/0 0/0 .text            SearchNearP__8daE_PH_cFv */
 void daE_PH_c::SearchNearP() {
-    f32 nearest_dist = 1000000000.0f;
+    f32 nearest_dist = G_CM3D_F_INF;
 
     for (int i = 0; i < mpPath->m_num; i++) {
         f32 pnt_dist = current.pos.absXZ(dPath_GetPnt(mpPath, i)->m_position);
@@ -314,7 +317,7 @@ void daE_PH_c::GoTarget() {
     cLib_chaseAngleS(&field_0x612, field_0x610 * mAnmSpeed, 0x10);
     mpMorf->setPlaySpeed(mAnmSpeed);
 
-    if (mAcch.GetGroundH() != -1000000000.0f && current.pos.y < mAcch.GetGroundH() + 100.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF && current.pos.y < mAcch.GetGroundH() + 100.0f) {
         current.pos.y = mAcch.GetGroundH() + 100.0f;
     }
 }
@@ -509,7 +512,7 @@ void daE_PH_c::S_SetPlaySpeed() {
 void daE_PH_c::S_GoTarget() {
     cXyz unused(mCurrentPntPos.x, mCurrentPntPos.y, mCurrentPntPos.z);
 
-    if (mAcch.GetGroundH() != -1000000000.0f && current.pos.y < mAcch.GetGroundH() + 100.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF && current.pos.y < mAcch.GetGroundH() + 100.0f) {
         current.pos.y = mAcch.GetGroundH() + 100.0f;
     }
 
@@ -1034,7 +1037,7 @@ void daE_PH_c::AttentionSet() {
             attention_info.distances[fopAc_attn_BATTLE_e] = 0x53;
         }
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else if (current.pos.absXZ(fopAcM_GetPosition(player_p)) > 1000.0f) {
         if (strcmp(dComIfGp_getStartStageName(), "D_MN07A") == 0) {
             attention_info.distances[fopAc_attn_BATTLE_e] = 0x52;
@@ -1196,7 +1199,7 @@ static int daE_PH_Execute(daE_PH_c* i_this) {
 
 /* 80741428-80741A44 0040C8 061C+00 1/1 0/0 0/0 .text            create__8daE_PH_cFv */
 int daE_PH_c::create() {
-    fopAcM_SetupActor(this, daE_PH_c);
+    fopAcM_ct(this, daE_PH_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "E_PH");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -1254,7 +1257,7 @@ int daE_PH_c::create() {
         mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, &mAcchCir,
                   fopAcM_GetSpeed_p(this), NULL, NULL);
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         attention_info.distances[fopAc_attn_BATTLE_e] = 0x22;
 
         cXyz sp3C(current.pos.x, current.pos.y + 200.0f, current.pos.z);
@@ -1262,7 +1265,7 @@ int daE_PH_c::create() {
         mAtInfo.mpSound = &mSound;
 
         J3DModel* model = mpMorf->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
 
         for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
             if (i != 0) {

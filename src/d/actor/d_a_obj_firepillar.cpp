@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_firepillar.h"
 #include "d/d_cc_d.h"
 #include "d/d_com_inf_game.h"
@@ -19,25 +21,6 @@ void daObjFPillar_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::ZXYrotM(shape_angle.x, shape_angle.y, shape_angle.z);
 }
-
-/* ############################################################################################## */
-/* 80BE9ABC-80BE9AC8 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BE9AC8-80BE9ADC 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BE9ADC-80BE9AF4 000020 0018+00 1/1 0/0 0/0 .data            l_cull_box */
 static f32 l_cull_box[6] = {
@@ -77,7 +60,7 @@ int daObjFPillar_c::Create() {
 
 /* 80BE9230-80BE9360 000190 0130+00 1/1 0/0 0/0 .text            create__14daObjFPillar_cFv */
 int daObjFPillar_c::create() {
-    fopAcM_SetupActor(this, daObjFPillar_c);
+    fopAcM_ct(this, daObjFPillar_c);
     int rv = Create();
     if (rv == 0) {
         return cPhs_ERROR_e;

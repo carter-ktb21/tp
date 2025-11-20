@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_path_line.h"
 #include "f_op/f_op_actor_mng.h"
 #include "dol2asm.h"

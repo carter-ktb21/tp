@@ -3,6 +3,8 @@
  * 
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_bottle_item.h"
 #include "d/d_item.h"
 #include "d/actor/d_a_player.h"
@@ -12,7 +14,7 @@
 s32 daTag_BottleItem_c::create() {
     s32 ret;
 
-    fopAcM_SetupActor(this, daTag_BottleItem_c);
+    fopAcM_ct(this, daTag_BottleItem_c);
     setTypeFromParam();
 
     if (!isBottleItem(mBottleItemType)) {
@@ -131,12 +133,12 @@ s32 daTag_BottleItem_c::orderEvent() {
     makeSoup();
 
     if (!daPy_py_c::checkNowWolf() && mBottleItemType != fpcNm_ITEM_EMPTY_BOTTLE) {
-        attention_info.flags = 0x20000008;
+        attention_info.flags = (fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e);
     } else {
         attention_info.flags = 0;
     }
 
-    if (attention_info.flags == 0x20000008) {
+    if (attention_info.flags == (fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e)) {
         attention_info.distances[fopAc_attn_TALK_e] = fpcNm_ITEM_EMPTY_BOTTLE;
         attention_info.distances[fopAc_attn_SPEAK_e] = fpcNm_ITEM_EMPTY_BOTTLE;
         eventInfo.onCondition(dEvtCnd_CANTALK_e);
@@ -147,11 +149,15 @@ s32 daTag_BottleItem_c::orderEvent() {
 
 /* 80D56418-80D564A0 0004B8 0088+00 2/2 0/0 0/0 .text            makeSoup__18daTag_BottleItem_cFv */
 void daTag_BottleItem_c::makeSoup() {
-    if (mBottleItemType == fpcNm_ITEM_LV1_SOUP && dComIfGs_isEventBit(2)) {
+    if (mBottleItemType == fpcNm_ITEM_LV1_SOUP
+           /* dSv_event_flag_c::F_0003 - Snowpeak Ruins - Handed over tomato puree and left room */
+        && dComIfGs_isEventBit(2)) {
         mBottleItemType = fpcNm_ITEM_LV2_SOUP;
     }
 
-    if (mBottleItemType == fpcNm_ITEM_LV2_SOUP && dComIfGs_isEventBit(1)) {
+    if (mBottleItemType == fpcNm_ITEM_LV2_SOUP
+           /* dSv_event_flag_c::F_0004 - Snowpeak Ruins - Handed over secret ingredient and left room */
+        && dComIfGs_isEventBit(1)) {
         mBottleItemType = fpcNm_ITEM_LV3_SOUP;
     }
 }

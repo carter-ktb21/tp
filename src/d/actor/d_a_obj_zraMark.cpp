@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_zraMark.cpp
+* @file d_a_obj_zraMark.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_zraMark.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -9,11 +11,6 @@
 #include "d/d_meter2_info.h"
 #include "d/actor/d_a_npc_hoz.h"
 #include "d/actor/d_a_npc_zra.h"
-
-_ZraMark_Hahen_c::_ZraMark_Hahen_c() {
-    mpModel = NULL;
-    setColor(0);
-}
 
 /* 80D42658-80D42678 000078 0020+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
 static int createSolidHeap(fopAc_ac_c* i_this) {
@@ -52,7 +49,7 @@ static char* l_arcName[1] = {"buoy"};
 
 /* 80D42678-80D4287C 000098 0204+00 1/1 0/0 0/0 .text            Create__14daObjZraMark_cFv */
 int daObjZraMark_c::Create() {
-    fopAcM_SetupActor(this, daObjZraMark_c);
+    fopAcM_ct(this, daObjZraMark_c);
 
     mType = getType();
 
@@ -87,7 +84,7 @@ int daObjZraMark_c::Create() {
 /* 80D4287C-80D42A7C 00029C 0200+00 1/1 0/0 0/0 .text            CreateHeap__14daObjZraMark_cFv */
 int daObjZraMark_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], l_arcIdx[mType]);
-    JUT_ASSERT(0x176, modelData != 0);
+    JUT_ASSERT(0x176, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -392,7 +389,7 @@ BOOL _ZraMark_Hahen_c::loadModel() {
     static const int sHahenBmdType[] = {7, 8};
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], sHahenBmdType[getColor()]);
-    JUT_ASSERT(0x428, modelData != 0);
+    JUT_ASSERT(0x428, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         // "--------------Can't load Fragment Model\n"

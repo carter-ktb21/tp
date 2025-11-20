@@ -3,6 +3,8 @@
  * Tag - Spinner Path
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_sppath.h"
 #include "d/actor/d_a_player.h"
 #include "math.h"
@@ -24,7 +26,7 @@ static dCcD_SrcCyl l_cylSrc = {
 
 /* 80D61C18-80D61DB8 000078 01A0+00 1/1 0/0 0/0 .text            create__13daTagSppath_cFv */
 int daTagSppath_c::create() {
-    fopAcM_SetupActor(this, daTagSppath_c);
+    fopAcM_ct(this, daTagSppath_c);
 
     mSwNo1 = fopAcM_GetParamBit(this, 8, 8);
     mSwNo2 = fopAcM_GetParamBit(this, 16, 8);

@@ -3,6 +3,8 @@
  * Treasure Chest (Opened state not saved)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tbox2.h"
 #include "d/d_bg_w.h"
 #include "d/actor/d_a_midna.h"
@@ -47,24 +49,6 @@ static const cM3dGCylS l_cyl_info[] = {
     },
 };
 
-/* 8049825C-80498268 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80498268-8049827C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 8049827C-80498280 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Tbox2";
 
@@ -93,8 +77,8 @@ int daTbox2_c::Create() {
     fopAcM_SetMtx(this, mpModel->getBaseTRMtx());
     fopAcM_setCullSizeBox2(this, mpModel->getModelData());
 
-    attention_info.flags = 0x40;
-    attention_info.flags |= 0x400000;
+    attention_info.flags = fopAc_AttnFlag_JUEL_e;
+    attention_info.flags |= fopAc_AttnFlag_UNK_0x400000;
 
     mAcchCir.SetWall(50.0f, 0.0f);
     mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, &mAcchCir,
@@ -128,7 +112,7 @@ int daTbox2_c::Create() {
 int daTbox2_c::CreateHeap() {
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_resInfo[mModelType].bmd_no);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return false;
@@ -136,7 +120,7 @@ int daTbox2_c::CreateHeap() {
 
     J3DAnmTransform* pbck =
         (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, l_resInfo[mModelType].bck_no);
-    JUT_ASSERT(0, pbck != 0);
+    JUT_ASSERT(0, pbck != NULL);
     mpBck = new mDoExt_bckAnm();
     if (mpBck == NULL || !mpBck->init(pbck, TRUE, J3DFrameCtrl::EMode_NONE, 1.0f, 0, -1, false)) {
         return false;
@@ -158,7 +142,7 @@ int daTbox2_c::CreateHeap() {
 
 /* 80496E3C-80497080 00049C 0244+00 1/1 0/0 0/0 .text            create1st__9daTbox2_cFv */
 int daTbox2_c::create1st() {
-    fopAcM_SetupActor(this, daTbox2_c);
+    fopAcM_ct(this, daTbox2_c);
     mModelType = getModelType();
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
@@ -184,7 +168,7 @@ int daTbox2_c::create1st() {
 int daTbox2_c::demoProc() {
     static char* action_table[] = {"WAIT", "OPEN", "APPEAR", "OPEN_SHORT"};
     int act_idx =
-        dComIfGp_evmng_getMyActIdx(mStaffIdx, action_table, ARRAY_SIZE(action_table), 0, 0);
+        dComIfGp_evmng_getMyActIdx(mStaffIdx, action_table, ARRAY_SIZEU(action_table), 0, 0);
 
     if (dComIfGp_evmng_getIsAddvance(mStaffIdx)) {
         switch (act_idx) {
@@ -478,7 +462,7 @@ int daTbox2_c::Delete() {
 
 /* 80497ED8-8049808C 001538 01B4+00 1/0 0/0 0/0 .text            daTbox2_create1st__FP9daTbox2_c */
 static int daTbox2_create1st(daTbox2_c* i_this) {
-    fopAcM_SetupActor(i_this, daTbox2_c);
+    fopAcM_ct(i_this, daTbox2_c);
     return i_this->create1st();
 }
 

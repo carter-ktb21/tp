@@ -3,6 +3,8 @@
  * Morpheel Arena Water
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv3WaterB.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "d/d_bg_w.h"
@@ -115,7 +117,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     obj_lv3WaterB_class* a_this = static_cast<obj_lv3WaterB_class*>(i_this);
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("L3_bwater", 5);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     a_this->mpBWaterModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (a_this->mpBWaterModel == NULL) {
@@ -145,7 +147,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("S_octhibi", 4);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     a_this->mpOctHibiModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (a_this->mpOctHibiModel == NULL) {
@@ -168,7 +170,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 80C5BBD4-80C5BD48 0006D4 0174+00 1/0 0/0 0/0 .text daObj_Lv3waterB_Create__FP10fopAc_ac_c */
 static int daObj_Lv3waterB_Create(fopAc_ac_c* i_this) {
     obj_lv3WaterB_class* a_this = static_cast<obj_lv3WaterB_class*>(i_this);
-    fopAcM_SetupActor(a_this, obj_lv3WaterB_class);
+    fopAcM_ct(a_this, obj_lv3WaterB_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mBWaterPhase, "L3_bwater");
     int octhibi_phase_state = dComIfG_resLoad(&a_this->mOcthibiPhase, "S_octhibi");

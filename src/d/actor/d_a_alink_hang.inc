@@ -354,7 +354,7 @@ int daAlink_c::procHangFallStartInit(cM3dGPla* param_0) {
 
     f32 cross = dComIfG_Bgsp().GroundCross(&mLinkGndChk);
     sp58.y = cross;
-    if (sp58.y != -1000000000.0f) {
+    if (sp58.y != -G_CM3D_F_INF) {
         if (sp58.y < current.pos.y + l_autoDownHeight) {
             return 0;
         }
@@ -1986,7 +1986,7 @@ int daAlink_c::checkClimbGround(cXyz* param_0, f32 param_1) {
         mLinkGndChk.SetPos(param_0);
 
         f32 cross = dComIfG_Bgsp().GroundCross(&mLinkGndChk);
-        if (cross != -1000000000.0f && dBgS_CheckBGroundPoly(mLinkGndChk) &&
+        if (cross != -G_CM3D_F_INF && dBgS_CheckBGroundPoly(mLinkGndChk) &&
             cross >= param_1 - 50.0f)
         {
             param_0->y = cross;
@@ -2634,17 +2634,16 @@ void daAlink_c::setRoofHangHandOnSE(cBgS_PolyInfo* unused) {
     }
 }
 
-/* 80452FA8-80452FB0 0015A8 0008+00 1/1 0/0 0/0 .sdata2          offsetAngle$25945 */
-static const s16 offsetAngle[] = {
-    0x0000,
-    0x8000,
-    0x4000,
-    0xC000,
-};
-
 /* 80100668-80100770 0FAFA8 0108+00 3/3 0/0 0/0 .text            checkRoofHangMovePos__9daAlink_cFv
  */
 int daAlink_c::checkRoofHangMovePos() {
+    static const s16 offsetAngle[] = {
+        0x0000,
+        0x8000,
+        0x4000,
+        0xC000,
+    };
+
     if (field_0x2f98 >= 4) {
         field_0x2f98 = 0;
     }

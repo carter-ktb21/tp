@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_timeFire.h"
 #include "d/d_com_inf_game.h"
 #include "dol2asm.h"
@@ -20,7 +22,7 @@ void daTimeFire_c::setBaseMtx() {
 
 /* 80D0E9B0-80D0EACC 0001B0 011C+00 1/1 0/0 0/0 .text            create__12daTimeFire_cFv */
 int daTimeFire_c::create() {
-    fopAcM_SetupActor(this, daTimeFire_c);
+    fopAcM_ct(this, daTimeFire_c);
     setBaseMtx();
     field_0x570 = current.pos;
     lightInit();

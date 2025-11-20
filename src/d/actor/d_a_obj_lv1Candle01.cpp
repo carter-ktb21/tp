@@ -2,6 +2,8 @@
 // Translation Unit: d_a_obj_lv1Candle01
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv1Candle01.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -55,7 +57,7 @@ int daLv1Cdl01_c::CreateHeap() {
 
 /* 80C56E14-80C57048 000254 0234+00 1/1 0/0 0/0 .text            create__12daLv1Cdl01_cFv */
 cPhs__Step daLv1Cdl01_c::create() {
-    fopAcM_SetupActor(this, daLv1Cdl01_c);
+    fopAcM_ct(this, daLv1Cdl01_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "lv1cdl01");
     if (step == cPhs_COMPLEATE_e) {
         if (MoveBGCreate("lv1cdl01", -1, NULL, 0x820, NULL) == cPhs_ERROR_e) {
@@ -132,7 +134,7 @@ void daLv1Cdl01_c::pointLightProc() {
 
 /* 80C57274-80C575F4 0006B4 0380+00 1/0 0/0 0/0 .text            Execute__12daLv1Cdl01_cFPPA3_A4_f
  */
-int daLv1Cdl01_c::Execute(f32 (**param_0)[3][4]) {
+int daLv1Cdl01_c::Execute(Mtx** param_0) {
     *param_0 = &mpModel->getBaseTRMtx();
     if (mTimer != 0) {
         mTimer--;

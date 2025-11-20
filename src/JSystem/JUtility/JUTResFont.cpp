@@ -3,14 +3,14 @@
 // Translation Unit: JUTResFont
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JUtility/JUTResFont.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "JSystem/JSupport/JSupport.h"
 #include "JSystem/JUtility/JUTAssert.h"
 #include "JSystem/JUtility/JUTConsole.h"
 #include "dolphin/gx.h"
-
-#define suAboutEncoding_ 3
 
 /* 802DEF48-802DEF94 2D9888 004C+00 0/0 1/1 0/0 .text            __ct__10JUTResFontFv */
 JUTResFont::JUTResFont() {

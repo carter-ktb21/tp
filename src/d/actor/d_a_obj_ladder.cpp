@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ladder.h"
 #include "JSystem/J3DGraphAnimator/J3DModelData.h"
 #include "SSystem/SComponent/c_math.h"
@@ -139,24 +141,6 @@ inline static const Attr& attr() {
 /* 8058DD74-8058DD7C 000024 0005+03 3/3 0/0 0/0 .rodata          M_arcname__Q211daObjLadder5Act_c */
 SECTION_RODATA char const daObjLadder::Act_c::M_arcname[5] = "Mhsg";
 
-/* 8058DDAC-8058DDB8 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 8058DDB8-8058DDCC 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 struct AttrType {
     /* 0x0 */ s16 field_0x0;
     /* 0x2 */ s16 field_0x2;
@@ -182,14 +166,13 @@ static inline const AttrType& attr_type(daObjLadder::Act_c::Type_e type) {
  */
 int daObjLadder::Act_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(M_arcname, attr_type(mType).field_0x0);
-    JUT_ASSERT(382, model_data != 0);
+    JUT_ASSERT(382, model_data != NULL);
     mModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     return mModel != NULL;
 }
 
 /* 8058D1D8-8058D378 0000F8 01A0+00 1/0 0/0 0/0 .text            Create__Q211daObjLadder5Act_cFv */
 int daObjLadder::Act_c::Create() {
-    // NONMATCHING
     fopAcM_SetMtx(this, mModel->getBaseTRMtx());
     init_mtx();
     fopAcM_setCullSizeBox(this, -55.0f, -1.0f, -10.0f, 55.0f, attr_type(mType).field_0x4 + 41.0f,
@@ -202,7 +185,7 @@ int daObjLadder::Act_c::Create() {
     mDoMtx_stack_c::multVecZero(&gndVec);
     mDoMtx_stack_c::pop();
     mGndChk.SetPos(&gndVec);
-    mGndChk.SetActorPid(base.id);
+    mGndChk.SetActorPid(base.base.id);
     mHeight = dComIfG_Bgsp().GroundCross(&mGndChk);
     mInDemo = false;
     mEventIdx = dComIfGp_getEventManager().getEventIdx(this, prm_get_evId());
@@ -219,7 +202,7 @@ int daObjLadder::Act_c::Create() {
 
 /* 8058D378-8058D478 000298 0100+00 1/1 0/0 0/0 .text Mthd_Create__Q211daObjLadder5Act_cFv */
 int daObjLadder::Act_c::Mthd_Create() {
-    fopAcM_SetupActor(this, Act_c);
+    fopAcM_ct(this, Act_c);
     int phase_state = dComIfG_resLoad(&mPhase, M_arcname);
     if (phase_state == cPhs_COMPLEATE_e) {
         mType = prm_get_type();
@@ -268,10 +251,6 @@ void daObjLadder::Act_c::mode_wait() {
 void daObjLadder::Act_c::mode_demoreq_init() {
     mMode = MODE_DEMOREQ;
     mInDemo = false;
-}
-
-static inline bool dComIfGp_evmng_existence(s16 eventIdx) {
-    return g_dComIfG_gameInfo.play.getEvtManager().getEventData(eventIdx) != NULL;
 }
 
 /* 8058D628-8058D6E8 000548 00C0+00 1/0 0/0 0/0 .text mode_demoreq__Q211daObjLadder5Act_cFv */

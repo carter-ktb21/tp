@@ -3,6 +3,8 @@
  * Snowpeak Ruins Chandelier (Swinging Platform)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv5ychndlr.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -95,7 +97,7 @@ void daObjYchndlr_c::rideActor(fopAc_ac_c* i_actor) {
 /* 80C6DA5C-80C6DB5C 00037C 0100+00 1/0 0/0 0/0 .text            CreateHeap__14daObjYchndlr_cFv */
 int daObjYchndlr_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdidx[0]);
-    JUT_ASSERT(0, model_data != 0);
+    JUT_ASSERT(0, model_data != NULL);
 
     mpChandlierModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (mpChandlierModel == NULL) {
@@ -103,7 +105,7 @@ int daObjYchndlr_c::CreateHeap() {
     }
 
     model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdidx[1]);
-    JUT_ASSERT(0, model_data != 0);
+    JUT_ASSERT(0, model_data != NULL);
 
     for (int i = 0; i < 4; i++) {
         mpShaftModels[i] = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
@@ -279,10 +281,10 @@ int daObjYchndlr_c::Execute(Mtx** param_0) {
 
     if (field_0xc8c) {
         fopAcM_OffStatus(this, 0);
-        attention_info.flags &= ~0x4;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OnStatus(this, 0);
-        attention_info.flags = 0x4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         Vec attn_pos, spA0, offset;
         f32 var_f31, var_f30;
@@ -352,7 +354,7 @@ int daObjYchndlr_c::Delete() {
 /* 80C6E404-80C6E518 000D24 0114+00 1/0 0/0 0/0 .text daObjYchndlr_create1st__FP14daObjYchndlr_c
  */
 static int daObjYchndlr_create1st(daObjYchndlr_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjYchndlr_c);
+    fopAcM_ct(i_this, daObjYchndlr_c);
     return i_this->create1st();
 }
 

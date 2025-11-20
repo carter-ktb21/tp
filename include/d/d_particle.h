@@ -403,9 +403,18 @@ public:
     void draw2DmenuFore(JPADrawInfo* i_drawInfo) { draw(i_drawInfo, 17); }
     void draw2DmenuBack(JPADrawInfo* i_drawInfo) { draw(i_drawInfo, 18); }
 
+    JKRSolidHeap* getHeap() { return mHeap; }
+    JKRSolidHeap* getSceneHeap() { return m_sceneHeap; }
     JKRExpHeap* getResHeap() { return m_resHeap; }
 
     void levelAllForceOnEventMove() { field_0x210.allForceOnEventMove(); }
+
+    void levelExecute(u32 param_0) {
+        level_c::emitter_c* emitter = field_0x210.get(param_0);
+        if (emitter != NULL) {
+            field_0x210.execute(emitter);
+        }
+    }
 
     static void onStatus(u8 status) { mStatus |= status; }
     static void offStatus(u8 status) { mStatus &= ~status; }

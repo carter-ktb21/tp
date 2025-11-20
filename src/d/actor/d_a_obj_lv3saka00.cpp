@@ -3,6 +3,8 @@
 // Object: lv3saka00 (Lakebed Temple)
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv3saka00.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
@@ -135,7 +137,7 @@ int daObjLv3saka_c::Delete() {
 /* 80C5C2F0-80C5C350 000510 0060+00 1/0 0/0 0/0 .text daObjLv3saka_create1st__FP14daObjLv3saka_c
  */
 static int daObjLv3saka_create1st(daObjLv3saka_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjLv3saka_c);
+    fopAcM_ct(i_this, daObjLv3saka_c);
     return i_this->create1st();
 }
 

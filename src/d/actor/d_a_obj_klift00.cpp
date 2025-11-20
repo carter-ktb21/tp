@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_klift00.h"
 #include "JSystem/JHostIO/JORMContext.h"
 #include "SSystem/SComponent/c_math.h"
@@ -10,10 +12,20 @@
 #include "d/d_cc_uty.h"
 #include "d/d_com_inf_game.h"
 
-static int daObjKLift00_create1st(daObjKLift00_c*);
-static int daObjKLift00_MoveBGDelete(daObjKLift00_c*);
-static int daObjKLift00_MoveBGExecute(daObjKLift00_c*);
-static int daObjKLift00_MoveBGDraw(daObjKLift00_c*);
+struct daObjKLift00_HIO_c : public mDoHIO_entry_c {
+    daObjKLift00_HIO_c();
+    ~daObjKLift00_HIO_c() {};
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ f32 mChainGravity;
+    /* 0x08 */ f32 mRideParameters;
+    /* 0x0C */ f32 mWindSwayOccuranceFactor;
+    /* 0x10 */ f32 mWindMagnitudeChain;
+    /* 0x14 */ f32 mWindMagnitudeFoundation;
+    /* 0x18 */ f32 mChainHitSpeed;
+    /* 0x1C */ f32 field_0x1C;
+};
 
 #ifdef DEBUG
 static daObjKLift00_HIO_c l_HIO;
@@ -70,7 +82,7 @@ static const char* l_arcName = "K_lift00";
 /* 8058C3F8-8058C438 000004 0040+00 1/1 0/0 0/0 .data            l_cc_sph_src */
 static dCcD_SrcSph l_cc_sph_src = {
     {
-        {0x0, {{0x0, 0x0, 0x0}, {0xd8fbfdff, 0x11}, 0x79}}, // mObj
+        {0x0, {{0x0, 0x0, 0x0}, {(s32)0xd8fbfdff, 0x11}, 0x79}}, // mObj
         {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0}, // mGObjAt
         {dCcD_SE_NONE, 0x5, 0x0, 0x0, 0x2}, // mGObjTg
         {0x0}, // mGObjCo
@@ -95,36 +107,15 @@ static dCcD_SrcCyl l_cc_cyl_src = {
     } // mCyl
 };
 
-/* 8058C47C-8058C49C -00001 0020+00 1/0 0/0 0/0 .data            daObjKLift00_METHODS */
-static actor_method_class daObjKLift00_METHODS = {
-    (process_method_func)daObjKLift00_create1st,
-    (process_method_func)daObjKLift00_MoveBGDelete,
-    (process_method_func)daObjKLift00_MoveBGExecute,
-    0,
-    (process_method_func)daObjKLift00_MoveBGDraw,
-};
-
-/* 8058C49C-8058C4CC -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_KLift00 */
-extern actor_process_profile_definition g_profile_Obj_KLift00 = {
-  fpcLy_CURRENT_e,        // mLayerID
-  3,                      // mListID
-  fpcPi_CURRENT_e,        // mListPrio
-  PROC_Obj_KLift00,       // mProcName
-  &g_fpcLf_Method.base,  // sub_method
-  sizeof(daObjKLift00_c), // mSize
-  0,                      // mSizeOther
-  0,                      // mParameters
-  &g_fopAc_Method.base,   // sub_method
-  673,                    // mPriority
-  &daObjKLift00_METHODS,  // sub_method
-  0x00040100,             // mStatus
-  fopAc_ACTOR_e,          // mActorType
-  fopAc_CULLBOX_CUSTOM_e, // cullType
-};
-
 #ifdef DEBUG
 static const int l_dzbidx[] = {9};
 #endif
+
+// force dCcD_Sph::~dCcD_Sph to be emitted earlier than it otherwise would
+void dummy() {
+    delete (dCcD_Sph*)NULL;
+    delete (dCcD_Cyl*)NULL;
+}
 
 /* 8058B02C-8058B0D0 00016C 00A4+00 1/1 0/0 0/0 .text            create1st__14daObjKLift00_cFv */
 cPhs__Step daObjKLift00_c::create1st() {
@@ -253,14 +244,14 @@ void daObjKLift00_c::rideActor(fopAc_ac_c* riding_actor) {
 /* 8058B5EC-8058B77C 00072C 0190+00 1/0 0/0 0/0 .text            CreateHeap__14daObjKLift00_cFv */
 int daObjKLift00_c::CreateHeap() {
     J3DModelData* const model_data = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, l_bmdidx[2]));
-    JUT_ASSERT(304, model_data != 0);
+    JUT_ASSERT(304, model_data != NULL);
     mpLiftPlatform = mDoExt_J3DModel__create(model_data, (1 << 19), 0x11000084);
     if(!mpLiftPlatform)
         return 0;
 
     if(!getNoBaseDisp()) {
         J3DModelData* const model_data = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, l_bmdidx[0]));
-        JUT_ASSERT(315, model_data != 0);
+        JUT_ASSERT(315, model_data != NULL);
         mpChainBase = mDoExt_J3DModel__create(model_data, (1 << 19), 0x11000084);
         if(!mpChainBase)
             return 0;
@@ -274,7 +265,7 @@ int daObjKLift00_c::CreateHeap() {
         return 0;
 
     mChainModelData = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, l_bmdidx[1]));
-    JUT_ASSERT(334, mChainModelData != 0);
+    JUT_ASSERT(334, mChainModelData != NULL);
 
     mChainMdlObjs = new dMdl_obj_c[mNumChainModels];
 
@@ -496,7 +487,7 @@ int daObjKLift00_c::Delete() {
 /* 8058C050-8058C164 001190 0114+00 1/0 0/0 0/0 .text daObjKLift00_create1st__FP14daObjKLift00_c
  */
 static int daObjKLift00_create1st(daObjKLift00_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKLift00_c);
+    fopAcM_ct(i_this, daObjKLift00_c);
     return i_this->create1st();
 }
 
@@ -517,3 +508,30 @@ static int daObjKLift00_MoveBGExecute(daObjKLift00_c* i_this) {
 static int daObjKLift00_MoveBGDraw(daObjKLift00_c* i_this) {
     return i_this->MoveBGDraw();
 }
+
+/* 8058C47C-8058C49C -00001 0020+00 1/0 0/0 0/0 .data            daObjKLift00_METHODS */
+static actor_method_class daObjKLift00_METHODS = {
+    (process_method_func)daObjKLift00_create1st,
+    (process_method_func)daObjKLift00_MoveBGDelete,
+    (process_method_func)daObjKLift00_MoveBGExecute,
+    0,
+    (process_method_func)daObjKLift00_MoveBGDraw,
+};
+
+/* 8058C49C-8058C4CC -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_KLift00 */
+extern actor_process_profile_definition g_profile_Obj_KLift00 = {
+    fpcLy_CURRENT_e,        // mLayerID
+    3,                      // mListID
+    fpcPi_CURRENT_e,        // mListPrio
+    PROC_Obj_KLift00,       // mProcName
+    &g_fpcLf_Method.base,  // sub_method
+    sizeof(daObjKLift00_c), // mSize
+    0,                      // mSizeOther
+    0,                      // mParameters
+    &g_fopAc_Method.base,   // sub_method
+    673,                    // mPriority
+    &daObjKLift00_METHODS,  // sub_method
+    0x00040100,             // mStatus
+    fopAc_ACTOR_e,          // mActorType
+    fopAc_CULLBOX_CUSTOM_e, // cullType
+  };

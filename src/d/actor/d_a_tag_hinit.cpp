@@ -3,12 +3,14 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_hinit.h"
 #include "f_op/f_op_actor_mng.h"
 
 /* 805A3758-805A3800 000078 00A8+00 1/1 0/0 0/0 .text            create__12daTagHinit_cFv */
 int daTagHinit_c::create() {
-    fopAcM_SetupActor(this, daTagHinit_c);
+    fopAcM_ct(this, daTagHinit_c);
 
     field_0x569 = shape_angle.x;
 

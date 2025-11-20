@@ -1,26 +1,10 @@
 //
 // d_a_e_oct_bg
 //
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "dolphin/types.h"
-
-// Needs to be declared before checkNormalAttk 
-/* 80739E54-80739E60 000000 000C+00 4/4 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80739E60-80739E74 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 #include "d/actor/d_a_e_oct_bg.h"
 #include "f_op/f_op_actor_mng.h"
@@ -35,6 +19,7 @@ static u32 lit_1787[1 + 4 /* padding */] = {
 #include "d/d_s_play.h"
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
+#include "Z2AudioLib/Z2Instances.h"
 
 /* 80739E80-80739EC0 00002C 0040+00 0/1 0/0 0/0 .data cc_obg_src__26@unnamed@d_a_e_oct_bg_cpp@ */
 static dCcD_SrcSph cc_obg_src = {
@@ -179,97 +164,8 @@ void daE_OctBg_c::action() {
     }
 }
 
-/* 8073A100-8073A104 000008 0001+03 3/3 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 8073A104-8073A108 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A108-8073A10C 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A10C-8073A110 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A110-8073A114 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A114-8073A118 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A118-8073A11C 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A11C-8073A120 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A120-8073A124 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A124-8073A128 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A128-8073A12C 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A12C-8073A130 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A130-8073A134 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A134-8073A138 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 8073A138-8073A13C 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
 /* 8073A13C-8073A140 -00001 0004+00 1/2 0/0 0/0 .bss             None */
-/* 8073A13C 0001+00 data_8073A13C @1009 */
 /* 8073A13D 0003+00 data_8073A13D None */
-static u8 struct_8073A13C;
 static u8 struct_8073A13D;
 
 /* 80736840-807368A8 000720 0068+00 1/1 0/0 0/0 .text            _delete__11daE_OctBg_cFv */
@@ -393,7 +289,7 @@ void daE_OctBg_c::born_swim() {
         field_0xb70++;
     } else if (field_0xb70 == -1) {
         field_0x8c0.SetTgType(0xd8fbfdff);
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else if (field_0xbae == 0) {
         cLib_addCalcAngleS(&current.angle.x, 0, 0x10, 0xc00, 0x200);
         cLib_chaseF(&speedF, 0.0f, 0.05f);
@@ -484,7 +380,7 @@ bool daE_OctBg_c::checkCoreFishAttack() {
     if (fopAcM_SearchByID(fopAcM_GetLinkId(this), &actor) == 0 || actor == NULL) {
         return false;
     } 
-    if (fopAcM_checkStatus(actor, 0x100000) == 0) {
+    if (fopAcM_CheckStatus(actor, 0x100000) == 0) {
         return false;
     } 
     return true;
@@ -699,7 +595,7 @@ void daE_OctBg_c::back_swim() {
 bool daE_OctBg_c::setBombCarry(int param_1) {
     fopAc_ac_c* actor = NULL;
     if (param_1 == 0) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         if (fopAcM_checkCarryNow(this) != 0) {
             current.angle.x = 0;
             actor =
@@ -913,7 +809,7 @@ int daE_OctBg_c::JointCallBack(J3DJoint* param_0, int param_1) {
 /* 8073921C-807393DC 0030FC 01C0+00 1/1 0/0 0/0 .text            CreateHeap__11daE_OctBg_cFv */
 int daE_OctBg_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_bg", 10);
-    JUT_ASSERT(1341, modelData != 0);
+    JUT_ASSERT(1341, modelData != NULL);
     field_0x5b4 = new mDoExt_McaMorfSO(
             modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_bg", 7), 0, 1.0f, 0, -1, &field_0x5bc,
             0x80000, 0x11000084);
@@ -921,7 +817,7 @@ int daE_OctBg_c::CreateHeap() {
         return 0;
     }
     J3DModel* model = field_0x5b4->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     for (u16 i = 1; i <  model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBack);
     }
@@ -937,7 +833,7 @@ int daE_OctBg_c::CreateHeap() {
 
 /* 80739424-807397B8 003304 0394+00 1/1 0/0 0/0 .text            create__11daE_OctBg_cFv */
 int daE_OctBg_c::create() {
-    fopAcM_SetupActor(this, daE_OctBg_c);
+    fopAcM_ct(this, daE_OctBg_c);
 
     int rv = dComIfG_resLoad(&mPhase,  "E_bg");
     if (rv == cPhs_COMPLEATE_e) {
@@ -951,7 +847,7 @@ int daE_OctBg_c::create() {
             field_0xbb3 = 1;
             struct_8073A14C.field_0x04 = -1;
         }
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         onWolfNoLock();
         fopAcM_SetMtx(this, field_0x5b4->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -50.0f, -50.0f, -50.0f);
@@ -1035,180 +931,6 @@ static int daE_OctBg_IsDelete(daE_OctBg_c* i_this) {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 8073A174-8073A178 00007C 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_8073A174[4];
-#pragma pop
-
-/* 8073A178-8073A17C 000080 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_8073A178[4];
-#pragma pop
-
-/* 8073A17C-8073A180 000084 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8073A17C[4];
-#pragma pop
-
-/* 8073A180-8073A184 000088 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8073A180[4];
-#pragma pop
-
-/* 8073A184-8073A188 00008C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A184[4];
-#pragma pop
-
-/* 8073A188-8073A18C 000090 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A188[4];
-#pragma pop
-
-/* 8073A18C-8073A190 000094 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A18C[4];
-#pragma pop
-
-/* 8073A190-8073A194 000098 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_8073A190[4];
-#pragma pop
-
-/* 8073A194-8073A198 00009C 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_8073A194[4];
-#pragma pop
-
-/* 8073A198-8073A19C 0000A0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_8073A198[4];
-#pragma pop
-
-/* 8073A19C-8073A1A0 0000A4 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8073A19C[4];
-#pragma pop
-
-/* 8073A1A0-8073A1A4 0000A8 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1A0[4];
-#pragma pop
-
-/* 8073A1A4-8073A1A8 0000AC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1A4[4];
-#pragma pop
-
-/* 8073A1A8-8073A1AC 0000B0 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1A8[4];
-#pragma pop
-
-/* 8073A1AC-8073A1B0 0000B4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1AC[4];
-#pragma pop
-
-/* 8073A1B0-8073A1B4 0000B8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1B0[4];
-#pragma pop
-
-/* 8073A1B4-8073A1B8 0000BC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1B4[4];
-#pragma pop
-
-/* 8073A1B8-8073A1BC 0000C0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1B8[4];
-#pragma pop
-
-/* 8073A1BC-8073A1C0 0000C4 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1BC[4];
-#pragma pop
-
-/* 8073A1C0-8073A1C4 0000C8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1C0[4];
-#pragma pop
-
-/* 8073A1C4-8073A1C8 0000CC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1C4[4];
-#pragma pop
-
-/* 8073A1C8-8073A1CC 0000D0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1C8[4];
-#pragma pop
-
-/* 8073A1CC-8073A1D0 0000D4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1CC[4];
-#pragma pop
-
-/* 8073A1D0-8073A1D4 0000D8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1D0[4];
-#pragma pop
-
-/* 8073A1D4-8073A1D8 0000DC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_8073A1D4[4];
-#pragma pop
-
-/* 80739E44-80739E44 0000E4 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
-
 static actor_method_class l_daE_OctBg_Method = {
     (process_method_func)daE_OctBg_Create,
     (process_method_func)daE_OctBg_Delete,
@@ -1234,3 +956,5 @@ extern actor_process_profile_definition g_profile_E_OctBg = {
     fopAc_ENEMY_e,            // mActorType
     fopAc_CULLBOX_CUSTOM_e,   // cullType
 };
+
+AUDIO_INSTANCES;

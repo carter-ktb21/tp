@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_pdtile.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -16,8 +18,6 @@
 static void rideCallBack(dBgW* param_1, fopAc_ac_c* param_2, fopAc_ac_c* param_3) {
     static_cast<daObjPDtile_c*>(param_2)->rideActor(param_3);
 }
-
-UNK_REL_DATA
 
 /* 80CAC5BC-80CAC5C0 -00001 0004+00 0/1 0/0 0/0 .data            l_arcName4 */
 static char* l_arcName4 = "P_Dtile";
@@ -199,7 +199,7 @@ void daObjPDtile_c::rideActor(fopAc_ac_c* param_1) {
 /* 80CAB1F0-80CAB258 0005B0 0068+00 1/0 0/0 0/0 .text            CreateHeap__13daObjPDtile_cFv */
 int daObjPDtile_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(mArcName, mBmdId);
-    JUT_ASSERT(557, model_data != 0);
+    JUT_ASSERT(557, model_data != NULL);
     mModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     return mModel != 0 ? TRUE : FALSE;
 }
@@ -443,7 +443,7 @@ int daObjPDtile_c::Execute(Mtx** param_1) {
                                   -1.0f, 0);
         }
         dBgS_ObjGndChk adStack_e4;
-        adStack_e4.SetActorPid(base.id);
+        adStack_e4.SetActorPid(base.base.id);
         adStack_e4.SetPos(&current.pos);
         dComIfG_Bgsp().GroundCross(&adStack_e4);
         if (home.pos.y - current.pos.y < -3000.0f) {
@@ -522,7 +522,7 @@ int daObjPDtile_c::Delete() {
 
 /* 80CAC0D8-80CAC1D4 001498 00FC+00 1/0 0/0 0/0 .text daObjPDtile_create1st__FP13daObjPDtile_c */
 static int daObjPDtile_create1st(daObjPDtile_c* i_this) {
-    fopAcM_SetupActor(i_this,daObjPDtile_c);
+    fopAcM_ct(i_this,daObjPDtile_c);
     return i_this->create1st();
 }
 

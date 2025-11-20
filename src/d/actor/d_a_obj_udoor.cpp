@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_udoor.h"
 #include "d/d_cc_d.h"
 #include "d/d_com_inf_game.h"
@@ -92,7 +94,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     obj_udoor_class* a_this = static_cast<obj_udoor_class*>(i_this);
 
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes("Obj_udoor", bmdd[a_this->field_0x570]);
-    JUT_ASSERT(301, model_data != 0);
+    JUT_ASSERT(301, model_data != NULL);
 
     a_this->mpModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (a_this->mpModel == NULL) {
@@ -128,12 +130,12 @@ static cPhs__Step daObj_Udoor_Create(fopAc_ac_c* i_this) {
         } // mSphAttr
     };
 
-    fopAcM_SetupActor(i_this, obj_udoor_class);
+    fopAcM_ct(i_this, obj_udoor_class);
     obj_udoor_class* a_this = static_cast<obj_udoor_class*>(i_this);
     
     cPhs__Step phase_state = (cPhs__Step)dComIfG_resLoad(&a_this->mPhase, "Obj_udoor");
     if (phase_state == cPhs_COMPLEATE_e) {
-        a_this->field_0x570 = a_this->base.parameters;
+        a_this->field_0x570 = fopAcM_GetParam(a_this);
         if (a_this->field_0x570 == 0xff) {
             a_this->field_0x570 = 0;
         }

@@ -3,15 +3,36 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_mf.h"
 #include "d/d_cc_d.h"
 #include "Z2AudioLib/Z2Instances.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
 #include "d/d_bomb.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include "d/actor/d_a_horse.h"
 #include "d/d_com_inf_game.h"
+
+class daE_MF_HIO_c : public JORReflexible {
+public:
+    /* 8070A70C */ daE_MF_HIO_c();
+    /* 80713464 */ virtual ~daE_MF_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 model_size;           // 基本サイズ
+    /* 0x0C */ f32 movement_speed;      // 移動速度
+    /* 0x10 */ f32 dash_speed;          // 突進速度
+    /* 0x14 */ f32 battle_init_range;   // 戦闘開始範囲
+    /* 0x18 */ f32 attack_init_range;   // 攻撃開始範囲
+    /* 0x1C */ s16 field_0x1c;          // 防御静止間
+    /* 0x1E */ s16 field_0x1e;          // 魂抜間 弱
+    /* 0x20 */ s16 field_0x20;          // 魂抜間 強
+    /* 0x22 */ u8 field_0x22;
+    /* 0x23 */ u8 invulnerable;         // 不死身
+};
 
 enum Action {
     /* 0x00 */ ACTION_NORMAL       = 0,
@@ -274,8 +295,6 @@ static BOOL other_bg_check2(e_mf_class* i_this, cXyz* param_2) {
 
     return FALSE;
 }
-
-UNK_REL_BSS;
 
 u8 l_initHIO;
 
@@ -2270,7 +2289,7 @@ static void action(e_mf_class* i_this) {
         a_this->attention_info.flags = 0;
     } else {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     }
 
     switch (i_this->mAction) {
@@ -2673,14 +2692,14 @@ static void action(e_mf_class* i_this) {
             gnd_chk.SetPos(&sp264);
             sp264.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-            if (sp264.y != -1000000000.0f) {
+            if (sp264.y != -G_CM3D_F_INF) {
                 sp258.x = sp264.x;
                 sp258.y = sp264.y + 100.0f;
                 sp258.z = sp264.z + fVar1;
                 gnd_chk.SetPos(&sp258);
                 sp258.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-                if (sp258.y != -1000000000.0f) {
+                if (sp258.y != -G_CM3D_F_INF) {
                     sVar7 = -cM_atan2s(sp258.y - sp264.y, sp258.z - sp264.z);
                     if (sVar7 > 0x3000 || sVar7 < -0x3000) {
                         sVar7 = 0;
@@ -2692,7 +2711,7 @@ static void action(e_mf_class* i_this) {
                 sp258.z = sp264.z;
                 gnd_chk.SetPos(&sp258);
                 sp258.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-                if (sp258.y != -1000000000.0f) {
+                if (sp258.y != -G_CM3D_F_INF) {
                     sVar6 = cM_atan2s(sp258.y - sp264.y, sp258.x - sp264.x);
                     if (sVar6 > 0x3000 || sVar6 < -0x3000) {
                         sVar6 = 0;
@@ -3141,7 +3160,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
-    model->setUserArea((u32)i_this);
+    model->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         if (i != 0) {
@@ -3154,14 +3173,14 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_mf", 39);
-    JUT_ASSERT(5274, modelData != 0);
+    JUT_ASSERT(5274, modelData != NULL);
     i_this->mpAxeModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpAxeModel == NULL) {
         return 0;
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("E_mf", 40);
-    JUT_ASSERT(5286, modelData != 0);
+    JUT_ASSERT(5286, modelData != NULL);
     i_this->mpShieldModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpShieldModel == NULL) {
         return 0;
@@ -3174,7 +3193,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 static cPhs__Step daE_MF_Create(fopAc_ac_c* a_this) {
     e_mf_class* i_this = (e_mf_class*)a_this;
 
-    fopAcM_SetupActor(a_this, e_mf_class);
+    fopAcM_ct(a_this, e_mf_class);
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&i_this->mPhase, "E_mf");
     if (phase == cPhs_COMPLEATE_e) {
@@ -3215,8 +3234,8 @@ static cPhs__Step daE_MF_Create(fopAc_ac_c* a_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_000100);
-        a_this->attention_info.flags = 4;
+        fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_0x100);
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(a_this, i_this->mpModelMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(a_this, 200.0f, 200.0f, 200.0f);
@@ -3283,7 +3302,7 @@ static cPhs__Step daE_MF_Create(fopAc_ac_c* a_this) {
         i_this->mAtInfo.mpSound = &i_this->mSound;
 
         if (strcmp(dComIfGp_getStartStageName(), "D_MN09") == 0) {
-            fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_004000);
+            fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_0x4000);
         }
 
         c_start = 1;

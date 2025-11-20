@@ -139,7 +139,7 @@ public:
     int getGroupID() { return fopAcM_GetParam(this) & 0xff; }
     u8 getPathID() { return fopAcM_GetParam(this) >> 24; }
     int isStop() { return TRUE; }
-    int getType() { return subtype & 0x7f; }
+    int getType() { return argument & 0x7f; }
     int getSeqNum() { return shape_angle.x & 0x3f; }
     int getFlowNodeNum() { return shape_angle.z; }
     u16 getStartTime() { return (fopAcM_GetParam(this) >> 8) & 0xff; }
@@ -149,12 +149,12 @@ public:
         u16 startTime = getStartTime();
         u16 endTime = getEndTime();
         if (startTime != 0xff && endTime != 0xff) {
-            u32 x = (u16)(startTime / 10);
-            u32 y = startTime % 10;
-            field_0xb8e = ((u16)(y * 10) + (x * 60));
-            u32 x2 = (u16)(endTime / 10);
-            u32 y2 = endTime % 10;
-            field_0xb8e = ((u16)(y2 * 10) + (x2 * 60));
+            u16 x = startTime / 10;
+            u16 y = (startTime % 10) * 10;
+            field_0xb8c = y + x * 60;
+            x = endTime / 10;
+            y = (endTime % 10) * 10;
+            field_0xb8e = y + x * 60;
             field_0xb96 = 0;
         } else {
             field_0xb96 = 1;
@@ -211,6 +211,7 @@ public:
                 rv = 0;
                 break;
             }
+                /* dSv_event_flag_c::F_0281 - Shop - Malo Mart opens in Castle Town */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[281]) && rv == 9) {
                 rv = 0xb;
             }
@@ -244,6 +245,7 @@ public:
                 rv = 0;
                 break;
             }
+                /* dSv_event_flag_c::F_0281 - Shop - Malo Mart opens in Castle Town */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[281]) && rv == 10) {
                 rv = 12;
             }
@@ -290,11 +292,11 @@ public:
     int chkEvent() {
         attention_info.flags = 0;
         if (mFlowNodeNum > 0) {
-            attention_info.flags = 0xa;
+            attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
         }
         if (mIsDarkWorld) {
             if (daPy_py_c::checkNowWolfEyeUp()) {
-                attention_info.flags |= 0xc00000;
+                attention_info.flags |= (fopAc_AttnFlag_UNK_0x800000 | fopAc_AttnFlag_UNK_0x400000);
             } else {
                 attention_info.flags = 0;
             }
@@ -312,13 +314,13 @@ public:
     }
 
     int orderEvent() {
-        if ((!mIsDarkWorld || daPy_py_c::checkNowWolfEyeUp()) && mFlowNodeNum > 0 && ((attention_info.flags & 8) || (attention_info.flags & 2))) {
+        if ((!mIsDarkWorld || daPy_py_c::checkNowWolfEyeUp()) && mFlowNodeNum > 0 && ((attention_info.flags & fopAc_AttnFlag_SPEAK_e) || (attention_info.flags & fopAc_AttnFlag_TALK_e))) {
             eventInfo.onCondition(dEvtCnd_CANTALK_e);
         }
         return 1;
     }
 
-    inline bool searchFirstScheduleTag(fopAc_ac_c* param_1);
+    inline bool searchFirstScheduleTag();
     inline bool searchNextScheduleTag();
 
     static actionFunc ActionTable[8][2];

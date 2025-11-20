@@ -1,37 +1,20 @@
 /**
- * @file d_a_obj_glowSphere.cpp
+* @file d_a_obj_glowSphere.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_glowSphere.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 
-UNK_REL_DATA
-
 /* 80BF934C-80BF938C 0000EC 0040+00 1/1 0/0 0/0 .text            __ct__14daGlwSph_HIO_cFv */
 daGlwSph_HIO_c::daGlwSph_HIO_c() {
     speed = 50.0f;
     speed2 = 4.0f;
 }
-
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
 
 /* 80BFABF4-80BFAC00 000054 000C+00 2/3 0/0 0/0 .bss             l_HIO */
 static daGlwSph_HIO_c l_HIO;
@@ -93,7 +76,7 @@ int daGlwSph_c::createHeapCallBack(fopAc_ac_c* i_this) {
 /* 80BF94CC-80BF95D4 00026C 0108+00 1/1 0/0 0/0 .text            CreateHeap__10daGlwSph_cFv */
 int daGlwSph_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("glwSphere", 5);
-    JUT_ASSERT(0xF4, modelData != 0);
+    JUT_ASSERT(0xF4, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mpModel == NULL) {
         return 0;
@@ -112,7 +95,7 @@ int daGlwSph_c::CreateHeap() {
 
 /* 80BF95D4-80BF9908 000374 0334+00 1/1 0/0 0/0 .text            create__10daGlwSph_cFv */
 int daGlwSph_c::create() {
-    fopAcM_SetupActor(this, daGlwSph_c);
+    fopAcM_ct(this, daGlwSph_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "glwSphere");
     if (phase_state != cPhs_COMPLEATE_e) {
@@ -243,7 +226,7 @@ void daGlwSph_c::effectSet() {
         JPABaseEmitter* emitterp = dComIfGp_particle_getEmitter(mEmitterIDs[i]);
         if (emitterp != NULL) {
             emitterp->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-            emitterp->setUserWork((u32)&field_0x974);
+            emitterp->setUserWork((uintptr_t)&field_0x974);
         }
     }
 
@@ -453,21 +436,21 @@ int _GlSph_Mng_c::_setting_main() {
 
 /* 80BFA5C4-80BFA60C 001364 0048+00 0/0 0/0 1/1 .text            _chkAllGet_main__12_GlSph_Mng_cFv
  */
-bool _GlSph_Mng_c::_chkAllGet_main() {
+BOOL _GlSph_Mng_c::_chkAllGet_main() {
     _GlSph_LstInfo_c* info = mListBuf;
 
     for (int i = 0; i < 120; i++) {
         if (info->isSet()) {
             daGlwSph_c* psph = info->getpSph();
             if (psph != NULL && !psph->is_getted()) {
-                return false;
+                return FALSE;
             }
         }
 
         info++;
     }
 
-    return true;
+    return TRUE;
 }
 
 /* 80BFAFE8 0002+00 data_80BFAFE8 mSphSe__12_GlSph_Mng_c */

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_mb.h"
 #include "d/actor/d_a_b_bq.h"
 #include "d/d_com_inf_game.h"
@@ -89,8 +91,6 @@ static int daE_MB_Draw(e_mb_class* i_this) {
     dComIfGd_set3DlineMat(&i_this->mRopeMat);
     return 1;
 }
-
-UNK_REL_BSS;
 
 /* 80708C2D 0003+00 data_80708C2D None */
 static u8 l_initHIO;
@@ -573,7 +573,7 @@ static int daE_MB_Execute(e_mb_class* i_this) {
             i_this->attention_info.position += i_this->eyePos;
 
             fopAcM_OnStatus(i_this, 0);
-            i_this->attention_info.flags = 4;
+            i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         } else {
             i_this->mpBombModel2Morf->play(NULL, 0, 0);
 
@@ -702,7 +702,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 80708584-8070879C 002504 0218+00 1/0 0/0 0/0 .text            daE_MB_Create__FP10fopAc_ac_c */
 static int daE_MB_Create(fopAc_ac_c* i_this) {
     e_mb_class* a_this = (e_mb_class*)i_this;
-    fopAcM_SetupActor(a_this, e_mb_class);
+    fopAcM_ct(a_this, e_mb_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "E_mb");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -749,7 +749,7 @@ static int daE_MB_Create(fopAc_ac_c* i_this) {
         a_this->mCcSph.Set(cc_sph_src);
         a_this->mCcSph.SetStts(&a_this->mColliderStts);
 
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         i_this->attention_info.distances[fopAc_attn_BATTLE_e] = 22;
         a_this->field_0x6b0 = 1;
         daE_MB_Execute(a_this);

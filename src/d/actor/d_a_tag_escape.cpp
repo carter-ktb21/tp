@@ -3,13 +3,15 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_escape.h"
 #include "d/d_procname.h"
 
 /* 80D587D8-80D58828 000078 0050+00 1/0 0/0 0/0 .text            daTagEscape_Create__FP10fopAc_ac_c
  */
 static int daTagEscape_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, daTagEscape_c);
+    fopAcM_ct(i_this, daTagEscape_c);
     return cPhs_COMPLEATE_e;
 }
 

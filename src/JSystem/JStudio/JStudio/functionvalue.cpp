@@ -3,6 +3,8 @@
 // Translation Unit: functionvalue
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio/functionvalue.h"
 #include "JSystem/JGadget/search.h"
 #include "JSystem/JUtility/JUTException.h"
@@ -43,9 +45,6 @@ ExtrapolateParameter TFunctionValue::toFunction_outside(int idx) {
 
 TFunctionValue::TFunctionValue() {}
 TFunctionValue::~TFunctionValue() {}
-
-TFunctionValueAttribute_refer::TFunctionValueAttribute_refer() :
-    JGadget::TVector_pointer<TFunctionValue*>(JGadget::TAllocator<void*>()) {}
 
 void TFunctionValueAttribute_refer::refer_initialize() {
     clear();
@@ -299,7 +298,7 @@ f64 TFunctionValue_composite::composite_index(TVector_pointer<TFunctionValue*> c
     }
     TFunctionValue** local_148 = (TFunctionValue**)param_1.begin();
     TFunctionValue* pFront = *local_148;
-    JUT_ASSERT(599, pFront!=0);
+    JUT_ASSERT(599, pFront!=NULL);
     f64 dVar4 = pFront->getValue(param_3);
     s32 index = floor(dVar4);
     u32 uVar2 = param_2.get_unsignedInteger();
@@ -395,7 +394,7 @@ f64 TFunctionValue_composite::composite_subtract(TVector_pointer<TFunctionValue*
     TContainerEnumerator_const_TVector<TFunctionValue*> aTStack_18(param_1);
     TFunctionValue* const* local_148 = *aTStack_18;
     TFunctionValue* pFront = *local_148;
-    JUT_ASSERT(688, pFront!=0);
+    JUT_ASSERT(688, pFront!=NULL);
     f64 dVar4 = pFront->getValue(param_3);
     while (aTStack_18) {
         TFunctionValue* const* ppiVar3 = *aTStack_18;
@@ -434,7 +433,7 @@ f64 TFunctionValue_composite::composite_divide(TVector_pointer<TFunctionValue*> 
     TContainerEnumerator_const_TVector<TFunctionValue*> aTStack_18(param_1);
     TFunctionValue* const* local_148 = *aTStack_18;
     TFunctionValue* pFront = *local_148;
-    JUT_ASSERT(724, pFront!=0);
+    JUT_ASSERT(724, pFront!=NULL);
     f64 dVar4 = pFront->getValue(param_3);
     while (aTStack_18) {
         TFunctionValue* const* ppiVar3 = *aTStack_18;
@@ -622,7 +621,7 @@ f64 TFunctionValue_list::getValue(f64 param_1) {
     }
     local_178._8 = floor(local_178._0);
     local_178._10 = local_178._8;
-    JUT_ASSERT(1063, pfnUpdate_!=0);
+    JUT_ASSERT(1063, pfnUpdate_!=NULL);
     return pfnUpdate_(*this, local_178);
 }
 
@@ -749,7 +748,7 @@ void TFunctionValue_list_parameter::prepare() {
  * getValue__Q27JStudio29TFunctionValue_list_parameterFd        */
 f64 TFunctionValue_list_parameter::getValue(f64 param_0) {
     param_0 = range_getParameter(param_0, data_getValue_front(), data_getValue_back());
-    JUT_ASSERT(1395, pfData_!=0)
+    JUT_ASSERT(1395, pfData_!=NULL)
 
     dat3 = JGadget::findUpperBound_binary_current(dat1, dat2, dat3, param_0);
     if (dat3 == dat1) {
@@ -762,7 +761,7 @@ f64 TFunctionValue_list_parameter::getValue(f64 param_0) {
 
     const f32* pf = dat3.get();
     JUT_ASSERT(1411, (pfData_<=pf-suData_size)&&(pf<pfData_+suData_size*uData_));
-    JUT_ASSERT(1412, pfnUpdate_!=0);
+    JUT_ASSERT(1412, pfnUpdate_!=NULL);
     return pfnUpdate_(*this, param_0);
 }
 
@@ -913,7 +912,7 @@ void TFunctionValue_hermite::prepare() {
  * getValue__Q27JStudio22TFunctionValue_hermiteFd               */
 f64 TFunctionValue_hermite::getValue(f64 param_0) {
     param_0 = range_getParameter(param_0, data_getValue_front(), data_getValue_back());
-    JUT_ASSERT(1716, pfData_!=0)
+    JUT_ASSERT(1716, pfData_!=NULL)
     
     dat3 = JGadget::findUpperBound_binary_current(dat1, dat2, dat3, param_0);
     

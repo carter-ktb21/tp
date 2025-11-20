@@ -46,9 +46,9 @@ public:
     f32 GetWallR() { return m_wall_r; }
     void SetWallH(f32 h) { m_wall_h = h; }
     void ClrWallHDirect() { m_flags &= ~WALL_H_DIRECT; }
-    bool ChkWallHit() { return m_flags & WALL_HIT; }
+    bool ChkWallHit() { return (m_flags & WALL_HIT) != 0; }
     s16 GetWallAngleY() { return m_wall_angle_y; }
-    bool ChkWallHDirect() { return m_flags & WALL_H_DIRECT; }
+    bool ChkWallHDirect() { return (m_flags & WALL_H_DIRECT) != 0; }
     f32 GetWallHDirect() { return m_wall_h_direct; }
     f32 GetWallRR() { return m_wall_rr; }
     void SetWallHit() { m_flags |= WALL_HIT; }
@@ -124,9 +124,9 @@ public:
     f32 GetRoofHeight() const { return m_roof_height; }
     int GetTblSize() { return m_tbl_size; }
     void SetLin() { m_lin.SetStartEnd(*pm_old_pos, *pm_pos); }
-    bool ChkGroundFind() { return m_flags & GROUND_FIND; }
-    bool ChkGroundHit() const { return m_flags & GROUND_HIT; }
-    bool ChkGroundLanding() const { return m_flags & GROUND_LANDING; }
+    bool ChkGroundFind() { return (m_flags & GROUND_FIND) != 0; }
+    bool ChkGroundHit() const { return (m_flags & GROUND_HIT) != 0; }
+    bool ChkGroundLanding() const { return (m_flags & GROUND_LANDING) != 0; }
     void ClrGroundLanding() { m_flags &= ~GROUND_LANDING; }
     void ClrGroundAway() { m_flags &= ~GROUND_AWAY; }
     void ClrWallHit() { m_flags &= ~WALL_HIT; }
@@ -136,26 +136,27 @@ public:
     u32 ChkWallHit() const { return m_flags & WALL_HIT; }
     void OffLineCheckHit() { m_flags &= ~LINE_CHECK_HIT; }
     void OffLineCheck() { m_flags &= ~LINE_CHECK; }
-    u32 ChkLineCheckNone() const { return m_flags & LINE_CHECK_NONE; }
-    u32 ChkLineCheck() const { return m_flags & LINE_CHECK; }
+    u32 ChkLineCheckNone() const { return (m_flags & LINE_CHECK_NONE) != 0; }
+    u32 ChkLineCheck() const { return (m_flags & LINE_CHECK) != 0; }
     void ClrRoofHit() { m_flags &= ~ROOF_HIT; }
     void ClrWaterHit() { m_flags &= ~WATER_HIT; }
     void SetWaterHit() { m_flags |= WATER_HIT; }
     void ClrWaterIn() { m_flags &= ~WATER_IN; }
     void SetWaterIn() { m_flags |= WATER_IN; }
     const u32 MaskWaterIn() const { return m_flags & WATER_IN; }
-    const bool ChkWaterIn() const { return MaskWaterIn();}
+    const bool ChkWaterIn() const { return MaskWaterIn() != 0; }
     void ClrGroundFind() { m_flags &= ~GROUND_FIND; }
     u32 MaskRoofHit() const { return m_flags & ROOF_HIT; }
-    bool ChkRoofHit() const { return MaskRoofHit(); }
+    bool ChkRoofHit() const { return MaskRoofHit() != 0; }
     void OffClrSpeedY() { m_flags |= CLR_SPEED_Y; }
+    void OnClrSpeedY() { m_flags &= ~CLR_SPEED_Y; }
     bool ChkClrSpeedY() const { return !(m_flags & CLR_SPEED_Y); }
     void SetGroundFind() { m_flags |= GROUND_FIND; }
     void SetGroundHit() { m_flags |= GROUND_HIT; }
     void SetGroundLanding() { m_flags |= GROUND_LANDING; }
     void SetGroundAway() { m_flags |= GROUND_AWAY; }
     const u32 MaskWaterHit() const { return m_flags & WATER_HIT; }
-    const bool ChkWaterHit() const { return MaskWaterHit(); }
+    const bool ChkWaterHit() const { return MaskWaterHit() != 0; }
     void ClrWaterNone() { m_flags &= ~WATER_NONE; }
     void SetWaterCheckOffset(f32 offset) { m_wtr_chk_offset = offset; }
     void OnLineCheck() { m_flags |= LINE_CHECK; }
@@ -164,15 +165,16 @@ public:
     void SetWtrChkMode(int mode) { m_wtr_mode = mode; }
     void SetGrndNone() { m_flags |= GRND_NONE; }
     void ClrGrndNone() { m_flags &= ~GRND_NONE; }
-    bool ChkMoveBGOnly() const { return m_flags & MOVE_BG_ONLY; }
+    bool ChkMoveBGOnly() const { return (m_flags & MOVE_BG_ONLY) != 0; }
     void SetWallHit() { m_flags |= WALL_HIT; }
     void ClrWallNone() { m_flags &= ~WALL_NONE; }
     void OnLineCheckNone() { m_flags |= LINE_CHECK_NONE; }
     void OffLineCheckNone() { m_flags &= ~LINE_CHECK_NONE; }
     void SetWallNone() { m_flags |= WALL_NONE; }
     void OnLineCheckHit() { m_flags |= LINE_CHECK_HIT; }
-    bool ChkGroundAway() const { return m_flags & GROUND_AWAY; }
+    bool ChkGroundAway() const { return (m_flags & GROUND_AWAY) != 0; }
     void ClrGroundHit() { m_flags &= ~GROUND_HIT; }
+    void SetGroundCheckOffset(f32 offset) { m_gnd_chk_offset = offset; }
 
     cM3dGCyl* GetWallBmdCylP() { return &m_wall_cyl; }
     fopAc_ac_c* getMyAc() { return m_my_ac; }
@@ -214,7 +216,7 @@ public:
     /* 0x090 */ f32 field_0x90;
     /* 0x094 */ f32 field_0x94;
     /* 0x098 */ f32 m_ground_h;
-    /* 0x09C */ f32 field_0x9c;
+    /* 0x09C */ f32 m_gnd_chk_offset;
     /* 0x0A0 */ cM3dGPla field_0xa0;
     /* 0x0B4 */ bool field_0xb4;
     /* 0x0B8 */ f32 field_0xb8;
@@ -249,7 +251,9 @@ public:
     }
 
     /* 80BB336C */ virtual ~dBgS_ObjAcch() {}
-};
+}; // Size: 0x1D8
+
+STATIC_ASSERT(sizeof(dBgS_ObjAcch) == 0x1D8);
 
 class dBgS_StatueAcch : public dBgS_Acch {
 public:

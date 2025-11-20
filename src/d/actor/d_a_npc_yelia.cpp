@@ -3,10 +3,10 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_yelia.h"
 #include "d/actor/d_a_demo_item.h"
-
-UNK_REL_DATA
 
 /* 80B524FC-80B52514 000020 0018+00 1/1 0/0 0/0 .data            l_bmdData */
 static daNpc_GetParam1 l_bmdData[3] = {
@@ -217,11 +217,11 @@ char* daNpc_Yelia_c::mCutNameList[6] = {
 /* 80B530B8-80B53100 000BDC 0048+00 1/2 0/0 0/0 .data            mCutList__13daNpc_Yelia_c */
 BOOL (daNpc_Yelia_c::*daNpc_Yelia_c::mCutList[6])(int) = {
     NULL,
-    &cutConversationAboutLoopHole,
-    &cutTWResistance,
-    &cutTakeWoodStatue,
-    &cutClothTry,
-    &cutThankYou,
+    &daNpc_Yelia_c::cutConversationAboutLoopHole,
+    &daNpc_Yelia_c::cutTWResistance,
+    &daNpc_Yelia_c::cutTakeWoodStatue,
+    &daNpc_Yelia_c::cutClothTry,
+    &daNpc_Yelia_c::cutThankYou,
 };
 
 enum Type {
@@ -449,7 +449,7 @@ int daNpc_Yelia_c::CreateHeap() {
     for (u16 i = 0; i < model_data->getJointNum(); i++) {
         model_data->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     mpMatAnm[0] = new daNpcT_MatAnm_c();
     if (mpMatAnm[0] == NULL) {
@@ -488,7 +488,7 @@ int daNpc_Yelia_c::Draw() {
         J3DModelData* model_data = mpMorf[0]->getModel()->getModelData();
         model_data->getMaterialNodePointer(getEyeballMaterialNo())->setMaterialAnm(mpMatAnm[0]);
     }
-    return draw(FALSE, FALSE, field_0xde8, NULL, 100.0f, FALSE, FALSE, FALSE);
+    return draw(FALSE, FALSE, mRealShadowSize, NULL, 100.0f, FALSE, FALSE, FALSE);
 }
 
 /* 80B4DD08-80B4DD28 000AE8 0020+00 1/1 0/0 0/0 .text
@@ -564,7 +564,7 @@ BOOL daNpc_Yelia_c::isDelete() {
 
 /* 80B4DF10-80B4E068 000CF0 0158+00 1/1 0/0 0/0 .text            reset__13daNpc_Yelia_cFv */
 void daNpc_Yelia_c::reset() {
-    u32 size = (u32)&field_0xfec - (u32)&mpNextAction;
+    u32 size = (uintptr_t)&field_0xfec - (uintptr_t)&mpNextAction;
     if (mpMatAnm[0] != NULL) {
         mpMatAnm[0]->initialize();
     }
@@ -619,7 +619,7 @@ void daNpc_Yelia_c::setParam() {
     attention_info.distances[fopAc_attn_TALK_e] = attention_info.distances[fopAc_attn_LOCK_e];
     attention_info.distances[fopAc_attn_SPEAK_e] =
         daNpcT_getDistTableIdx(speak_dist_idx, speak_angle_idx);
-    attention_info.flags = 0xa;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
 
     scale.set(l_HIO.m.mScale, l_HIO.m.mScale, l_HIO.m.mScale);
     mCcStts.SetWeight(l_HIO.m.mCcWeight);
@@ -631,9 +631,9 @@ void daNpc_Yelia_c::setParam() {
     }
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(l_HIO.m.mWallH);
-    field_0xde8 = l_HIO.m.mShadowDepth;
+    mRealShadowSize = l_HIO.m.mShadowDepth;
     gravity = l_HIO.m.mGravity;
-    field_0xa80 = l_HIO.m.field_0x6c;
+    mExpressionMorfFrame = l_HIO.m.field_0x6c;
     mMorfFrames = l_HIO.m.mMorfFrames;
     if (mType == TYPE_TWILIGHT || mType == TYPE_AFTER_ESCORT) {
         mAcch.SetGrndNone();
@@ -645,7 +645,7 @@ void daNpc_Yelia_c::setParam() {
 /* 80B4E2C0-80B4E5BC 0010A0 02FC+00 1/0 0/0 0/0 .text            checkChangeEvt__13daNpc_Yelia_cFv
  */
 BOOL daNpc_Yelia_c::checkChangeEvt() {
-    if (!chkAction(&talk)) {
+    if (!chkAction(&daNpc_Yelia_c::talk)) {
         mPreItemNo = 0;
         if (dComIfGp_event_chkTalkXY()) {
             if (dComIfGp_evmng_ChkPresentEnd()) {
@@ -791,10 +791,10 @@ void daNpc_Yelia_c::srchActors() {
 
 /* 80B4E7C8-80B4E868 0015A8 00A0+00 1/0 0/0 0/0 .text            evtTalk__13daNpc_Yelia_cFv */
 BOOL daNpc_Yelia_c::evtTalk() {
-    if (chkAction(&talk)) {
+    if (chkAction(&daNpc_Yelia_c::talk)) {
         (this->*mpAction)(NULL);
     } else {
-        setAction(&talk);
+        setAction(&daNpc_Yelia_c::talk);
     }
     return TRUE;
 }
@@ -923,13 +923,13 @@ BOOL daNpc_Yelia_c::selectAction() {
     mpNextAction = NULL;
     switch (mType) {
     case TYPE_HORSE:
-        mpNextAction = &horseWait;
+        mpNextAction = &daNpc_Yelia_c::horseWait;
         break;
     case TYPE_REMINISCENCE:
-        mpNextAction = &reminiscence;
+        mpNextAction = &daNpc_Yelia_c::reminiscence;
         break;
     default:
-        mpNextAction = &wait;
+        mpNextAction = &daNpc_Yelia_c::wait;
         break;
     }
     return TRUE;
@@ -1541,7 +1541,7 @@ BOOL daNpc_Yelia_c::talk(void* param_0) {
     case MODE_ENTER:
     case MODE_INIT:
         if (!mStagger.checkStagger()) {
-            if (&horseWait == mpNextAction) {
+            if (&daNpc_Yelia_c::horseWait == mpNextAction) {
                 mFaceMotionSeqMngr.setNo(FACE_HORSE_LOOKBACK, -1.0f, FALSE, 0);
                 mMotionSeqMngr.setNo(MOTION_HORSE_LOOKBACK, -1.0f, FALSE, 0);
             }
@@ -1552,13 +1552,13 @@ BOOL daNpc_Yelia_c::talk(void* param_0) {
 
     case MODE_RUN:
         if (!mStagger.checkStagger()) {
-            if (&horseWait == mpNextAction && mMotionSeqMngr.getNo() == MOTION_HORSE_LOOKBACK) {
+            if (&daNpc_Yelia_c::horseWait == mpNextAction && mMotionSeqMngr.getNo() == MOTION_HORSE_LOOKBACK) {
                 if (mMotionSeqMngr.checkEndSequence()) {
                     mFaceMotionSeqMngr.setNo(FACE_NONE, -1.0f, FALSE, 0);
                     mMotionSeqMngr.setNo(MOTION_HORSE_WAIT_C, -1.0f, FALSE, 0);
                 }
                 return FALSE;
-            } else if (mTwilight || mPlayerAngle == mCurAngle.y || &horseWait == mpNextAction
+            } else if (mTwilight || mPlayerAngle == mCurAngle.y || &daNpc_Yelia_c::horseWait == mpNextAction
                 || (mType == TYPE_KAKARIKO && !daNpcT_chkEvtBit(0x11f))
                 || mType == TYPE_AFTER_ESCORT)
             {
@@ -1568,7 +1568,7 @@ BOOL daNpc_Yelia_c::talk(void* param_0) {
                     mMode = MODE_EXIT;
                 }
                 mJntAnm.lookPlayer(false);
-                if (mTwilight || &horseWait == mpNextAction) {
+                if (mTwilight || &daNpc_Yelia_c::horseWait == mpNextAction) {
                     mJntAnm.lookNone(false);
                 }
             } else {

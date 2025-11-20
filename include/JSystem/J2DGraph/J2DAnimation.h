@@ -31,7 +31,7 @@ public:
         mFrameMax = 0;
     }
     /* 80053C94 */ virtual ~J2DAnmBase() {}
-    /* 800569B0 */ virtual void searchUpdateMaterialID(J2DScreen*);
+    /* 800569B0 */ virtual void searchUpdateMaterialID(J2DScreen*) {}
 
     s16 getFrameMax() const { return mFrameMax; }
     void setFrame(f32 frame) { mFrame = frame; }
@@ -54,10 +54,10 @@ class J2DAnmVtxColor : public J2DAnmBase {
 public:
     J2DAnmVtxColor() {
         mKind = KIND_VTX_COLOR;
-        for (s32 i = 0; i < ARRAY_SIZE(mAnmTableNum); i++) {
+        for (s32 i = 0; i < ARRAY_SIZEU(mAnmTableNum); i++) {
             mAnmTableNum[i] = NULL;
         }
-        for (s32 i = 0; i < ARRAY_SIZE(mVtxColorIndexData); i++) {
+        for (s32 i = 0; i < ARRAY_SIZEU(mVtxColorIndexData); i++) {
             mVtxColorIndexData[i] = NULL;
         }
     }
@@ -86,7 +86,7 @@ struct J3DTextureSRTInfo;
 class J2DAnmVtxColorKey : public J2DAnmVtxColor {
 public:
     J2DAnmVtxColorKey() {
-        for (s32 i = 0; i < ARRAY_SIZE(mInfoTable); i++) {
+        for (s32 i = 0; i < ARRAY_SIZEU(mInfoTable); i++) {
             mInfoTable[i] = NULL;
         }
     }
@@ -107,7 +107,7 @@ public:
 class J2DAnmVtxColorFull : public J2DAnmVtxColor {
 public:
     J2DAnmVtxColorFull() {
-        for (s32 i = 0; i < ARRAY_SIZE(mInfoTable); i++) {
+        for (s32 i = 0; i < ARRAY_SIZEU(mInfoTable); i++) {
             mInfoTable[i] = NULL;
         }
     }
@@ -156,7 +156,7 @@ public:
         mKind = KIND_TRANSFORM;
     }
     /* 80184370 */ virtual ~J2DAnmTransform() {}
-    /* 80191130 */ virtual void getTransform(u16, J3DTransformInfo*) const; // {} (should be inline)
+    /* 80191130 */ virtual void getTransform(u16, J3DTransformInfo*) const {}
 
     /* 0x10 */ f32* mScaleValues;
     /* 0x14 */ s16* mRotationValues;

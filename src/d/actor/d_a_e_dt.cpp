@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_dt.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
@@ -15,8 +17,27 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_bomb.h"
 #include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_graphic.h"
 #include "m_Do/m_Do_lib.h"
+
+class daE_DT_HIO_c {
+public:
+    /* 806AD90C */ daE_DT_HIO_c();
+    /* 806B5BDC */ virtual ~daE_DT_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mScale;
+    /* 0x0C */ f32 mWalkSpeed;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 mStunTimer;
+    /* 0x20 */ f32 mPressTimer;
+    /* 0x24 */ f32 mMaxFallSpeed;
+    /* 0x28 */ f32 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+};
 
 enum Action {
     /* 0x0 */ ACT_WAIT,
@@ -139,26 +160,8 @@ dCcD_SrcSph E_DT_n::cc_dt_tongue_src = {
     } // mSphAttr
 };
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-
 /* 806B629C-806B62A0 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 806B629C 0001+00 data_806B629C @1009 */
 /* 806B629D 0003+00 data_806B629D None */
-static u8 struct_806B629C;
 static bool hioInit;
 
 /* 806B62AC-806B62DC 000054 0030+00 7/8 0/0 0/0 .bss             l_HIO */
@@ -1990,7 +1993,7 @@ void daE_DT_c::executeOpening() {
             camera->Start();
             camera->SetTrimSize(0);
             dComIfGp_event_reset();
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             Z2GetAudioMgr()->subBgmStart(Z2BGM_DEKUTOAD);
             fpcM_Search(s_demo_otama, this);
             return;
@@ -2499,7 +2502,7 @@ int daE_DT_c::CreateHeap() {
         return 0;
     }
     J3DModel* model = mpMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     for (u16 i = 1; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBack);
     }
@@ -2515,7 +2518,7 @@ int daE_DT_c::CreateHeap() {
     if (mpSpitModel == NULL) {
         return 0;
     }
-    mpSpitModel->setUserArea((u32)this);
+    mpSpitModel->setUserArea((uintptr_t)this);
     for (u16 i = 1; i < mpSpitModel->getModelData()->getJointNum(); i++) {
         mpSpitModel->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBackTuba);
     }
@@ -2536,7 +2539,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 806B5460-806B592C 007C40 04CC+00 1/1 0/0 0/0 .text            create__8daE_DT_cFv */
 cPhs__Step daE_DT_c::create() {
-    fopAcM_SetupActor(this, daE_DT_c);
+    fopAcM_ct(this, daE_DT_c);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase[0], "E_DT");
     if (step != cPhs_COMPLEATE_e) {
@@ -2569,7 +2572,7 @@ cPhs__Step daE_DT_c::create() {
         l_HIO.field_0x4 = -1;
     }
 
-    attention_info.flags = 4;
+    attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
     fopAcM_SetMin(this, -700.0f, -200.0f, -700.0f);
     fopAcM_SetMax(this, 700.0f, 500.0f, 700.0f);
@@ -2613,7 +2616,7 @@ cPhs__Step daE_DT_c::create() {
         gravity = -5.0f;
         setActionMode(ACT_WAIT, 0);
         maxFallSpeed = l_HIO.mMaxFallSpeed;
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         current.pos.set(0.0f, 0.0f, -500.0f);
         shape_angle.y = cLib_targetAngleY(&current.pos, &daPy_getPlayerActorClass()->current.pos);
         Z2GetAudioMgr()->subBgmStart(Z2BGM_DEKUTOAD);

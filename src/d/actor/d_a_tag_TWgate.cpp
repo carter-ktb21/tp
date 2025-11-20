@@ -2,6 +2,8 @@
 // d_a_tag_TWgate
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_TWgate.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -77,24 +79,6 @@ static daTagTWGate_zevParam const l_zevParamTbl[4] = {
         14,
     },
 };
-
-/* 80D55974-80D55980 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D55980-80D55994 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80D55994-80D55998 -00001 0004+00 12/12 0/0 0/0 .data            l_myName */
 static const char* l_myName = "Gate";
@@ -462,6 +446,7 @@ void daTagTWGate_c::executeDemoOrdin2() {
             break;
         }
     }
+    int choiceNo;
     switch(*cutName) {
     case '0001':
     case '0003':
@@ -469,7 +454,8 @@ void daTagTWGate_c::executeDemoOrdin2() {
         break;
     case '0002':
         if (talkProc(NULL, 1, NULL)) {
-            if (mMsgFlow.getChoiceNo() == 0) {
+            choiceNo = mMsgFlow.getChoiceNo();
+            if (choiceNo == 0) {
                 setAction(ACT_DEMO_ORDIN_3);
             }
             evtMng.cutEnd(staffId);
@@ -653,6 +639,7 @@ void daTagTWGate_c::executeDemoRanail2() {
             break;
         }
     }
+    int choiceNo;
     switch(*cutName) {
     case '0001':
     case '0003':
@@ -660,7 +647,8 @@ void daTagTWGate_c::executeDemoRanail2() {
         break;
     case '0002':
         if (talkProc(NULL, 1, NULL)) {
-            if (mMsgFlow.getChoiceNo() == 0) {
+            choiceNo = mMsgFlow.getChoiceNo();
+            if (choiceNo == 0) {
                 setAction(ACT_DEMO_RANAIL_3);
             }
             evtMng.cutEnd(staffId);
@@ -688,6 +676,7 @@ void daTagTWGate_c::initDemoRanail3() {
         dComIfGp_getEventManager().getEventIdx(this, l_zevParamTbl[mType].mInEventName, -1);
     dComIfGp_getEvent().reset(this);
     fopAcM_orderChangeEventId(this, mEventID, 1, -1);
+    /* dSv_event_flag_c::F_0071 - Twilight Hyrule Field - Cannot warp to Lanayru */
     dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[170]);
 }
 
@@ -844,6 +833,7 @@ void daTagTWGate_c::executeDemoHyral2() {
             break;
         }
     }
+    int choiceNo;
     switch(*piVar3) {
     case '0001':
     case '0003':
@@ -851,7 +841,7 @@ void daTagTWGate_c::executeDemoHyral2() {
         break;
     case '0002':
         if (talkProc(NULL, 1, NULL)) {
-            s16 choiceNo = mMsgFlow.getChoiceNo();
+            choiceNo = mMsgFlow.getChoiceNo();
             if (choiceNo == 0) {
                 setAction(ACT_DEMO_HYRAL_3);
             }
@@ -1049,7 +1039,7 @@ int daTagTWGate_c::CreateHeap() {
 }
 
 int daTagTWGate_c::create() {
-    fopAcM_SetupActor(this, daTagTWGate_c);
+    fopAcM_ct(this, daTagTWGate_c);
 
     mType = getType();
 

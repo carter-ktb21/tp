@@ -3,6 +3,8 @@
  * Object - Table
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_barDesk.h"
 #include "d/d_procname.h"
 #include "d/d_bg_w.h"
@@ -13,21 +15,6 @@ static daBarDesk_HIO_c l_HIO;
 
 /* 80BA9D2C-80BA9D30 00001C 0004+00 1/1 0/0 0/0 .bss             None */
 static u8 data_80BA9D2C[4];
-
-/* 80BA9BBC-80BA9BC8 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BA9BC8-80BA9BDC 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80BA9B70-80BA9BA0 000000 0030+00 2/2 0/0 0/0 .rodata          mCcDObjInfo__11daBarDesk_c */
 dCcD_SrcGObjInf const daBarDesk_c::mCcDObjInfo = {
@@ -68,7 +55,7 @@ int daBarDesk_c::CreateHeap() {
 
 /* 80BA92F4-80BA94B8 000254 01C4+00 1/1 0/0 0/0 .text            create__11daBarDesk_cFv */
 cPhs__Step daBarDesk_c::create() {
-    fopAcM_SetupActor(this, daBarDesk_c);
+    fopAcM_ct(this, daBarDesk_c);
     if (fopAcM_isSwitch(this, (u8)fopAcM_GetParam(this))) {
         return cPhs_ERROR_e;
     }
@@ -100,8 +87,8 @@ int daBarDesk_c::Execute(Mtx** i_mtxP) {
 void daBarDesk_c::windowProc() {
     typedef void (daBarDesk_c::*daBarDesk_modeFunc)();
     static daBarDesk_modeFunc mode_proc[2] = {
-        &modeWait,
-        &modeBreak,
+        &daBarDesk_c::modeWait,
+        &daBarDesk_c::modeBreak,
     };
     (this->*mode_proc[mMode])();
 }

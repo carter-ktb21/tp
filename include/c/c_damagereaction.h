@@ -3,7 +3,7 @@
 
 #include "JSystem/JParticle/JPAParticle.h"
 
-class JPTraceParticleCallBack4 : JPAParticleCallBack {
+class JPTraceParticleCallBack4 : public JPAParticleCallBack {
 public:
     /* 8001817C */ void execute(JPABaseEmitter*, JPABaseParticle*);
     /* 800182A4 */ void draw(JPABaseEmitter*, JPABaseParticle*);
@@ -19,8 +19,10 @@ extern u8 data_80450C9B;
 extern u8 data_80450C9C;
 extern u8 data_80450C9D;
 extern u8 data_80450C9E;
-extern u8 cDmr_FishingWeather;
+extern u8 cDmr_FishingWether;
 extern u8 data_80450CA0;
 extern JPTraceParticleCallBack4 JPTracePCB4;
+
+void debug_actor_create();
 
 #endif /* C_C_DAMAGEREACTION_H */

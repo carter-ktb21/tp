@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kwheel01.h"
 #include "JSystem/JHostIO/JORMContext.h"
 #include "SSystem/SComponent/c_math.h"
@@ -140,7 +142,7 @@ void daObjKWheel01_c::setMtx() {
 /* 80C4EDCC-80C4EF38 0003CC 016C+00 1/0 0/0 0/0 .text            CreateHeap__15daObjKWheel01_cFv */
 int daObjKWheel01_c::CreateHeap() {
     J3DModelData* model_data = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, l_bmdidx[getOut()]));
-    JUT_ASSERT(229, model_data != 0);
+    JUT_ASSERT(229, model_data != NULL);
     mpModel = mDoExt_J3DModel__create(model_data, (1 << 19), 0x11000084);
 
     if(!mpModel)
@@ -372,7 +374,7 @@ extern actor_process_profile_definition g_profile_Obj_KWheel01 = {
 /* 80C4F4C0-80C4F540 000AC0 0080+00 1/1 0/0 0/0 .text daObjKWheel01_create1st__FP15daObjKWheel01_c
  */
 static int daObjKWheel01_create1st(daObjKWheel01_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKWheel01_c);
+    fopAcM_ct(i_this, daObjKWheel01_c);
     return i_this->create1st();
 }
 

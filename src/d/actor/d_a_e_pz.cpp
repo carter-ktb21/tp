@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_pz.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -10,9 +12,24 @@
 #include "d/d_s_play.h"
 #include "c/c_damagereaction.h"
 #include "Z2AudioLib/Z2Instances.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_PZ_HIO_c : public JORReflexible {
+public:
+    /* 8075856C */ daE_PZ_HIO_c();
+    /* 80760C60 */ virtual ~daE_PZ_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 body_model_size;
+    /* 0x0C */ f32 portal_model_size;
+    /* 0x10 */ f32 bullet_speed;
+    /* 0x14 */ f32 weapon_hit_warp_speed;
+    /* 0x18 */ s16 after_attack_wait_time;
+    /* 0x1A */ s16 blur_start_timing;
+};
 
 namespace {
 /* 807617F4-80761838 000038 0044+00 0/1 0/0 0/0 .data            cc_pz_src__22@unnamed@d_a_e_pz_cpp@
@@ -161,7 +178,7 @@ void daE_PZ_c::mEntrySUB(bool param_0) {
 
         attention_info.distances[fopAc_attn_BATTLE_e] = 0;
         fopAcM_OffStatus(this, 0);
-        attention_info.flags &= ~4;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     } else {
         if ((arg0 == 0 || arg0 == 1) && field_0x844 != 0) {
             dComIfGp_particle_set(0x8897, &eff_pos, &shape_angle, NULL);
@@ -171,11 +188,9 @@ void daE_PZ_c::mEntrySUB(bool param_0) {
     
         attention_info.distances[fopAc_attn_BATTLE_e] = 3;
         fopAcM_OnStatus(this, 0);
-        attention_info.flags |= 4;
+        attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
     }
 }
-
-UNK_REL_BSS;
 
 /* 80761DFD 0003+00 l_initHIO None */
 static u8 l_initHIO;
@@ -184,8 +199,8 @@ static u8 l_initHIO;
 static daE_PZ_HIO_c l_HIO;
 
 /* 80761E29 0003+00 data_80761E29 None */
-static u8 data_80761E28;
-static u8 data_80761E29;
+static u8 lbl_222_bss_70;
+static u8 lbl_222_bss_71;
 
 /* 80758A94-80758BA0 000614 010C+00 3/3 0/0 0/0 .text            mPzScaleSet__8daE_PZ_cFb */
 bool daE_PZ_c::mPzScaleSet(bool param_0) {
@@ -413,7 +428,6 @@ void daE_PZ_c::executeSearchPoint() {
 }
 
 /* 807593CC-8075B7CC 000F4C 2400+00 2/1 0/0 0/0 .text            executeOpeningDemo__8daE_PZ_cFv */
-// NONMATCHING - fopAcM_GetID not getting inlined, equivalent
 void daE_PZ_c::executeOpeningDemo() {
     static cXyz mPzCenterInit_dt[] = {
         cXyz(-50.0f, 10.0f, -3150.0f),
@@ -466,6 +480,7 @@ void daE_PZ_c::executeOpeningDemo() {
     cXyz sp108;
     cXyz spFC;
 
+    f32 var_f31 = 0.0f;
     fopAc_ac_c* parent;
     int sp28 = 22;
 
@@ -630,11 +645,11 @@ void daE_PZ_c::executeOpeningDemo() {
 
         if (mAnm != 0xD) {
             setBck(0xD, 2, 3.0f, 1.0f);
-            parentActorID = fopAcM_createChild(PROC_E_PZ, fopAcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
+            // fakematch, fpcM_GetID should be fopAcM_GetID
+            parentActorID = fopAcM_createChild(PROC_E_PZ, fpcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
         }
 
-        field_0x7d8 = 0;
-        data_80761E29 = 0;
+        lbl_222_bss_71 = field_0x7d8 = 0;
 
         if (field_0x7d0 == 0) {
             field_0x7d0 = 120;
@@ -728,9 +743,8 @@ void daE_PZ_c::executeOpeningDemo() {
         }
         break;
     case 130:
-        field_0x7d8 = 2;
-        data_80761E29 = 2;
-        data_80761E28 = 0;
+        lbl_222_bss_71 = field_0x7d8 = 2;
+        lbl_222_bss_70 = 0;
     case 30:
         if (!eventInfo.checkCommandDemoAccrpt()) {
             fopAcM_orderPotentialEvent(this, 2, 0xFFFF, 3);
@@ -749,11 +763,13 @@ void daE_PZ_c::executeOpeningDemo() {
 
         sp120.set(mPzCenterInit_dt[7]);
         sp108 = mDemoCameraCenter - sp120;
-        cLib_addCalcPos(&mDemoCameraCenter, sp120, 0.7f, sp108.abs() / 20.0f, 1.0f);
+        var_f31 = sp108.abs() / 20.0f;
+        cLib_addCalcPos(&mDemoCameraCenter, sp120, 0.7f, var_f31, 1.0f);
 
         sp114.set(mPzEyeInit_dt[7]);
         spFC = mDemoCameraEye - sp114;
-        cLib_addCalcPos(&mDemoCameraEye, sp114, 0.7f, spFC.abs() / 20.0f, 1.0f);
+        var_f31 = spFC.abs() / 20.0f;
+        cLib_addCalcPos(&mDemoCameraEye, sp114, 0.7f, var_f31, 1.0f);
 
         if (field_0x7d0 == 0) {
             if (fopAcM_SearchByID(parentActorID, &parent) && parent != NULL) {
@@ -836,7 +852,7 @@ void daE_PZ_c::executeOpeningDemo() {
 
         if (field_0x7d7 != 0) {
             if (field_0x7d7 == 1) {
-                data_80761E28 = 1;
+                lbl_222_bss_70 = 1;
 
                 mDemoCameraCenter.set(mPzCenterInit_dt[17]);
                 mDemoCameraEye.set(mPzEyeInit_dt[17]);
@@ -941,11 +957,13 @@ void daE_PZ_c::executeOpeningDemo() {
     case 106:
         sp120.set(mPzCenterInit_dt[12]);
         sp108 = mDemoCameraCenter - sp120;
-        cLib_addCalcPos(&mDemoCameraCenter, sp120, 0.7f, sp108.abs() / 10.0f, 1.0f);
+        var_f31 = sp108.abs() / 10.0f;
+        cLib_addCalcPos(&mDemoCameraCenter, sp120, 0.7f, var_f31, 1.0f);
 
         sp114.set(mPzEyeInit_dt[12]);
         spFC = mDemoCameraEye - sp114;
-        cLib_addCalcPos(&mDemoCameraEye, sp114, 0.7f, spFC.abs() / 10.0f, 1.0f);
+        var_f31 = spFC.abs() / 10.0f;
+        cLib_addCalcPos(&mDemoCameraEye, sp114, 0.7f, var_f31, 1.0f);
 
         if (field_0x7d0 != 0 || sp108.abs() > 2.0f || spFC.abs() > 2.0f) {
             break;
@@ -983,10 +1001,10 @@ void daE_PZ_c::executeOpeningDemo() {
     case 109:
         if (mAnm == 0xB && mpModelMorf->isStop()) {
             setBck(0xD, 2, 3.0f, 1.0f);
-            parentActorID = fopAcM_createChild(PROC_E_PZ, fopAcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
+            // fakematch, fpcM_GetID should be fopAcM_GetID
+            parentActorID = fopAcM_createChild(PROC_E_PZ, fpcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
 
-            field_0x7d8 = 2;
-            data_80761E29 = 2;
+            lbl_222_bss_71 = field_0x7d8 = 2;
         }
 
         if (mAnm != 0xB && mAnm != 0xD) {
@@ -1132,11 +1150,12 @@ void daE_PZ_c::executeOpeningDemo() {
             } else {
                 daPy_getPlayerActorClass()->changeDemoMode(0x17, 1, 0, 0);
             }
-    
+
             mDemoCameraCenter.set(mPzCenterInit_dt[3]);
             mDemoCameraEye.set(mPzEyeInit_dt[4]);
 
-            parentActorID = fopAcM_createChild(PROC_E_PZ, fopAcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
+            // fakematch, fpcM_GetID should be fopAcM_GetID
+            parentActorID = fopAcM_createChild(PROC_E_PZ, fpcM_GetID(this), sp28 + arg0, &field_0x7a8, fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
 
             setBck(0xC, 0, 10.0f, 1.0f);
             daPy_getPlayerActorClass()->changeDemoMode(0x10, 0, 0, 0);
@@ -1432,7 +1451,7 @@ void daE_PZ_c::executeAttack() {
                     }
 
                     var_r27++;
-                    if (data_80761E29 != var_r28) {
+                    if (lbl_222_bss_71 != var_r28) {
                         field_0x7d8 = var_r28;
                         var_r27 = 100;
                     }
@@ -1591,7 +1610,7 @@ void daE_PZ_c::executeDead() {
             field_0x843 = 0;
             fopAcM_OffStatus(this, 0);
             fopAcM_SetGroup(this, 0);
-            attention_info.flags &= ~4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
             break;
         }
 
@@ -1952,7 +1971,7 @@ void daE_PZ_c::executeSummonsBullet() {
 
                 if (((daE_PZ_c*)sp8C)->field_0x7dc[field_0x7d7] == 0) {
                     sp84 = BIRTH_DT[((daE_PZ_c*)sp8C)->field_0x7d8].parameters;
-                    data_80761E29 = ((daE_PZ_c*)sp8C)->field_0x7d8;
+                    lbl_222_bss_71 = ((daE_PZ_c*)sp8C)->field_0x7d8;
 
                     if (((daE_PZ_c*)sp8C)->field_0x7d8 == 2) {
                         sp84 |= field_0x7d7 << 8;
@@ -2047,7 +2066,7 @@ void daE_PZ_c::executeSummonsBullet() {
                 if (((daE_PZ_c*)sp88)->field_0x841 != 0) {
                     field_0x7d7 = 1;
 
-                    if (data_80761E28 == 0) {
+                    if (lbl_222_bss_70 == 0) {
                         break;
                     }
 
@@ -2409,7 +2428,7 @@ static int daE_PZ_Delete(daE_PZ_c* i_this) {
 int daE_PZ_c::CreateHeap() {
     if (arg0 >= 20 && arg0 <= 23) {
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_PZ", 0x18);
-        JUT_ASSERT(3876, modelData != 0);
+        JUT_ASSERT(3876, modelData != NULL);
         mpPortalModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
         if (mpPortalModel == NULL) {
             return 0;
@@ -2437,7 +2456,7 @@ int daE_PZ_c::CreateHeap() {
         }
 
         modelData = (J3DModelData*)dComIfG_getObjectRes("E_PZ", 0x19);
-        JUT_ASSERT(3920, modelData != 0);
+        JUT_ASSERT(3920, modelData != NULL);
         mpBallModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_PZ", 7), 2, 1.0f, 0, -1, NULL, 0, 0x11000084);
         if (mpBallModelMorf == NULL) {
             return 0;
@@ -2458,7 +2477,7 @@ int daE_PZ_c::CreateHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_PZ", 0x1C);
-    JUT_ASSERT(3959, modelData != 0);
+    JUT_ASSERT(3959, modelData != NULL);
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_PZ", 8), 2, 1.0f, 0, -1, &field_0x5dc, 0, 0x11000284);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
         return 0;
@@ -2492,7 +2511,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 8076010C-807607EC 007C8C 06E0+00 1/1 0/0 0/0 .text            create__8daE_PZ_cFv */
 int daE_PZ_c::create() {
-    fopAcM_SetupActor(this, daE_PZ_c);
+    fopAcM_ct(this, daE_PZ_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "E_PZ");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -2553,7 +2572,7 @@ int daE_PZ_c::create() {
                 l_HIO.no = mDoHIO_CREATE_CHILD("ファントムザント", &l_HIO);
             }
 
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
             mColliderStts.Init(0xFE, 0, this);
 
@@ -2627,7 +2646,7 @@ int daE_PZ_c::create() {
 
                     attention_info.distances[fopAc_attn_BATTLE_e] = 0;
                     fopAcM_OffStatus(this, 0);
-                    attention_info.flags &= ~4;
+                    attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
                     if (arg0 == 0) {
                         field_0x7bc = 20.0f;

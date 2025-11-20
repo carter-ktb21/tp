@@ -3,11 +3,15 @@
  * Weather System Manager
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag06.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
+#include "Z2AudioLib/Z2Instances.h"
 
 /* 8085786C-80857918 0000EC 00AC+00 1/1 0/0 0/0 .text            dice_wether_init__FUcff */
 static void dice_wether_init(u8 i_weatherMode, f32 i_weatherTime, f32 i_currentTime) {
@@ -57,25 +61,6 @@ static void dice_rain_minus() {
         dKyw_rain_set(env_light->raincnt);
     }
 }
-
-/* 80859FA0-80859FAC 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80859FAC-80859FC0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-// unused?
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80857A50-80857F28 0002D0 04D8+00 2/1 0/0 0/0 .text            dKy_event_proc__Fv */
 static void dKy_event_proc() {
@@ -537,7 +522,7 @@ static void daKytag06_wether_proc(kytag06_class* i_this, u8 param_1) {
  * daKytag06_type_07_wether_Execute__FP13kytag06_class          */
 static void daKytag06_type_07_wether_Execute(kytag06_class* i_this) {
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
-    daKytag06_wether_proc(i_this, env_light->field_0x12cc);
+    daKytag06_wether_proc(i_this, env_light->wether);
 }
 
 /* 808586F0-808589A4 000F70 02B4+00 1/1 0/0 0/0 .text daKytag06_type_07_Execute__FP13kytag06_class
@@ -620,100 +605,6 @@ static void daKytag06_type_07_Execute(kytag06_class* i_this) {
     }
 }
 
-/* 8085A130-8085A134 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-// all of these unused?
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 8085A134-8085A138 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A138-8085A13C 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A13C-8085A140 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A140-8085A144 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A144-8085A148 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A148-8085A14C 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A14C-8085A150 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A150-8085A154 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A154-8085A158 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A158-8085A15C 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A15C-8085A160 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A160-8085A164 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A164-8085A168 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A168-8085A16C 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 8085A16C-8085A170 000044 0001+03 0/0 0/0 0/0 .bss             @1009 */
-#pragma push
-#pragma force_active on
-static u8 lit_1009[1 + 3 /* padding */];
-#pragma pop
-
 /* 808589E0-80858CD4 001260 02F4+00 1/1 0/0 0/0 .text daKytag06_type_06_Execute__FP13kytag06_class
  */
 static void daKytag06_type_06_Execute(kytag06_class* i_this) {
@@ -727,7 +618,7 @@ static void daKytag06_type_06_Execute(kytag06_class* i_this) {
     dComIfGs_getTime();
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
 
-    daKytag06_wether_proc(i_this, env_light->field_0x12cc);
+    daKytag06_wether_proc(i_this, env_light->wether);
     cXyz spX;
 
     f32 current_time = dComIfGs_getTime();
@@ -792,18 +683,16 @@ static void daKytag06_type_06_Execute(kytag06_class* i_this) {
  */
 static void daKytag06_type_08_Execute(kytag06_class* i_this) {
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
-    daKytag06_lv7_boss_wether_proc(i_this, env_light->field_0x12cc);
+    daKytag06_lv7_boss_wether_proc(i_this, env_light->wether);
 }
 
-/* 80858D00-80858D2C 001580 002C+00 1/1 0/0 0/0 .text daKytag06_type_09_Execute__FP13kytag06_class
- */
+/* 80858D00-80858D2C 001580 002C+00 1/1 0/0 0/0 .text            daKytag06_type_09_Execute__FP13kytag06_class */
 static void daKytag06_type_09_Execute(kytag06_class* i_this) {
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
-    daKytag06_Ganon_wether_proc(i_this, env_light->field_0x12cc);
+    daKytag06_Ganon_wether_proc(i_this, env_light->wether);
 }
 
-/* 80858D2C-8085912C 0015AC 0400+00 1/1 0/0 0/0 .text daKytag06_type_10_Execute__FP13kytag06_class
- */
+/* 80858D2C-8085912C 0015AC 0400+00 1/1 0/0 0/0 .text            daKytag06_type_10_Execute__FP13kytag06_class */
 static void daKytag06_type_10_Execute(kytag06_class* i_this) {
     u8 tmp = 0;
     if (dComIfGs_isEventBit(dSv_event_flag_c::F_0266)) {
@@ -1265,7 +1154,7 @@ static void daKytag06_type03_init(fopAc_ac_c* i_this) {
 
 /* 80859C88-80859E68 002508 01E0+00 2/0 0/0 0/0 .text            daKytag06_Create__FP10fopAc_ac_c */
 static int daKytag06_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, kytag06_class);
+    fopAcM_ct(i_this, kytag06_class);
     kytag06_class* a_this = static_cast<kytag06_class*>(i_this);
 
     a_this->mType = (fopAcM_GetParam(a_this) >> 0x18) & 0xF;
@@ -1361,175 +1250,4 @@ extern actor_process_profile_definition g_profile_KYTAG06 = {
     fopAc_CULLBOX_0_e,
 };
 
-/* 8085A18C-8085A190 000064 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_8085A18C[4];
-#pragma pop
-
-/* 8085A190-8085A194 000068 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_8085A190[4];
-#pragma pop
-
-/* 8085A194-8085A198 00006C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8085A194[4];
-#pragma pop
-
-/* 8085A198-8085A19C 000070 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8085A198[4];
-#pragma pop
-
-/* 8085A19C-8085A1A0 000074 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A19C[4];
-#pragma pop
-
-/* 8085A1A0-8085A1A4 000078 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1A0[4];
-#pragma pop
-
-/* 8085A1A4-8085A1A8 00007C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1A4[4];
-#pragma pop
-
-/* 8085A1A8-8085A1AC 000080 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1A8[4];
-#pragma pop
-
-/* 8085A1AC-8085A1B0 000084 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1AC[4];
-#pragma pop
-
-/* 8085A1B0-8085A1B4 000088 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1B0[4];
-#pragma pop
-
-/* 8085A1B4-8085A1B8 00008C 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1B4[4];
-#pragma pop
-
-/* 8085A1B8-8085A1BC 000090 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1B8[4];
-#pragma pop
-
-/* 8085A1BC-8085A1C0 000094 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1BC[4];
-#pragma pop
-
-/* 8085A1C0-8085A1C4 000098 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1C0[4];
-#pragma pop
-
-/* 8085A1C4-8085A1C8 00009C 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1C4[4];
-#pragma pop
-
-/* 8085A1C8-8085A1CC 0000A0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1C8[4];
-#pragma pop
-
-/* 8085A1CC-8085A1D0 0000A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1CC[4];
-#pragma pop
-
-/* 8085A1D0-8085A1D4 0000A8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1D0[4];
-#pragma pop
-
-/* 8085A1D4-8085A1D8 0000AC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1D4[4];
-#pragma pop
-
-/* 8085A1D8-8085A1DC 0000B0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1D8[4];
-#pragma pop
-
-/* 8085A1DC-8085A1E0 0000B4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1DC[4];
-#pragma pop
-
-/* 8085A1E0-8085A1E4 0000B8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1E0[4];
-#pragma pop
-
-/* 8085A1E4-8085A1E8 0000BC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1E4[4];
-#pragma pop
-
-/* 8085A1E8-8085A1EC 0000C0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1E8[4];
-#pragma pop
-
-/* 8085A1EC-8085A1F0 0000C4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_8085A1EC[4];
-#pragma pop
-
-/* 80859F90-80859F90 000118 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
+AUDIO_INSTANCES;

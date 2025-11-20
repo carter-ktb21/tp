@@ -3,6 +3,8 @@
  * Enemy - Shadow Insect / 闇虫 (Yami Mushi)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_ym.h"
 #include "c/c_damagereaction.h"
 #include "d/actor/d_a_kago.h"
@@ -10,9 +12,24 @@
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_tag_firewall.h"
 #include "d/d_com_inf_game.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
 
+class daE_YM_HIO_c {
+public:
+    /* 8080812C */ daE_YM_HIO_c();
+
+    /* 80815458 */ virtual ~daE_YM_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mModelSize;
+    /* 0x0C */ f32 mElectricInvincibilityTimeExtension;
+    /* 0x10 */ f32 mMoveSpeed;
+    /* 0x14 */ f32 mFlyMoveSpeed;
+    /* 0x18 */ f32 mFlyAttackSpeed;
+    /* 0x1C */ f32 mSurpriseDistance;
+    /* 0x20 */ f32 mMoveRange;
+};
 
 //
 // Declarations:
@@ -276,7 +293,7 @@ void daE_YM_c::setFireEffect() {
             if (emitter != NULL) {
                 if (speed.abs() > 1.0f) {
                     emitter->setParticleCallBackPtr((JPAParticleCallBack*)&JPTracePCB4);
-                    emitter->setUserWork((u32)field_0x6d0);
+                    emitter->setUserWork((uintptr_t)field_0x6d0);
                 } else {
                     emitter->setParticleCallBackPtr(NULL);
                 }
@@ -1037,7 +1054,7 @@ void daE_YM_c::executeDown() {
                 dBgS_GndChk gnd_chk;
                 gnd_chk.SetPos(&current.pos);
                 gnd_cross = dComIfG_Bgsp().GroundCross(&gnd_chk);
-                if (gnd_cross == -1000000000.0f || fabsf(gnd_cross - current.pos.y) > 1000.0f
+                if (gnd_cross == -G_CM3D_F_INF || fabsf(gnd_cross - current.pos.y) > 1000.0f
                     || dComIfG_Bgsp().GetGroundCode(gnd_chk) == 4 || dComIfG_Bgsp().GetGroundCode(gnd_chk) == 10
                     || dComIfG_Bgsp().GetGroundCode(gnd_chk) == 5) {
                     bckSet(6, 0, 0.0f, 1.0f);
@@ -3393,7 +3410,7 @@ void daE_YM_c::setHideType() {
 
 /* 80814BA4-80815224 00CB64 0680+00 2/1 0/0 0/0 .text            create__8daE_YM_cFv */
 int daE_YM_c::create() {
-    fopAcM_SetupActor(this, daE_YM_c);
+    fopAcM_ct(this, daE_YM_c);
 
     mType = fopAcM_GetParam(this);
     if (mType == 0xFF) {

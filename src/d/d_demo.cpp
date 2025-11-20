@@ -1,6 +1,9 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_demo.h"
 #include "d/d_msg_class.h"
 #include "d/d_msg_object.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_graphic.h"
 #include "d/actor/d_a_movie_player.h"
 #include "JSystem/JGadget/pointer.h"
@@ -21,7 +24,7 @@ void jstudio_tAdaptor_message::adaptor_do_MESSAGE(JStudio::data::TEOperationData
                                                   const void* pContent, u32 uSize) {
     switch (iType) {
     case JStudio::data::UNK_0x19:
-        JUT_ASSERT(107, pContent!=0);
+        JUT_ASSERT(107, pContent!=NULL);
         JUT_ASSERT(108, uSize==4);
         u32 content = *(u32*)pContent;
         dMsgObject_setDemoMessage(content);
@@ -47,7 +50,7 @@ jstudio_tCreateObject_message::~jstudio_tCreateObject_message() {}
 bool
 jstudio_tCreateObject_message::create(JStudio::TObject** ppObject,
                                       const JStudio::stb::data::TParse_TBlock_object& iBlock) {
-    JUT_ASSERT(168, ppObject!=0);
+    JUT_ASSERT(168, ppObject!=NULL);
 
     u32 type = iBlock.get_type();
     switch (type) {
@@ -255,7 +258,9 @@ int dDemo_actor_c::getDemoIDData(int* param_0, int* param_1, int* param_2, u16* 
     return 1;
 }
 
+#if DEBUG
 s16 dDemo_c::m_branchNum = 0;
+#endif
 
 /* 80038490-80038518 032DD0 0088+00 1/1 0/0 0/0 .text            dDemo_getJaiPointer__FPCcUliPUs */
 static void* dDemo_getJaiPointer(char const* arcName, u32 anmID, int param_2, u16* param_3) {
@@ -287,8 +292,7 @@ int dDemo_setDemoData(fopAc_ac_c* i_actor, u8 i_flags, mDoExt_McaMorf* i_morf, c
 
     u8 flags = demo_actor->checkEnable(i_flags);
     if (flags & dDemo_actor_c::ENABLE_TRANS_e) {
-        i_actor->current.pos = demo_actor->getTrans();
-        i_actor->old.pos = i_actor->current.pos;
+        i_actor->old.pos = i_actor->current.pos = demo_actor->getTrans();
     }
 
     if (flags & dDemo_actor_c::ENABLE_ROTATE_e) {
@@ -311,24 +315,26 @@ int dDemo_setDemoData(fopAc_ac_c* i_actor, u8 i_flags, mDoExt_McaMorf* i_morf, c
 
     if (flags & dDemo_actor_c::ENABLE_ANM_e) {
         u32 anmID = demo_actor->getAnmId();
+        void* ptr;
 
         if (anmID != demo_actor->getOldAnmId()) {
             const char* a_name;
             if (anmID & 0x10000) {
                 a_name = dStage_roomControl_c::getDemoArcName();
-                JUT_ASSERT(267, a_name != NULL);
+                JUT_ASSERT(0x267, a_name != NULL);
             } else {
                 a_name = i_arcName;
             }
 
             demo_actor->setOldAnmId(anmID);
 
-            J3DAnmTransform* i_key = (J3DAnmTransform*)dComIfG_getObjectIDRes(a_name, anmID);
-            JUT_ASSERT(272, i_key != 0);
+            J3DAnmTransform* i_key = (J3DAnmTransform*)dComIfG_getObjectIDRes(a_name, anmID & 0xffff);
+            JUT_ASSERT(272, i_key != NULL);
 
-            void* ptr = dDemo_getJaiPointer(a_name, anmID, param_4, param_5);
+            ptr = dDemo_getJaiPointer(a_name, anmID & 0xffff, param_4, param_5);
 
-            i_morf->setAnm(i_key, -1, demo_actor->getPrm_Morf(), 1.0f, 0.0f, -1.0f, ptr);
+            f32 prmMorf = demo_actor->getPrm_Morf();
+            i_morf->setAnm(i_key, -1, prmMorf, 1.0f, 0.0f, -1.0f, ptr);
             demo_actor->setAnmFrameMax(i_morf->getEndFrame());
         }
     }
@@ -337,7 +343,8 @@ int dDemo_setDemoData(fopAc_ac_c* i_actor, u8 i_flags, mDoExt_McaMorf* i_morf, c
         f32 anm_frame = demo_actor->getAnmFrame();
 
         if (anm_frame > 1.0f) {
-            i_morf->setFrame(anm_frame - 1.0f);
+            anm_frame -= 1.0f;
+            i_morf->setFrame(anm_frame);
             i_morf->play(&i_actor->current.pos, param_6, i_reverb);
         } else {
             i_morf->setFrame(anm_frame);
@@ -352,13 +359,12 @@ int dDemo_setDemoData(fopAc_ac_c* i_actor, u8 i_flags, mDoExt_McaMorf* i_morf, c
 /* 800387A8-800387EC 0330E8 0044+00 1/1 0/0 0/0 .text            branchFile__FPCc */
 static void branchFile(char const* resName) {
     u8* branchData = (u8*)dComIfG_getObjectRes(dStage_roomControl_c::getDemoArcName(), resName);
-    JUT_ASSERT(712, branchData != 0);
+    JUT_ASSERT(712, branchData != NULL);
 
     dDemo_c::setBranchData(branchData);
 }
 
-/* 800387EC-80038920 03312C 0134+00 1/0 0/0 0/0 .text            JSGSetData__13dDemo_actor_cFUlPCvUl
- */
+/* 800387EC-80038920 03312C 0134+00 1/0 0/0 0/0 .text            JSGSetData__13dDemo_actor_cFUlPCvUl */
 void dDemo_actor_c::JSGSetData(u32 id, void const* pdata, u32 param_2) {
     if (id == ID_UNK_1) {
         JStudio::stb::TParseData_fixed<50, TValueIterator_misaligned<u16> > data(pdata);
@@ -423,7 +429,7 @@ void dDemo_actor_c::JSGSetTranslation(Vec const& i_trans) {
     } else {
         // "\n\n!!JSGSetTranslation outside of range. x[%f]y[%f]z[%f]\n"
         OS_REPORT("\n\n!!JSGSetTranslationで範囲外の指定がされました。x[%f]y[%f]z[%f]\n", i_trans.x, i_trans.y, i_trans.z);
-        JUT_ASSERT(789, 0);
+        JUT_ASSERT(789, FALSE);
     }
 }
 
@@ -924,7 +930,7 @@ int dDemo_system_c::JSGFindObject(JStage::TObject** p_TObj, char const* actorNam
     } else {
         // "Strange Demo Object type!! Type<%d>\n"
         OS_REPORT("へんなデモオブジェクトタイプです！！ タイプ<%d>\n");
-        JUT_ASSERT(1755, 0);
+        JUT_ASSERT(1755, FALSE);
     }
 
     return *p_TObj == NULL ? TRUE : FALSE;
@@ -933,32 +939,32 @@ int dDemo_system_c::JSGFindObject(JStage::TObject** p_TObj, char const* actorNam
 /* 80039678-80039910 033FB8 0298+00 0/0 1/1 0/0 .text            create__7dDemo_cFv */
 void dDemo_c::create() {
     m_system = new dDemo_system_c();
-    JUT_ASSERT(0, m_system != 0);
+    JUT_ASSERT(0, m_system != NULL);
 
     m_control = new JStudio::TControl();
-    JUT_ASSERT(0, m_control != 0);
+    JUT_ASSERT(0, m_control != NULL);
 
     m_mesgControl = new jmessage_tControl();
-    JUT_ASSERT(0, m_mesgControl != 0);
+    JUT_ASSERT(0, m_mesgControl != NULL);
 
     m_stage = new JStudio_JStage::TCreateObject(m_system);
-    JUT_ASSERT(0, m_stage != 0);
+    JUT_ASSERT(0, m_stage != NULL);
 
     m_audio = new JStudio_JAudio2::TCreateObject(Z2GetSoundStarter(), m_system);
-    JUT_ASSERT(0, m_audio != 0);
+    JUT_ASSERT(0, m_audio != NULL);
     m_audio->mPermit_onExit_notEnd = true;
 
     m_particle = new dDemo_particle_c(dPa_control_c::getEmitterManager(), m_system);
-    JUT_ASSERT(0, m_particle != 0);
+    JUT_ASSERT(0, m_particle != NULL);
 
     m_message = new jstudio_tCreateObject_message();
-    JUT_ASSERT(0, m_message != 0);
+    JUT_ASSERT(0, m_message != NULL);
 
     m_factory = new JStudio::TFactory();
-    JUT_ASSERT(0, m_factory != 0);
+    JUT_ASSERT(0, m_factory != NULL);
 
     m_object = new dDemo_object_c();
-    JUT_ASSERT(0, m_object != 0);
+    JUT_ASSERT(0, m_object != NULL);
 
     m_control->setSecondPerFrame(1.0f / 30.0f);
     m_control->setFactory(m_factory);
@@ -1031,7 +1037,7 @@ jmessage_tControl::~jmessage_tControl() {}
 
 /* 80039B6C-80039CF8 0344AC 018C+00 1/1 1/1 0/0 .text            start__7dDemo_cFPCUcP4cXyzf */
 int dDemo_c::start(u8 const* p_data, cXyz* p_translation, f32 rotationY) {
-    JUT_ASSERT(0, m_system != 0);
+    JUT_ASSERT(0, m_system != NULL);
 
     m_control->reset();
     JStudio::TParse parser(m_control);
@@ -1069,7 +1075,7 @@ int dDemo_c::start(u8 const* p_data, cXyz* p_translation, f32 rotationY) {
 
 /* 80039CF8-80039D4C 034638 0054+00 1/1 2/2 0/0 .text            end__7dDemo_cFv */
 void dDemo_c::end() {
-    JUT_ASSERT(0, m_system != 0);
+    JUT_ASSERT(0, m_system != NULL);
 
     m_control->destroyObject_all();
     m_object->remove();
@@ -1079,7 +1085,7 @@ void dDemo_c::end() {
 
 /* 80039D4C-80039DA4 03468C 0058+00 1/1 0/0 0/0 .text            branch__7dDemo_cFv */
 void dDemo_c::branch() {
-    JUT_ASSERT(0, m_system != 0);
+    JUT_ASSERT(0, m_system != NULL);
 
     m_control->destroyObject_all();
     const u8* branchData = m_branchData;
@@ -1091,7 +1097,7 @@ void dDemo_c::branch() {
 
 /* 80039DA4-80039EDC 0346E4 0138+00 0/0 1/1 0/0 .text            update__7dDemo_cFv */
 int dDemo_c::update() {
-    JUT_ASSERT(0, m_system != 0);
+    JUT_ASSERT(0, m_system != NULL);
 
     if (m_data == NULL) {
         if (m_branchData == NULL) {

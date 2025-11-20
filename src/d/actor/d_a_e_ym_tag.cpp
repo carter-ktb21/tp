@@ -3,6 +3,8 @@
  * Enemy - Shadow Insect / 闇虫 (Yami Mushi) - Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_ym_tag.h"
 #include "f_op/f_op_actor_mng.h"
 
@@ -56,7 +58,7 @@ static int daE_YM_TAG_Delete(daE_YM_TAG_c* i_this) {
 
 /* 80815F28-80815F90 0001A8 0068+00 1/1 0/0 0/0 .text            create__12daE_YM_TAG_cFv */
 int daE_YM_TAG_c::create() {
-    fopAcM_SetupActor(this, daE_YM_TAG_c);
+    fopAcM_ct(this, daE_YM_TAG_c);
     if ((u8)fopAcM_GetParam(this) == 0xFF) {
         return cPhs_ERROR_e;
     }

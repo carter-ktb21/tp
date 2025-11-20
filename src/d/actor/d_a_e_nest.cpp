@@ -3,6 +3,8 @@
  * Enemy - Beehive
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_nest.h"
 #include "d/actor/d_a_npc_tk.h"
 #include "SSystem/SComponent/c_math.h"
@@ -10,6 +12,7 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_bomb.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80504950-80504954 000008 0004+00 2/2 0/0 0/0 .bss             None */
 static bool l_hioInit;
@@ -309,6 +312,7 @@ static void e_nest_normal(e_nest_class* i_this) {
                             i_this->mHitActorID = fopAcM_GetID(daPy_getPlayerActorClass());
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) {
                                 i_this->mDemoStage = 1;
+                                /* dSv_event_flag_c::F_0084 - Ordon Village - Opening days 2&3: knocked down a beehive with slingshot */
                                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[183]);
                             }
                         }
@@ -318,12 +322,14 @@ static void e_nest_normal(e_nest_class* i_this) {
                             || i_this->mAtInfo.mHitType == HIT_TYPE_BOOMERANG
                             || i_this->mAtInfo.mHitType == HIT_TYPE_STUN) {
                         i_this->mHitActorID = fopAcM_GetID(daPy_getPlayerActorClass());
+                        /* dSv_event_flag_c::F_0073 - Ordon Village - Attacked after charging at large beehive */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[172]);
                     } else if (fopAcM_GetName(actor) == PROC_NPC_TK) {
                         daNPC_TK_c* hawk = static_cast<daNPC_TK_c*>(actor);
                         hawk->setBump();
                         i_this->mHitActorID = fopAcM_GetID(hawk);
                         i_this->mKnockDown = 1;
+                        /* dSv_event_flag_c::F_0072 - Ordon Village - Knocked down large beehive with hawk */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[171]);
                         i_this->mHitTimer = 20;
                         i_this->mHawkHit = true;
@@ -445,7 +451,7 @@ static s8 e_nest_carry(e_nest_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->mMode = 1;
         s16 angle_delta_y = i_this->mRotation.y - player->shape_angle.y;
         if (angle_delta_y > 0x4000 || angle_delta_y < -0x4000) {
@@ -714,7 +720,7 @@ static void bee_nest_action(e_nest_class* i_this) {
         break;
     case e_nest_class::ACT_DEBRIS:
         e_nest_hahen(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         return;
     }
 
@@ -725,7 +731,7 @@ static void bee_nest_action(e_nest_class* i_this) {
     }
 
     if (carry_check) {
-        cLib_onBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->attention_info.distances[fopAc_attn_CARRY_e] = 0x2c;
         if (fopAcM_checkCarryNow(i_this)) {
             i_this->mAction = e_nest_class::ACT_CARRY;
@@ -733,7 +739,7 @@ static void bee_nest_action(e_nest_class* i_this) {
             i_this->mCcSph.OffCoSetBit();
         }
     } else {
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 
     if (float_check && water_check(i_this)) {
@@ -983,7 +989,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80503FCC-805044AC 00312C 04E0+00 1/0 0/0 0/0 .text            daE_Nest_Create__FP10fopAc_ac_c */
 static cPhs__Step daE_Nest_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_nest_class);
+    fopAcM_ct(i_this, e_nest_class);
     e_nest_class* _this = static_cast<e_nest_class*>(i_this);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhase, "E_nest");

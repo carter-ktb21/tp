@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wood_pendulum.h"
 
 /* 80D393F8-80D39418 000078 0020+00 1/1 0/0 0/0 .text            CheckCreateHeap__FP10fopAc_ac_c */
@@ -90,7 +92,7 @@ int daObjWPndlm_c::CreateHeap() {
 int daObjWPndlm_c::create() {
     int phase;
 
-    fopAcM_SetupActor(this, daObjWPndlm_c);
+    fopAcM_ct(this, daObjWPndlm_c);
 
     phase = dComIfG_resLoad(&mPhaseReq, l_arcName);
 

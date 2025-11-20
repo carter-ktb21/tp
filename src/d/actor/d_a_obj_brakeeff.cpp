@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_brakeeff.h"
 #include "dol2asm.h"
 #include "d/d_kankyo.h"
@@ -165,7 +167,7 @@ int useHeapInit(fopAc_ac_c* i_this) {
 
     J3DAnmTevRegKey* tev_anm = static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("Obj_Bef", bef_brk[a_this->mEffectType]));
 
-    if (!a_this->mpBrk->init(a_this->mpModel->getModelData(), tev_anm, 1,0,1.0f,0,-1)) {
+    if (!a_this->mpBrk->init(a_this->mpModel->getModelData(), tev_anm, 1, J3DFrameCtrl::EMode_NONE, 1.0f, 0, -1)) {
         return 0;
     }
 
@@ -202,7 +204,7 @@ int daObj_Brakeeff_Create(fopAc_ac_c* i_this) {
 
     obj_brakeeff_class* a_this = static_cast<obj_brakeeff_class*>(i_this);
 
-    fopAcM_SetupActor(a_this, obj_brakeeff_class);
+    fopAcM_ct(a_this, obj_brakeeff_class);
 
     int res_load_result = dComIfG_resLoad(&a_this->mRequestOfPhase, "Obj_Bef");
 

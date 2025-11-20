@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_is.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
@@ -20,8 +22,6 @@ enum daE_IS_ACTION {
 
     ACTION_SEKIZOU = 100,
 };
-
-UNK_REL_DATA
 
 /* 806F5A4C-806F5A94 0000EC 0048+00 1/1 0/0 0/0 .text            __ct__12daE_IS_HIO_cFv */
 daE_IS_HIO_c::daE_IS_HIO_c() {
@@ -192,7 +192,7 @@ static void e_is_wait(e_is_class* a_this) {
             a_this->mode = 3;
             a_this->model_morf->setPlaySpeed(1.0f);
             fopAcM_OnStatus(actor, 0);
-            actor->attention_info.flags = 4;
+            actor->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         }
         break;
     case 3:
@@ -652,7 +652,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 806F736C-806F76B4 001A0C 0348+00 1/0 0/0 0/0 .text            daE_IS_Create__FP10fopAc_ac_c */
 static int daE_IS_Create(fopAc_ac_c* i_this) {
     e_is_class* a_this = (e_is_class*)i_this;
-    fopAcM_SetupActor(i_this, e_is_class);
+    fopAcM_ct(i_this, e_is_class);
 
     int phase_state = dComIfG_resLoad(&a_this->phase, "E_IS");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -683,7 +683,7 @@ static int daE_IS_Create(fopAc_ac_c* i_this) {
             l_HIO.id = mDoHIO_CREATE_CHILD("動くイデリア石像", &l_HIO);
         }
 
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(i_this, a_this->model_morf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(i_this, -500.0f, -200.0f, -500.0f);

@@ -3,6 +3,8 @@
  * Utility Functions
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_lib.h"
 #include "d/d_event.h"
 #include "d/d_stage.h"
@@ -229,7 +231,7 @@ bool STControl::checkDownTrigger() {
 u8 dLib_getEventSwitchNo(int param_0) {
     dStage_MapEvent_dt_c* mapEvent = dEvt_control_c::searchMapEventData(param_0);
     if (mapEvent != NULL) {
-        return mapEvent->mSwitch;
+        return mapEvent->switch_no;
     }
     return 0xff;
 }
@@ -253,7 +255,7 @@ BOOL dLib_checkActorInRectangle(fopAc_ac_c* param_0, fopAc_ac_c* param_1, cXyz c
  * dLib_getExpandSizeFromAramArchive__FP14JKRAramArchivePCc     */
 u32 dLib_getExpandSizeFromAramArchive(JKRAramArchive* i_aramArchive, char const* param_2) {
     u8 header[32] __attribute__((aligned(32)));
-    JUT_ASSERT(1252, i_aramArchive != 0);
+    JUT_ASSERT(1252, i_aramArchive != NULL);
     u32 address = i_aramArchive->getAramAddress(param_2);
     if (address == 0) {
         return 0;
@@ -262,7 +264,7 @@ u32 dLib_getExpandSizeFromAramArchive(JKRAramArchive* i_aramArchive, char const*
                                        0, 0, 0xffffffff, 0);
     JUT_ASSERT(1260, readAddress == header);
     JKRArchive::SDIFileEntry* entry = i_aramArchive->findFsResource(param_2, 0);
-    JUT_ASSERT(1263, entry != 0);
+    JUT_ASSERT(1263, entry != NULL);
     u32 uVar1 = ALIGN_NEXT(JKRDecompExpandSize(header), 32);
     u32 uVar5 = ALIGN_NEXT(entry->data_size, 32);
     if (uVar1 > uVar5) {

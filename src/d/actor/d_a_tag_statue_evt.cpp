@@ -3,6 +3,8 @@
 /* Owl Statue Event Tag -- Awarding Sky Characters
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_statue_evt.h"
 #include "d/d_com_inf_game.h"
 
@@ -31,8 +33,12 @@ void daTagStatue_c::initBaseMtx() {
 /* ############################################################################################## */
 /* 805A8104-805A8110 000000 000C+00 4/4 0/0 0/0 .rodata          l_event_bit */
 static const u16 l_event_bit[6] = {
-    dSv_event_flag_c::F_0791, dSv_event_flag_c::F_0792, dSv_event_flag_c::F_0793,
-    dSv_event_flag_c::F_0794, dSv_event_flag_c::F_0795, dSv_event_flag_c::F_0812
+    dSv_event_flag_c::F_0791, /* Sky character - Sky character 1 */
+    dSv_event_flag_c::F_0792, /* Sky character - Sky character 2 */
+    dSv_event_flag_c::F_0793, /* Sky character - Sky character 3 */
+    dSv_event_flag_c::F_0794, /* Sky character - Sky character 4 */
+    dSv_event_flag_c::F_0795, /* Sky character - Sky character 5 */
+    dSv_event_flag_c::F_0812, /* N/A - N/A */
 };
 
 /* 805A7000-805A7068 000120 0068+00 2/2 0/0 0/0 .text            setBaseMtx__13daTagStatue_cFv */
@@ -44,19 +50,6 @@ void daTagStatue_c::setBaseMtx() {
 
     mpModel->setBaseTRMtx(mDoMtx_stack_c::now);
 }
-
-/* 805A81FC-805A8208 000000 000C+00 3/3 0/0 0/0 .data            cNullVec__6Z2Calc */
-static Vec cNullVec__6Z2Calc = {0.0f, 0.0f, 0.0f};
-
-/* 805A8208-805A821C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 805A821C-805A8220 -00001 0004+00 3/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Obj_cs_f";
@@ -163,7 +156,7 @@ int daTagStatue_c::CreateHeap() {
 
 /* 805A7424-805A7514 000544 00F0+00 1/2 0/0 0/0 .text            create__13daTagStatue_cFv */
 cPhs__Step daTagStatue_c::create() {
-    fopAcM_SetupActor(this, daTagStatue_c);
+    fopAcM_ct(this, daTagStatue_c);
 
     mSkyCharacterEventBitIdIndex = fopAcM_GetParamBit(this, 8, 4);
 
@@ -298,7 +291,7 @@ static s16 l_statue_ang[6] = {
 
 /* 805A784C-805A7A68 00096C 021C+00 2/2 0/0 0/0 .text            demoProc__13daTagStatue_cFv */
 int daTagStatue_c::demoProc() {
-    int act_id = dComIfGp_evmng_getMyActIdx(mStaffId, action_table, ARRAY_SIZE(action_table), 0, 0);
+    int act_id = dComIfGp_evmng_getMyActIdx(mStaffId, action_table, ARRAY_SIZEU(action_table), 0, 0);
 
     if(dComIfGp_evmng_getIsAddvance(mStaffId)) {
         switch(act_id) {
@@ -331,6 +324,7 @@ int daTagStatue_c::demoProc() {
                 int item;
                 if(getLetterCount() == 5) {
                     item = fpcNm_ITEM_ANCIENT_DOCUMENT2;
+                    /* Sky character - Sky character 6 */
                     dComIfGs_onEventBit(dSv_event_flag_c::F_0796);
                 }
                 else {
@@ -436,9 +430,8 @@ BOOL daTagStatue_c::checkOnEffect() {
     return FALSE;
 }
 
-/* 805A7E94-805A7F0C 000FB4 0078+00 1/1 0/0 0/0 .text            getLetterCount__13daTagStatue_cFv
- */
- s32 daTagStatue_c::getLetterCount() {
+/* 805A7E94-805A7F0C 000FB4 0078+00 1/1 0/0 0/0 .text            getLetterCount__13daTagStatue_cFv */
+s32 daTagStatue_c::getLetterCount() {
     s32 numLetters = 0;
     for(int i = 0; i < 6; i++) {
         if(dComIfGs_isEventBit(l_event_bit[i])) {
@@ -446,8 +439,8 @@ BOOL daTagStatue_c::checkOnEffect() {
         }
     }
 
-    return numLetters;
- }
+return numLetters;
+}
 
 /* 805A7F0C-805A7FF8 00102C 00EC+00 1/1 0/0 0/0 .text            draw__13daTagStatue_cFv */
 int daTagStatue_c::draw() {

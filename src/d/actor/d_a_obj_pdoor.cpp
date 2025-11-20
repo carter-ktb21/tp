@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_pdoor.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -54,8 +56,6 @@ void daObjPDoor_c::setBaseMtx() {
     MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
 }
 
-UNK_REL_DATA
-
 /* 80CAAB6C-80CAAB70 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "V_OsuDoor";
 
@@ -76,7 +76,7 @@ int daObjPDoor_c::Create() {
         shape_angle.y = home.angle.y + 0x1555;
     } else if (!isSw2) {
         OS_REPORT("城下町押引扉：SW1,SW2共にＯＮになっています！\n");
-        JUT_PANIC(235, "0");
+        JUT_ASSERT(235, FALSE);
     } else {
         mDoorDirection = -1;
         shape_angle.y = home.angle.y - 0x1555;
@@ -92,7 +92,7 @@ int daObjPDoor_c::Create() {
 /* 80CAA14C-80CAA1BC 00032C 0070+00 1/0 0/0 0/0 .text            CreateHeap__12daObjPDoor_cFv */
 int daObjPDoor_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(270, modelData != 0);
+    JUT_ASSERT(270, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != NULL ? TRUE : FALSE;
 }
@@ -275,7 +275,7 @@ int daObjPDoor_c::Delete() {
 
 /* 80CAAA4C-80CAAAAC 000C2C 0060+00 1/0 0/0 0/0 .text daObjPDoor_create1st__FP12daObjPDoor_c */
 static int daObjPDoor_create1st(daObjPDoor_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjPDoor_c);
+    fopAcM_ct(i_this, daObjPDoor_c);
     return i_this->create1st();
 }
 

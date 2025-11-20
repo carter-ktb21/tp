@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_bou.h"
 #include "d/actor/d_a_cow.h"
 #include "d/actor/d_a_horse.h"
@@ -14,8 +16,6 @@
 //
 // Declarations:
 //
-
-UNK_REL_DATA;
 
 /* 80972AB0-80972AB8 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[1][2] = {
@@ -183,7 +183,7 @@ daNpc_Bou_Param_c::Data const daNpc_Bou_Param_c::m= {
 /* 8096D0D8-8096D38C 000238 02B4+00 1/1 0/0 0/0 .text            create__11daNpc_Bou_cFv */
 int daNpc_Bou_c::create() {
     static int const heapSize[6] = {15696, 15696, 15696, 15696, 15696, 0};
-    fopAcM_SetupActor2(this, daNpc_Bou_c, l_faceMotionAnmData, l_motionAnmData,
+    daNpcT_ct(this, daNpc_Bou_c, l_faceMotionAnmData, l_motionAnmData,
                        l_faceMotionSequenceData, 4, l_motionSequenceData, 4,
                        l_evtList, l_resNameList
     );
@@ -215,7 +215,7 @@ int daNpc_Bou_c::create() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1000000000.0f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             setEnvTevColor();
             setRoomNo();
         }
@@ -257,7 +257,7 @@ int daNpc_Bou_c::CreateHeap() {
         modelData->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
 
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     mpMatAnm[0] = new daNpcT_MatAnm_c();
     if (mpMatAnm[0] == NULL) {
         return 0;
@@ -288,7 +288,7 @@ int daNpc_Bou_c::Draw() {
         J3DModelData* modelData = mpMorf[0]->getModel()->getModelData();
         modelData->getMaterialNodePointer(getEyeballMaterialNo())->setMaterialAnm(mpMatAnm[0]);
     }
-    return daNpcT_c::draw(0, 0, field_0xde8, NULL, 100.0f, 0, 0, 0);
+    return daNpcT_c::draw(0, 0, mRealShadowSize, NULL, 100.0f, 0, 0, 0);
 }
 
 /* 8096D8A0-8096D8C0 000A00 0020+00 1/1 0/0 0/0 .text
@@ -325,7 +325,7 @@ void* daNpc_Bou_c::srchCow(void* arg0, void* arg1) {
 /* 8096D9B4-8096DA78 000B14 00C4+00 1/1 0/0 0/0 .text            getCowP__11daNpc_Bou_cFv */
 fopAc_ac_c* daNpc_Bou_c::getCowP() {
     fopAc_ac_c* pActor = NULL;
-    f32 minDist = 1e9f;
+    f32 minDist = G_CM3D_F_INF;
     mFindCount = 0;
     fopAcM_Search(srchCow, this);
     for (int i = 0; i < mFindCount; i++) {
@@ -432,7 +432,7 @@ void daNpc_Bou_c::afterJntAnm(int param_1) {
 void daNpc_Bou_c::setParam() {
     selectAction();
     srchActors();
-    u32 uVar7 = 10;
+    u32 uVar7 = (fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
     s16 sVar10 = daNpc_Bou_Param_c::m.field_0x48;
     s16 sVar9 = daNpc_Bou_Param_c::m.field_0x4a;
     s16 sVar8 = daNpc_Bou_Param_c::m.field_0x4c;
@@ -460,7 +460,7 @@ void daNpc_Bou_c::setParam() {
     attention_info.distances[1] = attention_info.distances[0];
     attention_info.distances[3] = daNpcT_getDistTableIdx(sVar10, sVar9);
     if (mType == TYPE_1) {
-        uVar7 |= (0x80 << 16);
+        uVar7 |= fopAc_AttnFlag_UNK_0x800000;
         field_0xfdc = getActorDistance(daPy_getPlayerActorClass(), 
                     daNpcT_getDistTableIdx(field_0xfe0, field_0xfe4), 
                     attention_info.distances[1]);
@@ -480,8 +480,8 @@ void daNpc_Bou_c::setParam() {
     mAttnFovY = daNpc_Bou_Param_c::m.field_0x50;
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daNpc_Bou_Param_c::m.field_0x18);
-    field_0xde8 = daNpc_Bou_Param_c::m.field_0x0c;
-    field_0xa80 = daNpc_Bou_Param_c::m.field_0x6c;
+    mRealShadowSize = daNpc_Bou_Param_c::m.field_0x0c;
+    mExpressionMorfFrame = daNpc_Bou_Param_c::m.field_0x6c;
     mMorfFrames = daNpc_Bou_Param_c::m.field_0x44;
     gravity = daNpc_Bou_Param_c::m.field_0x04;
 }
@@ -832,7 +832,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
         switch (prm_val) {
             case 0: {
                 actor_p = mActorMngr[0].getActorP();
-                JUT_ASSERT(0x803, 0 != actor_p);
+                JUT_ASSERT(0x803, NULL != actor_p);
                 ((daCow_c *)actor_p)->setCrazyReady();
                 daNpcT_offTmpBit(0x1C);
                 initTalk(mFlowNodeNo, NULL);
@@ -841,7 +841,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
 
             case 2: {
                 actor_p = mActorMngr[0].getActorP();
-                JUT_ASSERT(0x811, 0 != actor_p);
+                JUT_ASSERT(0x811, NULL != actor_p);
                 dComIfGp_getEvent().setPt2(actor_p);
                 Z2GetAudioMgr()->subBgmStart(0x1000011);
                 break;
@@ -849,7 +849,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
 
             case 5: {
                 actor_p = mActorMngr[0].getActorP();
-                JUT_ASSERT(0x820, 0 != actor_p);
+                JUT_ASSERT(0x820, NULL != actor_p);
                 ((daCow_c *)actor_p)->setCrazyGo();
                 break;
             }
@@ -898,7 +898,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
             if (prm_val == 2 || prm_val == 3) {
                 if (prm_val == 3) {
                     actor_p = mActorMngr[0].getActorP();
-                    JUT_ASSERT(0x853, 0 != actor_p);
+                    JUT_ASSERT(0x853, NULL != actor_p);
                     mJntAnm.lookActor(actor_p, 0.0f, 0);
                 }
 
@@ -919,7 +919,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
 
             if (prm_val == 3 && ret_val != 0) {
                 actor_p = mActorMngr[0].getActorP();
-                JUT_ASSERT(0x86A, 0 != actor_p);
+                JUT_ASSERT(0x86A, NULL != actor_p);
                 ((daCow_c *)actor_p)->setCrazyReadyDrawOn();
             }
 
@@ -932,7 +932,7 @@ int daNpc_Bou_c::cutWildGoat(int arg) {
         case 7:
         case 8: {
             actor_p = mActorMngr[0].getActorP();
-            JUT_ASSERT(0x875, 0 != actor_p);
+            JUT_ASSERT(0x875, NULL != actor_p);
             mJntAnm.lookActor(actor_p, 0.0f, 0);
             ret_val = 1;
         }
@@ -1351,7 +1351,7 @@ int daNpc_Bou_c::cutMeetingAgain(int arg) {
                     work += current.pos;
                     mGndChk.SetPos(&work);
                     work.y = dComIfG_Bgsp().GroundCross(&mGndChk);
-                    JUT_ASSERT(0xab4, -(1000000000.0f) != work.y);
+                    JUT_ASSERT(0xab4, -G_CM3D_F_INF != work.y);
                     dComIfGp_evmng_setGoal(&work);
 
                     my_svec.y = mCurAngle.y + 0x5800;
@@ -1361,7 +1361,7 @@ int daNpc_Bou_c::cutMeetingAgain(int arg) {
                     temp += work;
                     mGndChk.SetPos(&temp);
                     work.y = dComIfG_Bgsp().GroundCross(&mGndChk);
-                    JUT_ASSERT(0xabf, -(1000000000.0f) != work.y);
+                    JUT_ASSERT(0xabf, -G_CM3D_F_INF != work.y);
                     daPy_getPlayerActorClass()->setPlayerPosAndAngle(&temp, my_svec.y, 0);
                 } else {
                     my_svec.y = mPlayerAngle - home.angle.y;
@@ -1381,7 +1381,7 @@ int daNpc_Bou_c::cutMeetingAgain(int arg) {
                     work += current.pos;
                     mGndChk.SetPos(&work);
                     work.y = dComIfG_Bgsp().GroundCross(&mGndChk);
-                    JUT_ASSERT(0xad8, -(1000000000.0f) != work.y);
+                    JUT_ASSERT(0xad8, -G_CM3D_F_INF != work.y);
                     daPy_getPlayerActorClass()->setPlayerPosAndAngle(&work, mCurAngle.y + 0x8000, 0);
 
                     work.set(0.0f, 300.0f, 150.0f);
@@ -1390,7 +1390,7 @@ int daNpc_Bou_c::cutMeetingAgain(int arg) {
                     work += current.pos;
                     mGndChk.SetPos(&work);
                     work.y = dComIfG_Bgsp().GroundCross(&mGndChk);
-                    JUT_ASSERT(0xae2, -(1000000000.0f) != work.y);
+                    JUT_ASSERT(0xae2, -G_CM3D_F_INF != work.y);
                     dComIfGp_evmng_setGoal(&work);
                 }
 

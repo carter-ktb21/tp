@@ -3,6 +3,8 @@
  * JMessage Controller
  */
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JMessage/control.h"
 
 /* 802A7548-802A758C 2A1E88 0044+00 0/0 2/2 0/0 .text            __ct__Q28JMessage8TControlFv */
@@ -65,14 +67,14 @@ void JMessage::TControl::render() {
 /* 802A77E8-802A78F4 2A2128 010C+00 0/0 1/1 0/0 .text setMessageCode__Q28JMessage8TControlFUsUs */
 int JMessage::TControl::setMessageCode(u16 u16GroupID, u16 u16Index) {
     TProcessor* pProcessor = getProcessor();
-    JUT_ASSERT(120, pProcessor!=0);
+    JUT_ASSERT(120, pProcessor!=NULL);
     return setMessageCode_inReset_(pProcessor, u16GroupID, u16Index);
 }
 
 /* 802A78F4-802A7A20 2A2234 012C+00 0/0 6/6 0/0 .text setMessageID__Q28JMessage8TControlFUlUlPb */
 int JMessage::TControl::setMessageID(u32 uMsgID, u32 param_1, bool* pbValid) {
     TProcessor* pProcessor = getProcessor();
-    JUT_ASSERT(132, pProcessor!=0);
+    JUT_ASSERT(132, pProcessor!=NULL);
 
     u32 uCode = pProcessor->toMessageCode_messageID(uMsgID, param_1, pbValid);
     if (uCode == 0xFFFFFFFF) {
@@ -94,7 +96,7 @@ bool JMessage::TControl::setMessageCode_inSequence_(JMessage::TProcessor const* 
     uMessageID_ = u16Index;
     
     pResourceCache_ = pProcessor->getResourceCache();
-    JUT_ASSERT(155, pResourceCache_!=0);
+    JUT_ASSERT(155, pResourceCache_!=NULL);
 
     pMessageText_begin_ = pResourceCache_->getMessageText_messageEntry(pEntry_);
     pMessageText_current_ = pMessageText_begin_;

@@ -3,38 +3,12 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_startAndGoal.h"
-#include "d/actor/d_a_npc.h"
 #include "d/d_timer.h"
 #include "d/d_meter2_info.h"
 #include "f_op/f_op_actor_mng.h"
-
-class daStartAndGoal_Path_c : public daNpcF_Path_c {
-public:
-    /* 80D4D7B8 */ BOOL chkPassed2(cXyz);
-
-    /* 80D4D928 */ virtual ~daStartAndGoal_Path_c() {}
-};
-
-class daStartAndGoal_c : public fopAc_ac_c {
-public:
-    /* 80D4D84C */ int getType();
-    /* 80D4D884 */ int Create();
-    /* 80D4D998 */ void init();
-    /* 80D4DA68 */ void actorPosCheck();
-    /* 80D4DB30 */ int readyStartTimer();
-    /* 80D4DBAC */ BOOL isStartCheck();
-    /* 80D4DBD0 */ BOOL isReadyCheck();
-    /* 80D4DC50 */ int Execute();
-    /* 80D4DCF4 */ int Draw();
-    /* 80D4DCFC */ int Delete();
-
-    /* 0x568 */ daStartAndGoal_Path_c mPath;
-    /* 0xB98 */ u8 field_0xb98;
-    /* 0xB99 */ u8 mType;
-    /* 0xB9C */ int mAction;
-    /* 0xBA0 */ bool mStarted;
-};
 
 /* 80D4D7B8-80D4D84C 000078 0094+00 1/1 0/0 0/0 .text chkPassed2__21daStartAndGoal_Path_cF4cXyz */
 BOOL daStartAndGoal_Path_c::chkPassed2(cXyz i_checkPos) {
@@ -81,11 +55,13 @@ static timer_info l_timerType[] = {
 
 /* 80D4D884-80D4D928 000144 00A4+00 1/1 0/0 0/0 .text            Create__16daStartAndGoal_cFv */
 int daStartAndGoal_c::Create() {
-    fopAcM_SetupActor(this, daStartAndGoal_c);
+    fopAcM_ct(this, daStartAndGoal_c);
 
     init();
     return cPhs_COMPLEATE_e;
 }
+
+daStartAndGoal_Path_c::~daStartAndGoal_Path_c() {}
 
 /* 80D4DEB8-80D4DEBC 000000 0001+03 1/1 0/0 0/0 .rodata          l_DATA */
 static const u8 l_DATA[1] = {0};  // unused
@@ -98,7 +74,7 @@ void daStartAndGoal_c::init() {
 
     mPath.initialize();
     mPath.setPathInfo(fopAcM_GetParam(this) >> 8, fopAcM_GetRoomNo(this), 0);
-    JUT_ASSERT(0, 0 != mPath.getPathInfo());
+    JUT_ASSERT(0, NULL != mPath.getPathInfo());
 
     if (dComIfG_getTimerPtr() == NULL) {
         dTimer_createTimer(l_timerType[mType].mode, 9999000, l_timerType[mType].type, 0, 210.0f,

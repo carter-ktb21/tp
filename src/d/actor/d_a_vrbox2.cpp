@@ -3,10 +3,13 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_vrbox2.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
 #include "dol2asm.h"
@@ -98,10 +101,10 @@ static int daVrbox2_Draw(vrbox2_class* i_this) {
     }
 
 #ifdef DEBUG
-    if (g_kankyoHIO.field_0xB4 != 0) {
-        var_f31 = g_kankyoHIO.field_0xB8;
+    if (g_kankyoHIO.vrbox.field_0x14 != 0) {
+        var_f31 = g_kankyoHIO.vrbox.m_horizonHeight;
     } else {
-        g_kankyoHIO.field_0xB8 = var_f31;
+        g_kankyoHIO.vrbox.m_horizonHeight = var_f31;
     }
 #endif
 
@@ -400,7 +403,7 @@ static int daVrbox2_solidHeapCB(fopAc_ac_c* i_this) {
     vrbox2_class* a_this = (vrbox2_class*)i_this;
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getStageRes("vrbox_kumo.bmd");
-    JUT_ASSERT(785, modelData != 0);
+    JUT_ASSERT(785, modelData != NULL);
 
     a_this->mpKumoModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11020202);
 
@@ -409,12 +412,12 @@ static int daVrbox2_solidHeapCB(fopAc_ac_c* i_this) {
     sun_modelData = (J3DModelData*)dComIfG_getStageRes("vrbox_sun.bmd");
     if (sun_modelData != NULL) {
         a_this->model2 = mDoExt_J3DModel__create(sun_modelData, 0x80000, 0x11020202);
-        JUT_ASSERT(809, a_this->model2 != 0);
+        JUT_ASSERT(809, a_this->model2 != NULL);
         a_this->model2_und = mDoExt_J3DModel__create(sun_modelData, 0x80000, 0x11020202);
-        JUT_ASSERT(820, a_this->model2_und != 0);
+        JUT_ASSERT(820, a_this->model2_und != NULL);
 
         J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getStageRes("vrbox_sun.btk");
-        JUT_ASSERT(825, pbtk != 0);
+        JUT_ASSERT(825, pbtk != NULL);
         if (!a_this->mSunBtk.init(sun_modelData, pbtk, TRUE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1)) {
             return 0;
         }
@@ -430,7 +433,7 @@ static int daVrbox2_solidHeapCB(fopAc_ac_c* i_this) {
 
 /* 80499978-80499A1C 000F78 00A4+00 1/0 0/0 0/0 .text            daVrbox2_Create__FP10fopAc_ac_c */
 static int daVrbox2_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, vrbox2_class);
+    fopAcM_ct(i_this, vrbox2_class);
 
     int phase = cPhs_COMPLEATE_e;
     if (!fopAcM_entrySolidHeap(i_this, daVrbox2_solidHeapCB, 0x80004340)) {

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_fm.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -10,8 +12,137 @@
 #include "d/actor/d_a_obj_hhashi.h"
 #include "d/actor/d_a_obj_ystone.h"
 #include "c/c_damagereaction.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 #include "Z2AudioLib/Z2Instances.h"
+
+class daE_FM_HIO_c : public JORReflexible {
+public:
+    /* 804EF0EC */ daE_FM_HIO_c();
+
+    void genMessage(JORMContext*);
+    /* 804FA3D8 */ virtual ~daE_FM_HIO_c() {}
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 base_size;
+    /* 0x0C */ f32 field_0xc;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+    /* 0x20 */ f32 field_0x20;
+    /* 0x24 */ f32 field_0x24;
+    /* 0x28 */ f32 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ s16 field_0x34;
+    /* 0x36 */ s16 field_0x36;
+    /* 0x38 */ s16 field_0x38;
+    /* 0x3C */ f32 field_0x3c;
+    /* 0x40 */ f32 field_0x40;
+    /* 0x44 */ f32 field_0x44;
+    /* 0x48 */ f32 chain_size;
+    /* 0x4C */ f32 field_0x4c;
+    /* 0x50 */ f32 field_0x50;
+    /* 0x54 */ f32 field_0x54;
+    /* 0x58 */ f32 field_0x58;
+    /* 0x5C */ f32 field_0x5c;
+    /* 0x60 */ u8 field_0x60;
+    /* 0x61 */ u8 field_0x61;
+    /* 0x64 */ f32 field_0x64;
+    /* 0x68 */ f32 field_0x68;
+    /* 0x6C */ f32 field_0x6c;
+    /* 0x70 */ f32 field_0x70;
+    /* 0x74 */ f32 field_0x74;
+    /* 0x78 */ f32 field_0x78;
+    /* 0x7C */ f32 field_0x7c;
+    /* 0x80 */ f32 field_0x80;
+    /* 0x84 */ f32 field_0x84;
+    /* 0x88 */ f32 field_0x88;
+    /* 0x8C */ f32 field_0x8c;
+    /* 0x90 */ f32 field_0x90;
+    /* 0x94 */ s16 field_0x94;
+    /* 0x96 */ s16 field_0x96;
+    /* 0x98 */ s16 field_0x98;
+    /* 0x9A */ s16 field_0x9a;
+    /* 0x9C */ s16 field_0x9c;
+    /* 0xA0 */ f32 field_0xa0;
+    /* 0xA4 */ f32 field_0xa4;
+    /* 0xA8 */ f32 field_0xa8;
+    /* 0xAC */ u8 field_0xac;
+};
+
+enum E_FM_RES_FILE_ID {
+    /* BCK */
+    /* 0x07 */ BCK_EF_FMATTACK_A = 7,
+    /* 0x08 */ BCK_EF_FMATTACK_B,
+    /* 0x09 */ BCK_FM_ANIMAL,
+    /* 0x0A */ BCK_FM_ANIMAL02,
+    /* 0x0B */ BCK_FM_ATTACK,
+    /* 0x0C */ BCK_FM_ATTACK02,
+    /* 0x0D */ BCK_FM_BREAKCHAINL,
+    /* 0x0E */ BCK_FM_BREAKCHAINR,
+    /* 0x0F */ BCK_FM_CHANCE,
+    /* 0x10 */ BCK_FM_CHANCEDAMAGE,
+    /* 0x11 */ BCK_FM_DAMAGEWALK,
+    /* 0x12 */ BCK_FM_DAMAGE_L,
+    /* 0x13 */ BCK_FM_DAMAGE_R,
+    /* 0x14 */ BCK_FM_DEAD,
+    /* 0x15 */ BCK_FM_DEMOEND01,
+    /* 0x16 */ BCK_FM_DEMOEND02,
+    /* 0x17 */ BCK_FM_DEMOEND03,
+    /* 0x18 */ BCK_FM_DOWN,
+    /* 0x19 */ BCK_FM_DOWN02,
+    /* 0x1A */ BCK_FM_DOWNDAMAGE,
+    /* 0x1B */ BCK_FM_DOWNFR,
+    /* 0x1C */ BCK_FM_DOWNWAIT,
+    /* 0x1D */ BCK_FM_HANGWAIT,
+    /* 0x1E */ BCK_FM_KYORO2,
+    /* 0x1F */ BCK_FM_OPDEMO,
+    /* 0x20 */ BCK_FM_UP,
+    /* 0x21 */ BCK_FM_UP02,
+    /* 0x22 */ BCK_FM_WAIT01,
+    /* 0x23 */ BCK_FM_WALK,
+    /* 0x24 */ BCK_FM_WALK02,
+
+    /* BMDE */
+    /* 0x27 */ BMDE_FM_CORE = 0x27,
+
+    /* BMDR */
+    /* 0x2A */ BMDR_EF_FMATTACK_A = 0x2A,
+    /* 0X2B */ BMDR_EF_FMATTACK_B,
+    /* 0x2C */ BMDR_FM,
+    /* 0x2D */ BMDR_HANDLE,
+    /* 0x2E */ BMDR_KUSARI,
+
+    /* BRK */
+    /* 0x31 */ BRK_CORE_LIGHTON = 0x31,
+    /* 0x32 */ BRK_EF_FMATTACK_B,
+    /* 0x33 */ BRK_FM,
+    /* 0x34 */ BRK_FM_ANIMAL02,
+    /* 0x35 */ BRK_FM_ATTACK,
+    /* 0x36 */ BRK_FM_DEMOEND01,
+    /* 0x37 */ BRK_FM_DEMOEND02,
+    /* 0x38 */ BRK_FM_DEMOEND03,
+    /* 0x39 */ BRK_FM_HANGWAIT,
+    /* 0x3A */ BRK_FM_OPDEMO,
+    /* 0x3B */ BRK_FM_PUTOUT,
+    /* 0x3C */ BRK_FM_PUTOUTWAIT,
+
+    /* BTK */
+    /* 0x3F */ BTK_CORE_BEAT = 0x3F,
+    /* 0x40 */ BTK_EF_FMATTACK_A,
+    /* 0x41 */ BTK_EF_FMATTACK_B,
+    /* 0x42 */ BTK_FM,
+    /* 0x43 */ BTK_FM_ANIMAL02,
+    /* 0x44 */ BTK_FM_ATTACK,
+    /* 0x45 */ BTK_FM_DEMOEND01,
+    /* 0x46 */ BTK_FM_DEMOEND02,
+    /* 0x47 */ BTK_FM_HANGWAIT,
+    /* 0x48 */ BTK_FM_OPDEMO,
+    /* 0x49 */ BTK_FM_PUTOUT,
+    /* 0x4A */ BTK_FM_PUTOUTWAIT,
+};
 
 enum daE_FM_ACTION {
     ACTION_NORMAL,
@@ -39,8 +170,6 @@ enum daE_FM_TexAnm {
     TEXANM_DEMO_END01,
     TEXANM_DEMO_END02,
 };
-
-UNK_REL_DATA
 
 /* 804EF0EC-804EF250 0000EC 0164+00 1/1 0/0 0/0 .text            __ct__12daE_FM_HIO_cFv */
 daE_FM_HIO_c::daE_FM_HIO_c() {
@@ -106,8 +235,6 @@ static void* s_fmobj_del(void* i_actor, void* i_data) {
 
     return NULL;
 }
-
-UNK_REL_BSS;
 
 /* 804FAE95 0003+00 data_804FAE95 None */
 static u8 l_initHIO;
@@ -474,7 +601,7 @@ static void e_fm_normal(e_fm_class* i_this) {
             }
 
             i_this->field_0x5c4 = i_this->current.angle.y + sp8;
-            anm_init(i_this, 0x23, 20.0f, 2, l_HIO.field_0xc);
+            anm_init(i_this, BCK_FM_WALK, 20.0f, 2, l_HIO.field_0xc);
             i_this->mMode = 1;
             i_this->mTimers[0] = 100.0f + cM_rndF(100.0f);
         } else {
@@ -510,7 +637,7 @@ static void e_fm_normal(e_fm_class* i_this) {
         if (i_this->mTimers[0] == 0) {
             i_this->mMode = 0;
             i_this->mTimers[0] = 50.0f + cM_rndF(100.0f);
-            anm_init(i_this, 0x1E, 50.0f, 2, 1.0f);
+            anm_init(i_this, BCK_FM_KYORO2, 50.0f, 2, 1.0f);
             move_speed = 0.0f;
         } else {
             for (int i = 0; i < 2; i++) {
@@ -538,13 +665,13 @@ static void e_fm_fight_run(e_fm_class* i_this) {
     switch (i_this->mMode) {
     case 0:
         i_this->mTimers[0] = 20.0f + cM_rndF(10.0f);
-        anm_init(i_this, 0x22, 30.0f, 2, 1.0f);
+        anm_init(i_this, BCK_FM_WAIT01, 30.0f, 2, 1.0f);
         i_this->mTimers[2] = l_HIO.field_0x40 + cM_rndF(0.5f * l_HIO.field_0x40);
         i_this->mMode = 1;
         /* fallthrough */
     case 1:
         if (i_this->mTimers[0] == 0) {
-            anm_init(i_this, 0x24, 30.0f, 2, l_HIO.field_0xc);
+            anm_init(i_this, BCK_FM_WALK02, 30.0f, 2, l_HIO.field_0xc);
             i_this->mMode = 2;
         }
         break;
@@ -618,7 +745,7 @@ static void e_fm_fight_run(e_fm_class* i_this) {
     if (do_f_fight) {
         i_this->mAction = ACTION_F_FIGHT;
         i_this->mMode = 0;
-        anm_init(i_this, 0x22, 20.0f, 2, 1.0f);
+        anm_init(i_this, BCK_FM_WAIT01, 20.0f, 2, 1.0f);
     }
 
     if (do_n_fight) {
@@ -637,7 +764,7 @@ static void e_fm_n_fight(e_fm_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0xC, 10.0f, 0, 1.0f);
+        anm_init(i_this, BCK_FM_ATTACK02, 10.0f, 0, 1.0f);
         i_this->mSound.startCreatureSound(Z2SE_EN_FM_ATTACK02_CHAIN, 0, -1);
         i_this->mMode = 1;
         break;
@@ -679,7 +806,7 @@ static void e_fm_n_fight(e_fm_class* i_this) {
         if (i_this->mpFmModelMorf->isStop()) {
             if (cM_rndF(1.0f) < 0.5f && pl_check(i_this, l_HIO.field_0x24 + TREG_F(11), 0x3000)) {
                 i_this->mAction = ACTION_FIRE;
-                anm_init(i_this, 0x22, 20.0f, 2, 1.0f);
+                anm_init(i_this, BCK_FM_WAIT01, 20.0f, 2, 1.0f);
             } else {
                 i_this->mAction = ACTION_NORMAL;
             }
@@ -730,7 +857,7 @@ static void e_fm_f_fight(e_fm_class* i_this) {
     switch (i_this->mMode) {
     case 0:
         if ((int)i_this->mpFmBtk[0]->getFrame() == 0) {
-            anm_init(i_this, 0xB, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_ATTACK, 10.0f, 0, 1.0f);
             i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_ATTACK_TAME, -1);
             i_this->mSound.startCreatureSound(Z2SE_EN_FM_ATTACK_TAME, 0, -1);
 
@@ -804,7 +931,7 @@ static void animal_eff_set(e_fm_class* i_this, s16 param_1) {
 static void e_fm_animal(e_fm_class* i_this) {
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0xA, 10.0f, 0, 1.0f);
+        anm_init(i_this, BCK_FM_ANIMAL02, 10.0f, 0, 1.0f);
         i_this->mMode = 1;
         break;
     case 1:
@@ -827,7 +954,7 @@ static void e_fm_fire(e_fm_class* i_this) {
     case 0:
         if ((int)i_this->mpFmBtk[0]->getFrame() == 0) {
             i_this->field_0x1830 = 0.0f;
-            anm_init(i_this, 9, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_ANIMAL, 10.0f, 0, 1.0f);
             i_this->mMode = 1;
             i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_GAOO_SHORT, -1);
         }
@@ -932,7 +1059,7 @@ static void e_fm_damage_run(e_fm_class* i_this) {
     case 0:
         if (i_this->mpFmModelMorf->isStop()) {
             i_this->mTimers[0] = l_HIO.field_0xa4 + cM_rndF(50.0f);
-            anm_init(i_this, 0x11, 5.0f, 2, 2.0f);
+            anm_init(i_this, BCK_FM_DAMAGEWALK, 5.0f, 2, 2.0f);
             i_this->mMode = 1;
             Z2GetAudioMgr()->changeBgmStatus(3);
         }
@@ -1017,7 +1144,7 @@ static void e_fm_damage_run(e_fm_class* i_this) {
         }
 
         if (((i_this->mTimers[0] < l_HIO.field_0xa4 - 250.0f) && i_this->field_0x809 != 0) || i_this->mTimers[0] == 0) {
-            anm_init(i_this, 0xA, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_ANIMAL02, 10.0f, 0, 1.0f);
             i_this->mMode = 2;
             i_this->mPlayTexAnmNo = TEXANM_ANIMAL;
             i_this->mpFmBrk[TEXANM_ANIMAL]->setFrame(0.0f);
@@ -1304,7 +1431,7 @@ static void demo_camera(e_fm_class* i_this) {
         }
 
         if (i_this->mDemoCamTimer == 60) {
-            anm_init(i_this, 0x1F, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_OPDEMO, 10.0f, 0, 1.0f);
             i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_OPDEMO, -1);
             i_this->mSound.startCreatureSound(Z2SE_EN_FM_OPDEMO, 0, -1);
 
@@ -1521,7 +1648,7 @@ static void demo_camera(e_fm_class* i_this) {
         i_this->mDemoCamCenter += actor->current.pos;
 
         if (i_this->mDemoCamTimer == XREG_S(6) + 85) {
-            anm_init(i_this, 0x16, 1.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_DEMOEND02, 1.0f, 0, 1.0f);
             i_this->mPlayTexAnmNo = TEXANM_DEMO_END02;
             i_this->mpFmBrk[TEXANM_DEMO_END02]->setFrame(0.0f);
             i_this->mpFmBtk[TEXANM_DEMO_END02]->setFrame(0.0f);
@@ -1657,7 +1784,8 @@ static void demo_camera(e_fm_class* i_this) {
         if (i_this->mDemoCamTimer == VREG_S(3) + 110) {
             i_this->mDemoCamMode = 100;
             dComIfGs_onStageBossEnemy();
-            dComIfGs_onEventBit((u16)dSv_event_flag_c::saveBitLabels[64]);
+            /* dSv_event_flag_c::M_031 - Goron Mines - Goron Mines clear */
+            dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[64]);
         }
         break;
     }
@@ -1691,7 +1819,7 @@ static s8 e_fm_down(e_fm_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0x18, 10.0f, 0, 1.0f);
+        anm_init(i_this, BCK_FM_DOWN, 10.0f, 0, 1.0f);
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DOWN, -1);
         i_this->mMode = 1;
         i_this->field_0x7c0 = 2;
@@ -1734,18 +1862,20 @@ static s8 e_fm_down(e_fm_class* i_this) {
         }
 
         if (i_this->mpFmModelMorf->isStop()) {
-            anm_init(i_this, 0x1C, 0.0f, 2, 1.0f);
+            anm_init(i_this, BCK_FM_DOWNWAIT, 0.0f, 2, 1.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = 33;
             i_this->mTimers[1] = l_HIO.field_0x9c;
+            /* dSv_event_flag_c::F_0256 - For E3 2006 - Knocked down boss at leased once */
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[256]);
         }
         break;
     case 2:
+        /* dSv_event_flag_c::F_0257 - For E3 2006 - Only ON when boss is in hollow state (normally off, changes in real time) */
         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[257]);
 
-        if (i_this->mAnm == 0x1A && i_this->mpFmModelMorf->isStop()) {
-            anm_init(i_this, 0x1C, 5.0f, 2, 1.0f);
+        if (i_this->mAnm == BCK_FM_DOWNDAMAGE && i_this->mpFmModelMorf->isStop()) {
+            anm_init(i_this, BCK_FM_DOWNWAIT, 5.0f, 2, 1.0f);
         }
 
         if (i_this->mTimers[0] == 1) {
@@ -1765,7 +1895,7 @@ static s8 e_fm_down(e_fm_class* i_this) {
         }
 
         if (i_this->mTimers[1] == 0) {
-            anm_init(i_this, 0x20, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_UP, 10.0f, 0, 1.0f);
             i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_UP, -1);
             i_this->mMode = 3;
             enemy->offDownFlg();
@@ -1779,7 +1909,7 @@ static s8 e_fm_down(e_fm_class* i_this) {
         sp8 = 0;
 
         if (i_this->mpFmModelMorf->isStop()) {
-            anm_init(i_this, 0xA, 10.0f, 0, 1.0f);
+            anm_init(i_this, BCK_FM_ANIMAL02, 10.0f, 0, 1.0f);
             i_this->mMode = 4;
             i_this->mPlayTexAnmNo = TEXANM_ANIMAL;
             i_this->mpFmBrk[TEXANM_ANIMAL]->setFrame(0.0f);
@@ -1826,7 +1956,7 @@ static s8 e_fm_a_down(e_fm_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0x19, 15.0f, 0, 1.0f);
+        anm_init(i_this, BCK_FM_DOWN02, 15.0f, 0, 1.0f);
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DOWN, -1);
         i_this->mMode = 1;
         break;
@@ -1857,7 +1987,7 @@ static s8 e_fm_a_down(e_fm_class* i_this) {
         }
 
         if (i_this->mpFmModelMorf->isStop()) {
-            anm_init(i_this, 0x1C, 0.0f, 2, 1.0f);
+            anm_init(i_this, BCK_FM_DOWNWAIT, 0.0f, 2, 1.0f);
             i_this->mAction = ACTION_DOWN;
             i_this->mMode = 2;
             i_this->mTimers[0] = 33;
@@ -1891,7 +2021,7 @@ static s8 e_fm_start(e_fm_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0x1D, 0.0f, 2, 1.0f);
+        anm_init(i_this, BCK_FM_HANGWAIT, 0.0f, 2, 1.0f);
         i_this->mPlayTexAnmNo = TEXANM_HANG_WAIT;
         i_this->mMode = 1;
         i_this->mChain[3].field_0x617e = 1;
@@ -1986,7 +2116,7 @@ static s8 e_fm_end(e_fm_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 0x15, 1.0f, 0, 1.0f);
+        anm_init(i_this, BCK_FM_DEMOEND01, 1.0f, 0, 1.0f);
         i_this->mMode = 1;
         Z2GetAudioMgr()->bgmStop(0x1E, 0);
         i_this->mPlayTexAnmNo = TEXANM_DEMO_END01;
@@ -1997,7 +2127,7 @@ static s8 e_fm_end(e_fm_class* i_this) {
     case 1:
         break;
     case 10:
-        anm_init(i_this, 0x15, 0.0f, 0, 0.0f);
+        anm_init(i_this, BCK_FM_DEMOEND01, 0.0f, 0, 0.0f);
         i_this->mMode = 11;
         i_this->mPlayTexAnmNo = TEXANM_DEMO_END01;
         i_this->mpFmBrk[TEXANM_DEMO_END01]->setFrame(0.0f);
@@ -2059,20 +2189,22 @@ static void damage_check(e_fm_class* i_this) {
                         carry_off(i_this, 2);
                         carry_off(i_this, 3);
                     } else {
-                        anm_init(i_this, 0x21, 5.0f, 0, 1.0f);
+                        anm_init(i_this, BCK_FM_UP02, 5.0f, 0, 1.0f);
                         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_UP02, -1);
                         i_this->mMode = 3;
                         Z2GetAudioMgr()->changeBgmStatus(2);
                     }
                 } else {
-                    anm_init(i_this, 0x1A, 3.0f, 0, 1.0f);
+                    anm_init(i_this, BCK_FM_DOWNDAMAGE, 3.0f, 0, 1.0f);
                     i_this->mSound.startCreatureSound(Z2SE_EN_FM_FOOTNOTE, 0, -1);
                 }
 
                 i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DAMAGE, -1);
+                /* dSv_event_flag_c::F_0670 - Goron Mines - Hitting knocked-down Fyrus */
                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[670]);
             } else {
                 i_this->field_0x804++;
+                /* dSv_event_flag_c::F_0254 - For E3 2006 - Hit boss's weak spot at least once */
                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[254]);
 
                 if (i_this->field_0x804 >= 10) {
@@ -2082,7 +2214,7 @@ static void damage_check(e_fm_class* i_this) {
                     i_this->mDemoCamMode = 20;
                 } else {
                     i_this->mAction = ACTION_DAMAGE_RUN;
-                    anm_init(i_this, 0x10, 3.0f, 0, 1.0f);
+                    anm_init(i_this, BCK_FM_CHANCEDAMAGE, 3.0f, 0, 1.0f);
                     i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_CHANCEDAMAGE, -1);
                 }
                 i_this->mMode = 0;
@@ -2436,6 +2568,7 @@ static void chain_control3(e_fm_class* i_this, chain_s* i_chain_s, int param_2) 
                     }
 
                     i_chain_s->field_0x617e = 0;
+                    /* dSv_event_flag_c::F_0669 - Goron Mines - Pulled on Fyrus chains at least once */
                     dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[669]);
                 }
             }
@@ -2507,8 +2640,10 @@ static void action(e_fm_class* i_this) {
 
     i_this->field_0x1b07c = 1;
 
-    dComIfGs_offEventBit((u16)dSv_event_flag_c::saveBitLabels[255]);
-    dComIfGs_offEventBit((u16)dSv_event_flag_c::saveBitLabels[257]);
+    /* dSv_event_flag_c::F_0255 - For E3 2006 - Boss exhausted (grabbing chains) only on during state (normally off) */
+    dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[255]);
+    /* dSv_event_flag_c::F_0257 - For E3 2006 - Only ON when boss is in hollow state (normally off, changes in real time) */
+    dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[257]);
 
     switch (i_this->mAction) {
     case ACTION_NORMAL:
@@ -2529,7 +2664,8 @@ static void action(e_fm_class* i_this) {
         break;
     case ACTION_DAMAGE_RUN:
         e_fm_damage_run(i_this);
-        dComIfGs_onEventBit((u16)dSv_event_flag_c::saveBitLabels[255]);
+        /* dSv_event_flag_c::F_0255 - For E3 2006 - Boss exhausted (grabbing chains) only on during state (normally off) */
+        dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[255]);
         break;
     case ACTION_ANIMAL:
         e_fm_animal(i_this);
@@ -2641,7 +2777,7 @@ static void action(e_fm_class* i_this) {
 
     if (attn_on) {
         fopAcM_OnStatus(actor, 0);
-        actor->attention_info.flags = 4;
+        actor->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(actor, 0);
         actor->attention_info.flags = 0;
@@ -2893,25 +3029,25 @@ static int daE_FM_Execute(e_fm_class* i_this) {
 
     i_this->mpFmModelMorf->play(&actor->eyePos, 0, 0);
 
-    if (i_this->mAnm == 0x15 && i_this->mpFmModelMorf->checkFrame(1.0f)) {
+    if (i_this->mAnm == BCK_FM_DEMOEND01 && i_this->mpFmModelMorf->checkFrame(1.0f)) {
         i_this->mSound.startCreatureSound(Z2SE_EN_FM_DEMOEND, 0, -1);
         i_this->mSound.startCreatureSound(Z2SE_EN_FM_DEMOEND_CORE, 0, -1);
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DEMOEND, -1);
-    } else if (i_this->mAnm == 0xF && i_this->mpFmModelMorf->checkFrame(20.0f)) {
+    } else if (i_this->mAnm == BCK_FM_CHANCE && i_this->mpFmModelMorf->checkFrame(20.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_CHANCE, -1);
-    } else if (i_this->mAnm == 0x11 && (i_this->mpFmModelMorf->checkFrame(1.0f) || i_this->mpFmModelMorf->checkFrame(30.0f))) {
+    } else if (i_this->mAnm == BCK_FM_DAMAGEWALK && (i_this->mpFmModelMorf->checkFrame(1.0f) || i_this->mpFmModelMorf->checkFrame(30.0f))) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DAMAGEWALK, -1);
-    } else if (i_this->mAnm == 0x1C && i_this->mpFmModelMorf->checkFrame(5.0f)) {
+    } else if (i_this->mAnm == BCK_FM_DOWNWAIT && i_this->mpFmModelMorf->checkFrame(5.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_DOWNWAIT, -1);
-    } else if (i_this->mAnm == 0x1E && (i_this->mpFmModelMorf->checkFrame(1.0f) || i_this->mpFmModelMorf->checkFrame(30.0f))) {
+    } else if (i_this->mAnm == BCK_FM_KYORO2 && (i_this->mpFmModelMorf->checkFrame(1.0f) || i_this->mpFmModelMorf->checkFrame(30.0f))) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_KYORO, -1);
-    } else if (i_this->mAnm == 0x21 && i_this->mpFmModelMorf->checkFrame(145.0f)) {
+    } else if (i_this->mAnm == BCK_FM_UP02 && i_this->mpFmModelMorf->checkFrame(145.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_UP02_2, -1);
-    } else if (i_this->mAnm == 0x22 && i_this->mpFmModelMorf->checkFrame(13.0f)) {
+    } else if (i_this->mAnm == BCK_FM_WAIT01 && i_this->mpFmModelMorf->checkFrame(13.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_WAIT, -1);
-    } else if (i_this->mAnm == 0xA && i_this->mpFmModelMorf->checkFrame(1.0f)) {
+    } else if (i_this->mAnm == BCK_FM_ANIMAL02 && i_this->mpFmModelMorf->checkFrame(1.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_GAOO_LONG, -1);
-    } else if (i_this->mAnm == 0x1D && i_this->mpFmModelMorf->checkFrame(1.0f)) {
+    } else if (i_this->mAnm == BCK_FM_HANGWAIT && i_this->mpFmModelMorf->checkFrame(1.0f)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_FM_V_HANGWAIT, -1);
     }
 
@@ -3270,7 +3406,7 @@ static int daE_FM_Execute(e_fm_class* i_this) {
         i_this->field_0x182c = 0;
     }
 
-    if (i_this->mAnm == 0x15) {
+    if (i_this->mAnm == BCK_FM_DEMOEND01) {
         int anm_frame = i_this->mpFmModelMorf->getFrame();
         if (anm_frame == 90 || anm_frame == 120) {
             dComIfGp_getVibration().StartShock(VIBMODE_S_POWER3, 1, cXyz(0.0f, 1.0f, 0.0f));
@@ -3287,7 +3423,7 @@ static int daE_FM_Execute(e_fm_class* i_this) {
                 emitter->setGlobalRTMatrix(model->getAnmMtx(3));
             }
         }
-    } else if (i_this->mAnm == 0x1F) {
+    } else if (i_this->mAnm == BCK_FM_OPDEMO) {
         i_this->field_0x2350 = dComIfGp_particle_set(i_this->field_0x2350, 0x872C, &actor->current.pos, NULL, NULL);
         
         JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(i_this->field_0x2350);
@@ -3387,13 +3523,14 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     J3DModelData* modelData;
     e_fm_class* a_this = (e_fm_class*)i_this;
 
-    a_this->mpFmModelMorf = new mDoExt_McaMorf((J3DModelData*)dComIfG_getObjectRes("E_fm", 0x2C), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_fm", 0x22), 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
+    a_this->mpFmModelMorf = new mDoExt_McaMorf(static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", BMDR_FM)), NULL, NULL,
+                                               static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("E_fm", BCK_FM_WAIT01)), 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
     if (a_this->mpFmModelMorf == NULL || a_this->mpFmModelMorf->getModel() == NULL) {
         return 0;
     }
 
     J3DModel* fm_model = a_this->mpFmModelMorf->getModel();
-    fm_model->setUserArea((u32)a_this);
+    fm_model->setUserArea((uintptr_t)a_this);
 
     for (u16 i = 0; i < fm_model->getModelData()->getJointNum(); i++) {
         if (i == 1 || i == 2) {
@@ -3414,8 +3551,13 @@ static int useHeapInit(fopAc_ac_c* i_this) {
             anm_mode = 2;
         }
 
-        static int brk[] = {0x33, 0x35, 0x3B, 0x3C, 0x34, 0x3A, 0x39, 0x36, 0x37};
-        if (!a_this->mpFmBrk[i]->init(a_this->mpFmModelMorf->getModel()->getModelData(), (J3DAnmTevRegKey*)dComIfG_getObjectRes("E_fm", brk[i]), 1, anm_mode, 1.0f, 0, -1)) {
+        static int brk[] = {
+            BRK_FM, BRK_FM_ATTACK, BRK_FM_PUTOUT, BRK_FM_PUTOUTWAIT, BRK_FM_ANIMAL02, 
+            BRK_FM_OPDEMO, BRK_FM_HANGWAIT, BRK_FM_DEMOEND01, BRK_FM_DEMOEND02
+        };
+        if (a_this->mpFmBrk[i]->init(a_this->mpFmModelMorf->getModel()->getModelData(),
+                                     static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("E_fm", brk[i])),
+                                     1, anm_mode, 1.0f, 0, -1) == FALSE) {
             return 0;
         }
 
@@ -3424,13 +3566,19 @@ static int useHeapInit(fopAc_ac_c* i_this) {
             return 0;
         }
 
-        static int btk[] = {0x42, 0x44, 0x49, 0x4A, 0x43, 0x48, 0x47, 0x45, 0x46};
-        if (!a_this->mpFmBtk[i]->init(a_this->mpFmModelMorf->getModel()->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes("E_fm", btk[i]), 1, anm_mode, 1.0f, 0, -1)) {
+        static int btk[] = {
+            BTK_FM, BTK_FM_ATTACK, BTK_FM_PUTOUT, BTK_FM_PUTOUTWAIT, BTK_FM_ANIMAL02, 
+            BTK_FM_OPDEMO, BTK_FM_HANGWAIT, BTK_FM_DEMOEND01, BTK_FM_DEMOEND02
+        };
+        if (a_this->mpFmBtk[i]->init(a_this->mpFmModelMorf->getModel()->getModelData(),
+                                     static_cast<J3DAnmTextureSRTKey*>(dComIfG_getObjectRes("E_fm", btk[i])),
+                                     1, anm_mode, 1.0f, 0, -1) == FALSE) {
             return 0;
         }
     }
 
-    a_this->mpDemoFmModelMorf = new mDoExt_McaMorf((J3DModelData*)dComIfG_getObjectRes("E_fm", 0x2C), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_fm", 0x17), 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
+    a_this->mpDemoFmModelMorf = new mDoExt_McaMorf(static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", BMDR_FM)), NULL, NULL,
+                                                   static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("E_fm", BCK_FM_DEMOEND03)), 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
     if (a_this->mpDemoFmModelMorf == NULL || a_this->mpDemoFmModelMorf->getModel() == NULL) {
         return 0;
     }
@@ -3440,12 +3588,14 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpDemoFmBrk->init(a_this->mpFmModelMorf->getModel()->getModelData(), (J3DAnmTevRegKey*)dComIfG_getObjectRes("E_fm", 0x38), 1, 0, 1.0f, 0, -1)) {
+    if (a_this->mpDemoFmBrk->init(a_this->mpFmModelMorf->getModel()->getModelData(),
+                                  static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("E_fm", BRK_FM_DEMOEND03)),
+                                  1, 0, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("E_fm", 0x27);
-    JUT_ASSERT(7257, modelData != 0);
+    modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", BMDE_FM_CORE));
+    JUT_ASSERT(7257, modelData != NULL);
     a_this->mpCoreModel = mDoExt_J3DModel__create(modelData, 0, 0x11020203);
     if (a_this->mpCoreModel == NULL) {
         return 0;
@@ -3456,7 +3606,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpCoreBrk->init(a_this->mpCoreModel->getModelData(), (J3DAnmTevRegKey*)dComIfG_getObjectRes("E_fm", 0x31), 1, 2, 1.0f, 0, -1)) {
+    if (a_this->mpCoreBrk->init(a_this->mpCoreModel->getModelData(),
+                                static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("E_fm", BRK_CORE_LIGHTON)),
+                                1, 2, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
@@ -3465,15 +3617,17 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpCoreBtk->init(a_this->mpCoreModel->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes("E_fm", 0x3F), 1, 0, 1.0f, 0, -1)) {
+    if (a_this->mpCoreBtk->init(a_this->mpCoreModel->getModelData(),
+                                static_cast<J3DAnmTextureSRTKey*>(dComIfG_getObjectRes("E_fm", BTK_CORE_BEAT)),
+                                1, 0, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
     a_this->mpCoreBtk->setPlaySpeed(0.0f);
 
     for (int i = 0; i < 2; i++) {
-        static int eff_bmd[] = {0x2A, 0x2B};
-        a_this->mpAttackEfModelMorf[i] = new mDoExt_McaMorf((J3DModelData*)dComIfG_getObjectRes("E_fm", eff_bmd[i]), NULL, NULL, NULL, 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
+        static int eff_bmd[] = {BMDR_EF_FMATTACK_A, BMDR_EF_FMATTACK_B};
+        a_this->mpAttackEfModelMorf[i] = new mDoExt_McaMorf(static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", eff_bmd[i])), NULL, NULL, NULL, 0, 1.0f, 0, -1, 1, NULL, 0x80000, 0x11000284);
         if (a_this->mpAttackEfModelMorf[i] == NULL || a_this->mpAttackEfModelMorf[i]->getModel() == NULL) {
             return 0;
         }
@@ -3484,7 +3638,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
                 return 0;
             }
 
-            if (!a_this->mpAttackEfBrk->init(a_this->mpAttackEfModelMorf[i]->getModel()->getModelData(), (J3DAnmTevRegKey*)dComIfG_getObjectRes("E_fm", 0x32), 1, 2, 1.0f, 0, -1)) {
+            if (a_this->mpAttackEfBrk->init(a_this->mpAttackEfModelMorf[i]->getModel()->getModelData(),
+                                            static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("E_fm", BRK_EF_FMATTACK_B)),
+                                            1, 2, 1.0f, 0, -1) == FALSE) {
                 return 0;
             }
         }
@@ -3494,17 +3650,19 @@ static int useHeapInit(fopAc_ac_c* i_this) {
             return 0;
         }
 
-        static int eff_btk[] = {0x40, 0x41};
-        if (!a_this->mpAttackEfBtk[i]->init(a_this->mpAttackEfModelMorf[i]->getModel()->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes("E_fm", eff_btk[i]), 1, 2, 1.0f, 0, -1)) {
+        static int eff_btk[] = {BTK_EF_FMATTACK_A, BTK_EF_FMATTACK_B};
+        if (a_this->mpAttackEfBtk[i]->init(a_this->mpAttackEfModelMorf[i]->getModel()->getModelData(),
+                                           static_cast<J3DAnmTextureSRTKey*>(dComIfG_getObjectRes("E_fm", eff_btk[i])),
+                                           1, 2, 1.0f, 0, -1) == FALSE) {
             return 0;
         }
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("E_fm", 0x2E);
-    JUT_ASSERT(7404, modelData != 0);
+    modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", BMDR_KUSARI));
+    JUT_ASSERT(7404, modelData != NULL);
     
-    J3DModelData* modelData2 = (J3DModelData*)dComIfG_getObjectRes("E_fm", 0x2D);
-    JUT_ASSERT(7408, modelData2 != 0);
+    J3DModelData* modelData2 = static_cast<J3DModelData*>(dComIfG_getObjectRes("E_fm", BMDR_HANDLE));
+    JUT_ASSERT(7408, modelData2 != NULL);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 26; j++) {
@@ -3518,7 +3676,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
                 return 0;
             }
 
-            dKy_tevstr_init(&a_this->mChain[i].tevstr[j], fopAcM_GetRoomNo(i_this), 0xFF);
+            dKy_tevstr_init(&a_this->mChain[i].tevstr[j], (int) fopAcM_GetRoomNo(i_this), 0xFF);
         }
 
         a_this->mChain[i].field_0x61d0 = 26;
@@ -3533,7 +3691,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 804F9614-804F9B64 00A614 0550+00 1/0 0/0 0/0 .text            daE_FM_Create__FP10fopAc_ac_c */
 static int daE_FM_Create(fopAc_ac_c* i_this) {
     e_fm_class* a_this = (e_fm_class*)i_this;
-    fopAcM_SetupActor(a_this, e_fm_class);
+    fopAcM_ct(a_this, e_fm_class);
 
     static dCcD_SrcSph cc_sph_src = {
         {
@@ -3670,7 +3828,7 @@ static int daE_FM_Create(fopAc_ac_c* i_this) {
             l_HIO.no = mDoHIO_CREATE_CHILD("火魔人", &l_HIO);
         }
 
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(i_this, a_this->mpFmModelMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(i_this, -200.0f, -200.0f, -200.0f);
@@ -3745,9 +3903,13 @@ static int daE_FM_Create(fopAc_ac_c* i_this) {
         a_this->field_0x794 = 1.0f;
         a_this->field_0x778 = 1.0f;
 
+        /* dSv_event_flag_c::F_0254 - For E3 2006 - Hit boss's weak spot at least once */
         dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[254]);
+        /* dSv_event_flag_c::F_0256 - For E3 2006 - Knocked down boss at leased once */
         dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[256]);
+        /* dSv_event_flag_c::F_0669 - Goron Mines - Pulled on Fyrus chains at least once */
         dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[669]);
+        /* dSv_event_flag_c::F_0670 - Goron Mines - Hitting knocked-down Fyrus */
         dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[670]);
         demo_stop = 0;
 

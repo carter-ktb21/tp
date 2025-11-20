@@ -3,6 +3,8 @@
  * Object - Hookshot Target
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_hsTarget.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -37,7 +39,7 @@ static const u32 l_dzbIdx[2] = {7, 7};
 
 /* 80C1F598-80C1F6B0 000258 0118+00 1/1 0/0 0/0 .text            create__12daHsTarget_cFv */
 int daHsTarget_c::create() {
-    fopAcM_SetupActor(this, daHsTarget_c);
+    fopAcM_ct(this, daHsTarget_c);
 
     mIndex = getModelType();
     if (mIndex == 0x0f) {
@@ -60,7 +62,7 @@ int daHsTarget_c::create() {
 
 /* 80C1F6B0-80C1F6C4 000370 0014+00 1/0 0/0 0/0 .text            Execute__12daHsTarget_cFPPA3_A4_f
  */
-int daHsTarget_c::Execute(f32 (**param_0)[3][4]) {
+int daHsTarget_c::Execute(Mtx** param_0) {
     *param_0 = &mpModel->getBaseTRMtx();
     return 1;
 }

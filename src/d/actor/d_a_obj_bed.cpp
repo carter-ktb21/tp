@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_bed.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
@@ -26,7 +28,7 @@ daObj_Bed_c::~daObj_Bed_c() {
 
 /* 80BAD790-80BADA00 000210 0270+00 1/1 0/0 0/0 .text            create__11daObj_Bed_cFv */
 cPhs__Step daObj_Bed_c::create() {
-    fopAcM_SetupActor(this, daObj_Bed_c);
+    fopAcM_ct(this, daObj_Bed_c);
     mType = getType();
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, getResName());
     if (step == cPhs_COMPLEATE_e) {
@@ -48,7 +50,7 @@ cPhs__Step daObj_Bed_c::create() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1e9f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             setEnvTevColor();
             setRoomNo();
         }
@@ -90,7 +92,7 @@ int daObj_Bed_c::Execute() {
     mAcch.CrrPos(dComIfG_Bgsp());
     mGndChk = mAcch.m_gnd;
     mGroundH = mAcch.GetGroundH();
-    if (mGroundH != -1e9f) {
+    if (mGroundH != -G_CM3D_F_INF) {
         setEnvTevColor();
         setRoomNo();
     }
@@ -109,7 +111,7 @@ int daObj_Bed_c::Draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpModel, &tevStr);
     mDoExt_modelUpdateDL(mpModel);
-    if (mGroundH != -1e9f) {
+    if (mGroundH != -G_CM3D_F_INF) {
         mShadow = dComIfGd_setShadow(mShadow, 1, mpModel, &current.pos,
                                      daObj_Bed_Param_c::m.field_0xc, 20.0f,
                                      current.pos.y, mGroundH, mGndChk, &tevStr, 0,

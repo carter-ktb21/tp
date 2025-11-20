@@ -3,6 +3,8 @@
  *
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_mg_fish.h"
 
 #include "JSystem/JKernel/JKRSolidHeap.h"
@@ -62,8 +64,6 @@
 #define GEDOU_KIND_KN 25
 #define GEDOU_KIND_ED 26
 #define GEDOU_KIND_SY 27
-
-UNK_REL_DATA
 
 /* 805364C4-805364CC 000020 0008+00 0/1 0/0 0/0 .data            check_kind */
 static u16 check_kind[4] = {
@@ -184,8 +184,8 @@ static void* s_lure_sub(void* a, void* b) {
     if (fopAc_IsActor(a)) {
         if (fopAcM_GetName(a) == PROC_MG_ROD) {
             dmg_rod_class* rod = (dmg_rod_class*)a;
-            if (rod->field_0xf7c == 0 &&
-                rod->field_0xf7e == 4 &&
+            if (rod->kind == 0 &&
+                rod->action == 4 &&
                 rod->field_0x10a9 == 0 &&
                 rod->field_0x100d != 0) {
                 return rod;
@@ -200,10 +200,10 @@ static void* s_esa_sub(void* a, void* b) {
     if (fopAc_IsActor(a)) {
         if (fopAcM_GetName(a) == PROC_MG_ROD) {
             dmg_rod_class* rod = (dmg_rod_class*)a;
-            if (rod->field_0xf7c == 1 &&
-                rod->field_0xf7e != 5 &&
+            if (rod->kind == 1 &&
+                rod->action != 5 &&
                 rod->field_0x100d != 0 &&
-                rod->current.pos.y < rod->field_0x590 - 20.0f) {
+                rod->actor.current.pos.y < rod->field_0x590 - 20.0f) {
                 return rod;
             }
         }
@@ -224,8 +224,6 @@ static void* s_bait_sub(void* a, void* b) {
     }
     return NULL;
 }
-
-UNK_REL_BSS
 static u8 lit_1008;
 static u8 lit_1007;
 
@@ -260,7 +258,7 @@ static s32 search_lure(mg_fish_class* i_this, int param_2) {
             fpcM_Search(s_other_search_sub, i_this);
             if (s_fish_ct <= 1) {
                 f32 fVar1 = i_this->field_0x5ec;
-                if (rod->field_0xf80 == 4) {
+                if (rod->lure_type == MG_LURE_SP) {
                     fVar1 = 1000.0f;
                 } else {
                     if (rod->field_0x1009 != 0) {
@@ -274,13 +272,13 @@ static s32 search_lure(mg_fish_class* i_this, int param_2) {
                     fVar1 *= 0.5f;
                 }
                 if (i_this->mGedouKind != GEDOU_KIND_CF_1 &&
-                    rod->field_0xf80 != 4 &&
-                    (i_this->field_0x750 & learn_d[rod->field_0xf80]) != 0)
+                    rod->lure_type != MG_LURE_SP &&
+                    (i_this->field_0x750 & learn_d[rod->lure_type]) != 0)
                 {
                     return -1;
                 }
-                cXyz diff = rod->current.pos - i_this->actor.current.pos;
-                if (rod->field_0xf80 == 2 && rod->field_0x100c >= 10) {
+                cXyz diff = rod->actor.current.pos - i_this->actor.current.pos;
+                if (rod->lure_type == MG_LURE_PO && rod->field_0x100c >= 10) {
                     diff.y = -80.0f;
                 }
                 if (diff.abs() < fVar1) {
@@ -292,15 +290,15 @@ static s32 search_lure(mg_fish_class* i_this, int param_2) {
         fopAc_ac_c* rod_actor = (fopAc_ac_c*)fpcM_Search(s_esa_sub, i_this);
         if (rod_actor != NULL) {
             dmg_rod_class* rod = (dmg_rod_class*)rod_actor;
-            if (i_this->mGedouKind == GEDOU_KIND_KS_2 && rod->field_0x102d != 1) {
+            if (i_this->mGedouKind == GEDOU_KIND_KS_2 && rod->hook_kind != 1) {
                 return -1;
             }
-            if ((i_this->mGedouKind == GEDOU_KIND_BG || rod->field_0x102d == 1 || rod->field_0x102c != 0) &&
-                rod->current.pos.y < i_this->mSurfaceY - 60.0f)
+            if ((i_this->mGedouKind == GEDOU_KIND_BG || rod->hook_kind == 1 || rod->esa_kind != 0) &&
+                rod->actor.current.pos.y < i_this->mSurfaceY - 60.0f)
             {
                 f32 maxLatDist = i_this->field_0x5ec;
-                f32 distX = rod->current.pos.x - i_this->actor.current.pos.x;
-                f32 distZ = rod->current.pos.z - i_this->actor.current.pos.z;
+                f32 distX = rod->actor.current.pos.x - i_this->actor.current.pos.x;
+                f32 distZ = rod->actor.current.pos.z - i_this->actor.current.pos.z;
                 f32 latDist = JMAFastSqrt(distX * distX + distZ * distZ);
                 if (latDist < maxLatDist) {
                     return fopAcM_GetID(rod);
@@ -754,7 +752,7 @@ static f32 get_ground_y(mg_fish_class* i_this, cXyz* param_2) {
 static void mf_swim(mg_fish_class* i_this) {
     cXyz delta;
     switch (i_this->mActionPhase) {
-    case 0:
+    case 0: {
         i_this->mNextPos.x =  i_this->actor.home.pos.x + cM_rndFX(1000.0f);
         i_this->mNextPos.z =  i_this->actor.home.pos.z + cM_rndFX(1000.0f);
         if (i_this->field_0x624[2] == 0) {
@@ -777,6 +775,7 @@ static void mf_swim(mg_fish_class* i_this) {
             i_this->mActionPhase = 0;
             break;
         }
+    }
     case 1:
         delta = i_this->mNextPos - i_this->actor.current.pos;
         if ((i_this->mBobTimer & 3) == 0) {
@@ -877,7 +876,7 @@ static void mf_swim_p(mg_fish_class* i_this) {
         i_this->mNextPos.z = swim_path[i_this->mCurSwimStep].pos.z + cM_rndFX(200.0f);
 
         i_this->mActionPhase = 2;
-    case 2:
+    case 2: {
         cXyz delta = i_this->mNextPos - i_this->actor.current.pos;
         i_this->mMovementYaw = cM_atan2s(delta.x, delta.z);
         f32 latMoveDist = JMAFastSqrt(delta.x * delta.x + delta.z * delta.z);
@@ -895,6 +894,7 @@ static void mf_swim_p(mg_fish_class* i_this) {
             i_this->mActionPhase = 0;
         }
         break;
+    }
     case 10:
         targetSpeed = 0.0f;
         break;
@@ -999,7 +999,7 @@ static void mf_stay(mg_fish_class* i_this) {
         i_this->mActionPhase += 1;
         i_this->mMaxStep = 0;
         break;
-    case 1:
+    case 1: {
         f31 = 0.4f;
         f30 = 0.02f;
         cXyz delta = i_this->mNextPos - i_this->actor.current.pos;
@@ -1012,6 +1012,7 @@ static void mf_stay(mg_fish_class* i_this) {
         f32 mag = JMAFastSqrt(delta.x * delta.x + delta.z * delta.z);
         i_this->mMovementPitch = -cM_atan2s(delta.y, mag);
         break;
+    }
     case 2:
         cLib_addCalcAngleS2(&i_this->mMovementPitch, 0, 16, 0xa0);
         if (i_this->field_0x624[0] == 1 && i_this->field_0xc44 < 10) {
@@ -1120,7 +1121,7 @@ static void ri_swim(mg_fish_class* i_this) {
     f32 target = 0.0f;
     f32 maxStep = 0.01f;
     switch (i_this->mActionPhase) {
-    case 0:
+    case 0: {
         s16 foo = cM_rndFX(8000.0f);
         foo += i_this->actor.shape_angle.y + 0x8000;
         mDoMtx_YrotS(*calc_mtx, foo);
@@ -1140,6 +1141,7 @@ static void ri_swim(mg_fish_class* i_this) {
             break;
         }
         i_this->mMaxStep = 0;
+    }
     case 1:
         target = 0.25f;
         maxStep = 0.01f;
@@ -1378,9 +1380,9 @@ static void mf_lure_search(mg_fish_class* i_this) {
         foundLure = true;
     } else if (rod->field_0x100a != 0 || rod->field_0x100d == 0) {
         foundLure = true;
-    } else if (rod->field_0xf7e != 4) {
-        if (rod->field_0xf7e >= 5 &&
-            rod->mFishId == fopAcM_GetID(i_this)) {
+    } else if (rod->action != 4) {
+        if (rod->action >= 5 &&
+            rod->mg_fish_id == fopAcM_GetID(i_this)) {
             foundLure = false;
         } else {
             foundLure = true;
@@ -1404,7 +1406,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
     case 1:
         i_this->mActionPhase = 2;
     case 2: {
-        rodSep = rod->current.pos - i_this->actor.current.pos;
+        rodSep = rod->actor.current.pos - i_this->actor.current.pos;
         rodSep.y -= 10.0f;
         i_this->mMovementYaw = cM_atan2s(rodSep.x, rodSep.z);
         i_this->mMovementPitch = -cM_atan2s(rodSep.y, JMAFastSqrt(rodSep.x * rodSep.x + rodSep.z * rodSep.z));
@@ -1412,7 +1414,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
             i_this->mMovementPitch = -0x2000;
         }
         f32 rodDist = sqrtf(VECSquareMag(&rodSep));
-        if (rod->field_0xf80 != 4 && rod->field_0xf80 != 2 &&
+        if (rod->lure_type != MG_LURE_SP && rod->lure_type != MG_LURE_PO &&
             rodDist > 2.0f * i_this->field_0x5ec) {
             foundLure = true;
         } else {
@@ -1421,7 +1423,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
                 i_this->field_0x624[0] = cM_rndF(100.0f);
                 i_this->field_0x624[1] = cM_rndF(200.0f) + 100.0f;
                 if (i_this->mGedouKind == GEDOU_KIND_NP_1 || i_this->mGedouKind == GEDOU_KIND_LM_1) {
-                    if (rod->field_0x14f0 != 0) {
+                    if (rod->reel_btn_flags != 0) {
                         target = 2.0f;
                     }
                     f32 fVar11;
@@ -1431,8 +1433,8 @@ static void mf_lure_search(mg_fish_class* i_this) {
                         fVar11 = 0.025f;
                     }
                     if (rodDist < 1.3f * i_this->field_0x5ec &&
-                        (rod->field_0xf80 == 4 || rod->field_0xf80 == 3) &&
-                        rod->field_0x14f0 != 0 &&
+                        (rod->lure_type == MG_LURE_SP || rod->lure_type == MG_LURE_WS) &&
+                        rod->reel_btn_flags != 0 &&
                         (i_this->mBobTimer & 0x1f) == 0 &&
                         cM_rndF(1.0f) < fVar11) {
                         sVar10 = 0x5a;
@@ -1458,7 +1460,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
                             limit1 *= 2.0f;
                             limit2 *= 2.0f;
                         } else if (i_this->mGedouKind == GEDOU_KIND_RI_1 &&
-                            rod->field_0xf80 != 0 &&
+                            rod->lure_type != MG_LURE_FR &&
                             i_this->field_0x5f8 < 10) {
                             limit1 = limit2 = -1.0f;
                         }
@@ -1493,7 +1495,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
             i_this->field_0x624[2] = sVar10;
         }
 
-        cLib_addCalc2(&i_this->actor.current.pos.y, rod->current.pos.y - 20.0f,
+        cLib_addCalc2(&i_this->actor.current.pos.y, rod->actor.current.pos.y - 20.0f,
             0.05f, 2.0f);
 
         if (i_this->field_0x624[1] == 1) {
@@ -1511,12 +1513,12 @@ static void mf_lure_search(mg_fish_class* i_this) {
             break;
         }
 
-        rodSep = rod->current.pos - i_this->actor.current.pos;
+        rodSep = rod->actor.current.pos - i_this->actor.current.pos;
         i_this->mMovementYaw = cM_atan2s(rodSep.x, rodSep.z);
         i_this->mMovementPitch = -cM_atan2s(rodSep.y, JMAFastSqrt(rodSep.x * rodSep.x + rodSep.z * rodSep.z));
 
         target = 3.0f;
-        if (rod->field_0x14f0 != 0) {
+        if (rod->reel_btn_flags != 0) {
             target = 5.0f;
         }
 
@@ -1529,12 +1531,12 @@ static void mf_lure_search(mg_fish_class* i_this) {
 
         if (rodDist < i_this->mJointScale * 40.0f) {
             if (i_this->mGedouKind == GEDOU_KIND_CF_1) {
-                if (rod->field_0xf80 == 4) {
+                if (rod->lure_type == MG_LURE_SP) {
                     i_this->mRemainingHookTime = cM_rndF(10.0f) + 20.0f;
                 } else {
                     i_this->mRemainingHookTime = cM_rndF(12.0f) + 30.0f;
                 }
-            } else if (rod->field_0xf80 == 4) {
+            } else if (rod->lure_type == MG_LURE_SP) {
                 if (i_this->mJointScale >= 0.6f) {
                     if (sVar10 != 0) {
                         i_this->mActionPhase = 3;
@@ -1555,13 +1557,13 @@ static void mf_lure_search(mg_fish_class* i_this) {
             break;
         }
 
-        if (rod->field_0xf80 == 0) {
+        if (rod->lure_type == MG_LURE_FR) {
             i_this->mRemainingHookTime = cM_rndF(10.0f) + 40.0f;
         }
 
-        rod->field_0xf7e = 5;
+        rod->action = 5;
         rod->field_0x10a5 = 2;
-        rod->mFishId = fopAcM_GetID(i_this);
+        rod->mg_fish_id = fopAcM_GetID(i_this);
         rod->field_0x1006 = cM_rndFX(7000.0f) + 1000.0f;
         i_this->mHookedState = 1;
         i_this->mMovementYaw = cM_rndFX(65536.0f);
@@ -1570,7 +1572,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
         i_this->mActionPhase = 4;
         mouth_close(i_this);
 
-        if (rod->current.pos.y > i_this->mSurfaceY - 15.0f) {
+        if (rod->actor.current.pos.y > i_this->mSurfaceY - 15.0f) {
             sibuki_set(i_this, 2.5f, i_this->field_0x638);
             if (i_this->mGedouKind == GEDOU_KIND_RI_1) {
                 i_this->mSound.startCreatureSound(Z2SE_AL_DOJOU_EAT_IMPACT, 0, -1);
@@ -1593,7 +1595,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
         maxStep = 0.5f;
         i_this->mHookedState = 2;
         if (i_this->mRemainingHookTime == 0) {
-            if (rod->field_0xf80 != 4) {
+            if (rod->lure_type != MG_LURE_SP) {
                 rod->field_0x10a6 = 30;
                 if (rod->field_0x10a7 != 4) {
                     rod->field_0x10a7 = 1;
@@ -1635,7 +1637,7 @@ static void mf_lure_search(mg_fish_class* i_this) {
  */
 static void mf_bait_search(mg_fish_class* i_this) {
     s32 foundBait = false;
-    dmg_rod_class* rod = (dmg_rod_class*)fopAcM_SearchByID(i_this->mBaitId);
+    fr_class* rod = (fr_class*)fopAcM_SearchByID(i_this->mBaitId);
     if (rod == NULL) {
         i_this->mActionPhase = 100;
         foundBait = true;
@@ -1695,9 +1697,9 @@ static void mf_bait_search(mg_fish_class* i_this) {
         speedMaxStep = 1.0f;
         f32 fVar10 = offsetToRod.abs();
         if (fVar10 < 40.0f * i_this->mJointScale) {
-            rod->field_0x5a4.field_0x2e = 0x32;
-            rod->field_0x5a4.field_0x30 = 0;
-            rod->field_0x5a4.field_0x54 = fopAcM_GetID(i_this);
+            rod->field_0x5d2 = 0x32;
+            rod->field_0x5d4 = 0;
+            rod->field_0x5f8 = fopAcM_GetID(i_this);
             fVar10 = cM_rndFX(65536.0f);
             i_this->mMovementYaw = fVar10;
             i_this->mMovementPitch = 0x2000;
@@ -1877,7 +1879,7 @@ static void mf_hit(mg_fish_class* i_this) {
             }
         }
     } else {
-        if (pvVar5->field_0x14f0 == 0 ||
+        if (pvVar5->reel_btn_flags == 0 ||
             pvVar5->field_0x1515 == 0 ||
             pvVar5->field_0xf60 < 100.0f)
         {
@@ -1894,16 +1896,16 @@ static void mf_hit(mg_fish_class* i_this) {
         i_this->mActionPhase = 0;
         g_dComIfG_gameInfo.play.mVibration.StartShock(4, 1, cXyz(0.0f, 1.0f, 0.0f));
         Z2AudioMgr::getInterface()->changeBgmStatus(4);
-        pvVar5->field_0xf7e = 6;
-        pvVar5->field_0x13b4 = 10;
-        pvVar5->field_0x13b6 = 0;
+        pvVar5->action = 6;
+        pvVar5->play_cam_mode = 10;
+        pvVar5->play_cam_timer = 0;
         pvVar5->field_0x14c2 = 0;
-        pvVar5->field_0x1408 = 90.0f;
+        pvVar5->play_cam_fovy = 90.0f;
         pvVar5->field_0x146d = 0;
         pvVar5->field_0x10b0 = 0;
         daPy_py_c* player = daPy_getLinkPlayerActorClass();
         player->onFishingRodGetFish();
-        if (pvVar5->field_0xf80 == 4) {
+        if (pvVar5->lure_type == MG_LURE_SP) {
             u8 bVar7 = g_dComIfG_gameInfo.info.mSavedata.mEvent.getEventReg(0xf11f);
             if (bVar7 < 0x1f) {
                 bVar7++;
@@ -1913,12 +1915,12 @@ static void mf_hit(mg_fish_class* i_this) {
     } else if (iVar1 != 0) {
         if (iVar1 == 2) {
             pvVar5->field_0x10a7 = 3;
-            pvVar5->field_0x57e = cM_rndF(13.0f) + 30.0f;
+            pvVar5->timers[2] = cM_rndF(13.0f) + 30.0f;
             pvVar5->field_0x10a6 = 1;
         } else {
             pvVar5->field_0x10a7 = 2;
             pvVar5->field_0x10a6 = 0x19;
-            pvVar5->field_0x57e = 0;
+            pvVar5->timers[2] = 0;
         }
         i_this->mCurAction = ACTION_MG_FISH_MF_AWAY;
         i_this->mActionPhase = -1;
@@ -1979,7 +1981,7 @@ static void mf_jump(mg_fish_class* i_this) {
         i_this->actor.current.angle.z = i_this->actor.current.angle.z + i_this->jointYaws2[2];
         i_this->actor.shape_angle.z = i_this->actor.current.angle.z;
         i_this->mMovementPitch = i_this->mMovementPitch + i_this->jointYaws2[3];
-        if (i_this->field_0x624[0] == 1 && rod->mRodStickY <= -0.5f && cM_rndF(1.0f) < 0.35f) {
+        if (i_this->field_0x624[0] == 1 && rod->rod_stick_y <= -0.5f && cM_rndF(1.0f) < 0.35f) {
             i_this->field_0x65a = 1;
             i_this->mHookedState = 0;
         }
@@ -2224,9 +2226,9 @@ static void mf_catch(mg_fish_class* i_this) {
             i_this->mActionPhase = 3;
             i_this->field_0x624[0] = 40;
             player->onFishingRelease();
-            rod->health = 1;
-            rod->field_0x13b4 = 11;
-            rod->field_0x13b6 = 0;
+            rod->actor.health = 1;
+            rod->play_cam_mode = 11;
+            rod->play_cam_timer = 0;
             rod->field_0x146d = 0;
             i_this->field_0x740 = cM_rndF(1000.0f) + 3000.0f;
         }
@@ -2291,7 +2293,7 @@ static void mf_esa_search(mg_fish_class* i_this) {
         flag1 = 1;
     } else if (rod->field_0x100d == 0) {
         flag1 = 1;
-    } else if (rod->field_0xf7e == 5) {
+    } else if (rod->action == 5) {
         flag1 = 1;
     }
     if (flag1) {
@@ -2313,7 +2315,7 @@ static void mf_esa_search(mg_fish_class* i_this) {
         i_this->mActionPhase = 2;
     }
     case 2: {
-        cXyz xyz = rod->current.pos - i_this->actor.current.pos;
+        cXyz xyz = rod->actor.current.pos - i_this->actor.current.pos;
         i_this->mMovementYaw = cM_atan2s(xyz.x, xyz.z);
         i_this->mMovementPitch = -cM_atan2s(xyz.y,
             JMAFastSqrt(xyz.x * xyz.x + xyz.z * xyz.z));
@@ -2337,23 +2339,23 @@ static void mf_esa_search(mg_fish_class* i_this) {
             }
         }
 
-        xyz = i_this->field_0x638 - rod->current.pos;
+        xyz = i_this->field_0x638 - rod->actor.current.pos;
         if (sqrtf(VECSquareMag(&xyz)) < i_this->mJointScale * 14.0f) {
             fVar9 = i_this->field_0x654;
             i_this->mMaxStep = 0;
             if (i_this->field_0x624[0] == 0) {
-                rod->mFishId = fopAcM_GetID(i_this);
+                rod->mg_fish_id = fopAcM_GetID(i_this);
                 f32 fVar10 = 0.5f;
                 if (dComIfGs_getFishNum(5) <= 5) {
                     fVar10 = 1.5f;
                 }
                 if (i_this->mGedouKind != GEDOU_KIND_BG) {
-                    if (rod->field_0x102d == 1) {
+                    if (rod->hook_kind == 1) {
                         fVar10 = 1.0f;
                     }
-                    if (rod->field_0x102c == 1) {
+                    if (rod->esa_kind == 1) {
                         fVar10 *= 1.5f;
-                    } else if (rod->field_0x102c == 2) {
+                    } else if (rod->esa_kind == 2) {
                         fVar10 *= 2.0f;
                     }
                 }
@@ -2371,7 +2373,7 @@ static void mf_esa_search(mg_fish_class* i_this) {
                     rod->field_0x10a5 = fVar10 * (cM_rndF(15.0f) + 15.0f);
                     i_this->field_0x659 = rod->field_0x10a5;
                     i_this->field_0x650 = 0.0f;
-                    if (rod->field_0x102d == 0 && rod->field_0x102c == 0) {
+                    if (rod->hook_kind == 0 && rod->esa_kind == 0) {
                         i_this->field_0x624[0] = cM_rndF(80.0f) + 50.0f;
                     } else {
                         i_this->field_0x624[0] = cM_rndF(20.0f) + 30.0f;
@@ -2380,9 +2382,9 @@ static void mf_esa_search(mg_fish_class* i_this) {
             }
         }
         if (i_this->field_0x659 == 0) {
-            cLib_addCalc2(&i_this->actor.current.pos.y, rod->current.pos.y, 0.05f, 2.0f);
+            cLib_addCalc2(&i_this->actor.current.pos.y, rod->actor.current.pos.y, 0.05f, 2.0f);
         } else {
-            cLib_addCalc2(&i_this->actor.current.pos.y, rod->current.pos.y - 20.0f, 0.05f, 2.0f);
+            cLib_addCalc2(&i_this->actor.current.pos.y, rod->actor.current.pos.y - 20.0f, 0.05f, 2.0f);
         }
         break;
     }
@@ -2401,8 +2403,8 @@ static void mf_esa_search(mg_fish_class* i_this) {
     cLib_addCalcAngleS2(&i_this->actor.current.angle.y, i_this->mMovementYaw, 2, i_this->mMaxStep);
     cLib_addCalcAngleS2(&i_this->actor.current.angle.x, i_this->mMovementPitch, 2, i_this->mMaxStep);
     if (i_this->field_0x5ec > 10000.0f) {
-        cLib_addCalc2(&i_this->actor.current.pos.x, rod->current.pos.x, 0.1f, 50.0f);
-        cLib_addCalc2(&i_this->actor.current.pos.z, rod->current.pos.z, 0.1f, 50.0f);
+        cLib_addCalc2(&i_this->actor.current.pos.x, rod->actor.current.pos.x, 0.1f, 50.0f);
+        cLib_addCalc2(&i_this->actor.current.pos.z, rod->actor.current.pos.z, 0.1f, 50.0f);
     }
     if (flag2) {
         i_this->mCurAction = ACTION_MG_FISH_MF_SWIM_S;
@@ -2415,7 +2417,7 @@ static void mf_esa_search(mg_fish_class* i_this) {
 /* 8053109C-805313D8 00745C 033C+00 1/1 0/0 0/0 .text            mf_esa_hit__FP13mg_fish_class */
 static void mf_esa_hit(mg_fish_class* i_this) {
     dmg_rod_class* rod = (dmg_rod_class*)fopAcM_SearchByID(i_this->mRodId);
-    if (rod == NULL || (rod != NULL && rod->field_0xf7e != 5)) {
+    if (rod == NULL || (rod != NULL && rod->action != 5)) {
         i_this->mCurAction = ACTION_MG_FISH_MF_SWIM_S;
         i_this->mActionPhase = 0;
         i_this->field_0x62e = cM_rndF(100.0f) + 100.0f;
@@ -2613,7 +2615,7 @@ static void mf_aqua(mg_fish_class* i_this) {
         i_this->mActionPhase = 1;
         i_this->field_0x624[0] = cM_rndF(100.0f) + 100.0f;
         i_this->mMaxStep = 0;
-    case 1:
+    case 1: {
         targetSpeed = 0.4f;
         cXyz local_44 = i_this->mNextPos - i_this->actor.current.pos;
         i_this->mMovementYaw = cM_atan2s(local_44.x, local_44.z);
@@ -2633,6 +2635,7 @@ static void mf_aqua(mg_fish_class* i_this) {
             }
         }
         break;
+    }
     case 2:
         cLib_addCalcAngleS2(&i_this->mMovementPitch, 0, 0x10, 100);
         if (i_this->field_0x624[0] == 0) {
@@ -3294,6 +3297,16 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
 
     daPy_py_c* player = daPy_getPlayerActorClass();
 
+#if VERSION == VERSION_GCN_JPN
+    lit_1008 = 0;
+#elif VERSION == VERSION_GCN_PAL
+    if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_ENGLISH) {
+        lit_1008 = 2;
+    } else {
+        lit_1008 = 0;
+    }
+#endif
+
     if (i_this->mSurfaceY != 0.0f) {
         if ((g_Counter.mTimer + fopAcM_GetID(i_this) & 0xf) == 0) {
             get_surface_y(i_this, &i_this->actor.current.pos);
@@ -3398,7 +3411,7 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
                          i_this->actor.current.pos.z);
                 cMtx_YrotM(mDoMtx_stack_c::now, i_this->actor.shape_angle.y);
                 cMtx_XrotM(mDoMtx_stack_c::now, 0x4000);
-                if (rod->field_0x102d == 1) {
+                if (rod->hook_kind == 1) {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, 35.0f);
                 } else {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, 29.0f);
@@ -3516,7 +3529,7 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
                          i_this->actor.current.pos.z);
                 cMtx_YrotM(mDoMtx_stack_c::now, i_this->actor.shape_angle.y);
                 cMtx_XrotM(mDoMtx_stack_c::now, -0x4000);
-                if (rod->field_0x102d == 1) {
+                if (rod->hook_kind == 1) {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, -14.0f);
                 } else {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, -8.0f);
@@ -3533,7 +3546,7 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
                          i_this->actor.current.pos.z);
                 cMtx_YrotM(mDoMtx_stack_c::now, i_this->actor.shape_angle.y);
                 cMtx_XrotM(mDoMtx_stack_c::now, -0x4000);
-                if (rod->field_0x102d == 1) {
+                if (rod->hook_kind == 1) {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, -25.0f);
                 } else {
                     mDoMtx_stack_c::transM(0.0f, 0.0f, -19.0f);
@@ -3586,7 +3599,7 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
     MtxPosition(&commonXyz, &i_this->field_0x638);
     if (i_this->mHookedState != 0) {
         dmg_rod_class* rod = (dmg_rod_class*)fopAcM_SearchByID(i_this->mRodId);
-        if (rod->field_0xf80 == 4 && i_this->mCurAction == ACTION_MG_FISH_MF_CATCH) {
+        if (rod->lure_type == MG_LURE_SP && i_this->mCurAction == ACTION_MG_FISH_MF_CATCH) {
             if (i_this->mKind2 == 0) {
                 f32 fVar3 = (i_this->mJointScale - 0.48f) * 100.0f;
                 if (fVar3 < 0.0f) {
@@ -3606,29 +3619,29 @@ static int daMg_Fish_Execute(mg_fish_class* i_this) {
                 commonXyz.z += 5.0f;
             }
             MtxPosition(&commonXyz, &i_this->field_0x638);
-            rod->current.angle.y = 0;
-            rod->current.angle.x = 0x4000;
-            rod->current.angle.z = player->shape_angle.y + 8000;
-            rod->shape_angle.x = rod->current.angle.x;
-            rod->shape_angle.y = rod->current.angle.y;
-            rod->shape_angle.z = rod->current.angle.z;
+            rod->actor.current.angle.y = 0;
+            rod->actor.current.angle.x = 0x4000;
+            rod->actor.current.angle.z = player->shape_angle.y + 8000;
+            rod->actor.shape_angle.x = rod->actor.current.angle.x;
+            rod->actor.shape_angle.y = rod->actor.current.angle.y;
+            rod->actor.shape_angle.z = rod->actor.current.angle.z;
             rod->field_0x114a = 0;
             rod->field_0x114c = 0;
             rod->field_0x1004 = 0;
         } else {
-            if (rod->field_0xf80 == 0 && i_this->mGedouKind == GEDOU_KIND_RI_1) {
+            if (rod->lure_type == MG_LURE_FR && i_this->mGedouKind == GEDOU_KIND_RI_1) {
                 commonXyz.y += 8.0f;
                 commonXyz.z += -3.0f;
                 MtxPosition(&commonXyz, &i_this->field_0x638);
             }
-            cLib_addCalcAngleS2(&rod->current.angle.y, i_this->actor.shape_angle.y - 0x1710, 2, 0x800);
-            cLib_addCalcAngleS2(&rod->current.angle.x,
+            cLib_addCalcAngleS2(&rod->actor.current.angle.y, i_this->actor.shape_angle.y - 0x1710, 2, 0x800);
+            cLib_addCalcAngleS2(&rod->actor.current.angle.x,
                 i_this->actor.shape_angle.x + - 0x310c + rod->field_0x1006, 2, 0x800);
-            cLib_addCalcAngleS2(&rod->current.angle.z, 0x6328, 2, 0x800);
+            cLib_addCalcAngleS2(&rod->actor.current.angle.z, 0x6328, 2, 0x800);
         }
-        rod->current.pos.x = i_this->field_0x638.x;
-        rod->current.pos.y = i_this->field_0x638.y;
-        rod->current.pos.z = i_this->field_0x638.z;
+        rod->actor.current.pos.x = i_this->field_0x638.x;
+        rod->actor.current.pos.y = i_this->field_0x638.y;
+        rod->actor.current.pos.z = i_this->field_0x638.z;
         rod->field_0x1000 = 0;
         rod->field_0xffc = 0;
     }
@@ -3848,11 +3861,11 @@ static int daMg_Fish_Create(fopAc_ac_c* i_this) {
         0.708f,
     };
 
-    fopAcM_SetupActor(i_this, mg_fish_class);
+    fopAcM_ct(i_this, mg_fish_class);
 
     mg_fish_class* a_this = (mg_fish_class*)i_this;
 
-    a_this->mGedouKind = i_this->base.parameters;
+    a_this->mGedouKind = fopAcM_GetParam(i_this);
 
     bool flag1 = false;
     if (a_this->mGedouKind == 106) {
@@ -3902,13 +3915,23 @@ static int daMg_Fish_Create(fopAc_ac_c* i_this) {
         a_this->mResName = "O_gD_bott";
     }
 
+#if VERSION == VERSION_GCN_JPN
+    lit_1008 = 0;
+#elif VERSION == VERSION_GCN_PAL
+    if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_ENGLISH) {
+        lit_1008 = 2;
+    } else {
+        lit_1008 = 0;
+    }
+#else
     lit_1008 = 1;
+#endif
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&a_this->mPhaseReq, a_this->mResName);
     cPhs__Step retval = phase;
 
     if (phase == cPhs_COMPLEATE_e) {
-        s32 params_0 = i_this->base.parameters >> 24;
+        s32 params_0 = fopAcM_GetParam(i_this) >> 24;
         if (params_0 != 0 && params_0 != 0xff &&
             g_dComIfG_gameInfo.info.isSwitch(params_0, fopAcM_GetRoomNo(i_this)))
         {
@@ -3924,7 +3947,7 @@ static int daMg_Fish_Create(fopAc_ac_c* i_this) {
             a_this->mGedouKind == GEDOU_KIND_ED ||
             a_this->mGedouKind == GEDOU_KIND_SY)
         {
-            s32 params_2 = i_this->base.parameters >> 8 & 0xff;
+            s32 params_2 = fopAcM_GetParam(i_this) >> 8 & 0xff;
             if (params_2 == 0xff) {
                 params_2 = 0x1e;
             }
@@ -3969,7 +3992,7 @@ static int daMg_Fish_Create(fopAc_ac_c* i_this) {
         a_this->mAcch.Set(&i_this->current.pos, &i_this->old.pos, i_this, 1, &a_this->mAcchCir,
             &i_this->speed, NULL, NULL);
         a_this->field_0xc44 = dComIfGs_getEventReg(0xf11f);
-        a_this->mJointScale = 0.0001f + (i_this->base.parameters >> 8 & 0xff) * 0.01f;
+        a_this->mJointScale = 0.0001f + (fopAcM_GetParam(i_this) >> 8 & 0xff) * 0.01f;
         if (a_this->mGedouKind >= GEDOU_KIND_BG) {
             f32 fishMaxSize;
             if (lit_1008 == 1) {

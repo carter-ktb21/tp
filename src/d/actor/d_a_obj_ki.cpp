@@ -3,6 +3,8 @@
  * Object - Tree
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ki.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
@@ -132,7 +134,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     }
     
     J3DModel* model = _this->mpMorf->getModel();
-    model->setUserArea((u32)_this);
+    model->setUserArea((uintptr_t)_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
@@ -154,7 +156,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 80C4466C-80C449F8 00086C 038C+00 1/0 0/0 0/0 .text            daObj_Ki_Create__FP10fopAc_ac_c */
 static cPhs__Step daObj_Ki_Create(fopAc_ac_c* i_this) {
     obj_ki_class* _this = static_cast<obj_ki_class*>(i_this);
-    fopAcM_SetupActor(_this, obj_ki_class);
+    fopAcM_ct(_this, obj_ki_class);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhaseReq, "Obj_Ki");
 
     if (step == cPhs_COMPLEATE_e) {

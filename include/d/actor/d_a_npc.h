@@ -2,6 +2,7 @@
 #define D_A_D_A_NPC_H
 
 #include "JSystem/J3DGraphAnimator/J3DMaterialAnm.h"
+#include "SSystem/SComponent/c_counter.h"
 #include "SSystem/SComponent/c_math.h"
 #include "Z2AudioLib/Z2Creature.h"
 #include "d/actor/d_a_player.h"
@@ -20,6 +21,11 @@ struct daNpc_GetParam2 {  // name unknown
     /* 0x0 */ int fileIdx;
     /* 0x4 */ int attr;
     /* 0x8 */ int arcIdx;
+};
+
+struct daNpc_GetParam3 {  // name unknown
+    /* 0x0 */ int fileIdx;
+    /* 0x4 */ int attr;
 };
 
 class daNpcT_ActorMngr_c {
@@ -55,8 +61,8 @@ public:
 
     void setNowOffsetX(f32 i_value) { mNowOffsetX = i_value; }
     void setNowOffsetY(f32 i_value) { mNowOffsetY = i_value; }
-    void onEyeMoveFlg() { mEyeMoveFlg = 1; }
-    void offEyeMoveFlg() { mEyeMoveFlg = 0; }
+    void onEyeMoveFlag() { mEyeMoveFlg = 1; }
+    void offEyeMoveFlag() { mEyeMoveFlg = 0; }
     void setMorfFrm(u8 i_value) { mMorfFrm = i_value; }
 };
 
@@ -94,6 +100,7 @@ public:
             }
         }
     }
+    void setOffset(int i_offset) { mOffset = i_offset; }
 
 private:
     /* 0x00 */ sequenceStepData_c const* mpSeqData;
@@ -157,7 +164,7 @@ public:
         mEyeAngle.x = field_0x132.x * (1.0f - 1.0f / param_2) +
                       sVar3 * (1.0f / param_2);
     }
-    
+
     void setEyeAngleY(cXyz param_1, s16 param_2, BOOL param_3, f32 param_4, s16 param_5) {
         cXyz cStack_50;
         s16 sVar3 = 0;
@@ -174,6 +181,11 @@ public:
         }
         mEyeAngle.y = field_0x132.y * (1.0f - 1.0f / param_4) +
                       sVar3 * (1.0f / param_4);
+    }
+
+    void setEyeAngleY(s16 param_1, f32 param_2) {
+        mEyeAngle.y = field_0x132.y * (1.0f - 1.0f / param_2) +
+        param_1 * (1.0f / param_2);
     }
 
     s16 getEyeAngleX() { return mEyeAngle.x; }
@@ -266,14 +278,15 @@ public:
         setMode(LOOK_PLAYER, FALSE);
         setDirect(isDirect);
     }
-    
+
     void lookCamera(u8 isDirect) {
         setMode(LOOK_CAMERA, FALSE);
         setDirect(isDirect);
     }
 
     void lookActor(fopAc_ac_c* param_1, f32 param_2, u8 isDirect) {
-        if (setMode(LOOK_ACTOR, mActrMngr.getActorP() != param_1) && fopAcM_IsActor(param_1)) {
+        bool isDifferentActor = mActrMngr.getActorP() != param_1;
+        if (setMode(LOOK_ACTOR, isDifferentActor) && fopAcM_IsActor(param_1)) {
             mActrMngr.entry(param_1);
             field_0x14c = param_2;
         }
@@ -285,6 +298,24 @@ public:
         if (setMode(LOOK_POS, tmp)) {
             mAttnPosP = i_pos;
         }
+        setDirect(i_direct);
+    }
+
+    void lookAround(u8 i_direct, int i_baseTimer) {
+        if (setMode(LOOK_MODE_7, FALSE)) {
+            mTimer = 0;
+        }
+
+        mBaseTimer = i_baseTimer;
+        setDirect(i_direct);
+    }
+
+    void lookAround2(u8 i_direct, int i_baseTimer) {
+        if (setMode(LOOK_MODE_8, FALSE)) {
+            mTimer = 0;
+        }
+
+        mBaseTimer = i_baseTimer;
         setDirect(i_direct);
     }
 
@@ -313,8 +344,9 @@ public:
     /* 80147E3C */ void calc(BOOL);
 
     void initialize() {
+        u8 zero = 0;
         for (int i = 0; i < 2; i++) {
-            mAngle[i].setall(0);
+            mAngle[i].setall(zero);
             mPower[i] = 0.0f;
         }
         mStagger = 0;
@@ -331,6 +363,9 @@ public:
         for (int i = 0; i < 2; i++) {
             mPower[i] = power;
         }
+    }
+    void setRebirth() {
+        mRebirth = true;
     }
 
     /* 0x00 */ csXyz mAngle[2];
@@ -416,11 +451,18 @@ public:
     /* 80145C74 */ int setPathInfo(u8, s8, u8);
     /* 80145D2C */ int setNextPathInfo(s8, u8);
     /* 80145DA0 */ void reverse();
+    void setNextIdx() { setNextIdx(getNumPnts()); }
     /* 80145DD0 */ int setNextIdx(int);
+    int getDstPos(cXyz i_pnt, cXyz* o_pos_p) {
+        return getDstPos(i_pnt, o_pos_p, getNumPnts());
+    }
     /* 80145E38 */ int getDstPos(cXyz, cXyz*, int);
     /* 80145FB4 */ int getDstPosH(cXyz, cXyz*, int, int);
     /* 80146188 */ int chkPassed1(cXyz, int);
     /* 801464D8 */ int chkPassed2(cXyz, cXyz*, int, int);
+#if DEBUG
+    int drawDbgInfo(f32, int);
+#endif
 
     daNpcT_Path_c() {
         initialize();
@@ -429,6 +471,10 @@ public:
     virtual ~daNpcT_Path_c() {}
 
     Vec getPntPos(int i_idx) { return mPathInfo->m_points[i_idx].m_position; }
+
+    int getArg0() { return mPathInfo->m_points[mIdx].mArg0; }
+    int getArg1() { return mPathInfo->m_points[mIdx].mArg1; }
+    int getArg2() { return mPathInfo->m_points[mIdx].mArg2; }
 
     int chkClose() {
         BOOL rt = dPath_ChkClose(mPathInfo);
@@ -441,7 +487,7 @@ public:
 
     void setIdx(int i_idx) { mIdx = i_idx; }
 
-    const u16 getIdx() { return mIdx; }
+    const int getIdx() { return mIdx; }
 
     dPath* getPathInfo() { return mPathInfo; }
 
@@ -454,6 +500,8 @@ public:
         mDirection = 0;
         field_0x1E = 1;
     }
+
+    BOOL chkNextId() { return mPathInfo->m_nextID != 0xFFFF; }
 };
 
 class mDoExt_McaMorfSO;
@@ -480,11 +528,11 @@ public:
     /* 0x974 */ dMsgFlow_c mFlow;
     /* 0x9C0 */ dPaPoT_c field_0x9c0;
     /* 0xA40 */ dCcD_Stts field_0xa40;
-    /* 0xA7C */ u32 mFlowNodeNo;
-    /* 0xA80 */ f32 field_0xa80;
+    /* 0xA7C */ s32 mFlowNodeNo;
+    /* 0xA80 */ f32 mExpressionMorfFrame;
     /* 0xA84 */ f32 mMorfFrames;
     /* 0xA88 */ bool mCreating;
-    /* 0xA89 */ bool mTwilight;
+    /* 0xA89 */ u8 mTwilight;
     /* 0xA8C */ dBgS_GndChk field_0xa8c;
     /* 0xAE0 */ dBgS_LinChk mLinChk;
     /* 0xB50 */ daNpcT_MotionSeqMngr_c mFaceMotionSeqMngr;
@@ -519,9 +567,9 @@ public:
     /* 0xDC4 */ int mEventTimer;
     /* 0xDC8 */ s16 mPlayerAngle;
     /* 0xDCA */ s16 mGroundAngle;
-    /* 0xDCC */ u8 field_0xdcc[2];
+    /* 0xDCC */ s16 field_0xdcc;
     /* 0xDCE */ s16 mFootLPolyAngle;
-    /* 0xDD0 */ u8 field_0xdd0[2];
+    /* 0xDD0 */ s16 field_0xdd0;
     /* 0xDD2 */ s16 mFootRPolyAngle;
     /* 0xDD4 */ s16 mStartAngle;
     /* 0xDD6 */ s16 mTargetAngle;
@@ -530,7 +578,7 @@ public:
     /* 0xDDC */ f32 mTurnCount;
     /* 0xDE0 */ f32 field_0xde0;
     /* 0xDE4 */ f32 field_0xde4;
-    /* 0xDE8 */ f32 field_0xde8;
+    /* 0xDE8 */ f32 mRealShadowSize;
     /* 0xDEC */ f32 mCylH;
     /* 0xDF0 */ f32 mWallR;
     /* 0xDF4 */ f32 mGroundH;
@@ -578,6 +626,8 @@ public:
         mpArcNames(i_arcNames),
         mFaceMotionSeqMngr(i_faceMotionSequenceData, i_faceMotionStepNum),
         mMotionSeqMngr(i_motionSequenceData, i_motionStepNum) {
+        // "daNpcT_c -> construct"
+        OS_REPORT("|%06d:%x|daNpcT_c -> コンストラクト\n", g_Counter.mCounter0, this);
         initialize();
     }
 
@@ -644,9 +694,9 @@ public:
     /* 8014CC4C */ virtual s32 getHeadJointNo() { return -1; }
     /* 8014CC90 */ virtual s32 getFootLJointNo() { return -1; }
     /* 8014CC88 */ virtual s32 getFootRJointNo() { return -1; }
-    /* 8014D0A8 */ virtual s32 getEyeballLMaterialNo() { return 0; }
-    /* 8014D0B0 */ virtual s32 getEyeballRMaterialNo() { return 0; }
-    /* 8014D0B8 */ virtual s32 getEyeballMaterialNo() { return 0; }
+    /* 8014D0A8 */ virtual u16 getEyeballLMaterialNo() { return 0; }
+    /* 8014D0B0 */ virtual u16 getEyeballRMaterialNo() { return 0; }
+    /* 8014D0B8 */ virtual u16 getEyeballMaterialNo() { return 0; }
     /* 8014951C */ virtual int ctrlJoint(J3DJoint*, J3DModel*);
     /* 8014CC48 */ virtual void afterJntAnm(int) {}
     /* 8014CC24 */ virtual void setParam() {}
@@ -715,7 +765,7 @@ public:
     static dCcD_SrcSph mCcDSph;
     static fopAc_ac_c* mFindActorPtrs[50];
     static s16 mSrchName;
-    static s32 mFindCount;
+    static int mFindCount;
 
     enum Mode {
         /*  0 */ MODE_ENTER,
@@ -747,6 +797,12 @@ public:
 
 STATIC_ASSERT(sizeof(daNpcT_c) == 0xE40);
 
+#define daNpcT_ct(ptr, ClassName, faceMotionAnmData, motionAnmData, faceMotionSequenceData, faceMotionStepNum, motionSequenceData, motionStepNum, evtData, arcNames) \
+    if (!fopAcM_CheckCondition(ptr, fopAcCnd_INIT_e)) { \
+        new (ptr) ClassName(faceMotionAnmData, motionAnmData, faceMotionSequenceData, faceMotionStepNum, motionSequenceData, motionStepNum, evtData, arcNames); \
+        fopAcM_OnCondition(ptr, fopAcCnd_INIT_e); \
+    }
+
 BOOL daNpcT_chkEvtBit(u32 i_idx);
 BOOL daNpcT_chkPointInArea(cXyz param_0, cXyz param_1, cXyz param_2, s16 param_3, BOOL param_4);
 u8 daNpcT_getDistTableIdx(int param_0, int param_1);
@@ -755,9 +811,13 @@ void daNpcT_offTmpBit(u32 i_idx);
 void daNpcT_onTmpBit(u32 i_idx);
 BOOL daNpcT_chkTmpBit(u32 i_idx);
 void daNpcT_onEvtBit(u32 i_idx);
+void daNpcT_offEvtBit(u32 i_idx);
 BOOL daNpcT_chkTmpBit(u32 i_idx);
 BOOL daNpcT_getPlayerInfoFromPlayerList(int param_0, int i_roomNo, cXyz* o_spawnPos,
                                         csXyz* o_angle);
+int daNpcT_judgeRace(dPath* i_path, fopAc_ac_c** param_1, daNpcT_pntData_c* i_pntData, int param_3, int* param_4);
+BOOL daNpcT_chkActorInScreen(fopAc_ac_c* i_ActorP, f32 param_1, f32 param_2, f32 param_3,
+                             f32 param_4, f32 param_5, f32 param_6, f32 param_7, int param_8);
 
 class daBaseNpc_matAnm_c : public J3DMaterialAnm {
 public:
@@ -882,7 +942,7 @@ public:
     /* 0x83C */ u16* field_0x83c;
     /* 0x840 */ u16 field_0x840;
     /* 0x842 */ u16 field_0x842;
-    /* 0x844 */ bool field_0x844;
+    /* 0x844 */ u8 field_0x844;
     /* 0x845 */ u8 field_0x845[0x848 - 0x845];
     /* 0x848 */ s32 field_0x848;
     /* 0x84C */ dMsgFlow_c mMsgFlow;
@@ -910,6 +970,10 @@ public:
     /* 8014F60C */ int MoveBGCreate(char const*, int, MoveBGActor_SetFunc, u32);
     /* 8014F6FC */ int MoveBGDelete();
     /* 8014F770 */ int MoveBGExecute();
+    int MoveBGDraw() {
+        int ret = Draw();
+        return ret;
+    }
 
     /* 80155FB0 */ virtual ~daBaseNpc_moveBgActor_c() {}
     /* 801503BC */ virtual int CreateHeap() { return 1; }
@@ -950,7 +1014,7 @@ public:
 
 class daNpcF_c : public fopAc_ac_c {
 protected:
-    /* 0x568 */ mDoExt_McaMorfSO* mpMorf;
+    /* 0x568 */ mDoExt_McaMorfSO* mAnm_p;
     /* 0x56C */ mDoExt_bckAnm mBckAnm;
     /* 0x588 */ mDoExt_btpAnm mBtpAnm;
     /* 0x5A0 */ mDoExt_btkAnm mBtkAnm;
@@ -1000,7 +1064,7 @@ protected:
     /* 0x992 */ s16 field_0x992;
     /* 0x994 */ s16 mTurnStartAngle;
     /* 0x996 */ s16 mTurnTargetAngle;
-    /* 0x998 */ u16 field_0x998;
+    /* 0x998 */ s16 field_0x998;
     /* 0x99C */ u32 mAnmFlags;
     /* 0x9A0 */ u32 mShadowKey;
     /* 0x9A4 */ u32 field_0x9a4;
@@ -1033,7 +1097,7 @@ protected:
     /* 0x9F1 */ u8 field_0x9f1;
     /* 0x9F2 */ bool mHide;
     /* 0x9F3 */ u8 field_0x9f3;
-    /* 0x9F4 */ bool mTwilight;
+    /* 0x9F4 */ u8 mTwilight;
     /* 0x9F5 */ u8 field_0x9f5;
     /* 0x9F6 */ u8 field_0x9f6;
     /* 0x9F8 */ dMsgFlow_c mFlow;
@@ -1045,7 +1109,7 @@ public:
     struct daNpcF_anmPlayData {
         u16 idx;
         f32 morf;
-        s32 numLoops;
+        int numLoops;
     };
 
     enum AnmFlags {
@@ -1081,7 +1145,10 @@ public:
         /* 5 */ LOOK_ATTN,
     };
 
-    daNpcF_c() { initialize(); }
+    daNpcF_c() {
+        FORCE_DONT_INLINE;
+        initialize();
+    }
     /* 80152014 */ BOOL execute();
     /* 801522AC */ int draw(BOOL, BOOL, f32, _GXColorS10*, BOOL);
     /* 80152614 */ static void tgHitCallBack(fopAc_ac_c*, dCcD_GObjInf*, fopAc_ac_c*,
@@ -1170,6 +1237,8 @@ public:
     void setIntFlowNodeNo(int i_flowNodeNo) { mFlowNodeNo = i_flowNodeNo; }
     void setCutType(int i_cutType) { mCutType = i_cutType; }
     void onInterrupt(u8 param_0) { field_0x9ef = param_0; }
+    void onHide() { mHide = true; }
+    void offHide() { mHide = false; }
 
     static dCcD_SrcGObjInf const mCcDObjInfo;
     static dCcD_SrcCyl mCcDCyl;
@@ -1187,6 +1256,11 @@ BOOL daNpcF_chkTmpBit(u32 i_idx);
 void daNpcF_onTmpBit(u32 i_idx);
 void daNpcF_offTmpBit(u32 i_idx);
 u8 daNpcF_getDistTableIdx(int param_0, int param_1);
+#if DEBUG
+class daNpcF_HIOParam;
+void daNpcF_commonListenPropertyEvent(char*, int*, daNpcF_HIOParam*);
+void daNpcF_commonGenMessage(JORMContext*, daNpcF_HIOParam*);
+#endif
 void daNpcF_clearMessageTmpBit();
 BOOL daNpcF_chkPointInArea(cXyz, cXyz, cXyz, s16);
 int daNpcF_getPlayerInfoFromPlayerList(int param_0, int i_roomNo, cXyz& param_2, csXyz& param_3);
@@ -1196,6 +1270,7 @@ BOOL daNpcF_pntVsLineSegmentLengthSquare2D(f32 i_pntX, f32 i_pntZ, f32 i_startX,
                                            f32* o_dist2);
 BOOL daNpcF_chkPassed(cXyz i_pos, dPnt* i_points, u16 i_idx, u16 i_num, BOOL i_isClosed,
                       BOOL i_isReversed);
+BOOL daNpcF_chkDoBtnEqSpeak(fopAc_ac_c* i_actor_p);
 
 class daNpcF_MatAnm_c : public J3DMaterialAnm {
 private:
@@ -1222,7 +1297,7 @@ private:
     /* 0x00 */ u16 mNurbs;
     /* 0x02 */ u16 field_0x02;
     /* 0x04 */ u8 mIsReversed;
-    /* 0x05 */ bool mIsClosed;
+    /* 0x05 */ u8 mIsClosed;
     /* 0x08 */ dPnt mPoints[96];
 
 public:
@@ -1278,6 +1353,10 @@ public:
     void offReverse() { mIsReversed = false; }
     dPath* getPathInfo() { return mPathInfo; }
     void setRange(f32 i_range) { mRange = i_range; }
+    u16 getNumPnts() { return mPathInfo->m_num; }
+#if DEBUG
+    void drawDbgInfoXyz();
+#endif
 };  // Size: 0x630
 
 class daNpcF_Lookat_c {
@@ -1316,7 +1395,7 @@ public:
     /* 80155B54 */ ~daNpcF_MoveBgActor_c() {}
     /* 80155E88 */ virtual bool CreateHeap() { return true; }
     /* 80155E90 */ virtual bool Create() { return true; }
-    /* 80155EA0 */ virtual bool Execute(f32 (**)[3][4]) { return true; }
+    /* 80155EA0 */ virtual bool Execute(Mtx**) { return true; }
     /* 80155EA8 */ virtual bool Draw() { return true; }
     /* 80155E98 */ virtual bool Delete() { return true; }
     /* 80155EB0 */ virtual bool IsDelete() { return true; }
@@ -1367,6 +1446,10 @@ struct daNpcT_HIOParam {
     /* 0x84 */ f32 box_max_z;
     /* 0x88 */ f32 box_offset;
 };
+
+void daNpcT_cmnGenMessage(JORMContext*, daNpcT_HIOParam* param_1);
+
+void daNpcT_cmnListenPropertyEvent(char*, int*, daNpcT_HIOParam*);
 
 struct daNpcF_HIOParam {
     /* 0x00 */ f32 attention_offset;

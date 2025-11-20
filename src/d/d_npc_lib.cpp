@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_npc_lib.h"
 #include "SSystem/SComponent/c_math.h"
 

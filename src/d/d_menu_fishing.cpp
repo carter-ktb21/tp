@@ -3,6 +3,8 @@
  * Menu - Fishing Journal
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_fishing.h"
 #include "JSystem/J2DGraph/J2DTextBox.h"
 #include "JSystem/JKernel/JKRMemArchive.h"
@@ -12,11 +14,6 @@
 #include "d/d_msg_string.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
-
-/* 803BD038-803BD044 01A158 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 /* 803BD050-803BD05C 01A170 000C+00 2/3 0/0 0/0 .data            map_init_process */
 typedef void (dMenu_Fishing_c::*initFunc)();
@@ -124,7 +121,7 @@ void dMenu_Fishing_c::_draw() {
     if (mpArchive) {
         J2DGrafContext* grafPort = dComIfGp_getCurrentGrafPort();
         mpBlackTex->setAlpha(0xff);
-        mpBlackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, 0, 0, 0);
+        mpBlackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0, 0, 0);
         mpScreen->draw(0.0f, 0.0f, grafPort);
         mpIconScreen->draw(0.0f, 0.0f, grafPort);
     }
@@ -140,10 +137,25 @@ bool dMenu_Fishing_c::isSync() {
 
 /* 801C522C-801C52E4 1BFB6C 00B8+00 1/1 0/0 0/0 .text            init__15dMenu_Fishing_cFv */
 void dMenu_Fishing_c::init() {
+    #if VERSION == VERSION_GCN_PAL
+    BOOL isEnglish = FALSE;
+    if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_ENGLISH) {
+        isEnglish = TRUE;
+    }
+    #endif
+
     for (int i = 0; i < MAX_FINDABLE_FISHES; i++) {
         if (dComIfGs_getFishNum(i) != 0) {
             // Fish has been caught once, display it along with it's params
+            #if VERSION == VERSION_GCN_PAL
+            if (isEnglish) {
+                setFishParam(i, dComIfGs_getFishNum(i), dComIfGs_getFishSize(i) / 2.54f);
+            } else {
+                setFishParam(i, dComIfGs_getFishNum(i), dComIfGs_getFishSize(i));
+            }
+            #else
             setFishParam(i, dComIfGs_getFishNum(i), dComIfGs_getFishSize(i));
+            #endif
             mpFishParent[i]->show();
         } else {
             // Fish hasn't been caught yet, don't display it and also hide params

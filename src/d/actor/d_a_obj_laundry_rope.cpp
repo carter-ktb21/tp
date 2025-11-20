@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_laundry_rope.cpp
+* @file d_a_obj_laundry_rope.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_laundry_rope.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -283,7 +285,7 @@ static int daObjLndRope_Delete(daObjLndRope_c* i_this) {
 }
 
 int daObjLndRope_c::create() {
-    fopAcM_SetupActor(this, daObjLndRope_c);
+    fopAcM_ct(this, daObjLndRope_c);
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, createSolidHeap, 0x6c0)) {

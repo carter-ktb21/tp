@@ -3,23 +3,26 @@
  * Model, Animation, and Heap Functions
  */
 
-#include "m_Do/m_Do_ext.h"
-#include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
+#include <dolphin/gf/GFPixel.h>
+#include <dolphin/gx.h>
 #include "JSystem/J3DGraphAnimator/J3DMaterialAnm.h"
+#include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
+#include "JSystem/J3DGraphLoader/J3DMaterialFactory.h"
 #include "JSystem/JKernel/JKRAssertHeap.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "JSystem/JKernel/JKRSolidHeap.h"
-#include "JSystem/JUtility/JUTResFont.h"
 #include "JSystem/JUtility/JUTCacheFont.h"
-#include "stdio.h"
+#include "JSystem/JUtility/JUTResFont.h"
 #include "Z2AudioLib/Z2Creature.h"
 #include "d/d_com_inf_game.h"
 #include "dol2asm.h"
-#include <dolphin/gx.h>
-#include <dolphin/gf/GFPixel.h>
 #include "global.h"
+#include "m_Do/m_Do_ext.h"
 #include "m_Do/m_Do_mtx.h"
+#include "stdio.h"
 
 /* 8000D0AC-8000D320 0079EC 0274+00 5/5 0/0 0/0 .text
  * mDoExt_setJ3DData__FPA4_fPC16J3DTransformInfoUs              */
@@ -213,18 +216,16 @@ int mDoExt_brkAnm::init(J3DMaterialTable* i_matTable, J3DAnmTevRegKey* i_brk, in
     return 1;
 }
 
-/* 8000D7A8-8000D7DC 0080E8 0034+00 0/0 8/8 96/96 .text
- * entry__13mDoExt_brkAnmFP16J3DMaterialTablef                  */
+/* 8000D7A8-8000D7DC 0080E8 0034+00 0/0 8/8 96/96 .text          entry__13mDoExt_brkAnmFP16J3DMaterialTablef */
 void mDoExt_brkAnm::entry(J3DMaterialTable* i_matTable, f32 i_frame) {
     mpAnm->setFrame(i_frame);
     i_matTable->entryTevRegAnimator(mpAnm);
 }
 
-/* 8000D7DC-8000D8E4 00811C 0108+00 0/0 18/18 85/85 .text
- * init__13mDoExt_bckAnmFP15J3DAnmTransformiifssb               */
+/* 8000D7DC-8000D8E4 00811C 0108+00 0/0 18/18 85/85 .text        init__13mDoExt_bckAnmFP15J3DAnmTransformiifssb */
 int mDoExt_bckAnm::init(J3DAnmTransform* i_bck, int i_play, int i_attr, f32 i_rate,
                         s16 i_startF, s16 i_endF, bool i_modify) {
-    JUT_ASSERT(614, (i_modify || isCurrentSolidHeap()) && i_bck != 0);
+    JUT_ASSERT(614, (i_modify || isCurrentSolidHeap()) && i_bck != NULL);
     mAnm = i_bck;
     if (!i_modify) {
         mpMtxCalc = new J3DMtxCalcAnimation<J3DMtxCalcAnimationAdaptorDefault<J3DMtxCalcCalcTransformMaya>, J3DMtxCalcJ3DSysInitMaya>(mAnm);
@@ -241,29 +242,25 @@ int mDoExt_bckAnm::init(J3DAnmTransform* i_bck, int i_play, int i_attr, f32 i_ra
     return 1;
 }
 
-/* 8000D990-8000D9CC 0082D0 003C+00 0/0 5/5 31/31 .text
- * changeBckOnly__13mDoExt_bckAnmFP15J3DAnmTransform            */
+/* 8000D990-8000D9CC 0082D0 003C+00 0/0 5/5 31/31 .text          changeBckOnly__13mDoExt_bckAnmFP15J3DAnmTransform */
 void mDoExt_bckAnm::changeBckOnly(J3DAnmTransform* i_bck) {
     mAnm = i_bck;
     mpMtxCalc->setAnmTransform(mAnm);
 }
 
-/* 8000D9CC-8000D9E8 00830C 001C+00 0/0 11/11 59/59 .text entry__13mDoExt_bckAnmFP12J3DModelDataf
- */
+/* 8000D9CC-8000D9E8 00830C 001C+00 0/0 11/11 59/59 .text        entry__13mDoExt_bckAnmFP12J3DModelDataf */
 void mDoExt_bckAnm::entry(J3DModelData* i_modelData, f32 i_frame) {
     mAnm->setFrame(i_frame);
     i_modelData->getJointNodePointer(0)->setMtxCalc(mpMtxCalc);
 }
 
-/* 8000D9E8-8000DA08 008328 0020+00 0/0 1/1 1/1 .text
- * entryJoint__13mDoExt_bckAnmFP12J3DModelDataUsf               */
+/* 8000D9E8-8000DA08 008328 0020+00 0/0 1/1 1/1 .text            entryJoint__13mDoExt_bckAnmFP12J3DModelDataUsf */
 void mDoExt_bckAnm::entryJoint(J3DModelData* i_modelData, u16 i_jntNo, f32 i_frame) {
     mAnm->setFrame(i_frame);
     i_modelData->getJointNodePointer(i_jntNo)->setMtxCalc(mpMtxCalc);
 }
 
-/* 8000DA08-8000DAA8 008348 00A0+00 0/0 1/1 3/3 .text
- * init__13mDoExt_blkAnmFP13J3DDeformDataP13J3DAnmClusteriifss  */
+/* 8000DA08-8000DAA8 008348 00A0+00 0/0 1/1 3/3 .text            init__13mDoExt_blkAnmFP13J3DDeformDataP13J3DAnmClusteriifss */
 int mDoExt_blkAnm::init(J3DDeformData* i_deformData, J3DAnmCluster* i_blk, int i_anmPlay,
                         int i_attribute, f32 i_rate, s16 i_start, s16 param_6) {
     mpAnm = i_blk;
@@ -283,8 +280,7 @@ int mDoExt_blkAnm::init(J3DDeformData* i_deformData, J3DAnmCluster* i_blk, int i
     return 1;
 }
 
-/* 8000DAA8-8000DB10 0083E8 0068+00 3/3 0/0 0/0 .text            mDoExt_changeMaterial__FP8J3DModel
- */
+/* 8000DAA8-8000DB10 0083E8 0068+00 3/3 0/0 0/0 .text            mDoExt_changeMaterial__FP8J3DModel */
 static void mDoExt_changeMaterial(J3DModel* i_model) {
     J3DModelData* model_data = i_model->getModelData();
 
@@ -293,8 +289,7 @@ static void mDoExt_changeMaterial(J3DModel* i_model) {
     }
 }
 
-/* 8000DB10-8000DBC8 008450 00B8+00 0/0 0/0 1/1 .text mDoExt_modelTexturePatch__FP12J3DModelData
- */
+/* 8000DB10-8000DBC8 008450 00B8+00 0/0 0/0 1/1 .text mDoExt_modelTexturePatch__FP12J3DModelData */
 void mDoExt_modelTexturePatch(J3DModelData* i_modelData) {
     j3dSys.setTexture(i_modelData->getTexture());
 
@@ -311,6 +306,12 @@ void mDoExt_modelTexturePatch(J3DModelData* i_modelData) {
         OSRestoreInterrupts(ret);
         GDSetCurrent(NULL);
     }
+}
+
+static void dummy1() {
+    ((J3DTevBlock*)NULL)->patch();
+    ((J3DColorBlock*)NULL)->patchLight();
+    ((J3DPEBlock*)NULL)->patch();
 }
 
 /* 8000DBD8-8000DC2C 008518 0054+00 3/3 0/0 0/0 .text            mDoExt_modelDiff__FP8J3DModel */
@@ -355,8 +356,7 @@ void mDoExt_modelUpdateDL(J3DModel* i_model) {
     i_model->viewCalc();
 }
 
-/* 8000DD64-8000DDF0 0086A4 008C+00 4/4 3/3 10/10 .text            mDoExt_modelEntryDL__FP8J3DModel
- */
+/* 8000DD64-8000DDF0 0086A4 008C+00 4/4 3/3 10/10 .text            mDoExt_modelEntryDL__FP8J3DModel */
 void mDoExt_modelEntryDL(J3DModel* i_model) {
     J3DModelData* model_data = i_model->getModelData();
 
@@ -373,7 +373,7 @@ void mDoExt_modelEntryDL(J3DModel* i_model) {
     i_model->viewCalc();
 }
 
-/* 8000DDF0-8000DE8C 008730 009C+00 0/0 0/0 14/14 .text mDoExt_btkAnmRemove__FP12J3DModelData */
+/* 8000DDF0-8000DE8C 008730 009C+00 0/0 0/0 14/14 .text          mDoExt_btkAnmRemove__FP12J3DModelData */
 void mDoExt_btkAnmRemove(J3DModelData* i_modelData) {
     for (u16 i = 0; i < i_modelData->getMaterialNum(); i++) {
         J3DMaterialAnm* matAnm = i_modelData->getMaterialNodePointer(i)->getMaterialAnm();
@@ -386,7 +386,7 @@ void mDoExt_btkAnmRemove(J3DModelData* i_modelData) {
     }
 }
 
-/* 8000DE8C-8000DF3C 0087CC 00B0+00 0/0 0/0 7/7 .text mDoExt_brkAnmRemove__FP12J3DModelData */
+/* 8000DE8C-8000DF3C 0087CC 00B0+00 0/0 0/0 7/7 .text            mDoExt_brkAnmRemove__FP12J3DModelData */
 void mDoExt_brkAnmRemove(J3DModelData* i_modelData) {
     for (u16 i = 0; i < i_modelData->getMaterialNum(); i++) {
         J3DMaterialAnm* matAnm = i_modelData->getMaterialNodePointer(i)->getMaterialAnm();
@@ -400,8 +400,93 @@ void mDoExt_brkAnmRemove(J3DModelData* i_modelData) {
     }
 }
 
-/* 8000E53C-8000E5F8 008E7C 00BC+00 0/0 0/0 19/19 .text
- * create__21mDoExt_invisibleModelFP8J3DModelUc                 */
+// this needs a lot of work still
+static void dummy2() {
+    J3DGXColor gxColor;
+    J3DColorChan colorChan;
+    J3DTexCoord texCoord;
+    J3DGXColorS10 gxColorS10;
+    J3DIndTevStage indTevStage;
+    J3DTevOrder tevOrder;
+    J3DTevSwapModeTable tevSwapModeTable;
+    J3DIndTexOrder indTexOrder;
+    J3DIndTexMtx indTexMtx;
+    J3DIndTexCoordScale indTexCoordScale;
+
+    J3DColorBlock* colorBlock = NULL;
+    colorBlock->setColorChanNum((const u8*)NULL);
+    colorBlock->setMatColor(0, gxColor);
+    colorBlock->setColorChan(0, colorChan);
+    colorBlock->setAmbColor(0, gxColor);
+
+    J3DTexGenBlock* texGenBlock = NULL;
+    texGenBlock->setTexGenNum((const u32*)NULL);
+    texGenBlock->setTexCoord(0, NULL);
+
+    J3DTevBlock* tevBlock = NULL;
+    tevBlock->setTevStageNum((const u8*)NULL);
+    tevBlock->setTevColor(0, J3DGXColorS10());
+    tevBlock->setTevKColor(0, gxColor);
+    tevBlock->setTevOrder(0, tevOrder);
+    tevBlock->setTevKColorSel(0, (const u8*)NULL);
+    tevBlock->setTevKAlphaSel(0, (const u8*)NULL);
+    tevBlock->setTevSwapModeTable(0, tevSwapModeTable);
+    tevBlock->setTexNo(0, (const u16*)NULL);
+    J3DTevStage tevStage;
+    tevBlock->setTevStage(0, tevStage);
+    tevBlock->setIndTevStage(0, indTevStage);
+
+    J3DIndBlock* indBlock = NULL;
+    indBlock->setIndTexStageNum(0);
+    indBlock->setIndTexMtx(0, indTexMtx);
+    indBlock->setIndTexCoordScale(0, indTexCoordScale);
+    indTexCoordScale.~J3DIndTexCoordScale();
+
+    J3DPEBlock* peBlock = NULL;
+    J3DAlphaComp alphaComp;
+    peBlock->setAlphaComp(alphaComp);
+    J3DBlend blend;
+    peBlock->setBlend(blend);
+    J3DZMode zMode;
+    peBlock->setZMode(zMode);
+    u8 compLoc;
+    peBlock->setZCompLoc(&compLoc);
+
+    colorBlock->getColorChanNum();
+    colorBlock->getMatColor(0);
+    colorBlock->getColorChan(0);
+    colorBlock->getAmbColor(0);
+
+    texGenBlock->getTexGenNum();
+    texGenBlock->getTexCoord(0);
+    texGenBlock->getTexMtx(0);
+
+    tevBlock->getTevStageNum();
+    tevBlock->getTevColor(0);
+    tevBlock->getTevKColor(0);
+    tevBlock->getTevOrder(0);
+    tevBlock->getTevKColorSel(0);
+    tevBlock->getTevKAlphaSel(0);
+    tevBlock->getTevSwapModeTable(0);
+    tevBlock->getTexNo(0);
+    tevBlock->getTevStage(0);
+    tevBlock->getIndTevStage(0);
+
+    indBlock = NULL;
+    indBlock->getIndTexStageNum();
+    indBlock->getIndTexOrder(0);
+    indBlock->getIndTexMtx(0);
+    indBlock->getIndTexCoordScale(0);
+
+    peBlock = NULL;
+    peBlock->getFog();
+    peBlock->getAlphaComp();
+    peBlock->getBlend();
+    peBlock->getZMode();
+    peBlock->getZCompLoc();
+}
+
+/* 8000E53C-8000E5F8 008E7C 00BC+00 0/0 0/0 19/19 .text          create__21mDoExt_invisibleModelFP8J3DModelUc */
 int mDoExt_invisibleModel::create(J3DModel* i_model, u8 param_1) {
     J3DModelData* model_data = i_model->getModelData();
 
@@ -421,7 +506,7 @@ int mDoExt_invisibleModel::create(J3DModel* i_model, u8 param_1) {
     return 1;
 }
 
-/* 8000E6C8-8000E7C0 009008 00F8+00 1/1 0/0 0/0 .text entryJoint__21mDoExt_invisibleModelFP4cXyz
+/* 8000E6C8-8000E7C0 009008 00F8+00 1/1 0/0 0/0 .text            entryJoint__21mDoExt_invisibleModelFP4cXyz
  */
 void mDoExt_invisibleModel::entryJoint(cXyz* param_0) {
     J3DModelData* modelData = mModel->getModelData();
@@ -457,15 +542,15 @@ void mDoExt_invisibleModel::entryDL(cXyz* param_0) {
 /* 8000E834-8000EA80 009174 024C+00 0/0 0/0 7/7 .text
  * mDoExt_setupShareTexture__FP12J3DModelDataP12J3DModelData    */
 void mDoExt_setupShareTexture(J3DModelData* i_modelData, J3DModelData* i_shareModelData) {
-    JUT_ASSERT(1547, i_modelData != 0 && i_shareModelData != 0);
+    JUT_ASSERT(1547, i_modelData != NULL && i_shareModelData != NULL);
     J3DTexture* texture = i_modelData->getTexture();
-    JUT_ASSERT(1549, texture != 0);
+    JUT_ASSERT(1549, texture != NULL);
     JUTNameTab* textureName = i_modelData->getTextureName();
-    JUT_ASSERT(1551, textureName != 0);
+    JUT_ASSERT(1551, textureName != NULL);
     J3DTexture* shareTexture = i_shareModelData->getTexture();
-    JUT_ASSERT(1553, shareTexture != 0);
+    JUT_ASSERT(1553, shareTexture != NULL);
     JUTNameTab* shareTextureName = i_shareModelData->getTextureName();
-    JUT_ASSERT(1555, shareTextureName != 0)
+    JUT_ASSERT(1555, shareTextureName != NULL)
 
     bool bvar = false;
     for (u16 i = 0; i < texture->getNum(); i++) {
@@ -487,7 +572,7 @@ void mDoExt_setupShareTexture(J3DModelData* i_modelData, J3DModelData* i_shareMo
         for (u16 i = 0; i < i_modelData->getMaterialNum(); i++) {
             J3DMaterial* mat = i_modelData->getMaterialNodePointer(i);
             J3DTevBlock* tevBlock = mat->getTevBlock();
-            JUT_ASSERT(1577, tevBlock != 0);
+            JUT_ASSERT(1577, tevBlock != NULL);
             J3DDisplayListObj* dlObj = mat->getSharedDisplayListObj();
 
             BOOL ret = OSDisableInterrupts();
@@ -501,19 +586,15 @@ void mDoExt_setupShareTexture(J3DModelData* i_modelData, J3DModelData* i_shareMo
     }
 }
 
-/* ############################################################################################## */
-/* 803740FC-803740FC 00075C 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
-#pragma push
-#pragma force_active on
-// MWCC ignores mapping of some japanese characters using the
-// byte 0x5C (ASCII '\'). This is why this string is hex-encoded.
+static const char* dummy3() {
+    // MWCC ignores mapping of some japanese characters using the
+    // byte 0x5C (ASCII '\'). This is why this string is hex-encoded.
 
-// "ソリッドヒープちゃうがな！\n"
-// "This isn't a solid heap! \n"
-SECTION_DEAD static char const* const stringBase_803740FC =
-    "\x83\x5C\x83\x8A\x83\x62\x83\x68\x83\x71\x81\x5B\x83\x76\x82\xBF\x82\xE1\x82\xA4\x82\xAA\x82"
-    "\xC8\x81\x49\x0A";
-#pragma pop
+    // "ソリッドヒープちゃうがな！\n"
+    // "This isn't a solid heap! \n"
+    return "\x83\x5C\x83\x8A\x83\x62\x83\x68\x83\x71\x81\x5B\x83\x76\x82\xBF\x82\xE1\x82\xA4\x82"
+        "\xAA\x82\xC8\x81\x49\x0A";
+}
 
 /* 8000EA80-8000ECC0 0093C0 0240+00 0/0 0/0 6/6 .text mDoExt_setupStageTexture__FP12J3DModelData
  */
@@ -694,7 +775,7 @@ static JKRSolidHeap* mDoExt_createSolidHeap(u32 i_size, JKRHeap* i_heap, u32 i_a
 
     JKRSolidHeap* createdHeap;
     if (i_size == 0 || i_size == 0xFFFFFFFF) {
-        createdHeap = JKRSolidHeap::create(0xFFFFFFFFFF, i_heap, false);
+        createdHeap = JKRSolidHeap::create(0xFFFFFFFF, i_heap, false);
     } else {
         i_size = ALIGN_NEXT(i_size, 0x10);
         i_size += 0x80;
@@ -1299,11 +1380,11 @@ void mDoExt_McaMorf::getTransform(u16 param_0, J3DTransformInfo* param_1) {
 mDoExt_McaMorfSO::mDoExt_McaMorfSO(J3DModelData* param_0, mDoExt_McaMorfCallBack1_c* param_1,
                                    mDoExt_McaMorfCallBack2_c* param_2, J3DAnmTransform* param_3,
                                    int param_4, f32 param_5, int param_6, int param_7,
-                                   Z2Creature* param_8, u32 param_9, u32 param_10) {
+                                   Z2Creature* param_8, u32 i_modelFlag, u32 i_differedDlistFlag) {
     mTranslate = false;
     mMorfNone = false;
-    create(param_0, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8, param_9,
-           param_10);
+    create(param_0, param_1, param_2, param_3, param_4, param_5, param_6, param_7, param_8,
+           i_modelFlag, i_differedDlistFlag);
 }
 
 /* 80010888-800108F0 00B1C8 0068+00 1/0 0/0 0/0 .text            __dt__16mDoExt_McaMorfSOFv */
@@ -1317,7 +1398,7 @@ mDoExt_McaMorfSO::~mDoExt_McaMorfSO() {
 int mDoExt_McaMorfSO::create(J3DModelData* i_modelData, mDoExt_McaMorfCallBack1_c* param_1,
                              mDoExt_McaMorfCallBack2_c* param_2, J3DAnmTransform* param_3,
                              int param_4, f32 param_5, int param_6, int param_7,
-                             Z2Creature* i_sound, u32 param_9, u32 param_10) {
+                             Z2Creature* i_sound, u32 i_modelFlag, u32 i_differedDlistFlag) {
     mpModel = NULL;
     mpTransformInfo = NULL;
     mpQuat = NULL;
@@ -1327,20 +1408,22 @@ int mDoExt_McaMorfSO::create(J3DModelData* i_modelData, mDoExt_McaMorfCallBack1_
         return 0;
     }
 
-    if (i_modelData->getMaterialNodePointer(0)->getSharedDisplayListObj() != NULL && param_9 == 0) {
+    if (i_modelData->getMaterialNodePointer(0)->getSharedDisplayListObj() != NULL &&
+        i_modelFlag == 0)
+    {
         if (i_modelData->isLocked()) {
-            param_9 = 0x20000;
+            i_modelFlag = 0x20000;
         } else {
-            param_9 = 0x80000;
+            i_modelFlag = 0x80000;
         }
     }
 
-    mpModel = mDoExt_J3DModel__create(i_modelData, param_9, param_10);
+    mpModel = mDoExt_J3DModel__create(i_modelData, i_modelFlag, i_differedDlistFlag);
     if (mpModel == NULL) {
         return 0;
     }
 
-    if (param_9 != 0x80000) {
+    if (i_modelFlag != 0x80000) {
         mDoExt_changeMaterial(mpModel);
     }
 
@@ -1397,7 +1480,7 @@ int mDoExt_McaMorfSO::create(J3DModelData* i_modelData, mDoExt_McaMorfCallBack1_
 // NONMATCHING regalloc
 void mDoExt_McaMorfSO::calc() {
     if (mpModel != NULL) {
-        u16 jnt_no = J3DMtxCalc::getJoint()->getJntNo();
+        u16 jnt_no = getJoint()->getJntNo();
         j3dSys.setCurrentMtxCalc(this);
 
         J3DTransformInfo trans;
@@ -1504,7 +1587,7 @@ void mDoExt_McaMorfSO::setAnm(J3DAnmTransform* i_anm, int i_attr, f32 i_morf, f3
 
     setPlayMode(i_attr);
     setPlaySpeed(i_rate);
-    
+
     if (i_rate >= 0.0f) {
         setFrame(i_start);
     } else {
@@ -1679,7 +1762,7 @@ mDoExt_McaMorf2::~mDoExt_McaMorf2() {
 
         *var_r29 = *sp2C;
         JMAEulerToQuat(var_r29->mRotation.x, var_r29->mRotation.y, var_r29->mRotation.z, var_r26);
-        
+
         var_r29++;
         var_r26++;
     }
@@ -1705,7 +1788,6 @@ void mDoExt_McaMorf2::ERROR_EXIT() {
 }
 
 /* 800116F4-80011D70 00C034 067C+00 1/0 0/0 0/0 .text            calc__15mDoExt_McaMorf2Fv */
-// NONMATCHING - float regswap, equivalent
 void mDoExt_McaMorf2::calc() {
     if (mpModel != NULL) {
         u16 jnt_no = J3DMtxCalc::getJoint()->getJntNo();
@@ -1732,10 +1814,8 @@ void mDoExt_McaMorf2::calc() {
         f32 var_f31;
         f32 var_f30;
         f32 var_f29;
-        f32 sp1C;
-        f32 sp18;
-        f32 sp14;
-        f32 sp10;
+        f32 sp18[2];
+        f32 sp10[2];
         if (mpQuat == NULL) {
             var_r27 = &sp30;
         } else {
@@ -1758,7 +1838,7 @@ void mDoExt_McaMorf2::calc() {
                 if (mpCallback1 != NULL) {
                     mpCallback1->execute(jnt_no, &spF0[0]);
                 }
-    
+
                 JMAEulerToQuat(spF0[0].mRotation.x, spF0[0].mRotation.y, spF0[0].mRotation.z,
                                var_r27);
                 J3DMtxCalcCalcTransformMaya::calcTransform(spF0[0]);
@@ -1766,29 +1846,29 @@ void mDoExt_McaMorf2::calc() {
             } else {
                 field_0x40->getTransform(jnt_no, &spF0[1]);
 
-                sp18 = 1.0f - field_0x44;
-                sp1C = field_0x44;
+                sp18[0] = 1.0f - mAnmRate;
+                sp18[1] = mAnmRate;
 
-                var_r30->mScale.x = spF0[0].mScale.x * sp18
-                                    + spF0[1].mScale.x * sp1C;
-                var_r30->mScale.y = spF0[0].mScale.y * sp18
-                                    + spF0[1].mScale.y * sp1C;
-                var_r30->mScale.z = spF0[0].mScale.z * sp18
-                                    + spF0[1].mScale.z * sp1C;
-                var_r30->mTranslate.x = spF0[0].mTranslate.x * sp18
-                                    + spF0[1].mTranslate.x * sp1C;
-                var_r30->mTranslate.y = spF0[0].mTranslate.y * sp18
-                                        + spF0[1].mTranslate.y * sp1C;
-                var_r30->mTranslate.z = spF0[0].mTranslate.z * sp18
-                                        + spF0[1].mTranslate.z * sp1C;
+                var_r30->mScale.x = spF0[0].mScale.x * sp18[0]
+                                    + spF0[1].mScale.x * sp18[1];
+                var_r30->mScale.y = spF0[0].mScale.y * sp18[0]
+                                    + spF0[1].mScale.y * sp18[1];
+                var_r30->mScale.z = spF0[0].mScale.z * sp18[0]
+                                    + spF0[1].mScale.z * sp18[1];
+                var_r30->mTranslate.x = spF0[0].mTranslate.x * sp18[0]
+                                    + spF0[1].mTranslate.x * sp18[1];
+                var_r30->mTranslate.y = spF0[0].mTranslate.y * sp18[0]
+                                        + spF0[1].mTranslate.y * sp18[1];
+                var_r30->mTranslate.z = spF0[0].mTranslate.z * sp18[0]
+                                        + spF0[1].mTranslate.z * sp18[1];
 
                 for (int i = 0; i < 2; i++) {
                     JMAEulerToQuat(spF0[i].mRotation.x, spF0[i].mRotation.y, spF0[i].mRotation.z, &sp60[i]);
                 }
 
-                var_f29 = sp1C / (sp18 + sp1C);
-
+                var_f29 = sp18[1] / (sp18[0] + sp18[1]);
                 JMAQuatLerp(&sp60[0], &sp60[1], var_f29, var_r27);
+
                 mDoMtx_quat(spC0, var_r27);
                 mDoExt_setJ3DData(spC0, var_r30, jnt_no);
             }
@@ -1823,27 +1903,27 @@ void mDoExt_McaMorf2::calc() {
             mpAnm->getTransform(jnt_no, &spF0[0]);
             field_0x40->getTransform(jnt_no, &spF0[1]);
 
-            sp10 = 1.0f - field_0x44;
-            sp14 = field_0x44;
+            sp10[0] = 1.0f - mAnmRate;
+            sp10[1] = mAnmRate;
 
-            sp80.mScale.x = spF0[0].mScale.x * sp10
-                                + spF0[1].mScale.x * sp14;
-            sp80.mScale.y = spF0[0].mScale.y * sp10
-                                + spF0[1].mScale.y * sp14;
-            sp80.mScale.z = spF0[0].mScale.z * sp10
-                                + spF0[1].mScale.z * sp14;
-            sp80.mTranslate.x = spF0[0].mTranslate.x * sp10
-                                + spF0[1].mTranslate.x * sp14;
-            sp80.mTranslate.y = spF0[0].mTranslate.y * sp10
-                                    + spF0[1].mTranslate.y * sp14;
-            sp80.mTranslate.z = spF0[0].mTranslate.z * sp10
-                                    + spF0[1].mTranslate.z * sp14;
+            sp80.mScale.x = spF0[0].mScale.x * sp10[0]
+                                + spF0[1].mScale.x * sp10[1];
+            sp80.mScale.y = spF0[0].mScale.y * sp10[0]
+                                + spF0[1].mScale.y * sp10[1];
+            sp80.mScale.z = spF0[0].mScale.z * sp10[0]
+                                + spF0[1].mScale.z * sp10[1];
+            sp80.mTranslate.x = spF0[0].mTranslate.x * sp10[0]
+                                + spF0[1].mTranslate.x * sp10[1];
+            sp80.mTranslate.y = spF0[0].mTranslate.y * sp10[0]
+                                    + spF0[1].mTranslate.y * sp10[1];
+            sp80.mTranslate.z = spF0[0].mTranslate.z * sp10[0]
+                                    + spF0[1].mTranslate.z * sp10[1];
 
             for (int i = 0; i < 2; i++) {
                 JMAEulerToQuat(spF0[i].mRotation.x, spF0[i].mRotation.y, spF0[i].mRotation.z, &sp40[i]);
             }
 
-            var_f31 = sp14 / (sp10 + sp14);
+            var_f31 = sp10[1] / (sp10[0] + sp10[1]);
             JMAQuatLerp(&sp40[0], &sp40[1], var_f31, &sp20);
 
             var_f31 = (mCurMorf - mPrevMorf) / (1.0f - mPrevMorf);
@@ -1879,7 +1959,7 @@ void mDoExt_McaMorf2::setAnm(J3DAnmTransform* param_0, J3DAnmTransform* param_1,
                              int i_attr, f32 i_morf, f32 i_speed, f32 i_start, f32 i_end) {
     mpAnm = param_0;
     field_0x40 = param_1;
-    field_0x44 = param_2;
+    mAnmRate = param_2;
 
     setStartFrame(i_start);
 
@@ -1899,7 +1979,7 @@ void mDoExt_McaMorf2::setAnm(J3DAnmTransform* param_0, J3DAnmTransform* param_1,
 
     setPlayMode(i_attr);
     setPlaySpeed(i_speed);
-    
+
     if (i_speed >= 0.0f) {
         setFrame(i_start);
     } else {
@@ -1925,9 +2005,9 @@ void mDoExt_McaMorf2::setAnm(J3DAnmTransform* param_0, J3DAnmTransform* param_1,
 /* 80011FCC-800120A0 00C90C 00D4+00 0/0 0/0 2/2 .text            setAnmRate__15mDoExt_McaMorf2Ff */
 void mDoExt_McaMorf2::setAnmRate(f32 param_0) {
     void* pBas = NULL;
-    field_0x44 = param_0;
+    mAnmRate = param_0;
     if (mpSound != NULL) {
-        if (field_0x44 < 0.5f) {
+        if (mAnmRate < 0.5f) {
             if (mpAnm != NULL) {
                 pBas = ((mDoExt_transAnmBas*)mpAnm)->getBas();
             }
@@ -2007,7 +2087,7 @@ void mDoExt_invJntPacket::draw() {
             GFSetBlendModeEtc(GX_BM_NONE, GX_BL_ZERO, GX_BL_ZERO, GX_LO_CLEAR, 0, 0, 1);
 
             J3DShapePacket* shapePkt = sp18->getShapePacket();
-            JUT_ASSERT(0x1393, shapePkt != 0);
+            JUT_ASSERT(5011, shapePkt != NULL);
             shapePkt->getShape()->loadPreDrawSetting();
 
             do {
@@ -2057,15 +2137,14 @@ void mDoExt_invJntPacket::draw() {
 }
 
 /* 800123D0-800125DC 00CD10 020C+00 2/2 0/0 0/0 .text            init__15mDoExt_3Dline_cFUsii */
-// NONMATCHING - regalloc, probably some types are wrong
-int mDoExt_3Dline_c::init(u16 param_0, int param_1, int param_2) {
+int mDoExt_3Dline_c::init(u16 param_0, int param_1, BOOL param_2) {
     field_0x0 = new cXyz[param_0];
     if (field_0x0 == NULL) {
         return 0;
     }
 
     if (param_1 != 0) {
-        field_0x4 = new f32[param_1];
+        field_0x4 = new f32[param_0];
         if (field_0x4 == NULL) {
             return 0;
         }
@@ -2085,38 +2164,35 @@ int mDoExt_3Dline_c::init(u16 param_0, int param_1, int param_2) {
         return 0;
     }
 
-    field_0x10 = new u8[param_0 * 3];
+    field_0x10 = new mDoExt_3Dline_field_0x10_c[sp20];
     if (field_0x10 == NULL) {
         return 0;
     }
 
-    field_0x14 = new u8[param_0 * 3];
+    field_0x14 = new mDoExt_3Dline_field_0x10_c[sp20];
     if (field_0x14 == NULL) {
         return 0;
     }
 
-    if (param_2 != 0) {
-        field_0x18 = new f32[sp20];
+    if (param_2) {
+        field_0x18 = new mDoExt_3Dline_field_0x18_c[sp20];
         if (field_0x18 == NULL) {
             return 0;
         }
 
-        field_0x1c = new f32[sp20];
+        field_0x1c = new mDoExt_3Dline_field_0x18_c[sp20];
         if (field_0x1c == NULL) {
             return 0;
         }
 
-        f32* var_r28 = field_0x18;
-        f32* var_r27 = field_0x1c;
-        for (int i = 0; i < param_0; i++) {
-            var_r28[0] = 0.0f;
-            var_r27[0] = 0.0f;
+        mDoExt_3Dline_field_0x18_c* var_r28 = field_0x18;
+        mDoExt_3Dline_field_0x18_c* var_r27 = field_0x1c;
+        for (s32 i = 0; i < param_0; i++) {
+            var_r28++->field_0x0 = 0.0f;
+            var_r27++->field_0x0 = 0.0f;
 
-            var_r28[2] = 1.0f;
-            var_r27[2] = 1.0f;
-
-            var_r28 += 4;
-            var_r27 += 4;
+            var_r28++->field_0x0 = 1.0f;
+            var_r27++->field_0x0 = 1.0f;
         }
     }
 
@@ -2135,7 +2211,7 @@ int mDoExt_3DlineMat0_c::init(u16 param_0, u16 param_1, int param_2) {
     }
 
     for (int i = 0; i < param_0; i++) {
-        if (!field_0x18[i].init(param_1, param_2, 0)) {
+        if (!field_0x18[i].init(param_1, param_2, FALSE)) {
             return 0;
         }
     }
@@ -2144,9 +2220,6 @@ int mDoExt_3DlineMat0_c::init(u16 param_0, u16 param_1, int param_2) {
     field_0x16 = 0;
     return 1;
 }
-
-/* 800126BC-800126C0 00CFFC 0004+00 2/2 0/0 0/0 .text            __ct__15mDoExt_3Dline_cFv */
-mDoExt_3Dline_c::mDoExt_3Dline_c() {}
 
 /* 803A30C0-803A3160 0001E0 0084+1C 1/1 0/0 0/0 .data            l_matDL */
 static u8 l_matDL[132] ALIGN_DECL(32) = {
@@ -2191,7 +2264,6 @@ void mDoExt_3DlineMat0_c::setMaterial() {
 }
 
 /* 80012774-80012874 00D0B4 0100+00 1/0 0/0 0/0 .text            draw__19mDoExt_3DlineMat0_cFv */
-// NONMATCHING - issues with the iterators
 void mDoExt_3DlineMat0_c::draw() {
     GXSetTevColor(GX_TEVREG2, field_0x8);
 
@@ -2200,11 +2272,11 @@ void mDoExt_3DlineMat0_c::draw() {
     }
 
     mDoExt_3Dline_c* var_r28 = field_0x18;
-    int var_r26 = (field_0x14 & 0x7FFF) << 1;
+    int var_r26 = (field_0x14 << 1) & 0xFFFF;
 
     for (int i = 0; i < field_0x10; i++) {
-        GXSetArray(GX_VA_POS, var_r28[field_0x16].field_0x8, sizeof(cXyz));
-        GXSetArray(GX_VA_NRM, var_r28[field_0x16].field_0x10, 3);
+        GXSetArray(GX_VA_POS, ((mDoExt_3Dline_c*)((int)var_r28 + field_0x16 * 4))->field_0x8, sizeof(cXyz));
+        GXSetArray(GX_VA_NRM, ((mDoExt_3Dline_c*)((int)var_r28 + field_0x16 * 4))->field_0x10, 3);
 
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, var_r26);
         for (u16 j = 0; j < (u16)var_r26;) {
@@ -2213,135 +2285,278 @@ void mDoExt_3DlineMat0_c::draw() {
             j++;
 
             GXPosition1x16(j);
-            GXNormal1x16(j);
-            j++;
+            GXNormal1x16(j++);
         }
         GXEnd();
         var_r28++;
     }
 
-    field_0x16 ^= 1;
+    field_0x16 ^= (u8)1;
 }
 
 /* 80012874-80012E3C 00D1B4 05C8+00 0/0 0/0 2/2 .text
  * update__19mDoExt_3DlineMat0_cFifR8_GXColorUsP12dKy_tevstr_c  */
 void mDoExt_3DlineMat0_c::update(int param_0, f32 param_1, GXColor& param_2, u16 param_3,
                                      dKy_tevstr_c* param_4) {
-    // NONMATCHING
-}
-
-/* 80012E3C-80013360 00D77C 0524+00 0/0 0/0 9/9 .text
- * update__19mDoExt_3DlineMat0_cFiR8_GXColorP12dKy_tevstr_c     */
-// NONMATCHING
-void mDoExt_3DlineMat0_c::update(int param_0, GXColor& param_1, dKy_tevstr_c* param_2) {
-    field_0x8 = param_1;
-    field_0xc = param_2;
+    field_0x8 = param_2;
+    field_0xc = param_4;
 
     if (param_0 < 0) {
         field_0x14 = field_0x12;
     } else if (param_0 > field_0x12) {
         field_0x14 = field_0x12;
     } else {
-        field_0x14 = param_0;
+        field_0x14 = (u16)param_0;
     }
 
-    view_class* view_p = dComIfGd_getView();
-    mDoExt_3Dline_c* sp30 = field_0x18;
-    int sp2C = field_0x14 * 2;
-    int sp28 = field_0x14 * 12;
+    view_class* sp_2c = dComIfGd_getView();
 
-    cXyz sp134;
-    cXyz sp128;
-    cXyz sp11C;
-    cXyz sp110;
+    mDoExt_3Dline_c* sp_28 = field_0x18;
 
-    for (int i = 0; i < field_0x10; i++) {
-        cXyz* pos_p = sp30->field_0x0;
-        f32* size_p = sp30->field_0x4;
-        JUT_ASSERT(0x1545, size_p != 0);
+    f32 local_f30 = param_3 != 0 ? param_1 / param_3 : 0.0f;
 
-        cXyz* sp20 = &sp30->field_0x8[field_0x16];
-        cXyz* sp24 = sp20;
+    u32 sp_24 = (field_0x14 << 1) * 12;
+    u32 sp_20 = (field_0x14 << 1) * 3;
 
-        u8* sp1C = &sp30->field_0x10[field_0x16];
+    cXyz sp_12c;
+    cXyz sp_120;
+    cXyz sp_114;
+    cXyz sp_108;
 
-        u8* var_r30 = sp1C;
-        u8* var_r29 = var_r30 + 3;
+    cXyz* local_r27;
+    cXyz* local_r26;
+    cXyz* sp_1c;
 
-        sp128 = pos_p[1] - pos_p[0];
-        sp134 = pos_p[0] - view_p->lookat.eye;
-        sp128 = sp128.outprod(sp134);
-        sp128.normalizeZP();
+    mDoExt_3Dline_field_0x10_c* local_r30;
+    mDoExt_3Dline_field_0x10_c* local_r29;
+    mDoExt_3Dline_field_0x10_c* sp_18;
 
-        var_r30[0] = sp128.x * 64.0f;
-        var_r30[1] = sp128.y * 64.0f;
-        var_r30[2] = sp128.z * 64.0f;
-        var_r29[0] = -sp1C[0];
-        var_r29[1] = -sp1C[1];
-        var_r29[2] = -sp1C[2];
+    for (s32 sp_14 = 0; sp_14 < field_0x10; sp_14++) {
+        local_r27 = sp_28->field_0x0;
 
-        sp128 *= *size_p;
-        sp20[0] = pos_p[0] + sp128;
-        sp20[1] = pos_p[0] - sp128;
-        
-        pos_p++;
+        sp_1c = ((mDoExt_3Dline_c*)((int)sp_28 + (field_0x16 << 2)))->field_0x8;
+        local_r26 = sp_1c;
+        sp_18 = ((mDoExt_3Dline_c*)((int)sp_28 + (field_0x16 << 2)))->field_0x10;
+        local_r30 = sp_18;
 
-        sp11C = pos_p[0] + sp128;
-        sp110 = pos_p[0] - sp128;
+        local_r29 = local_r30 + 1;
 
-        for (int sp10 = field_0x14 - 2; sp10 > 0; sp10--) {
-            sp128 = pos_p[1] - pos_p[0];
-            sp134 = pos_p[0] - view_p->lookat.eye;
-            sp128 = sp128.outprod(sp134);
-            sp128.normalizeZP();
+        f32 local_f31 = param_1;
 
-            var_r30 += 6;
-            var_r29 += 6;
+        sp_120 = local_r27[1] - local_r27[0];
+        sp_12c = local_r27[0] - sp_2c->lookat.eye;
+        sp_120 = sp_120.outprod(sp_12c);
+        sp_120.normalizeZP();
 
-            var_r30[0] = sp128.x * 64.0f;
-            var_r30[1] = sp128.y * 64.0f;
-            var_r30[2] = sp128.z * 64.0f;
-            var_r29[0] = -sp1C[0];
-            var_r29[1] = -sp1C[1];
-            var_r29[2] = -sp1C[2];
+        local_r30->x = sp_120.x * 64.0f;
+        local_r30->y = sp_120.y * 64.0f;
+        local_r30->z = sp_120.z * 64.0f;
+        local_r29->x = -local_r30->x;
+        local_r29->y = -local_r30->y;
+        local_r29->z = -local_r30->z;
 
-            sp128 *= *size_p;
-            sp11C += pos_p[0] + sp128;
-            sp110 += pos_p[0] - sp128;
-            *sp24 = sp11C * 0.5f;
-            *sp20 = sp110 * 0.5f;
-            
-            pos_p++;
+        sp_120 *= local_f31;
+        *local_r26++ = *local_r27 + sp_120;
+        *local_r26++ = *local_r27 - sp_120;
+        local_r27++;
+        sp_114 = *local_r27 + sp_120;
+        sp_108 = *local_r27 - sp_120;
 
-            sp11C = pos_p[0] + sp128;
-            sp110 = pos_p[0] - sp128;
+        for (s32 local_r19 = field_0x14 - 2; local_r19 > 0; local_r19--) {
+            if (local_r19 < param_3) {
+                local_f31 -= local_f30;
+            }
+
+            sp_120 = local_r27[1] - local_r27[0];
+            sp_12c = local_r27[0] - sp_2c->lookat.eye;
+            sp_120 = sp_120.outprod(sp_12c);
+            sp_120.normalizeZP();
+
+            local_r30 += 2;
+            local_r29 += 2;
+
+            local_r30->x = sp_120.x * 64.0f;
+            local_r30->y = sp_120.y * 64.0f;
+            local_r30->z = sp_120.z * 64.0f;
+            local_r29->x = -local_r30->x;
+            local_r29->y = -local_r30->y;
+            local_r29->z = -local_r30->z;
+
+            sp_120 *= local_f31;
+            sp_114 += *local_r27 + sp_120;
+            sp_108 += *local_r27 - sp_120;
+            *local_r26++ = sp_114 * 0.5f;
+            *local_r26++ = sp_108 * 0.5f;
+
+            local_r27++;
+
+            sp_114 = *local_r27 + sp_120;
+            sp_108 = *local_r27 - sp_120;
         }
+        local_r29 += 1;
+        local_r29->x = local_r30->x;
+        local_r29->y = local_r30->y;
+        local_r29->z = local_r30->z;
+        local_r30 += 1;
+        local_r29 += 1;
+        local_r29->x = local_r30->x;
+        local_r29->y = local_r30->y;
+        local_r29->z = local_r30->z;
+        if (param_3 != 0) {
+            *local_r26++ = *local_r27;
+            *local_r26 = *local_r27;
+        } else {
+            *local_r26++ = sp_114;
+            *local_r26 = sp_108;
+        }
+        DCStoreRangeNoSync(sp_1c, sp_24);
+        DCStoreRangeNoSync(sp_18, sp_20);
+        sp_28++;
+    }
+}
 
-        var_r29 += 3;
+/* 80012E3C-80013360 00D77C 0524+00 0/0 0/0 9/9 .text
+ * update__19mDoExt_3DlineMat0_cFiR8_GXColorP12dKy_tevstr_c     */
+void mDoExt_3DlineMat0_c::update(int param_0, GXColor& param_2, dKy_tevstr_c* param_4) {
+    field_0x8 = param_2;
+    field_0xc = param_4;
 
-        var_r29[0] = var_r30[0];
-        var_r29[1] = var_r30[1];
-        var_r29[2] = var_r30[2];
+    if (param_0 < 0) {
+        field_0x14 = field_0x12;
+    } else if (param_0 > field_0x12) {
+        field_0x14 = field_0x12;
+    } else {
+        field_0x14 = (u16)param_0;
+    }
 
-        var_r30 += 3;
-        var_r29 += 3;
+    view_class* sp_34 = dComIfGd_getView();
 
-        var_r29[0] = var_r30[0];
-        var_r29[1] = var_r30[1];
-        var_r29[2] = var_r30[2];
+    mDoExt_3Dline_c* sp_30 = field_0x18;
 
-        *sp24 = sp11C;
-        *sp20 = sp110;
+    u32 sp_2c = (field_0x14 << 1) * 12;
+    u32 sp_28 = (field_0x14 << 1) * 3;
 
-        DCStoreRangeNoSync(sp20, sp2C);
-        DCStoreRangeNoSync(sp1C, sp28);
+    cXyz sp_12c;
+    cXyz sp_120;
+    cXyz sp_114;
+    cXyz sp_108;
+
+    cXyz* local_r27;
+    cXyz* sp_24;
+    cXyz* sp_20;
+
+    mDoExt_3Dline_field_0x10_c* local_r30;
+    mDoExt_3Dline_field_0x10_c* local_r29;
+    mDoExt_3Dline_field_0x10_c* sp_1c;
+    f32* sp_18;
+
+    for (s32 sp_14 = 0; sp_14 < field_0x10; sp_14++) {
+        local_r27 = sp_30->field_0x0;
+
+        sp_18 = sp_30->field_0x4;
+
+        JUT_ASSERT(0x1545, sp_18 != NULL);
+
+        sp_20 = ((mDoExt_3Dline_c*)((int)sp_30 + (field_0x16 << 2)))->field_0x8;
+        sp_24 = sp_20;
+        sp_1c = ((mDoExt_3Dline_c*)((int)sp_30 + (field_0x16 << 2)))->field_0x10;
+        local_r30 = sp_1c;
+
+        local_r29 = local_r30 + 1;
+
+        sp_120 = local_r27[1] - local_r27[0];
+        sp_12c = local_r27[0] - sp_34->lookat.eye;
+        sp_120 = sp_120.outprod(sp_12c);
+        sp_120.normalizeZP();
+
+        local_r30->x = sp_120.x * 64.0f;
+        local_r30->y = sp_120.y * 64.0f;
+        local_r30->z = sp_120.z * 64.0f;
+        local_r29->x = -local_r30->x;
+        local_r29->y = -local_r30->y;
+        local_r29->z = -local_r30->z;
+
+        sp_120 *= *sp_18;
+        *sp_24++ = *local_r27 + sp_120;
+        *sp_24++ = *local_r27 - sp_120;
+        local_r27++;
+        sp_18++;
+        sp_114 = *local_r27 + sp_120;
+        sp_108 = *local_r27 - sp_120;
+
+        for (s32 local_r19 = field_0x14 - 2; local_r19 > 0; local_r19--) {
+            sp_120 = local_r27[1] - local_r27[0];
+            sp_12c = local_r27[0] - sp_34->lookat.eye;
+            sp_120 = sp_120.outprod(sp_12c);
+            sp_120.normalizeZP();
+
+            local_r30 += 2;
+            local_r29 += 2;
+
+            local_r30->x = sp_120.x * 64.0f;
+            local_r30->y = sp_120.y * 64.0f;
+            local_r30->z = sp_120.z * 64.0f;
+            local_r29->x = -local_r30->x;
+            local_r29->y = -local_r30->y;
+            local_r29->z = -local_r30->z;
+
+            sp_120 *= *sp_18;
+            sp_114 += *local_r27 + sp_120;
+            sp_108 += *local_r27 - sp_120;
+            *sp_24++ = sp_114 * 0.5f;
+            *sp_24++ = sp_108 * 0.5f;
+
+            local_r27++;
+            sp_18++;
+
+            sp_114 = *local_r27 + sp_120;
+            sp_108 = *local_r27 - sp_120;
+        }
+        local_r29 += 1;
+        local_r29->x = local_r30->x;
+        local_r29->y = local_r30->y;
+        local_r29->z = local_r30->z;
+        local_r30 += 1;
+        local_r29 += 1;
+        local_r29->x = local_r30->x;
+        local_r29->y = local_r30->y;
+        local_r29->z = local_r30->z;
+        *sp_24++ = sp_114;
+        *sp_24 = sp_108;
+        DCStoreRangeNoSync(sp_20, sp_2c);
+        DCStoreRangeNoSync(sp_1c, sp_28);
+        sp_30++;
     }
 }
 
 /* 80013360-800134F8 00DCA0 0198+00 0/0 0/0 19/19 .text init__19mDoExt_3DlineMat1_cFUsUsP7ResTIMGi
  */
 int mDoExt_3DlineMat1_c::init(u16 param_0, u16 param_1, ResTIMG* param_2, int param_3) {
-    // NONMATCHING
+    mNumLines = param_0;
+    field_0x32 = param_1;
+    mpLines = new mDoExt_3Dline_c[param_0];
+    if (mpLines == NULL) {
+        return 0;
+    }
+
+    for (s32 iVar2 = 0; iVar2 < param_0; iVar2++) {
+        if (mpLines[iVar2].init(param_1, param_3, TRUE) == 0) {
+            return 0;
+        }
+    }
+
+    field_0x4 = 0;
+    mIsDrawn = 0;
+
+    GXInitTexObj(&mTextureObject, (void*)((int)param_2 + param_2->imageOffset), param_2->width,
+                 param_2->height, (GXTexFmt)param_2->format, (GXTexWrapMode)param_2->wrapS,
+                 (GXTexWrapMode)param_2->wrapT, param_2->mipmapCount > 1 ? GX_TRUE : GX_FALSE);
+    GXInitTexObjLOD(&mTextureObject, (GXTexFilter)param_2->minFilter,
+                    (GXTexFilter)param_2->magFilter, param_2->minLOD * 0.125f,
+                    param_2->maxLOD * 0.125f, param_2->LODBias * 0.01f, (u8)param_2->biasClamp,
+                    (u8)param_2->doEdgeLOD, (GXAnisotropy)param_2->maxAnisotropy);
+
+    return 1;
 }
 
 /* 800134F8-800135D0 00DE38 00D8+00 1/0 0/0 0/0 .text setMaterial__19mDoExt_3DlineMat1_cFv */
@@ -2363,7 +2578,6 @@ void mDoExt_3DlineMat1_c::setMaterial() {
 }
 
 /* 800135D0-8001373C 00DF10 016C+00 1/0 0/0 0/0 .text            draw__19mDoExt_3DlineMat1_cFv */
-// NONMATCHING- some smaller issues
 void mDoExt_3DlineMat1_c::draw() {
     GXLoadTexObj(&mTextureObject, GX_TEXMAP0);
     GXSetTexCoordScaleManually(GX_TEXCOORD0, 1, GXGetTexObjWidth(&mTextureObject), GXGetTexObjHeight(&mTextureObject));
@@ -2372,41 +2586,306 @@ void mDoExt_3DlineMat1_c::draw() {
         dKy_Global_amb_set(mpTevStr);
     }
     mDoExt_3Dline_c* lines = mpLines;
-    s32 vert_num = (field_0x34 & 0x7fff) << 1;
+    u16 vert_num = field_0x34 << 1;
     for (s32 i = 0; i < mNumLines; i++) {
-        GXSetArray(GX_VA_POS, lines[mIsDrawn].field_0x8, 0xC);
-        GXSetArray(GX_VA_NRM, lines[mIsDrawn].field_0x10, 0x3);
-        GXSetArray(GX_VA_TEX0, lines[mIsDrawn].field_0x18, 0x8);
+        GXSetArray(GX_VA_POS, ((mDoExt_3Dline_c*)((s32)lines + (mIsDrawn << 2)))->field_0x8, 0xC);
+        GXSetArray(GX_VA_NRM, ((mDoExt_3Dline_c*)((s32)lines + (mIsDrawn << 2)))->field_0x10, 0x3);
+        GXSetArray(GX_VA_TEX0, ((mDoExt_3Dline_c*)((s32)lines + (mIsDrawn << 2)))->field_0x18, 0x8);
         GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, vert_num);
 
-        s16 tempJ;
-        for (u32 j = 0; j < (u32)field_0x34; j += 1) {
+        u16 j = 0;
+        while (j < vert_num) {
             GXPosition1x16(j);
             GXNormal1x16(j);
             GXTexCoord1x16(j);
-            tempJ = j + 1;
-            GXPosition1x16(tempJ);
-            GXNormal1x16(tempJ);
-            GXTexCoord1x16(tempJ);
+            GXPosition1x16(++j);
+            GXNormal1x16(j);
+            GXTexCoord1x16(j);
+            j++;
         }
         GXEnd();
         lines++;
     }
     GXSetTexCoordScaleManually(GX_TEXCOORD0, 0, 0, 0);
-    mIsDrawn ^= 1;
+    mIsDrawn ^= (u8)1;
 }
 
 /* 8001373C-80013FB0 00E07C 0874+00 0/0 0/0 6/6 .text
  * update__19mDoExt_3DlineMat1_cFifR8_GXColorUsP12dKy_tevstr_c  */
 void mDoExt_3DlineMat1_c::update(int param_0, f32 param_1, _GXColor& param_2, u16 param_3,
                                      dKy_tevstr_c* param_4) {
-    // NONMATCHING
+    mColor = param_2;
+    this->mpTevStr = param_4;
+    if (param_0 < 0) {
+        field_0x34 = field_0x32;
+    } else if (param_0 > field_0x32) {
+        field_0x34 = field_0x32;
+    } else {
+        field_0x34 = param_0;
+    }
+    view_class* sp_3c = dComIfGd_getView();
+    mDoExt_3Dline_c* sp_38 = mpLines;
+    f32 local_f30;
+    f32 local_f26;
+    f32 local_f29;
+    f32 local_f27;
+    if (param_3 != 0) {
+        local_f26 = param_1 / param_3;
+    } else {
+        local_f26 = 0.0f;
+    }
+    local_f27 = local_f26;
+
+    u32 sp_34 = (field_0x34 << 1) * 12;
+    u32 sp_30 = (field_0x34 << 1) * 3;
+    u32 sp_2c = (field_0x34 << 1) * 8;
+
+    cXyz sp_13c;
+    cXyz sp_130;
+    cXyz sp_124;
+    cXyz sp_118;
+
+    cXyz* local_r27;
+    cXyz* sp_28;
+    cXyz* sp_24;
+
+    mDoExt_3Dline_field_0x10_c* local_r30;
+    mDoExt_3Dline_field_0x10_c* local_r28;
+    mDoExt_3Dline_field_0x10_c* sp_20;
+
+    mDoExt_3Dline_field_0x18_c* sp_1c;
+
+    mDoExt_3Dline_field_0x18_c* sp_18;
+
+    f32 local_f31 = 0.0f;
+
+    for (s32 sp_14 = 0; sp_14 < mNumLines; sp_14++) {
+        local_r27 = sp_38[0].field_0x0;
+        sp_24 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x8;
+        sp_28 = sp_24;
+
+        sp_20 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x10;
+        local_r30 = sp_20;
+        local_r28 = local_r30 + 1;
+
+        sp_18 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x18;
+        sp_1c = sp_18;
+
+        local_f29 = param_1;
+
+        sp_1c++->field_0x4 = local_f31;
+        sp_1c++->field_0x4 = local_f31;
+
+        sp_130 = local_r27[1] - local_r27[0];
+        local_f30 = sp_130.abs();
+
+        if (param_1 < 8.0f) {
+            local_f31 += local_f30 * 0.1f;
+        } else {
+            local_f31 += local_f30 * 0.02f * (8.0f / param_1);
+        }
+
+        sp_13c = *local_r27 - sp_3c->lookat.eye;
+        sp_130 = sp_130.outprod(sp_13c);
+        sp_130.normalizeZP();
+
+        local_r30->x = sp_130.x * 64.0f;
+        local_r30->y = sp_130.y * 64.0f;
+        local_r30->z = sp_130.z * 64.0f;
+        local_r28->x = -local_r30->x;
+        local_r28->y = -local_r30->y;
+        local_r28->z = -local_r30->z;
+
+        sp_130 *= param_1;
+        *sp_28++ = *local_r27 + sp_130;
+        *sp_28++ = *local_r27 - sp_130;
+        local_r27++;
+        sp_124 = *local_r27 + sp_130;
+        sp_118 = *local_r27 - sp_130;
+
+        for (s32 sp_10 = field_0x34 - 2; sp_10 > 0; sp_10--) {
+            if (sp_10 < param_3) {
+                local_f29 -= local_f27;
+            }
+
+            sp_1c++->field_0x4 = local_f31;
+            sp_1c++->field_0x4 = local_f31;
+
+            sp_130 = local_r27[1] - local_r27[0];
+            local_f30 = sp_130.abs();
+
+            if (param_1 < 8.0f) {
+                local_f31 += local_f30 * 0.1f;
+            } else {
+                local_f31 += local_f30 * 0.02f * (8.0f / param_1);
+            }
+
+            sp_13c = local_r27[0] - sp_3c->lookat.eye;
+            sp_130 = sp_130.outprod(sp_13c);
+            sp_130.normalizeZP();
+
+            local_r30 += 2;
+            local_r28 += 2;
+
+            local_r30->x = sp_130.x * 64.0f;
+            local_r30->y = sp_130.y * 64.0f;
+            local_r30->z = sp_130.z * 64.0f;
+            local_r28->x = -local_r30->x;
+            local_r28->y = -local_r30->y;
+            local_r28->z = -local_r30->z;
+
+            sp_130 *= local_f29;
+            sp_124 += *local_r27 + sp_130;
+            sp_118 += *local_r27 - sp_130;
+            *sp_28++ = sp_124 * 0.5f;
+            *sp_28++ = sp_118 * 0.5f;
+
+            local_r27++;
+            sp_124 = local_r27[0] + sp_130;
+            sp_118 = local_r27[0] - sp_130;
+        }
+
+        sp_1c++->field_0x4 = local_f31;
+        sp_1c->field_0x4 = local_f31;
+
+        local_r28 += 1;
+        local_r28->x = local_r30->x;
+        local_r28->y = local_r30->y;
+        local_r28->z = local_r30->z;
+        local_r30 += 1;
+        local_r28 += 1;
+        local_r28->x = local_r30->x;
+        local_r28->y = local_r30->y;
+        local_r28->z = local_r30->z;
+
+        if (param_3 != 0) {
+            *sp_28++ = *local_r27;
+            *sp_28 = *local_r27;
+        } else {
+            *sp_28++ = sp_124;
+            *sp_28 = sp_118;
+        }
+        DCStoreRangeNoSync(sp_24, sp_34);
+        DCStoreRangeNoSync(sp_20, sp_30);
+        DCStoreRangeNoSync(sp_18, sp_2c);
+        sp_38++;
+    }
 }
 
 /* 80013FB0-80014738 00E8F0 0788+00 0/0 0/0 14/14 .text
  * update__19mDoExt_3DlineMat1_cFiR8_GXColorP12dKy_tevstr_c     */
-void mDoExt_3DlineMat1_c::update(int param_0, _GXColor& param_1, dKy_tevstr_c* param_2) {
-    // NONMATCHING
+void mDoExt_3DlineMat1_c::update(int param_0, _GXColor& param_2, dKy_tevstr_c* param_4) {
+    mColor = param_2;
+    this->mpTevStr = param_4;
+    if (param_0 < 0) {
+        field_0x34 = field_0x32;
+    } else if (param_0 > field_0x32) {
+        field_0x34 = field_0x32;
+    } else {
+        field_0x34 = param_0;
+    }
+    view_class* stack_3c = dComIfGd_getView();
+    mDoExt_3Dline_c* sp_38 = mpLines;
+    f32 local_f30;
+    f32 local_f29;
+
+    u32 sp_34 = (field_0x34 << 1) * 12;
+    u32 sp_30 = (field_0x34 << 1) * 3;
+    u32 sp_2c = (field_0x34 << 1) * 8;
+    cXyz sp_13c;
+    cXyz sp_130;
+    cXyz sp_124;
+    cXyz sp_118;
+    cXyz* local_r27;
+    cXyz* sp_28;
+    cXyz* sp_24;
+    mDoExt_3Dline_field_0x10_c* local_r30;
+    mDoExt_3Dline_field_0x10_c* local_r28;
+    mDoExt_3Dline_field_0x10_c* sp_20;
+    mDoExt_3Dline_field_0x18_c* sp_1c;
+    mDoExt_3Dline_field_0x18_c* sp_18;
+    f32 local_f31 = 0.0f;
+    f32* local_r18;
+    for (s32 sp_14 = 0; sp_14 < mNumLines; sp_14++) {
+        local_r27 = sp_38[0].field_0x0;
+        local_r18 = sp_38->field_0x4;
+        JUT_ASSERT(0x16f3, sp_18 != NULL);
+        sp_24 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x8;
+        sp_28 = sp_24;
+        sp_20 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x10;
+        local_r30 = sp_20;
+        local_r28 = local_r30 + 1;
+        sp_18 = ((mDoExt_3Dline_c*)((int)sp_38 + (mIsDrawn << 2)))->field_0x18;
+        sp_1c = sp_18;
+        sp_1c++->field_0x4 = local_f31;
+        sp_1c++->field_0x4 = local_f31;
+        sp_130 = local_r27[1] - local_r27[0];
+        local_f30 = sp_130.abs();
+        local_f31 += local_f30 * 0.1f;
+        sp_13c = local_r27[0] - stack_3c->lookat.eye;
+        sp_130 = sp_130.outprod(sp_13c);
+        sp_130.normalizeZP();
+        local_r30->x = sp_130.x * 64.0f;
+        local_r30->y = sp_130.y * 64.0f;
+        local_r30->z = sp_130.z * 64.0f;
+        local_r28->x = -local_r30->x;
+        local_r28->y = -local_r30->y;
+        local_r28->z = -local_r30->z;
+        sp_130 *= *local_r18;
+        *sp_28++ = local_r27[0] + sp_130;
+        *sp_28++ = local_r27[0] - sp_130;
+        local_r27++;
+        local_r18++;
+        sp_124 = local_r27[0] + sp_130;
+        sp_118 = local_r27[0] - sp_130;
+        for (s32 sp_10 = field_0x34 - 2; sp_10 > 0; sp_10--) {
+            sp_1c++->field_0x4 = local_f31;
+            sp_1c++->field_0x4 = local_f31;
+            sp_130 = local_r27[1] - local_r27[0];
+            local_f30 = sp_130.abs();
+            local_f31 += local_f30 * 0.1f;
+            sp_13c = local_r27[0] - stack_3c->lookat.eye;
+            sp_130 = sp_130.outprod(sp_13c);
+            sp_130.normalizeZP();
+            local_r30 += 2;
+            local_r28 += 2;
+            local_r30->x = sp_130.x * 64.0f;
+            local_r30->y = sp_130.y * 64.0f;
+            local_r30->z = sp_130.z * 64.0f;
+            local_r28->x = -local_r30->x;
+            local_r28->y = -local_r30->y;
+            local_r28->z = -local_r30->z;
+            sp_130 *= *local_r18;
+            sp_124 += local_r27[0] + sp_130;
+            sp_118 += local_r27[0] - sp_130;
+            *sp_28++ = sp_124 * 0.5f;
+            *sp_28++ = sp_118 * 0.5f;
+            local_r27++;
+            local_r18++;
+            sp_124 = local_r27[0] + sp_130;
+            sp_118 = local_r27[0] - sp_130;
+        }
+
+        sp_1c++->field_0x4 = local_f31;
+        sp_1c->field_0x4 = local_f31;
+
+        local_r28 += 1;
+        local_r28->x = local_r30->x;
+        local_r28->y = local_r30->y;
+        local_r28->z = local_r30->z;
+        local_r30 += 1;
+        local_r28 += 1;
+        local_r28->x = local_r30->x;
+        local_r28->y = local_r30->y;
+        local_r28->z = local_r30->z;
+
+        *sp_28++ = sp_124;
+        *sp_28 = sp_118;
+        DCStoreRangeNoSync(sp_24, sp_34);
+        DCStoreRangeNoSync(sp_20, sp_30);
+        DCStoreRangeNoSync(sp_18, sp_2c);
+        sp_38 += 1;
+    }
 }
 
 /* 80014738-8001479C 00F078 0064+00 0/0 0/0 29/29 .text
@@ -2431,6 +2910,17 @@ void mDoExt_3DlineMatSortPacket::draw() {
 }
 
 #ifdef DEBUG
+mDoExt_cube8pPacket::mDoExt_cube8pPacket(cXyz* i_points, const GXColor& i_color) {
+    cXyz* pnt_array = mPoints;
+
+    for (int i = 0; i < 8; i++) {
+        *(pnt_array)++ = *(i_points)++;
+    }
+
+    DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 8);
+    mColor = i_color;
+}
+
 void drawCube(MtxP mtx, cXyz* pos, const GXColor& color) {
     GXSetArray(GX_VA_POS, pos, sizeof(cXyz));
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
@@ -2473,6 +2963,17 @@ void drawCube(MtxP mtx, cXyz* pos, const GXColor& color) {
     GXEnd();
 }
 
+void mDoExt_cube8pPacket::draw() {
+    drawCube(j3dSys.getViewMtx(), mPoints, mColor);
+}
+
+mDoExt_cubePacket::mDoExt_cubePacket(cXyz& i_position, cXyz& i_size, csXyz& i_angle, const GXColor& i_color) {
+    mPosition = i_position;
+    mSize = i_size;
+    mAngle = i_angle;
+    mColor = i_color;
+}
+
 void mDoExt_cubePacket::draw() {
     static cXyz l_pos[8] = {
         cXyz(-1.0f, 1.0f, -1.0f), cXyz(1.0f, 1.0f, -1.0f),   cXyz(-1.0f, 1.0f, 1.0f),
@@ -2485,6 +2986,389 @@ void mDoExt_cubePacket::draw() {
     mDoMtx_stack_c::scaleM(mSize.x, mSize.y, mSize.z);
     mDoMtx_stack_c::revConcat(j3dSys.getViewMtx());
     drawCube(mDoMtx_stack_c::get(), l_pos, mColor);
+}
+
+mDoExt_quadPacket::mDoExt_quadPacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ) {
+    cXyz* pnt_array = mPoints;
+
+    for (int i = 0; i < 4; i++) {
+        *(pnt_array)++ = *(i_points)++;
+    }
+
+    DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 4);
+    mColor = i_color;
+    mClipZ = i_clipZ;
+}
+
+void mDoExt_quadPacket::draw() {
+    GXSetArray(GX_VA_POS, mPoints, sizeof(cXyz));
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP,
+                  GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXLoadPosMtxImm(j3dSys.getViewMtx(), 0);
+    GXSetCurrentMtx(0);
+
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition1x8(0);
+    GXPosition1x8(1);
+    GXPosition1x8(2);
+    GXPosition1x8(3);
+    GXEnd();
+}
+
+mDoExt_trianglePacket::mDoExt_trianglePacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ) {
+    cXyz* pnt_array = mPoints;
+
+    for (int i = 0; i < 3; i++) {
+        *(pnt_array)++ = *(i_points)++;
+    }
+
+    DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 3);
+    mColor = i_color;
+    mClipZ = i_clipZ;
+}
+
+void mDoExt_trianglePacket::draw() {
+    j3dSys.reinitGX();
+
+    GXSetArray(GX_VA_POS, mPoints, sizeof(cXyz));
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
+    GXLoadPosMtxImm(j3dSys.getViewMtx(), 0);
+    GXSetCurrentMtx(0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetZCompLoc(GX_ENABLE);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, g_clearColor);
+    GXSetFogRangeAdj(GX_DISABLE, 0, NULL);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetDither(GX_ENABLE);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXSetNumIndStages(0);
+
+    GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
+    GXPosition1x8(0);
+    GXPosition1x8(1);
+    GXPosition1x8(2);
+    GXEnd();
+
+    J3DShape::resetVcdVatCache();
+}
+
+mDoExt_linePacket::mDoExt_linePacket(cXyz& i_start, cXyz& i_end, const GXColor& i_color, u8 i_clipZ, u8 i_width) {
+    mStart = i_start;
+    mEnd = i_end;
+    mColor = i_color;
+    mClipZ = i_clipZ;
+    mWidth = i_width;
+}
+
+void mDoExt_linePacket::draw() {
+    j3dSys.reinitGX();
+
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXLoadPosMtxImm(j3dSys.getViewMtx(), 0);
+    GXSetCurrentMtx(0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetZCompLoc(GX_ENABLE);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, g_clearColor);
+    GXSetFogRangeAdj(GX_DISABLE, 0, NULL);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetDither(GX_ENABLE);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXSetNumIndStages(0);
+    GXSetLineWidth(mWidth, GX_TO_ZERO);
+
+    GXBegin(GX_LINES, GX_VTXFMT0, 2);
+    GXPosition3f32(mStart.x, mStart.y, mStart.z);
+    GXPosition3f32(mEnd.x, mEnd.y, mEnd.z);
+    GXEnd();
+
+    J3DShape::resetVcdVatCache();
+}
+
+mDoExt_ArrowPacket::mDoExt_ArrowPacket(cXyz& i_position, cXyz& param_1, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
+    mStart = i_position;
+    mEnd = param_1;
+    mColor = i_color;
+    mClipZ = i_clipZ;
+    mLineWidth = i_lineWidth;
+}
+
+void mDoExt_ArrowPacket::draw() {
+    Mtx sp28;
+    cXyz sp18;
+
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXSetLineWidth(mLineWidth, GX_TO_ZERO);
+
+    sp18 = mEnd - mStart;
+    MtxTrans(mStart.x, mStart.y, mStart.z, 0);
+    cMtx_YrotM(*calc_mtx, sp18.atan2sX_Z());
+    cMtx_XrotM(*calc_mtx, cM_atan2s(JMAFastSqrt(SQUARE(sp18.x) + SQUARE(sp18.z)), sp18.y));
+    cMtx_concat(j3dSys.getViewMtx(), *calc_mtx, sp28);
+
+    GXLoadPosMtxImm(sp28, 0);
+    GXSetCurrentMtx(0);
+
+    GXBegin(GX_LINES, GX_VTXFMT0, 2);
+    GXPosition3f32(0.0f, 0.0f, 0.0f);
+    GXPosition3f32(0.0f, sp18.abs(), 0.0f);
+    GXEnd();
+
+    f32 var_f29 = sp18.abs();
+    f32 var_f31 = var_f29 * 0.1f;
+    f32 var_f30 = var_f29 * 0.8f;
+
+    GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, 6);
+    GXPosition3f32(0.0f, var_f29, 0.0f);
+    GXPosition3f32(0.0f, var_f30, var_f31);
+    GXPosition3f32(var_f31, var_f30, 0.0f);
+    GXPosition3f32(0.0f, var_f30, -var_f31);
+    GXPosition3f32(-var_f31, var_f30, 0.0f);
+    GXPosition3f32(0.0f, var_f30, var_f31);
+    GXEnd();
+}
+
+mDoExt_pointPacket::mDoExt_pointPacket(cXyz& i_position, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
+    mPosition = i_position;
+    mColor = i_color;
+    mClipZ = i_clipZ;
+    mLineWidth = i_lineWidth;
+}
+
+void mDoExt_pointPacket::draw() {
+    j3dSys.reinitGX();
+
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXSetPointSize(mLineWidth, GX_TO_ZERO);
+
+    GXLoadPosMtxImm(j3dSys.getViewMtx(), 0);
+    GXSetCurrentMtx(0);
+
+    GXBegin(GX_POINTS, GX_VTXFMT0, 1);
+    GXPosition3f32(mPosition.x, mPosition.y, mPosition.z);
+    GXEnd();
+
+    j3dSys.reinitGX();
+    J3DShape::resetVcdVatCache();
+}
+
+mDoExt_circlePacket::mDoExt_circlePacket(cXyz& i_position, f32 i_radius, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
+    mPosition = i_position;
+    mRadius = i_radius;
+    mColor = i_color;
+    mClipZ = i_clipZ;
+    mLineWidth = i_lineWidth;
+}
+
+void mDoExt_circlePacket::draw() {
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetClipMode(GX_CLIP_ENABLE);
+    GXSetLineWidth(mLineWidth, GX_TO_ZERO);
+    GXLoadPosMtxImm(j3dSys.getViewMtx(), 0);
+    GXSetCurrentMtx(0);
+
+    cXyz sp38;
+    cXyz sp44;
+    int numEdges = 36;
+    sp38.y = sp44.y = mPosition.y;
+    
+    GXBegin(GX_LINES, GX_VTXFMT0, numEdges * 2);
+    for (int i = 0; i < numEdges; i++) {
+        sp38.x = cM_fcos((i * 6.2831855f) / numEdges) * mRadius;
+        sp38.z = cM_fsin((i * 6.2831855f) / numEdges) * mRadius;
+
+        sp44.x = cM_fcos(((i + 1) * 6.2831855f) / numEdges) * mRadius;
+        sp44.z = cM_fsin(((i + 1) * 6.2831855f) / numEdges) * mRadius;
+
+        sp38.x += mPosition.x;
+        sp38.z += mPosition.z;
+        sp44.x += mPosition.x;
+        sp44.z += mPosition.z;
+        GXPosition3f32(sp38.x, sp38.y, sp38.z);
+        GXPosition3f32(sp44.x, sp44.y, sp44.z);
+    }
+    GXEnd();
+}
+
+mDoExt_spherePacket::mDoExt_spherePacket(cXyz& i_position, f32 i_size, const GXColor& i_color, u8 i_clipZ) {
+    mPosition = i_position;
+    mSize = i_size;
+    mColor = i_color;
+    mClipZ = i_clipZ;
+}
+
+void mDoExt_spherePacket::draw() {
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetClipMode(GX_CLIP_ENABLE);
+
+    mDoMtx_stack_c::copy(j3dSys.getViewMtx());
+    mDoMtx_stack_c::transM(mPosition.x, mPosition.y, mPosition.z);
+    mDoMtx_stack_c::scaleM(mSize, mSize, mSize);
+
+    GXLoadPosMtxImm(mDoMtx_stack_c::get(), 0);
+    mDoMtx_stack_c::inverseTranspose();
+
+    GXLoadNrmMtxImm(mDoMtx_stack_c::get(), 0);
+    GXSetCurrentMtx(0);
+
+    GXDrawSphere(8, 8);
+}
+
+mDoExt_cylinderPacket::mDoExt_cylinderPacket(cXyz& i_position, f32 i_radius, f32 i_height, const GXColor& i_color, u8 i_clipZ) {
+    mPosition = i_position;
+    mRadius = i_radius;
+    mHeight = i_height;
+    mColor = i_color;
+    mClipZ = i_clipZ;
 }
 
 void mDoExt_cylinderPacket::draw() {
@@ -2510,9 +3394,11 @@ void mDoExt_cylinderPacket::draw() {
     GXSetCullMode(GX_CULL_BACK);
     GXSetClipMode(GX_CLIP_ENABLE);
 
+    f32 var_f31 = mHeight * 0.5f;
+
     mDoMtx_stack_c::copy(j3dSys.getViewMtx());
-    mDoMtx_stack_c::transM(mPosition.x, mPosition.y + mHeight * 0.5f, mPosition.z);
-    mDoMtx_stack_c::scaleM(mRadius, mRadius * 0.5f, mRadius);
+    mDoMtx_stack_c::transM(mPosition.x, mPosition.y + var_f31, mPosition.z);
+    mDoMtx_stack_c::scaleM(mRadius, var_f31, mRadius);
     mDoMtx_stack_c::XrotM(0x4000);
 
     GXLoadPosMtxImm(mDoMtx_stack_c::get(), 0);
@@ -2522,6 +3408,46 @@ void mDoExt_cylinderPacket::draw() {
     GXSetCurrentMtx(0);
     GXDrawCylinder(8);
 }
+
+mDoExt_cylinderMPacket::mDoExt_cylinderMPacket(Mtx i_mtx, const GXColor& i_color, u8 i_clipZ) {
+    cMtx_copy(i_mtx, mMatrix);
+    mColor = i_color;
+    mClipZ = i_clipZ;
+}
+
+void mDoExt_cylinderMPacket::draw() {
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0, GX_ENABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT0, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevColor(GX_TEVREG0, mColor);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_ENABLE, GX_TEVPREV);
+
+    if (mClipZ) {
+        GXSetZMode(GX_ENABLE, GX_LEQUAL, GX_ENABLE);
+    } else {
+        GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    }
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXSetClipMode(GX_CLIP_ENABLE);
+
+    cMtx_concat(j3dSys.getViewMtx(), mMatrix, mMatrix);
+
+    GXLoadPosMtxImm(mMatrix, 0);
+    cMtx_inverseTranspose(mMatrix, mMatrix);
+
+    GXLoadNrmMtxImm(mMatrix, 0);
+    GXSetCurrentMtx(0);
+
+    GXDrawCylinder(8);
+}
 #endif
 
 /* 80014804-8001494C 00F144 0148+00 3/3 0/0 0/0 .text
@@ -2529,10 +3455,10 @@ void mDoExt_cylinderPacket::draw() {
 static void mDoExt_initFontCommon(JUTFont** mDoExt_font, ResFONT** mDoExt_resfont, JKRHeap* param_2,
                                   char const* param_3, JKRArchive* param_4, u8 param_5,
                                   u32 param_6, u32 param_7) {
-    JUT_ASSERT(7141, mDoExt_font == 0);
-    JUT_ASSERT(7142, mDoExt_resfont == 0);
+    JUT_ASSERT(7141, mDoExt_font == NULL);
+    JUT_ASSERT(7142, mDoExt_resfont == NULL);
     *mDoExt_resfont = (ResFONT*)JKRGetResource('ROOT', param_3, param_4);
-    JUT_ASSERT(7144, *mDoExt_resfont != 0);
+    JUT_ASSERT(7144, *mDoExt_resfont != NULL);
     if (param_5 == 0) {
         u32 cacheSize = JUTCacheFont::calcCacheSize(param_7, param_6);
         JUTCacheFont* cacheFont = new (param_2, 0) JUTCacheFont(*mDoExt_resfont, cacheSize, param_2);
@@ -2552,7 +3478,7 @@ static void mDoExt_initFontCommon(JUTFont** mDoExt_font, ResFONT** mDoExt_resfon
         delete *mDoExt_font;
         *mDoExt_font = NULL;
     }
-    JUT_ASSERT(7183, mDoExt_font != 0);
+    JUT_ASSERT(7183, mDoExt_font != NULL);
 }
 
 /* 80450C44-80450C48 000144 0004+00 3/3 0/0 0/0 .sbss            mDoExt_font0 */
@@ -2677,18 +3603,18 @@ J3DModel* mDoExt_J3DModel__create(J3DModelData* i_modelData, u32 i_modelFlag, u3
             // Update the modelFlag if the model data passed in has a shared dlist object
             if (i_modelData->getMaterialNodePointer(0)->getSharedDisplayListObj() != NULL) {
                 if (i_modelData->isLocked()) {
-                    i_modelFlag = J3DMdlFlag_Unk20000;
-                } else if (i_modelFlag == J3DMdlFlag_Unk20000) {
-                    i_modelFlag |= J3DMdlFlag_Unk40000;
+                    i_modelFlag = J3DMdlFlag_UseSharedDL;
+                } else if (i_modelFlag == J3DMdlFlag_UseSharedDL) {
+                    i_modelFlag |= J3DMdlFlag_UseSingleDL;
                 } else {
-                    i_modelFlag = J3DMdlFlag_Unk80000;
+                    i_modelFlag = J3DMdlFlag_DifferedDLBuffer;
                 }
             }
 
             // Set up the model
-            if (!model->entryModelData(i_modelData, i_modelFlag, 1)) {
-                if (i_modelFlag == J3DMdlFlag_Unk80000 &&
-                    model->newDifferedDisplayList(i_differedDlistFlag))
+            if (model->entryModelData(i_modelData, i_modelFlag, 1) == kJ3DError_Success) {
+                if (i_modelFlag == J3DMdlFlag_DifferedDLBuffer &&
+                    model->newDifferedDisplayList(i_differedDlistFlag) != kJ3DError_Success)
                 {
                     return NULL;
                 }
@@ -2703,7 +3629,7 @@ J3DModel* mDoExt_J3DModel__create(J3DModelData* i_modelData, u32 i_modelFlag, u3
 }
 
 /* 80450C68-80450C70 000168 0004+04 1/1 0/0 0/0 .sbss            aram_cache_size */
-static u32 aram_cache_size;
+u32 aram_cache_size;
 
 /* 80014D5C-80014D64 00F69C 0008+00 0/0 1/1 0/0 .text            mDoExt_setAraCacheSize__FUl */
 void mDoExt_setAraCacheSize(u32 size) {
@@ -2719,19 +3645,4 @@ OSThread* mDoExt_GetCurrentRunningThread() {
     }
 
     return thread;
-}
-
-/* 80014E20-80014E7C 00F760 005C+00 1/0 2/2 0/0 .text __dt__26mDoExt_3DlineMatSortPacketFv */
-mDoExt_3DlineMatSortPacket::~mDoExt_3DlineMatSortPacket() {
-    // NONMATCHING
-}
-
-/* 80014E7C-80014E84 00F7BC 0008+00 1/0 0/0 0/0 .text getMaterialID__19mDoExt_3DlineMat1_cFv */
-int mDoExt_3DlineMat1_c::getMaterialID() {
-    return 1;
-}
-
-/* 80014E84-80014E8C 00F7C4 0008+00 1/0 0/0 0/0 .text getMaterialID__19mDoExt_3DlineMat0_cFv */
-int mDoExt_3DlineMat0_c::getMaterialID() {
-    return 0;
 }

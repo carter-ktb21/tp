@@ -3,6 +3,8 @@
 // Translation Unit: a/npc/d_a_npc_cd
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_cd.h"
 #include "d/actor/d_a_player.h"
 
@@ -216,7 +218,7 @@ dCcD_SrcCyl const daNpcCd_c::m_cylDat = {
 int daNpcCd_c::NpcCreate(int param_1) {
     J3DModelData* a_mdlData_p = getNpcMdlDataP(param_1);
 
-    JUT_ASSERT(470, 0 != a_mdlData_p);
+    JUT_ASSERT(470, NULL != a_mdlData_p);
 
     mpMorf = new mDoExt_McaMorfSO(a_mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mCreature,
                                   0x80000, 0x11000084);
@@ -258,7 +260,7 @@ int daNpcCd_c::NpcCreate(int param_1) {
         a_mdlData_p->getJointNodePointer(i)->setCallBack(jntNodeCallBack);
     }
 
-    mpMorf->getModel()->setUserArea((u32)this);
+    mpMorf->getModel()->setUserArea((uintptr_t)this);
 
     OS_REPORT("   [ |   X   l     Type=%d  ", param_1);
 
@@ -278,7 +280,7 @@ J3DModel* daNpcCd_c::ObjCreate(int param_0) {
 BOOL daNpcCd_c::isM_() {
     // JUT_ASSERT(574, m_type < MdlNUM_e); // Not yet configured in DEBUG
 
-    return field_0x9c4 < 16;
+    return m_type < 16;
 }
 
 /* 80156248-801563C8 150B88 0180+00 0/0 0/0 1/1 .text            getAnmP__9daNpcCd_cFii */
@@ -357,6 +359,14 @@ J3DAnmTransform* daNpcCd_c::getAnmP(int param_1, int param_2) {
     return (J3DAnmTransform*)dComIfG_getObjectRes(anmTbl.arc_name, anmTbl.resource_index);
 }
 
+/* 803B3B8C-803B3C04 -00001 0078+00 2/2 0/0 0/0 .data            l_resNameTbl */
+static char* const* l_resNameTbl[30] = {
+    l_resMANa,  l_resMADa,  l_resMCNa,  l_resMONa,  l_resMANb,  l_resMANc,  l_resMASa,  l_resMBNa,
+    l_resMANa2, l_resMADa2, l_resMCNa2, l_resMONa2, l_resMANb2, l_resMANc2, l_resMASa2, l_resMBNa2,
+    l_resWANa,  l_resWADa,  l_resMATa,  l_resWCNa,  l_resWONa,  l_resWGNa,  l_resWANb,  l_resWANa2,
+    l_resWADa2, l_resMATa2, l_resWCNa2, l_resWONa2, l_resWGNa2, l_resWANb2,
+};
+
 /* 803B3C04-803B3CF4 010D24 00F0+00 2/2 0/0 0/0 .data            l_bmdTbl */
 static anmTblPrm const l_bmdTbl[30] = {
     {l_resMANa[0], 3},  {l_resMADa[0], 3},  {l_resMCNa[0], 3},  {l_resMONa[0], 3},
@@ -386,7 +396,6 @@ daNpcCd_HIO_c l_Cd_HIO;
 
 /* 801563C8-80156B4C 150D08 0784+00 0/0 0/0 2/2 .text            setAttention__9daNpcCd_cFi */
 int daNpcCd_c::setAttention(int i_idx) {
-    // NONMATCHING
     static cXyz const a_eyeOfsTbl[30] = {
         cXyz(0.0f, 10.0f, 0.0f), cXyz(0.0f, 10.0f, 0.0f), cXyz(0.0f, 10.0f, 0.0f),
         cXyz(0.0f, 10.0f, 0.0f), cXyz(0.0f, 10.0f, 0.0f), cXyz(0.0f, 10.0f, 0.0f),
@@ -405,19 +414,6 @@ int daNpcCd_c::setAttention(int i_idx) {
     attention_info.position.set(current.pos.x, current.pos.y + HIO_atnOfs(i_idx), current.pos.z);
     return 1;
 }
-
-/* 803B3B80-803B3B8C 010CA0 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc   UNK */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 803B3B8C-803B3C04 -00001 0078+00 2/2 0/0 0/0 .data            l_resNameTbl */
-static char* const* l_resNameTbl[30] = {
-    l_resMANa,  l_resMADa,  l_resMCNa,  l_resMONa,  l_resMANb,  l_resMANc,  l_resMASa,  l_resMBNa,
-    l_resMANa2, l_resMADa2, l_resMCNa2, l_resMONa2, l_resMANb2, l_resMANc2, l_resMASa2, l_resMBNa2,
-    l_resWANa,  l_resWADa,  l_resMATa,  l_resWCNa,  l_resWONa,  l_resWGNa,  l_resWANb,  l_resWANa2,
-    l_resWADa2, l_resMATa2, l_resWCNa2, l_resWONa2, l_resWGNa2, l_resWANb2,
-};
 
 /* 80156B4C-80156C50 15148C 0104+00 0/0 0/0 1/1 .text            loadResrc__9daNpcCd_cFii */
 int daNpcCd_c::loadResrc(int param_0, int param_1) {
@@ -553,12 +549,12 @@ int daNpcCd_c::jntNodeCB(J3DJoint* i_jnt, J3DModel* i_model) {
     J3DJoint* i_jnt_ = i_jnt;
     int jntNo = i_jnt_->getJntNo();
     mDoMtx_stack_c::copy(i_model->getAnmMtx(jntNo));
-    mDoMtx_stack_c::ZXYrotM(HIO_jntRX(field_0x9c4, jntNo), HIO_jntRY(field_0x9c4, jntNo),
-                            HIO_jntRZ(field_0x9c4, jntNo));
+    mDoMtx_stack_c::ZXYrotM(HIO_jntRX(m_type, jntNo), HIO_jntRY(m_type, jntNo),
+                            HIO_jntRZ(m_type, jntNo));
 
-    f32 tmp_z = HIO_jntTZ(field_0x9c4, jntNo);
-    f32 tmp_y = HIO_jntTY(field_0x9c4, jntNo);
-    f32 tmp_x = HIO_jntTX(field_0x9c4, jntNo);
+    f32 tmp_z = HIO_jntTZ(m_type, jntNo);
+    f32 tmp_y = HIO_jntTY(m_type, jntNo);
+    f32 tmp_x = HIO_jntTX(m_type, jntNo);
     mDoMtx_stack_c::transM(tmp_x, tmp_y, tmp_z);  // Fake force eval order
     i_model->setAnmMtx(jntNo, mDoMtx_stack_c::get());
     cMtx_copy(mDoMtx_stack_c::get(), J3DSys::mCurrentMtx);
@@ -1259,13 +1255,13 @@ daNpcCd_HIO_c::daNpcCd_HIO_c() {
         for (int j = 0; j < 12; j++) {
             memcpy((void*)&field_0x0004[i].field_0x4[j].jntT, a_jntTbl_M[i][j], 20);
         }
-        memcpy(&field_0x0004[i].field_0x128, a_prmTbl_M + i * 0x40, 0x40);
+        memcpy(&field_0x0004[i].field_0x124, a_prmTbl_M + i * 0x40, 0x40);
     }
     for (int i = 0; i < 14; i++) {
         for (int j = 0; j < 12; j++) {
             memcpy((void*)&field_0x1648[i].field_0x4[j].jntT, a_jntTbl_W[i][j], 20);
         }
-        memcpy(&field_0x1648[i].field_0x128, a_prmTbl_W + i * 0x40, 0x40);
+        memcpy(&field_0x1648[i].field_0x124, a_prmTbl_W + i * 0x40, 0x40);
     }
 }
 

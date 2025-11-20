@@ -3,6 +3,8 @@
 // Translation Unit: a/npc/d_a_npc_cd2
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_cd2.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_path.h"
@@ -257,7 +259,7 @@ static Vec const a_transScaleTbl[30] = {
 /* 80157D00-80157F28 152640 0228+00 0/0 0/0 4/4 .text            NpcCreate__10daNpcCd2_cFi */
 int daNpcCd2_c::NpcCreate(int param_1) {
     J3DModelData* a_mdlData_p = getNpcMdlDataP(param_1);
-    JUT_ASSERT(590, 0 != a_mdlData_p);
+    JUT_ASSERT(590, NULL != a_mdlData_p);
     J3DAnmTexPattern* anmTex = getTexAnmP(param_1);
     int uVar5;
     if (anmTex != NULL) {
@@ -278,7 +280,7 @@ int daNpcCd2_c::NpcCreate(int param_1) {
     mCitizen.setMdlType(param_1, false, mIsDarkWorld != 0 ? 1 : 0);
     if (anmTex != NULL) {
         mpBtpAnm = new mDoExt_btpAnm();
-        JUT_ASSERT(622, 0 != mpBtpAnm);
+        JUT_ASSERT(622, NULL != mpBtpAnm);
         if (mpBtpAnm == NULL || !mpBtpAnm->init(a_mdlData_p, anmTex, 1, 2, 1.0f, 0, -1)) {
             return 0;
         }
@@ -291,7 +293,7 @@ int daNpcCd2_c::NpcCreate(int param_1) {
     for (u16 i = 0; i < a_mdlData_p->getJointNum(); i++) {
         a_mdlData_p->getJointNodePointer(i)->setCallBack(jntNodeCallBack);
     }
-    mpMorf->getModel()->setUserArea((u32)this);
+    mpMorf->getModel()->setUserArea((uintptr_t)this);
     return 1;
 }
 
@@ -337,12 +339,6 @@ bool daNpcCd2_c::isM_() {
     JUT_ASSERT(738, (a_jntNum == JntM_NUM_e) || (a_jntNum == JntW_NUM_e));
     return a_jntNum == JntM_NUM_e;
 }
-
-/* ############################################################################################## */
-/* 803B61C0-803B61CC 0132E0 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 /* 803B61CC-803B6244 -00001 0078+00 2/2 0/0 0/0 .data            l_resNameTbl */
 static char* const* l_resNameTbl[30] = {
@@ -1824,12 +1820,12 @@ void daNpcCd2_c::setHitodamaParticle() {
     };
     
     field_0xac0 = (u16)(field_0xac2 * 2);
-    field_0xab4 = 8.0f * cM_ssin(field_0xac2);
-    field_0xab8 = 4.0f * cM_ssin(field_0xac0);
-    field_0xabc = field_0xab4 * -cM_ssin(shape_angle.y);
-    field_0xab4 = field_0xab4 * cM_scos(shape_angle.y);
+    field_0xab4.x = 8.0f * cM_ssin(field_0xac2);
+    field_0xab4.y = 4.0f * cM_ssin(field_0xac0);
+    field_0xab4.z = field_0xab4.x * -cM_ssin(shape_angle.y);
+    field_0xab4.x = field_0xab4.x * cM_scos(shape_angle.y);
     field_0xac2 += 0x400;
-    cXyz local_28(eyePos.x + field_0xab4, eyePos.y + field_0xab8, eyePos.z + field_0xabc);
+    cXyz local_28(eyePos.x + field_0xab4.x, eyePos.y + field_0xab4.y, eyePos.z + field_0xab4.z);
     for (int i = 0; i < 2; i++) {
         mHitodamaEmitters[i] =
             dComIfGp_particle_set(mHitodamaEmitters[i], id[i], &local_28, &shape_angle, 0);
@@ -1956,7 +1952,7 @@ bool PathTrace_c::setPath(int param_1, int param_2, int param_3, cXyz* param_4, 
 
     field_0x20 = 0;
     if (param_5) {
-        f32 minDist = 1000000000.0f;
+        f32 minDist = G_CM3D_F_INF;
         field_0x20 = 0;
         for (int i = 0; i < mPath->m_num; i++) {
             dPnt* pnt = dPath_GetPnt(mPath, i);
@@ -2010,9 +2006,9 @@ void PathTrace_c::getTargetPoint(Vec* targetPoint) {
 
 /* 80159ECC-80159F98 15480C 00CC+00 1/1 0/0 0/0 .text            setAvoidPoint__11PathTrace_cFv */
 void PathTrace_c::setAvoidPoint() {
-    JUT_ASSERT(1602, mPath != 0);
-    JUT_ASSERT(1603, mMyself != 0);
-    JUT_ASSERT(1604, mObstacle != 0);
+    JUT_ASSERT(1602, mPath != NULL);
+    JUT_ASSERT(1603, mMyself != NULL);
+    JUT_ASSERT(1604, mObstacle != NULL);
     cXyz& selfPos = fopAcM_GetPosition(mMyself);
     s16 obstacleAngle = cLib_targetAngleY(&selfPos, &fopAcM_GetPosition(mObstacle));
     s16 diff = (s16)obstacleAngle - cLib_targetAngleY(&selfPos, &dPath_GetPnt(mPath, field_0x20)->m_position);
@@ -2048,7 +2044,7 @@ void PathTrace_c::setNextPoint() {
     dPnt* pnt2 = dPath_GetPnt(mPath, field_0x20);
     cXyz acStack_28(pnt1->m_position);
     field_0x18 = acStack_28.abs(pnt2->m_position);
-    mNextPoint = 1000000000.0f;
+    mNextPoint = G_CM3D_F_INF;
 }
 
 /* 8015A264-8015A294 154BA4 0030+00 1/1 0/0 0/0 .text            incIndex__11PathTrace_cFi */
@@ -2109,14 +2105,14 @@ fopAc_ac_c* PathTrace_c::checkObstacle(fopAc_ac_c* param_0) {
  * checkObstacleSub__11PathTrace_cFP10fopAc_ac_c                */
 void PathTrace_c::checkObstacleSub(fopAc_ac_c* pObstacle) {
     if (mMyself != pObstacle) {
-        JUT_ASSERT(1816, mPath != 0);
+        JUT_ASSERT(1816, mPath != NULL);
         cXyz& newObstaclePos = fopAcM_GetPosition(pObstacle);
         dPnt* pnt = dPath_GetPnt(mPath, field_0x20);
         f32 local_38;
         f32 local_3c;
         f32 local_40;
-        local_38 = 1000000000.0f;
-        JUT_ASSERT(1822, mMyself != 0);
+        local_38 = G_CM3D_F_INF;
+        JUT_ASSERT(1822, mMyself != NULL);
         cXyz& selfPos = fopAcM_GetPosition(mMyself);
         if (mObstacle != NULL) {
             f32 distCurObstacle = selfPos.abs2(fopAcM_GetPosition(mObstacle));

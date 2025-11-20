@@ -3,6 +3,8 @@
 // Object - Dig Snow
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_digsnow.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -35,31 +37,13 @@ int daObjDigSnow_c::Create() {
     return TRUE;
 }
 
-/* 80BDD6E8-80BDD6F4 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BDD6F4-80BDD708 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80BDD708-80BDD70C -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Y_horiyuk";
 
 /* 80BDCD64-80BDCDD4 000184 0070+00 1/0 0/0 0/0 .text            CreateHeap__14daObjDigSnow_cFv */
 int daObjDigSnow_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0x9F, modelData != 0);
+    JUT_ASSERT(0x9F, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
 
     if (mpModel == NULL) {
@@ -90,7 +74,7 @@ int daObjDigSnow_c::create1st() {
  */
 int daObjDigSnow_c::Execute(Mtx** i_mtx) {
     if (daPy_py_c::checkNowWolf()) {
-        attention_info.flags = 0x80;
+        attention_info.flags = fopAc_AttnFlag_ETC_e;
     } else {
         attention_info.flags = 0;
     }
@@ -133,11 +117,11 @@ void daObjDigSnow_c::mode_wait() {
 void daObjDigSnow_c::mode_init_dig() {
     dBgS_ObjGndChk obj_gnd_chk;
 
-    obj_gnd_chk.SetActorPid(base.id);
+    obj_gnd_chk.SetActorPid(base.base.id);
     obj_gnd_chk.SetPos(&current.pos);
 
     f32 gnd_height = dComIfG_Bgsp().GroundCross(&obj_gnd_chk);
-    if (gnd_height != -1000000000.0f) {
+    if (gnd_height != -G_CM3D_F_INF) {
         mGroundHeight = gnd_height;
     } else {
 #ifdef DEBUG
@@ -195,7 +179,7 @@ int daObjDigSnow_c::Delete() {
 /* 80BDD2EC-80BDD418 00070C 012C+00 1/0 0/0 0/0 .text daObjDigSnow_create1st__FP14daObjDigSnow_c
  */
 static int daObjDigSnow_create1st(daObjDigSnow_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjDigSnow_c);
+    fopAcM_ct(i_this, daObjDigSnow_c);
     return i_this->create1st();
 }
 

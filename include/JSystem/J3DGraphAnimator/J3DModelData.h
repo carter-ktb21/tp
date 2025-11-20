@@ -8,7 +8,6 @@
 #include "JSystem/J3DGraphBase/J3DSys.h"
 #include "JSystem/J3DGraphBase/J3DVertex.h"
 
-typedef struct _GXColor GXColor;
 class JUTNameTab;
 
 /**
@@ -68,7 +67,7 @@ public:
     bool checkFlag(u32 flag) const { return (mFlags & flag) ? true : false; }
     u32 getFlag() const { return mFlags; }
     void const* getRawData() const { return mpRawData; }
-    u16 checkBumpFlag() const { return mbHasBumpArray; }
+    bool checkBumpFlag() const { return mbHasBumpArray == 1; }
     void setBumpFlag(u32 flag) { mbHasBumpArray = flag; }
     bool checkBBoardFlag() const { return mbHasBillboard == 1; }
     bool isLocked() { return mMaterialTable.isLocked(); }
@@ -94,6 +93,12 @@ public:
     void makeHierarchy(J3DJoint* joint, J3DModelHierarchy const** hierarchy) {
         mJointTree.makeHierarchy(joint, hierarchy, &mMaterialTable, &mShapeTable);
         mShapeTable.initShapeNodes(getDrawMtxData(), &getVertexData());
+    }
+    void show() {
+        mShapeTable.show();
+    }
+    void hide() {
+        mShapeTable.hide();
     }
 
 private:

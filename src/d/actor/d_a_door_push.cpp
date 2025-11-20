@@ -3,6 +3,8 @@
  * Door - Push
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_push.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_bg_w.h"
@@ -73,24 +75,6 @@ void daDoorPush_c::setBaseMtx() {
         mDoMtx_stack_c::multVec(&mult, &mPosition);
     }
 }
-
-/* 80678F50-80678F5C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80678F5C-80678F70 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80678F70-80678F74 -00001 0004+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "V_OsuDoor";
@@ -276,7 +260,7 @@ int daDoorPush_c::demoProc() {
     field_0x644 = dComIfGp_evmng_getMyStaffId("pdoor", NULL, 0);
 
     s32 actIdx =
-        dComIfGp_evmng_getMyActIdx(field_0x644, action_table, ARRAY_SIZE(action_table), 0, 0);
+        dComIfGp_evmng_getMyActIdx(field_0x644, action_table, ARRAY_SIZEU(action_table), 0, 0);
     if (dComIfGp_evmng_getIsAddvance(field_0x644) != 0) {
         switch (actIdx) {
         case WAIT_e:
@@ -389,7 +373,7 @@ int daDoorPush_c::Delete() {
 
 /* 80678DAC-80678E38 00106C 008C+00 1/0 0/0 0/0 .text daDoorPush_create1st__FP12daDoorPush_c */
 static int daDoorPush_create1st(daDoorPush_c* i_this) {
-    fopAcM_SetupActor(i_this, daDoorPush_c);
+    fopAcM_ct(i_this, daDoorPush_c);
     return i_this->create1st();
 }
 

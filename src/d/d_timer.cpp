@@ -3,6 +3,8 @@
  * Minigame HUD Timer / Counter
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_timer.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -34,7 +36,7 @@ int dTimer_c::_create() {
         }
 
         dRes_info_c* resInfo = dComIfG_getObjectResInfo("Timer");
-        JUT_ASSERT(0, resInfo != 0);
+        JUT_ASSERT(0, resInfo != NULL);
         dComIfGp_setAllMapArchive(resInfo->getArchive());
 
         mp_heap = fopMsgM_createExpHeap(0x11000, NULL);
@@ -43,7 +45,7 @@ int dTimer_c::_create() {
             mp_heap->getTotalFreeSize();
 
             mp_tm_scrn = new dDlst_TimerScrnDraw_c();
-            JUT_ASSERT(0, mp_tm_scrn != 0);
+            JUT_ASSERT(0, mp_tm_scrn != NULL);
 
             if (appen->timer_mode == 10) {
                 mp_tm_scrn->setScreen(dComIfG_getTimerMode(), resInfo->getArchive());
@@ -478,12 +480,12 @@ int dTimer_c::getRestTimeMs() {
 }
 
 /* 8025DB10-8025DB38 258450 0028+00 1/1 0/0 4/4 .text            isStart__8dTimer_cFv */
-u8 dTimer_c::isStart() {
+bool dTimer_c::isStart() {
     if (field_0x16A != 1 && m_mode == 4) {
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 /* 8025DB38-8025DBE0 258478 00A8+00 1/1 0/0 0/0 .text            __ct__21dDlst_TimerScrnDraw_cFv */
@@ -612,7 +614,7 @@ void dDlst_TimerScrnDraw_c::setScreen(s32 param_0, JKRArchive* i_archive) {
     setShowType(3);
 
     mpGetInScreen = new J2DScreen();
-    JUT_ASSERT(0, mpGetInScreen != 0);
+    JUT_ASSERT(0, mpGetInScreen != NULL);
 
     bool fg = mpGetInScreen->setPriority("zelda_game_image_cow_get_in.blo", 0x20000, mpArchive);
     JUT_ASSERT(0, fg != false);
@@ -623,13 +625,13 @@ void dDlst_TimerScrnDraw_c::setScreen(s32 param_0, JKRArchive* i_archive) {
         JKRGetNameResource("zelda_game_image_cow_get_in.bck", mpArchive));
 
     mpGetInParent = new CPaneMgr(mpGetInScreen, 'get_in_n', 2, NULL);
-    JUT_ASSERT(0, mpGetInParent != 0);
+    JUT_ASSERT(0, mpGetInParent != NULL);
 
     mpGetInRoot = new CPaneMgr(mpGetInScreen, 'n_all', 0, NULL);
-    JUT_ASSERT(0, mpGetInRoot != 0);
+    JUT_ASSERT(0, mpGetInRoot != NULL);
 
     mpGetInText = new CPaneMgr(mpGetInScreen, 'get_in', 0, NULL);
-    JUT_ASSERT(0, mpGetInText != 0);
+    JUT_ASSERT(0, mpGetInText != NULL);
 
     static_cast<J2DTextBox*>(mpGetInScreen->search('get_in_s'))->setFont(mDoExt_getMesgFont());
     static_cast<J2DTextBox*>(mpGetInScreen->search('get_in'))->setFont(mDoExt_getMesgFont());
@@ -652,7 +654,7 @@ void dDlst_TimerScrnDraw_c::setScreen(s32 param_0, JKRArchive* i_archive) {
 /* 8025E240-8025E66C 258B80 042C+00 1/1 0/0 0/0 .text setScreenBase__21dDlst_TimerScrnDraw_cFv */
 void dDlst_TimerScrnDraw_c::setScreenBase() {
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
 
     bool fg = mpScreen->setPriority("zelda_game_image_cow_game.blo", 0x20000, mpArchive);
     JUT_ASSERT(0, fg != false);
@@ -661,15 +663,15 @@ void dDlst_TimerScrnDraw_c::setScreenBase() {
     mpParent = NULL;
 
     mpCowParent = new CPaneMgr(mpScreen, 'cow_n', 2, NULL);
-    JUT_ASSERT(0, mpCowParent != 0);
+    JUT_ASSERT(0, mpCowParent != NULL);
     mpCowParent->setAlphaRate(0.0f);
 
     mpTimeParent = new CPaneMgr(mpScreen, 'time_n', 2, NULL);
-    JUT_ASSERT(0, mpTimeParent != 0);
+    JUT_ASSERT(0, mpTimeParent != NULL);
     mpTimeParent->setAlphaRate(0.0f);
 
     mpImageParent = new CPaneMgr(mpScreen, 'cow_i_n', 2, NULL);
-    JUT_ASSERT(0, mpImageParent != 0);
+    JUT_ASSERT(0, mpImageParent != NULL);
     mpImageParent->setAlphaRate(0.0f);
 
     field_0x5c[0][0] = mpScreen->search('c_n_2');
@@ -700,23 +702,23 @@ void dDlst_TimerScrnDraw_c::setScreenBase() {
  */
 void dDlst_TimerScrnDraw_c::setScreenBoatRace() {
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
 
     bool fg = mpScreen->setPriority("zelda_game_image_zora_kawakudari.blo", 0x20000, mpArchive);
     JUT_ASSERT(0, fg != false);
     dPaneClass_showNullPane(mpScreen);
 
     mpParent = new CPaneMgr(mpScreen, 'ta_co_n', 2, NULL);
-    JUT_ASSERT(0, mpParent != 0);
+    JUT_ASSERT(0, mpParent != NULL);
 
     mpCowParent = new CPaneMgr(mpScreen, 'num_n', 2, NULL);
-    JUT_ASSERT(0, mpCowParent != 0);
+    JUT_ASSERT(0, mpCowParent != NULL);
     mpCowParent->setAlphaRate(0.0f);
 
     mpTimeParent = NULL;
 
     mpImageParent = new CPaneMgr(mpScreen, 'target_n', 2, NULL);
-    JUT_ASSERT(0, mpImageParent != 0);
+    JUT_ASSERT(0, mpImageParent != NULL);
     mpImageParent->setAlphaRate(0.0f);
 
     mpScreen->search('w_target')->hide();
@@ -743,7 +745,7 @@ void dDlst_TimerScrnDraw_c::setScreenBoatRace() {
 /* 8025E8B8-8025EB20 2591F8 0268+00 1/1 0/0 0/0 .text setScreenRider__21dDlst_TimerScrnDraw_cFv */
 void dDlst_TimerScrnDraw_c::setScreenRider() {
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
 
     bool fg = mpScreen->setPriority("zelda_game_image_rider.blo", 0x20000, mpArchive);
     JUT_ASSERT(0, fg != false);
@@ -752,13 +754,13 @@ void dDlst_TimerScrnDraw_c::setScreenRider() {
     mpParent = NULL;
 
     mpCowParent = new CPaneMgr(mpScreen, 'num_n', 2, NULL);
-    JUT_ASSERT(0, mpCowParent != 0);
+    JUT_ASSERT(0, mpCowParent != NULL);
     mpCowParent->setAlphaRate(0.0f);
 
     mpTimeParent = NULL;
 
     mpImageParent = new CPaneMgr(mpScreen, 'rid_i_n', 2, NULL);
-    JUT_ASSERT(0, mpImageParent != 0);
+    JUT_ASSERT(0, mpImageParent != NULL);
     mpImageParent->setAlphaRate(0.0f);
 
     field_0x5c[0][0] = mpScreen->search('n_n_2');
@@ -1460,6 +1462,12 @@ void dDlst_TimerScrnDraw_c::playBckAnimation(f32 i_frame) {
     mpGetInParent->getPanePtr()->setAnimation((J2DAnmTransform*)NULL);
 }
 
+#if VERSION == VERSION_GCN_JPN
+bool dDlst_TimerScrnDraw_c::isLeadByte(int i_char) {
+    return (i_char >= 0x81 && i_char <= 0x9f) || (i_char >= 0xe0 && i_char <= 0xfc);
+}
+#endif
+
 /* 80260B54-80260F04 25B494 03B0+00 1/1 0/0 0/0 .text drawPikari__21dDlst_TimerScrnDraw_cFi */
 void dDlst_TimerScrnDraw_c::drawPikari(int i_no) {
     f32 temp_f28;
@@ -1484,12 +1492,23 @@ void dDlst_TimerScrnDraw_c::drawPikari(int i_no) {
     }
 
     for (; string[str_idx] != 0; str_idx++) {
+        int c = string[str_idx] & 0xFF;
+
         if (str_idx > 0) {
             var_f29 +=
                 var_f25 * static_cast<J2DTextBox*>(mpGetInText->getPanePtr())->getCharSpace();
         }
 
-        int c = string[str_idx] & 0xFF;
+#if VERSION == VERSION_GCN_JPN
+        if (isLeadByte(c)) {
+            c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
+            str_idx++;
+        } else {
+            c = string[str_idx] & 0xFF;
+        }
+#else
+        c = string[str_idx] & 0xFF;
+#endif
 
         var_f29 +=
             var_f25 * (font_size.mSizeX * ((f32)font_p->getWidth(c) / (f32)font_p->getCellWidth()));
@@ -1499,13 +1518,23 @@ void dDlst_TimerScrnDraw_c::drawPikari(int i_no) {
     f32 frame;
 
     for (str_idx = 0; string[str_idx] != 0; str_idx++) {
+        int c = string[str_idx] & 0xFF;
+
         if (str_idx > 0) {
             var_f26 +=
                 var_f25 * static_cast<J2DTextBox*>(mpGetInText->getPanePtr())->getCharSpace();
         }
 
-        int c = string[str_idx] & 0xFF;
-
+#if VERSION == VERSION_GCN_JPN
+        if (isLeadByte(c)) {
+            c = ((string[str_idx] & 0xFF) << 8) | (string[str_idx + 1] & 0xFF);
+            str_idx++;
+        } else {
+            c = string[str_idx] & 0xFF;
+        }
+#else
+        c = string[str_idx] & 0xFF;
+#endif
         f32 temp_f24 =
             var_f25 * (font_size.mSizeX * ((f32)font_p->getWidth(c) / (f32)font_p->getCellWidth()));
         if (c != 0x20 && c != 0x8140) {
@@ -1563,7 +1592,7 @@ static int dTimer_Create(msg_class* i_this) {
 }
 
 /* 80260F8C-80261034 25B8CC 00A8+00 0/0 1/1 9/9 .text            dTimer_createTimer__FlUlUcUcffff */
-s32 dTimer_createTimer(s32 i_mode, u32 i_limitMs, u8 i_type, u8 param_3, f32 param_4, f32 param_5,
+fpc_ProcID dTimer_createTimer(s32 i_mode, u32 i_limitMs, u8 i_type, u8 param_3, f32 param_4, f32 param_5,
                        f32 param_6, f32 param_7) {
     if (dComIfG_getTimerMode() == -1) {
         return fopMsgM_Timer_create(PROC_TIMER, i_mode, i_limitMs, i_type, param_3, param_4,
@@ -1616,12 +1645,12 @@ static int dTimer_createStart2D(s32 param_0, u16 param_1) {
 }
 
 /* 802611F0-80261244 25BB30 0054+00 0/0 0/0 5/5 .text            dTimer_isStart__Fv */
-u8 dTimer_isStart() {
+bool dTimer_isStart() {
     if (dComIfG_getTimerPtr() != NULL) {
         return dComIfG_getTimerPtr()->isStart();
     }
 
-    return 0;
+    return false;
 }
 
 /* 80261244-80261298 25BB84 0054+00 0/0 0/0 2/2 .text            dTimer_getRestTimeMs__Fv */

@@ -1,15 +1,15 @@
 /**
- * @file d_a_obj_lv6TogeRoll.cpp
+* @file d_a_obj_lv6TogeRoll.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_lv6TogeRoll.h"
 #include "d/d_path.h"
 
 /* 80C79D44-80C79D58 000014 0014+00 4/4 0/0 0/0 .bss             l_HIO */
 static daTogeRoll_HIO_c l_HIO;
-
-UNK_REL_DATA;
 
 /* 80C79B0C-80C79B4C 000020 0040+00 2/2 0/0 0/0 .data            mCcDSph__12daTogeRoll_c */
 dCcD_SrcSph daTogeRoll_c::mCcDSph = {
@@ -81,7 +81,7 @@ f32 const daTogeRoll_c::mSpeed[] = {
 
 /* 80C77DBC-80C78058 00027C 029C+00 1/1 0/0 0/0 .text            create__12daTogeRoll_cFv */
 int daTogeRoll_c::create() {
-    fopAcM_SetupActor(this, daTogeRoll_c);
+    fopAcM_ct(this, daTogeRoll_c);
 
     int phase = dComIfG_resLoad(&mPhase, "togeRol");
 

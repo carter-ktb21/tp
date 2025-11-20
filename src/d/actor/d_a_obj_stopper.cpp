@@ -1,14 +1,13 @@
 /**
- * @file d_a_obj_stopper.cpp
+* @file d_a_obj_stopper.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_stopper.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_BSS
-UNK_REL_DATA
 
 /* 80CECF0C-80CECF34 0000EC 0028+00 1/1 0/0 0/0 .text            getStopModelData__Fv */
 static J3DModelData* getStopModelData() {
@@ -73,7 +72,7 @@ int daObjStopper_c::CreateHeap() {
 
 /* 80CED258-80CED440 000438 01E8+00 1/1 0/0 0/0 .text            create__14daObjStopper_cFv */
 int daObjStopper_c::create() {
-    fopAcM_SetupActor(this, daObjStopper_c);
+    fopAcM_ct(this, daObjStopper_c);
     if (!field_0x9fc) {
         field_0x9f8 = home.angle.x;
         field_0x9fa = home.angle.z;
@@ -93,7 +92,7 @@ int daObjStopper_c::create() {
 
 /* 80CED6BC-80CED708 00089C 004C+00 1/0 0/0 0/0 .text            Execute__14daObjStopper_cFPPA3_A4_f
  */
-int daObjStopper_c::Execute(f32 (**param_0)[3][4]) {
+int daObjStopper_c::Execute(Mtx** param_0) {
     action();
     *param_0 = &mBgMtx;
     setBaseMtx();

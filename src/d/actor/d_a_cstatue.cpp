@@ -1,7 +1,9 @@
 /**
- * @file d_a_cstatue.cpp
+* @file d_a_cstatue.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_cstatue.h"
 #include <Z2AudioLib/Z2Instances.h>
@@ -10,9 +12,6 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_cc_d.h"
 #include "d/d_tresure.h"
-
-UNK_REL_BSS;
-UNK_REL_DATA;
 
 static u8 const unused[12] = {};
 
@@ -166,7 +165,7 @@ int daCstatue_c::createHeap() {
     mpMorf = new mDoExt_McaMorfSO(
         static_cast<J3DModelData*>(dComIfG_getObjectRes(mResName, (u16)resource_index)), NULL, NULL,
         animation, 0, 0.0f, animation->getFrameMax(), -1, &mSound,
-        mType == daCstatueType_Normal2 ? J3DMdlFlag_None : J3DMdlFlag_Unk80000, data->morfIndex);
+        mType == daCstatueType_Normal2 ? J3DMdlFlag_None : J3DMdlFlag_DifferedDLBuffer, data->morfIndex);
 
     if (mpMorf == NULL || mpMorf->mpModel == NULL) {
         return cPhs_INIT_e;
@@ -220,7 +219,7 @@ int daCstatue_c::create() {
 
     static int const heapSize[daCstatueType_N] = {4368, 2208, 4688, 6240, 6240};
 
-    fopAcM_SetupActor(this, daCstatue_c);
+    fopAcM_ct(this, daCstatue_c);
     mType = (fopAcM_GetParam(this) >> 8) & 0xf;
     if (mType == daCstatueType_Normal2) {
         mType = daCstatueType_Small;
@@ -384,7 +383,7 @@ int daCstatue_c::create() {
             mSph->SetTgType(0xd97afddf);
             mControlDistanceOffset = JMAFastSqrt(650000.0f);
             attention_info.distances[0] = 92;
-            cLib_onBit<u32>(attention_info.flags, 1);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_LOCK_e);
             mTargetFrame = 35.0f;
         }
         mControlDistanceOffset += 100.0f;
@@ -434,7 +433,7 @@ static int daCstatue_Delete(void* actor) {
 /* 80664AA0-80664B38 0014E0 0098+00 2/2 0/0 0/0 .text            setRoomInfo__11daCstatue_cFv */
 void daCstatue_c::setRoomInfo() {
     int roomId;
-    if (mStatueAcch.GetGroundH() != -1000000000.0f) {
+    if (mStatueAcch.GetGroundH() != -G_CM3D_F_INF) {
         roomId = dComIfG_Bgsp().GetRoomId(mStatueAcch.m_gnd);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mStatueAcch.m_gnd);
     } else {
@@ -476,7 +475,7 @@ void daCstatue_c::setMatrix() {
 void daCstatue_c::posMove() {
     if (checkStateFlg0(daCstatue_FLG0_8)) {
         mStatueAcch.CrrPos(dComIfG_Bgsp());
-        if (mStatueAcch.GetGroundH() == -1000000000.0f) {
+        if (mStatueAcch.GetGroundH() == -G_CM3D_F_INF) {
             return;
         }
         if (dComIfG_Bgsp().ChkMoveBG_NoDABg(mStatueAcch.m_gnd)) {
@@ -585,7 +584,7 @@ void daCstatue_c::posMove() {
         current.pos += *mStts.GetCCMoveP();
         mStts.ClrCcMove();
         mStatueAcch.CrrPos(dComIfG_Bgsp());
-        if (groundHit && !mStatueAcch.ChkGroundHit() && mStatueAcch.GetGroundH() != -1000000000.0f)
+        if (groundHit && !mStatueAcch.ChkGroundHit() && mStatueAcch.GetGroundH() != -G_CM3D_F_INF)
         {
             f32 groundDistance = mStatueAcch.GetGroundH() - current.pos.y;
             cM3dGPla plane;
@@ -1122,6 +1121,7 @@ int daCstatue_c::execute() {
                 !fopAcM_CheckCondition(this, 4))
             {
                 if (!fopAcM_lc_c::lineCheck(&eyePos, &link->eyePos, this)) {
+                    /* dSv_event_flag_c::F_0684 - Temple of Time - Look at R00 statue using sense */
                     dComIfGs_onEventBit(0x5440);
                 }
             }
@@ -1137,7 +1137,7 @@ int daCstatue_c::execute() {
         }
     }
     u32 morf =
-        mStatueAcch.GetGroundH() != -1000000000.0f ? dKy_pol_sound_get(&mStatueAcch.m_gnd) : 0;
+        mStatueAcch.GetGroundH() != -G_CM3D_F_INF ? dKy_pol_sound_get(&mStatueAcch.m_gnd) : 0;
     mpMorf->play(morf, mReverb);
     if (!bossType && mCurrentAnim == CStatueAnimIndex_2 && link->checkCopyRodSwingMode()) {
         if (mpMorf->getEndFrame() > link->getBaseAnimeFrame()) {
@@ -1160,9 +1160,9 @@ int daCstatue_c::execute() {
     setCollision();
     if (mType == daCstatueType_Small) {
         if (mStatueAcch.ChkGroundHit() && !fopAcM_checkCarryNow(this)) {
-            cLib_onBit<u32>(attention_info.flags, 0x10);  // this is 0x80 in the debug rom
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         } else {
-            cLib_offBit<u32>(attention_info.flags, 0x10);  // this is 0x80 in the debug rom
+            cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         }
     }
 
@@ -1258,5 +1258,5 @@ extern actor_process_profile_definition g_profile_CSTATUE = {
 AUDIO_INSTANCES;
 
 #include "JSystem/JAudio2/JAUSectionHeap.h"
-template <>
+template<>
 JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;

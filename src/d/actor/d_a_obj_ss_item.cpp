@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ss_item.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
@@ -44,7 +46,7 @@ daObj_SSItem_c::~daObj_SSItem_c() {
 
 /* 80CE6E68-80CE70CC 0002C8 0264+00 1/1 0/0 0/0 .text            create__14daObj_SSItem_cFv */
 int daObj_SSItem_c::create() {
-    fopAcM_SetupActor(this, daObj_SSItem_c);
+    fopAcM_ct(this, daObj_SSItem_c);
     field_0xB0E = getTypeFromParam();
     setFlowNodeNumber(getFlowNodeNum());
     setValueNumber(getValue());
@@ -112,7 +114,7 @@ int daObj_SSItem_c::Execute() {
             mAcch.CrrPos(dComIfG_Bgsp());
             mGndChk = mAcch.m_gnd;
             field_0xB00 = mAcch.GetGroundH();
-            if (field_0xB00 != -1000000000.0f) {
+            if (field_0xB00 != -G_CM3D_F_INF) {
                 setEnvTevColor();
                 setRoomNo();
             }
@@ -150,10 +152,12 @@ int daObj_SSItem_c::Draw() {
         g_env_light.settingTevStruct(0, &current.pos, &tevStr);
         g_env_light.setLightTevColorType_MAJI(mpModel, &tevStr);
         mDoExt_modelUpdateDL(mpModel);
-        if (field_0xB00 != -1000000000.0f) {
+        if (field_0xB00 != -G_CM3D_F_INF) {
             cM3dGPla plane;
-            if (dComIfG_Bgsp().GetTriPla(mGndChk, &plane)) {
-                dComIfGd_setSimpleShadow(&current.pos, field_0xB00, 20.0f, &plane.mNormal, 0, 1.0f,
+            bool tri_pla = dComIfG_Bgsp().GetTriPla(mGndChk, &plane);
+            if (tri_pla) {
+                f32 param2 = 20.0f;
+                dComIfGd_setSimpleShadow(&current.pos, field_0xB00, param2, &plane.mNormal, 0, 1.0f,
                                          dDlst_shadowControl_c::getSimpleTex());
             }
         }
@@ -286,7 +290,7 @@ int daObj_SSItem_c::setProcess(ProcessFunc i_process) {
 /* 80CE7BB4-80CE7C24 001014 0070+00 1/1 0/0 0/0 .text            setParam__14daObj_SSItem_cFv */
 void daObj_SSItem_c::setParam() {
     scale.set(1.4f, 1.4f, 1.4f);
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mAcchCir.SetWallR(24.0f);
     mAcchCir.SetWallH(12.0f);
     gravity = -5.0f;

@@ -3,10 +3,10 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_prayer.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_DATA
 
 /* 80AB5BB4-80AB5BB8 000014 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daNpcPray_Param_c l_HIO;
@@ -69,7 +69,7 @@ daNpcPray_c::~daNpcPray_c() {
     }
 
     if (heap != NULL) {
-        mpMorf->stopZelAnime();
+        mAnm_p->stopZelAnime();
     }
 }
 
@@ -112,7 +112,7 @@ const daNpcPray_HIOParam daNpcPray_Param_c::m = {
 
 /* 80AB3204-80AB348C 000504 0288+00 1/1 0/0 0/0 .text            Create__11daNpcPray_cFv */
 int daNpcPray_c::Create() {
-    fopAcM_SetupActor(this, daNpcPray_c);
+    fopAcM_ct(this, daNpcPray_c);
 
     mMessageNo = getMessageNo();
 
@@ -129,8 +129,8 @@ int daNpcPray_c::Create() {
             return cPhs_ERROR_e;
         }
 
-        J3DModelData* modelData = mpMorf->getModel()->getModelData();
-        fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
+        J3DModelData* modelData = mAnm_p->getModel()->getModelData();
+        fopAcM_SetMtx(this, mAnm_p->getModel()->getBaseTRMtx());
         fopAcM_setCullSizeBox(this, -60.0f, -10.0f, -60.0f, 60.0f, 220.0f, 60.0f);
 
         mSound.init(&current.pos, &eyePos, 3, 1);
@@ -163,28 +163,28 @@ int daNpcPray_c::Create() {
 /* 80AB348C-80AB3610 00078C 0184+00 1/1 0/0 0/0 .text            CreateHeap__11daNpcPray_cFv */
 int daNpcPray_c::CreateHeap() {
     J3DModelData* mdlData_p = (J3DModelData*)dComIfG_getObjectRes(l_arcNames[0], 9);
-    JUT_ASSERT(313, 0 != mdlData_p);
+    JUT_ASSERT(313, NULL != mdlData_p);
 
-    mpMorf = new mDoExt_McaMorfSO(mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mSound, 0x80000, 0x11000084);
-    if (mpMorf != NULL && mpMorf->getModel() == NULL) {
-        mpMorf->stopZelAnime();
-        mpMorf = NULL;
+    mAnm_p = new mDoExt_McaMorfSO(mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mSound, 0x80000, 0x11000084);
+    if (mAnm_p != NULL && mAnm_p->getModel() == NULL) {
+        mAnm_p->stopZelAnime();
+        mAnm_p = NULL;
     }
 
-    if (mpMorf == NULL) {
+    if (mAnm_p == NULL) {
         return 0;
     }
 
     cXyz scale(1.0f, 1.0999999f, 1.0f);
-    mpMorf->offTranslate();
-    mpMorf->setTranslateScale(scale);
+    mAnm_p->offTranslate();
+    mAnm_p->setTranslateScale(scale);
 
-    J3DModel* model_p = mpMorf->getModel();
+    J3DModel* model_p = mAnm_p->getModel();
     for (u16 i = 0; i < mdlData_p->getJointNum(); i++) {
         mdlData_p->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
 
-    model_p->setUserArea((u32)this);
+    model_p->setUserArea((uintptr_t)this);
     setMotion(MOTION_WAIT_e, -1.0f, 0);
     return 1;
 }
@@ -215,13 +215,13 @@ int daNpcPray_c::ctrlJoint(J3DJoint* i_joint, J3DModel* i_model) {
     int spC[] = {1, 2, 3};
 
     if (jnt_no == 0) {
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(1));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(1));
         mDoMtx_stack_c::multVecZero(&mLookatPos[0]);
 
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(2));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(2));
         mDoMtx_stack_c::multVecZero(&mLookatPos[1]);
 
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(3));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(3));
         mDoMtx_stack_c::multVecZero(&mLookatPos[2]);
     }
 
@@ -265,7 +265,7 @@ void daNpcPray_c::setParam() {
     attention_info.distances[fopAc_attn_LOCK_e] = getDistTableIdx(daNpcPray_Param_c::m.common.attention_distance, daNpcPray_Param_c::m.common.attention_angle);
     attention_info.distances[fopAc_attn_TALK_e] = attention_info.distances[fopAc_attn_LOCK_e];
     attention_info.distances[fopAc_attn_SPEAK_e] = getDistTableIdx(daNpcPray_Param_c::m.common.talk_distance, daNpcPray_Param_c::m.common.talk_angle);
-    attention_info.flags = 0xA;
+    attention_info.flags = (fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
 
 #if VERSION == VERSION_SHIELD_DEBUG
     scale.set(daNpcPray_Param_c::m.common.scale, daNpcPray_Param_c::m.common.scale, daNpcPray_Param_c::m.common.scale);
@@ -298,7 +298,7 @@ void daNpcPray_c::setAttnPos() {
 
     cXyz sp14(10.0f, 15.0f, 0.0f);
 
-    mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(3));
+    mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(3));
     mDoMtx_stack_c::multVecZero(&mHeadPos);
     mDoMtx_stack_c::multVec(&sp14, &eyePos);
     sp14.x = 0.0f;
@@ -309,7 +309,7 @@ void daNpcPray_c::setAttnPos() {
     attention_info.position.set(mHeadPos.x, mHeadPos.y + daNpcPray_Param_c::m.common.attention_offset, mHeadPos.z);
 
     cXyz cyl_center;
-    mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(1));
+    mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(1));
     mDoMtx_stack_c::multVecZero(&cyl_center);
     cyl_center.y = current.pos.y;
 
@@ -435,7 +435,7 @@ void daNpcPray_c::setLookMode(int i_mode) {
 /* 80AB4020-80AB4200 001320 01E0+00 1/1 0/0 0/0 .text            lookat__11daNpcPray_cFv */
 void daNpcPray_c::lookat() {
     daPy_py_c* player = NULL;
-    J3DModel* model_p = mpMorf->getModel();
+    J3DModel* model_p = mAnm_p->getModel();
 
     int var_r28 = 0;
     f32 body_angleX_min = daNpcPray_Param_c::m.common.body_angleX_min;
@@ -582,7 +582,7 @@ bool daNpcPray_c::wait(void*) {
         break;
     case 1:
     case 3:
-        JUT_ASSERT(1076, 0);
+        JUT_ASSERT(1076, FALSE);
         break;
     }
 
@@ -600,15 +600,15 @@ bool daNpcPray_c::fear(void*) {
         mActionMode = 2;
         break;
     case 2:
-        OS_REPORT("-------------prayer frame=%f\n", mpMorf->getFrame());
-        if (1.0f == mpMorf->getFrame()) {
+        OS_REPORT("-------------prayer frame=%f\n", mAnm_p->getFrame());
+        if (1.0f == mAnm_p->getFrame()) {
             OS_REPORT("-------------prayer fear se start!!\n");
             mSound.playVoice(2);
         }
         break;
     case 1:
     case 3:
-        JUT_ASSERT(1076, 0);
+        JUT_ASSERT(1076, FALSE);
         break;
     }
 
@@ -672,7 +672,7 @@ bool daNpcPray_c::talk(void*) {
         }
         break;
     default:
-        JUT_ASSERT(1209, 0);
+        JUT_ASSERT(1209, FALSE);
     }
 
     return var_r28;
@@ -695,7 +695,7 @@ bool daNpcPray_c::demo(void*) {
             if (staffID != -1) {
                 mStaffID = staffID;
  
-                JUT_ASSERT(1243, 0 != mEvtSeqList[mOrderEvtNo]);
+                JUT_ASSERT(1243, NULL != mEvtSeqList[mOrderEvtNo]);
                 if ((this->*mEvtSeqList[mOrderEvtNo])(staffID)) {
                     evtmgr.cutEnd(staffID);
                     var_r25 = 1;
@@ -721,7 +721,7 @@ bool daNpcPray_c::demo(void*) {
         }
         break;
     case 3:
-        JUT_ASSERT(1280, 0);
+        JUT_ASSERT(1280, FALSE);
         break;
     }
 
@@ -777,7 +777,7 @@ BOOL daNpcPray_c::_Evt_GetHeart_CutInit(const int& i_cutId) {
         break;
     }
     default:
-        JUT_ASSERT(1396, 0);
+        JUT_ASSERT(1396, FALSE);
         break;
     }
 
@@ -830,7 +830,7 @@ BOOL daNpcPray_c::_Evt_GetHeart_CutMain(int const& i_cutId) {
         break;
     }
     default:
-        JUT_ASSERT(1474, 0);
+        JUT_ASSERT(1474, FALSE);
         var_r28 = 1;
         break;
     }

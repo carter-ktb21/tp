@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_dr.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -12,7 +14,55 @@
 #include "d/actor/d_a_npc.h"
 #include "d/d_camera.h"
 #include "c/c_damagereaction.h"
+#include "f_op/f_op_camera_mng.h"
 #include "Z2AudioLib/Z2Instances.h"
+
+
+class daB_DR_HIO_c : public JORReflexible {
+public:
+    /* 805BAE6C */ daB_DR_HIO_c();
+    /* 805C6B94 */ virtual ~daB_DR_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 fall_accel;
+    /* 0x10 */ f32 fall_accel_max;
+    /* 0x14 */ f32 wind_large_attack_lockon_range;
+    /* 0x18 */ f32 unk_0x18;
+    /* 0x1C */ f32 wind_small_attack_power;
+    /* 0x20 */ f32 wind_attack_power;
+    /* 0x24 */ f32 glide_wind_power;
+    /* 0x28 */ f32 breath_attack_threshold;
+    /* 0x2C */ f32 unk_0x2c;
+    /* 0x30 */ f32 breath_move_speed_max;
+    /* 0x34 */ f32 breath_move_speed_min;
+    /* 0x38 */ s16 tail_hit_chance_time;
+    /* 0x3A */ s16 center_wind_time;
+    /* 0x3C */ s16 breath_continue_time;
+    /* 0x3E */ s16 breath_continue_no_armor_time;
+    /* 0x40 */ s16 breath_feint1_time;
+    /* 0x42 */ s16 breath_feint2_time;
+    /* 0x44 */ s16 breath_feint3_time;
+    /* 0x46 */ s16 no_attack_time;
+    /* 0x48 */ s16 unk_0x48;
+    /* 0x4A */ s16 no_attack_no_armor_time;
+    /* 0x4C */ s16 unk_0x4c;
+    /* 0x4E */ s16 back_hit_chance_time;
+    /* 0x50 */ s16 after_breath_chance_time;
+    /* 0x52 */ s16 neck_search_speed;
+    /* 0x54 */ s16 neck_search2_speed;
+    /* 0x56 */ s16 neck_search_speed_max;
+    /* 0x58 */ s16 body_search_speed;
+    /* 0x5A */ s16 body_search2_speed;
+    /* 0x5C */ s16 body_search_speed_max;
+    /* 0x5E */ s16 body_search_feint_speed_max;
+    /* 0x60 */ s16 feint_angle;
+    /* 0x62 */ s16 unk_0x62;
+    /* 0x64 */ u8 display_range;
+    /* 0x65 */ u8 breath_feint2_OFF;
+};
 
 #define ANM_DR_BOOT_A 0x10
 #define ANM_DR_BOOT_A_DEMO 0x11
@@ -85,8 +135,6 @@ enum daB_DR_Action {
     ACTION_MIDDLE_DEMO,
     ACTION_DEAD,
 };
-
-UNK_REL_DATA
 
 namespace {
 /* 805C7268-805C72AC 000020 0044+00 0/1 0/0 0/0 .data cc_dr_week_src__22@unnamed@d_a_b_dr_cpp@ */
@@ -244,8 +292,6 @@ daB_DR_HIO_c::daB_DR_HIO_c() {
     display_range = false;
     breath_feint2_OFF = true;
 }
-
-UNK_REL_BSS
 
 /* 805C78FD 0003+00 l_initHIO None */
 static u8 l_initHIO;
@@ -496,13 +542,13 @@ void daB_DR_c::mStatusONOFF(int i_status) {
     switch (i_status) {
     case 0:
         attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-        attention_info.flags &= ~4;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
         fopAcM_OffStatus(this, 0);
         fopAcM_OffStatus(this, 0x200000);
         return;
     case 1:
         attention_info.distances[fopAc_attn_BATTLE_e] = 85;
-        attention_info.flags |= 4;
+        attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
         fopAcM_OnStatus(this, 0);
         fopAcM_OnStatus(this, 0x200000);
         return;
@@ -510,7 +556,7 @@ void daB_DR_c::mStatusONOFF(int i_status) {
         attention_info.distances[fopAc_attn_BATTLE_e] = 60;
         fopAcM_OnStatus(this, 0);
         fopAcM_OffStatus(this, 0x200000);
-        attention_info.flags |= 4;
+        attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
         return;
     }    
 }
@@ -879,6 +925,10 @@ void daB_DR_c::mHabatakiAnmSet(int param_0) {
     }
 }
 
+static u8 dummy(u8 param_0) {
+    return cLib_calcTimer<u8>(&param_0);
+}
+
 /* 805BC57C-805BC8B4 0017FC 0338+00 3/2 0/0 0/0 .text            mGlider_AniSet__8daB_DR_cFb */
 void daB_DR_c::mGlider_AniSet(bool param_0) {
     if (param_0 && mTimer[0] != 0 && mAnm == ANM_DR_FLY) {
@@ -962,7 +1012,7 @@ void daB_DR_c::tail_hit_check() {
     if (health > 0) {
         daPy_getPlayerActorClass()->onBossRoomWait();
 
-        if (fopAcM_checkStatus(this, 0x200000) && cLib_calcTimer<u8>(&field_0x7d0) == 0 && mActionMode != ACTION_TAIL_HIT && field_0x7d1 != 2) {
+        if (fopAcM_CheckStatus(this, 0x200000) && cLib_calcTimer<u8>(&field_0x7d0) == 0 && mActionMode != ACTION_TAIL_HIT && field_0x7d1 != 2) {
             if (mTailCc.ChkTgHit()) {
                 speedF = 0.0f;
                 dComIfGs_onZoneSwitch(21, fopAcM_GetRoomNo(this));
@@ -979,7 +1029,7 @@ void daB_DR_c::week_hit_check() {
     if (mWeekCc.ChkTgSet()) {
         daPy_getPlayerActorClass()->onBossRoomWait();
 
-        if (health > 0 && fopAcM_checkStatus(this, 0x200000) && cLib_calcTimer<u8>(&field_0x7d0) == 0 && mActionMode != ACTION_WEEK_HIT && field_0x7d1 == 2) {
+        if (health > 0 && fopAcM_CheckStatus(this, 0x200000) && cLib_calcTimer<u8>(&field_0x7d0) == 0 && mActionMode != ACTION_WEEK_HIT && field_0x7d1 == 2) {
             if (mWeekCc.ChkTgHit() && mWeekCc.GetTgHitObj()->ChkAtType(AT_TYPE_HOOKSHOT)) {
                 speedF = 0.0f;
                 Z2GetAudioMgr()->changeBgmStatus(2);
@@ -1065,7 +1115,7 @@ bool daB_DR_c::flapMove(bool param_0) {
         }
     }
 
-    if (-1000000000.0f == mAcch.GetGroundH()) {
+    if (-G_CM3D_F_INF == mAcch.GetGroundH()) {
         target_y += home.pos.y;
     } else {
         target_y += mAcch.GetGroundH();
@@ -1145,7 +1195,7 @@ bool daB_DR_c::mPlayerHighCheck() {
     gndchk.SetPos(&chk_pos);
     field_0x734 = dComIfG_Bgsp().GroundCross(&gndchk);
 
-    if (-1000000000.0f == field_0x734 || field_0x734 < 0.0f) {
+    if (-G_CM3D_F_INF == field_0x734 || field_0x734 < 0.0f) {
         field_0x734 = home.pos.y;
     }
 
@@ -1167,7 +1217,7 @@ bool daB_DR_c::mBgFallGroundCheck() {
     chkpos.y += 300.0f;
     gndchk.SetPos(&chkpos);
     chkpos.y = dComIfG_Bgsp().GroundCross(&gndchk);
-    if (-1000000000.0f == chkpos.y) {
+    if (-G_CM3D_F_INF == chkpos.y) {
         chkpos.y = home.pos.y;
     }
     if (chkpos.y < home.pos.y) {
@@ -1939,6 +1989,7 @@ void daB_DR_c::executeWeekHit() {
         break;
     case 1000:
         if (cLib_calcTimer<int>(&mTimer[0]) == 0) {
+            /* City in the Sky - City in the Sky clear */
             dComIfGs_onEventBit(dSv_event_flag_c::F_0268);
             dComIfGs_onStageBossEnemy(0x16);
             fopAcM_onSwitch(this, 0x38);
@@ -2319,18 +2370,18 @@ void daB_DR_c::executeBreathAttack() {
             mTimer[3] = 1000;
         }
 
-        attention_info.flags |= 4;
+        attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
 
         if (cLib_calcTimer<int>(&mTimer[3]) != 0 && mTargetHeight - 300.0f < player->current.pos.y) {
             if (abs((s16)(fopAcM_searchPlayerAngleY(this) - shape_angle.y)) < ZREG_S(0) + 0x5000) {
                 mWeekCc.OffTgSetBit();
-                attention_info.flags &= ~0x4;
+                attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
             } else {
                 mWeekCc.OnTgSetBit();
                 if (mTarget != 0 || (dComIfGp_getAttention()->GetLockonList(0) != NULL && dComIfGp_getAttention()->LockonTruth() && dComIfGp_getAttention()->GetLockonList(0)->getActor() == this)) {
                     mTarget = 0;
                 } else {
-                    attention_info.flags &= ~0x4;
+                    attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
                     mTarget = 0;
                 }
             }
@@ -2677,7 +2728,7 @@ void daB_DR_c::executeGliderAttack() {
                 field_0x7dc = 1;
             }
 
-            if (-1000000000.0f != mAcch.GetGroundH()) {
+            if (-G_CM3D_F_INF != mAcch.GetGroundH()) {
                 if (mAnm == ANM_DR_WIND_ATTACKB) {
                     mCount[1]++;
                     if (mCount[1] > WREG_S(9)) {
@@ -2747,7 +2798,7 @@ void daB_DR_c::executeGliderAttack() {
         if (mGliderMoveSub(field_0x748) != 0) {
             mStatusONOFF(0);
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags &= ~0x4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
             fopAcM_OffStatus(this, 0);
 
             mCount[2] = 0;
@@ -2894,7 +2945,7 @@ void daB_DR_c::executePillarSearch() {
         cLib_addCalcAngleS2(&current.angle.x, sp30.atan2sY_XZ(), 20, NREG_S(3) + 0x400);
         cLib_addCalcAngleS2(&shape_angle.x, current.angle.x, NREG_S(2) + 20, NREG_S(3) + 0x400);
 
-        if (mPlayerHighCheck() && -1000000000.0f != mAcch.GetGroundH()) {
+        if (mPlayerHighCheck() && -G_CM3D_F_INF != mAcch.GetGroundH()) {
             setActionMode(ACTION_BREATH_ATTACK, 0);
         }
     }
@@ -3520,7 +3571,7 @@ void daB_DR_c::action() {
         if (abs(temp_r28) < 0x2000) {
             field_0x74e = temp_r28;
         }
-        if (mAnm == ANM_DR_WIND_ATTACKATOB || mAnm == ANM_DR_WIND_ATTACKB || -1000000000.0f != mAcch.GetGroundH() || mCount[3] == 0) {
+        if (mAnm == ANM_DR_WIND_ATTACKATOB || mAnm == ANM_DR_WIND_ATTACKB || -G_CM3D_F_INF != mAcch.GetGroundH() || mCount[3] == 0) {
             field_0x74e = 0;
         }
     }
@@ -3581,7 +3632,7 @@ void daB_DR_c::mtx_set() {
         sp28.SetPos(&sp1C);
         
         f32 var_f31 = dComIfG_Bgsp().GroundCross(&sp28);
-        if (-1000000000.0f == var_f31 || var_f31 < 5250.0f + JREG_F(4)) {
+        if (-G_CM3D_F_INF == var_f31 || var_f31 < 5250.0f + JREG_F(4)) {
             var_f31 = 5250.0f + JREG_F(4);
         }
         field_0x7a8.y = var_f31;
@@ -3597,7 +3648,7 @@ void daB_DR_c::mtx_set() {
         }
     }
 
-    if (mAnm == ANM_DR_WIND_ATTACKB && -1000000000.0f != mAcch.GetGroundH()) {
+    if (mAnm == ANM_DR_WIND_ATTACKB && -G_CM3D_F_INF != mAcch.GetGroundH()) {
         cXyz sp10 = current.pos - home.pos;
         if (sp10.abs() > 3000.0f || current.pos.y > 370.0f) {
             if (field_0x7d8 == 0) {
@@ -3695,7 +3746,7 @@ void daB_DR_c::cc_set() {
             mSound2.startCreatureSoundLevel(Z2SE_EN_DR_WIND_ATTACK, 0, -1);
         }
 
-        if (mAnm == ANM_DR_WIND_ATTACKB && -1000000000.0f != mAcch.GetGroundH() && mCount[1] > WREG_S(9)) {
+        if (mAnm == ANM_DR_WIND_ATTACKB && -G_CM3D_F_INF != mAcch.GetGroundH() && mCount[1] > WREG_S(9)) {
             var_r27 = 1;
         }
 
@@ -3826,7 +3877,7 @@ void daB_DR_c::demo_skip(int) {
         camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
         dStage_changeScene(1, 0.0f, 0, fopAcM_GetRoomNo(this), 0, -1);
         Z2GetAudioMgr()->subBgmStop();
-        dKy_getEnvlight()->field_0x12cc = 1;
+        dKy_getEnvlight()->wether = 1;
 
         cDmr_SkipInfo = 1;
         dComIfGs_onZoneSwitch(0, fopAcM_GetRoomNo(this));
@@ -3876,7 +3927,7 @@ int daB_DR_c::execute() {
     if (arg0 == 0xFF) {
         if (parentActorID != 0 && health > 1 && cLib_calcTimer<int>(&mTimer[0]) == 0) {
             fopAc_ac_c* parent;
-            if (fopAcM_SearchByID(parentActorID, &parent) != 0 && parent != NULL && parent->subtype != 1) {
+            if (fopAcM_SearchByID(parentActorID, &parent) != 0 && parent != NULL && parent->argument != 1) {
                 if (dComIfGs_isZoneSwitch(20, fopAcM_GetRoomNo(this))) {
                     dComIfGp_getEvent().setSkipProc(this, DemoSkipCallBack, 0);
                 }
@@ -3914,7 +3965,7 @@ int daB_DR_c::execute() {
                 current.angle = parent->current.angle;
                 shape_angle = parent->shape_angle;
 
-                if (parent->subtype == 1 && field_0x7e0 < 54) {
+                if (parent->argument == 1 && field_0x7e0 < 54) {
                     if (mAnm != ANM_DR_BURU) {
                         setBck(ANM_DR_BURU, 0, 0.0f, 1.0f);
                         mpModelMorf->setStartFrame(111.0f);
@@ -4004,7 +4055,7 @@ int daB_DR_c::CreateHeap() {
     if (arg0 == 0x14 || arg0 == 0x15) {
         static int mPartDt[] = {74, 74, 75, 76, 77, 78};
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_DR", mPartDt[mPartNo]);
-        JUT_ASSERT(6312, modelData != 0);
+        JUT_ASSERT(6312, modelData != NULL);
 
         mpPartModel = mDoExt_J3DModel__create(modelData, 0, 0x11020203);
         if (mpPartModel == NULL) {
@@ -4015,7 +4066,7 @@ int daB_DR_c::CreateHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_DR", 0x49);
-    JUT_ASSERT(6324, modelData != 0);
+    JUT_ASSERT(6324, modelData != NULL);
     
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_DR", 0x2F), 2, 1.0f, 0, -1, &mSound, 0, 0x11000084);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -4033,7 +4084,7 @@ int daB_DR_c::CreateHeap() {
     }
 
     this->model = mpModelMorf->getModel();
-    this->model->setUserArea((u32)this);
+    this->model->setUserArea((uintptr_t)this);
 
     for (u16 i = 0; i < this->model->getModelData()->getJointNum(); i++) {
         if (i != 0) {
@@ -4051,7 +4102,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 805C5974-805C62B0 00ABF4 093C+00 1/1 0/0 0/0 .text            create__8daB_DR_cFv */
 int daB_DR_c::create() {
-    fopAcM_SetupActor(this, daB_DR_c);
+    fopAcM_ct(this, daB_DR_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "B_DR");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -4077,7 +4128,7 @@ int daB_DR_c::create() {
             OS_REPORT("パーツ %d\n", mPartNo);
         case 10:
             attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-            attention_info.flags &= ~0x4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetGroup(this, 0);
             fopAcM_OffStatus(this, 0);
@@ -4131,7 +4182,7 @@ int daB_DR_c::create() {
                 }
 
                 dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-                kankyo->field_0x12cc = 0;
+                kankyo->wether = 0;
                 return cPhs_ERROR_e;
             }
 
@@ -4173,7 +4224,7 @@ int daB_DR_c::create() {
             shape_angle.y = current.angle.y;
 
             attention_info.distances[fopAc_attn_BATTLE_e] = 85;
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetMtx(this, mpModelMorf->getModel()->getBaseTRMtx());
             fopAcM_SetMin(this, -20000.0f, -20000.0f, -20000.0f);
@@ -4235,7 +4286,7 @@ int daB_DR_c::create() {
             setActionMode(ACTION_GLIDER_ATTACK, 0);
 
             mTargetHeight = 1500.0f + mAcch.GetGroundH();
-            if (-1000000000.0f == mAcch.GetGroundH()) {
+            if (-G_CM3D_F_INF == mAcch.GetGroundH()) {
                 mTargetHeight = 1500.0f + current.pos.y;
             }
             if (dComIfGs_isZoneSwitch(1, fopAcM_GetRoomNo(this))) {
@@ -4256,7 +4307,7 @@ int daB_DR_c::create() {
                 setActionMode(ACTION_FLY_WAIT, 0);
                 
                 dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-                kankyo->field_0x12cc = 2;
+                kankyo->wether = 2;
             }
 
             if (arg0 == 0) {
@@ -4274,7 +4325,7 @@ int daB_DR_c::create() {
                     }
     
                     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-                    kankyo->field_0x12cc = 0;
+                    kankyo->wether = 0;
                 }
 
                 if (cDmr_SkipInfo != 0 || dComIfGs_isZoneSwitch(0, fopAcM_GetRoomNo(this)) ) {

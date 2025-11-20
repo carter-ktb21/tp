@@ -2,6 +2,8 @@
 // d_a_door_dbdoor00
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_dbdoor00.h"
 #include "printf.h"
 #include "SSystem/SComponent/c_math.h"
@@ -52,24 +54,6 @@ char* daDbDoor00_c::getBmdArcName() {
     return "DbDoor0";
 }
 
-/* 8045E664-8045E670 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 8045E670-8045E684 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 8045E684-8045E688 -00001 0004+00 1/1 0/0 0/0 .data            l_bmd_base_name */
 static char* l_bmd_base_name = "door-pushDouble_";
 
@@ -117,7 +101,7 @@ int daDbDoor00_c::CreateHeap() {
     J3DJoint* nodePointerR = modelData->getJointNodePointer(field_0x5c1);
     nodePointerL->setCallBack(nodeCallBack);
     nodePointerR->setCallBack(nodeCallBack);
-    mpModel2->setUserArea((u32)this);
+    mpModel2->setUserArea((uintptr_t)this);
 
     mpBgW = new dBgW();
     cBgD_t* dzb = (cBgD_t*)dComIfG_getObjectRes(getAlwaysArcName(), getDzb());
@@ -173,7 +157,7 @@ int daDbDoor00_c::CreateInit() {
     field_0x594 = 0x1e;
     attention_info.position.y += 250.0f;
     eyePos.y += 250.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     mpBgW->Move();
     return 1;
@@ -181,7 +165,7 @@ int daDbDoor00_c::CreateInit() {
 
 /* 8045D9A8-8045DA68 0006A8 00C0+00 1/1 0/0 0/0 .text            create__12daDbDoor00_cFv */
 int daDbDoor00_c::create() {
-    fopAcM_SetupActor(this, daDbDoor00_c);
+    fopAcM_ct(this, daDbDoor00_c);
 
     int phase = dComIfG_resLoad(&mPhaseReq2, getAlwaysArcName());
     if (phase != cPhs_COMPLEATE_e) {
@@ -204,7 +188,7 @@ int daDbDoor00_c::getDemoAction() {
         "WAIT",      "SET_START", "SET_ANGLE", "END",        "OPEN",
         "STOP_OPEN", "SET_GOAL",  "SET_GOAL2", "ADJUSTMENT",
     };
-    return dComIfGp_evmng_getMyActIdx(field_0x598, action_table, ARRAY_SIZE(action_table), 0, 0);
+    return dComIfGp_evmng_getMyActIdx(field_0x598, action_table, ARRAY_SIZEU(action_table), 0, 0);
 }
 
 /* 8045DAB0-8045DE44 0007B0 0394+00 5/4 0/0 0/0 .text            demoProc__12daDbDoor00_cFv */

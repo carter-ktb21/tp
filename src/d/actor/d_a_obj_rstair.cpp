@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_rstair.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
@@ -74,8 +76,6 @@ int daObjRotStair_c::Create() {
     return 1;
 }
 
-UNK_REL_DATA
-
 /* 80CC275C-80CC2760 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "K_spkai00";
 
@@ -87,20 +87,20 @@ static Vec l_water_check_offset = {
 /* 80CC17F0-80CC19E0 000310 01F0+00 1/0 0/0 0/0 .text            CreateHeap__15daObjRotStair_cFv */
 int daObjRotStair_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(215, modelData != 0);
+    JUT_ASSERT(215, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mModel == NULL) {
         return 0;
     }
     for (int i = 0; i < 2; i++) {
         modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_wtr_bmd[i]);
-        JUT_ASSERT(232, modelData != 0);
+        JUT_ASSERT(232, modelData != NULL);
         mWaterModels[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x19000284);
         if (mWaterModels[i] == NULL) {
             return 0;
         }
         J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, l_wtr_btk[i]);
-        JUT_ASSERT(245, pbtk != 0);
+        JUT_ASSERT(245, pbtk != NULL);
         mBtks[i] = new mDoExt_btkAnm();
         if (mBtks[i] == NULL || mBtks[i]->init(modelData, pbtk, 1, 2, 1.0f, 0, -1) == 0) {
             return 0;
@@ -346,7 +346,9 @@ int daObjRotStair_c::Draw() {
                 Mtx lightMtx;
                 C_MTXLightPerspective(lightMtx, dComIfGd_getView()->fovy,
                                       dComIfGd_getView()->aspect, 1.0f, 1.0f, -0.01f, 0);
+                #if WIDESCREEN_SUPPORT
                 mDoGph_gInf_c::setWideZoomLightProjection(lightMtx);
+                #endif
                 texMtxInfo->setEffectMtx(lightMtx);
                 modelData->simpleCalcMaterial(0, (MtxP)j3dDefaultMtx);
             }
@@ -369,7 +371,7 @@ int daObjRotStair_c::Delete() {
 /* 80CC262C-80CC268C 00114C 0060+00 1/0 0/0 0/0 .text daObjRotStair_create1st__FP15daObjRotStair_c
  */
 static int daObjRotStair_create1st(daObjRotStair_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjRotStair_c);
+    fopAcM_ct(i_this, daObjRotStair_c);
     return i_this->create1st();
 }
 

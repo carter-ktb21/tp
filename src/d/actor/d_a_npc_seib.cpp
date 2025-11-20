@@ -1,11 +1,11 @@
 /**
- * @file d_a_npc_seib.cpp
+* @file d_a_npc_seib.cpp
  *
  */
 
-#include "d/actor/d_a_npc_seib.h"
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
-UNK_REL_DATA
+#include "d/actor/d_a_npc_seib.h"
 
 /* 80AC7118-80AC7120 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[2][1] = {12, 1};
@@ -114,7 +114,7 @@ daNpc_seiB_Param_c::Data const daNpc_seiB_Param_c::m = {
 
 /* 80AC5188-80AC53C8 000188 0240+00 1/1 0/0 0/0 .text            create__12daNpc_seiB_cFv */
 int daNpc_seiB_c::create() {
-    fopAcM_SetupActor2(this, daNpc_seiB_c, &l_faceMotionAnmData, l_motionAnmData,
+    daNpcT_ct(this, daNpc_seiB_c, &l_faceMotionAnmData, l_motionAnmData,
                        l_faceMotionSequenceData, 4, l_motionSequenceData, 4, l_evtList,
                        l_resNameList);
 
@@ -160,7 +160,7 @@ int daNpc_seiB_c::create() {
 int daNpc_seiB_c::CreateHeap() {
     J3DModelData* mdlData_p =
         (J3DModelData*)dComIfG_getObjectRes(l_resNameList[l_bmdData[0][1]], l_bmdData[0][0]);
-    JUT_ASSERT(466, 0 != mdlData_p);
+    JUT_ASSERT(466, NULL != mdlData_p);
 
     mpMorf[0] =
         new mDoExt_McaMorfSO(mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mSound, 0, 0x11020284);
@@ -173,7 +173,7 @@ int daNpc_seiB_c::CreateHeap() {
         return 0;
     }
 
-    mpMorf[0]->getModel()->setUserArea((u32)this);
+    mpMorf[0]->getModel()->setUserArea((uintptr_t)this);
     if (setFaceMotionAnm(0, false) && setMotionAnm(0, 0.0f, FALSE)) {
         return 1;
     }
@@ -201,7 +201,7 @@ int daNpc_seiB_c::Draw() {
         mdlData_p->getMaterialNodePointer(getEyeballMaterialNo())->setMaterialAnm(mpMatAnm[0]);
     }
 
-    return draw(FALSE, TRUE, field_0xde8, NULL, 100.0f, FALSE, FALSE, FALSE);
+    return draw(FALSE, TRUE, mRealShadowSize, NULL, 100.0f, FALSE, FALSE, FALSE);
 }
 
 /* 80AC5608-80AC5628 000608 0020+00 1/1 0/0 0/0 .text
@@ -269,9 +269,9 @@ void daNpc_seiB_c::setParam() {
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(mpParam->m.mWallH);
 
-    field_0xde8 = mpParam->m.field_0xc;
+    mRealShadowSize = mpParam->m.field_0xc;
     gravity = mpParam->m.mGravity;
-    field_0xa80 = mpParam->m.field_0x6c;
+    mExpressionMorfFrame = mpParam->m.field_0x6c;
     mMorfFrames = mpParam->m.mMorfFrames;
 }
 
@@ -499,7 +499,7 @@ void daNpc_seiB_c::ctrlWaitAnm() {
         return;
     }
 
-    JUT_ASSERT(1068, 0);
+    JUT_ASSERT(1068, FALSE);
 }
 
 /* 80AC6140-80AC616C 001140 002C+00 1/0 0/0 0/0 .text            wait__12daNpc_seiB_cFPv */

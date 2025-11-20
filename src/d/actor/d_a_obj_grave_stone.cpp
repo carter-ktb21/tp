@@ -3,6 +3,8 @@
  * Object - Zora Gravestone
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_grave_stone.h"
 #include "d/d_procname.h"
 #include "d/d_com_inf_game.h"
@@ -165,7 +167,7 @@ int daGraveStone_c::CreateHeap() {
 
 /* 80C12D1C-80C12EF0 00079C 01D4+00 1/1 0/0 0/0 .text            create__14daGraveStone_cFv */
 cPhs__Step daGraveStone_c::create() {
-    fopAcM_SetupActor(this, daGraveStone_c);
+    fopAcM_ct(this, daGraveStone_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, l_arcName);
     if (step == cPhs_COMPLEATE_e) {
         int dzb_id = dComIfG_getObjctResName2Index(l_arcName, "H_Haka.dzb");

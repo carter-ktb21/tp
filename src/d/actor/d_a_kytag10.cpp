@@ -3,11 +3,14 @@
  * Sparks Particle Emitter on a Path
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag10.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80528BF8-80528D0C 000078 0114+00 1/1 0/0 0/0 .text            get_rail_ratio_pos__FP5dPathifPsPs
  */
@@ -153,7 +156,7 @@ static int daKytag10_IsDelete(kytag10_class* i_this) {
 /* 8052917C-80529248 0005FC 00CC+00 1/0 0/0 0/0 .text            daKytag10_Delete__FP13kytag10_class
  */
 static int daKytag10_Delete(kytag10_class* i_this) {
-    g_env_light.field_0xf21 = 0;
+    g_env_light.mOdourData.field_0xf21 = 0;
 
     if (i_this->mpEmitter1 != NULL) {
         i_this->mpEmitter1->deleteAllParticle();
@@ -177,7 +180,7 @@ static int daKytag10_Delete(kytag10_class* i_this) {
 /* 80529248-805293F8 0006C8 01B0+00 1/0 0/0 0/0 .text            daKytag10_Create__FP10fopAc_ac_c */
 static int daKytag10_Create(fopAc_ac_c* i_this) {
     kytag10_class* a_this = (kytag10_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag10_class);
+    fopAcM_ct(i_this, kytag10_class);
 
     u8 prm0 = fopAcM_GetParam(i_this);
     if (prm0 == 0xFF) {

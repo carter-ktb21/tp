@@ -1,7 +1,10 @@
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_allmato.h"
 #include "d/actor/d_a_obj_itamato.h"
 #include "d/actor/d_a_obj_boumato.h"
 #include "d/actor/d_a_arrow.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 804897BC-804897FC -00001 0040+00 2/2 0/0 0/0 .data            l_evtList */
 static daNpcT_evtData_c l_evtList[8] = {
@@ -34,7 +37,7 @@ static char* l_resNameList[3] = {
 /* 80487538-80487670 000078 0138+00 1/1 0/0 0/0 .text            create__15daTag_AllMato_cFv */
 int daTag_AllMato_c::create() {
     int var_r29 = 0;
-    fopAcM_SetupActor(this, daTag_AllMato_c);
+    fopAcM_ct(this, daTag_AllMato_c);
 
     scale.x *= 100.0f;
     scale.y *= 100.0f;
@@ -64,7 +67,6 @@ int daTag_AllMato_c::Delete() {
 }
 
 /* 804876B8-80487C5C 0001F8 05A4+00 1/1 0/0 0/0 .text            Execute__15daTag_AllMato_cFv */
-// NONMATCHING - issues with dComIfGp_getEventManager
 int daTag_AllMato_c::Execute() {
     camera_class* camera_p = NULL;
 
@@ -76,7 +78,14 @@ int daTag_AllMato_c::Execute() {
             return 1;
         }
 
-        if (dComIfGp_event_runCheck()) {
+#if VERSION != VERSION_SHIELD_DEBUG
+        // TODO: gameInfo fake match to force reuse of pointer
+        dComIfG_play_c* play = &g_dComIfG_gameInfo.play;
+        if (play->getEvent().runCheck())
+#else
+        if (dComIfGp_event_runCheck())
+#endif
+        {
             if (!eventInfo.checkCommandTalk()) {
                 if (eventInfo.checkCommandDemoAccrpt() && dComIfGp_getEventManager().endCheck(mEventIdx)) {
                     u16 evt_action = EVT_NONE;
@@ -85,7 +94,7 @@ int daTag_AllMato_c::Execute() {
                     case 1:
                     case 2:
                         actor_p = mBrkMatoActorMngr.getActorP();
-                        JUT_ASSERT(164, 0 != actor_p);
+                        JUT_ASSERT(164, NULL != actor_p);
 
                         if (((daObj_BouMato_c*)actor_p)->getTgHitAcId() != fpcM_ERROR_PROCESS_ID_e) {
                             if (daNpcT_chkEvtBit(76)) {
@@ -116,7 +125,11 @@ int daTag_AllMato_c::Execute() {
                         }
 
                         dCam_getBody()->CorrectCenter();
+#if VERSION != VERSION_SHIELD_DEBUG
+                        play->getEvent().reset();
+#else
                         dComIfGp_event_reset();
+#endif
                         mEventIdx = -1;
                     }
                 } else {
@@ -135,7 +148,7 @@ int daTag_AllMato_c::Execute() {
 
                         if (dComIfGp_getEventManager().getIsAddvance(staff_id)) {
                             actor_p = mBrkMatoActorMngr.getActorP();
-                            JUT_ASSERT(218, 0 != actor_p);
+                            JUT_ASSERT(218, NULL != actor_p);
 
                             dComIfGp_getEvent().setPt2(mBrkMatoActorMngr.getActorP());
 
@@ -145,7 +158,7 @@ int daTag_AllMato_c::Execute() {
                                 case 2:
                                     camera_id = dComIfGp_getPlayerCameraID(0);
                                     camera_p = dComIfGp_getCamera(camera_id);
-                                    JUT_ASSERT(228, 0 != camera_p);
+                                    JUT_ASSERT(228, NULL != camera_p);
 
                                     dComIfGp_saveCameraPosition(0,
                                         fopCamM_GetCenter_p(camera_p),
@@ -194,7 +207,7 @@ int daTag_AllMato_c::Execute() {
                     break;
                 case 3:
                     actor_p = mBrkMatoActorMngr.getActorP();
-                    JUT_ASSERT(292, 0 != actor_p);
+                    JUT_ASSERT(292, NULL != actor_p);
     
                     if (field_0x1d10 == 0) {
                         switch (((daObj_ItaMato_c*)actor_p)->getNo()) { 
@@ -216,7 +229,7 @@ int daTag_AllMato_c::Execute() {
                     switch (field_0x1d08) {
                     case 4:
                         actor_p = mBrkMatoActorMngr.getActorP();
-                        JUT_ASSERT(320, 0 != actor_p)
+                        JUT_ASSERT(320, NULL != actor_p)
 
                         switch (((daObj_ItaMato_c*)actor_p)->getNo()) {
                         case 1:

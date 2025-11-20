@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_go.h"
 #include "SSystem/SComponent/c_math.h"
 #include "f_op/f_op_actor_mng.h"
@@ -236,7 +238,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80603A54-80603CA0 000994 024C+00 1/0 0/0 0/0 .text            daB_GO_Create__FP10fopAc_ac_c */
 static int daB_GO_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, b_go_class);
+    fopAcM_ct(i_this, b_go_class);
     b_go_class* a_this = (b_go_class*)i_this;
 
     OS_REPORT("B_GO//////////////B_GO SET 0 !!\n");
@@ -259,7 +261,7 @@ static int daB_GO_Create(fopAc_ac_c* i_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(a_this, a_this->mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -500.0f, -2000.0f, -500.0f);
         fopAcM_SetMax(a_this, 500.0f, 2000.0f, 500.0f);

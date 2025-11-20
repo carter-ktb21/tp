@@ -135,8 +135,17 @@ public:
         m_demoMode = 1;
     }
 
-    /* 807E27F8 */ void onDemoJumpDistance(f32, f32);
-    /* 807E28B8 */ void changeDemoPos0(cXyz const*);
+    /* 807E27F8 */ void onDemoJumpDistance(f32 param_1, f32 param_2) {
+        field_0x1768 = param_1;
+        field_0x176c = param_2;
+        field_0x1770 = param_1;
+
+    }
+
+    /* 807E28B8 */ void changeDemoPos0(cXyz const* pos) {
+        m_demoPos0 = *pos;
+    }
+
     /* 80838498 */ void coHitCallbackBoarJump(fopAc_ac_c*);
     /* 80838798 */ void coHitCallbackBoarHit(fopAc_ac_c*, dCcD_GObjInf*);
     /* 80838904 */ void coHitCallbackCowHit(fopAc_ac_c*);
@@ -195,7 +204,7 @@ public:
     /* 80841084 */ void setBoarHit(fopAc_ac_c*, int);
     /* 8084116C */ void savePos();
     /* 808411D0 */ int callHorseSubstance(cXyz const*);
-    /* 80841468 */ int setHorsePosAndAngleSubstance(cXyz const*, s16);
+    /* 80841468 */ void setHorsePosAndAngleSubstance(cXyz const*, s16);
     /* 808415B4 */ BOOL checkPlayerHeavy();
     /* 80841628 */ void setTgCoGrp(u32, u32);
     /* 80841698 */ void onRideFlgSubstance();
@@ -221,11 +230,11 @@ public:
     /* 80844590 */ int draw();
     /* 8084478C */ ~daHorse_c();
     
-    /* 80182D04 */ bool getLashDashStart() const { return checkResetStateFlg0(RFLG0_LASH_DASH_START); }
+    /* 80182D04 */ u32 getLashDashStart() const { return checkResetStateFlg0(RFLG0_LASH_DASH_START); }
     
 
     bool checkNoBombProc() const { return m_procID == PROC_WAIT_e || m_procID == PROC_MOVE_e; }
-    bool checkResetStateFlg0(daHorse_RFLG0 flag) const { return m_resetStateFlg0 & flag; }
+    BOOL checkResetStateFlg0(daHorse_RFLG0 flag) const { return m_resetStateFlg0 & flag; }
     bool checkEndResetStateFlg0(daHorse_ERFLG0 flag) const { return m_endResetStateFlg0 & flag; }
     u32 checkStateFlg0(daHorse_FLG0 flag) const { return m_stateFlg0 & flag; }
     f32 getNormalMaxSpeedF() { return m_normalMaxSpeedF; }
@@ -257,8 +266,8 @@ public:
     daHoZelda_c* getZeldaActor() { return (daHoZelda_c*)m_zeldaActorKeep.getActor(); }
     void setZeldaActor(fopAc_ac_c* i_actor) { m_zeldaActorKeep.setData(i_actor); }
 
-    bool checkTurnStandCamera() const { return checkResetStateFlg0(RFLG0_TURN_STAND_CAMERA); }
-    bool checkTurnStand() const { return checkResetStateFlg0(RFLG0_TURN_STAND); }
+    u32 checkTurnStandCamera() const { return checkResetStateFlg0(RFLG0_TURN_STAND_CAMERA); }
+    BOOL checkTurnStand() const { return checkResetStateFlg0(RFLG0_TURN_STAND); }
     u32 checkRodeoMode() const { return checkStateFlg0(FLG0_RODEO_MODE); }
     bool checkCutTurnCancel() const { return checkEndResetStateFlg0(ERFLG0_CUT_TURN_CANCEL); }
     bool checkTurnCancelKeep() const { return checkStateFlg0(FLG0_TURN_CANCEL_KEEP); }
@@ -266,11 +275,11 @@ public:
     BOOL checkHorseCallWait() const { return checkStateFlg0(FLG0_NO_DRAW_WAIT); }
     BOOL checkTurn() const { return m_procID == PROC_TURN_e && field_0x1720 == 0; }
     BOOL checkStop() const { return m_procID == PROC_STOP_e; }
-    bool checkJump() const { return m_procID == PROC_JUMP_e; }
+    BOOL checkJump() const { return m_procID == PROC_JUMP_e; }
     bool checkWait() const { return m_procID == PROC_WAIT_e; }
     bool checkLand() const { return m_procID == PROC_LAND_e && field_0x171a == 0; }
     bool checkGetOff() const { return fabsf(speedF) < 3.0f; }
-    bool checkEnemySearch() { return checkResetStateFlg0(RFLG0_ENEMY_SEARCH); }
+    BOOL checkEnemySearch() { return checkResetStateFlg0(RFLG0_ENEMY_SEARCH); }
     bool checkOriginalDemo() const { return field_0x16b8 == 3; }
     bool checkHorseDemoMode() { return field_0x16b8 != 0; }
     s16 checkCowHit() const { return m_cowHit; }
@@ -459,7 +468,7 @@ public:
     /* 0x18BC */ void (daHorse_c::*m_setReinPosHand)(int);
     /* 0x18C8 */ void (daHorse_c::*m_setReinPosNormal)();
     /* 0x18D4 */ int (daHorse_c::*m_callHorse)(const cXyz*);
-    /* 0x18E0 */ int (daHorse_c::*m_setHorsePosAngle)(const cXyz* i_pos, s16 i_angle);
+    /* 0x18E0 */ void (daHorse_c::*m_setHorsePosAngle)(const cXyz* i_pos, s16 i_angle);
     /* 0x18EC */ void (daHorse_c::*m_onRideFlg)();
     /* 0x18F8 */ void (daHorse_c::*m_offRideFlg)();
 };

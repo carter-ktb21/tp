@@ -3,14 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_flag3.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "d/actor/d_a_set_bgobj.h"
 #include "d/d_com_inf_game.h"
-#include "dol2asm.h"
 #include "d/d_a_obj.h"
 
-#ifdef DEBUG
 class daObjFlag3_Hio_c : public JORReflexible {
 public:
     daObjFlag3_Hio_c() {
@@ -48,6 +48,7 @@ public:
     /* 0x8 */ daObjFlag3_Attr_c mAttr;
 };
 
+#if DEBUG
 daObjFlag3_Hio_c M_hio;
 #endif
 
@@ -121,13 +122,22 @@ inline cXyz FlagCloth2_c::calcFlagFactor(cXyz* param_1, cXyz* param_2, cXyz* par
         }
         f32 fVar1;
         if (abs(*pRelPosIdx - param_4) == 1 || abs(*pRelPosIdx - param_4) == 6) {
-            fVar1 = 84.85281;
-        } else {
             fVar1 = 60.0f;
+        } else {
+            fVar1 = 84.85281f;
         }
         calcFlagFactorSub(param_1 + param_4, param_1 + *pRelPosIdx, &flagFactor, fVar1);
     }
     return flagFactor;
+}
+
+inline void FlagCloth2_c::calcFlagFactorSub(cXyz* param_1, cXyz* param_2, cXyz* param_3, f32 param_4) {
+    cXyz acStack_2c = *param_2 - *param_1;
+    param_4 = acStack_2c.abs() - param_4;
+    cXyz cStack_38 = acStack_2c.normZC();
+    param_4 *= mSpringRate;
+    cStack_38 *= param_4;
+    *param_3 += cStack_38;
 }
 
 /* 80BEEF74-80BEF278 000574 0304+00 2/2 0/0 0/0 .text calcFlagNormal__12FlagCloth2_cFP4cXyzi */
@@ -202,7 +212,7 @@ inline void FlagCloth2_c::calcFlagNormal(cXyz* param_1, int param_2) {
     param_1->set(cStack_74);
 }
 
-static void initCcSphereDummy() {
+void FlagCloth2_c::initCcSphere(fopAc_ac_c*) {
     const static dCcD_SrcSph ccSphSrc = {
         {
             {0x0, {{0x0, 0x0, 0x0}, {0x10000, 0x11}, 0x0}},  // mObj
@@ -216,241 +226,8 @@ static void initCcSphereDummy() {
     };
 }
 
-/* 80BEEA78-80BEEC3C 000078 01C4+00 1/1 0/0 0/0 .text            createHeap__12daObjFlag3_cFv */
-int daObjFlag3_c::createHeap() {
-    s8 flagNum = (u8)shape_angle.x;
-    if (mFlagValid) {
-        char acStack_40[16];
-        sprintf(acStack_40, "flag%02d.bti", flagNum);
-        shape_angle.setall(0);
-        current.angle.setall(0);
-        ResTIMG* image = (ResTIMG*)dComIfG_getObjectRes(mFlagName, "flag.bti");
-        JUT_ASSERT(838, image != 0);
-        GXInitTexObj(mFlagCloth.getImageTexObj(), (u8*)image + image->imageOffset, image->width,
-                     image->height, (GXTexFmt)image->format, (GXTexWrapMode)image->wrapS,
-                     (GXTexWrapMode)image->wrapT, image->mipmapCount > 1 ? GX_TRUE : GX_FALSE);
-        if (image->mipmapCount > 1) {
-            GXInitTexObjLOD(mFlagCloth.getImageTexObj(), (GXTexFilter)image->minFilter,
-                            (GXTexFilter)image->magFilter, image->minLOD * 0.125f,
-                            image->maxLOD * 0.125f, image->LODBias * 0.01f, image->biasClamp,
-                            image->doEdgeLOD, (GXAnisotropy)image->maxAnisotropy);
-        }
-    }
-    J3DModelData* modelData_pole = (J3DModelData*)dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), "model0.bmd");
-    JUT_ASSERT(865, modelData_pole != 0);
-    mModel = mDoExt_J3DModel__create(modelData_pole, 0x80000, 0x11000084);
-    return mModel != NULL ? TRUE : FALSE;
-}
-
-/* 80BEEC3C-80BEEC5C 00023C 0020+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
-static int createSolidHeap(fopAc_ac_c* i_this) {
-    return static_cast<daObjFlag3_c*>(i_this)->createHeap();
-}
-
-inline int daObjFlag3_c::draw() {
-    g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
-    dComIfGd_setListBG();
-    g_env_light.setLightTevColorType_MAJI(mModel, &tevStr);
-    mDoExt_modelUpdateDL(mModel);
-    if (mFlagValid) {
-        j3dSys.getDrawBuffer(0)->entryImm(&mFlagCloth, 0);
-    }
-    dComIfGd_setList();
-    return 1;
-}
-
-/* 80BEEC5C-80BEED1C 00025C 00C0+00 1/0 0/0 0/0 .text            daObjFlag3_Draw__FP12daObjFlag3_c
- */
-static int daObjFlag3_Draw(daObjFlag3_c* i_this) {
-    return i_this->draw();
-}
-
-/* 80BEED1C-80BEED3C 00031C 0020+00 1/0 0/0 0/0 .text daObjFlag3_Execute__FP12daObjFlag3_c */
-static int daObjFlag3_Execute(daObjFlag3_c* i_this) {
-    return i_this->execute();
-}
-
-/* 80BEED3C-80BEEDA8 00033C 006C+00 1/1 0/0 0/0 .text            execute__12daObjFlag3_cFv */
-int daObjFlag3_c::execute() {
-    if (!mFlagValid) {
-        return 1;
-    }
-
-    #ifdef DEBUG
-    mFlagCloth.setSpringRate(attr().mSpringCoeeficient);
-    mFlagCloth.setWindRate(attr().mWindCoefficient);
-    mFlagCloth.setDecayRate(attr().mDecayRate);
-    mFlagCloth.setGravity(attr().mGravity);
-    mFlagCloth.setTornado(attr().mTornado);
-    #endif
-
-    mFlagCloth.execute();
-    eyePos = mFlagCloth.getTargetPos();
-    return 1;
-}
-
-inline void FlagCloth2_c::calcFlagNormalBack() {
-    cXyz* pNormal = getNormal();
-    cXyz* pNormalBack = getNormalBack();
-    for (int i = 0; i < 36; pNormal++, pNormalBack++, i++) {
-        pNormalBack->set(-pNormal->x, -pNormal->y, -pNormal->z);
-    }
-}
-
-/* 80BEEDE4-80BEEF74 0003E4 0190+00 1/1 0/0 0/0 .text            execute__12FlagCloth2_cFv */
-void FlagCloth2_c::execute() {
-    cXyz direction;
-    f32 power;
-    dKyw_get_AllWind_vec(mpFlagPosition, &direction, &power);
-    direction.normalizeZP();
-    direction *= power * mWindRate;
-    cXyz* pPos = getPos();
-    cXyz* pNormal = getNormal();
-    cXyz* pNormal2 = pNormal;
-    cXyz* pVec = getVec();
-    cXyz cStack_40;
-    for (int i = 0; i < 36; pVec++, i++) {
-        cXyz cStack_40 = calcFlagFactor(pPos, pNormal, &direction, i);
-        *pVec += cStack_40;
-        *pVec *= mDecayRate;
-    }
-
-    pNormal = getVec();
-    for (int i = 0; i < 36; pPos++, pNormal++, i++) {
-        *pPos += *pNormal;
-    }
-
-    for (int i = 0; i < 36; pNormal2++, i++) {
-        calcFlagNormal(pNormal2, i);
-    }
-    calcFlagNormalBack();
-    DCStoreRangeNoSync(getPos(), sizeof(cXyz) * 36);
-    DCStoreRangeNoSync(getNormal(), sizeof(cXyz) * 36);
-    DCStoreRangeNoSync(getNormalBack(), sizeof(cXyz) * 36);
-}
-
-/* 80BEF6D0-80BEF6D8 000CD0 0008+00 1/0 0/0 0/0 .text daObjFlag3_IsDelete__FP12daObjFlag3_c */
-static int daObjFlag3_IsDelete(daObjFlag3_c* i_this) {
-    return 1;
-}
-
-/* 80BEF6D8-80BEF700 000CD8 0028+00 1/0 0/0 0/0 .text            daObjFlag3_Delete__FP12daObjFlag3_c
- */
-static int daObjFlag3_Delete(daObjFlag3_c* i_this) {
-    fopAcM_GetID(i_this);
-    i_this->~daObjFlag3_c();
-    return 1;
-}
-
-/* 80BEF700-80BEF790 000D00 0090+00 1/1 0/0 0/0 .text            __dt__12daObjFlag3_cFv */
-daObjFlag3_c::~daObjFlag3_c() {
-    #ifdef DEBUG
-    M_hio.dt();
-    #endif
-
-    if (mFlagValid) {
-        dComIfG_resDelete(&mFlagPhase, mFlagName);
-    }
-    dComIfG_resDelete(&mArcPhase, daSetBgObj_c::getArcName(this));
-}
-
-/* 80BEF790-80BEF93C 000D90 01AC+00 2/1 0/0 0/0 .text            __dt__12FlagCloth2_cFv */
-FlagCloth2_c::~FlagCloth2_c() {}
-
-/* 80BEF93C-80BEF95C 000F3C 0020+00 1/0 0/0 0/0 .text            daObjFlag3_Create__FP10fopAc_ac_c
- */
-static int daObjFlag3_Create(fopAc_ac_c* i_this) {
-    fopAcM_GetID(i_this);
-    return static_cast<daObjFlag3_c*>(i_this)->create();
-}
-
-/* 80BEF95C-80BEFBC4 000F5C 0268+00 1/1 0/0 0/0 .text            create__12daObjFlag3_cFv */
-int daObjFlag3_c::create() {
-    fopAcM_SetupActor(this, daObjFlag3_c);
-    s8 flagNum = (u8)shape_angle.x;
-    if (flagNum <= -1 || flagNum > 99) {
-        mFlagValid = false;
-    } else {
-        mFlagValid = true;
-        sprintf(mFlagName, "FlagObj%02d", flagNum);
-        int rv = dComIfG_resLoad(&mFlagPhase, mFlagName);
-        if (rv != cPhs_COMPLEATE_e) {
-            return rv;
-        }
-    }
-    int rv = dComIfG_resLoad(&mArcPhase, daSetBgObj_c::getArcName(this));
-    if (rv == cPhs_COMPLEATE_e) {
-        if (fopAcM_entrySolidHeap(this, createSolidHeap, 0x4000) == 0) {
-            return cPhs_ERROR_e;
-        } else {
-            create_init();
-        }
-    }
-    return rv;
-}
-
-void daObjFlag3_c::initBaseMtx() {
-    mDoMtx_stack_c::transS(current.pos);
-    mModel->setBaseTRMtx(mDoMtx_stack_c::get());
-    fopAcM_SetMtx(this, mModel->getBaseTRMtx());
-}
-
-/* 80BEFBC4-80BEFD08 0011C4 0144+00 1/1 0/0 0/0 .text            create_init__12daObjFlag3_cFv */
-void daObjFlag3_c::create_init() {
-    int* pOffset = (int*)dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), "spec.dat");
-    f32 offset = (u16)*pOffset;
-    field_0x1320.set(current.pos.x, current.pos.y + offset, current.pos.z);
-    fopAcM_setCullSizeBox(this, -600.0f, -offset, -600.0f, 600.0f, 400.0f, 600.0f);
-    eyePos.set(mFlagCloth.getTargetPos());
-    mFlagCloth.initFlagPos(&field_0x1320, this);
-    mFlagCloth.setSpringRate(attr().mSpringCoeeficient);
-    mFlagCloth.setWindRate(attr().mWindCoefficient);
-    mFlagCloth.setDecayRate(attr().mDecayRate);
-    mFlagCloth.setGravity(attr().mGravity);
-    mFlagCloth.setTornado(attr().mTornado);
-    initBaseMtx();
-    
-    #ifdef DEBUG
-    M_hio.ct();
-    #endif
-}
-
-/* 80BEFD08-80BEFF30 001308 0228+00 1/1 0/0 0/0 .text
- * initFlagPos__12FlagCloth2_cFP4cXyzP10fopAc_ac_c              */
-void FlagCloth2_c::initFlagPos(cXyz* param_0, fopAc_ac_c* param_1) {
-    mpFlagPosition = param_0;
-    cXyz direction;
-    f32 power;
-    dKyw_get_AllWind_vec(mpFlagPosition, &direction, &power);
-    mDoMtx_stack_c::transS(*mpFlagPosition);
-    cMtx_copy(mDoMtx_stack_c::get(), mModelMtx);
-    f32 dVar7 = -150.0f;
-    f32 dVar8 = 0.0f;
-    cXyz* pPos = getPos();
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 6; j++, pPos++) {
-            pPos->set(0.0f, dVar7, dVar8);
-            if (i != 0 && i != 30) {
-                pPos->x += cM_rndFX(10.0f);
-                pPos->y += cM_rndFX(10.0f);
-                pPos->z += cM_rndFX(10.0f);
-            }
-            dVar8 += 60.0f;
-        }
-        dVar7 += 60.0f;
-        dVar8 = 0.0f;
-    }
-    
-    cXyz* pNormal = getNormal();
-    for (int i = 0; i < 36; i++, pNormal++) {
-        calcFlagNormal(pNormal, i);
-    }
-    calcFlagNormalBack();
-    initTexCoord();
-}
-
 /* 80BF00A0-80BF0434 0016A0 0394+00 1/0 0/0 0/0 .text            draw__12FlagCloth2_cFv */
-void FlagCloth2_c::draw() {
+inline void FlagCloth2_c::draw() {
     j3dSys.reinitGX();
     GXSetNumIndStages(0);
     dKy_setLight_again();
@@ -524,6 +301,231 @@ void FlagCloth2_c::draw() {
     }
 
     J3DShape::resetVcdVatCache();
+}
+
+/* 80BEEA78-80BEEC3C 000078 01C4+00 1/1 0/0 0/0 .text            createHeap__12daObjFlag3_cFv */
+int daObjFlag3_c::createHeap() {
+    s8 flagNum = (u8)shape_angle.x;
+    if (mFlagValid) {
+        char acStack_40[16];
+        sprintf(acStack_40, "flag%02d.bti", flagNum);
+        shape_angle.setall(0);
+        current.angle.setall(0);
+        ResTIMG* image = (ResTIMG*)dComIfG_getObjectRes(mFlagName, "flag.bti");
+        JUT_ASSERT(838, image != NULL);
+        GXInitTexObj(mFlagCloth.getImageTexObj(), (u8*)image + image->imageOffset, image->width,
+                     image->height, (GXTexFmt)image->format, (GXTexWrapMode)image->wrapS,
+                     (GXTexWrapMode)image->wrapT, image->mipmapCount > 1 ? GX_TRUE : GX_FALSE);
+        if (image->mipmapCount > 1) {
+            GXInitTexObjLOD(mFlagCloth.getImageTexObj(), (GXTexFilter)image->minFilter,
+                            (GXTexFilter)image->magFilter, image->minLOD * 0.125f,
+                            image->maxLOD * 0.125f, image->LODBias * 0.01f, image->biasClamp,
+                            image->doEdgeLOD, (GXAnisotropy)image->maxAnisotropy);
+        }
+    }
+    J3DModelData* modelData_pole = (J3DModelData*)dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), "model0.bmd");
+    JUT_ASSERT(865, modelData_pole != NULL);
+    mModel = mDoExt_J3DModel__create(modelData_pole, 0x80000, 0x11000084);
+    return mModel != NULL ? TRUE : FALSE;
+}
+
+/* 80BEEC3C-80BEEC5C 00023C 0020+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
+static int createSolidHeap(fopAc_ac_c* i_this) {
+    return static_cast<daObjFlag3_c*>(i_this)->createHeap();
+}
+
+inline int daObjFlag3_c::draw() {
+    g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
+    dComIfGd_setListBG();
+    g_env_light.setLightTevColorType_MAJI(mModel, &tevStr);
+    mDoExt_modelUpdateDL(mModel);
+    if (mFlagValid) {
+        j3dSys.getDrawBuffer(0)->entryImm(&mFlagCloth, 0);
+    }
+    dComIfGd_setList();
+    return 1;
+}
+
+/* 80BEEC5C-80BEED1C 00025C 00C0+00 1/0 0/0 0/0 .text            daObjFlag3_Draw__FP12daObjFlag3_c
+ */
+static int daObjFlag3_Draw(daObjFlag3_c* i_this) {
+    return i_this->draw();
+}
+
+/* 80BEED1C-80BEED3C 00031C 0020+00 1/0 0/0 0/0 .text daObjFlag3_Execute__FP12daObjFlag3_c */
+static int daObjFlag3_Execute(daObjFlag3_c* i_this) {
+    return i_this->execute();
+}
+
+/* 80BEED3C-80BEEDA8 00033C 006C+00 1/1 0/0 0/0 .text            execute__12daObjFlag3_cFv */
+int daObjFlag3_c::execute() {
+    if (!mFlagValid) {
+        return 1;
+    }
+
+    #ifdef DEBUG
+    mFlagCloth.setSpringRate(attr().mSpringCoeeficient);
+    mFlagCloth.setWindRate(attr().mWindCoefficient);
+    mFlagCloth.setDecayRate(attr().mDecayRate);
+    mFlagCloth.setGravity(attr().mGravity);
+    mFlagCloth.setTornado(attr().mTornado);
+    #endif
+
+    mFlagCloth.execute();
+    eyePos.set(mFlagCloth.getTargetPos());
+    return 1;
+}
+
+
+/* 80BEEDE4-80BEEF74 0003E4 0190+00 1/1 0/0 0/0 .text            execute__12FlagCloth2_cFv */
+void FlagCloth2_c::execute() {
+    cXyz direction;
+    f32 power;
+    dKyw_get_AllWind_vec(mpFlagPosition, &direction, &power);
+    direction.normalizeZP();
+    direction *= power * mWindRate;
+    cXyz* pPos = getPos();
+    cXyz* pNormal = getNormal();
+    cXyz* pNormal2 = pNormal;
+    cXyz* pVec = getVec();
+    cXyz cStack_40;
+    for (int i = 0; i < 36; pVec++, i++) {
+        cXyz cStack_40 = calcFlagFactor(pPos, pNormal, &direction, i);
+        *pVec += cStack_40;
+        *pVec *= mDecayRate;
+    }
+
+    pNormal = getVec();
+    for (int i = 0; i < 36; pPos++, pNormal++, i++) {
+        *pPos += *pNormal;
+    }
+
+    for (int i = 0; i < 36; pNormal2++, i++) {
+        calcFlagNormal(pNormal2, i);
+    }
+    calcFlagNormalBack();
+    DCStoreRangeNoSync(getPos(), sizeof(cXyz) * 36);
+    DCStoreRangeNoSync(getNormal(), sizeof(cXyz) * 36);
+    DCStoreRangeNoSync(getNormalBack(), sizeof(cXyz) * 36);
+}
+
+/* 80BEF6D0-80BEF6D8 000CD0 0008+00 1/0 0/0 0/0 .text daObjFlag3_IsDelete__FP12daObjFlag3_c */
+static int daObjFlag3_IsDelete(daObjFlag3_c* i_this) {
+    return 1;
+}
+
+/* 80BEF6D8-80BEF700 000CD8 0028+00 1/0 0/0 0/0 .text            daObjFlag3_Delete__FP12daObjFlag3_c
+ */
+static int daObjFlag3_Delete(daObjFlag3_c* i_this) {
+    fopAcM_GetID(i_this);
+    i_this->~daObjFlag3_c();
+    return 1;
+}
+
+/* 80BEF700-80BEF790 000D00 0090+00 1/1 0/0 0/0 .text            __dt__12daObjFlag3_cFv */
+daObjFlag3_c::~daObjFlag3_c() {
+    #ifdef DEBUG
+    M_hio.dt();
+    #endif
+
+    if (mFlagValid) {
+        dComIfG_resDelete(&mFlagPhase, mFlagName);
+    }
+    dComIfG_resDelete(&mArcPhase, daSetBgObj_c::getArcName(this));
+}
+
+/* 80BEF790-80BEF93C 000D90 01AC+00 2/1 0/0 0/0 .text            __dt__12FlagCloth2_cFv */
+FlagCloth2_c::~FlagCloth2_c() {}
+
+/* 80BEF93C-80BEF95C 000F3C 0020+00 1/0 0/0 0/0 .text            daObjFlag3_Create__FP10fopAc_ac_c
+ */
+static int daObjFlag3_Create(fopAc_ac_c* i_this) {
+    fopAcM_GetID(i_this);
+    return static_cast<daObjFlag3_c*>(i_this)->create();
+}
+
+void daObjFlag3_c::initBaseMtx() {
+    mDoMtx_stack_c::transS(current.pos);
+    mModel->setBaseTRMtx(mDoMtx_stack_c::get());
+    fopAcM_SetMtx(this, mModel->getBaseTRMtx());
+}
+
+/* 80BEFBC4-80BEFD08 0011C4 0144+00 1/1 0/0 0/0 .text            create_init__12daObjFlag3_cFv */
+void daObjFlag3_c::create_init() {
+    int* pOffset = (int*)dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), "spec.dat");
+    f32 offset = (u16)*pOffset;
+    field_0x1320.set(current.pos.x, current.pos.y + offset, current.pos.z);
+    fopAcM_setCullSizeBox(this, -600.0f, -offset, -600.0f, 600.0f, 400.0f, 600.0f);
+    eyePos.set(mFlagCloth.getTargetPos());
+    mFlagCloth.initFlagPos(&field_0x1320, this);
+    mFlagCloth.setSpringRate(attr().mSpringCoeeficient);
+    mFlagCloth.setWindRate(attr().mWindCoefficient);
+    mFlagCloth.setDecayRate(attr().mDecayRate);
+    mFlagCloth.setGravity(attr().mGravity);
+    mFlagCloth.setTornado(attr().mTornado);
+    initBaseMtx();
+
+    #ifdef DEBUG
+    M_hio.ct();
+    #endif
+}
+
+/* 80BEFD08-80BEFF30 001308 0228+00 1/1 0/0 0/0 .text            initFlagPos__12FlagCloth2_cFP4cXyzP10fopAc_ac_c */
+void FlagCloth2_c::initFlagPos(cXyz* param_0, fopAc_ac_c* param_1) {
+    mpFlagPosition = param_0;
+    cXyz direction;
+    f32 power;
+    dKyw_get_AllWind_vec(mpFlagPosition, &direction, &power);
+    mDoMtx_stack_c::transS(*mpFlagPosition);
+    cMtx_copy(mDoMtx_stack_c::get(), mModelMtx);
+    f32 dVar7 = -150.0f;
+    f32 dVar8 = 0.0f;
+    cXyz* pPos = getPos();
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++, pPos++) {
+            pPos->set(0.0f, dVar7, dVar8);
+            if (i != 0 && i != 30) {
+                pPos->x += cM_rndFX(10.0f);
+                pPos->y += cM_rndFX(10.0f);
+                pPos->z += cM_rndFX(10.0f);
+            }
+            dVar8 += 60.0f;
+        }
+        dVar7 += 60.0f;
+        dVar8 = 0.0f;
+    }
+
+    cXyz* pNormal = getNormal();
+    for (int i = 0; i < 36; i++, pNormal++) {
+        calcFlagNormal(pNormal, i);
+    }
+    calcFlagNormalBack();
+    initTexCoord();
+}
+
+/* 80BEF95C-80BEFBC4 000F5C 0268+00 1/1 0/0 0/0 .text            create__12daObjFlag3_cFv */
+int daObjFlag3_c::create() {
+    fopAcM_ct(this, daObjFlag3_c);
+    s8 flagNum = (u8)shape_angle.x;
+    if (flagNum <= -1 || flagNum > 99) {
+        mFlagValid = false;
+    } else {
+        mFlagValid = true;
+        sprintf(mFlagName, "FlagObj%02d", flagNum);
+        int rv = dComIfG_resLoad(&mFlagPhase, mFlagName);
+        if (rv != cPhs_COMPLEATE_e) {
+            return rv;
+        }
+    }
+    int rv = dComIfG_resLoad(&mArcPhase, daSetBgObj_c::getArcName(this));
+    if (rv == cPhs_COMPLEATE_e) {
+        if (fopAcM_entrySolidHeap(this, createSolidHeap, 0x4000) == 0) {
+            return cPhs_ERROR_e;
+        } else {
+            create_init();
+        }
+    }
+    return rv;
 }
 
 /* 80BF058C-80BF05AC -00001 0020+00 1/0 0/0 0/0 .data            l_daObjFlag3_Method */

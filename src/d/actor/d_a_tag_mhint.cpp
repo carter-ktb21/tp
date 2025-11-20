@@ -3,6 +3,8 @@
  * Tag - Midna Hint
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_mhint.h"
 #include "d/actor/d_a_midna.h"
 #include "d/d_com_inf_game.h"
@@ -12,7 +14,7 @@
 
 /* 805A56B8-805A58C8 000078 0210+00 1/1 0/0 0/0 .text            create__12daTagMhint_cFv */
 int daTagMhint_c::create() {
-    fopAcM_SetupActor(this, daTagMhint_c);
+    fopAcM_ct(this, daTagMhint_c);
 
     field_0x574 = fopAcM_GetParam(this) & 0x3FF;
     field_0x57c = (fopAcM_GetParam(this) >> 10) & 0x3FF;

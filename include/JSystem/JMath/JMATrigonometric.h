@@ -2,8 +2,9 @@
 #define JMATRIGONOMETRIC_H
 
 #include "dolphin/types.h"
-#include "utility.h"
+#include <utility.h>
 
+namespace JMath {
 template<typename T>
 struct TAngleConstant_;
 
@@ -72,38 +73,38 @@ struct TAtanTable {
  * @ingroup jsystem-jmath
  * 
  */
+template<int N, typename T>
 struct TAsinAcosTable {
-    f32 table[1025];
+    T table[1025];
     u8 pad[0x1C];
 
-    f32 acos_(f32 x) {
+    T acos_(T x) const {
         if (x >= 1.0f) {
             return 0.0f;
         } else if (x <= -1.0f) {
-            return TAngleConstant_<f32>::RADIAN_DEG180();
+            return TAngleConstant_<T>::RADIAN_DEG180();
         } else if (x < 0.0f) {
-            return table[(u32)(-x * 1023.5f)] + TAngleConstant_<f32>::RADIAN_DEG090();
+            return table[(u32)(-x * 1023.5f)] + TAngleConstant_<T>::RADIAN_DEG090();
         } else {
-            return TAngleConstant_<f32>::RADIAN_DEG090() - table[(u32)(x * 1023.5f)];
+            return TAngleConstant_<T>::RADIAN_DEG090() - table[(u32)(x * 1023.5f)];
         }
     }
 
-    f32 acosDegree(f32 x) {
-        return acos_(x) * TAngleConstant_<f32>::RADIAN_TO_DEGREE_FACTOR();
+    T acosDegree(T x) const {
+        return acos_(x) * TAngleConstant_<T>::RADIAN_TO_DEGREE_FACTOR();
     }
 };
 
-namespace JMath {
 extern TSinCosTable<13, f32> sincosTable_;
 extern TAtanTable atanTable_;
-extern TAsinAcosTable asinAcosTable_;
+extern TAsinAcosTable<1024, f32> asinAcosTable_;
 
 inline f32 acosDegree(f32 x) {
     return asinAcosTable_.acosDegree(x);
 }
 };  // namespace JMath
 
-inline f32 JMASCosShort(s16 v) {
+inline f32 JMACosShort(s16 v) {
     return JMath::sincosTable_.cosShort(v);
 }
 inline f32 JMASinShort(s16 v) {
@@ -111,7 +112,7 @@ inline f32 JMASinShort(s16 v) {
 }
 
 inline f32 JMASCos(s16 v) {
-    return JMASCosShort(v);
+    return JMACosShort(v);
 }
 inline f32 JMASSin(s16 v) {
     return JMASinShort(v);

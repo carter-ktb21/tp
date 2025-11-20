@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_tp.h"
 #include "JSystem/J3DGraphAnimator/J3DAnimation.h"
 #include "JSystem/J3DGraphAnimator/J3DModelData.h"
@@ -37,7 +39,9 @@ static int daObj_Tp_Draw(obj_tp_class* i_this) {
                         Mtx lightProjMtx;
                         C_MTXLightPerspective(lightProjMtx, dComIfGd_getView()->fovy,
                                               dComIfGd_getView()->aspect, 1.0f, 1.0f, -0.01f, 0);
+                        #if WIDESCREEN_SUPPORT
                         mDoGph_gInf_c::setWideZoomLightProjection(lightProjMtx);
+                        #endif
                         texMtxInfo->setEffectMtx(lightProjMtx);
                         modelData->simpleCalcMaterial(0, (MtxP)j3dDefaultMtx);
                     }
@@ -79,25 +83,6 @@ static void* s_tp_sub(void* param_1, void* param_2) {
     }
     return NULL;
 }
-
-/* ############################################################################################## */
-/* 80D1EEA0-80D1EEAC 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D1EEAC-80D1EEC0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80D1D8C8-80D1E460 0003C8 0B98+00 3/1 0/0 0/0 .text            daObj_Tp_Execute__FP12obj_tp_class
  */
@@ -379,7 +364,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     if (tp->field_0x5a0 != 0xf) {
         for (int i = 0; i < 2; i++) {
             J3DModelData* modelData = ( J3DModelData*)dComIfG_getObjectRes("Obj_tp", eff_bmd[i]);
-            JUT_ASSERT(809, modelData != 0);
+            JUT_ASSERT(809, modelData != NULL);
             tp->mModels[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
             if (tp->mModels[i] == NULL) {
                 return 0;
@@ -436,7 +421,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80D1E950-80D1ECF0 001450 03A0+00 1/0 0/0 0/0 .text            daObj_Tp_Create__FP10fopAc_ac_c */
 static int daObj_Tp_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, obj_tp_class);
+    fopAcM_ct(i_this, obj_tp_class);
     obj_tp_class* tp = (obj_tp_class*)i_this;
     int rv = dComIfG_resLoad(&tp->mPhase, "Obj_tp");
     if (rv == cPhs_COMPLEATE_e) {

@@ -3,6 +3,8 @@
  * Dying Midna Actor
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_dmidna.h"
 #include "f_op/f_op_actor_mng.h"
 
@@ -29,7 +31,7 @@ static int daDmidna_createHeap(fopAc_ac_c* i_this) {
 
 /* 8045CFE4-8045D094 000184 00B0+00 1/1 0/0 0/0 .text            create__10daDmidna_cFv */
 int daDmidna_c::create() {
-    fopAcM_SetupActor(this, daDmidna_c);
+    fopAcM_ct(this, daDmidna_c);
 
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {

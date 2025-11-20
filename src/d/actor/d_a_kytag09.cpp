@@ -3,6 +3,8 @@
  * Twilight Film Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag09.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -127,7 +129,7 @@ static int daKytag09_Create(fopAc_ac_c* i_this) {
     kytag09_class* a_this = (kytag09_class*)i_this;
     a_this->mType = fopAcM_GetParam(i_this) & 0xFF;
 
-    fopAcM_SetupActor(a_this, kytag09_class);
+    fopAcM_ct(a_this, kytag09_class);
 
     int phase;
     if (a_this->mType != 1) {

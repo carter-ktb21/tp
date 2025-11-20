@@ -3,42 +3,11 @@
 
 #include "d/actor/d_a_npc.h"
 
-/**
- * @ingroup actors-npcs
- * @class daNpc_Moi_c
- * @brief Rusl
- *
- * @details
- *
- */
-
 struct daNpc_Moi_HIOParam {
-    /* 0x00 */ f32 field_0x00;
-    /* 0x04 */ f32 field_0x04;
-    /* 0x08 */ f32 field_0x08;
-    /* 0x0C */ f32 field_0x0c;
-    /* 0x10 */ f32 field_0x10;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-    /* 0x1C */ f32 field_0x1c;
-    /* 0x20 */ f32 field_0x20;
-    /* 0x24 */ f32 field_0x24;
-    /* 0x28 */ f32 field_0x28;
-    /* 0x2C */ f32 field_0x2c;
-    /* 0x30 */ f32 field_0x30;
-    /* 0x34 */ f32 field_0x34;
-    /* 0x38 */ f32 field_0x38;
-    /* 0x3C */ f32 field_0x3c;
-    /* 0x40 */ f32 field_0x40;
-    /* 0x44 */ f32 field_0x44;
-    /* 0x48 */ s16 field_0x48;
-    /* 0x4A */ s16 field_0x4a;
-    /* 0x4C */ s16 field_0x4c;
-    /* 0x4E */ s16 field_0x4e;
-    /* 0x50 */ f32 field_0x50;
-    /* 0x54 */ u8 field_0x54[24];
-    /* 0x6C */ f32 field_0x6c;
-    /* 0x70 */ u8 field_0x70[40];
+    /* 0x00 */ daNpcT_HIOParam common;
+    /* 0x8C */ f32 field_0x8c;
+    /* 0x90 */ f32 field_0x90;
+    /* 0x94 */ f32 field_0x94;
     /* 0x98 */ s16 field_0x98;
     /* 0x9A */ s16 field_0x9a;
     /* 0x9C */ s16 field_0x9c;
@@ -46,7 +15,9 @@ struct daNpc_Moi_HIOParam {
     /* 0xA0 */ s16 field_0xa0;
     /* 0xA2 */ s16 field_0xa2;
     /* 0xA4 */ f32 field_0xa4;
-    /* 0xA8 */ u8 field_0xa8[12];
+    /* 0xA8 */ f32 field_0xa8;
+    /* 0xAC */ f32 field_0xac;
+    /* 0xB0 */ f32 field_0xb0;
     /* 0xB4 */ f32 field_0xb4;
     /* 0xB8 */ f32 field_0xb8;
 };
@@ -55,18 +26,33 @@ class daNpc_Moi_Param_c {
 public:
     /* 80A7AE84 */ virtual ~daNpc_Moi_Param_c() {};
 
-    static daNpc_Moi_HIOParam const m;
+    static const daNpc_Moi_HIOParam m;
 };
 
-class daNpc_Moi_HIO_c
-#ifdef DEBUG
-    : public mDoHIO_entry_c
-#endif
-{
+#if DEBUG
+class daNpc_Moi_HIO_c : public mDoHIO_entry_c {
 public:
+    daNpc_Moi_HIO_c();
+
+    void listenPropertyEvent(const JORPropertyEvent*);
     void genMessage(JORMContext*);
+
+    daNpc_Moi_HIOParam m;
 };
 
+#define NPC_MOI_HIO_CLASS daNpc_Moi_HIO_c
+#else
+#define NPC_MOI_HIO_CLASS daNpc_Moi_Param_c
+#endif
+
+/**
+ * @ingroup actors-npcs
+ * @class daNpc_Moi_c
+ * @brief Rusl
+ *
+ * @details
+ *
+ */
 class daNpc_Moi_c : public daNpcT_c {
 public:
     typedef int (daNpc_Moi_c::*cutFunc)(int);
@@ -146,7 +132,13 @@ public:
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {}
-    /* 80A7AE0C */ s32 getEyeballMaterialNo() { return chkMoiN() ? 4 : 2; }
+    /* 80A7AE0C */ u16 getEyeballMaterialNo() {
+        if (chkMoiN()) {
+            return 4;
+        } else {
+            return 2;
+        }
+    }
     /* 80A7AE3C */ s32 getHeadJointNo() { return 4; }
     /* 80A7AE44 */ s32 getNeckJointNo() { return 3; }
     /* 80A7AE4C */ s32 getBackboneJointNo() { return 1; }
@@ -166,11 +158,11 @@ public:
     bool chkSFight() { return field_0x166b == 1; }
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xff00) >> 8; }
 
-    static const char* mCutNameList[5];
+    static char* mCutNameList[5];
     static cutFunc mCutList[5];
 
 private:
-    /* 0x0E40 */ daNpc_Moi_HIO_c* field_0xe40;
+    /* 0x0E40 */ NPC_MOI_HIO_CLASS* mpHIO;
     /* 0x0E44 */ J3DModel* mpModel[6];
     /* 0x0E5C */ dCcD_Cyl mCyl[4];
     /* 0x134C */ dCcD_Cyl mCyl2;

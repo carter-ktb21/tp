@@ -1,11 +1,11 @@
 /**
- * @file d_a_npc_fairy_seirei.cpp
+* @file d_a_npc_fairy_seirei.cpp
  *
  */
 
-#include "d/actor/d_a_npc_fairy_seirei.h"
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
-UNK_REL_DATA
+#include "d/actor/d_a_npc_fairy_seirei.h"
 
 /* ############################################################################################## */
 
@@ -88,7 +88,7 @@ const f32 daNpc_FairySeirei_Param_c::m[37] = {
 
 /* 8054006C-80540298 0001EC 022C+00 1/1 0/0 0/0 .text            create__19daNpc_FairySeirei_cFv */
 int daNpc_FairySeirei_c::create() {
-    fopAcM_SetupActor2(this, daNpc_FairySeirei_c, &l_faceMotionAnmData, l_motionAnmData,
+    daNpcT_ct(this, daNpc_FairySeirei_c, &l_faceMotionAnmData, l_motionAnmData,
                        l_faceMotionSequenceData, 4, l_motionSequenceData, 4, l_evtList,
                        l_resNameList);
     mType = getType();
@@ -105,7 +105,7 @@ int daNpc_FairySeirei_c::create() {
     mAcch.CrrPos(dComIfG_Bgsp());
     mGndChk = mAcch.m_gnd;
     mGroundH = mAcch.GetGroundH();
-    if (mGroundH != -1e9f) {
+    if (mGroundH != -G_CM3D_F_INF) {
         setEnvTevColor();
         setRoomNo();
     }
@@ -170,15 +170,15 @@ void daNpc_FairySeirei_c::setParam() {
     attention_info.distances[fopAc_attn_LOCK_e] = 0x27;
     attention_info.distances[fopAc_attn_TALK_e] = 0x27;
     attention_info.distances[fopAc_attn_SPEAK_e] = 0x27;
-    attention_info.flags = 8;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e;
     mCcStts.SetWeight(daNpc_FairySeirei_Param_c::m[4]);
     mCylH = daNpc_FairySeirei_Param_c::m[5];
     mWallR = daNpc_FairySeirei_Param_c::m[7];
     mAttnFovY = daNpc_FairySeirei_Param_c::m[20];
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daNpc_FairySeirei_Param_c::m[6]);
-    field_0xde8 = daNpc_FairySeirei_Param_c::m[3];
-    field_0xa80 = daNpc_FairySeirei_Param_c::m[27];
+    mRealShadowSize = daNpc_FairySeirei_Param_c::m[3];
+    mExpressionMorfFrame = daNpc_FairySeirei_Param_c::m[27];
     mMorfFrames = daNpc_FairySeirei_Param_c::m[17];
     gravity = daNpc_FairySeirei_Param_c::m[1];
 }

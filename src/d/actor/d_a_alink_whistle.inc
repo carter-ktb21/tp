@@ -168,7 +168,7 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
         mLinkGndChk.SetPos(param_4);
 
         f32 gnd_cross = dComIfG_Bgsp().GroundCross(&mLinkGndChk);
-        if (gnd_cross != -1000000000.0f) {
+        if (gnd_cross != -G_CM3D_F_INF) {
             current.pos.set(param_4->x, gnd_cross, param_4->z);
         }
 
@@ -271,7 +271,9 @@ int daAlink_c::procGrassWhistleWait() {
             procWaitInit();
         }
     } else {
+        #if VERSION != VERSION_SHIELD_DEBUG
         setGrassCancelStatus(0);
+        #endif
     }
 
     return 1;
@@ -342,7 +344,7 @@ int daAlink_c::procHawkCatchInit() {
 /* 80112220-80112278 10CB60 0058+00 1/0 0/0 0/0 .text            procHawkCatch__9daAlink_cFv */
 int daAlink_c::procHawkCatch() {
     if (mUnderFrameCtrl[0].checkAnmEnd()) {
-        dComIfGp_evmng_cutEnd(field_0x3184);
+        dComIfGp_evmng_cutEnd(mAlinkStaffId);
         procHawkSubjectInit();
     }
 
@@ -379,7 +381,7 @@ int daAlink_c::procHawkSubject() {
             }
         }
     } else if (checkEventRun()) {
-        dComIfGp_evmng_cutEnd(field_0x3184);
+        dComIfGp_evmng_cutEnd(mAlinkStaffId);
     } else {
         fopAc_ac_c* temp_r29 = field_0x280c.getActor();
         setGrassCancelStatus(0x12);

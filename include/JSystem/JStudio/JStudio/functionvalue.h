@@ -79,7 +79,7 @@ public:
 
 class TFunctionValueAttribute_refer : public JGadget::TVector_pointer<TFunctionValue*> {
 public:
-    inline TFunctionValueAttribute_refer();
+    TFunctionValueAttribute_refer() : JGadget::TVector_pointer<TFunctionValue*>(JGadget::TAllocator<void*>()) {}
     ~TFunctionValueAttribute_refer() {}
 
     /* 802816E8 */ void refer_initialize();
@@ -338,7 +338,7 @@ public:
 
         f32 operator*() {
 #ifdef DEBUG
-            JUT_ASSERT(947, pf_!=0);
+            JUT_ASSERT(947, pf_!=NULL);
 #endif
             return *pf_;
         }
@@ -451,7 +451,7 @@ public:
 
         f32 operator*() {
 #ifdef DEBUG
-            JUT_ASSERT(1098, pf_!=0);
+            JUT_ASSERT(1098, pf_!=NULL);
 #endif
             return *pf_;
         }

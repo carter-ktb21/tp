@@ -3,8 +3,11 @@
  * Main UI handler
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_meter2.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
+#include "d/d_camera.h"
 #include "d/d_demo.h"
 #include "d/d_scope.h"
 #include "d/d_timer.h"
@@ -245,11 +248,15 @@ int dMeter2_c::_create() {
 int dMeter2_c::_execute() {
     JKRHeap* heap = mDoExt_setCurrentHeap(mpHeap);
 
-    if (!dComIfGs_isCollectMirror(0) && dComIfGs_isEventBit(dSv_event_flag_c::F_0685)) {
+    if (!dComIfGs_isCollectMirror(0)
+           /* dSv_event_flag_c::F_0685 - Cutscene - (Cutscene 32) Sage appears, get first Mirror of Twilight shard */
+        && dComIfGs_isEventBit(dSv_event_flag_c::F_0685)) {
         dComIfGs_onCollectMirror(0);
     }
 
-    if (!dComIfGs_isCollectCrystal(3) && dComIfGs_isEventBit(dSv_event_flag_c::F_0686)) {
+    if (!dComIfGs_isCollectCrystal(3)
+           /* dSv_event_flag_c::F_0686 - Palace of Twilight - Get fused shadow piece (final mask) */
+        && dComIfGs_isEventBit(dSv_event_flag_c::F_0686)) {
         dComIfGs_onCollectCrystal(3);
     }
 

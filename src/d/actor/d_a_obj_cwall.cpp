@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cwall.h"
 #include "SSystem/SComponent/c_math.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -77,8 +79,6 @@ static Vec const l_check_min_wolf = {
 static Vec const l_check_max_wolf = {
     120.0f, 0.0f, 160.0f,
 };
-
-UNK_REL_DATA
 
 /* 80BDA0E0-80BDA0E8 -00001 0008+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName[2] = {
@@ -181,7 +181,7 @@ int daObjCwall_c::Create() {
 /* 80BD6D08-80BD6E94 0003A8 018C+00 1/0 0/0 0/0 .text            CreateHeap__12daObjCwall_cFv */
 int daObjCwall_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[mType], l_wallBmd[mType]);
-    JUT_ASSERT(573, modelData != 0);
+    JUT_ASSERT(573, modelData != NULL);
     mWallModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mWallModel == NULL) {
         return 0;
@@ -192,7 +192,7 @@ int daObjCwall_c::CreateHeap() {
     }
     modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[mType], l_chainBmd[mType]);
-    JUT_ASSERT(592, modelData != 0);
+    JUT_ASSERT(592, modelData != NULL);
     chain_s* pChain = mChains;
     for (int i = 0; i < 6; i++, pChain++) {
         pChain->mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -202,7 +202,7 @@ int daObjCwall_c::CreateHeap() {
     }
     modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[mType], l_handleBmd[mType]);
-    JUT_ASSERT(609, modelData != 0);
+    JUT_ASSERT(609, modelData != NULL);
     mHandleModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mHandleModel == NULL) {
         return 0;
@@ -345,100 +345,6 @@ void daObjCwall_c::calcSePos() {
     mDoMtx_stack_c::YrotM(shape_angle.y);
     mDoMtx_stack_c::multVec(&field_0xf2c, &field_0xf2c);
 }
-
-/* ############################################################################################## */
-/* 80BDA300-80BDA304 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 80BDA304-80BDA308 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA308-80BDA30C 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA30C-80BDA310 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA310-80BDA314 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA314-80BDA318 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA318-80BDA31C 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA31C-80BDA320 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA320-80BDA324 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA324-80BDA328 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA328-80BDA32C 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA32C-80BDA330 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA330-80BDA334 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA334-80BDA338 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA338-80BDA33C 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 80BDA33C-80BDA340 000044 0001+03 0/0 0/0 0/0 .bss             @1009 */
-#pragma push
-#pragma force_active on
-static u8 lit_1009[1 + 3 /* padding */];
-#pragma pop
 
 /* 80BDA34C-80BDA358 000054 000C+00 1/2 0/0 0/0 .bss             l_chainOffset */
 static cXyz l_chainOffset(0.0f, 105.0f, 30.0f);
@@ -949,7 +855,7 @@ int daObjCwall_c::Delete() {
 
 /* 80BD9988-80BD9B70 003028 01E8+00 1/0 0/0 0/0 .text daObjCwall_create1st__FP12daObjCwall_c */
 static int daObjCwall_create1st(daObjCwall_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjCwall_c);
+    fopAcM_ct(i_this, daObjCwall_c);
     return i_this->create1st();
 }
 

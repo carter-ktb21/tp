@@ -3,6 +3,8 @@
  * Snowpeak Ruins Key Lock
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_Lv5Key.h"
 #include "d/d_com_inf_game.h"
 
@@ -15,7 +17,7 @@ static char* l_arcName = "Lv5_KEY";
 int daObjLv5Key_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 7);
     J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
@@ -332,7 +334,7 @@ static int daObjLv5Key_Execute(daObjLv5Key_c* i_this) {
 
 /* 80B9C5EC-80B9C798 000CAC 01AC+00 1/1 0/0 0/0 .text            create_1st__13daObjLv5Key_cFv */
 int daObjLv5Key_c::create_1st() {
-    fopAcM_SetupActor(this, daObjLv5Key_c);
+    fopAcM_ct(this, daObjLv5Key_c);
 
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {

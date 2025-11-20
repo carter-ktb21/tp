@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_treesh.h"
 #include "d/d_com_inf_game.h"
 
@@ -57,7 +59,7 @@ void daTreeSh_c::setBaseMtx() {
 /* 80D1F2E8-80D1F358 000308 0070+00 1/0 0/0 0/0 .text            CreateHeap__10daTreeSh_cFv */
 int daTreeSh_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(211, modelData != 0);
+    JUT_ASSERT(211, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
@@ -80,7 +82,7 @@ int daTreeSh_c::Create() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
     modelData->getJointNodePointer(1)->setCallBack(nodeCallBack);
     modelData->getJointNodePointer(2)->setCallBack(nodeCallBack);
-    mpModel->setUserArea((u32)this);
+    mpModel->setUserArea((uintptr_t)this);
     return 1;
 }
 
@@ -147,7 +149,7 @@ int daTreeSh_c::Delete() {
 /* 80D1F720-80D1F7AC 000740 008C+00 1/0 0/0 0/0 .text            daTreeSh_create1st__FP10daTreeSh_c
  */
 static int daTreeSh_create1st(daTreeSh_c* i_this) {
-    fopAcM_SetupActor(i_this, daTreeSh_c);
+    fopAcM_ct(i_this, daTreeSh_c);
     return i_this->create1st();
 }
 

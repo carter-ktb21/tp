@@ -2,6 +2,8 @@
 //  d_a_tag_qs
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_qs.h"
 #include "d/actor/d_a_obj_carry.h"
 #include "d/actor/d_a_player.h"
@@ -32,7 +34,7 @@ daTagQs_c::~daTagQs_c() {}
 
 /* 80D5DFB0-80D5E110 0001B0 0160+00 1/1 0/0 0/0 .text            create__9daTagQs_cFv */
 int daTagQs_c::create() {
-    fopAcM_SetupActor(this, daTagQs_c);
+    fopAcM_ct(this, daTagQs_c);
     f32 typeScale;
     if (getType() == 0) {
         typeScale = 1.0f;

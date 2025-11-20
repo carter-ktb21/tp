@@ -3,13 +3,30 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_yd.h"
 #include "d/actor/d_a_e_yd_leaf.h"
 #include "d/d_bg_w.h"
 #include "d/d_cc_d.h"
 #include "d/d_cc_uty.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+
+class daE_YD_HIO_c {
+public:
+    daE_YD_HIO_c();
+    virtual ~daE_YD_HIO_c() {}
+
+    /* 0x4 */ s8 field_0x4;
+    /* 0x8 */ f32 field_0x8;
+    /* 0xC */ f32 field_0xc;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ s16 field_0x14;
+    /* 0x16 */ s16 field_0x16;
+    /* 0x18 */ u8 field_0x18;
+};
+
+STATIC_ASSERT(sizeof(daE_YD_HIO_c) == 0x1c);
 
 /* 807F2C2C-807F2C78 0000EC 004C+00 1/1 0/0 0/0 .text __ct__12daE_YD_HIO_cFv */
 daE_YD_HIO_c::daE_YD_HIO_c() {
@@ -134,7 +151,7 @@ static void damage_check(e_yd_class* i_this) {
                         j = i_this->field_0xff4.mpCollider->ChkAtType(AT_TYPE_BOMB | AT_TYPE_40);
                         if (j != 0 || i_this->field_0x66e == 6) {
                             at_power_check(&i_this->field_0xff4);
-                            if (daPy_getPlayerActorClass()->getCutType() != 0) {
+                            if (daPy_getPlayerActorClass()->getCutType() != daPy_py_c::CUT_TYPE_NONE) {
                                 cVar6 = 1;
                             } else {
                                 cVar6 = 2;
@@ -1059,10 +1076,10 @@ static void action(e_yd_class* i_this) {
 
     if (unkFlag1) {
         fopAcM_OnStatus(enemy, 0);
-        enemy->attention_info.flags = 0x4;
+        enemy->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(enemy, 0);
-        enemy->attention_info.flags = 0x0;
+        enemy->attention_info.flags = 0;
     }
 
     if (!unusedFlag) {
@@ -1406,7 +1423,7 @@ static int daE_YD_Create(fopAc_ac_c* i_this) {
         } // mSphAttr
     };
 
-    fopAcM_SetupActor(i_this, e_yd_class);
+    fopAcM_ct(i_this, e_yd_class);
     e_yd_class* a_this = (e_yd_class*)i_this;
 
     s32 loadRv = dComIfG_resLoad(&a_this->field_0x5ac, "E_yd");
@@ -1442,7 +1459,7 @@ static int daE_YD_Create(fopAc_ac_c* i_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        i_this->attention_info.flags = 0x4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(i_this, ((e_yd_class*)i_this)->mpMorf->getModel()->getBaseTRMtx());
 
         fopAcM_SetMin(i_this, -300.0f, -400.0f, -300.0f);

@@ -204,6 +204,9 @@ public:
     void setHorseLifeCount(s16 i_count) { mHorseLifeCount = i_count; }
     void resetTouchKeyCheck() { mTouchKeyCheck = 0; }
     void resetWindowAccept() { mWindowAccept = 0xFFFF; }
+    void onWindowAccept(int param_0) { mWindowAccept |= (u16)(1 << param_0); }
+    void offWindowAccept(int param_0) { mWindowAccept &= ~(u16)(1 << param_0); }
+    void onMenuInForce(int param_0) { unk_0x98 |= (u16)(1 << param_0); }
 
 public:
     /* 0x04 */ u8 unk_0x4[4];
@@ -307,6 +310,12 @@ u8 dMeter2Info_getNewLetterNum();
 int dMeter2Info_setNewLetterSender();
 bool dMeter2Info_isItemOpenCheck();
 bool dMeter2Info_isMapOpenCheck();
+s16 dMeter2Info_getNowLifeGauge();
+
+#if WIDESCREEN_SUPPORT
+void dMeter2Info_onWide2D();
+void dMeter2Info_offWide2D();
+#endif
 
 inline void dMeter2Info_Initialize() {
     g_meter2_info.init();
@@ -737,6 +746,10 @@ inline s16 dMeter2Info_getHorseLifeCount() {
     return g_meter2_info.getHorseLifeCount();
 }
 
+inline void dMeter2Info_setMeterString(s32 i_string) {
+    g_meter2_info.setMeterString(i_string);
+}
+
 inline void dMeter2Info_resetMeterString() {
     g_meter2_info.resetMeterString();
 }
@@ -836,6 +849,18 @@ inline void dMeter2Info_setFloatingMessage(u16 i_msgID, s16 i_msgTimer, bool i_w
 
 inline void dMeter2Info_setMiniGameCount(s8 i_count) {
     g_meter2_info.setMiniGameCount(i_count);
+}
+
+inline void dMeter2Info_onWindowAccept(int param_0) {
+    g_meter2_info.onWindowAccept(param_0);
+}
+
+inline void dMeter2Info_offWindowAccept(int param_0) {
+    g_meter2_info.offWindowAccept(param_0);
+}
+
+inline void dMeter2Info_onMenuInForce(int param_0) {
+    g_meter2_info.onMenuInForce(param_0);
 }
 
 #endif /* D_METER_D_METER2_INFO_H */

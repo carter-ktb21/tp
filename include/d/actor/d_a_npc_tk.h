@@ -4,6 +4,7 @@
 #include "d/actor/d_a_npc.h"
 #include "d/d_cc_uty.h"
 #include "d/d_path.h"
+#include "d/d_spline_path.h"
 
 struct cXyz;
 class daNpc_Hanjo_c;
@@ -14,7 +15,7 @@ class J3DModel;
 /**
  * @ingroup actors-npcs
  * @class daNPC_TK_c
- * @brief Hawk
+ * @brief Hawk (Taka)
  *
  * @details
  *
@@ -98,7 +99,8 @@ public:
     void setQuickHanjoHand() { mFlags |= 0x200; }
     BOOL isHanjoHand() { return mIsHanjoHand != 0; }
 
-private:
+    void setResistanceDemo() { mFlags |= 0x100; }
+
     /* 0x568 */ request_of_phase_process_class mPhase;
     /* 0x570 */ mDoExt_McaMorfSO* mpMorf;
     /* 0x574 */ Z2Creature mSound;
@@ -179,30 +181,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daNPC_TK_c) == 0xB44);
-
-class daNPC_TK_HIO_c : public JORReflexible {
-public:
-    daNPC_TK_HIO_c();
-    virtual ~daNPC_TK_HIO_c() {}
-
-    void genMessage(JORMContext*) {}
-
-    s8 field_0x4;
-    f32 field_0x8;
-    f32 field_0xc;
-    f32 field_0x10;
-    f32 field_0x14;
-    f32 field_0x18;
-    f32 field_0x1c;
-    f32 field_0x20;
-    f32 field_0x24;
-    f32 field_0x28;
-    f32 mFlySpeed;
-    f32 field_0x30;
-    f32 field_0x34;
-    f32 field_0x38;
-    u8 field_0x3c;
-};
-
 
 #endif /* D_A_NPC_TK_H */

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_Y_taihou.h"
 #include "d/d_bg_w.h"
 #include "d/d_cc_d.h"
@@ -67,7 +69,6 @@ static fopAc_ac_c* pushPullcallBack(fopAc_ac_c* param_0, fopAc_ac_c* param_1, s1
 
 /* 80B9FD5C-80B9FDE8 00035C 008C+00 1/1 0/0 0/0 .text            searchIronBallCallback__FPvPv */
 static void* searchIronBallCallback(void* i_actor, void* i_data) {
-    // NONMATCHING
     daObjYtaihou_c* taihou_rhs = (daObjYtaihou_c*)i_data;
     if (fopAcM_GetProfName(i_actor) == PROC_Obj_Carry) {
         daObjCarry_c* pCarry = ((daObjCarry_c*)i_actor);
@@ -170,23 +171,6 @@ void daObjYtaihou_c::setNextAngle() {
     current.angle.z = home.angle.y + l_offsetAngle[field_0x775];
 }
 
-UNK_BSS(1109);
-UNK_BSS(1107);
-UNK_BSS(1105);
-UNK_BSS(1104);
-UNK_BSS(1099);
-UNK_BSS(1097);
-UNK_BSS(1095);
-UNK_BSS(1094);
-UNK_BSS(1057);
-UNK_BSS(1055);
-UNK_BSS(1053);
-UNK_BSS(1052);
-UNK_BSS(1014);
-UNK_BSS(1012);
-UNK_BSS(1010);
-UNK_BSS(1009);
-
 /* 80BA1358-80BA135C 000048 0004+00 1/1 0/0 0/0 .bss             l_wheelMinR$3836 */
 static f32 l_wheelMinR;
 
@@ -213,7 +197,6 @@ void daObjYtaihou_c::setMtx() {
 
 /* 80BA0208-80BA045C 000808 0254+00 1/1 0/0 0/0 .text            rotateCheck__14daObjYtaihou_cFv */
 void daObjYtaihou_c::rotateCheck() {
-    // NONMATCHING
     if (shape_angle.y != current.angle.z) {
         cLib_chaseAngleS(&current.angle.x, 0xbe, 5);
         if (cLib_chaseAngleS(&shape_angle.y, current.angle.z, current.angle.x)) {
@@ -414,7 +397,7 @@ int daObjYtaihou_c::Delete() {
 /* 80BA0C88-80BA0DA4 001288 011C+00 1/0 0/0 0/0 .text daObjYtaihou_create1st__FP14daObjYtaihou_c
  */
 static void daObjYtaihou_create1st(daObjYtaihou_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjYtaihou_c);
+    fopAcM_ct(i_this, daObjYtaihou_c);
     i_this->create1st();
 }
 

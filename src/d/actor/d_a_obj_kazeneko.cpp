@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kazeneko.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_npc_tk.h"
@@ -115,13 +117,13 @@ static char* l_arcName = "J_Kazami";
 
 inline int daObjKazeNeko_c::createHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "pole.bmd");
-    JUT_ASSERT(458, modelData != 0);
+    JUT_ASSERT(458, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mModel == NULL) {
         return 0;
     }
     modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "arm.bmd");
-    JUT_ASSERT(465, modelData != 0);
+    JUT_ASSERT(465, modelData != NULL);
     for (int i = 0; i < 4; i++) {
         mArmModels[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
         if (mArmModels[i] == NULL) {
@@ -216,7 +218,7 @@ static int daObjKazeNeko_Delete(daObjKazeNeko_c* i_this) {
 }
 
 inline int daObjKazeNeko_c::create() {
-    fopAcM_SetupActor(this, daObjKazeNeko_c);
+    fopAcM_ct(this, daObjKazeNeko_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, createSolidHeap, 0x2800) == 0) {

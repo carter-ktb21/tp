@@ -3,6 +3,8 @@
  * Snowpeak Ruins Cannon Ball Tray
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv5yiblltray.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -66,7 +68,7 @@ void daObjYIblltray_c::setMtx() {
 /* 80C6EDA8-80C6EED4 000228 012C+00 1/0 0/0 0/0 .text            CreateHeap__16daObjYIblltray_cFv */
 int daObjYIblltray_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 9);
-    JUT_ASSERT(0, model_data != 0);
+    JUT_ASSERT(0, model_data != NULL);
 
     mpTrayModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (mpTrayModel == NULL) {
@@ -74,7 +76,7 @@ int daObjYIblltray_c::CreateHeap() {
     }
 
     model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 8);
-    JUT_ASSERT(0, model_data != 0);
+    JUT_ASSERT(0, model_data != NULL);
 
     mpHandleModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (mpHandleModel == NULL) {
@@ -253,13 +255,13 @@ static fopAc_ac_c* searchNearBackTrayIronball(void* i_ball, void* i_tray) {
 /* 80C6F440-80C6F450 0008C0 0010+00 1/1 0/0 0/0 .text            onAttention__16daObjYIblltray_cFv
  */
 void daObjYIblltray_c::onAttention() {
-    attention_info.flags |= 0x80;
+    attention_info.flags |= fopAc_AttnFlag_ETC_e;
 }
 
 /* 80C6F450-80C6F460 0008D0 0010+00 1/1 0/0 0/0 .text            offAttention__16daObjYIblltray_cFv
  */
 void daObjYIblltray_c::offAttention() {
-    attention_info.flags &= ~0x80;
+    attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
 }
 
 /* 80C6F460-80C702E0 0008E0 0E80+00 1/0 0/0 0/0 .text Execute__16daObjYIblltray_cFPPA3_A4_f */
@@ -267,7 +269,7 @@ int daObjYIblltray_c::Execute(Mtx** param_0) {
     if (!getNoSameRoom() && mTrayID == fpcM_ERROR_PROCESS_ID_e) {
         daObjYIblltray_c* ptray =
             (daObjYIblltray_c*)fopAcM_Search((fopAcIt_JudgeFunc)searchObjYIblltray, this);
-        JUT_ASSERT(0, ptray != 0);
+        JUT_ASSERT(0, ptray != NULL);
 
         mTrayID = fopAcM_GetID(ptray);
     }
@@ -581,7 +583,7 @@ int daObjYIblltray_c::Delete() {
 /* 80C70480-80C70554 001900 00D4+00 1/0 0/0 0/0 .text
  * daObjYIblltray_create1st__FP16daObjYIblltray_c               */
 static int daObjYIblltray_create1st(daObjYIblltray_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjYIblltray_c);
+    fopAcM_ct(i_this, daObjYIblltray_c);
     return i_this->create1st();
 }
 

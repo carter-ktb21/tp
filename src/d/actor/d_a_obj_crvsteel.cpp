@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_crvsteel.h"
 #include "d/d_com_inf_game.h"
 #include "dol2asm.h"
@@ -89,14 +91,14 @@ static char* l_arcName = "CrvSteel";
 /* 80BD5DB8-80BD5E30 000278 0078+00 1/0 0/0 0/0 .text            CreateHeap__15daObjCRVSTEEL_cFv */
 int daObjCRVSTEEL_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "U_CrvSteelGate.bmd");
-    JUT_ASSERT(86, modelData != 0);
+    JUT_ASSERT(86, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != NULL ? TRUE : FALSE;
 }
 
 /* 80BD5E30-80BD6030 0002F0 0200+00 1/1 0/0 0/0 .text            create__15daObjCRVSTEEL_cFv */
 int daObjCRVSTEEL_c::create() {
-    fopAcM_SetupActor(this, daObjCRVSTEEL_c);
+    fopAcM_ct(this, daObjCRVSTEEL_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
         gravity = -9.0f;

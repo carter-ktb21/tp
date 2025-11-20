@@ -67,6 +67,7 @@ public:
     int setObjectRes(char const* i_arcName, void* i_archiveRes, u32 i_bufferSize, JKRHeap* i_heap);
     int setStageRes(char const* i_arcName, JKRHeap* i_heap);
     void dump();
+    void dump(char*);
     int getObjectResName2Index(char const* i_arcName, char const* i_resName);
 
     static int setRes(char const* i_arcName, dRes_info_c* i_resInfo, int i_infoNum, char const* i_path, u8 i_mountDirection, JKRHeap* i_heap);
@@ -81,51 +82,57 @@ public:
     static int syncAllRes(dRes_info_c* i_resInfo, int i_infoNum);
 
     int setObjectRes(const char* i_arcName, u8 i_mountDirection, JKRHeap* i_heap) {
-        return setRes(i_arcName, mObjectInfo, ARRAY_SIZE(mObjectInfo), "/res/Object/", i_mountDirection,
+        return setRes(i_arcName, mObjectInfo, ARRAY_SIZEU(mObjectInfo), "/res/Object/", i_mountDirection,
                       i_heap);
     }
 
     void* getObjectRes(const char* i_arcName, const char* resName) {
-        return getRes(i_arcName, resName, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return getRes(i_arcName, resName, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     void* getObjectRes(const char* i_arcName, s32 i_index) {
-        return getRes(i_arcName, i_index, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return getRes(i_arcName, i_index, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     void* getObjectIDRes(const char* i_arcName, u16 i_resID) {
-        return getIDRes(i_arcName, i_resID, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return getIDRes(i_arcName, i_resID, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     int syncObjectRes(const char* i_arcName) {
-        return syncRes(i_arcName, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return syncRes(i_arcName, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     int syncStageRes(const char* i_arcName) {
-        return syncRes(i_arcName, mStageInfo, ARRAY_SIZE(mStageInfo));
+        return syncRes(i_arcName, mStageInfo, ARRAY_SIZEU(mStageInfo));
     }
 
-    int syncAllObjectRes() { return syncAllRes(mObjectInfo, ARRAY_SIZE(mObjectInfo)); }
+    int syncAllObjectRes() { return syncAllRes(mObjectInfo, ARRAY_SIZEU(mObjectInfo)); }
 
     int deleteObjectRes(const char* i_arcName) {
-        return deleteRes(i_arcName, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return deleteRes(i_arcName, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     int deleteStageRes(const char* i_arcName) {
-        return deleteRes(i_arcName, mStageInfo, ARRAY_SIZE(mStageInfo));
+        return deleteRes(i_arcName, mStageInfo, ARRAY_SIZEU(mStageInfo));
     }
 
     void* getStageRes(const char* i_arcName, const char* i_resName) {
-        return getRes(i_arcName, i_resName, mStageInfo, ARRAY_SIZE(mStageInfo));
+        return getRes(i_arcName, i_resName, mStageInfo, ARRAY_SIZEU(mStageInfo));
     }
 
     dRes_info_c* getObjectResInfo(const char* i_arcName) {
-        return getResInfo(i_arcName, mObjectInfo, ARRAY_SIZE(mObjectInfo));
+        return getResInfo(i_arcName, mObjectInfo, ARRAY_SIZEU(mObjectInfo));
     }
 
     dRes_info_c* getStageResInfo(const char* i_arcName) {
-        return getResInfo(i_arcName, mStageInfo, ARRAY_SIZE(mStageInfo));
+        return getResInfo(i_arcName, mStageInfo, ARRAY_SIZEU(mStageInfo));
     }
+    
+    #if DEBUG
+    void dumpTag() {
+        // TODO
+    }
+    #endif
 
     /* 0x0000 */ dRes_info_c mObjectInfo[128];
     /* 0x1200 */ dRes_info_c mStageInfo[64];

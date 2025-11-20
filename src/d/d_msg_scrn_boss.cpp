@@ -1,10 +1,10 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_boss.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
-
-extern "C" extern dMsgObject_HIO_c g_MsgObject_HIO_c;
 
 /* 8023C5C8-8023C928 236F08 0360+00 0/0 1/1 0/0 .text            __ct__14dMsgScrnBoss_cFv */
 dMsgScrnBoss_c::dMsgScrnBoss_c() {
@@ -34,7 +34,9 @@ dMsgScrnBoss_c::dMsgScrnBoss_c() {
     for (int i = 0; i < 7; i++) {
         mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getRubyFont());
+#if VERSION != VERSION_GCN_JPN
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setCharSpace(1.0f);
+#endif
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x100, "");
     }
 

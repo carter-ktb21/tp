@@ -1,7 +1,9 @@
 /**
- * @file d_a_npc_tk.cpp
+* @file d_a_npc_tk.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_npc_tk.h"
 #include "Z2AudioLib/Z2Instances.h"
@@ -13,7 +15,31 @@
 #include "d/d_camera.h"
 #include "d/d_cc_d.h"
 #include "d/d_s_play.h"
-#include "dol2asm.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daNPC_TK_HIO_c : public JORReflexible {
+public:
+    daNPC_TK_HIO_c();
+    virtual ~daNPC_TK_HIO_c() {}
+
+    void genMessage(JORMContext*) {}
+
+    s8 field_0x4;
+    f32 field_0x8;
+    f32 field_0xc;
+    f32 field_0x10;
+    f32 field_0x14;
+    f32 field_0x18;
+    f32 field_0x1c;
+    f32 field_0x20;
+    f32 field_0x24;
+    f32 field_0x28;
+    f32 mFlySpeed;
+    f32 field_0x30;
+    f32 field_0x34;
+    f32 field_0x38;
+    u8 field_0x3c;
+};
 
 //
 // Declarations:
@@ -97,7 +123,7 @@ int daNPC_TK_c::checkBeforeBg() {
     gndChkPos.y += 100.0f;
     gndChk.SetPos(&gndChkPos);
     linChkEnd.y = dComIfG_Bgsp().GroundCross(&gndChk);
-    if (linChkEnd.y != -1e+09f) {
+    if (linChkEnd.y != -G_CM3D_F_INF) {
         if (current.pos.y < linChkEnd.y) {
             if (speed.y < 0.0f) {
                 speed.y = 0.0f;
@@ -121,7 +147,7 @@ void daNPC_TK_c::setActionMode(int param_0) {
         field_0x694 = 0;
         field_0x6c5 = 0;
         current.angle.y = shape_angle.y;
-        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_004000);
+        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x4000);
     }
 }
 
@@ -234,8 +260,6 @@ void daNPC_TK_c::setFlySE() {
         }
     }
 }
-
-UNK_REL_BSS
 
 static s16 m_near_angle;
 
@@ -352,7 +376,10 @@ void daNPC_TK_c::executeFly() {
                 mpMaster = NULL;
             }
         }
-        if (mpMaster != NULL && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xcf]) != 0) {
+
+        if (mpMaster != NULL
+               /* dSv_event_flag_c::F_0207 - Ordon Village - Viewed Hanch, the Hawker cutscene */
+            && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0xCF])) {
             setActionMode(6);
             mSphere.OffCoSetBit();
         }
@@ -1271,6 +1298,7 @@ void daNPC_TK_c::executeBack() {
                     }
 
                     if (fopAcM_GetName(field_0x634) == PROC_OBJ_KAGO &&
+                         /* dSv_event_flag_c::F_0577 - Ordon Village - 2nd Day - Retrieved basket from monkey (hit hawk) */
                         !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x241]))
                     {
                         Z2GetAudioMgr()->changeBgmStatus(1);
@@ -1375,10 +1403,12 @@ void daNPC_TK_c::executeBack() {
                 if (current.pos.absXZ(playerPos) < 200.0f) {
                     field_0x6b4 = 0;
                     if (fopAcM_GetName(field_0x634) == PROC_OBJ_KAGO &&
+                         /* dSv_event_flag_c::F_0577 - Ordon Village - 2nd Day - Retrieved basket from monkey (hit hawk) */
                         !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x241]))
                     {
                         Z2GetAudioMgr()->changeBgmStatus(0);
 
+                        /* dSv_event_flag_c::F_0577 - Ordon Village - 2nd Day - Retrieved basket from monkey (hit hawk) */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x241]);
 
                         field_0x6b8 = 0x46;
@@ -1517,7 +1547,7 @@ void daNPC_TK_c::executeAttackLink() {
         field_0x694 = 1;
         setBck(8, 2, 10.0f, 1.0f);
         mSound.startCreatureVoice(Z2SE_HAWK_V_TAKE_OFF, -1);
-        fopAcM_OffStatus(this, fopAcM_STATUS_UNK_004000);
+        fopAcM_OffStatus(this, fopAcM_STATUS_UNK_0x4000);
         field_0x6b4 = 0x1e;
         break;
     }
@@ -1623,7 +1653,7 @@ void daNPC_TK_c::executeAttackLink() {
         cLib_chaseF(&speedF, 30.0f, 3.0f);
         if (field_0x6b0 == 0) {
             if (dComIfGp_checkPlayerStatus0(0, fopAcM_STATUS_HOOK_CARRY_NOW) ||
-                dComIfGp_checkPlayerStatus0(0, fopAcM_STATUS_UNK_000100) ||
+                dComIfGp_checkPlayerStatus0(0, fopAcM_STATUS_UNK_0x100) ||
                 daPy_getPlayerActorClass()->checkWolfTagLockJumpReady())
             {
                 field_0x6b0 = 10;
@@ -2003,7 +2033,7 @@ void daNPC_TK_c::executeWolfPerch() {
         field_0x6c5 = 2;
 
         mWolfPathData = dPath_GetRoomPath(mpPath1->m_nextID, fopAcM_GetRoomNo(this));
-        JUT_ASSERT(2498, mWolfPathData != 0);
+        JUT_ASSERT(2498, mWolfPathData != NULL);
 
         field_0x6ea = mWolfPathData->field_0x6;
         field_0x6e8 = mWolfPathData->field_0x4;
@@ -3205,7 +3235,7 @@ int daNPC_TK_c::JointCallBack(J3DJoint* param_0, int param_1) {
 /* 80B0BBC8-80B0BD04 00A8A8 013C+00 1/1 0/0 0/0 .text            CreateHeap__10daNPC_TK_cFv */
 int daNPC_TK_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Npc_tk", "tk.bmd");
-    JUT_ASSERT_MSG(0xf4f, modelData != 0, "  鷹匠");  // falconer
+    JUT_ASSERT_MSG(0xf4f, modelData != NULL, "  鷹匠");  // falconer
 
     mpMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                   (J3DAnmTransform*)dComIfG_getObjectRes("Npc_tk", 6), 0, 1.0f, 0,
@@ -3215,7 +3245,7 @@ int daNPC_TK_c::CreateHeap() {
     }
 
     J3DModel* model = mpMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         if (i != 0) {
@@ -3246,7 +3276,7 @@ int daNPC_TK_c::create() {
         }  // mSphAttr
     };
 
-    fopAcM_SetupActor(this, daNPC_TK_c);
+    fopAcM_ct(this, daNPC_TK_c);
 
     int loadRes = dComIfG_resLoad(&mPhase, "Npc_tk");
     eventInfo.setArchiveName("Npc_tk");

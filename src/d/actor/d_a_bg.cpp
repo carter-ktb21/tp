@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_bg.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_com_static.h"
@@ -53,7 +55,7 @@ int daBg_btkAnm_c::create(J3DModelData* i_modelData, J3DAnmTextureSRTKey* i_btk,
         return 0;
     }
 
-    if (!mpBtk->init(i_modelData, i_btk, i_anmPlay, -1, 1.0f, 0, -1)) {
+    if (!mpBtk->init(i_modelData, i_btk, i_anmPlay, J3DFrameCtrl::EMode_NULL, 1.0f, 0, -1)) {
         return 0;
     }
 
@@ -88,7 +90,7 @@ int daBg_brkAnm_c::create(J3DModelData* i_modelData, J3DAnmTevRegKey* i_brk, int
         return 0;
     }
 
-    if (!mpBrk->init(i_modelData, i_brk, i_anmPlay, -1, 1.0f, 0, -1)) {
+    if (!mpBrk->init(i_modelData, i_brk, i_anmPlay, J3DFrameCtrl::EMode_NULL, 1.0f, 0, -1)) {
         return 0;
     }
 
@@ -358,6 +360,7 @@ int daBg_c::draw() {
                             field_0x5f0 = 0;
                         }
 
+                            /* Main Event - Get shadow crystal (can now transform) */
                         if (dComIfGs_isEventBit(dSv_event_flag_c::M_077)) {
                             field_0x5f0 = 9;
                         }
@@ -404,6 +407,13 @@ int daBg_c::draw() {
                                 sp50.b = 0;
                                 break;
                             }
+
+                            #ifdef DEBUG
+                            s16 sp56 = 0xFF;
+                            if (g_kankyoHIO.navy.fish_pond_colreg_adjust_ON) {
+                                sp50 = g_kankyoHIO.navy.fish_pond_colreg_c0;
+                            }
+                            #endif
 
                             f32 var_f31 = bgPart->tevstr->AmbCol.r / 10.0f;
                             var_f31 *= var_f31;
@@ -504,7 +514,7 @@ int daBg_c::create() {
     field_0x5f1 = 0;
 
     if (this->heap == NULL) {
-        fopAcM_SetupActor(this, daBg_c);
+        fopAcM_ct(this, daBg_c);
 
         home.roomNo = roomNo;
         current.roomNo = roomNo;
@@ -512,7 +522,7 @@ int daBg_c::create() {
         JKRExpHeap* room_heap = dStage_roomControl_c::getMemoryBlock(roomNo);
         if (room_heap != NULL) {
             this->heap = JKRCreateSolidHeap(-1, room_heap, false);
-            JUT_ASSERT(471, heap != 0);
+            JUT_ASSERT(471, heap != NULL);
 
             JKRHeap* old = mDoExt_setCurrentHeap(this->heap);
             int rt = createHeap();

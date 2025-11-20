@@ -3,6 +3,8 @@
  * Howling Cliff
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_tgake.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
@@ -116,7 +118,7 @@ int daObjGake_c::Delete() {
 
 /* 80D0C068-80D0C0C8 0004C8 0060+00 1/0 0/0 0/0 .text daObjGake_create1st__FP11daObjGake_c */
 static int daObjGake_create1st(daObjGake_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjGake_c);
+    fopAcM_ct(i_this, daObjGake_c);
 
     return i_this->create1st();
 }

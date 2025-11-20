@@ -3,6 +3,8 @@
  * Object - Spinner Switch
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swspinner.h"
 #include "d/d_procname.h"
 
@@ -54,7 +56,7 @@ void daObjSwSpinner_c::setBaseMtx() {
 
 /* 80D00284-80D0035C 000384 00D8+00 1/0 0/0 0/0 .text            Create__16daObjSwSpinner_cFv */
 int daObjSwSpinner_c::Create() {
-    if (fopAcM_isSwitch(this, getSwBit2())) {
+    if (fopAcM_isSwitch(this, getSwbit2())) {
         mPartBHeight = 50.0f;
         mCanUse = false;
     } else {
@@ -79,14 +81,14 @@ static char* l_arcName = "P_Sswitch";
 /* 80D0035C-80D00498 00045C 013C+00 1/0 0/0 0/0 .text            CreateHeap__16daObjSwSpinner_cFv */
 int daObjSwSpinner_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0xED, modelData != 0);
+    JUT_ASSERT(0xED, modelData != NULL);
     mpModelA = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModelA == NULL) {
         return 0;
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(0xF8, modelData != 0);
+    JUT_ASSERT(0xF8, modelData != NULL);
     mpModelB = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModelB == NULL) {
         return 0;
@@ -139,7 +141,7 @@ int daObjSwSpinner_c::Execute(Mtx** param_0) {
         mCount++;
     }
 
-    if (fopAcM_isSwitch(this, getSwBit2())) {
+    if (fopAcM_isSwitch(this, getSwbit2())) {
         if (cLib_addCalc(&mPartBHeight, 50.0f, 0.1f, 10.0f, 2.0f) == 0.0f && mCanUse) {
             if (mSpinnerIn) {
                 spinner->offSpinnerTag();
@@ -156,13 +158,13 @@ int daObjSwSpinner_c::Execute(Mtx** param_0) {
     } else if (mSpinnerIn) {
         if (mCount > 200) {
             if (mRotSpeedY > 3000) {
-                fopAcM_onSwitch(this, getSwBit());
+                fopAcM_onSwitch(this, getSwbit());
             } else {
-                fopAcM_offSwitch(this, getSwBit());
+                fopAcM_offSwitch(this, getSwbit());
             }
         }
     } else {
-        dComIfGs_offSwitch(getSwBit() & 0xFF, fopAcM_GetHomeRoomNo(this));
+        dComIfGs_offSwitch(getSwbit() & 0xFF, fopAcM_GetHomeRoomNo(this));
     }
 
     if (mSpinnerIn && !mPrevSpinnerIn) {
@@ -180,7 +182,7 @@ int daObjSwSpinner_c::Execute(Mtx** param_0) {
     attention_info.position = current.pos;
     attention_info.position.y -= 100.0f;
 
-    mPrevIsSwbit2 = fopAcM_isSwitch(this, getSwBit2());
+    mPrevIsSwbit2 = fopAcM_isSwitch(this, getSwbit2());
     mPrevSpinnerIn = mSpinnerIn;
     return 1;
 }
@@ -211,7 +213,7 @@ int daObjSwSpinner_c::Delete() {
 /* 80D009C0-80D00A20 000AC0 0060+00 1/0 0/0 0/0 .text
  * daObjSwSpinner_create1st__FP16daObjSwSpinner_c               */
 static int daObjSwSpinner_create1st(daObjSwSpinner_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjSwSpinner_c);
+    fopAcM_ct(i_this, daObjSwSpinner_c);
     return i_this->create1st();
 }
 

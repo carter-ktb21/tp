@@ -3,28 +3,12 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_automata.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "d/d_cc_d.h"
 #include "d/d_com_inf_game.h"
-
-/* 80BA6CB0-80BA6CBC 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BA6CBC-80BA6CD0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BA6CD0-80BA6CD8 000020 0008+00 4/5 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[1][2] = {
@@ -81,7 +65,7 @@ daObj_AutoMata_c::~daObj_AutoMata_c() {
 
 /* 80BA5990-80BA5D2C 000390 039C+00 1/1 0/0 0/0 .text            create__16daObj_AutoMata_cFv */
 int daObj_AutoMata_c::create() {
-    fopAcM_SetupActor(this, daObj_AutoMata_c);
+    fopAcM_ct(this, daObj_AutoMata_c);
     field_0xb30 = 0;
     int rv = dComIfG_resLoad(&mPhase, l_resNameList[l_bmdData[field_0xb30][1]]);
     if (rv == cPhs_COMPLEATE_e) {
@@ -104,7 +88,7 @@ int daObj_AutoMata_c::create() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1e9f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             setEnvTevColor();
             setRoomNo();
         }
@@ -150,7 +134,7 @@ int daObj_AutoMata_c::Execute() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1e9f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             if (fopAcIt_Judge((fopAcIt_JudgeFunc)srchTHouse, &current.pos) != NULL) {
                 current.pos.y = mGroundH;
             }
@@ -164,7 +148,7 @@ int daObj_AutoMata_c::Execute() {
         mAnmPlaySpeed = 0.0f;
         setSe();
         setMtx();
-        if (field_0xb31 == 0) {
+        if (mCoNone == 0) {
             cStack_28.set(0.0f, 40.0f, 0.0f);
             mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(3));
             mDoMtx_stack_c::multVec(&cStack_28, &sphCenter);
@@ -180,7 +164,7 @@ int daObj_AutoMata_c::Execute() {
         mCyl.ClrCoHit();
         attention_info.flags = 0;
         eyePos = attention_info.position = current.pos;
-        field_0xb31 = 0;
+        mCoNone = 0;
         return 1;
     } 
     return 0;
@@ -195,7 +179,7 @@ int daObj_AutoMata_c::Draw() {
     mBtk.entry(modelData);
     mpMorf->entryDL();
     mBtk.remove(modelData);
-    if (mGroundH != -1e+09f) {
+    if (mGroundH != -G_CM3D_F_INF) {
         mShadowId = dComIfGd_setShadow(
             mShadowId, 1, morfModel, &current.pos, 600.0f, 20.0f,
             current.pos.y, mGroundH, mGndChk,

@@ -3,10 +3,21 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv3Water2.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_msg_mng.h"
 #include "m_Do/m_Do_graphic.h"
+
+struct daLv3Water2_HIO_c : public mDoHIO_entry_c {
+    /* 80C5A40C */ daLv3Water2_HIO_c();
+    /* 80C5B14C */ ~daLv3Water2_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ u8 mLevelControlWaitFrames;
+};
 
 typedef void (daLv3Water2_c::*actionFunc)(void);
 
@@ -27,9 +38,6 @@ void daLv3Water2_HIO_c::genMessage(JORMContext* ctx) {
     ctx->genSlider("wait time", &mLevelControlWaitFrames, 0, 255, 0, NULL, 0xffff, 0xffff, 0x200, 0x18);
 }
 #endif
-
-/* 80C5B3A4-80C5B3B0 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-UNK_REL_DATA;
 
 /* 80C5B3C4-80C5B3C8 -00001 0004+00 3/3 0/0 0/0 .data            l_resNameIdx */
 static char* l_resNameIdx[] = {"Kr03wat04"};
@@ -88,7 +96,7 @@ static const int l_btkIdx[] = {9};
 /* 80C5A4F8-80C5A5E4 0001D8 00EC+00 1/0 0/0 0/0 .text            CreateHeap__13daLv3Water2_cFv */
 int daLv3Water2_c::CreateHeap() {
     J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_resNameIdx[mResourceIndex], l_bmdIdx[mResourceIndex]));
-    JUT_ASSERT(171, modelData != 0);
+    JUT_ASSERT(171, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, (1 << 19), 0x19000284);
     if(!mpModel)
         return 0;
@@ -101,7 +109,7 @@ int daLv3Water2_c::CreateHeap() {
 
 /* 80C5A5E4-80C5A7FC 0002C4 0218+00 1/1 0/0 0/0 .text            create__13daLv3Water2_cFv */
 cPhs__Step daLv3Water2_c::create() {
-    fopAcM_SetupActor(this, daLv3Water2_c);
+    fopAcM_ct(this, daLv3Water2_c);
     mResourceIndex = getParam(0, 4);
 
     cPhs__Step resPhase = static_cast<cPhs__Step>(dComIfG_resLoad(&mPhase, l_resNameIdx[mResourceIndex]));
@@ -228,7 +236,7 @@ int daLv3Water2_c::Draw() {
             Mtx lightProjMtx;
             C_MTXLightPerspective(lightProjMtx, dComIfGd_getView()->fovy, dComIfGd_getView()->aspect, 1.0f, 1.0f, -0.01f, 0);
 
-            #ifdef DEBUG
+            #if WIDESCREEN_SUPPORT
             mDoGph_gInf_c::setWideZoomLightProjection(lightProjMtx);
             /* TODO: Handle screen capture perspective calculations */
             #endif

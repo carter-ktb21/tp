@@ -3,6 +3,8 @@
  * Main Gameplay Scene
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_s_play.h"
 #include "JSystem/JUtility/JUTConsole.h"
 #include "JSystem/JUtility/JUTGamePad.h"
@@ -24,6 +26,10 @@
 #include "m_Do/m_Do_graphic.h"
 #include "d/actor/d_a_suspend.h"
 #include "d/actor/d_a_ykgr.h"
+
+#if PLATFORM_WII
+#include "d/d_cursor_mng.h"
+#endif
 
 static void dScnPly_Create(scene_class*);
 static int dScnPly_Delete(dScnPly_c*);
@@ -86,8 +92,8 @@ static const s16 T_JOINT_dylKeyTbl[1] = {
 /* 80259440-80259468 253D80 0028+00 1/1 0/0 0/0 .text            __ct__22dScnPly_env_otherHIO_cFv */
 dScnPly_env_otherHIO_c::dScnPly_env_otherHIO_c() {
     mShadowDensity = 255.0f;
-    mLODBias = 1;
-    mDispTransCylinder = false;
+    mAdjustLODBias = 1;
+    mDisplayTransparentCyl = false;
 }
 
 void dScnPly_env_otherHIO_c::genMessage(JORMContext* ctx) {
@@ -291,6 +297,11 @@ static int dScnPly_Delete(dScnPly_c* i_this) {
     }
 
     dComIfGp_init();
+
+    #if PLATFORM_WII
+    data_8053a730 = 0;
+    #endif
+
     JUTAssertion::setMessageCount(0);
     return 1;
 }
@@ -343,6 +354,10 @@ static int phase_00(dScnPly_c* i_this) {
     if (!i_this->resetGame()) {
         return cPhs_INIT_e;
     } else {
+        #if PLATFORM_WII
+        data_8053a730 = 1;
+        #endif
+
         mDoGph_gInf_c::offBlure();
         return cPhs_NEXT_e;
     }
@@ -360,11 +375,10 @@ static int phase_01(dScnPly_c* i_this) {
         mDoAud_setInDarkness(false);
     }
 
-    s8 start_room = dComIfGp_getStartStageRoomNo();
-    int layer = dComIfG_play_c::getLayerNo_common(dComIfGp_getStartStageName(), start_room,
-                                                  dComIfGp_getStartStageLayer());
-
-    mDoAud_setSceneName(dComIfGp_getStartStageName(), start_room, layer);
+    mDoAud_setSceneName(dComIfGp_getStartStageName(),
+                        dComIfGp_getStartStageRoomNo(),
+                        dComIfG_play_c::getLayerNo_common(dComIfGp_getStartStageName(), dComIfGp_getStartStageRoomNo(),
+                                                                 dComIfGp_getStartStageLayer()));
 
     if (!mDoAud_load1stDynamicWave()) {
         return cPhs_INIT_e;
@@ -612,7 +626,7 @@ static int phase_4(dScnPly_c* i_this) {
         dComIfGp_setPlayerPtr(i, NULL);
     }
 
-    dComIfGp_setWindow(0, 0.0f, 0.0f, 608.0f, 448.0f, 0.0f, 1.0f, 0, 2);
+    dComIfGp_setWindow(0, 0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0.0f, 1.0f, 0, 2);
     dComIfGp_setCameraInfo(0, NULL, 0, 0, -1);
     dComIfGd_setWindow(NULL);
     dComIfGd_setViewport(NULL);
@@ -678,7 +692,7 @@ static int phase_5(dScnPly_c* i_this) {
         const char** resNames = PreLoadInfoT[preLoadNo].resNameTbl;
         s32 resNameNum = PreLoadInfoT[preLoadNo].resNameNum;
         if (resNames != NULL && *resNames != NULL) {
-            JUT_ASSERT(2830, resNameNum <= (sizeof(resPhase) / sizeof(resPhase[0])));
+            JUT_ASSERT(2830, resNameNum <= ARRAY_SIZEU(resPhase));
             int goodLoads = 0;
             int loadNum = 0;
             for (int i = 0; i < resNameNum; i++) {
@@ -709,7 +723,7 @@ static int phase_6(dScnPly_c* i_this) {
         const s16* dylKeyTbl = PreLoadInfoT[preLoadNo].profNameTbl;
         s32 dylKeyTblNum = PreLoadInfoT[preLoadNo].dylKeyTblNum;
         if (dylKeyTbl != NULL && *dylKeyTbl != 0) {
-            JUT_ASSERT(2864, dylKeyTblNum <= (sizeof(dylPhase) / sizeof(dylPhase[0])));
+            JUT_ASSERT(2864, dylKeyTblNum <= ARRAY_SIZEU(dylPhase));
             int goodLoads = 0;
             int loadNum = 0;
             for (int i = 0; i < dylKeyTblNum; i++) {

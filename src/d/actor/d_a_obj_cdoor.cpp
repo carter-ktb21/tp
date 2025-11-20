@@ -3,25 +3,13 @@
  * Object - Sewer Gate / Sluice Gate
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cdoor.h"
 #include "d/actor/d_a_obj_wchain.h"
+#include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
-
-/* 80BC7D58-80BC7D64 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BC7D64-80BC7D78 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80BC7D78-80BC7D80 -00001 0008+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName[2] = {
@@ -73,7 +61,7 @@ static void* daObjCdoor_searchChain(fopAc_ac_c* i_actor, void* i_this) {
 
 /* 80BC6F30-80BC7234 0001F0 0304+00 1/1 0/0 0/0 .text            create__12daObjCdoor_cFv */
 cPhs__Step daObjCdoor_c::create() {
-    fopAcM_SetupActor(this, daObjCdoor_c);
+    fopAcM_ct(this, daObjCdoor_c);
     mType = (fopAcM_GetParam(this) >> 8) & 0xf;
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, l_arcName[mType]);
     if (step == cPhs_COMPLEATE_e) {
@@ -201,9 +189,9 @@ void daObjCdoor_c::execCdoor() {
 void daObjCdoor_c::execWgate() {
     typedef void (daObjCdoor_c::*daObjCdoor_modeFunc)();
     static daObjCdoor_modeFunc mode_proc[3] = {
-        &modeWait,
-        &modeOpen,
-        &modeClose,
+        &daObjCdoor_c::modeWait,
+        &daObjCdoor_c::modeOpen,
+        &daObjCdoor_c::modeClose,
     };
     u8 was_open = mIsOpen;
     mIsOpen = fopAcM_isSwitch(this, mSw);
@@ -270,10 +258,10 @@ static int daObjCdoor_Execute(daObjCdoor_c* i_this) {
 void daObjCdoor_c::event_proc_call() {
     typedef void (daObjCdoor_c::*daObjCdoor_eventFunc)();
     static daObjCdoor_eventFunc l_func[4] = {
-        &actionWait,
-        &actionOrderEvent,
-        &actionEvent,
-        &actionDead,
+        &daObjCdoor_c::actionWait,
+        &daObjCdoor_c::actionOrderEvent,
+        &daObjCdoor_c::actionEvent,
+        &daObjCdoor_c::actionDead,
     };
     (this->*l_func[mAction])();
 }

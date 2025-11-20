@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swpropeller.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -113,7 +115,7 @@ int daObjSwPr_c::Create() {
 
     J3DJoint* jnt = mpModel->getModelData()->getJointNodePointer(mKaitenJntID);
     jnt->setCallBack(nodeCallBack);
-    mpModel->setUserArea((u32)this);
+    mpModel->setUserArea((uintptr_t)this);
 
     eyePos.y += 100.0f;
 
@@ -140,7 +142,7 @@ int daObjSwPr_c::CreateHeap() {
 
 /* 8059A888-8059AA74 0003E8 01EC+00 1/1 0/0 0/0 .text            create__11daObjSwPr_cFv */
 int daObjSwPr_c::create() {
-    fopAcM_SetupActor(this, daObjSwPr_c);
+    fopAcM_ct(this, daObjSwPr_c);
 
     mNameArg = getNameArg();
 

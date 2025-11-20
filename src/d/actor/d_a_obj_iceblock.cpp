@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_iceblock.cpp
+* @file d_a_obj_iceblock.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_iceblock.h"
 #include "SSystem/SComponent/c_math.h"
@@ -9,6 +11,7 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_camera.h"
 #include "d/actor/d_a_mirror.h"
+#include "f_op/f_op_camera_mng.h"
 
 enum PUSH_DIR {
     DIR_SOUTH,
@@ -211,24 +214,6 @@ void daObjIceBlk_c::disablePushPull() {
     }
 }
 
-/* 80C244D0-80C244DC 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C244DC-80C244F0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80C244F0-80C244F4 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Y_icecube";
 
@@ -339,7 +324,7 @@ int daObjIceBlk_c::CreateHeap() {
 
     if (getSwbit2() != 0xFF && !fopAcM_isSwitch(this, getSwbit2())) {
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[0]);
-        JUT_ASSERT(0, modelData != 0);
+        JUT_ASSERT(0, modelData != NULL);
 
         mpIceModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
         if (mpIceModel == NULL) {
@@ -360,10 +345,10 @@ int daObjIceBlk_c::CreateHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[1]);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     J3DModelData* shareModelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[0]);
-    JUT_ASSERT(0, shareModelData != 0);
+    JUT_ASSERT(0, shareModelData != NULL);
 
     mDoExt_setupShareTexture(modelData, shareModelData);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -655,7 +640,7 @@ int daObjIceBlk_c::checkWallPre(s16 i_angle) {
 
     int var_r29 = -1;
 
-    linchk.SetActorPid(base.id);
+    linchk.SetActorPid(base.base.id);
 
     mDoMtx_stack_c::YrotS(i_angle);
     mDoMtx_stack_c::multVec(&cXyz::BaseZ, &spBC);
@@ -687,11 +672,11 @@ int daObjIceBlk_c::checkWallPre(s16 i_angle) {
 /* 80C236C8-80C237B0 001A68 00E8+00 2/2 0/0 0/0 .text            checkBgHit__13daObjIceBlk_cFv */
 int daObjIceBlk_c::checkBgHit() {
     cXyz check_pos;
-    mGroundY = -1000000000.0f;
+    mGroundY = -G_CM3D_F_INF;
 
     int var_r29 = -1;
 
-    mGndChk.SetActorPid(base.id);
+    mGndChk.SetActorPid(base.base.id);
 
     for (int i = 0; i < 5; i++) {
         static const Vec l_check_offsetXZ[] = {
@@ -758,7 +743,7 @@ BOOL daObjIceBlk_c::checkFall() {
     cXyz end;
 
     dBgS_ObjLinChk linchk;
-    linchk.SetActorPid(base.id);
+    linchk.SetActorPid(base.base.id);
 
     for (int i = 0; i < 5; i++) {
         static const Vec l_check_offsetXZ[] = {
@@ -878,7 +863,7 @@ int daObjIceBlk_c::Delete() {
 
 /* 80C23E68-80C23FCC 002208 0164+00 1/0 0/0 0/0 .text daObjIceBlk_create1st__FP13daObjIceBlk_c */
 static int daObjIceBlk_create1st(daObjIceBlk_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjIceBlk_c);
+    fopAcM_ct(i_this, daObjIceBlk_c);
     return i_this->create1st();
 }
 

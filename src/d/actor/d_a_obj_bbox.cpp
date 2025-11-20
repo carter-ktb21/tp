@@ -3,6 +3,8 @@
  * Object - Breakable Wooden Box
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_bbox.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -59,7 +61,7 @@ int daObjBBox_c::CreateHeap() {
 
 /* 80BACEC0-80BAD030 000200 0170+00 1/1 0/0 0/0 .text            create1st__11daObjBBox_cFv */
 int daObjBBox_c::create1st() {
-    fopAcM_SetupActor(this, daObjBBox_c);
+    fopAcM_ct(this, daObjBBox_c);
 
     if (fopAcM_isSwitch(this, getSwNo())) {
         return cPhs_ERROR_e;
@@ -118,7 +120,7 @@ int daObjBBox_c::Delete() {
 
 /* 80BAD30C-80BAD400 00064C 00F4+00 1/0 0/0 0/0 .text daObjBBox_create1st__FP11daObjBBox_c */
 static int daObjBBox_create1st(daObjBBox_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjBBox_c);
+    fopAcM_ct(i_this, daObjBBox_c);
     return i_this->create1st();
 }
 

@@ -3,13 +3,23 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_nan.h"
 #include "SSystem/SComponent/c_xyz.h"
 #include "d/d_menu_insect.h"
 #include "d/d_cc_uty.h"
 #include "d/d_com_inf_game.h"
 
-UNK_REL_DATA
+class daObj_NanHIO_c {
+public:
+    /* 80CA05AC */ daObj_NanHIO_c();
+    /* 80CA30D0 */ virtual ~daObj_NanHIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 field_0x8;
+    /* 0x0C */ f32 field_0xc;
+};
 
 /* 80CA32D0-80CA3310 000020 0040+00 0/1 0/0 0/0 .data cc_sph_src__25@unnamed@d_a_obj_nan_cpp@ */
 static dCcD_SrcSph cc_sph_src = {
@@ -57,7 +67,7 @@ static int const l_nan_btk_index[2] = {
 
 inline int daObjNAN_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("I_Nan", 9);
-    JUT_ASSERT(254, modelData != 0);
+    JUT_ASSERT(254, modelData != NULL);
     mMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                        (J3DAnmTransform*)dComIfG_getObjectRes("I_Nan", 6), 2, 1.0f,
                                        0, -1, &mCreatureSound, 0, 0x11000284);
@@ -321,7 +331,7 @@ void daObjNAN_c::bin_wait() {
         fopAcM_OnStatus(this, 0x4000);
         mDraw = false;
         field_0x7d0++;
-    } else if (field_0x7d0 != -1 && field_0x56C != 0) {
+    } else if (field_0x7d0 != -1 && field_0x56c != 0) {
         current.angle.y = daPy_getPlayerActorClass()->current.angle.y - 0x4000;
         if (strcmp("R_SP160", dComIfGp_getStartStageName()) == 0 &&
             dComIfGp_getStartStageRoomNo() == 3)
@@ -414,7 +424,7 @@ void daObjNAN_c::hook() {
         if (mDraw) {
             nan_setParticle();
         }
-        if (!fopAcM_checkStatus(this, 0x100000)) {
+        if (!fopAcM_CheckStatus(this, 0x100000)) {
             setAction(&daObjNAN_c::drop);
         }
         dBgS_LinChk linkChk;
@@ -552,13 +562,13 @@ void daObjNAN_c::action() {
 /* ############################################################################################## */
 /* 80CA3270-80CA3274 0000B4 0002+02 0/1 0/0 0/0 .rodata          l_nan_itemno */
 static u8 const l_nan_itemno[2] = {
-    0xC8, 0xC9,
+    fpcNm_ITEM_M_NANAFUSHI, fpcNm_ITEM_F_NANAFUSHI,
 };
 
 /* 80CA276C-80CA2904 0022AC 0198+00 1/1 0/0 0/0 .text            execute__10daObjNAN_cFv */
 int daObjNAN_c::execute() {
     if (ChkGetDemo()) {
-        field_0x57C = field_0x578 + 10000.0f;
+        field_0x57c = field_0x578 + 10000.0f;
         mCreatureSound.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
         Insect_GetDemoMain();
         nan_setParticle();
@@ -633,7 +643,7 @@ inline int daObjNAN_c::draw() {
                 cStack_88.y += 20.0f;
                 gndChk.SetPos(&cStack_88);
                 f32 groundCross = dComIfG_Bgsp().GroundCross(&gndChk);
-                if (groundCross != 1000000000.0f) {
+                if (groundCross != G_CM3D_F_INF) {
                     dComIfGd_setSimpleShadow(&current.pos, groundCross, 15.0f, gndChk, 0, -0.6f, 
                                              dDlst_shadowControl_c::getSimpleTex());
                 }
@@ -655,7 +665,10 @@ static int daObjNAN_Execute(daObjNAN_c* i_this) {
 
 /* ############################################################################################## */
 /* 80CA3294-80CA3298 0000D8 0004+00 0/1 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x0199, 0x019A};
+static u16 const l_musiya_num[2] = {
+    0x0199, /* dSv_event_flag_c::F_0409 - Misc. - Phasmid (M) */
+    0x019A, /* dSv_event_flag_c::F_0410 - Misc. - Phasmid (F) */
+};
 
 /* 80CA3298-80CA329C 0000DC 0004+00 0/1 0/0 0/0 .rodata          l_heapsize */
 static u16 const l_heapsize[2] = {0x0EE0, 0x0EC0};
@@ -666,7 +679,7 @@ static daObj_NanHIO_c l_HIO;
 /* 80CA2B68-80CA2FDC 0026A8 0474+00 1/1 0/0 0/0 .text            create__10daObjNAN_cFv */
 int daObjNAN_c::create() {
     u8 uVar6 = (fopAcM_GetParam(this) & 0xf00) >> 8;
-    fopAcM_SetupActor(this, daObjNAN_c);
+    fopAcM_ct(this, daObjNAN_c);
     int rv = dComIfG_resLoad(&mPhase, "I_Nan");
     if (rv == cPhs_COMPLEATE_e) {
         OS_REPORT("NAN PARAM %x\n", fopAcM_GetParam(this));

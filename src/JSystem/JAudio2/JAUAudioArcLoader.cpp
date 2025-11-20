@@ -3,13 +3,11 @@
 // Translation Unit: JAUAudioArcLoader
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JAudio2/JAUAudioArcLoader.h"
 #include "JSystem/JAudio2/JAISeMgr.h"
 #include "JSystem/JAudio2/JAUSectionHeap.h"
-
-//
-// Declarations:
-//
 
 /* 802A4740-802A478C 29F080 004C+00 0/0 1/1 0/0 .text __ct__17JAUAudioArcLoaderFP10JAUSection */
 JAUAudioArcLoader::JAUAudioArcLoader(JAUSection* section) {

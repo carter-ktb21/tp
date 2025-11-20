@@ -3,6 +3,9 @@
  *
  */
 
+// not sure if this object is supposed to have a PCH -
+// including it completely messes up weak function ordering
+
 #define NO_INLINE_DLSTBASE_DRAW
 
 #include "d/d_map.h"
@@ -98,7 +101,7 @@ int renderingAmap_c::getDispType() const {
         disp_type = 5;
         break;
     default:
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
         break;
     }
 
@@ -336,7 +339,7 @@ GXColor* renderingAmap_c::getLineColor(int param_0, int param_1) {
             *color = borderColor1;
             break;
         default:
-            JUT_ASSERT(0, 0);
+            JUT_ASSERT(0, FALSE);
             break;
         }
     } else {
@@ -357,7 +360,7 @@ const GXColor* renderingAmap_c::getDecoLineColor(int param_0, int param_1) {
 
     const GXColor* color;
     if (isDrawOutSideTrim() && field_0x38 != 2) {
-        JUT_ASSERT(0, m_outSideBlackLineCnt < (sizeof(colorTable) / sizeof(colorTable[0])));
+        JUT_ASSERT(0, m_outSideBlackLineCnt < ARRAY_SIZEU(colorTable));
         color = &colorTable[m_outSideBlackLineCnt];
     } else {
         color = getLineColor(param_0, param_1);
@@ -427,7 +430,7 @@ int renderingAmap_c::getStayType() const {
  * isDrawIconSingle2__15renderingAmap_cCFPCQ27dTres_c6data_sbbi */
 bool renderingAmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool param_1, bool param_2,
                                         int param_3) const {
-    JUT_ASSERT(0, i_data != 0);
+    JUT_ASSERT(0, i_data != NULL);
 
     bool var_r31 = false;
     int disp_type = getDispType();
@@ -480,6 +483,7 @@ bool renderingAmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
                 if (dComIfGp_getStartStageDarkArea() == 2) {
                     int temp_r3 = i_data->mNo;
                     if (temp_r3 == 0x33 || temp_r3 == 0x34 || temp_r3 == 0x35) {
+                            /* dSv_event_flag_c::M_086 - Twilight Hyrule Field - Show Boss Bug's Tear of Light on the map */
                         if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[119])) {
                             temp_r23_2 = true;
                         }
@@ -592,7 +596,7 @@ bool renderingAmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         }
         break;
     default:
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
         break;
     }
 
@@ -621,7 +625,7 @@ bool dMap_c::isSpecialOutline() {
 
 /* 8002974C-800297A8 02408C 005C+00 1/1 0/0 0/0 .text            copyPalette__6dMap_cFv */
 void dMap_c::copyPalette() {
-    JUT_ASSERT(0, m_res != 0);
+    JUT_ASSERT(0, m_res != NULL);
 
     cLib_memCpy(m_res, m_res_src, sizeof(dMap_HIO_prm_res_dst_s::m_res->palette_data));
     if (getStayType() == 0) {
@@ -680,7 +684,7 @@ dMap_c::dMap_c(int param_0, int param_1, int param_2, int param_3) {
     field_0x90 = 0;
 
     m_res = new (0x20) dMap_prm_res_s;
-    JUT_ASSERT(0, m_res != 0);
+    JUT_ASSERT(0, m_res != NULL);
 
     dMap_HIO_prm_res_dst_s::m_res = m_res;
 
@@ -696,12 +700,12 @@ dMap_c::dMap_c(int param_0, int param_1, int param_2, int param_3) {
 
     int buffer_size = GXGetTexBufferSize(param_2, param_3, 9, GX_FALSE, 0);
     mImage_p = new (0x20) u8[buffer_size];
-    JUT_ASSERT(0, mImage_p != 0);
+    JUT_ASSERT(0, mImage_p != NULL);
 
     renderingDAmap_c::init(mImage_p, mTexSizeX, mTexSizeY, mTexSizeX, mTexSizeY);
 
     mResTIMG = new (0x20) ResTIMG;
-    JUT_ASSERT(0, mResTIMG != 0);
+    JUT_ASSERT(0, mResTIMG != NULL);
 
     makeResTIMG(mResTIMG, mTexSizeX, mTexSizeY, mImage_p, (u8*)m_res, 0x33);
 }
@@ -746,7 +750,7 @@ void dMap_c::getMapMinMaxXZ(int i_roomNo, f32* param_1, f32* param_2, f32* param
         f32 sp8 = 0.0f;
 
         dStage_FileList2_dt_c* fileList2_p = dStage_roomControl_c::getFileList2(i_roomNo);
-        JUT_ASSERT(0, fileList2_p != 0);
+        JUT_ASSERT(0, fileList2_p != NULL);
 
         if (fileList2_p != NULL) {
             dMapInfo_n::getRoomMinMaxXZ(i_roomNo, &sp14, &sp10, &spC, &sp8);
@@ -754,7 +758,7 @@ void dMap_c::getMapMinMaxXZ(int i_roomNo, f32* param_1, f32* param_2, f32* param
 
         switch (getDispType()) {
         default:
-            JUT_ASSERT(0, 0);
+            JUT_ASSERT(0, FALSE);
         case 4:
         case 0:
             var_f0 = temp_f31;
@@ -866,7 +870,7 @@ void dMap_c::calcMapCenterXZ(int i_roomNo, f32* param_1, f32* param_2) {
 /* 80029E1C-80029F84 02475C 0168+00 1/1 0/0 0/0 .text            calcMapCmPerTexel__6dMap_cFiPf */
 void dMap_c::calcMapCmPerTexel(int i_roomNo, f32* ip_cmPerTexel) {
     JUT_ASSERT(0, i_roomNo >= 0);
-    JUT_ASSERT(0, ip_cmPerTexel != 0);
+    JUT_ASSERT(0, ip_cmPerTexel != NULL);
 
     f32 cmPerTexel = 0.0f;
     JUT_ASSERT(0, mTexSizeY != 0);
@@ -893,7 +897,7 @@ void dMap_c::calcMapCmPerTexel(int i_roomNo, f32* ip_cmPerTexel) {
             f32 var_f31 = 0.0f;
 
             stage_stag_info_class* pstag = dComIfGp_getStage()->getStagInfo();
-            JUT_ASSERT(0, pstag != 0);
+            JUT_ASSERT(0, pstag != NULL);
 
             if (pstag != NULL) {
                 var_f31 = pstag->field_0x20;
@@ -1102,7 +1106,7 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
     switch (getDispType()) {
     default:
     case 0:
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
         break;
     case 5:
         field_0x8e = 2;
@@ -1228,12 +1232,13 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
         break;
     case 2:
         switch (field_0x8f) {
-        case 2:
+        case 2: {
             f32 temp_f31 = (f32)field_0x90 / 5.0f;
             setMapPaletteColorAlphaPer(0x2F, 0x32, temp_f31);
             setMapPaletteColorAlphaPer(0x21, 0x2B, temp_f31);
             break;
-        case 3:
+        }
+        case 3: {
             calcMapCenterXZ(field_0x88, &mCenterX, &mCenterZ);
             f32 sp24, sp20;
             calcMapCenterXZ(field_0x84, &sp24, &sp20);
@@ -1264,11 +1269,13 @@ void dMap_c::_move(f32 i_centerX, f32 i_centerZ, int i_roomNo, f32 param_3) {
             mCenterX += sp14;
             mCenterZ -= sp10;
             break;
-        case 4:
+        }
+        case 4: {
             f32 temp_f31_3 = 1.0f - ((f32)field_0x90 / 5.0f);
             setMapPaletteColorAlphaPer(0x2F, 0x32, temp_f31_3);
             setMapPaletteColorAlphaPer(0x21, 0x2B, temp_f31_3);
             break;
+        }
         case 6:
             copyPalette();
             break;

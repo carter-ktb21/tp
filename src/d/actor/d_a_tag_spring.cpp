@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_spring.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
@@ -26,7 +28,7 @@ int daTagSpring_c::Create() {
 
 /* 805A6AF4-805A6B5C 000114 0068+00 1/1 0/0 0/0 .text            create__13daTagSpring_cFv */
 int daTagSpring_c::create() {
-    fopAcM_SetupActor(this, daTagSpring_c);
+    fopAcM_ct(this, daTagSpring_c);
 
     if (!Create()) {
         return cPhs_ERROR_e;

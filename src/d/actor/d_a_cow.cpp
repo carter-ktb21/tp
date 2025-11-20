@@ -1,7 +1,9 @@
 /**
- * @file d_a_cow.cpp
+* @file d_a_cow.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_cow.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -15,6 +17,7 @@
 #include "d/d_timer.h"
 #include "dolphin/types.h"
 #include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_ext.h"
 #include "m_Do/m_Do_lib.h"
 #include "m_Do/m_Do_mtx.h"
@@ -34,10 +37,7 @@
         (val) = (min);                                                                             \
     }
 
-#define CLAMP_COW_BODY_ANGLE(angle) CLAMP((angle), -0x2000, 0x2000)
-
-UNK_REL_DATA;
-UNK_REL_BSS;
+#define CLAMP_COW_BODY_ANGLE(angle) CLAMP((angle), -0x2000, 0x2000);
 
 namespace {
 static dCcD_SrcSph cc_sph_src = {{{0, {{0, 0, {0}}, {0xfbfdfb, {0x11}}, {{0x79}}}},
@@ -199,7 +199,7 @@ void daCow_c::setCarryStatus() {
     mDoMtx_stack_c::multVec(&daPy_getPlayerActorClass()->current.pos, &carryPosition);
     if (fabsf(carryPosition.x) < xMax && carryPosition.z > 0.0f && carryPosition.z < zMax) {
         // todo: what does this mean
-        attention_info.flags |= 0x10;  // in debug this is 0x80
+        attention_info.flags |= fopAc_AttnFlag_CARRY_e;  // in debug this is 0x80
     }
 }
 
@@ -208,7 +208,7 @@ void daCow_c::setActetcStatus() {
     if (!mNadeNade) {
         s32 playerAngle = fopAcM_seenPlayerAngleY(this);
         if (playerAngle < 0x6000 && playerAngle > 0x2000) {
-            attention_info.flags |= 0x80;  // in debug this is 0x800
+            attention_info.flags |= fopAc_AttnFlag_ETC_e;  // in debug this is 0x800
         }
     }
 }
@@ -1698,9 +1698,9 @@ void daCow_c::action_angry() {
         setSeSnort();
 
         if (!player->checkHorseRide()) {
-            attention_info.flags |= 1;
+            attention_info.flags |= fopAc_AttnFlag_LOCK_e;
         } else {
-            attention_info.flags &= ~1;
+            attention_info.flags &= ~fopAc_AttnFlag_LOCK_e;
         }
         if (mCrazy == daCow_c::Crazy_Dash) {
             setCarryStatus();
@@ -1908,7 +1908,7 @@ void daCow_c::action_angry() {
         mJoint1Offset.y = 0;
         mJoint8Offset.y = 0;
 
-        attention_info.flags &= ~1;
+        attention_info.flags &= ~fopAc_AttnFlag_LOCK_e;
         break;
     }
 }
@@ -1957,7 +1957,7 @@ void daCow_c::executeCrazyWait() {
 
         mAcchCir.SetWall(100.0f, 110.0f);
         mTimer1 = 30;
-        fopAcM_OffStatus(this, fopAcM_STATUS_UNK_000100);
+        fopAcM_OffStatus(this, fopAcM_STATUS_UNK_0x100);
     }
 }
 
@@ -2471,7 +2471,7 @@ void daCow_c::executeCrazyBack() {
         }
         break;
     case daCow_c::Action_4:
-        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_000100);
+        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x100);
         if (fopAcM_CheckCondition(this, fopAcCnd_NODRAW_e)) {
             fopAcM_delete(this);
         }
@@ -2547,19 +2547,19 @@ void daCow_c::action_crazy() {
 
         dComIfGoat_SetThrow(this);
         mMode = daCow_c::Mode_1;
-        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_000100);
+        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x100);
         break;
     case daCow_c::Mode_1:
         TICK_TIMER(mForgetCowPTimer);
         TICK_TIMER(mTimer1);
 
-        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_004000);
+        fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x4000);
         if (dComIfGp_event_runCheck() &&
             strcmp(dComIfGp_getEventManager().getRunEventName(), "WILDGOAT") &&
             strcmp(dComIfGp_getEventManager().getRunEventName(), "WILDGOAT_SUCCESS") &&
             strcmp(dComIfGp_getEventManager().getRunEventName(), "WILDGOAT_FAILURE"))
         {
-            fopAcM_OffStatus(this, fopAcM_STATUS_UNK_004000);
+            fopAcM_OffStatus(this, fopAcM_STATUS_UNK_0x4000);
         }
 
         switch (mCrazy) {
@@ -2780,7 +2780,7 @@ void daCow_c::action_wolf() {
         mMode = daCow_c::Mode_1;
         mCrazy = daCow_c::Crazy_Wait;
         calcRunAnime(true);
-        attention_info.flags |= 1;
+        attention_info.flags |= fopAc_AttnFlag_LOCK_e;
         mSound.startCreatureVoice(Z2SE_GOAT_V_ANGRY, -1);
         mTimer10 = cM_rndF(90.0f) + 90.0f;
         break;
@@ -2877,7 +2877,7 @@ void daCow_c::action_wolf() {
         mJoint1Offset.y = 0;
         mJoint8Offset.y = 0;
 
-        attention_info.flags &= ~0x1;
+        attention_info.flags &= ~fopAc_AttnFlag_LOCK_e;
 
         for (int iWolfBuster = 0; iWolfBuster < N_WOLF_BUSTERS; iWolfBuster++) {
             if (gWolfBustersID[iWolfBuster] == fopAcM_GetID(this)) {
@@ -2962,7 +2962,7 @@ void daCow_c::setAttnPos() {
     cXyz pos;
 
     if (mpMorf) {
-        if (attention_info.flags & 0x80) {
+        if (attention_info.flags & fopAc_AttnFlag_ETC_e) {
             arg.set(0.0f, 0.0f, 0.0f);
             mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(11));
             mDoMtx_stack_c::multVec(&arg, &eyePos);
@@ -3020,8 +3020,8 @@ int daCow_c::Execute() {
     mCounter1++;
     mJointIndex = 0;
 
-    attention_info.flags &= ~0x10;
-    attention_info.flags &= ~0x80;
+    attention_info.flags &= ~fopAc_AttnFlag_CARRY_e;
+    attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
     action();
 
     if (!mDrawOff) {
@@ -3074,7 +3074,7 @@ int daCow_c::CreateHeap() {
         return cPhs_INIT_e;
     }
 
-    mpMorf->getModel()->setUserArea((u32)this);
+    mpMorf->getModel()->setUserArea((uintptr_t)this);
 
     for (u16 iJoint = 0; iJoint < modelData->getJointNum(); iJoint++) {
         if (iJoint == 1 || iJoint == 8 || iJoint == 0) {

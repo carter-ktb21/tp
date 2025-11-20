@@ -221,7 +221,7 @@ void daAlink_c::hookshotAtHitCallBack(dCcD_GObjInf* i_atObjInf, fopAc_ac_c* i_tg
             mSearchBallScale = dist_to_hitpos;
 
             if (checkHookshotWait()) {
-                if (fopAcM_checkStatus(i_tgActor, 0x280000)) {
+                if (fopAcM_CheckStatus(i_tgActor, 0x280000)) {
                     mHookTargetAcKeep.setData(i_tgActor);
                 } else {
                     field_0x3494 = 1.0f;
@@ -430,7 +430,7 @@ void daAlink_c::setHookshotModel() {
     mDoExt_setCurrentHeap(heap);
 
     resetHookshotMode();
-    mpHookChain->setUserArea((u32)this);
+    mpHookChain->setUserArea((uintptr_t)this);
     field_0x2f94 = 1;
     if (mEquipItem == fpcNm_ITEM_W_HOOKSHOT) {
         field_0x2f95 = 6;
@@ -834,7 +834,6 @@ void daAlink_c::setHookshotTopPosFly() {
 static cXyz l_hookSnowSandHitScale(0.5f, 0.5f, 0.5f);
 
 /* 80109BDC-8010B2DC 10451C 1700+00 1/1 0/0 0/0 .text            setHookshotPos__9daAlink_cFv */
-// NONMATCHING - almost, just cXyz stack order
 void daAlink_c::setHookshotPos() {
     mDoMtx_stack_c::copy(mpLinkModel->getAnmMtx(field_0x30c0));
     mDoMtx_stack_c::transM(-2.0f, 1.0f, 1.0f);
@@ -1009,8 +1008,7 @@ void daAlink_c::setHookshotPos() {
 
         mDoMtx_stack_c::copy(mHeldItemModel->getBaseTRMtx());
 
-        cXyz sp134(hookRoot);
-        mDoMtx_stack_c::transM(sp134);
+        mDoMtx_stack_c::transM(cXyz(hookRoot));
         if (mTargetedActor != NULL || mItemMode != 2) {
             mDoMtx_stack_c::multVecZero(&mHookshotTopPos);
         }
@@ -1213,8 +1211,7 @@ void daAlink_c::setHookshotPos() {
         if (field_0x3024 == 0) {
             mDoMtx_stack_c::copy(field_0x0710->getBaseTRMtx());
 
-            cXyz sp5C(hookRoot);
-            mDoMtx_stack_c::transM(sp5C);
+            mDoMtx_stack_c::transM(cXyz(hookRoot));
 
             mIronBallBgChkPos = field_0x3810;
         }

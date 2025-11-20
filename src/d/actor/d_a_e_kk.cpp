@@ -1,15 +1,31 @@
 /**
- * @file d_a_e_kk.cpp
+* @file d_a_e_kk.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_kk.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+
+class daE_KK_HIO_c : public JORReflexible {
+public:
+    /* 806FA70C */ daE_KK_HIO_c();
+    /* 806FF0F0 */ virtual ~daE_KK_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 spear_throw_range;
+    /* 0x10 */ f32 direct_attack_range;
+    /* 0x14 */ f32 default_moving_range;
+    /* 0x18 */ s16 escape_time;
+    /* 0x1A */ u8 range_display;
+};
 
 enum daE_KK_Action {
     ACTION_WAIT,
@@ -388,7 +404,7 @@ bool daE_KK_c::way_gake_check() {
         gndChk.SetPos(&field_0x6d4[i]);
         field_0x6d4[i].y = dComIfG_Bgsp().GroundCross(&gndChk);
 
-        if (field_0x6d4[i].y == -1000000000.0f) {
+        if (field_0x6d4[i].y == -G_CM3D_F_INF) {
             field_0x6d4[i].y = current.pos.y;
             return true;
         }
@@ -885,7 +901,7 @@ void daE_KK_c::executeDead() {
     switch (mMoveMode) {
     case 0:
         fopAcM_OffStatus(this, 0);
-        attention_info.flags &= 0xFFFFFFFB;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
         attention_info.distances[2] = 0;
         offHeadLockFlg();
         health = 0;
@@ -1150,7 +1166,7 @@ void daE_KK_c::action() {
             position.y += 300.0f;
             gndChk.SetPos(&position);
             position.y = dComIfG_Bgsp().GroundCross(&gndChk);
-            if (position.y == -1000000000.0f) {
+            if (position.y == -G_CM3D_F_INF) {
                 mTimer = 100;
                 setActionMode(10, 2);
             } else {
@@ -1284,7 +1300,7 @@ int daE_KK_c::execute() {
             attention_info.distances[2] = 0x45;
             fopAcM_SetGroup(this, 2);
             fopAcM_OnStatus(this, 0);
-            attention_info.flags |= 4;
+            attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
         }
     }
 
@@ -1346,7 +1362,7 @@ static int daE_KK_Delete(daE_KK_c* i_this) {
 int daE_KK_c::CreateHeap() {
     if (field_0x679 != 1) {
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_KK", 0x22);
-        JUT_ASSERT(2212, modelData != 0);
+        JUT_ASSERT(2212, modelData != NULL);
 
         mpMorfSO = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                         (J3DAnmTransform*)dComIfG_getObjectRes("E_KK", 0x19), 0,
@@ -1355,7 +1371,7 @@ int daE_KK_c::CreateHeap() {
             return 0;
         }
         model = mpMorfSO->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
         for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
             if (i != 0) {
                 model->getModelData()->getJointNodePointer(i)->setCallBack(JointCallBack);
@@ -1364,7 +1380,7 @@ int daE_KK_c::CreateHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_KK", 0x23);
-    JUT_ASSERT(2247, modelData != 0);
+    JUT_ASSERT(2247, modelData != NULL);
 
     mpWeaponMorfSO = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                           (J3DAnmTransform*)dComIfG_getObjectRes("E_KK", 0x1D), 0,
@@ -1382,7 +1398,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 806FE6B8-806FED20 004098 0668+00 1/1 0/0 0/0 .text            create__8daE_KK_cFv */
 int daE_KK_c::create() {
-    fopAcM_SetupActor(this, daE_KK_c);
+    fopAcM_ct(this, daE_KK_c);
 
     int phase_state = dComIfG_resLoad(&mPhaseReq, "E_KK");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -1463,7 +1479,7 @@ int daE_KK_c::create() {
 
             field_0x760 = current.pos.y;
 
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             attention_info.distances[2] = 0x4C;
 
             if (field_0x679 != 3) {
@@ -1485,7 +1501,7 @@ int daE_KK_c::create() {
             attention_info.distances[2] = 0;
             fopAcM_SetGroup(this, 0);
             fopAcM_OffStatus(this, 0);
-            attention_info.flags &= 0xFFFFFFFB;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
         }
 
         if (field_0x67a == 0xFF || field_0x67a == 0) {

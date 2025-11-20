@@ -3,6 +3,8 @@
  * Background (Map) Collision main handler
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_bg_s.h"
 #include "d/d_bg_s_sph_chk.h"
 #include "d/d_bg_w.h"
@@ -129,7 +131,7 @@ bool cBgS::LineCross(cBgS_LinChk* p_line) {
 
 /* 800744A0-80074578 06EDE0 00D8+00 0/0 51/51 231/231 .text GroundCross__4cBgSFP11cBgS_GndChk */
 f32 cBgS::GroundCross(cBgS_GndChk* p_gnd) {
-    p_gnd->SetNowY(-1000000000.0f);
+    p_gnd->SetNowY(-G_CM3D_F_INF);
     p_gnd->ClearPi();
     p_gnd->PreCheck();
 
@@ -192,18 +194,18 @@ void* cBgS::ConvDzb(void* p_dzb) {
     }
 
     if (pbgd->m_v_tbl != 0) {
-        pbgd->m_v_tbl += (u32)p_dzb;
+        pbgd->m_v_tbl += (uintptr_t)p_dzb;
     }
 
-    pbgd->m_t_tbl += (u32)p_dzb;
-    pbgd->m_b_tbl += (u32)p_dzb;
-    pbgd->m_tree_tbl += (u32)p_dzb;
-    pbgd->m_g_tbl += (u32)p_dzb;
-    pbgd->m_ti_tbl += (u32)p_dzb;
+    pbgd->m_t_tbl += (uintptr_t)p_dzb;
+    pbgd->m_b_tbl += (uintptr_t)p_dzb;
+    pbgd->m_tree_tbl += (uintptr_t)p_dzb;
+    pbgd->m_g_tbl += (uintptr_t)p_dzb;
+    pbgd->m_ti_tbl += (uintptr_t)p_dzb;
 
     for (int i = 0; i < pbgd->m_g_num; i++) {
         ((cBgD_Grp_t_*)pbgd->m_g_tbl)[i].strOffset =
-            (u32)p_dzb + ((cBgD_Grp_t_*)pbgd->m_g_tbl)[i].strOffset;
+            (uintptr_t)p_dzb + ((cBgD_Grp_t_*)pbgd->m_g_tbl)[i].strOffset;
     }
 
     return p_dzb;

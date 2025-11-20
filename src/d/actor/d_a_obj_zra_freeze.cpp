@@ -3,6 +3,8 @@
  * Object - Frozen Zora
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_zra_freeze.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
@@ -42,7 +44,7 @@ BOOL daZraFreeze_c::chkActorInScreen() {
     PSMTXMultVecArray(mDoMtx_stack_c::get(), vec, vec, 8);
     for (int i = 0; i < 8; i++) {
         mDoLib_project(&vec[i], &proj);
-        if (0.0f < proj.x && proj.x < 608.0f && 0.0f < proj.y && proj.y < 448.0f) {
+        if (0.0f < proj.x && proj.x < FB_WIDTH && 0.0f < proj.y && proj.y < FB_HEIGHT) {
             continue;
         }
         return false;
@@ -57,7 +59,7 @@ static int createSolidHeap(fopAc_ac_c* i_this) {
 
 /* 80D442BC-80D4443C 00027C 0180+00 1/1 0/0 0/0 .text            Create__13daZraFreeze_cFv */
 cPhs__Step daZraFreeze_c::Create() {
-    fopAcM_SetupActor(this, daZraFreeze_c);
+    fopAcM_ct(this, daZraFreeze_c);
     field_0x5b0 = (fopAcM_GetParam(this) >> 8) & 0xff;
     field_0x5b1 = (fopAcM_GetParam(this) >> 0x10) & 0xff;
     field_0x5b2 = (fopAcM_GetParam(this) >> 0x18) & 0xff;
@@ -91,7 +93,7 @@ int daZraFreeze_c::CreateHeap() {
         "zrA_pain_TW.bmd",
         "zrA_sol_TW.bmd",
     };
-    J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdName[subtype]);
+    J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdName[argument]);
     mpModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;

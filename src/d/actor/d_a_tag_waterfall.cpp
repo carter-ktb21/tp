@@ -3,9 +3,12 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_waterfall.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80D64D94-80D64D98 000000 0004+00 2/2 0/0 0/0 .data            m_master_id */
 static u32 m_master_id = static_cast<u32>(0xFFFFFFFF);
@@ -206,7 +209,7 @@ static int daTagWaterFall_Delete(daTagWaterFall_c* i_this) {
 
 /* 80D64B20-80D64CBC 0005E0 019C+00 1/1 0/0 0/0 .text            create__16daTagWaterFall_cFv */
 cPhs__Step daTagWaterFall_c::create() {
-    fopAcM_SetupActor(this, daTagWaterFall_c);
+    fopAcM_ct(this, daTagWaterFall_c);
 
     if (masterWaterfallTagExists == false) {
         masterWaterfallTagExists = true;

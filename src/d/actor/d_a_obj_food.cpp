@@ -3,6 +3,8 @@
  * Object - Bone / Ball
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_food.h"
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/JKernel/JKRHeap.h"
@@ -67,7 +69,7 @@ static void ground_ang_set(obj_food_class* i_this) {
     vec1.z = vec2.z + 10.0f;
     gnd_chk.SetPos(&vec1);
     vec1.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (vec1.y != -1e9f) {
+    if (vec1.y != -G_CM3D_F_INF) {
         i_this->mGroundAngleX = -cM_atan2s(vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
@@ -76,7 +78,7 @@ static void ground_ang_set(obj_food_class* i_this) {
     vec1.z = vec2.z;
     gnd_chk.SetPos(&vec1);
     vec1.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (vec1.y != -1e9f) {
+    if (vec1.y != -G_CM3D_F_INF) {
         i_this->mGroundAngleZ = cM_atan2s(vec1.y - vec2.y, vec1.x - vec2.x);
     }
 }
@@ -151,7 +153,7 @@ static void food_normal(obj_food_class* i_this) {
     if (i_this->mAcch.ChkGroundHit()) {
         fopAcM_SetFoodStatus(i_this, fopAcM_FOOD_0);
         if (i_this->mBounces >= 3) {
-            cLib_onBit<u32>(i_this->attention_info.flags, 0x10);
+            cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
             i_this->speedF = 0.0f;
 
             if (fopAcM_checkCarryNow(i_this)) {
@@ -263,14 +265,14 @@ static void action(obj_food_class* i_this) {
         break;
     case fopAcM_FOOD_1:
         food_normal(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_2:
         food_carry(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_3:
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_4:
         fopAcM_SetFoodStatus(i_this, fopAcM_FOOD_0);
@@ -435,7 +437,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
  */
 static cPhs__Step daObj_Food_Create(fopAc_ac_c* i_this) {
     obj_food_class* _this = static_cast<obj_food_class*>(i_this);
-    fopAcM_SetupActor(i_this, obj_food_class);
+    fopAcM_ct(i_this, obj_food_class);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhase, "Obj_fd");
     if (step == cPhs_COMPLEATE_e) {

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swturn.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -122,8 +124,6 @@ int daObjSwTurn_c::Create() {
     return 1;
 }
 
-UNK_REL_DATA
-
 /* 80D020EC-80D020F4 -00001 0008+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName[2] = {
     "P_Lv4tsw",
@@ -133,7 +133,7 @@ static char* l_arcName[2] = {
 /* 80D00EE4-80D00F64 000384 0080+00 1/0 0/0 0/0 .text            CreateHeap__13daObjSwTurn_cFv */
 int daObjSwTurn_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[mModelType], l_bmd[mModelType]);
-    JUT_ASSERT(347, modelData != 0);
+    JUT_ASSERT(347, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != 0 ? TRUE : FALSE;
 }
@@ -440,7 +440,7 @@ int daObjSwTurn_c::Delete() {
 
 /* 80D01F98-80D01FF8 001438 0060+00 1/0 0/0 0/0 .text daObjSwTurn_create1st__FP13daObjSwTurn_c */
 static int daObjSwTurn_create1st(daObjSwTurn_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjSwTurn_c);
+    fopAcM_ct(i_this, daObjSwTurn_c);
     return i_this->create1st();
 }
 

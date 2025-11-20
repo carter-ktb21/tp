@@ -3,11 +3,21 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_zs.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
 #include "d/actor/d_a_b_ds.h"
 
+class daE_ZS_HIO_c {
+public:
+    /* 808330AC */ daE_ZS_HIO_c();
+    /* 80834DDC */ virtual ~daE_ZS_HIO_c() {}
+
+    /* 0x4 */ s8 field_0x4;
+    /* 0x8 */ f32 field_0x8;
+    /* 0xc */ f32 field_0xc;
+};
 
 //
 // Declarations:
@@ -521,7 +531,7 @@ static void useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80834884-80834BA8 0018C4 0324+00 1/1 0/0 0/0 .text            create__8daE_ZS_cFv */
 int daE_ZS_c::create() {
-    fopAcM_SetupActor(this, daE_ZS_c);
+    fopAcM_ct(this, daE_ZS_c);
     int phase = dComIfG_resLoad(&mPhase, "E_ZS");
     if (phase == cPhs_COMPLEATE_e) {
         OS_REPORT("E_ZS PARAM %x\n", fopAcM_GetParam(this));
@@ -541,7 +551,7 @@ int daE_ZS_c::create() {
         }
 
         OS_REPORT("arg0 %d\n", field_0x672);
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(this, 200.0f, 200.0f, 200.0f);

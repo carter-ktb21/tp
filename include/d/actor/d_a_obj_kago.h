@@ -37,7 +37,7 @@ public:
         int iVar1 = fopAcM_GetParam(this) & 0xFF;
         u8 rv;
 
-        switch ((subtype & 127)) {
+        switch ((argument & 127)) {
             case 0:
                 switch (iVar1) {
                     case 0:
@@ -69,10 +69,6 @@ public:
         current.pos = sp18;
         old.pos = current.pos;
         field_0x574->setBaseTRMtx(param_1);
-    }
-
-    u32 fopAcM_checkHawkCarryNow(fopAc_ac_c* actor) {
-        return fopAcM_checkStatus(actor, 0x80000000);
     }
 
     void popup(f32 param_1, f32 param_2, cXyz* param_3) {

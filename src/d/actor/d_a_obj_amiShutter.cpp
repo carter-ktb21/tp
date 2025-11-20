@@ -3,18 +3,25 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_amiShutter.h"
 #include "d/actor/d_a_player.h"
 #include "c/c_damagereaction.h"
 #include "d/d_bg_w.h"
 
-//
-// Declarations:
-//
+struct daAmiShutter_HIO_c : public mDoHIO_entry_c {
+    /* 0x04 */ f32 mRange;
+    /* 0x08 */ f32 mMaxOpenSpeed;
+    /* 0x0c */ f32 mMaxCloseSpeed;
+    /* 0x10 */ u8 mWaitTime;
+    /* 0x11 */ u8 field_0x11;
 
-/* ############################################################################################## */
+    /* 80BA14CC */ daAmiShutter_HIO_c();
+    /* 80BA21E0 */ ~daAmiShutter_HIO_c() {}
 
-UNK_REL_DATA
+    void genMessage(JORMContext*);
+};
 
 /* 80BA14CC-80BA1514 0000EC 0048+00 1/1 0/0 0/0 .text            __ct__18daAmiShutter_HIO_cFv */
 daAmiShutter_HIO_c::daAmiShutter_HIO_c() {
@@ -54,10 +61,10 @@ void daAmiShutter_c::setBaseMtx() {
 /* 80BA15E4-80BA1650 000204 006C+00 1/0 0/0 0/0 .text            CreateHeap__14daAmiShutter_cFv */
 int daAmiShutter_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes("S_Zami", 4);
-    JUT_ASSERT(167, modelData != 0); 
+    JUT_ASSERT(167, modelData != NULL); 
     
     mpModel = mDoExt_J3DModel__create(modelData, 
-        J3DMdlFlag_Unk80000, 0x11000084);
+        J3DMdlFlag_DifferedDLBuffer, 0x11000084);
     if (mpModel == NULL) {
         return 0;
     }
@@ -68,7 +75,7 @@ int daAmiShutter_c::CreateHeap() {
 
 /* 80BA1650-80BA182C 000270 01DC+00 1/1 0/0 0/0 .text            create__14daAmiShutter_cFv */
 cPhs__Step daAmiShutter_c::create() {
-    fopAcM_SetupActor(this, daAmiShutter_c);
+    fopAcM_ct(this, daAmiShutter_c);
     cPhs__Step phaseStep = (cPhs__Step) dComIfG_resLoad(&mPhaseReq, "S_Zami");
 
     if (phaseStep == cPhs_COMPLEATE_e) {

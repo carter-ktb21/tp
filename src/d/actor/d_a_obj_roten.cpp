@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_roten.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
@@ -78,7 +80,7 @@ static u32 l_bmdFileIdx = 4;
 /* 80CC0EC4-80CC0F40 0003E4 007C+00 1/0 0/0 0/0 .text            CreateHeap__13daObj_Roten_cFv */
 int daObj_Roten_c::CreateHeap() {
     J3DModelData* mdlData_p = (J3DModelData*)dComIfG_getObjectRes(getResName(), l_bmdFileIdx);
-    JUT_ASSERT(156, mdlData_p != 0);
+    JUT_ASSERT(156, mdlData_p != NULL);
     mModel = mDoExt_J3DModel__create(mdlData_p, 0x80000, 0x11000084);
     return mModel != NULL;
 }
@@ -89,7 +91,8 @@ static u32 l_dzbFileIdx = 7;
 
 /* 80CC0F40-80CC1038 000460 00F8+00 1/1 0/0 0/0 .text            create__13daObj_Roten_cFv */
 int daObj_Roten_c::create() {
-    fopAcM_SetupActor(this, daObj_Roten_c);
+    fopAcM_ct(this, daObj_Roten_c);
+         /* dSv_event_flag_c::M_031 - Goron Mines - Goron Mines clear */
     if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x40])) {
         return cPhs_ERROR_e;
     }

@@ -13,41 +13,6 @@
 #include "m_Do/m_Do_DVDError.h"
 #include "m_Do/m_Do_MemCard.h"
 
-//
-// Forward References:
-//
-
-extern "C" static void my_OSCancelAlarmAll__Fv();
-extern "C" static void destroyVideo__Fv();
-extern "C" void mDoRst_reset__FiUli();
-extern "C" void mDoRst_resetCallBack__FiPv();
-extern "C" u32 getResetData__6mDoRstFv();
-extern "C" extern char const* const m_Do_m_Do_Reset__stringBase0;
-extern "C" u8 mResetData__6mDoRst[4 + 4 /* padding */];
-
-//
-// External References:
-//
-
-extern "C" void mDoDvdErr_ThdCleanup__Fv();
-extern "C" void cAPICPad_recalibrate__Fv();
-extern "C" void pause__13JASTaskThreadFb();
-extern "C" void getThreadPointer__6JASDvdFv();
-extern "C" void hasReset__10Z2AudioMgrCFv();
-extern "C" void destroyManager__8JUTVideoFv();
-extern "C" void clearIndex__6JUTXfbFv();
-extern "C" void LCDisable();
-extern "C" void VIWaitForRetrace();
-extern "C" void VIFlush();
-extern "C" void GXFlush();
-extern "C" void GXAbortFrame();
-extern "C" void GXDrawDone();
-extern "C" void _savegpr_27();
-extern "C" u8 mAudioMgrPtr__10Z2AudioMgr[4 + 4 /* padding */];
-extern "C" u8 sCallback__Q210JUTGamePad13C3ButtonReset[4];
-extern "C" u8 sCallbackArg__Q210JUTGamePad13C3ButtonReset[4 + 4 /* padding */];
-extern "C" u8 sManager__6JUTXfb[4 + 4 /* padding */];
-
 static void my_OSCancelAlarmAll() {}
 
 static void destroyVideo() {
@@ -144,29 +109,3 @@ void mDoRst_resetCallBack(int port, void*) {
         mDoRst::onReset();
     }
 }
-
-/* ############################################################################################## */
-/* 80450C80-80450C88 -00001 0008+00 0/0 6/6 0/0 .sbss            None */
-/* 80450C80 0001+00 data_80450C80 None */
-/* 80450C81 0007+00 data_80450C81 None */
-// most of these are probably fake
-#pragma push
-#pragma force_active on
-u8 struct_80450C7C;
-u8 struct_80450C7D;
-u8 struct_80450C7E;
-u8 struct_80450C7F;
-
-bool SyncWidthSound;
-u8 sDefaultDirection;
-
-u8 struct_80450C82;
-u8 struct_80450C83;
-u8 struct_80450C84;
-u8 struct_80450C85;
-u8 struct_80450C86;
-u8 struct_80450C87;
-#pragma pop
-
-/* 80450C88-80450C90 000188 0008+00 0/0 2/2 0/0 .sbss            None */
-bool mDoDvdErr_initialized;

@@ -3,6 +3,8 @@
 // Translation Unit: d_a_tag_camera
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_camera.h"
 #include "cmath.h"
 #include "d/actor/d_a_alink.h"
@@ -196,7 +198,7 @@ static u8 const lit_3874[12] = {
 };
 
 int daTag_Cam_c::create() {
-    fopAcM_SetupActor(this, daTag_Cam_c);
+    fopAcM_ct(this, daTag_Cam_c);
 
     if (getAreaType() == 0) {
         scale.x *= 500.0f;

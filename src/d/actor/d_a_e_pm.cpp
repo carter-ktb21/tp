@@ -3,6 +3,8 @@
  * Enemy - Skull Kid
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_pm.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
@@ -11,11 +13,44 @@
 #include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
+#include "d/actor/d_a_alink.h"
 #include "d/actor/d_a_e_fs.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_smw_stone.h"
-UNK_REL_DATA
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_PM_HIO_c {
+public:
+    /* 80741EEC */ daE_PM_HIO_c();
+    /* 8074BA68 */ virtual ~daE_PM_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mLampParticleScale;
+    /* 0x0C */ f32 mGlowEffectScale;
+    /* 0x10 */ f32 mEscapeRange;
+    /* 0x14 */ s16 mGlowColor1R;
+    /* 0x16 */ s16 mGlowColor1G;
+    /* 0x18 */ s16 mGlowColor1B;
+    /* 0x1A */ s16 mGlowColor2R;
+    /* 0x1C */ s16 mGlowColor2G;
+    /* 0x1E */ s16 mGlowColor2B;
+    /* 0x20 */ s16 mGlowColor1A;
+    /* 0x22 */ s16 mBossEscapeTimer;
+    /* 0x24 */ s16 field_0x24;
+    /* 0x26 */ s16 mAdditionalPuppetNum;
+    /* 0x28 */ f32 mCreateTimer;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ f32 field_0x34;
+    /* 0x38 */ f32 mBossLightR;
+    /* 0x3C */ f32 mBossLightG;
+    /* 0x40 */ f32 mBossLightB;
+    /* 0x44 */ f32 field_0x44;
+    /* 0x48 */ f32 field_0x48;
+};
+
+STATIC_ASSERT(sizeof(daE_PM_HIO_c) == 0x4C);
 
 enum Action {
     /* 0x0 */ ACT_START,
@@ -78,27 +113,23 @@ enum Joint {
     /* 0x19 */ JNT_FOOT_R,
     /* 0x1A */ JNT_SKIRT,
 };
- 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
+
+enum Mode {
+#if VERSION == VERSION_GCN_JPN
+    /* 0x00 */ Mode0_JPN,
+#endif
+    /* 0x00 */ Mode0,
+    /* 0x01 */ Mode1,
+    /* 0x02 */ Mode2,
+    /* 0x03 */ Mode3,
+    /* 0x04 */ Mode4,
+    /* 0x05 */ Mode5,
+    /* 0x06 */ Mode6,
+    /* 0x07 */ Mode7,
+};
 
 /* 8074C384-8074C388 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 8074C384 0001+00 data_8074C384 @1009 */
 /* 8074C385 0003+00 data_8074C385 None */
-static u8 struct_8074C384;
 static bool hioInit;
 
 /* 8074C394-8074C3E0 000054 004C+00 11/13 0/0 0/0 .bss             l_HIO */
@@ -274,6 +305,10 @@ void daE_PM_c::SetAnm(int i_anm, int i_attr, f32 i_morf, f32 i_rate) {
     mAnm = i_anm;
 }
 
+static void dummy() {
+    delete (cM3dGPla*)NULL;
+}
+
 /* 80742768-80742810 000968 00A8+00 2/2 0/0 0/0 .text way_bg_check2__FP8daE_PM_c4cXyz4cXyz */
 static BOOL way_bg_check2(daE_PM_c* i_this, cXyz i_start, cXyz i_end) {
     dBgS_LinChk lin_chk;
@@ -320,16 +355,18 @@ static s16 s_TargetAngle;
 }  // namespace
 
 /* 80742958-80742C94 000B58 033C+00 1/1 0/0 0/0 .text            SearchFarP__8daE_PM_cFv */
-// NONMATCHING regalloc, instruction order
 void daE_PM_c::SearchFarP() {
     //! @bug best_distance is not initialized
     f32 best_distance;
     int best_index;
     dPnt* pnt = dPath_GetPnt(mpPath, 0);
-    cXyz point(pnt->m_position.x, pnt->m_position.y, pnt->m_position.z);
+    Vec pos;
+    pos = pnt->m_position;
+    cXyz point(pos.x, pos.y, pos.z);
     for (int i = 0; i < mpPath->m_num; i++) {
         pnt = dPath_GetPnt(mpPath, i);
-        point.set(pnt->m_position.x, pnt->m_position.y, pnt->m_position.z);
+        pos = pnt->m_position;
+        point.set(pos.x, pos.y, pos.z);
         if (s_LinkPos->absXZ(point) > best_distance && mPointIndex != i) {
             best_index = i;
             best_distance = s_LinkPos->absXZ(point);
@@ -459,13 +496,26 @@ void daE_PM_c::Ap_StartAction() {
     bool bVar3 = false;
 
     switch (mMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (mAppear) {
+            bVar3 = true;
+            mMode++;
+        } else if (mSecondEncounter && fopAcM_searchPlayerDistanceXZ(this) < 800.0f) {
+            bVar3 = true;
+            mMode++;
+        }
+        break;
+    case Mode0:
+        bVar3 = true;
+#else
+    case Mode0:
         if (mAppear) {
             bVar3 = true;
         } else if (mSecondEncounter && fopAcM_searchPlayerDistanceXZ(this) < 800.0f) {
             bVar3 = true;
         }
-
+#endif
         if (bVar3 && CameraSet()) {
             if (dComIfG_play_c::getLayerNo(0) == 2) {
                 player_pos.set(-10477.0f, mAcch.GetGroundH(), 17710.0f);
@@ -483,7 +533,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 1:
+    case Mode1:
         if (fopAcM_SearchByName(PROC_Obj_SmWStone, (fopAc_ac_c**)&stone) && stone != NULL) {
             stone->deleteStone();
         }
@@ -506,7 +556,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 2:
+    case Mode2:
         if (mTimer[0] == 0) {
             mTargetAngleY = shape_angle.y;
             mMode++;
@@ -523,7 +573,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 3:
+    case Mode3:
         mParticleKey = dComIfGp_particle_set(mParticleKey, 0x880C, &current.pos, &tevStr,
                                              &current.angle, &scale, 0xff, NULL, -1,
                                              NULL, NULL, NULL);
@@ -560,7 +610,7 @@ void daE_PM_c::Ap_StartAction() {
         SetMoveCam2(0.15f, 50.0f);
         break;
 
-    case 4:
+    case Mode4:
         if (mTimer[0] == 0) {
             mAction = ACT_CREATE;
             mMode = 0;
@@ -797,6 +847,11 @@ void daE_PM_c::DemoBeforeEscape() {
             for (int i = 0; i < 4; i++) {
                 e_fs_class* puppet;
                 if (fopAcM_SearchByID(mPuppetID[i], (fopAc_ac_c**)&puppet)) {
+#if VERSION == VERSION_GCN_JPN
+                    if (puppet == NULL) {
+                        continue;
+                    }
+#endif
                     puppet->mAction = e_fs_class::ACT_END;
                     puppet->mMode = 0;
                 }
@@ -1249,10 +1304,17 @@ void daE_PM_c::Action() {
 
 /* 80745ED0-80746624 0040D0 0754+00 2/1 0/0 0/0 .text            DemoBossStart2__8daE_PM_cFv */
 void daE_PM_c::DemoBossStart2() {
+    daPy_py_c* player;
     bool bVar1 = false;
     cXyz vec1, vec2;
 
-    if (mDemoMode != 0) {
+    player = (daPy_py_c*)dComIfGp_getPlayer(0);
+
+#if VERSION == VERSION_GCN_JPN
+    if (mDemoMode > Mode0) {
+#else
+    if (mDemoMode != Mode0) {
+#endif
         SetMoveCam(0.1f, 50.0f);
     } else {
         SetMoveCam(0.03f, 50.0f);
@@ -1261,7 +1323,34 @@ void daE_PM_c::DemoBossStart2() {
     mTargetAngleY = s_TargetAngle;
 
     switch (mDemoMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (!CameraSet()) {
+            break;
+        }
+
+        mPuppetNum = 4;
+        gravity = -9.0f;
+        mTimer[0] = 130;
+        if (mSecondEncounter) {
+            mTimer[0] = 180;
+            vec1.set(current.pos.x, 1900.0f, current.pos.z);
+            SetStopCam(vec1, 500.0f, 0.0f, s_TargetAngle);
+            mCamEye.set(mCamEyeTarget);
+            actor_status &= ~0x100;
+        }
+        if (mSecondEncounter) {
+            player->mDemo.setDemoType(daPy_demo_c::DEMO_TYPE_ORIGINAL_e);
+            player->mDemo.setParam0(0);
+            player->mDemo.setDemoMode(4);
+            player->mDemo.setParam0(0);
+            player->mDemo.setParam1(0);
+            player->mDemo.setParam2(0);
+        }
+        mDemoMode++;
+        break;
+#endif
+    case Mode0:
         current.pos.y = 10000.0f;
         old.pos.y = current.pos.y;
         if (mTimer[0] < 150) {
@@ -1278,7 +1367,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 1:
+    case Mode1:
         if (mAnm == ANM_APPEAR01) {
             mParticleKey = dComIfGp_particle_set(mParticleKey, 0x880C, &current.pos, &tevStr,
                                                  &current.angle, &scale, 0xff, NULL, -1,
@@ -1298,7 +1387,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 2:
+    case Mode2:
         if (mpMorf->isStop()) {
             mDemoMode++;
 
@@ -1329,7 +1418,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 3:
+    case Mode3:
         if (mTimer[0] == 0) {
             SetAnm(ANM_FOGBLOW_ST, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_V_FOGBLOW, -1);
@@ -1340,7 +1429,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 4:
+    case Mode4:
         vec1.set(current.pos.x, current.pos.y, current.pos.z);
         GakkiLoopAction(vec1, 400.0f);
 
@@ -1356,7 +1445,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 5:
+    case Mode5:
         if (mpMorf->isStop()) {
             SetAnm(ANM_WAIT01, J3DFrameCtrl::EMode_LOOP, 5.0f, 1.0f);
             mpTrumpetMorf->setPlaySpeed(0.0f);
@@ -1365,7 +1454,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 6:
+    case Mode6:
         if (mTimer[0] == 0) {
             if (mDoorAction == 0) {
                 SetReleaseCam();
@@ -1389,12 +1478,28 @@ void daE_PM_c::DemoBossStart2() {
 void daE_PM_c::DemoBossStart() {
     bool bVar1 = false;
     cXyz vec1, vec2;
-    if (mDemoMode > 2) {
+    if (mDemoMode > Mode2) {
         mTargetAngleY = cLib_targetAngleY(&current.pos, s_LinkPos);
     }
 
     switch (mDemoMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (!CameraSet()) {
+            break;
+        }
+
+        mPuppetNum = 4;
+        gravity = -9.0f;
+        mTimer[0] = 130;
+        vec1.set(current.pos.x, current.pos.y + 80.0f, current.pos.z);
+        mTargetAngleY = shape_angle.y;
+        SetStopCam(vec1, 500.0f, -150.0f, shape_angle.y);
+        mDemoMode++;
+
+        break;
+#endif
+    case Mode0:
         if (mTimer[0] == 100) {
             vec1.set(0.0f, 50.0f, 300.0f);
             cLib_offsetPos(&mCamEyeTarget, &current.pos, shape_angle.y, &vec1);
@@ -1409,7 +1514,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 1:
+    case Mode1:
         if (mpMorf->isStop()) {
             SetAnm(ANM_HIDE, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_FADEOUT, -1);
@@ -1446,7 +1551,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 2:
+    case Mode2:
         if (mpMorf->isStop() && mAnm == ANM_HIDE) {
             mPoint = dPath_GetPnt(mpPath, 1)->m_position;
             current.pos.set(mPoint.x, mPoint.y + 10000.0f, mPoint.z);
@@ -1489,7 +1594,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 3:
+    case Mode3:
         mCamCenterTarget.y = current.pos.y + 100.0f;
 
         if (mAnm == ANM_APPEAR01) {
@@ -1519,7 +1624,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.08f, 50.0f);
         break;
 
-    case 4:
+    case Mode4:
         if (mTimer[0] == 0) {
             SetAnm(ANM_FOGBLOW_ST, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_V_FOGBLOW, -1);
@@ -1532,7 +1637,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 5:
+    case Mode5:
         vec1.set(current.pos.x, current.pos.y, current.pos.z);
         GakkiLoopAction(vec1, 400.0f);
 
@@ -1550,7 +1655,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 6:
+    case Mode6:
         if (mpMorf->isStop()) {
             SetAnm(ANM_WAIT01, J3DFrameCtrl::EMode_LOOP, 5.0f, 1.0f);
             mpTrumpetMorf->setPlaySpeed(0.0f);
@@ -1561,7 +1666,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 7:
+    case Mode7:
         if (mTimer[0] == 0) {
             if (mDoorAction == 0) {
                 SetReleaseCam();
@@ -1623,7 +1728,7 @@ void daE_PM_c::BossEscapeAction() {
 
     case 3:
         if (mpMorf->isStop()) {
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             mAction = ACT_WAIT;
             mMode = 0;
             if (mBossHealth < 3) {
@@ -2148,13 +2253,17 @@ void daE_PM_c::StartAction() {
             old.pos.y = current.pos.y;
         }
         if (fopAcM_gc_c::gndCheck(&pos) && current.pos.absXZ(*s_LinkPos) < 1000.0f
-            && mAnm == ANM_WAIT01 && s_LinkPos->y <= fopAcM_gc_c::getGroundY() + 100.0f
-            && CameraSet())
+            && mAnm == ANM_WAIT01 && s_LinkPos->y <= fopAcM_gc_c::getGroundY() + 100.0f)
         {
+#if VERSION != VERSION_GCN_JPN
+            if (!CameraSet()) {
+                break;
+            }
+
             mPuppetNum = 4;
             gravity = -9.0f;
             mAction = ACT_DEMO;
-            mMode = 1;
+            mMode = Mode1;
             mTimer[0] = 130;
 
             if (mSecondEncounter) {
@@ -2173,6 +2282,12 @@ void daE_PM_c::StartAction() {
                 player->changeOriginalDemo();
                 player->changeDemoMode(4, 0, 0, 0);
             }
+#else
+            mPuppetNum = 4;
+            mAction = 6;
+            mMode = Mode0;
+            mDemoMode = 0;
+#endif
         }
     }
 }
@@ -2384,8 +2499,8 @@ void daE_PM_c::DamageAction() {
 }
 
 /* 8074A210-8074A3DC 008410 01CC+00 1/1 0/0 0/0 .text            At_Check__8daE_PM_cFv */
-// NONMATCHING regalloc
 void daE_PM_c::At_Check() {
+    fopAc_ac_c* player = dComIfGp_getPlayer(0);
     mAtInfo.mpCollider = mCcCyl.GetTgHitObj();
     mAtInfo.mpActor = at_power_check(&mAtInfo);
 
@@ -2394,12 +2509,11 @@ void daE_PM_c::At_Check() {
             mAtInfo.mAttackPower = 0;
         }
 
-        s16 attack_power = mAtInfo.mAttackPower;
-        if (attack_power > 0) {
-            health -= attack_power;
+        if ((s16)mAtInfo.mAttackPower > 0) {
+            health -= (s16)mAtInfo.mAttackPower;
         }
 
-        u32 pause_timer;
+        u32 pause_timer = 0;
         if (mAtInfo.mAttackPower != 0 && health <= l_HIO.field_0x34) {
             mAtInfo.mHitStatus = 2;
             pause_timer = 5;
@@ -2413,7 +2527,8 @@ void daE_PM_c::At_Check() {
             pause_timer = 0;
         }
 
-        u8 sound = ((dCcD_GObjInf*)mAtInfo.mpCollider)->GetAtSe();
+        dCcD_GObjInf* collider = (dCcD_GObjInf*)mAtInfo.mpCollider;
+        u32 sound = collider->GetAtSe();
         u32 var1 = 30;
         if (mAtInfo.mHitStatus == 1) {
             var1 = 31;
@@ -2423,7 +2538,7 @@ void daE_PM_c::At_Check() {
 
         if (mAtInfo.mpSound != NULL) {
             if (mAtInfo.field_0x18 != 0) {
-                mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), var1);
+                mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), mAtInfo.field_0x18);
             } else {
                 mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), var1);
             }
@@ -2751,7 +2866,7 @@ void daE_PM_c::SkipChk() {
 
 /* 8074B4DC-8074B834 0096DC 0358+00 1/1 0/0 0/0 .text            Create__8daE_PM_cFv */
 cPhs__Step daE_PM_c::Create() {
-    fopAcM_SetupActor(this, daE_PM_c);
+    fopAcM_ct(this, daE_PM_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "E_PM");
 
     if (step == cPhs_COMPLEATE_e) {
@@ -2770,7 +2885,7 @@ cPhs__Step daE_PM_c::Create() {
         mpPath = dPath_GetRoomPath(mPathIndex, fopAcM_GetRoomNo(this));
         mSwBit = (fopAcM_GetParam(this) >> 0x18) & 0xFF;
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         attention_info.distances[fopAc_attn_BATTLE_e] = 86;
         fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, 0.0f, -200.0f);
@@ -2791,7 +2906,7 @@ cPhs__Step daE_PM_c::Create() {
         mCreatureSound.setEnemyName("E_PM");
 
         J3DModel* model = mpMorf->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
         model->getModelData()->getJointNodePointer(JNT_HEAD)->setCallBack(JointCallBack);
 
         if (dComIfG_play_c::getLayerNo(0) == 2 || dComIfG_play_c::getLayerNo(0) == 5) {

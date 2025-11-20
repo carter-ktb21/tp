@@ -6,7 +6,6 @@
 #include "d/d_msg_flow.h"
 #include "f_op/f_op_actor_mng.h"
 #include "m_Do/m_Do_ext.h"
-#include "m_Do/m_Do_hostIO.h"
 
 // This struct may end up belonging elsewhere
 struct ShopItem {
@@ -108,8 +107,8 @@ public:
     /* 80949948 */ J3DAnmTexPattern* getTexPtrnAnm(char*);
     /* 80949A70 */ int checkEndAnm(J3DFrameCtrl*);
     /* 80949998 */ int checkEndAnm(f32);
-    /* 80949AD4 */ int getItemNumMax();
-    /* 80949AE0 */ int getItemType(void*);
+    /* 80949AD4 */ u8 getItemNumMax();
+    /* 80949AE0 */ u8 getItemType(void*);
     /* 80949C0C */ u16 getFlowNodeNum();
     /* 80949C44 */ void checkDead();
     /* 80949D54 */ int chkPlayerInEvtArea(fopAc_ac_c*, cXyz);
@@ -121,9 +120,11 @@ public:
 
     daMyna_c() {}
 
-    void onEventFlag(u8 flag) { field_0x92F |= (1 << flag); }
-    void offEventFlag(u8 flag) { field_0x92F &= ~(1 << flag); }
-    bool isEventFlag(u8 flag) { return field_0x92F & (1 << flag); }
+    void onEventFlag(u8 flag) { field_0x92F |= (u8)(1 << flag); }
+    void offEventFlag(u8 flag) { field_0x92F &= (u8)~(u8)(1 << flag); }
+    bool isEventFlag(u8 flag) {
+        return (field_0x92F & (u8)(1 << flag)) ? true : false;
+    }
 
     fopAc_ac_c* getSpeakActorPtr() { return field_0x828; }
 
@@ -163,7 +164,7 @@ public:
     /* 0x920 */ s16 field_0x920;
     /* 0x922 */ s16 field_0x922;
     /* 0x924 */ s16 field_0x924;
-    /* 0x926 */ s16 field_0x926;
+    /* 0x926 */ s16 mDamageTimer;
     /* 0x928 */ s16 field_0x928;
     /* 0x92A */ s16 field_0x92A;
     /* 0x92C */ u8 field_0x92C;
@@ -184,32 +185,5 @@ public:
 
 STATIC_ASSERT(sizeof(daMyna_c) == 0x93C);
 
-class daMyna_HIO_c : public mDoHIO_entry_c {
-public:
-    /* 8094A960 */ virtual ~daMyna_HIO_c() {}
-
-    // Must be inlined but defined in .cpp for sinit to match
-    inline daMyna_HIO_c();
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ f32 field_0x04;  // DAT_8094ba40
-    /* 0x08 */ f32 field_0x08;  // DAT_8094ba44
-    /* 0x0C */ f32 field_0x0C;  // DAT_8094ba48
-    /* 0x10 */ f32 field_0x10;  // DAT_8094ba4c
-    /* 0x14 */ f32 field_0x14;  // DAT_8094ba50
-    /* 0x18 */ f32 field_0x18;  // DAT_8094ba54
-    /* 0x1C */ f32 field_0x1C;  // DAT_8094ba58
-    /* 0x20 */ f32 field_0x20;  // DAT_8094ba5c
-    /* 0x24 */ s16 field_0x24;  // DAT_8094ba60
-    /* 0x26 */ s16 field_0x26;  // DAT_8094ba62
-    /* 0x28 */ s16 field_0x28;  // DAT_8094ba64
-    /* 0x2A */ s16 field_0x2A;  // DAT_8094ba66
-    /* 0x2C */ s16 field_0x2C;  // DAT_8094ba68
-    /* 0x2E */ s16 field_0x2E;  // DAT_8094ba6a
-    /* 0x30 */ s16 field_0x30;  // DAT_8094ba6c
-};
-
-STATIC_ASSERT(sizeof(daMyna_HIO_c) == 0x34);
 
 #endif /* D_A_MYNA_H */

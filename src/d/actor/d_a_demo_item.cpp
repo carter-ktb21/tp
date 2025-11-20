@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_demo_item.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item.h"
@@ -11,6 +13,49 @@
 #include "d/actor/d_a_player.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "Z2AudioLib/Z2Instances.h"
+
+/* 804E1C34-804E1C40 000054 000C+00 0/2 0/0 0/0 .bss             l_player_offset */
+static cXyz l_player_offset = cXyz(0.0f, 115.0f, 54.0f);
+
+/* 804E1C4C-804E1C58 00006C 000C+00 0/2 0/0 0/0 .bss             l_wolf_offset */
+static cXyz l_wolf_offset = cXyz(13.0f, 135.0f, 57.0f);
+
+/* 804E1C64-804E1C70 000084 000C+00 0/2 0/0 0/0 .bss             l_horse_offset */
+static cXyz l_horse_offset = cXyz(0.0f, 20.0f, 54.0f);
+
+#ifdef DEBUG
+
+class DitemHIO_c 
+: public mDoHIO_entry_c 
+{
+public:
+    ~DitemHIO_c() {}
+    void genMessage(JORMContext*) {}
+    
+    /* 0x08 */ cXyz field_0x08;
+    /* 0x14 */ u16 field_0x14;
+    /* 0x16 */ u16 field_0x16;
+    /* 0x18 */ u16 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+    /* 0x20 */ u16 field_0x20;
+    /* 0x22 */ u8 field_0x22;
+    /* 0x23 */ u8 field_0x23;
+    /* 0x24 */ u8 field_0x24;
+
+    DitemHIO_c() {
+        field_0x20 = 0xfa;
+        field_0x23 = 0;
+        field_0x08 = l_player_offset;
+        field_0x24 = 0;
+        field_0x14 = 0x8c;
+        field_0x16 = 0x7c;
+        field_0x18 = 0x6a;
+        field_0x1c = 8.0f;
+        field_0x22 = 0;
+    }
+};
+
+#endif
 
 /* 804DFBCC-804DFBD4 0000EC 0008+00 1/0 0/0 0/0 .text            __CreateHeap__9daDitem_cFv */
 int daDitem_c::__CreateHeap() {
@@ -122,7 +167,6 @@ void daDitem_c::actionStart() {
 }
 
 /* 804E00DC-804E0A50 0005FC 0974+00 1/1 0/0 0/0 .text            actionEvent__9daDitem_cFv */
-// NONMATCHING - r30/r31 swap
 void daDitem_c::actionEvent() {
     if (mSetLightEff) {
         cLib_addCalc2(&mLight.mPow, mLightStrength, 0.1f, 1.0f);
@@ -138,7 +182,7 @@ void daDitem_c::actionEvent() {
         }
 
         if (m_itemNo == fpcNm_ITEM_KAKERA_HEART) {
-            s32 room_no = dComIfGp_roomControl_getStayNo();
+            int room_no = dComIfGp_roomControl_getStayNo();
 
             if (strcmp(dComIfGp_getStartStageName(), "F_SP116") == 0 && room_no == 2) {
                 onEventReg(0, 0);
@@ -160,8 +204,10 @@ void daDitem_c::actionEvent() {
                 onEventReg(1, 1);
             } else if (strcmp(dComIfGp_getStartStageName(), "F_SP110") == 0 && room_no == 0) {
                 onEventReg(1, 2);
-            } else if (strcmp(dComIfGp_getStartStageName(), "F_SP109") == 0 && room_no == 0 && dComIfGs_isTmpBit(0x0604)) {
-                onEventReg(1, 3);
+            } else if (strcmp(dComIfGp_getStartStageName(), "F_SP109") == 0 && room_no == 0) {
+                if (dComIfGs_isTmpBit(0x0604)) {
+                    onEventReg(1, 3);
+                }
             } else if (strcmp(dComIfGp_getStartStageName(), "F_SP126") == 0 && room_no == 0) {
                 onEventReg(1, 5);
             } else if (strcmp(dComIfGp_getStartStageName(), "D_MN05") == 0 && room_no == 5) {
@@ -309,32 +355,6 @@ void daDitem_c::onEventReg(int i_regNo, int i_value) {
     OS_REPORT("ハートの欠片：%d %d\n", i_regNo, i_value);
 }
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
-
-/* 804E1C34-804E1C40 000054 000C+00 0/2 0/0 0/0 .bss             l_player_offset */
-static cXyz l_player_offset(0.0f, 115.0f, 54.0f);
-
-/* 804E1C4C-804E1C58 00006C 000C+00 0/2 0/0 0/0 .bss             l_wolf_offset */
-static cXyz l_wolf_offset(13.0f, 135.0f, 57.0f);
-
-/* 804E1C64-804E1C70 000084 000C+00 0/2 0/0 0/0 .bss             l_horse_offset */
-static cXyz l_horse_offset(0.0f, 20.0f, 54.0f);
-
 /* 804E0DB4-804E105C 0012D4 02A8+00 1/1 0/0 0/0 .text            set_pos__9daDitem_cFv */
 void daDitem_c::set_pos() {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -460,7 +480,7 @@ static int daDitem_Delete(daDitem_c* i_this) {
 }
 
 int daDitem_c::create() {
-    fopAcM_SetupActor(this, daDitem_c);
+    fopAcM_ct(this, daDitem_c);
 
     m_itemNo = daDitem_prm::getNo(this);
 

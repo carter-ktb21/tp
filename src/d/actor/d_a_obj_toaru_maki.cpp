@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_toaru_maki.h"
 #include "d/d_bg_w.h"
 
@@ -34,7 +36,7 @@ int daObjToaruMaki_c::createHeap() {
     u32 nameArg = getNameArg_0();
     J3DModelData* a_model_data_p =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[nameArg], l_bmdIdx[nameArg]);
-    JUT_ASSERT(101, a_model_data_p != 0);
+    JUT_ASSERT(101, a_model_data_p != NULL);
     mpModel = mDoExt_J3DModel__create(a_model_data_p, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -63,7 +65,7 @@ static const u32 l_heapSize[2] = {
 
 /* 80D132B4-80D133C0 0002B4 010C+00 1/1 0/0 0/0 .text            create__16daObjToaruMaki_cFv */
 int daObjToaruMaki_c::create() {
-    fopAcM_SetupActor(this, daObjToaruMaki_c);
+    fopAcM_ct(this, daObjToaruMaki_c);
     u32 nameArg = getNameArg_0();
     int rv = dComIfG_resLoad(this, l_arcName[nameArg]);
     if (rv == cPhs_COMPLEATE_e) {
@@ -118,7 +120,7 @@ int daObjToaruMaki_c::execute() {
  */
 static int daObjToaruMaki_create(daObjToaruMaki_c* i_this) {
     // !@bug this setup is called twice. No adverse effects though.
-    fopAcM_SetupActor(i_this, daObjToaruMaki_c);
+    fopAcM_ct(i_this, daObjToaruMaki_c);
     return i_this->create();
 }
 

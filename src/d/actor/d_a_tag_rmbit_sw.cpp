@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_rmbit_sw.h"
 #include "d/d_procname.h"
 
@@ -14,7 +16,7 @@ daTagRmbitSw_c::~daTagRmbitSw_c() {}
 
 /* 80D5FB94-80D5FBEC 000114 0058+00 1/1 0/0 0/0 .text            create__14daTagRmbitSw_cFv */
 int daTagRmbitSw_c::create() {
-    fopAcM_SetupActor(this, daTagRmbitSw_c);
+    fopAcM_ct(this, daTagRmbitSw_c);
     init();
     return cPhs_COMPLEATE_e;
 }
@@ -105,7 +107,7 @@ u8 daTagRmbitSw_c::chkPlyrInTag() {
 
 /* 80D5FEEC-80D5FF40 00046C 0054+00 1/0 0/0 0/0 .text daTagRmbitSw_create__FP14daTagRmbitSw_c */
 int daTagRmbitSw_create(daTagRmbitSw_c* i_this) {
-    fopAcM_SetupActor(i_this, daTagRmbitSw_c);
+    fopAcM_ct(i_this, daTagRmbitSw_c);
     return i_this->create();
 }
 

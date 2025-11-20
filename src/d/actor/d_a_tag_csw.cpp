@@ -2,29 +2,13 @@
 // d_a_tag_csw
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_csw.h"
 #include "d/actor/d_a_cstatue.h"
 #include "d/d_cc_d.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_bg_w.h"
-
-/* 80D58628-80D58634 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D58634-80D58648 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80D58648-80D5864C -00001 0004+00 2/3 0/0 0/0 .data            l_arcName */
 static const char* l_arcName = "Lv6Warp";
@@ -109,13 +93,13 @@ void daTagCsw_c::setMtx() {
 /* 80D56EF8-80D572B8 000398 03C0+00 1/1 0/0 0/0 .text            createHeap__10daTagCsw_cFv */
 int daTagCsw_c::createHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(303, modelData != 0);
+    JUT_ASSERT(303, modelData != NULL);
     field_0x574 = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (field_0x574 == NULL) {
         return 0;
     }
     modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 6);
-    JUT_ASSERT(314, modelData != 0);
+    JUT_ASSERT(314, modelData != NULL);
     if (field_0x570 == 0 && getSw() == 6) {
         field_0x578 = NULL;
     } else {
@@ -204,7 +188,7 @@ int daTagCsw_c::chkInsideStatueStart() {
 
 /* 80D573C0-80D576D4 000860 0314+00 1/1 0/0 0/0 .text            create__10daTagCsw_cFv */
 int daTagCsw_c::create() {
-    fopAcM_SetupActor(this, daTagCsw_c);
+    fopAcM_ct(this, daTagCsw_c);
     field_0x570 = getType();
     int rv = dComIfG_resLoad(this, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {

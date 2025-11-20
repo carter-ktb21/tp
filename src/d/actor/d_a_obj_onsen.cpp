@@ -3,6 +3,8 @@
  * Object - Hot Spring
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_onsen.h"
 #include "d/d_procname.h"
 
@@ -119,7 +121,7 @@ int daObjOnsen_c::Delete() {
 
 /* 80CA8048-80CA80A8 000568 0060+00 1/0 0/0 0/0 .text daObjOnsen_create1st__FP12daObjOnsen_c */
 static int daObjOnsen_create1st(daObjOnsen_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjOnsen_c);
+    fopAcM_ct(i_this, daObjOnsen_c);
     return i_this->create1st();
 }
 

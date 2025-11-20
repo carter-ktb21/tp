@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_smtile.h"
 #include "d/d_com_inf_game.h"
 #include "dol2asm.h"
@@ -39,7 +41,7 @@ daObj_SMTile_c::~daObj_SMTile_c() {
 
 /* 80CDD3E8-80CDD580 000228 0198+00 1/1 0/0 0/0 .text            create__14daObj_SMTile_cFv */
 int daObj_SMTile_c::create() {
-    fopAcM_SetupActor(this, daObj_SMTile_c);
+    fopAcM_ct(this, daObj_SMTile_c);
     mType = getType();
     int rv = dComIfG_resLoad(
         &mPhase,

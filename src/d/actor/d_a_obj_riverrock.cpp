@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_riverrock.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_cc_d.h"
@@ -240,14 +242,14 @@ static int daObjRIVERROCK_Execute(daObjRIVERROCK_c* i_this) {
 /* 80CBD348-80CBD3C0 000D68 0078+00 1/0 0/0 0/0 .text            CreateHeap__16daObjRIVERROCK_cFv */
 int daObjRIVERROCK_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes(l_arcName, "M_RiverRock.bmd");
-    JUT_ASSERT(242, modelData != 0);
+    JUT_ASSERT(242, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != NULL ? TRUE : FALSE;
 }
 
 /* 80CBD3C0-80CBD71C 000DE0 035C+00 1/1 0/0 0/0 .text            create__16daObjRIVERROCK_cFv */
 int daObjRIVERROCK_c::create() {
-    fopAcM_SetupActor(this, daObjRIVERROCK_c);
+    fopAcM_ct(this, daObjRIVERROCK_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
         gravity = -9.0f;

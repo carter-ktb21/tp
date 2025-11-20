@@ -3,6 +3,8 @@
  * Tag - Lantern
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_lantern.h"
 #include "d/d_procname.h"
 
@@ -11,7 +13,7 @@ daTag_Lantern_c::~daTag_Lantern_c() {}
 
 /* 8048ED28-8048EDA8 000168 0080+00 1/1 0/0 0/0 .text            create__15daTag_Lantern_cFv */
 int daTag_Lantern_c::create() {
-    fopAcM_SetupActor(this, daTag_Lantern_c);
+    fopAcM_ct(this, daTag_Lantern_c);
     initialize();
     return cPhs_COMPLEATE_e;
 }
@@ -46,7 +48,7 @@ int daTag_Lantern_c::Execute() {
     mGroundCross = dComIfG_Bgsp().GroundCross(&mGndChk);
 
     s32 room_no;
-    if (mGroundCross != -1000000000.0f) {
+    if (mGroundCross != -G_CM3D_F_INF) {
         room_no = dComIfG_Bgsp().GetRoomId(mGndChk);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mGndChk);
     } else {

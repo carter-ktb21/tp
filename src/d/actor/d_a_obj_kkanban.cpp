@@ -3,6 +3,8 @@
  * Object - Kakariko Sign
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kkanban.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_procname.h"
@@ -66,7 +68,7 @@ int daObjKKanban_c::Create() {
         }
     }
     mpModel->getModelData()->getJointNodePointer(mJointIdx)->setCallBack(nodeCallBack);
-    mpModel->setUserArea((u32)this);
+    mpModel->setUserArea((uintptr_t)this);
     fopAcM_setCullSizeBox(this, -950.0f, -2150.0f, -2000.0f, 100.0f, 50.0f, 800.0f);
     mStts.Init(0xff, 0xff, this);
     mTri.Set(l_tri_src);
@@ -145,7 +147,7 @@ int daObjKKanban_c::Delete() {
 /* 80C46CF4-80C46DF4 0006D4 0100+00 1/0 0/0 0/0 .text daObjKKanban_create1st__FP14daObjKKanban_c
  */
 static int daObjKKanban_create1st(daObjKKanban_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKKanban_c);
+    fopAcM_ct(i_this, daObjKKanban_c);
     return i_this->create1st();
 }
 

@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_nameplate.cpp
+* @file d_a_obj_nameplate.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_nameplate.h"
 #include "d/actor/d_a_alink.h"
@@ -218,13 +220,13 @@ void daObjNameplate_c::messageProc() {
             cLib_distanceAngleS(shape_angle.GetY(), fopAcM_searchPlayerAngleY(this)) < 0x3000)
         {
             fopAcM_OnStatus(this, 0);
-            cLib_onBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
             attention_info.distances[fopAc_attn_TALK_e] = 0x15;
             attention_info.distances[fopAc_attn_SPEAK_e] = 0x15;
             eventInfo.onCondition(1);
         } else {
             fopAcM_OffStatus(this, 0);
-            cLib_offBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         }
 
         if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk()) {
@@ -310,7 +312,7 @@ static int daObjNameplate_Delete(daObjNameplate_c* i_this) {
 }
 
 int daObjNameplate_c::create() {
-    fopAcM_SetupActor(this, daObjNameplate_c);
+    fopAcM_ct(this, daObjNameplate_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {

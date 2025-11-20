@@ -3,6 +3,8 @@
  * Object - Wind Stone
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wind_stone.h"
 #include "d/actor/d_a_alink.h"
 #include "d/d_meter2_info.h"
@@ -56,7 +58,7 @@ COMPILER_STRIP_GATE(0x80D38608, &lit_3760);
 
 /* 80D37C20-80D37E2C 0002A0 020C+00 1/1 0/0 0/0 .text            create__13daWindStone_cFv */
 int daWindStone_c::create() {
-    fopAcM_SetupActor(this, daWindStone_c);
+    fopAcM_ct(this, daWindStone_c);
 
     int phase = dComIfG_resLoad(this, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
@@ -181,7 +183,7 @@ void daWindStone_c::exeModeHowl() {
         daAlink_getAlinkActorClass()->startWindStoneSound(tuneId, &current.pos);
         attention_info.flags = 0;
         if (chkWlfInRange()) {
-            attention_info.flags |= 0x80;
+            attention_info.flags |= fopAc_AttnFlag_ETC_e;
             attention_info.distances[fopAc_attn_ETC_e] = 65;
         }
     }
@@ -247,7 +249,7 @@ u8 daWindStone_c::getGoldWolfIdx() {
 
 /* 80D3853C-80D38590 000BBC 0054+00 1/0 0/0 0/0 .text daWindStone_create__FP13daWindStone_c */
 static int daWindStone_create(daWindStone_c* i_this) {
-    fopAcM_SetupActor(i_this, daWindStone_c);
+    fopAcM_ct(i_this, daWindStone_c);
 
     return i_this->create();
 }

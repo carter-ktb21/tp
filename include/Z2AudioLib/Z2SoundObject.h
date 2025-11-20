@@ -17,16 +17,17 @@ public:
     bool isAlive() const { return mIsInitialized; }
     void setSoundStarter(Z2SoundStarter* i_soundStarter) { mSoundStarter = i_soundStarter; }
 
-    virtual void framework(u32, s8);
+#if VERSION == VERSION_SHIELD_DEBUG
+    /* 0x10 */ u8 unk_0x10[0x20 - 0x10];
+#endif
+
+    virtual void framework(u32, s8 reverb);
     virtual void dispose();
     virtual bool stopOK(Z2SoundHandlePool& pool);
     virtual void init(Vec* pSoundPos, u8 pNumHandles);
     virtual Z2SoundHandlePool* startSound(JAISoundID, u32, s8);
     virtual Z2SoundHandlePool* startLevelSound(JAISoundID, u32, s8);
 
-#if VERSION == VERSION_SHIELD_DEBUG
-    /* 0x14 */ u8 unk_0x14[0x24 - 0x14];
-#endif
     /* 0x14 */ Z2SoundStarter* mSoundStarter;
     /* 0x18 */ JGeometry::TVec3<f32>* mSoundPos;
     /* 0x1C */ u16 field_0x1c;

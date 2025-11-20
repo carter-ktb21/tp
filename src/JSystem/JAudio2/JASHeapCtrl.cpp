@@ -3,6 +3,8 @@
 // Translation Unit: JASHeapCtrl
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JAudio2/JASHeapCtrl.h"
 #include "JSystem/JAudio2/JASMutex.h"
 #include "JSystem/JAudio2/JASWaveArcLoader.h"
@@ -30,7 +32,7 @@ void JASHeap::initRootHeap(void* param_0, u32 param_1) {
 
 /* 8029021C-802903F4 28AB5C 01D8+00 0/0 2/2 0/0 .text            alloc__7JASHeapFP7JASHeapUl */
 bool JASHeap::alloc(JASHeap* mother, u32 param_1) {
-    JUT_ASSERT(120, mother != 0);
+    JUT_ASSERT(120, mother != NULL);
     JASMutexLock lock(&mMutex);
     if (isAllocated()) {
 #ifdef DEBUG
@@ -116,7 +118,7 @@ bool JASHeap::free() {
     JSUTreeIterator<JASHeap> stack_20;
     for (JSUTreeIterator<JASHeap> it(mTree.getFirstChild()); it != mTree.getEndChild(); it = stack_20) {
         stack_20 = it;
-        stack_20++;
+        ++stack_20;
         it->free();
     }
     JSUTree<JASHeap>* parentTree = mTree.getParent();
@@ -145,8 +147,8 @@ bool JASHeap::free() {
  * insertChild__7JASHeapFP7JASHeapP7JASHeapPvUlb                */
 // NONMATCHING regalloc
 void JASHeap::insertChild(JASHeap* heap, JASHeap* next, void* param_2, u32 param_3, bool param_4) {
-    JUT_ASSERT(537, heap != 0);
-    JUT_ASSERT(538, next == 0 || &mTree == next->mTree.getParent());
+    JUT_ASSERT(537, heap != NULL);
+    JUT_ASSERT(538, next == NULL || &mTree == next->mTree.getParent());
     JASMutexLock lock(&mMutex);
     if (!param_4) {
         JSUTreeIterator<JASHeap> it;

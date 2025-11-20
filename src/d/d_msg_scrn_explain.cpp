@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_explain.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "d/d_lib.h"
@@ -11,12 +13,11 @@
 #include "m_Do/m_Do_controller_pad.h"
 #include "stdio.h"
 
-extern dMsgObject_HIO_c g_MsgObject_HIO_c;
-
-/* 803C0E40-803C0E4C 01DF60 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
+#if VERSION == VERSION_GCN_JPN
+#define STR_BUF_LEN 528
+#else
+#define STR_BUF_LEN 512
+#endif
 
 static dMsgScrnExplain_c::ProcFunc init_process[] = {
     &dMsgScrnExplain_c::wait_init,        &dMsgScrnExplain_c::open_request_init,
@@ -75,7 +76,11 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         mpTxScreen->search('n_3fline')->hide();
         mpTxScreen->search('n_e4line')->hide();
 
+#if VERSION == VERSION_GCN_JPN
+        field_0x50 = 0.0f;
+#else
         field_0x50 = -10.0f;
+#endif
         field_0x4c = 0.0f;
     } else {
         mpTxScreen->setPriority("zelda_message_window_text.blo", 0x20000,
@@ -84,6 +89,31 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
 
         mpScreen->search('n_all')->scale(g_MsgObject_HIO_c.mBoxTalkScaleX,
                                          g_MsgObject_HIO_c.mBoxTalkScaleY);
+#if VERSION == VERSION_GCN_JPN
+        field_0x50 = 0.0f;
+
+        if (dComIfGs_getOptUnk0() == 0) {
+            mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3flin', 0, NULL);
+            mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3f_s', 0, NULL);
+
+            field_0x10[0] = new CPaneMgr(mpTxScreen, 'mg_3f', 0, NULL);
+            field_0x10[1] = new CPaneMgr(mpTxScreen, 'mg_3f_s', 0, NULL);
+
+            mpTxScreen->search('n_3line')->hide();
+            mpTxScreen->search('n_3fline')->show();
+            mpTxScreen->search('n_e4line')->hide();
+        } else {
+            mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3line', 0, NULL);
+            mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3_s', 0, NULL);
+
+            field_0x10[0] = NULL;
+            field_0x10[1] = NULL;
+
+            mpTxScreen->search('n_3line')->show();
+            mpTxScreen->search('n_3fline')->hide();
+            mpTxScreen->search('n_e4line')->hide();
+        }
+#else
         field_0x50 = -10.0f;
 
         mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_e4lin', 0, NULL);
@@ -95,6 +125,7 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         mpTxScreen->search('n_3line')->hide();
         mpTxScreen->search('n_3fline')->hide();
         mpTxScreen->search('n_e4line')->show();
+#endif
 
         if (param_1 == 2 || param_1 == 4) {
             field_0x4c = 0.0f;
@@ -106,12 +137,20 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
     f32 lineSpace = ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getLineSpace();
     for (int i = 0; i < 2; i++) {
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+#if VERSION == VERSION_GCN_JPN
+        ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x210, "");
+#else
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x200, "");
+#endif
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setLineSpace(lineSpace);
 
         if (field_0x10[i] != NULL) {
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+#if VERSION == VERSION_GCN_JPN
+            ((J2DTextBox*)field_0x10[i]->getPanePtr())->setString(0x210, "");
+#else
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setString(0x200, "");
+#endif
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setLineSpace(lineSpace);
         }
     }
@@ -130,8 +169,8 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         ResTIMG* texResource =
             (ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG', "tt_block8x8.bti");
         mpBackTex = new J2DPicture(texResource);
-        mpBackTex->setBlackWhite(JUtility::TColor::TColor(0, 0, 0, 0),
-                                 JUtility::TColor::TColor(0, 0, 0, 0xff));
+        mpBackTex->setBlackWhite(JUtility::TColor(0, 0, 0, 0),
+                                 JUtility::TColor(0, 0, 0, 0xff));
         mpBackTex->setAlpha(0);
     } else {
         mpBackTex = NULL;
@@ -244,11 +283,15 @@ void dMsgScrnExplain_c::draw(J2DOrthoGraph* i_graf) {
         mpScreen->draw(0.0f, 0.0f, (J2DGrafContext*)i_graf);
     }
 
-    char string_buf[512];
+    char string_buf[STR_BUF_LEN];
     strcpy(string_buf, ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getStringPtr());
 
     mpTxScreen->draw(0.0f, 0.0f, (J2DGrafContext*)i_graf);
+#if VERSION == VERSION_GCN_JPN
+    mpString_c->getString(field_0x54, (J2DTextBox*)mpTm_c[0]->getPanePtr(), NULL, NULL, NULL, 12);
+#else
     mpString_c->getString(field_0x54, (J2DTextBox*)mpTm_c[0]->getPanePtr(), NULL, NULL, NULL, 8);
+#endif
     mpString_c->drawOutFont((J2DTextBox*)mpTm_c[0]->getPanePtr(), -1.0f);
 
     strcpy(((J2DTextBox*)mpTm_c[0]->getPanePtr())->getStringPtr(), string_buf);
@@ -288,9 +331,9 @@ void dMsgScrnExplain_c::open_request_proc() {
         uVar6 = (J2DTextBox*)field_0x10[0]->getPanePtr();
     }
 
-    char acStack_220[512];
-    char acStack_420[512];
-    char acStack_620[512];
+    char acStack_220[STR_BUF_LEN];
+    char acStack_420[STR_BUF_LEN];
+    char acStack_620[STR_BUF_LEN];
 
     if (dMsgObject_getString(field_0x54, uVar1, uVar6, mDoExt_getMesgFont(), mpOutFont, acStack_220,
                              acStack_420, acStack_620, &field_0x5c) != 0)

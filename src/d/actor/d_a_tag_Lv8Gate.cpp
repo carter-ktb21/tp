@@ -3,6 +3,8 @@
 // Translation Unit: d_a_tag_Lv8Gate
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_Lv8Gate.h"
 
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
@@ -39,7 +41,7 @@ inline void daTagLv8Gate_c::create_init() {
     fopAcM_setCullSizeBox(this, -100.0f, -50.0f, -100.0f, 100.0f, 220.0f, 100.0f);
     fopAcM_OnCarryType(this, fopAcM_CARRY_LIGHT);
 
-    attention_info.flags = 0x10;
+    attention_info.flags = fopAc_AttnFlag_CARRY_e;
     attention_info.distances[fopAc_attn_CARRY_e] = 90;
 
     mEventID = -1;
@@ -48,9 +50,10 @@ inline void daTagLv8Gate_c::create_init() {
 }
 
 inline int daTagLv8Gate_c::create() {
-    fopAcM_SetupActor(this, daTagLv8Gate_c);
+    fopAcM_ct(this, daTagLv8Gate_c);
 
     cPhs__Step step;
+         /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
     if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354])) {
         step = cPhs_ERROR_e;
     } else {
@@ -186,7 +189,7 @@ int daTagLv8Gate_c::execute() {
 
         if (fopAcM_checkCarryNow(this)) {
             fopAcM_cancelCarryNow(this);
-            attention_info.flags &= ~0x10;
+            attention_info.flags &= ~fopAc_AttnFlag_CARRY_e;
             eventInfo.setArchiveName(l_arcName);
             dComIfGp_getEventManager().setObjectArchive(eventInfo.getArchiveName());
             mEventID = dComIfGp_getEventManager().getEventIdx(this, "LV8_GATE_ENTRY", -1);

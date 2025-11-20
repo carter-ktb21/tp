@@ -177,7 +177,6 @@ f32 daAlink_c::damageMagnification(int i_checkZoraMag, int param_1) {
 }
 
 /* 800D72BC-800D7478 0D1BFC 01BC+00 6/6 1/1 0/0 .text            setDamagePoint__9daAlink_cFiiii */
-// NONMATCHING - regalloc
 int daAlink_c::setDamagePoint(int i_dmgAmount, int i_checkZoraMag, int i_setDmgTimer, int param_3) {
     if (i_dmgAmount <= 0) {
         dComIfGp_setItemLifeCount(-i_dmgAmount, 0);
@@ -185,9 +184,9 @@ int daAlink_c::setDamagePoint(int i_dmgAmount, int i_checkZoraMag, int i_setDmgT
     }
 
     f32 magnified_dmgF = (f32)i_dmgAmount * damageMagnification(i_checkZoraMag, param_3);
-    int magnified_dmg = magnified_dmgF;
+    i_dmgAmount = magnified_dmgF;
     if ((int)(magnified_dmgF * 10.0f) % 10 != 0) {
-        magnified_dmg++;
+        i_dmgAmount++;
     }
 
     if (checkWolf()) {
@@ -195,9 +194,9 @@ int daAlink_c::setDamagePoint(int i_dmgAmount, int i_checkZoraMag, int i_setDmgT
     }
 
     if (checkMagicArmorNoDamage()) {
-        dComIfGp_setItemRupeeCount(-magnified_dmg * 10);
+        dComIfGp_setItemRupeeCount(-i_dmgAmount * 10);
     } else {
-        dComIfGp_setItemLifeCount(-magnified_dmg, 0);
+        dComIfGp_setItemLifeCount(-i_dmgAmount, 0);
     }
 
     onResetFlg1(RFLG1_DAMAGE_IMPACT);
@@ -309,7 +308,7 @@ int daAlink_c::checkPolyDamage() {
         }
     }
 
-    if (!checkBoardRide() && ((checkWaterPolygonUnder() && dComIfG_Bgsp().ChkPolySafe(mLinkAcch.m_wtr) && ((dKy_pol_argument_get(&mLinkAcch.m_wtr) & 0x60) || field_0x2fbc == 6)) || (checkModeFlg(0x40) && field_0x33bc < field_0x33b8 && -1000000000.0f != field_0x33b8 && ((field_0x2fc6 & 0x60) || field_0x2fc5 == 6) && (field_0x2fc5 != 6 || !(field_0x33b8 > field_0x33d8 + daAlinkHIO_basic_c0::m.mLavaDeathDepth))))) {
+    if (!checkBoardRide() && ((checkWaterPolygonUnder() && dComIfG_Bgsp().ChkPolySafe(mLinkAcch.m_wtr) && ((dKy_pol_argument_get(&mLinkAcch.m_wtr) & 0x60) || field_0x2fbc == 6)) || (checkModeFlg(0x40) && field_0x33bc < field_0x33b8 && -G_CM3D_F_INF != field_0x33b8 && ((field_0x2fc6 & 0x60) || field_0x2fc5 == 6) && (field_0x2fc5 != 6 || !(field_0x33b8 > field_0x33d8 + daAlinkHIO_basic_c0::m.mLavaDeathDepth))))) {
         return 2;
     }
 
@@ -670,7 +669,7 @@ BOOL daAlink_c::checkDamageAction() {
                 }
             }
 
-            if (at_mtrl == dCcD_MTRL_UNK_5) {
+            if (at_mtrl == dCcD_MTRL_ELECTRIC) {
                 dComIfGp_getVibration().StartShock(4, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
             } else if (checkHugeAttack(at_spl)) {
                 dComIfGp_getVibration().StartShock(8, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
@@ -682,7 +681,7 @@ BOOL daAlink_c::checkDamageAction() {
 
             setDamagePoint(dmg, at_mtrl == dCcD_MTRL_FIRE || at_mtrl == dCcD_MTRL_ICE, TRUE, 0);
 
-            if (armor_no_dmg && at_mtrl != dCcD_MTRL_UNK_5 && at_mtrl != dCcD_MTRL_ICE) {
+            if (armor_no_dmg && at_mtrl != dCcD_MTRL_ELECTRIC && at_mtrl != dCcD_MTRL_ICE) {
                 setGuardSe(var_r29);
             } else if (at_mtrl == dCcD_MTRL_FIRE) {
                 seStartOnlyReverb(Z2SE_AL_BURN_START);
@@ -700,10 +699,10 @@ BOOL daAlink_c::checkDamageAction() {
                     voiceStart(Z2SE_AL_V_DAMAGE_S);
                     seStartOnlyReverb(Z2SE_AL_DAMAGE_NORMAL);
                 }
-            } else if (at_mtrl == dCcD_MTRL_UNK_5 && !checkSpecialHorseRide()) {
+            } else if (at_mtrl == dCcD_MTRL_ELECTRIC && !checkSpecialHorseRide()) {
                 return procCoElecDamageInit(var_r29->GetTgHitAc(), var_r29, at_spl);
             } else if (checkReinRide()) {
-                if (at_mtrl == dCcD_MTRL_UNK_5) {
+                if (at_mtrl == dCcD_MTRL_ELECTRIC) {
                     return procCoLargeDamageInit(-1, 1, 0, 0, var_r29, 0);
                 }
 
@@ -1309,7 +1308,7 @@ int daAlink_c::procLargeDamageUpInit(int param_0, int param_1, s16 param_2, s16 
             if (param_0 == -5 && mDemo.getParam1() > 0) {
                 mProcVar0.field_0x3008 = mDemo.getParam1();
                 var_f31 = 0.0f;
-            } else if (param_0 == -2 && mDemo.getDemoType() == 1) {
+            } else if (param_0 == -2 && mDemo.getDemoType() == daPy_demo_c::DEMO_TYPE_TOOL_e) {
                 mProcVar0.field_0x3008 = 0x1E;
                 var_f31 = 0.0f;
             } else {
@@ -1407,7 +1406,7 @@ int daAlink_c::procLargeDamageUp() {
             offModeFlg(0x04000000);
 
             if ((checkEventRun() && mProcVar0.field_0x3008 < 0) || mDemo.getDemoMode() == 0x1B || mDemo.getDemoMode() == 9) {
-                dComIfGp_evmng_cutEnd(field_0x3184);
+                dComIfGp_evmng_cutEnd(mAlinkStaffId);
             } else {
                 checkNextAction(0);
             }

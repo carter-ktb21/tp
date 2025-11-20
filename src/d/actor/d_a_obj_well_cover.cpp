@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_well_cover.h"
 #include "d/d_procname.h"
 #include "d/actor/d_a_player.h"
@@ -29,38 +31,20 @@ int daObjWCover_c::Create() {
     return 1;
 }
 
-/* 80D36A4C-80D36A58 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D36A58-80D36A6C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80D36A6C-80D36A70 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "H_Idohuta";
 
 /* 80D36394-80D36404 000174 0070+00 1/0 0/0 0/0 .text            CreateHeap__13daObjWCover_cFv */
 int daObjWCover_c::CreateHeap() {
     J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes(l_arcName, 4));
-    JUT_ASSERT(194, modelData != 0)
+    JUT_ASSERT(194, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mpModel != NULL ? 1 : 0;
 }
 
 /* 80D36404-80D364E0 0001E4 00DC+00 1/1 0/0 0/0 .text            create__13daObjWCover_cFv */
 int daObjWCover_c::create() {
-    fopAcM_SetupActor(this, daObjWCover_c);
+    fopAcM_ct(this, daObjWCover_c);
     if (fopAcM_isSwitch(this, getSwNo())) {
         return cPhs_ERROR_e;
     }

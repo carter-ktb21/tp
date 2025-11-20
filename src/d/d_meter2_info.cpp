@@ -1,13 +1,15 @@
-#include "d/d_meter2_info.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "JSystem/J2DGraph/J2DTextBox.h"
-#include "JSystem/JUtility/JUTFont.h"
 #include "JSystem/JMessage/JMessage.h"
+#include "JSystem/JUtility/JUTFont.h"
 #include "d/actor/d_a_npc.h"
-#include "d/d_meter2.h"
-#include "d/d_meter_map.h"
-#include "d/d_msg_object.h"
-#include "d/d_msg_class.h"
 #include "d/d_item_data.h"
+#include "d/d_meter2.h"
+#include "d/d_meter2_info.h"
+#include "d/d_meter_map.h"
+#include "d/d_msg_class.h"
+#include "d/d_msg_object.h"
 
 enum ITEMICON_RES_FILE_ID {
     ITEMICON_BTI_ARI_MESU_00=0x3,
@@ -396,7 +398,6 @@ void dMeter2Info_c::getString(u32 i_stringID, char* o_string, JMSMesgEntry_c* i_
 
 /* 8021C370-8021C544 216CB0 01D4+00 0/0 1/1 0/0 .text
  * getStringKana__13dMeter2Info_cFUlPcP14JMSMesgEntry_c         */
-// NONMATCHING - regalloc
 void dMeter2Info_c::getStringKana(u32 i_stringID, char* o_string, JMSMesgEntry_c* i_msgEntry) {
     strcpy(o_string, "");
 
@@ -416,11 +417,9 @@ void dMeter2Info_c::getStringKana(u32 i_stringID, char* o_string, JMSMesgEntry_c
 
     char* string_ptr = NULL;
     for (u16 i = 0; i < bmg_inf->entry_num; i++) {
-        u8* entry = ((u8*)bmg_inf + (i * sizeof(JMSMesgEntry_c)));
-
         // check if i_stringID equals the message entry "Message ID"
-        if (i_stringID == *(u16*)(entry + 0x14)) {
-            string_ptr = (char*)(string_data + *(u32*)(entry + 0x10));  // use entry "String Offset" to get string pointer
+        if (i_stringID == bmg_inf->entries[i].message_id) {
+            string_ptr = (char*)(string_data + bmg_inf->entries[i].string_offset);  // use entry "String Offset" to get string pointer
 
             int var_r29 = 0;
             int sp14 = 0;
@@ -456,7 +455,7 @@ void dMeter2Info_c::getStringKana(u32 i_stringID, char* o_string, JMSMesgEntry_c
             }
 
             if (i_msgEntry != NULL) {
-                memcpy(i_msgEntry, entry + 0x10, sizeof(JMSMesgEntry_c));
+                memcpy(i_msgEntry, &bmg_inf->entries[i], sizeof(JMSMesgEntry_c));
             }
 
             return;
@@ -470,7 +469,6 @@ void dMeter2Info_c::getStringKana(u32 i_stringID, char* o_string, JMSMesgEntry_c
 
 /* 8021C544-8021C6A4 216E84 0160+00 0/0 32/32 1/1 .text
  * getStringKanji__13dMeter2Info_cFUlPcP14JMSMesgEntry_c        */
-// NONMATCHING - couple wrong instructions
 void dMeter2Info_c::getStringKanji(u32 i_stringID, char* o_string, JMSMesgEntry_c* i_msgEntry) {
     strcpy(o_string, "");
 
@@ -491,8 +489,8 @@ void dMeter2Info_c::getStringKanji(u32 i_stringID, char* o_string, JMSMesgEntry_
     char* string_ptr = NULL;
     for (u16 i = 0; i < bmg_inf->entry_num; i++) {
         // check if i_stringID equals the message entry "Message ID"
-        if (i_stringID == *(u16*)(((u8*)bmg_inf + (i * 0x14)) + 0x14)) {
-            string_ptr = (char*)(string_data + *(u32*)(((u8*)bmg_inf + (i * 0x14)) + 0x10));  // use entry "String Offset" to get string pointer
+        if (i_stringID == bmg_inf->entries[i].message_id) {
+            string_ptr = (char*)(string_data + bmg_inf->entries[i].string_offset);  // use entry "String Offset" to get string pointer
 
             int var_r29 = 0;
             while (var_r29 < 0x200) {
@@ -512,7 +510,7 @@ void dMeter2Info_c::getStringKanji(u32 i_stringID, char* o_string, JMSMesgEntry_
             }
 
             if (i_msgEntry != NULL) {
-                memcpy(i_msgEntry, ((u8*)bmg_inf + (i * 0x14)) + 0x10, 0x14);
+                memcpy(i_msgEntry, &bmg_inf->entries[i], 0x14);
             }
 
             return;
@@ -545,6 +543,15 @@ f32 dMeter2Info_c::getStringLength(J2DTextBox* i_textbox, char* i_string) {
             str_width = 0.0f;
         } else {
             int c = (u8)*string;
+#if VERSION == VERSION_GCN_JPN
+            bool unkFlag1 = false;
+            if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xfc)) {
+                unkFlag1 = true;
+            }
+            if (unkFlag1) {
+                c = (c << 8) | (u8)*++string;
+            }
+#endif
             str_width += charSpace + (fontSize.mSizeX * ((f32)font->getWidth(c) / (f32)font->getCellWidth()));
         }
     }
@@ -570,6 +577,15 @@ f32 dMeter2Info_c::getStringLength(JUTFont* i_font, f32 param_2, f32 param_3, ch
             str_width = 0.0f;
         } else {
             int c = (u8)*string;
+#if VERSION == VERSION_GCN_JPN
+            bool unkFlag1 = false;
+            if ((c >= 0x81 && c <= 0x9f) || (c >= 0xe0 && c <= 0xfc)) {
+                unkFlag1 = true;
+            }
+            if (unkFlag1) {
+                c = (c << 8) | (u8)*++string;
+            }
+#endif
             str_width += param_3 + param_2 * ((f32)i_font->getWidth(c) / (f32)i_font->getCellWidth());
         }
     }
@@ -587,8 +603,7 @@ void dMeter2Info_c::onDirectUseItem(int param_0) {
     mDirectUseItem |= (u8)(1 << param_0);
 }
 
-/* 8021C950-8021C970 217290 0020+00 0/0 4/4 0/0 .text            isDirectUseItem__13dMeter2Info_cFi
- */
+/* 8021C950-8021C970 217290 0020+00 0/0 4/4 0/0 .text            isDirectUseItem__13dMeter2Info_cFi */
 BOOL dMeter2Info_c::isDirectUseItem(int param_0) {
     return (mDirectUseItem & (u8)(1 << param_0)) ? TRUE : FALSE;
 }
@@ -596,8 +611,7 @@ BOOL dMeter2Info_c::isDirectUseItem(int param_0) {
 /* 80430188-80430280 05CEA8 00F8+00 4/4 267/267 70/70 .bss             g_meter2_info */
 dMeter2Info_c g_meter2_info;
 
-/* 8021C970-8021C9DC 2172B0 006C+00 0/0 0/0 5/5 .text            setMeterString__13dMeter2Info_cFl
- */
+/* 8021C970-8021C9DC 2172B0 006C+00 0/0 0/0 5/5 .text            setMeterString__13dMeter2Info_cFl */
 int dMeter2Info_c::setMeterString(s32 i_string) {
     if (mMeterString != 0) {
         return 0;
@@ -619,8 +633,7 @@ int dMeter2Info_c::setMeterString(s32 i_string) {
     return 0;
 }
 
-/* 8021C9DC-8021CA04 21731C 0028+00 1/1 3/3 0/0 .text            resetWarpStatus__13dMeter2Info_cFv
- */
+/* 8021C9DC-8021CA04 21731C 0028+00 1/1 3/3 0/0 .text            resetWarpStatus__13dMeter2Info_cFv */
 void dMeter2Info_c::resetWarpStatus() {
     if (mWarpStatus == 2) {
         dComIfGs_resetLastWarpAcceptStage();
@@ -849,7 +862,7 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
             }
 
             const ResTIMG* img = i_pic1->changeTexture((ResTIMG*)i_texBuf1, 0);
-            JUT_ASSERT(1284, img != 0);
+            JUT_ASSERT(1284, img != NULL);
         }
 
         tex_num++;
@@ -863,7 +876,7 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
                 if (i_pic2 != NULL) {
                     set3rdColor(itemType, i_pic2);
                     const ResTIMG* img = i_pic2->changeTexture((ResTIMG*)i_texBuf2, 0);
-                    JUT_ASSERT(1333, img != 0);
+                    JUT_ASSERT(1333, img != NULL);
                 }
 
                 tex_num++;
@@ -875,7 +888,7 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
                 if (i_pic2 != NULL) {
                     set2ndColor(itemType, i_pic2);
                     const ResTIMG* img = i_pic2->changeTexture((ResTIMG*)i_texBuf2, 0);
-                    JUT_ASSERT(1348, img != 0);
+                    JUT_ASSERT(1348, img != NULL);
                 }
 
                 tex_num++;
@@ -888,7 +901,7 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
                     if (i_pic3 != NULL) {
                         set3rdColor(itemType, i_pic3);
                         const ResTIMG* img = i_pic3->changeTexture((ResTIMG*)i_texBuf3, 0);
-                        JUT_ASSERT(1364, img != 0);
+                        JUT_ASSERT(1364, img != NULL);
                     }
 
                     tex_num++;
@@ -901,7 +914,7 @@ int dMeter2Info_c::readItemTexture(u8 i_itemNo, void* i_texBuf1, J2DPicture* i_p
                         if (i_pic4 != NULL) {
                             set4thColor(itemType, i_pic4);
                             const ResTIMG* img = i_pic4->changeTexture((ResTIMG*)i_texBuf4, 0);
-                            JUT_ASSERT(1380, img != 0);
+                            JUT_ASSERT(1380, img != NULL);
                         }
 
                         tex_num++;
@@ -1460,7 +1473,6 @@ const char* dMeter2Info_getPlusTextureName() {
 }
 
 /* 8021E308-8021E4B0 218C48 01A8+00 0/0 3/3 0/0 .text dMeter2Info_getPixel__FffffffPC7ResTIMG */
-// NONMATCHING
 bool dMeter2Info_getPixel(f32 i_posX, f32 i_posY, f32 param_2, f32 param_3, f32 i_sizeX,
                           f32 i_sizeY, ResTIMG const* i_resTimg) {
     f32 temp_f31 = i_posX - param_2;
@@ -1478,12 +1490,12 @@ bool dMeter2Info_getPixel(f32 i_posX, f32 i_posY, f32 param_2, f32 param_3, f32 
 
     JUT_ASSERT(3065, s < i_resTimg->width && t < i_resTimg->height);
 
-    u32 sp1C = ((s & 7) + ((t & 0xFFFFFFFC) * ((timg_width + 7) & 0xFFFFFFF8))) + ((s & 0xFFFFFFF8) << 2) + ((t & 3) << 3);
-    u8* pixel = (u8*)((u32)i_resTimg + (i_resTimg->imageOffset + sp1C));
+    u32 sp1C = (t & ~3) * ((timg_width + 7) & ~7) + ((s & ~7) * 4 + (s & 7)) + (t & 3) * 8;
+    u8* pixel = (u8*)((uintptr_t)i_resTimg + (i_resTimg->imageOffset + sp1C));
 
     JUT_ASSERT(3074, *pixel < i_resTimg->numColors);
 
-    u16* palette_p = (u16*)((u32)i_resTimg + i_resTimg->paletteOffset);
+    u16* palette_p = (u16*)((uintptr_t)i_resTimg + i_resTimg->paletteOffset);
     u16 var_r24 = (u16)palette_p[*pixel];
     if (var_r24 & 0x8000) {
         return 1;
@@ -1687,7 +1699,7 @@ int dMeter2Info_recieveLetter() {
                         OS_REPORT("letter info =====> %d, %d\n", j, dComIfGs_getGetNumber(j) - 1);
                     }
 
-                    JUT_ASSERT(3552, 0);
+                    JUT_ASSERT(3552, FALSE);
                 }
 
                 letterNum++;

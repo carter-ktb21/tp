@@ -4,6 +4,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_chest.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "SSystem/SComponent/c_math.h"
@@ -94,24 +96,6 @@ int daObjChest_c::Create() {
     return 1;
 }
 
-/* 80BCA0B8-80BCA0C4 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BCA0C4-80BCA0D8 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80BCA0D8-80BCA0DC -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "H_Tansu";
 
@@ -127,7 +111,7 @@ int daObjChest_c::CreateHeap() {
 
 /* 80BC92B0-80BC93F0 000430 0140+00 1/1 0/0 0/0 .text            create__12daObjChest_cFv */
 int daObjChest_c::create() {
-    fopAcM_SetupActor(this, daObjChest_c);
+    fopAcM_ct(this, daObjChest_c);
 
     int phase = dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {

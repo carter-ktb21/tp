@@ -3,13 +3,15 @@
  * Midna Wait Trigger
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_mwait.h"
 #include "d/actor/d_a_midna.h"
 #include "d/d_procname.h"
 
 /* 80D5BE18-80D5BFFC 000078 01E4+00 1/1 0/0 0/0 .text            create__12daTagMwait_cFv */
 int daTagMwait_c::create() {
-    fopAcM_SetupActor(this, daTagMwait_c);
+    fopAcM_ct(this, daTagMwait_c);
 
     mEnterSw = fopAcM_GetParam(this) >> 8;
 
@@ -136,7 +138,7 @@ int daTagMwait_c::execute() {
                            player_p->current.pos.y >= current.pos.y &&
                            player_p->current.pos.y <= current.pos.y + scale.y)
                 {
-                    attention_info.flags = 2;
+                    attention_info.flags = fopAc_AttnFlag_TALK_e;
                     eventInfo.onCondition(dEvtCnd_CANTALK_e);
                 }
             }

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_zdoor.h"
 #include "dol2asm.h"
 #include "d/actor/d_a_player.h"
@@ -314,7 +316,6 @@ int daZdoor_c::create1st() {
 
 /* 80D3FACC-80D3FCE8 00070C 021C+00 1/0 0/0 0/0 .text            Execute__9daZdoor_cFPPA3_A4_f */
 int daZdoor_c::Execute(Mtx** i_mtx) {
-    // NONMATCHING
     s16 current_open_angle = mOpenAngle;
     set_cyl();
 
@@ -386,7 +387,7 @@ int daZdoor_c::Delete() {
 
 /* 80D3FDCC-80D3FF18 000A0C 014C+00 1/0 0/0 0/0 .text            daZdoor_create1st__FP9daZdoor_c */
 static int daZdoor_create1st(daZdoor_c* i_this) {
-    fopAcM_SetupActor(i_this, daZdoor_c);
+    fopAcM_ct(i_this, daZdoor_c);
 
     return i_this->create1st();
 }

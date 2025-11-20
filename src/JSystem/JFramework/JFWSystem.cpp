@@ -3,6 +3,8 @@
 // Translation Unit: JFWSystem
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JFramework/JFWSystem.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "JSystem/JUtility/JUTConsole.h"
@@ -56,7 +58,7 @@ s32 JFWSystem::CSetUpParam::aPiecePriority = 6;
 ResFONT* JFWSystem::CSetUpParam::systemFontRes = (ResFONT*)&JUTResFONT_Ascfont_fix12;
 
 /* 80450794-80450798 -00001 0004+00 1/1 1/1 0/0 .sdata renderMode__Q29JFWSystem11CSetUpParam */
-GXRenderModeObj* JFWSystem::CSetUpParam::renderMode = &GXNtsc480IntDf;
+const GXRenderModeObj* JFWSystem::CSetUpParam::renderMode = &GXNtsc480IntDf;
 
 /* 80450798-804507A0 000218 0004+04 1/1 0/0 0/0 .sdata
  * exConsoleBufferSize__Q29JFWSystem11CSetUpParam               */
@@ -64,7 +66,7 @@ u32 JFWSystem::CSetUpParam::exConsoleBufferSize = 0x24FC;
 
 /* 80271CD0-80271D18 26C610 0048+00 1/1 1/1 0/0 .text            firstInit__9JFWSystemFv */
 void JFWSystem::firstInit() {
-    JUT_ASSERT(80, rootHeap == 0);
+    JUT_ASSERT(80, rootHeap == NULL);
     OSInit();
     DVDInit();
     rootHeap = JKRExpHeap::createRoot(CSetUpParam::maxStdHeaps, false);
@@ -87,7 +89,7 @@ JUTConsoleManager* JFWSystem::systemConsoleManager;
 JUTConsole* JFWSystem::systemConsole;
 
 /* 804511BC-804511C0 0006BC 0004+00 1/1 0/0 0/0 .sbss            None */
-static u8 sInitCalled;
+bool JFWSystem::sInitCalled = false;
 
 /* 80271D18-80272040 26C658 0328+00 0/0 1/1 0/0 .text            init__9JFWSystemFv */
 // NONMATCHING - regalloc, equivalent

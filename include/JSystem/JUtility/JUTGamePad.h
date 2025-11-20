@@ -100,7 +100,7 @@ public:
     JUTGamePadRecordBase* getPadReplay() const { return mPadReplay; }
     JUTGamePadRecordBase* getPadRecord() const { return mPadRecord; }
 
-    u32 testTrigger(u32 button) const { return mButton.mTrigger & button; }
+    bool testTrigger(u32 button) const { return mButton.mTrigger & button; }
 
     bool isPushing3ButtonReset() const {
         return mPortNum != EPortInvalid && mButtonReset.mReset != false;
@@ -110,7 +110,10 @@ public:
     void stopMotor() { mRumble.stopMotor(mPortNum, false); }
     void stopMotorHard() { mRumble.stopMotorHard(mPortNum); }
 
-    static s8 getPortStatus(u32 port) { return mPadStatus[port].err; }
+    static s8 getPortStatus(EPadPort port) {
+        JUT_ASSERT(360, 0 <= port && port < 4);
+        return mPadStatus[port].err;
+    }
 
     struct CButton {
         CButton() { clear(); }

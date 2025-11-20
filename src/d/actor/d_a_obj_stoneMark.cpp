@@ -6,6 +6,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_stoneMark.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
@@ -41,7 +43,7 @@ int daObjSMark_c::Create() {
 
 /* 8059A168-8059A25C 0001C8 00F4+00 1/1 0/0 0/0 .text            create__12daObjSMark_cFv */
 int daObjSMark_c::create() {
-    fopAcM_SetupActor(this, daObjSMark_c);
+    fopAcM_ct(this, daObjSMark_c);
 
     int phase = dComIfG_resLoad(&mpPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
@@ -113,5 +115,5 @@ extern actor_process_profile_definition g_profile_Obj_StoneMark = {
     &l_daObjSMark_Method,   // sub_method
     0x40100,                // mStatus
     fopAc_ACTOR_e,          // mActorType
-    fopAc_CULLSPHERE_8_e,   // cullType
+    fopAc_CULLSPHERE_CUSTOM_e,   // cullType
 };

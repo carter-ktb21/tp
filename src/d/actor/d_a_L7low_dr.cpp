@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_L7low_dr.h"
 #include "d/d_com_inf_game.h"
 
@@ -134,20 +136,20 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 805AAC5C-805AAD58 0006DC 00FC+00 1/1 0/0 0/0 .text            CreateHeap__11daL7lowDr_cFv */
 int daL7lowDr_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("L7lowDr", 10);
-    JUT_ASSERT(244, modelData != 0);
+    JUT_ASSERT(244, modelData != NULL);
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("L7lowDr", 4), 0, 1.0f, 0, -1, &mSound, 0x80000, 0x11000084);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
         return 0;
     }
 
     J3DModel* model = mpModelMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     return 1;
 }
 
 /* 805AAD58-805AAE88 0007D8 0130+00 1/1 0/0 0/0 .text            create__11daL7lowDr_cFv */
 int daL7lowDr_c::create() {
-    fopAcM_SetupActor(this, daL7lowDr_c);
+    fopAcM_ct(this, daL7lowDr_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "L7lowDr");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -183,6 +185,7 @@ static int daL7lowDr_Create(daL7lowDr_c* i_this) {
 
 /* 805AAEA8-805AAF44 000928 009C+00 1/1 0/0 0/0 .text            draw__11daL7lowDr_cFv */
 int daL7lowDr_c::draw() {
+         /* dSv_event_flag_c::F_0510 - City in the Sky - Watched City in the Sky start cutscene */
     if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[510])) {
         return 1;
     }

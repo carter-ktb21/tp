@@ -23,7 +23,7 @@ public:
     /* 80D467C0 */ void create_init();
     ~daPasserMng_c() { delete [] childProcIds; }
 
-    u8 getDetailLevel() { return subtype; }
+    u8 getDetailLevel() { return argument; }
     u8 getPathID() { return fopAcM_GetParam(this); }
     u8 getIntervalTime() { return fopAcM_GetParam(this) >> 24; }
     int getStartTime() { return (fopAcM_GetParam(this) >> 8) & 0xff; }
@@ -32,17 +32,11 @@ public:
     u8 getGroupNo() { return (shape_angle.x >> 8) & 0xff; }
 
     int getTimeHour() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_hour();
-        } 
-        return dKy_getdaytime_hour();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_hour() : dKy_getdaytime_hour();
     }
 
     int getTimeMinute() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_minute();
-        } 
-        return dKy_getdaytime_minute();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_minute() : dKy_getdaytime_minute();
     }
 
     int getTime() {
@@ -50,10 +44,7 @@ public:
     }
 
     int getDayOfWeek() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_week();
-        }
-        return dKy_get_dayofweek();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_week() : dKy_get_dayofweek();
     }
 
     int getChildNum() {
@@ -253,7 +244,7 @@ public:
             break;
         default:
             OS_REPORT("%s: Line.%d arg=%d\n", "d_a_passer_mng.cpp", 1049, param_1);
-            JUT_PANIC(1050, 0);
+            JUT_ASSERT(1050, FALSE);
             break;
         }
         return paramLow << 8;

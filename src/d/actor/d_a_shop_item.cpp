@@ -3,6 +3,8 @@
  * Shop Item Actor
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_shop_item.h"
 #include "JSystem/JKernel/JKRSolidHeap.h"
 #include "d/d_com_inf_game.h"
@@ -226,7 +228,7 @@ u8 daShopItem_c::getCollisionR() {
 }
 
 int daShopItem_c::_create() {
-    fopAcM_SetupActor(this, daShopItem_c);
+    fopAcM_ct(this, daShopItem_c);
 
     mAngleX = 0;
     mAngleY = 0;

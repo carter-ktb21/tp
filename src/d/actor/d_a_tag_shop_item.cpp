@@ -3,12 +3,14 @@
  * Tag - Shop Item
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_shop_item.h"
 #include "d/d_procname.h"
 
 /* 80D60B78-80D60D78 000078 0200+00 1/1 0/0 0/0 .text            create__16daTag_ShopItem_cFv */
 int daTag_ShopItem_c::create() {
-    fopAcM_SetupActor(this, daTag_ShopItem_c);
+    fopAcM_ct(this, daTag_ShopItem_c);
     initialize();
     field_0x572 = false;
 

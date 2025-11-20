@@ -3,23 +3,9 @@
 // Translation Unit: JASRegisterParam
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JAudio2/JASRegisterParam.h"
-
-//
-// Types:
-//
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* 80293644-80293664 28DF84 0020+00 0/0 1/1 0/0 .text            __ct__16JASRegisterParamFv */
 JASRegisterParam::JASRegisterParam() {

@@ -3,22 +3,9 @@
  * Lantern Oil Pot
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_oiltubo.h"
-
-/* 80CA7988-80CA7994 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80CA7994-80CA79A8 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80CA79A8-80CA79AC -00001 0004+00 1/1 0/0 0/0 .data            l_resFileName */
 static char* l_resFileName = "Obj_otubo";
@@ -44,7 +31,7 @@ dCcD_SrcCyl daObj_Oiltubo_c::mCcDCyl = {
 
 /* 80CA6718-80CA6914 000078 01FC+00 1/1 0/0 0/0 .text            create__15daObj_Oiltubo_cFv */
 int daObj_Oiltubo_c::create() {
-    fopAcM_SetupActor(this, daObj_Oiltubo_c);
+    fopAcM_ct(this, daObj_Oiltubo_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, getResName());
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -69,7 +56,7 @@ const dCcD_SrcGObjInf daObj_Oiltubo_c::mCcDObjInfo = {
 /* 80CA6B28-80CA6C5C 000488 0134+00 1/1 0/0 0/0 .text            CreateHeap__15daObj_Oiltubo_cFv */
 int daObj_Oiltubo_c::CreateHeap() {
     J3DModelData* mdlData_p = (J3DModelData*)dComIfG_getObjectRes(getResName(), l_bmdFileName);
-    JUT_ASSERT(0, mdlData_p != 0);
+    JUT_ASSERT(0, mdlData_p != NULL);
 
     mpModel = mDoExt_J3DModel__create(mdlData_p, 0x80000, 0x11000084);
     if (mpModel == NULL) {
@@ -77,7 +64,7 @@ int daObj_Oiltubo_c::CreateHeap() {
     }
 
     J3DModelData* mdlBData_p = (J3DModelData*)dComIfG_getObjectRes(getResName(), l_bbmdFileName);
-    JUT_ASSERT(0, mdlBData_p != 0);
+    JUT_ASSERT(0, mdlBData_p != NULL);
 
     mpBModel = mDoExt_J3DModel__create(mdlBData_p, 0x80000, 0x19000284);
     if (mpBModel == NULL) {
@@ -108,7 +95,7 @@ int daObj_Oiltubo_c::Execute() {
     mGroundChk = mAcch.m_gnd;
     mGroundHeight = mAcch.GetGroundH();
 
-    if (mGroundHeight != -1000000000.0f) {
+    if (mGroundHeight != -G_CM3D_F_INF) {
         setEnvTevColor();
         setRoomNo();
     }

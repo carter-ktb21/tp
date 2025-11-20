@@ -3,12 +3,15 @@
  * Insect - Pillbug
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_dan.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80BDC568-80BDC56C 000008 0004+00 2/2 0/0 0/0 .bss             None */
 static bool hioInit;
@@ -269,12 +272,12 @@ void daObjDAN_c::checkGroundPos() {
 
 /* 80BDB0D8-80BDB0E8 000C38 0010+00 1/0 0/0 0/0 .text            Insect_Release__10daObjDAN_cFv */
 void daObjDAN_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = ACT_MOVE;
 }
 
 /* 80BDC42C-80BDC430 00007C 0002+02 1/2 0/0 0/0 .rodata          l_dan_itemno */
-static u8 const l_dan_itemno[2] = {0xCA, 0xCB};
+static u8 const l_dan_itemno[2] = {fpcNm_ITEM_M_DANGOMUSHI, fpcNm_ITEM_F_DANGOMUSHI};
 
 /* 80BDB0E8-80BDB264 000C48 017C+00 1/1 0/0 0/0 .text            Z_BufferChk__10daObjDAN_cFv */
 void daObjDAN_c::Z_BufferChk() {
@@ -289,7 +292,7 @@ void daObjDAN_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -490,7 +493,10 @@ static int daObjDAN_Execute(daObjDAN_c* i_this) {
 }
 
 /* 80BDC460-80BDC464 0000B0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x019B, 0x019C};
+static u16 const l_musiya_num[2] = {
+    0x019B, /* dSv_event_flag_c::F_0411 - Misc. - Pill bug (M) */
+    0x019C, /* dSv_event_flag_c::F_0412 - Misc. - Pill bug (F) */
+};
 
 /* 80BDBB0C-80BDBCB8 00166C 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjDAN_cFv */
 bool daObjDAN_c::CreateChk() {
@@ -529,13 +535,13 @@ bool daObjDAN_c::CreateChk() {
 
 /* 80BDBCB8-80BDC170 001818 04B8+00 1/1 0/0 0/0 .text            create__10daObjDAN_cFv */
 cPhs__Step daObjDAN_c::create() {
-    fopAcM_SetupActor(this, daObjDAN_c);
+    fopAcM_ct(this, daObjDAN_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "I_Dan");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
         } else {
@@ -596,7 +602,7 @@ cPhs__Step daObjDAN_c::create() {
         pos.y += 100.0f;
         gnd_chk.SetPos(&pos);
         f32 cross = dComIfG_Bgsp().GroundCross(&gnd_chk);
-        if (cross != -1e9f) {
+        if (cross != -G_CM3D_F_INF) {
             current.pos.y = cross;
         }
 

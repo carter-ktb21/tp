@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_grm.h"
 #include "dol2asm.h"
 
@@ -54,7 +56,7 @@ __ct__11daNpc_grM_cFPC26daNpcT_faceMotionAnmData_cPC22daNpcT_motionAnmData_cPCQ2
 extern "C" void __dt__8cM3dGCylFv();
 extern "C" void __dt__8cM3dGAabFv();
 extern "C" void __dt__4cXyzFv();
-extern "C" s32 getEyeballMaterialNo__11daNpc_grM_cFv();
+extern "C" u16 getEyeballMaterialNo__11daNpc_grM_cFv();
 extern "C" s32 getHeadJointNo__11daNpc_grM_cFv();
 extern "C" s32 getNeckJointNo__11daNpc_grM_cFv();
 extern "C" bool getBackboneJointNo__11daNpc_grM_cFv();
@@ -259,47 +261,23 @@ SECTION_DEAD static char const* const stringBase_809D6E7A = "grA_mdl";
 SECTION_DEAD static char const* const stringBase_809D6E82 = "TALK_SPA";
 #pragma pop
 
-/* 809D6E94-809D6EA0 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 809D6EA0-809D6EB4 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 809D6EB4-809D6EBC 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 SECTION_DATA static u8 l_bmdData[8] = {
     0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02,
 };
 
 /* 809D6EBC-809D6ED4 -00001 0018+00 0/1 0/0 0/0 .data            l_evtList */
-#pragma push
-#pragma force_active on
-SECTION_DATA static void* l_evtList[6] = {
-    (void*)&d_a_npc_grm__stringBase0,
-    (void*)NULL,
-    (void*)(((char*)&d_a_npc_grm__stringBase0) + 0x1),
-    (void*)NULL,
-    (void*)NULL,
-    (void*)NULL,
+static daNpcT_evtData_c l_evtList[3] = {
+    {"", 0},
+    {"DEFAULT_GETITEM", 0},
+    {NULL, 0},
 };
-#pragma pop
 
 /* 809D6ED4-809D6EE0 -00001 000C+00 2/3 0/0 0/0 .data            l_resNameList */
-SECTION_DATA static void* l_resNameList[3] = {
-    (void*)&d_a_npc_grm__stringBase0,
-    (void*)(((char*)&d_a_npc_grm__stringBase0) + 0x11),
-    (void*)(((char*)&d_a_npc_grm__stringBase0) + 0x1A),
+static char* l_resNameList[3] = {
+    "",
+    "grA_base",
+    "grA_mdl",
 };
 
 /* 809D6EE0-809D6EE4 00004C 0003+01 1/0 0/0 0/0 .data            l_loadResPtrn0 */
@@ -373,9 +351,9 @@ SECTION_DATA static u8 l_motionSequenceData[80] = {
 #pragma pop
 
 /* 809D70BC-809D70C4 -00001 0008+00 1/1 0/0 0/0 .data            mCutNameList__11daNpc_grM_c */
-SECTION_DATA void* daNpc_grM_c::mCutNameList[2] = {
-    (void*)&d_a_npc_grm__stringBase0,
-    (void*)(((char*)&d_a_npc_grm__stringBase0) + 0x22),
+char* daNpc_grM_c::mCutNameList[2] = {
+    "",
+    "TALK_SPA",
 };
 
 /* 809D70C4-809D70D0 -00001 000C+00 1/1 0/0 0/0 .data            @3831 */
@@ -982,7 +960,7 @@ extern "C" void __dt__4cXyzFv() {
 }
 
 /* 809D5F98-809D5FA0 002018 0008+00 1/0 0/0 0/0 .text getEyeballMaterialNo__11daNpc_grM_cFv */
-s32 daNpc_grM_c::getEyeballMaterialNo() {
+u16 daNpc_grM_c::getEyeballMaterialNo() {
     return true;
 }
 

@@ -3,6 +3,8 @@
  * dolzel2 - Eye Highlight Management
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_eye_hl.h"
 #include "JSystem/J3DGraphBase/J3DTexture.h"
 #include "d/d_com_inf_game.h"
@@ -43,7 +45,7 @@ dEyeHL_c* dEyeHL_mng_c::m_obj;
 void dEyeHL_mng_c::update() {
     dEyeHL_c* obj = m_obj;
 
-    if (g_envHIO.mOther.mLODBias == 0 || !dComIfGp_event_runCheck()) {
+    if (g_envHIO.mOther.mAdjustLODBias == 0 || !dComIfGp_event_runCheck()) {
         for (; obj != NULL; obj = obj->m_next) {
             obj->m_timg->LODBias = obj->m_lodBias;
         }

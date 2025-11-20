@@ -3,12 +3,11 @@
  * Gates that shutter open / close
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_dshutter.h"
 #include "SSystem/SComponent/c_math.h"
 #include "Z2AudioLib/Z2Instances.h"
-#include "dol2asm.h"
-
-UNK_REL_DATA
 
 /* 80467F7C-80467F88 -00001 000C+00 2/2 0/0 0/0 .data            l_arcName */
 static char* l_arcName[] = {
@@ -51,7 +50,7 @@ int daDsh_c::Draw() {
 }
 
 /* 80467640-80467694 000220 0054+00 1/0 0/0 0/0 .text            Execute__7daDsh_cFPPA3_A4_f */
-int daDsh_c::Execute(f32 (**param_0)[3][4]) {
+int daDsh_c::Execute(Mtx** param_0) {
     callExecute();
     setMtx();
     *param_0 = &mBgMtx;
@@ -97,23 +96,6 @@ int daDsh_c::initOpenWait() {
     current.pos.y = home.pos.y;
     return 1;
 }
-
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
 
 /* 804680B0-804680C8 000040 0018+00 2/3 0/0 0/0 .bss             l_openWaitAction */
 static daDsh_c::action_c l_openWaitAction(&daDsh_c::initOpenWait, &daDsh_c::executeOpenWait);
@@ -258,7 +240,7 @@ AUDIO_INSTANCES;
 
 /* 80467C7C-80467DF8 00085C 017C+00 1/0 0/0 0/0 .text            daDsh_Create__FP10fopAc_ac_c */
 int daDsh_c::create() {
-    fopAcM_SetupActor(this, daDsh_c);
+    fopAcM_ct(this, daDsh_c);
 
     mType = getType();
 

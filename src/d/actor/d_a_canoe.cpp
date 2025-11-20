@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_canoe.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
@@ -97,13 +99,15 @@ static dCcD_SrcCyl l_cylSrc = {
 
 /* 804DA740-804DAB18 0002E0 03D8+00 1/1 0/0 0/0 .text            create__9daCanoe_cFv */
 int daCanoe_c::create() {
-    fopAcM_SetupActor(this, daCanoe_c);
+    fopAcM_ct(this, daCanoe_c);
 
     if (strcmp(dComIfGp_getStartStageName(), "F_SP127") == 0) {
+             /* dSv_event_flag_c::F_0463 - Fishing Pond - Reserved for fishing */
         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[463])) {
             return cPhs_ERROR_e;
         }
 
+            /* dSv_event_flag_c::F_0464 - Fishing Pond - Reserved for fishing */
         if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[464])) {
             fopAcM_SetParam(this, 2);
         } else {
@@ -195,7 +199,7 @@ static int daCanoe_Delete(daCanoe_c* i_this) {
 /* 804DB008-804DB0B0 000BA8 00A8+00 1/1 0/0 0/0 .text            setRoomInfo__9daCanoe_cFv */
 void daCanoe_c::setRoomInfo() {
     int room_no;
-    if (mAcch[0].GetGroundH() != -1000000000.0f) {
+    if (mAcch[0].GetGroundH() != -G_CM3D_F_INF) {
         room_no = dComIfG_Bgsp().GetRoomId(mAcch[0].m_gnd);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mAcch[0].m_gnd);
     } else {
@@ -549,8 +553,6 @@ void daCanoe_c::frontBackBgCheck() {
     }
 }
 
-UNK_REL_BSS
-
 /* 804DC330-804DC554 001ED0 0224+00 1/1 0/0 0/0 .text            setPaddleEffect__9daCanoe_cFv */
 void daCanoe_c::setPaddleEffect() {
     static cXyz paddleRippleScale(0.7f, 0.7f, 0.7f);
@@ -871,9 +873,9 @@ int daCanoe_c::execute() {
     setCanoeSliderEffect();
 
     if (!player->checkCanoeRideOwn(this) && speedF < 0.1f && mWaterSpeed.abs2XZ() < 0.1f && !player->checkFishingRodEquip()) {
-        attention_info.flags |= 0x80;
+        attention_info.flags |= fopAc_AttnFlag_ETC_e;
     } else {
-        attention_info.flags &= ~0x80;
+        attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
     }
 
     u32 sp1C = 127.0f * (fabsf(speedF) / player->getCanoeMaxSpeed());
@@ -962,4 +964,5 @@ extern actor_process_profile_definition g_profile_CANOE = {
 };
 
 AUDIO_INSTANCES
+template<>
 JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;

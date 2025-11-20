@@ -6,7 +6,6 @@
 #include "SSystem/SComponent/c_cc_d.h"
 #include "JSystem/JUtility/JUTAssert.h"
 
-#define CHECK_FLOAT_CLASS(line, x) JUT_ASSERT(line, !(((sizeof(x) == sizeof(float)) ? __fpclassifyf((float)(x)) : __fpclassifyd((double)(x)) ) == 1));
 #define CHECK_FLOAT_RANGE(line, x) JUT_ASSERT(line, -1.0e32f < x && x < 1.0e32f);
 
 /* 80430CB4-80430CC0 05D9D4 000C+00 1/1 2/2 0/0 .bss             m_virtual_center__14cCcD_ShapeAttr
@@ -224,9 +223,9 @@ void cCcD_Stts::PlusCcMove(f32 x, f32 y, f32 z) {
     m_cc_move.y += y;
     m_cc_move.z += z;
 
-    CHECK_FLOAT_CLASS(422, m_cc_move.x);
-    CHECK_FLOAT_CLASS(423, m_cc_move.y);
-    CHECK_FLOAT_CLASS(424, m_cc_move.z);
+    JUT_ASSERT(422, !isnan(m_cc_move.x));
+    JUT_ASSERT(423, !isnan(m_cc_move.y));
+    JUT_ASSERT(424, !isnan(m_cc_move.z));
 
     CHECK_FLOAT_RANGE(426, m_cc_move.x);
     CHECK_FLOAT_RANGE(427, m_cc_move.y);
@@ -298,6 +297,22 @@ void cCcD_ShapeAttr::getShapeAccess(cCcD_ShapeAttr::Shape* pshape) const {
     pshape->_4.y = 0.0f;
     pshape->_4.x = 0.0f;
 }
+
+bool cCcD_PntAttr::GetNVec(cXyz const& param_0, cXyz* param_1) const {
+    param_1->x = param_0.x - vtx.x;
+    param_1->y = param_0.y - vtx.y;
+    param_1->z = param_0.z - vtx.z;
+    if (cM3d_IsZero(PSVECMag(param_1))) {
+        param_1->x = 0.0f;
+        param_1->y = 0.0f;
+        param_1->z = 0.0f;
+        return false;
+    } else {
+        PSVECNormalize(param_1, param_1);
+        return true;
+    }
+}
+
 
 /* 80263A88-80263B58 25E3C8 00D0+00 1/0 1/0 0/0 .text
  * CrossAtTg__12cCcD_TriAttrCFRC12cCcD_CpsAttrP4cXyz            */

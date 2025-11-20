@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_hstop.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
@@ -11,7 +13,7 @@
 
 /* 805A43EC-805A45D8 0000EC 01EC+00 1/1 0/0 0/0 .text            create__12daTagHstop_cFv */
 int daTagHstop_c::create() {
-    fopAcM_SetupActor(this, daTagHstop_c);
+    fopAcM_ct(this, daTagHstop_c);
 
     scale.x *= 100.0f;
     scale.y *= 100.0f;

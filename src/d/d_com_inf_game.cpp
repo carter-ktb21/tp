@@ -3,20 +3,22 @@
  * Game Information
  */
 
-#include "d/d_com_inf_game.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRAramArchive.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "d/actor/d_a_alink.h"
+#include "d/d_com_inf_game.h"
 #include "d/d_item.h"
-#include "d/d_simple_model.h"
-#include "d/d_timer.h"
 #include "d/d_map_path_dmap.h"
 #include "d/d_menu_fmap.h"
+#include "d/d_menu_window_HIO.h"
 #include "d/d_meter2_info.h"
 #include "d/d_meter_HIO.h"
-#include "d/d_menu_window_HIO.h"
-#include "f_op/f_op_scene_mng.h"
+#include "d/d_simple_model.h"
+#include "d/d_timer.h"
 #include "f_op/f_op_msg_mng.h"
+#include "f_op/f_op_scene_mng.h"
 #include "m_Do/m_Do_Reset.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
@@ -1138,7 +1140,7 @@ s8 dComIfGp_getReverb(int i_roomNo) {
  * dComIfGd_setSimpleShadow__FP4cXyzffR13cBgS_PolyInfosfP9_GXTexObj */
 int dComIfGd_setSimpleShadow(cXyz* i_pos, f32 param_1, f32 param_2, cBgS_PolyInfo& param_3,
                              s16 i_angle, f32 param_5, GXTexObj* i_tex) {
-    if (param_3.ChkSetInfo() && -1000000000.0f != param_1) {
+    if (param_3.ChkSetInfo() && -G_CM3D_F_INF != param_1) {
         cM3dGPla plane;
         dComIfG_Bgsp().GetTriPla(param_3, &plane);
 
@@ -1635,8 +1637,10 @@ void dComIfGp_createSubExpHeap2D() {
     u32 size = dComIfGp_getExpHeap2D()->getTotalFreeSize() * (2.0f / 5.0f);
 
     for (int i = 0; i < 2; i++) {
+        JUT_ASSERT(3573, dComIfGp_getSubExpHeap2D(i) == NULL);
         if (dComIfGp_getSubExpHeap2D(i) == NULL) {
-            JKRExpHeap* i_heap = JKRExpHeap::create(size, dComIfGp_getExpHeap2D(), false);
+            JKRExpHeap* i_heap = JKRCreateExpHeap(size, dComIfGp_getExpHeap2D(), false);
+            JUT_ASSERT(3576, i_heap != NULL);
             dComIfGp_setSubExpHeap2D(i, i_heap);
         }
     }
@@ -1696,7 +1700,7 @@ u8 dComIfGs_checkGetInsectNum() {
     u8 insectCount = 0;
     u8* insectList = l_itemno;
 
-    for (int i = 0; i < ARRAY_SIZE(l_itemno); i++) {
+    for (int i = 0; i < ARRAY_SIZEU(l_itemno); i++) {
         u8 insectId = *insectList;
         insectList++;
         if (dComIfGs_isItemFirstBit(insectId) &&
@@ -1821,7 +1825,7 @@ void dComIfGp_addSelectItemNum(int i_selItemIdx, s16 i_num) {
 int dComIfGd_setShadow(u32 param_0, s8 param_1, J3DModel* param_2, cXyz* param_3, f32 param_4,
                        f32 param_5, f32 param_6, f32 param_7, cBgS_PolyInfo& param_8,
                        dKy_tevstr_c* param_9, s16 param_10, f32 param_11, _GXTexObj* param_12) {
-    if (param_7 <= -1000000000.0f) {
+    if (param_7 <= -G_CM3D_F_INF) {
         return 0;
     } else {
         return dComIfGd_setRealShadow(param_0, param_1, param_2, param_3, param_4,
@@ -1932,12 +1936,12 @@ void dComIfG_playerStatusD() {
     dComIfGs_onEventBit(0x5d80);
 
     if (!mDoCPd_c::isConnect(PAD_3)) {
-        g_fmapHIO.mRangeCheckInterval = 0;
+        g_fmapHIO.mAllRegionsUnlocked = 0;
     } else {
-        g_fmapHIO.mRangeCheckInterval = 1;
+        g_fmapHIO.mAllRegionsUnlocked = 1;
     }
 
-    g_fmapHIO.mRegionImageDebug = 1;
+    g_fmapHIO.mPortalWarpON = 1;
     g_fmapHIO.update();
 
     g_mwHIO.setArrowFlag(1);

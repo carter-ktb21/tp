@@ -3,10 +3,13 @@
  * NPC - Squirrel
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_sq.h"
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
@@ -331,11 +334,12 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80AF6F98-80AF7260 001098 02C8+00 1/0 0/0 0/0 .text            daNpc_Sq_Create__FP10fopAc_ac_c */
 static cPhs__Step daNpc_Sq_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, npc_sq_class);
+    fopAcM_ct(i_this, npc_sq_class);
     npc_sq_class* _this = static_cast<npc_sq_class*>(i_this);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhaseReq, "Sq");
     if (step == cPhs_COMPLEATE_e) {
+            /* dSv_event_flag_c::D_0001 - Ordon Village - Stopped by squirrel in front of house at night */
         if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[25])) {
             return cPhs_ERROR_e;
         }

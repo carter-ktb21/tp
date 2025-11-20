@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_horse.h"
 #include "d/actor/d_a_alink.h"
 #include "d/d_com_inf_game.h"
@@ -148,10 +150,8 @@ const daHorse_hio_c1 daHorse_hio_c0::m = {
 };
 
 /* 80837F2C-8083836C 0000EC 0440+00 1/1 0/0 0/0 .text            setReinPos__13daHorseRein_cFi */
-// NONMATCHING 
 void daHorseRein_c::setReinPos(int param_0) {
-    cXyz* var_r27 = &field_0x0[0][param_0];
-    var_r27++;
+    cXyz* var_r27 = &field_0x0[0][param_0] + 1;
 
     cXyz spE0 = *field_0x0[0] - *var_r27;
     spE0.normalizeZP();
@@ -215,8 +215,6 @@ void daHorseRein_c::setReinPosPart(int param_0) {
         setReinPos(i);
     }
 }
-
-UNK_REL_DATA
 
 /* 808458F4-808458F8 000020 0004+00 1/2 0/0 0/0 .data            l_autoUpHeight */
 static f32 l_autoUpHeight = 50.0f;
@@ -507,7 +505,7 @@ static void* daHorse_searchSingleBoar(fopAc_ac_c* i_actor, void* i_data) {
 /* 80838F98-808392D8 001158 0340+00 1/1 0/0 0/0 .text            createHeap__9daHorse_cFv */
 int daHorse_c::createHeap() {
     m_modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 0x26);
-    JUT_ASSERT(0x487, m_modelData != 0);
+    JUT_ASSERT(0x487, m_modelData != NULL);
 
     m_model = mDoExt_J3DModel__create(m_modelData, 0x80000, 0x11020084);
     if (m_model == NULL) {
@@ -544,7 +542,7 @@ int daHorse_c::createHeap() {
     }
 
     ResTIMG* texImg = (ResTIMG*)dComIfG_getObjectRes(l_arcName, 0x2C);
-    JUT_ASSERT(0x4B6, texImg != 0);
+    JUT_ASSERT(0x4B6, texImg != NULL);
 
     if (!m_reinLine.init(1, 75, texImg, 0)) {
         return 0;
@@ -586,16 +584,22 @@ BOOL daHorse_c::checkEnding() {
 
 /* 80839498-80839CFC 001658 0864+00 1/1 0/0 0/0 .text            create__9daHorse_cFv */
 int daHorse_c::create() {
-    fopAcM_SetupActor(this, daHorse_c);
+    fopAcM_ct(this, daHorse_c);
 
     if (checkEnding()) {
         onStateFlg0(FLG0_UNK_8000);
     }
 
     if (!checkStateFlg0(FLG0_UNK_8000) &&
-        (((dComIfGs_isEventBit(dSv_event_flag_c::M_008) && !dComIfGs_isEventBit(dSv_event_flag_c::M_023)) &&
-        (!daAlink_c::checkStageName("F_SP109") || !dComIfGs_isEventBit(dSv_event_flag_c::F_0066))) ||
-        dComIfGs_isTmpBit(dSv_event_tmp_flag_c::NO_TELOP)))
+           /* Cutscene - Cutscene - attacked by monsters at Ordon spring */
+        (((dComIfGs_isEventBit(dSv_event_flag_c::M_008)
+            /* Main Event - Epona rescued flag */
+        && !dComIfGs_isEventBit(dSv_event_flag_c::M_023))
+        && (!daAlink_c::checkStageName("F_SP109")
+            /* Death Mountain - First saw Goron cutscene on mountain path */
+        || !dComIfGs_isEventBit(dSv_event_flag_c::F_0066)))
+           /* General use - When on (while changing scenes) stage name is not shown */
+        || dComIfGs_isTmpBit(dSv_event_tmp_flag_c::NO_TELOP)))
     {
         return cPhs_ERROR_e;
     }
@@ -626,7 +630,11 @@ int daHorse_c::create() {
         m_offRideFlg = &daHorse_c::offRideFlgSubstance;
 
         if (!daAlink_getAlinkActorClass()->checkHorseStart() && !checkStateFlg0(FLG0_UNK_8000)) {
-            if (strcmp(dComIfGs_getHorseRestartStageName(), "") != 0 && (!dComIfGs_isEventBit(0x1580) || dComIfGs_isEventBit(0x601))) {
+            if (strcmp(dComIfGs_getHorseRestartStageName(), "") != 0
+                     /* dSv_event_flag_c::M_002 - Cutscene - [cutscene: 2] Met with Ilia (brings horse to spring) */
+                && (!dComIfGs_isEventBit(0x1580)
+                   /* dSv_event_flag_c::M_023 - Main Event - Epona rescued flag */
+                || dComIfGs_isEventBit(0x601))) {
                 if (daAlink_c::checkStageName(dComIfGs_getHorseRestartStageName()) && (room_no == -1 || fopAcM_GetRoomNo(this) == dComIfGs_getHorseRestartRoomNo())) {
                     current.pos = dComIfGs_getHorseRestartPos();
                     old.pos = current.pos;
@@ -737,7 +745,7 @@ int daHorse_c::create() {
 
         procWaitInit();
 
-        m_model->setUserArea((u32)this);
+        m_model->setUserArea((uintptr_t)this);
         for (u16 i = 0; i < 38; i++) {
             m_modelData->getJointNodePointer(i)->setCallBack(daHorse_modelCallBack);
         }
@@ -899,7 +907,7 @@ int daHorse_c::setSingleAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_end
     J3DAnmTransform* bck;
     if (i_isDemoAnm) {
         if (i_anmIdx & 0x8000) {
-            JUT_ASSERT(0x6D4, 0);
+            JUT_ASSERT(1748, FALSE);
         }
 
         bck = (J3DAnmTransform*)dComIfG_getObjectIDRes(dStage_roomControl_c::getDemoArcName(), i_anmIdx);
@@ -1393,7 +1401,7 @@ void daHorse_c::acceptPlayerRide() {
     if (!checkStateFlg0(FLG0_UNK_1) && !daPy_py_c::checkNowWolf()) {
         int angle = fopAcM_seenPlayerAngleY(this);
         if (angle > 0x2800 && (!daAlink_getAlinkActorClass()->checkHorseZelda() || angle < 0x5800)) {
-            attention_info.flags |= 0x80;
+            attention_info.flags |= fopAc_AttnFlag_ETC_e;
         }
     }
 }
@@ -2099,7 +2107,7 @@ BOOL daHorse_c::checkWaitTurn() const {
 /* 8083D774-8083D918 005934 01A4+00 2/2 0/0 0/0 .text            setRoomInfo__9daHorse_cFi */
 void daHorse_c::setRoomInfo(int param_0) {
     int room_no;
-    if (-1000000000.0f != m_acch.GetGroundH() && (checkStateFlg0(FLG0_UNK_1) || m_procID == PROC_LARGE_DAMAGE_e || m_procID == PROC_JUMP_e || current.pos.y - m_acch.GetGroundH() < 500.0f)) {
+    if (-G_CM3D_F_INF != m_acch.GetGroundH() && (checkStateFlg0(FLG0_UNK_1) || m_procID == PROC_LARGE_DAMAGE_e || m_procID == PROC_JUMP_e || current.pos.y - m_acch.GetGroundH() < 500.0f)) {
         room_no = dComIfG_Bgsp().GetRoomId(m_acch.m_gnd);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(m_acch.m_gnd);
 
@@ -2134,23 +2142,6 @@ void daHorse_c::setRoomInfo(int param_0) {
         fopAcM_SetRoomNo(this, room_no);
     }
 }
-
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
 
 /* 80845C04-80845C10 000054 000C+00 1/2 0/0 0/0 .bss             l_frontFootOffset */
 static cXyz l_frontFootOffset(23.5f, -20.0f, 0.0f);
@@ -3374,8 +3365,7 @@ int daHorse_c::callHorseSubstance(cXyz const* i_pos) {
 
 /* 80841468-808415B4 009628 014C+00 1/0 0/0 0/0 .text
  * setHorsePosAndAngleSubstance__9daHorse_cFPC4cXyzs            */
-// NONMATCHING - small regalloc, equivalent
-int daHorse_c::setHorsePosAndAngleSubstance(cXyz const* param_0, s16 param_1) {
+void daHorse_c::setHorsePosAndAngleSubstance(cXyz const* param_0, s16 param_1) {
     int i, j;
 
     cXyz sp10(current.pos);
@@ -3397,13 +3387,12 @@ int daHorse_c::setHorsePosAndAngleSubstance(cXyz const* param_0, s16 param_1) {
     mDoMtx_stack_c::transM(-sp10.x, -sp10.y, -sp10.z);
     mDoMtx_stack_c::multVec(&field_0x17a0, &field_0x17a0);
 
-    daHorseRein_c* m_rein = m_rein;
-    for (i = 0; i < 3; i++) {
-        cXyz* var_r28 = m_rein->field_0x0[0];
-        for (j = 0; j < m_rein->field_0x8[1]; j++, var_r28++) {
+    daHorseRein_c* rein_p = m_rein;
+    for (i = 0; i < 3; i++, rein_p++) {
+        cXyz* var_r28 = rein_p->field_0x0[0];
+        for (j = 0; j < rein_p->field_0x8[1]; j++, var_r28++) {
             mDoMtx_stack_c::multVec(var_r28, var_r28);
         }
-        m_rein++;
     }
 }
 
@@ -3582,7 +3571,7 @@ int daHorse_c::procWait() {
 
     if (!checkStateFlg0(FLG0_UNK_1)) {
         if (daPy_py_c::checkNowWolf()) {
-            attention_info.flags |= 0x8;
+            attention_info.flags |= fopAc_AttnFlag_SPEAK_e;
             eventInfo.onCondition(1);
         } else if (m_procID == PROC_WAIT_e) {
             acceptPlayerRide();
@@ -4296,7 +4285,7 @@ int daHorse_c::execute() {
     }
 
     m_resetStateFlg0 = 0;
-    attention_info.flags &= ~0x88;
+    attention_info.flags &= ~(fopAc_AttnFlag_ETC_e | fopAc_AttnFlag_SPEAK_e);
     field_0x16b6 = 0;
     field_0x16e8 = shape_angle.y;
     field_0x1710 = field_0x170e;
@@ -4383,7 +4372,7 @@ int daHorse_c::execute() {
         sp54.z = sp70.mTranslate.z;
 
         mDoMtx_stack_c::multVec(&sp54, &current.pos);
-        if (field_0x1730 != 0 && -1000000000.0f != m_acch.GetGroundH()) {
+        if (field_0x1730 != 0 && -G_CM3D_F_INF != m_acch.GetGroundH()) {
             current.pos.y = m_acch.GetGroundH();
         }
     } else if (m_procID == PROC_JUMP_e) {

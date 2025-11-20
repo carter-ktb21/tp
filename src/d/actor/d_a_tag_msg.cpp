@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_msg.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -30,11 +32,11 @@ daTag_Msg_c::~daTag_Msg_c() {
 
 /* 8048F878-8048F954 000118 00DC+00 1/1 0/0 0/0 .text            create__11daTag_Msg_cFv */
 int daTag_Msg_c::create() {
-    fopAcM_SetupActor(this, daTag_Msg_c);
+    fopAcM_ct(this, daTag_Msg_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, getResName());
     if (phase_state == cPhs_COMPLEATE_e) {
-        attention_info.flags = 0x20000008;
+        attention_info.flags = (fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e);
         getParam();
 
         eventInfo.setArchiveName(getResName());
@@ -123,7 +125,7 @@ int daTag_Msg_c::execute() {
     if (set_event && rangeCheck() && otherCheck()) {
         if (field_0x5dd) {
             mOrderEvtNum = 1;
-            JUT_ASSERT(0, 0 != l_evtNameTBL[mOrderEvtNum]);
+            JUT_ASSERT(0, NULL != l_evtNameTBL[mOrderEvtNum]);
 
             mEventIdx =
                 dComIfGp_getEventManager().getEventIdx(this, l_evtNameTBL[mOrderEvtNum], 0xFF);

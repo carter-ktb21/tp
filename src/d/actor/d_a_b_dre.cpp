@@ -1,7 +1,9 @@
 /**
- * @file d_a_b_dre.cpp
+* @file d_a_b_dre.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_b_dre.h"
 #include "SSystem/SComponent/c_math.h"
@@ -11,11 +13,12 @@
 #include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_graphic.h"
 
 int daB_DRE_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_DR", 0x49);
-    JUT_ASSERT(0xB4, modelData != 0);
+    JUT_ASSERT(0xB4, modelData != NULL);
 
     if (mAction == 0) {
         mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
@@ -180,23 +183,6 @@ void daB_DRE_c::SetReleaseCam() {
     dComIfGp_event_reset();
 }
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
-
 namespace {
 /* 805CB080-805CB084 000048 0004+00 0/1 0/0 0/0 .bss             s_dis__23@unnamed@d_a_b_dre_cpp@ */
 static f32 s_dis;
@@ -276,7 +262,7 @@ void daB_DRE_c::CamAction2() {
         if (mTimers[0] == 0) {
             SetAnm(mpModelMorf, 0x38, 0, 5.0f, 1.0f);
             dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-            kankyo->field_0x12cc = 2;
+            kankyo->wether = 2;
             mDrMode++;
             mCameraMode++;
         }
@@ -350,7 +336,7 @@ void daB_DRE_c::DrAction2() {
         break;
     case 2:
         if (mpModelMorf->checkFrame(110.0f)) {
-            subtype = 1;
+            argument = 1;
             mBlurRate = 150.0f;
             mTimers[0] = 100;
             mHideParts = true;
@@ -594,7 +580,7 @@ void daB_DRE_c::DrAction() {
             mAnm = 0x1F;
 
             dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-            kankyo->field_0x12cc = 0;
+            kankyo->wether = 0;
 
             mHideModel = true;
             mDrMode++;
@@ -916,7 +902,7 @@ static int daB_DRE_Execute(daB_DRE_c* i_this) {
 
 /* 805CA944-805CAC3C 002F04 02F8+00 1/1 0/0 0/0 .text            create__9daB_DRE_cFv */
 int daB_DRE_c::create() {
-    fopAcM_SetupActor(this, daB_DRE_c);
+    fopAcM_ct(this, daB_DRE_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "B_DR");
     if (phase_state == cPhs_COMPLEATE_e) {

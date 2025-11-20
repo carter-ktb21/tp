@@ -1,12 +1,12 @@
 /**
- * @file d_a_obj_goGate.cpp
+* @file d_a_obj_goGate.cpp
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_goGate.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_DATA
 
 /* 80BFD6AC-80BFD6DC 0000EC 0030+00 1/1 0/0 0/0 .text            __ct__14daGoGate_HIO_cFv */
 daGoGate_HIO_c::daGoGate_HIO_c() {
@@ -33,7 +33,7 @@ int daGoGate_c::CreateHeap() {
 
 /* 80BFD82C-80BFD984 00026C 0158+00 1/1 0/0 0/0 .text            create__10daGoGate_cFv */
 cPhs__Step daGoGate_c::create() {
-    fopAcM_SetupActor(this, daGoGate_c);
+    fopAcM_ct(this, daGoGate_c);
 
     cPhs__Step phase = static_cast<cPhs__Step>(dComIfG_resLoad(&mPhase, "P_Ggate"));
     if (phase == cPhs_COMPLEATE_e) {
@@ -75,8 +75,7 @@ int daGoGate_c::Execute(Mtx** param_0) {
 /* 80BFE11C-80BFE128 000014 000C+00 4/4 0/0 0/0 .bss             l_HIO */
 static daGoGate_HIO_c l_HIO;
 
-/* 80BFD9D4-80BFDAD8 000414 0104+00 1/1 0/0 0/0 .text
-    // NONMATCHING  moveGate__10daGoGate_cFv */
+/* 80BFD9D4-80BFDAD8 000414 0104+00 1/1 0/0 0/0 .text            moveGate__10daGoGate_cFv */
 void daGoGate_c::moveGate() {
     typedef void (daGoGate_c::*daGoGate_modeFunc)();
     static daGoGate_modeFunc mode_proc[] = {

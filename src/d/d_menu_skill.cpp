@@ -3,6 +3,8 @@
  * Menu - Hidden Skills
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_skill.h"
 #include "JSystem/J2DGraph/J2DTextBox.h"
 #include "JSystem/JKernel/JKRMemArchive.h"
@@ -14,11 +16,6 @@
 #include "d/d_msg_string.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
-
-/* 803BE7D8-803BE7E4 01B8F8 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_Skill_c::*initFunc)();
 static initFunc map_init_process[] = {
@@ -151,12 +148,12 @@ void dMenu_Skill_c::_draw() {
         J2DGrafContext* context = dComIfGp_getCurrentGrafPort();
         u8 alpha = mpBlackTex->mAlpha;
         mpBlackTex->setAlpha(0xff);
-        mpBlackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, 0, 0, 0);
+        mpBlackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0, 0, 0);
         mpBlackTex->setAlpha(alpha);
         mpMenuScreen->draw(mPosX, 0.0f, context);
         mpDrawCursor->draw();
         if (mProcess == 1 || mProcess == 2 || mProcess == 3) {
-            mpBlackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, 0, 0, 0);
+            mpBlackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0, 0, 0);
             mpLetterScreen->draw(0.0f, 0.0f, context);
             if (mStringID != 0) {
                 mpString->getString(mStringID, (J2DTextBox*)mpTextPane->getPanePtr(), NULL, NULL,
@@ -443,6 +440,16 @@ void dMenu_Skill_c::screenSetMenu() {
     mpParent = new CPaneMgr(mpMenuScreen, 'n_all', 2, NULL);
     mpParent->setAlphaRate(0.0f);
     for (int i = 0; i < 7; i++) {
+#if VERSION == VERSION_GCN_JPN
+        mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(tag_sub0[i]);
+        mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(tag_sub1[i]);
+        mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(tag_name0[i]);
+        mpFTagPicture[i][3] = (J2DTextBox*)mpMenuScreen->search(tag_name1[i]);
+        mpMenuScreen->search(ftag_sub0[i])->hide();
+        mpMenuScreen->search(ftag_sub1[i])->hide();
+        mpMenuScreen->search(ftag_name0[i])->hide();
+        mpMenuScreen->search(ftag_name1[i])->hide();
+#else
         mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(ftag_sub0[i]);
         mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(ftag_sub1[i]);
         mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(ftag_name0[i]);
@@ -451,6 +458,7 @@ void dMenu_Skill_c::screenSetMenu() {
         mpMenuScreen->search(tag_sub1[i])->hide();
         mpMenuScreen->search(tag_name0[i])->hide();
         mpMenuScreen->search(tag_name1[i])->hide();
+#endif
         for (int j = 0; j < 4; j++) {
             mpFTagPicture[i][j]->setFont(mDoExt_getMesgFont());
             mpFTagPicture[i][j]->setString(0x40, "");
@@ -487,8 +495,13 @@ void dMenu_Skill_c::screenSetMenu() {
             mSelectWhite[i] = mpFTagPicture[1][i]->getWhite();
         }
     }
+#if VERSION == VERSION_GCN_JPN
+    J2DTextBox* textBox = (J2DTextBox*)mpMenuScreen->search('t_t00');
+    mpMenuScreen->search('f_t00')->hide();
+#else
     J2DTextBox* textBox = (J2DTextBox*)mpMenuScreen->search('f_t00');
     mpMenuScreen->search('t_t00')->hide();
+#endif
     textBox->setFont(mDoExt_getSubFont());
     textBox->setString(0x200, "");
     mpString->getString(0x6a4, textBox, NULL, NULL, NULL, 0);
@@ -513,16 +526,26 @@ void dMenu_Skill_c::screenSetLetter() {
     mpLetterScreen = new J2DScreen();
     mpLetterScreen->setPriority("zelda_ougi_info.blo", 0x20000, mpArchive);
     dPaneClass_showNullPane(mpLetterScreen);
+#if VERSION == VERSION_GCN_JPN
+    mpTextPane = new CPaneMgr(mpLetterScreen, 'mg_3line', 0, NULL);
+    mpLetterScreen->search('n_e4line')->hide();
+#else
     mpTextPane = new CPaneMgr(mpLetterScreen, 'mg_e4lin', 0, NULL);
     mpLetterScreen->search('n_3line')->hide();
+#endif
     mpExpName = new CPaneMgr(mpLetterScreen, 'label_n', 0, NULL);
     J2DTextBox* paneFont = (J2DTextBox*)mpTextPane->getPanePtr();
     paneFont->setFont(mDoExt_getMesgFont());
     J2DTextBox* paneString = (J2DTextBox*)mpTextPane->getPanePtr();
     paneString->setString(0x200, "");
     for (int i = 0; i < 4; i++) {
+#if VERSION == VERSION_GCN_JPN
+        mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(name_tag[i]);
+        mpLetterScreen->search(fame_tag[i])->hide();
+#else
         mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(fame_tag[i]);
         mpLetterScreen->search(name_tag[i])->hide();
+#endif
         mpNameString[i]->setFont(mDoExt_getMesgFont());
         mpNameString[i]->setString(0x40, "");
     }
@@ -646,7 +669,13 @@ void dMenu_Skill_c::setNameString(u16 i_stringID) {
 /* 801F9470-801F9500 1F3DB0 0090+00 1/1 0/0 0/0 .text            getSkillNum__13dMenu_Skill_cFv */
 u8 dMenu_Skill_c::getSkillNum() {
     static u32 evt_id[7] = {
-        339, 338, 340, 341, 342, 343, 344,
+        339, /* dSv_event_flag_c::F_0339 - Secret techniques - Obtained 2 secret techinques */
+        338, /* dSv_event_flag_c::F_0338 - Secret techniques - Obtained 1 secret techinques - Shield attack */
+        340, /* dSv_event_flag_c::F_0340 - Secret techniques - Obtained 3 secret techinques */
+        341, /* dSv_event_flag_c::F_0341 - Secret techniques - Obtained 4 secret techinques */
+        342, /* dSv_event_flag_c::F_0342 - Secret techniques - Obtained 5 secret techinques */
+        343, /* dSv_event_flag_c::F_0343 - Secret techniques - Obtained 6 secret techinques */
+        344, /* dSv_event_flag_c::F_0344 - Secret techniques - Obtained 7 secret techinques */
     };
 
     u8 skillNum = 0;

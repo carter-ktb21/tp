@@ -207,7 +207,7 @@ void daAlink_c::preKandelaarDraw() {
         var_f3 = 0.0f;
     }
 
-    if (proj.x > 0.0f && proj.x < 608.0f && proj.y > var_f3 && proj.y < 448.0f - var_f3) {
+    if (proj.x > 0.0f && proj.x < FB_WIDTH && proj.y > var_f3 && proj.y < FB_HEIGHT - var_f3) {
         dComIfGd_peekZ(proj.x, proj.y, &field_0x32c8);
     } else {
         field_0x32c8 = 0;
@@ -379,9 +379,8 @@ int daAlink_c::procKandelaarSwingInit() {
         BOOL is_sm2 = name == PROC_E_SM2;
 
         if (name == PROC_OBJ_OILTUBO ||
-            (name == PROC_TAG_SSDRINK &&
-             static_cast<daTag_SSDrink_c*>(catch_target_p)->checkShopOil()) ||
-            (is_sm2 && static_cast<e_sm2_class*>(catch_target_p)->checkYellow()))
+            (name == PROC_TAG_SSDRINK && ((daTag_SSDrink_c*)catch_target_p)->checkShopOil()) ||
+            (is_sm2 && ((e_sm2_class*)catch_target_p)->checkYellow()))
         {
             return procBottleSwingInit(catch_target_p, is_sm2);
         }
@@ -420,7 +419,7 @@ int daAlink_c::procKandelaarSwing() {
 
     if (frameCtrl_p->checkAnmEnd()) {
         if (mDemo.getDemoMode() == 0x27) {
-            dComIfGp_evmng_cutEnd(field_0x3184);
+            dComIfGp_evmng_cutEnd(mAlinkStaffId);
         } else {
             checkNextAction(0);
         }

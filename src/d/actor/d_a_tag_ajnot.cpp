@@ -3,13 +3,15 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_ajnot.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
 
 /* 805A2658-805A26A8 000078 0050+00 1/1 0/0 0/0 .text            create__12daTagAJnot_cFv */
 int daTagAJnot_c::create() {
-    fopAcM_SetupActor(this, daTagAJnot_c);
+    fopAcM_ct(this, daTagAJnot_c);
     return cPhs_COMPLEATE_e;
 }
 

@@ -28,25 +28,26 @@ f32 daAlink_c::getCrawlMoveSpeed() {
 
 /* 800F7CE8-800F7E48 0F2628 0160+00 4/4 0/0 0/0 .text setCrawlMoveDirectionArrow__9daAlink_cFv */
 void daAlink_c::setCrawlMoveDirectionArrow() {
-    static const u8 data_80452F38[2] = {1, 4};
+    static const u8 data_80452F38[1] = {1};
+    static const u8 data_80452F39[1] = {4};
 
     u8 direction = 0;
-    camera_class* camera = dComIfGp_getCamera(field_0x317c);
+    camera_class* camera = (camera_class*)dComIfGp_getCamera(field_0x317c);
     BOOL bvar = cLib_distanceAngleS(fopCamM_GetAngleY(camera), shape_angle.y) > 0x4000;
 
     if (field_0x3198 & 4) {
         if (!bvar) {
-            direction = data_80452F38[0];
+            direction = *data_80452F38;
         } else {
-            direction = data_80452F38[1];
+            direction = *data_80452F39;
         }
     }
 
     if (field_0x3198 & 8) {
         if (!bvar) {
-            direction |= data_80452F38[1];
+            direction |= *data_80452F39;
         } else {
-            direction |= data_80452F38[0];
+            direction |= *data_80452F38;
         }
     }
 
@@ -390,7 +391,10 @@ void daAlink_c::setCrawlMoveAngle() {
         }
 
         mLinkGndChk.SetPos(&sp20);
-        sp2C.set(sp20.x - sp38.x, dComIfG_Bgsp().GroundCross(&mLinkGndChk) - sp38.y,
+        // dBgS::GroundCross is implicitly inlined to cBgS::GroundCross, but for some
+        // reason here that breaks the match. This is the only place in the code so
+        // far (September 2025) where it causes issues.
+        sp2C.set(sp20.x - sp38.x, ((cBgS&)dComIfG_Bgsp()).GroundCross(&mLinkGndChk) - sp38.y,
                  sp20.z - sp38.z);
 
         if (cLib_distanceAngleS(sp2C.atan2sY_XZ(), shape_angle.x) > 0x800) {
@@ -669,9 +673,8 @@ int daAlink_c::procCrawlMove() {
 }
 
 /* 800F99FC-800F9ABC 0F433C 00C0+00 1/1 0/0 0/0 .text procCrawlAutoMoveInit__9daAlink_cFiP4cXyz */
-// NONMATCHING - extrwi vs rlwinm
 int daAlink_c::procCrawlAutoMoveInit(int param_0, cXyz* param_1) {
-    BOOL var_r30 = dComIfGp_checkPlayerStatus0(0, 0x2000);
+    BOOL var_r30 = dComIfGp_checkPlayerStatus0(0, 0x2000) != 0 ? TRUE : FALSE;
     commonProcInit(PROC_CRAWL_AUTO_MOVE);
     field_0x37c8 = *param_1;
     field_0x33cc = 1.0f;

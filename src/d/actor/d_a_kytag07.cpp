@@ -3,6 +3,8 @@
  * Environment Tag 7
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag07.h"
 #include "d/d_stage.h"
 #include "f_op/f_op_overlap_mng.h"
@@ -52,7 +54,7 @@ static int daKytag07_Delete(kytag07_class* i_this) {
 static int daKytag07_Create(fopAc_ac_c* i_this) {
     kytag07_class* a_this = (kytag07_class*)i_this;
 
-    fopAcM_SetupActor(a_this, kytag07_class);
+    fopAcM_ct(a_this, kytag07_class);
 
     a_this->mLightInfluence.mPosition = i_this->current.pos;
     a_this->mLightInfluence.mColor.r = fopAcM_GetParam(i_this) & 0xFF;

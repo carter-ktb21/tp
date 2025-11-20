@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_attention.h"
 #include "d/actor/d_a_player.h"
 
@@ -18,7 +20,7 @@ int daAttp_c::Create() {
 
 /* 804D5354-804D53AC 0000B4 0058+00 1/1 0/0 0/0 .text            create__8daAttp_cFv */
 int daAttp_c::create() {
-    fopAcM_SetupActor(this, daAttp_c);
+    fopAcM_ct(this, daAttp_c);
     Create();
     return cPhs_COMPLEATE_e;
 }
@@ -112,9 +114,9 @@ int daAttp_c::execute() {
     }
 
     if (bVar1) {
-        attention_info.flags = attention_info.flags | 1;
+        attention_info.flags |= fopAc_AttnFlag_LOCK_e;
     } else {
-        attention_info.flags = attention_info.flags & 0xfffffffe;
+        attention_info.flags &= ~fopAc_AttnFlag_LOCK_e;
     }
 
     return 1;

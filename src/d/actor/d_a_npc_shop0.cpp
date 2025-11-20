@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_shop0.h"
 
 /* 80AEA7D8-80AEA7F8 000078 0020+00 1/1 0/0 0/0 .text            createHeapCallBack__FP10fopAc_ac_c
@@ -27,7 +29,7 @@ daNpc_Shop0_c::~daNpc_Shop0_c() {
 
 /* 80AEAA10-80AEAC10 0002B0 0200+00 1/1 0/0 0/0 .text            create__13daNpc_Shop0_cFv */
 int daNpc_Shop0_c::create() {
-    fopAcM_SetupActor(this, daNpc_Shop0_c);
+    fopAcM_ct(this, daNpc_Shop0_c);
 
     int phase_step = dComIfG_resLoad(&mPhaseReq, getResName());
     if (phase_step == cPhs_COMPLEATE_e) {
@@ -124,7 +126,7 @@ int daNpc_Shop0_c::draw() {
     mBckAnm.entry(mpModel->getModelData());
     mDoExt_modelUpdateDL(mpModel);
 
-    if (mGroundCross != -1e+9f) {
+    if (mGroundCross != -G_CM3D_F_INF) {
         cM3dGPla tri_pla;
         if (dComIfG_Bgsp().GetTriPla(mGndChk, &tri_pla)) {
             dComIfGd_setSimpleShadow(
@@ -185,11 +187,11 @@ int daNpc_Shop0_c::init() {
     mCyl.SetStts(&mStts);
     mCyl.Set(mCylDat);
     
-    attention_info.flags = 0xa;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
     eventInfo.setArchiveName(getResName());
     field_0x9e8 = -1;
 
-    setProcess(daNpc_Shop0_c::wait, NULL, 0);
+    setProcess(&daNpc_Shop0_c::wait, NULL, 0);
     setRoomInf();
     return execute();
 }
@@ -245,7 +247,7 @@ int daNpc_Shop0_c::checkEvent() {
 
 /* 80AEB5E8-80AEB634 000E88 004C+00 1/1 0/0 0/0 .text            orderEvent__13daNpc_Shop0_cFv */
 void daNpc_Shop0_c::orderEvent() {
-    if (getFlowNodeNum() >= 0 && attention_info.flags == 0xa) {
+    if (getFlowNodeNum() >= 0 && attention_info.flags == (fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e)) {
         eventInfo.onCondition(1);
     }
 }
@@ -269,7 +271,7 @@ void daNpc_Shop0_c::setRoomInf() {
 
     mGroundCross = dComIfG_Bgsp().GroundCross(&mGndChk);
 
-    if (mGroundCross != -1e+09f) {
+    if (mGroundCross != -G_CM3D_F_INF) {
         room_no = dComIfG_Bgsp().GetRoomId(mGndChk);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mGndChk);
     } else {
@@ -345,7 +347,7 @@ int daNpc_Shop0_c::talk(void* i_stat_loc) {
             break;
         case 1:
             if (cut_alert(-1, 0) != 0) {
-                setProcess(daNpc_Shop0_c::wait, NULL, 0);
+                setProcess(&daNpc_Shop0_c::wait, NULL, 0);
             }
             break;
         case 2:

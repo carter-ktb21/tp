@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_iceleaf.cpp
+* @file d_a_obj_iceleaf.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_iceleaf.h"
 #include "SSystem/SComponent/c_math.h"
@@ -19,24 +21,6 @@ void daObjIceLeaf_c::initBaseMtx() {
     mpModel->setBaseScale(scale);
     setBaseMtx();
 }
-
-/* 80C25DB0-80C25DBC 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C25DBC-80C25DD0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80C25DD0-80C25DD4 -00001 0004+00 7/7 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "V_IceLeaf";
@@ -75,7 +59,7 @@ void daObjIceLeaf_c::setBaseMtx() {
         mDoMtx_stack_c::ZXYrotM(shape_angle);
     } else {
         J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-        JUT_ASSERT(0x106, pbck != 0);
+        JUT_ASSERT(0x106, pbck != NULL);
         pbck->getTransform(0, &mTransformInfo);
 
         cXyz pos;
@@ -111,7 +95,7 @@ static dCcD_SrcCyl l_cyl_src = {
 };
 
 /* 80C249E4-80C24BC4 000344 01E0+00 1/1 0/0 0/0 .text            Create__14daObjIceLeaf_cFv */
-// NONMATCHING - J3DTransformInfo operator= seems to be inline asm, needs work
+// NONMATCHING - regalloc
 int daObjIceLeaf_c::Create() {
     J3DJoint* joint = mpModel->getModelData()->getJointNodePointer(0);
     mTransformInfo = joint->getTransformInfo();
@@ -155,7 +139,7 @@ int daObjIceLeaf_c::Create() {
 /* 80C24BC4-80C24C9C 000524 00D8+00 2/2 0/0 0/0 .text            setAnmPos__14daObjIceLeaf_cFv */
 void daObjIceLeaf_c::setAnmPos() {
     J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0x168, pbck != 0);
+    JUT_ASSERT(0x168, pbck != NULL);
     pbck->getTransform(0, &mTransformInfo);
 
     mDoMtx_stack_c::transS(mTransformInfo.mTranslate.x, mTransformInfo.mTranslate.y,
@@ -171,14 +155,14 @@ void daObjIceLeaf_c::setAnmPos() {
 /* 80C24C9C-80C24DCC 0005FC 0130+00 1/1 0/0 0/0 .text            CreateHeap__14daObjIceLeaf_cFv */
 int daObjIceLeaf_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 7);
-    JUT_ASSERT(0x189, modelData != 0);
+    JUT_ASSERT(0x189, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpModel == NULL) {
         return 0;
     }
 
     J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0x196, pbck != 0);
+    JUT_ASSERT(0x196, pbck != NULL);
 
     mpBck = new mDoExt_bckAnm();
     if (mpBck == NULL || !mpBck->init(pbck, TRUE, J3DFrameCtrl::EMode_NONE, 1.0f, 0, -1, false)) {
@@ -192,7 +176,7 @@ int daObjIceLeaf_c::CreateHeap() {
 
 /* 80C24E14-80C24F8C 000774 0178+00 1/1 0/0 0/0 .text            create__14daObjIceLeaf_cFv */
 int daObjIceLeaf_c::create() {
-    fopAcM_SetupActor(this, daObjIceLeaf_c);
+    fopAcM_ct(this, daObjIceLeaf_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -258,6 +242,7 @@ void daObjIceLeaf_c::action() {
 void daObjIceLeaf_c::modeDropWait() {
     daPy_py_c* player = daPy_getPlayerActorClass();
 
+        /* dSv_event_flag_c::F_0308 - Snowpeak mountain - Watched first meeting event with Yeto at top of mountain (human) */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x134])) {
         bool start_drop = false;
         if (player->current.pos.abs(current.pos) < 250.0f &&
@@ -291,7 +276,7 @@ void daObjIceLeaf_c::modeDropWait() {
 void daObjIceLeaf_c::modeDrop() {
     if (mpBck->play()) {
         J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-        JUT_ASSERT(0x2C8, pbck != 0);
+        JUT_ASSERT(0x2C8, pbck != NULL);
         pbck->getTransform(0, &mTransformInfo);
 
         mDoMtx_stack_c::transS(mTransformInfo.mTranslate.x, mTransformInfo.mTranslate.y,
@@ -314,7 +299,7 @@ void daObjIceLeaf_c::modeDrop() {
         cXyz sp24(KREG_F(10) + 1.0f, KREG_F(10) + 1.0f, KREG_F(10) + 1.0f);
 
         J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-        JUT_ASSERT(0x2EB, pbck != 0);
+        JUT_ASSERT(0x2EB, pbck != NULL);
         pbck->getTransform(0, &mTransformInfo);
 
         cXyz sp30;
@@ -341,7 +326,7 @@ void daObjIceLeaf_c::modeDrop() {
 /* 80C258F8-80C25904 001258 000C+00 1/0 0/0 0/0 .text            modePlayerWait__14daObjIceLeaf_cFv
  */
 void daObjIceLeaf_c::modePlayerWait() {
-    attention_info.flags = 0x80;
+    attention_info.flags = fopAc_AttnFlag_ETC_e;
 }
 
 /* 80C25904-80C25908 001264 0004+00 1/0 0/0 0/0 .text            modeRide__14daObjIceLeaf_cFv */
@@ -393,7 +378,7 @@ void daObjIceLeaf_c::actionDead() {}
 /* 80C25AC8-80C25BB8 001428 00F0+00 1/1 0/0 0/0 .text            setFallSE__14daObjIceLeaf_cFv */
 void daObjIceLeaf_c::setFallSE() {
     J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0x36C, pbck != 0);
+    JUT_ASSERT(0x36C, pbck != NULL);
     pbck->getTransform(0, &mTransformInfo);
 
     mDoMtx_stack_c::transS(mTransformInfo.mTranslate.x, mTransformInfo.mTranslate.y,

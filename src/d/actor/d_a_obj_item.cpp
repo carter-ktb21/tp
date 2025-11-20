@@ -3,6 +3,8 @@
  * Item (Rupee, Arrow, Heart, etc) Object Actor
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_item.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_a_itembase_static.h"
@@ -11,23 +13,8 @@
 #include "d/d_item.h"
 #include "d/d_item_data.h"
 #include "d/d_s_play.h"
-#include "dol2asm.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_mtx.h"
-
-//
-// Forward References:
-//
-
-extern "C" void itemGetNextExecute__8daItem_cFv();
-extern "C" void checkPlayerGet__8daItem_cFv();
-
-//
-// External References:
-//
-
-extern "C" extern void* __vt__16Z2SoundObjSimple[8];
-extern "C" void __dl__FPv();
-extern "C" void __dt__14Z2SoundObjBaseFv();
 
 /* 8015ADCC-8015B0B8 15570C 02EC+00 1/1 0/0 0/0 .text            Reflect__FP4cXyzRC13cBgS_PolyInfof
  */
@@ -103,8 +90,6 @@ void daItem_c::setBaseMtx_1() {
 
 /* 8015B254-8015B320 155B94 00CC+00 2/2 0/0 0/0 .text
  * itemGetCoCallBack__FP10fopAc_ac_cP12dCcD_GObjInfP10fopAc_ac_cP12dCcD_GObjInf */
-// NONMATCHING - matches, but pushes up weak daPy_py_c functions incorrectly
-// might need other TUs that use daPy_py_c weaks to be finished first
 static void itemGetCoCallBack(fopAc_ac_c* i_coActorA, dCcD_GObjInf* i_coObjInfA,
                               fopAc_ac_c* i_coActorB, dCcD_GObjInf* i_coObjInfB) {
     daItem_c* a_coActorA = (daItem_c*)i_coActorA;
@@ -144,11 +129,6 @@ static void itemGetTgCallBack(fopAc_ac_c* i_tgActor, dCcD_GObjInf* i_tgObjInf,
         }
     }
 }
-
-/* 803B9DA0-803B9DAC 016EC0 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 /* 8015B3D8-8015B7BC 155D18 03E4+00 1/1 0/0 0/0 .text            CreateInit__8daItem_cFv */
 void daItem_c::CreateInit() {
@@ -261,7 +241,7 @@ void daItem_c::setCullInfo() {
 
 /* 8015B7D4-8015BA3C 156114 0268+00 1/1 0/0 0/0 .text            _daItem_create__8daItem_cFv */
 int daItem_c::_daItem_create() {
-    fopAcM_SetupActor(this, daItem_c);
+    fopAcM_ct(this, daItem_c);
 
     if (!field_0x95d) {
         field_0x92c = home.angle.x;
@@ -291,7 +271,7 @@ int daItem_c::_daItem_create() {
     {
         // "fpcNm_ITEM_(ITEM) is an unhandled item<%d>\n"
         OS_REPORT_ERROR("fpcNm_(ITEM)では扱わないアイテムです<%d>\n", m_itemNo);
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
         return cPhs_ERROR_e;
     } else if (m_itemNo == fpcNm_ITEM_BOMB_5 || m_itemNo == fpcNm_ITEM_BOMB_10 || m_itemNo == fpcNm_ITEM_BOMB_20 ||
                m_itemNo == fpcNm_ITEM_BOMB_30)
@@ -325,12 +305,6 @@ int daItem_c::_daItem_create() {
     }
 
     return phase_state;
-}
-
-/* 8015BA3C-8015BA9C 15637C 0060+00 0/0 1/1 0/0 .text            __dt__16Z2SoundObjSimpleFv */
-// Z2SoundObjSimple::~Z2SoundObjSimple() {
-extern "C" void __dt__16Z2SoundObjSimpleFv() {
-    // NONMATCHING
 }
 
 /* 8015BA9C-8015BD84 1563DC 02E8+00 1/1 0/0 0/0 .text            _daItem_execute__8daItem_cFv */
@@ -1178,7 +1152,7 @@ void daItem_c::initFlag() {
     default:
         // "Item: Set Type<%d>\n"
         OS_REPORT("アイテム：セットタイプ<%d>\n", type);
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
     case TYPE_LAUNCH_e:
     case TYPE_LAUNCH_SMALL_e:
     case TYPE_LAUNCH_FROM_PLAYER_e:
@@ -1229,7 +1203,7 @@ void daItem_c::initScale() {
         scale.setall(0.0f);
         break;
     default:
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
     case TYPE_FIXED_PLACE_e:
     case TYPE_WAIT_e:
     case TYPE_SIMPLE_GET_e:

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_waterGate.h"
 #include "d/d_com_inf_game.h"
 
@@ -12,9 +14,6 @@ static int daWtGate_Draw(daWtGate_c*);
 static int daWtGate_Execute(daWtGate_c*);
 static int daWtGate_Delete(daWtGate_c*);
 static int daWtGate_Create(fopAc_ac_c*);
-
-/* 80D2C498-80D2C4A4 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-UNK_REL_DATA
 
 /* 80D2C5BC-80D2C5C8 000014 000C+00 3/3 0/0 0/0 .bss             l_HIO */
 static daWtGate_HIO_c l_HIO;
@@ -44,7 +43,7 @@ void daWtGate_c::setBaseMtx() {
 /* 80D2BC94-80D2BD00 0001F4 006C+00 1/0 0/0 0/0 .text            CreateHeap__10daWtGate_cFv */
 int daWtGate_c::CreateHeap() {
     J3DModelData* const modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("S_Zsuimon", 4));
-    JUT_ASSERT(159, modelData != 0);
+    JUT_ASSERT(159, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
 
@@ -56,7 +55,7 @@ int daWtGate_c::CreateHeap() {
 
 /* 80D2BD00-80D2BE7C 000260 017C+00 1/1 0/0 0/0 .text            create__10daWtGate_cFv */
 cPhs__Step daWtGate_c::create() {
-    fopAcM_SetupActor(this, daWtGate_c);
+    fopAcM_ct(this, daWtGate_c);
 
     const cPhs__Step resPhase = static_cast<cPhs__Step>(dComIfG_resLoad(&mPhase, "S_Zsuimon"));
     if(resPhase == cPhs_COMPLEATE_e) {

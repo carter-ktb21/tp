@@ -3,39 +3,10 @@
  * Tag - River Back
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_river_back.h"
 #include "d/d_procname.h"
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
-
-/* ############################################################################################## */
-/* 80D5F980-80D5F98C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D5F98C-80D5F9A0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80D5F9A0-80D5F9A4 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "RvBack";
@@ -53,7 +24,7 @@ int daTagRiverBack_c::Create() {
 
 /* 80D5F360-80D5F3F0 0000E0 0090+00 1/1 0/0 0/0 .text            create__16daTagRiverBack_cFv */
 int daTagRiverBack_c::create() {
-    fopAcM_SetupActor(this, daTagRiverBack_c);
+    fopAcM_ct(this, daTagRiverBack_c);
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
         int result = Create();
@@ -144,7 +115,7 @@ static char* action_table[] = {"WAIT", "SCENE_CHG"};
 
 /* 80D5F710-80D5F88C 000490 017C+00 2/2 0/0 0/0 .text            demoProc__16daTagRiverBack_cFv */
 int daTagRiverBack_c::demoProc() {
-    int act_id = dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZE(action_table), 0, 0);
+    int act_id = dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZEU(action_table), 0, 0);
 
     if (dComIfGp_evmng_getIsAddvance(mStaffID)) {
         switch (act_id) {

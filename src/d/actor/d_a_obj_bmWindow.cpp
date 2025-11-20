@@ -2,29 +2,13 @@
 // Bm Window
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_bmWindow.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_bg_w.h"
 #include "SSystem/SComponent/c_math.h"
-
-/* 80BB980C-80BB9818 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BB9818-80BB982C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BB820C-80BB82AC 0000EC 00A0+00 1/1 0/0 0/0 .text            __ct__16daBmWindow_HIO_cFv */
 daBmWindow_HIO_c::daBmWindow_HIO_c() {
@@ -59,7 +43,7 @@ void daBmWindow_c::setBaseMtx() {
 /* 80BB8400-80BB846C 0002E0 006C+00 1/0 0/0 0/0 .text            CreateHeap__12daBmWindow_cFv */
 int daBmWindow_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("H_Window", 4);
-    JUT_ASSERT(285, modelData != 0);
+    JUT_ASSERT(285, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     return mModel != NULL ? 1 : 0;
 }
@@ -83,7 +67,7 @@ static Vec const l_check_area[4] = {
 
 /* 80BB846C-80BB869C 00034C 0230+00 1/1 0/0 0/0 .text            create__12daBmWindow_cFv */
 int daBmWindow_c::create() {
-    fopAcM_SetupActor(this, daBmWindow_c);
+    fopAcM_ct(this, daBmWindow_c);
     if (fopAcM_isSwitch(this, (u8)fopAcM_GetParam(this))) {
         return cPhs_ERROR_e;
     }

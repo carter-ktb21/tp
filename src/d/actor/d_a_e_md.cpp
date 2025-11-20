@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_md.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
@@ -64,7 +66,7 @@ int daE_MD_c::CreateHeap() {
         modelData = dComIfG_getObjectRes("E_MD", 9);
     }
 
-    JUT_ASSERT(180, modelData != 0);
+    JUT_ASSERT(180, modelData != NULL);
 
     mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)modelData, NULL, NULL, NULL, 2, 1.0f, 0, -1, &mSound, 0x80000, 0x11000084);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -401,7 +403,7 @@ static int daE_MD_Execute(daE_MD_c* i_this) {
 
 /* 8070A044-8070A3CC 0012C4 0388+00 1/1 0/0 0/0 .text            create__8daE_MD_cFv */
 int daE_MD_c::create() {
-    fopAcM_SetupActor(this, daE_MD_c);
+    fopAcM_ct(this, daE_MD_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "E_MD");
     if (phase_state == cPhs_COMPLEATE_e) {

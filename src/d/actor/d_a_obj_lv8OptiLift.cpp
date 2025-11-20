@@ -1,31 +1,15 @@
 /**
- * @file d_a_obj_lv8OptiLift.cpp
+* @file d_a_obj_lv8OptiLift.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_lv8OptiLift.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
-
-/* 80C8BA44-80C8BA50 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C8BA50-80C8BA64 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80C8A30C-80C8A368 0000EC 005C+00 1/1 0/0 0/0 .text            __ct__16daOptiLift_HIO_cFv */
 daOptiLift_HIO_c::daOptiLift_HIO_c() {
@@ -61,7 +45,7 @@ const f32 daOptiLift_c::mSpeed[] = {
 /* 80C8A438-80C8A500 000218 00C8+00 1/0 0/0 0/0 .text            CreateHeap__12daOptiLift_cFv */
 int daOptiLift_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Lv8Lift", 5);
-    JUT_ASSERT(0xC4, modelData != 0);
+    JUT_ASSERT(0xC4, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0, 0x11000284);
     if (mpModel == NULL) {
@@ -79,7 +63,7 @@ static daOptiLift_HIO_c l_HIO;
 
 /* 80C8A500-80C8A738 0002E0 0238+00 1/1 0/0 0/0 .text            create__12daOptiLift_cFv */
 int daOptiLift_c::create() {
-    fopAcM_SetupActor(this, daOptiLift_c);
+    fopAcM_ct(this, daOptiLift_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "Lv8Lift");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -156,7 +140,7 @@ void daOptiLift_c::rideCallBack(dBgW* i_bgw, fopAc_ac_c* i_this, fopAc_ac_c* i_r
 
 /* 80C8A7E8-80C8A848 0005C8 0060+00 1/0 0/0 0/0 .text            Execute__12daOptiLift_cFPPA3_A4_f
  */
-int daOptiLift_c::Execute(f32 (**param_0)[3][4]) {
+int daOptiLift_c::Execute(Mtx** param_0) {
     moveLift();
     lightSet();
 

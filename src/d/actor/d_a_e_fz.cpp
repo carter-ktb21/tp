@@ -1,12 +1,11 @@
 /**
- * @file d_a_obj_carry.cpp
+ * @file d_a_e_fz.cpp
  * @brief Enemy - Mini Freezard
- * 
- * @details This should match in theory??
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_fz.h"
-UNK_REL_DATA
 #include "f_op/f_op_actor_enemy.h"
 #include "d/actor/d_a_mirror.h"
 #include "d/actor/d_a_b_yo.h"
@@ -14,6 +13,30 @@ UNK_REL_DATA
 #include "d/d_item.h"
 #include "SSystem/SComponent/c_math.h"
 #include "SSystem/SComponent/c_xyz.h"
+
+class daE_FZ_HIO_c {
+public:
+    /* 806BE94C */ daE_FZ_HIO_c();
+    /* 806C1440 */ virtual ~daE_FZ_HIO_c() {};
+
+public:
+    /* 0x04 */ s8 field_0x04;
+    /* 0x05 */ u8 field_0x05[0x06 - 0x05];
+    /* 0x06 */ s16 field_0x06;
+    /* 0x08 */ s16 field_0x08;
+    /* 0x0A */ u8 field_0x0A[0x0C - 0x0A];
+    /* 0x0C */ f32 field_0x0c;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+    /* 0x20 */ f32 field_0x20;
+    /* 0x24 */ f32 field_0x24;
+    /* 0x28 */ f32 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ f32 field_0x34;
+};
 
 namespace {
 
@@ -138,7 +161,7 @@ void daE_FZ_c::deadnextSet(bool param_0) {
 
     mTgCoSph.ClrTgHit();
     fopAcM_OffStatus(this,0);
-    attention_info.flags &= 0xfffffffb;
+    attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
 
     mAtSph.OffAtSetBit();
     mTgCoSph.OffTgSetBit();
@@ -354,7 +377,7 @@ bool daE_FZ_c::way_gake_check() {
     gnd_chk.SetPos(&field_0x6e8);
     
     field_0x6e8.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (field_0x6e8.y == -1e+09f) {
+    if (field_0x6e8.y == -G_CM3D_F_INF) {
         field_0x6e8.y = current.pos.y;
         return true;
     } else if (current.pos.y - field_0x6e8.y > 100.0f) {
@@ -673,10 +696,10 @@ void daE_FZ_c::action() {
 
     if (!fopAcM_otherBgCheck(this, dComIfGp_getPlayer(0))) {
         fopAcM_OnStatus(this, 0);
-        attention_info.flags |= 4;
+        attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(this, 0);
-        attention_info.flags &= 0xfffffffb;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     }
 
     linkSearch = false;
@@ -759,7 +782,7 @@ void daE_FZ_c::action() {
                 gnd_chk.SetPos(&pos);
                 pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-                if (pos.y != -1e+09f) {
+                if (pos.y != -G_CM3D_F_INF) {
                     field_0x710 = 0;
 
                     if (current.pos.y - pos.y > 400.0f && field_0x713 == 0) {
@@ -837,7 +860,7 @@ s32 daE_FZ_c::execute() {
             #if DEBUG
             fopAcM_OnStatus(this,0);
             #endif
-            attention_info.flags |= 4;
+            attention_info.flags |= fopAc_AttnFlag_BATTLE_e;
         }
     }
 
@@ -869,7 +892,7 @@ s32 daE_FZ_c::execute() {
             mDoMtx_stack_c::transM(0.0f, 40.0f, 0.0f);
             emitter->setGlobalSRTMatrix(mDoMtx_stack_c::get());
             emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-            emitter->setUserWork((u32)(&mUserWork));
+            emitter->setUserWork((uintptr_t)(&mUserWork));
         }
     }
 
@@ -934,7 +957,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 806C0CD0-806C1208 002470 0538+00 1/1 0/0 0/0 .text            create__8daE_FZ_cFv */
 s32 daE_FZ_c::create() {
-  fopAcM_SetupActor(this,daE_FZ_c);
+  fopAcM_ct(this,daE_FZ_c);
 
   s32 phase = dComIfG_resLoad(&mPhaseReq,"E_FZ");
   if (phase == cPhs_COMPLEATE_e) {
@@ -947,7 +970,7 @@ s32 daE_FZ_c::create() {
       l_HIO.field_0x04 = -1;
     }
 
-    attention_info.flags = 4;
+    attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     attention_info.distances[fopAc_attn_BATTLE_e] = 69;
     
     fopAcM_SetMtx(this,mpModel->getBaseTRMtx());
@@ -970,7 +993,7 @@ s32 daE_FZ_c::create() {
       speedF = rng + 4.0f;
       field_0x6fc = rng + 4.0f;
       if (field_0x714 == 1) {
-        fopAcM_OnStatus(this,fopAcM_STATUS_UNK_004000);
+        fopAcM_OnStatus(this,fopAcM_STATUS_UNK_0x4000);
       }
     }
 
@@ -1016,12 +1039,12 @@ s32 daE_FZ_c::create() {
       attention_info.distances[fopAc_attn_BATTLE_e] = 0;
       fopAcM_SetGroup(this,0);
       fopAcM_OffStatus(this,0);
-      attention_info.flags &= 0xfffffffb;
+      attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     }
 
     if (field_0x714 == 3) {
       mRadiusBase = 0.0f;
-      attention_info.flags &= 0xfffffffb;
+      attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
       mAtSph.SetAtType(AT_TYPE_CSTATUE_SWING);
       mAtSph.SetAtSpl(dCcG_At_Spl_UNK_1);
       setActionMode(ACT_ROLLMOVE,0);

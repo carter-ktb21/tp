@@ -2,6 +2,8 @@
 // Door Shutter
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_shutter.h"
 #include "d/actor/d_a_obj_Lv5Key.h"
 #include "d/actor/d_a_obj_keyhole.h"
@@ -33,24 +35,6 @@ J3DModelData* daDoor20_c::getStopModelData() {
 char* daDoor20_c::getAlwaysArcName() {
     return "static";
 }
-
-/* 80466E7C-80466E88 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80466E88-80466E9C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80460BA4-80460C40 0000E4 009C+00 9/8 0/0 0/0 .text            getArcName__10daDoor20_cFv */
 char* daDoor20_c::getArcName() {
@@ -130,7 +114,7 @@ static int CheckCreateHeap(fopAc_ac_c* i_this) {
 int daDoor20_c::CreateHeap() {
     int kind = door_param2_c::getKind(this);
     J3DModelData* modelData = getModelData();
-    JUT_ASSERT(355, modelData != 0);
+    JUT_ASSERT(355, modelData != NULL);
     int dListFlag = 0x11000084;
     if (kind == 2) {
         dListFlag |= 0x200;
@@ -152,7 +136,7 @@ int daDoor20_c::CreateHeap() {
             return 0;
         }
         J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), "FDoorA.bck");
-        JUT_ASSERT(394, anm != 0);
+        JUT_ASSERT(394, anm != NULL);
         if (!field_0x5a0.init(anm, 1, 0, 1.0f, 0, -1, false)) {
             return 0;
         }
@@ -175,7 +159,7 @@ int daDoor20_c::CreateHeap() {
             break;
         case 2:
             J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getStageRes(getBtk());
-            JUT_ASSERT(421, pbtk != 0);
+            JUT_ASSERT(421, pbtk != NULL);
             field_0x5c0 = new mDoExt_btkAnm();
             if (field_0x5c0 == NULL || !field_0x5c0->init(mModel1->getModelData(), pbtk, 1, 0, 1.0f, 0, -1)) {
                 return 0;
@@ -186,7 +170,7 @@ int daDoor20_c::CreateHeap() {
             anm = (J3DAnmTransform*)dComIfG_getObjectRes(getArcName(), "oj_DoorOpF.bck");
             break;
         }
-        JUT_ASSERT(375, anm != 0);
+        JUT_ASSERT(375, anm != NULL);
         if (field_0x584.init(anm, 1, 0, 1.0f, 0, -1, false) == 0) {
             return 0;
         }
@@ -435,7 +419,7 @@ void daDoor20_c::openInit_0() {
             anm = (J3DAnmTransform*)dComIfG_getObjectRes(getArcName(), "oj_DoorOpD.bck");
         }
     }
-    JUT_ASSERT(832, anm != 0);
+    JUT_ASSERT(832, anm != NULL);
     int rt = field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(835, rt == 0);
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -467,7 +451,7 @@ void daDoor20_c::openInit_1() {
     } else {
         anm = (J3DAnmTransform*)dComIfG_getObjectRes(getArcName(), "oj_DoorOpC.bck");
     }
-    JUT_ASSERT(915, anm != 0);
+    JUT_ASSERT(915, anm != NULL);
     int rt = field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(918, rt == 0);
     u8 bVar5 = door_param2_c::getSwbit3(this);
@@ -616,7 +600,7 @@ void daDoor20_c::closeInit_0() {
     } else {
         anm = (J3DAnmTransform*)dComIfG_getObjectRes(getArcName(), "oj_DoorCloseD.bck");
     }
-    JUT_ASSERT(1178, anm != 0);
+    JUT_ASSERT(1178, anm != NULL);
     int rt = field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(1181, rt == 0);
     cXyz acStack_40(home.pos.x, home.pos.y + 200.0f, home.pos.z);
@@ -645,7 +629,7 @@ void daDoor20_c::closeInit_0() {
 void daDoor20_c::closeInit_1() {
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(getArcName(), "oj_DoorCloseC.bck");
-    JUT_ASSERT(1236, anm != 0);
+    JUT_ASSERT(1236, anm != NULL);
     int rt = field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(1239, rt == 0);
     mDoAud_seStart(Z2SE_OBJ_WOOD_DOOR_ROLLCLOSE, &current.pos, 0,
@@ -794,7 +778,7 @@ int daDoor20_c::CreateInit() {
     setAction(ACTION_INIT);
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     fopAcM_SetMtx(this, field_0x5f4);
     if (door_param2_c::getKind(this) == 10) {
         fopAcM_setCullSizeBox(this, -300.0f, 0, -50.0f, 300.0f, 700.0f, 50.0f);
@@ -945,11 +929,11 @@ int daDoor20_c::demoProc() {
         case 13:
             J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(
                 getAlwaysArcName(), "FDoorB.bck");
-            JUT_ASSERT(1796, anm != 0);
+            JUT_ASSERT(1796, anm != NULL);
             if (!field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true) || !field_0x5a0.init(anm,
                                                              1, 0, 1.0f, 0, -1, true))
             {
-                JUT_PANIC(1799, 0);
+                JUT_ASSERT(1799, FALSE);
             }
             field_0x67c = 0;
             openInit2();
@@ -957,11 +941,11 @@ int daDoor20_c::demoProc() {
         case 12:
             anm =
                 (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), "FDoorA.bck");
-            JUT_ASSERT(1809, anm != 0);
+            JUT_ASSERT(1809, anm != NULL);
             if (!field_0x584.init(anm, 1, 0, 1.0f, 0, -1, true) || !field_0x5a0.init(anm,
                                                              1, 0, 1.0f, 0, -1, true))
             {
-                JUT_PANIC(1812, 0);
+                JUT_ASSERT(1812, FALSE);
             }
             field_0x67c = 0;
             openInit2();
@@ -1563,7 +1547,7 @@ int daDoor20_c::drawCheck(int param_1) {
 /* 80464E18-80464EC4 004358 00AC+00 1/1 0/0 0/0 .text            checkExecute__10daDoor20_cFv */
 int daDoor20_c::checkExecute() {
     field_0x68c = frontCheck();
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         return 1;
     }
     if (eventInfo.checkCommandDemoAccrpt() || eventInfo.checkCommandDoor()) {
@@ -2217,7 +2201,7 @@ int dDoor_stop_c::openProc(daDoor20_c* i_this) {
 /* 804664E8-80466538 005A28 0050+00 1/1 0/0 0/0 .text create__12dDoor_stop_cFP10daDoor20_c */
 int dDoor_stop_c::create(daDoor20_c* i_this) {
     J3DModelData* stopModelData = i_this->getStopModelData();
-    JUT_ASSERT(3923, stopModelData != 0);
+    JUT_ASSERT(3923, stopModelData != NULL);
     field_0x0 = mDoExt_J3DModel__create(stopModelData, 0x80000, 0x11000084);
     return field_0x0 != NULL ? 1 : 0;
 }
@@ -2251,7 +2235,7 @@ static int daDoor20_Delete(daDoor20_c* i_this) {
 
 /* 80466618-8046670C 005B58 00F4+00 1/0 0/0 0/0 .text            daDoor20_Create__FP10fopAc_ac_c */
 static int daDoor20_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, daDoor20_c);
+    fopAcM_ct(i_this, daDoor20_c);
     return static_cast<daDoor20_c*>(i_this)->create();
 }
 

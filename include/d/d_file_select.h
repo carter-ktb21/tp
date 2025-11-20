@@ -13,7 +13,7 @@ class dFile_info_c;
 class dDlst_FileSel_c : public dDlst_base_c {
 public:
     /* 8018DEBC */ void draw();
-    /* 8019135C */ ~dDlst_FileSel_c() {
+    /* 8019135C */ virtual ~dDlst_FileSel_c() {
         delete Scr;
         delete mpMessageString;
     }
@@ -125,6 +125,9 @@ public:
     /* 0x000D */ u8 field_0x000d;
     /* 0x000E */ u8 field_0x000e[2];
     /* 0x0010 */ float field_0x0010[3];
+#if VERSION == VERSION_GCN_PAL
+    u8 temp_padding[0x1D];
+#endif
     /* 0x001C */ u8 field_0x001c;
     /* 0x001D */ u8 field_0x001d;
     /* 0x001E */ u8 field_0x001e;

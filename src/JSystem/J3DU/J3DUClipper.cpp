@@ -3,20 +3,10 @@
 // Translation Unit: J3DUClipper
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/J3DU/J3DUClipper.h"
 #include "math.h"
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* 80273778-8027378C 26E0B8 0014+00 0/0 1/1 0/0 .text            init__11J3DUClipperFv */
 void J3DUClipper::init() {

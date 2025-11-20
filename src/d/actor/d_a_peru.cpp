@@ -3,11 +3,11 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_peru.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/actor/d_a_obj_catdoor.h"
-
-UNK_REL_DATA
 
 /* 80D4C1FC-80D4C204 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[1][2] = {
@@ -170,7 +170,7 @@ PeruParams const daPeru_Param_c::m = {
 
 /* 80D46FCC-80D4720C 0001CC 0240+00 1/1 0/0 0/0 .text            create__8daPeru_cFv */
 int daPeru_c::create() {
-    fopAcM_SetupActor2(this, daPeru_c, (daNpcT_faceMotionAnmData_c*)l_faceMotionAnmData, (daNpcT_motionAnmData_c*)l_motionAnmData, (daNpcT_MotionSeqMngr_c::sequenceStepData_c*)l_faceMotionSequenceData, 4, (daNpcT_MotionSeqMngr_c::sequenceStepData_c*)l_motionSequenceData, 4, l_evtList, l_resNameList);
+    daNpcT_ct(this, daPeru_c, (daNpcT_faceMotionAnmData_c*)l_faceMotionAnmData, (daNpcT_motionAnmData_c*)l_motionAnmData, (daNpcT_MotionSeqMngr_c::sequenceStepData_c*)l_faceMotionSequenceData, 4, (daNpcT_MotionSeqMngr_c::sequenceStepData_c*)l_motionSequenceData, 4, l_evtList, l_resNameList);
     OS_REPORT("------------ ルイーズ生成処理開始\n");
     mType = getType();
     OS_REPORT("type=%d\n", mType);
@@ -227,7 +227,7 @@ int daPeru_c::CreateHeap() {
     }
     J3DModelData* mdlData_p =
         (J3DModelData*)dComIfG_getObjectRes(l_resNameList[l_bmdData[idx][1]], l_bmdData[idx][0]);
-    JUT_ASSERT(660, 0 != mdlData_p);
+    JUT_ASSERT(660, NULL != mdlData_p);
     mpMorf[0] = new mDoExt_McaMorfSO(mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mSound, 0x80000,
                                      0x11020284);
     if (mpMorf[0] != NULL && mpMorf[0]->getModel() == NULL) {
@@ -244,7 +244,7 @@ int daPeru_c::CreateHeap() {
         mdlData_p->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
 
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     mpMatAnm[0] = new daNpcT_MatAnm_c();
     if (mpMatAnm[0] == NULL) {
         return 0;
@@ -339,16 +339,16 @@ void daPeru_c::reset() {
     attention_info.distances[fopAc_attn_LOCK_e] = daNpcT_getDistTableIdx(daPeru_Param_c::m.field_0x48[2], daPeru_Param_c::m.field_0x48[3]);
     attention_info.distances[fopAc_attn_TALK_e] = attention_info.distances[0];
     attention_info.distances[fopAc_attn_SPEAK_e] = daNpcT_getDistTableIdx(daPeru_Param_c::m.field_0x48[0], daPeru_Param_c::m.field_0x48[1]);
-    attention_info.flags = 0xa;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
     scale.setall(daPeru_Param_c::m.field_0x00[2]);
     mCcStts.SetWeight(daPeru_Param_c::m.field_0x00[4]);
     mCylH = daPeru_Param_c::m.field_0x00[5];
     mWallR = daPeru_Param_c::m.field_0x00[7];
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daPeru_Param_c::m.field_0x00[6]);
-    field_0xde8 = daPeru_Param_c::m.field_0x00[3];
+    mRealShadowSize = daPeru_Param_c::m.field_0x00[3];
     gravity = daPeru_Param_c::m.field_0x00[1];
-    field_0xa80 = daPeru_Param_c::m.field_0x64[2];
+    mExpressionMorfFrame = daPeru_Param_c::m.field_0x64[2];
     mMorfFrames = daPeru_Param_c::m.field_0x00[17];
     mActionFunc = NULL;
     if (mpMatAnm[0] != NULL) {
@@ -365,9 +365,9 @@ void daPeru_c::reset() {
 /* 80D47B20-80D47C4C 000D20 012C+00 1/0 0/0 0/0 .text            setParam__8daPeru_cFv */
 void daPeru_c::setParam() {
     srchActors();
-    attention_info.flags = 0xa;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
     if (!daPy_py_c::checkNowWolf()) {
-        attention_info.flags = 0x2000000a;
+        attention_info.flags = (fopAc_AttnFlag_TALKCHECK_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
     }
     if (mType == 0 && !daNpcT_chkEvtBit(0x127)) {
         attention_info.flags = 0;
@@ -381,9 +381,9 @@ void daPeru_c::setParam() {
     mWallR = daPeru_Param_c::m.field_0x00[7];
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daPeru_Param_c::m.field_0x00[6]);
-    field_0xde8 = daPeru_Param_c::m.field_0x00[3];
+    mRealShadowSize = daPeru_Param_c::m.field_0x00[3];
     gravity = daPeru_Param_c::m.field_0x00[1];
-    field_0xa80 = daPeru_Param_c::m.field_0x64[2];
+    mExpressionMorfFrame = daPeru_Param_c::m.field_0x64[2];
     mMorfFrames = daPeru_Param_c::m.field_0x00[17];
 }
 
@@ -810,7 +810,7 @@ int daPeru_c::demo_walk_to_link(int param_0) {
         fopAc_ac_c* actor = mActors[2].getActorP();
         if (actor == NULL) {
             OS_REPORT("-----there is no player!!\n");
-            JUT_PANIC(1948, 0);
+            JUT_ASSERT(1948, FALSE);
         }
         cLib_chaseAngleS(&mCurAngle.y, fopAcM_searchActorAngleY(this, actor), 0x800);
         current.angle.y = mCurAngle.y;
@@ -955,8 +955,6 @@ int daPeru_c::cutAppear(int param_1) {
     return _cutAppear_Main(*pCutId);
 }
 
-UNK_REL_BSS
-
 /* 80D4C83C-80D4C840 000054 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daPeru_Param_c l_HIO;
 
@@ -1015,7 +1013,7 @@ int daPeru_c::_cutAppear_Init(int const& param_1) {
         if (fopAcM_SearchByName(PROC_MIDNA, &midna) != 0) {
             if (midna == NULL) {
                 OS_REPORT("---- there is no midna!!\n");
-                JUT_PANIC(2446, 0);
+                JUT_ASSERT(2446, FALSE);
             } else {
                 mJntAnm.lookActor(midna, 0.0, 0);
             }
@@ -1186,7 +1184,7 @@ void daPeru_c::_catdoor_open() {
     daObjCatDoor_c* pCatDoor = (daObjCatDoor_c*)mActors[1].getActorP();
     if (pCatDoor == NULL) {
         OS_REPORT("---- there is no catdoor!! ----!!\n");
-        JUT_PANIC(2799, 0);
+        JUT_ASSERT(2799, FALSE);
     } else {
         pCatDoor->setDoorOpen();
     }
@@ -1198,7 +1196,7 @@ void daPeru_c::_catdoor_open_demoskip() {
     daObjCatDoor_c* pCatDoor = (daObjCatDoor_c*)mActors[1].getActorP();
     if (pCatDoor == NULL) {
         OS_REPORT("---- there is no catdoor!! ----!!\n");
-        JUT_PANIC(2829, 0);
+        JUT_ASSERT(2829, FALSE);
     } else {
         pCatDoor->_toDoorOpened();
     }

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_a_itembase_static.h"
 #include "SSystem/SComponent/c_lib.h"
 #include "d/actor/d_a_itembase.h"
@@ -28,16 +30,16 @@ void daItemBase_c::changeDraw() {
     }
 }
 
-u8 daItemBase_c::chkDraw() {
-    return cLib_checkBit<u8>(field_0x92b, 1) != 0;
+bool daItemBase_c::chkDraw() {
+    return cLib_checkBit<u8>(field_0x92b, 1);
 }
 
 void daItemBase_c::dead() {
     cLib_onBit<u8>(field_0x92b, 2);
 }
 
-u8 daItemBase_c::chkDead() {
-    return cLib_checkBit<u8>(field_0x92b, 2) != 0;
+bool daItemBase_c::chkDead() {
+    return cLib_checkBit<u8>(field_0x92b, 2);
 }
 
 /* 80037B0C-80037B78 03244C 006C+00 0/0 0/0 1/1 .text            CheckItemCreateHeap__FP10fopAc_ac_c

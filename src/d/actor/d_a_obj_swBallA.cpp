@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swBallA.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_carry.h"
@@ -140,21 +142,19 @@ int daObjSwBallA_c::Create() {
     return 1;
 }
 
-UNK_REL_DATA
-
 /* 80CF4438-80CF443C -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "P_LBswA";
 
 /* 80CF37FC-80CF3928 00057C 012C+00 1/1 0/0 0/0 .text            CreateHeap__14daObjSwBallA_cFv */
 int daObjSwBallA_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(381, modelData != 0);
+    JUT_ASSERT(381, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mModel == 0) {
         return 0;
     }
     J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 7);
-    JUT_ASSERT(381, pbtk != 0);
+    JUT_ASSERT(381, pbtk != NULL);
     field_0x588 = new mDoExt_btkAnm();
     if (field_0x588 == NULL || field_0x588->init(modelData, pbtk, 1, 0, 1.0f, 0, -1) == 0) {
         return 0;
@@ -165,7 +165,7 @@ int daObjSwBallA_c::CreateHeap() {
 
 /* 80CF3970-80CF3A90 0006F0 0120+00 1/1 0/0 0/0 .text            create__14daObjSwBallA_cFv */
 int daObjSwBallA_c::create() {
-    fopAcM_SetupActor(this, daObjSwBallA_c);
+    fopAcM_ct(this, daObjSwBallA_c);
     if (field_0x5c4 == 0) {
         field_0x5c4 = 1;
         field_0x5c6 = home.angle.x;

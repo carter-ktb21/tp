@@ -180,7 +180,7 @@ public:
     u8 isSelectMessage() { return mSelectMessage; }
     void onNonStopJunpFlowFlag() { mNonStopJunpFlowFlag = 1; }
     u16 getSelectNum() { return query005(NULL, NULL, 0); }
-    s16 getChoiceNo() { return mChoiceNo; }
+    int getChoiceNo() { return (s16)mChoiceNo; }
     void setMsg(u32 msg) { mMsg = msg; }
     bool checkEndFlow() { return field_0x26 == 1; }
 
@@ -222,6 +222,6 @@ private:
     /* 0x46 */ u8 mSelType;
     /* 0x47 */ u8 field_0x47;
     /* 0x48 */ u8 mNonStopJunpFlowFlag;
-};
+}; // size 0x4c
 
 #endif /* D_MSG_D_MSG_FLOW_H */

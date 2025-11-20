@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_warp_bug.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -145,7 +147,7 @@ static int daWarpBug_Delete(daWarpBug_c* i_this) {
 }
 
 int daWarpBug_c::create() {
-    fopAcM_SetupActor(this, daWarpBug_c);
+    fopAcM_ct(this, daWarpBug_c);
 
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {

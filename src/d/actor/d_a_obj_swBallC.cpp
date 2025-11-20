@@ -2,6 +2,8 @@
 // d_a_obj_swBallC
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swBallC.h"
 #include "d/actor/d_a_obj_swBallB.h"
 #include "d/actor/d_a_obj_carry.h"
@@ -64,24 +66,6 @@ void daObjSwBallC_c::setBaseMtx() {
 /* 80CF6CD4-80CF6CD8 000000 0004+00 3/3 0/0 0/0 .rodata          l_color */
 static GXColor const l_color = {0x03, 0x96, 0xFF, 0xFF};
 
-/* 80CF6D90-80CF6D9C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80CF6D9C-80CF6DB0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80CF6DB0-80CF6DB4 -00001 0004+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "P_LBswBC";
 
@@ -126,13 +110,13 @@ static char* l_staffName = "lbsw";
 /* 80CF5EF8-80CF6024 0003D8 012C+00 1/1 0/0 0/0 .text            CreateHeap__14daObjSwBallC_cFv */
 int daObjSwBallC_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 6);
-    JUT_ASSERT(427, modelData != 0);
+    JUT_ASSERT(427, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mModel == 0) {
         return 0;
     }
     J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 10);
-    JUT_ASSERT(441, pbtk != 0);
+    JUT_ASSERT(441, pbtk != NULL);
     field_0x574 = new mDoExt_btkAnm();
     if (field_0x574 == NULL || field_0x574->init(modelData, pbtk, 1, 0, 1.0f, 0, -1) == 0) {
         return 0;
@@ -143,7 +127,7 @@ int daObjSwBallC_c::CreateHeap() {
 
 /* 80CF606C-80CF6120 00054C 00B4+00 1/1 0/0 0/0 .text            create__14daObjSwBallC_cFv */
 int daObjSwBallC_c::create() {
-    fopAcM_SetupActor(this, daObjSwBallC_c);
+    fopAcM_ct(this, daObjSwBallC_c);
     int res = dComIfG_resLoad(&field_0x568, l_arcName);
     if (res == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, CheckCreateHeap, 0x960) == 0) {

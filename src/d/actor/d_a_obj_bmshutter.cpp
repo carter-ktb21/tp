@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_bmshutter.cpp
+* @file d_a_obj_bmshutter.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_bmshutter.h"
 #include "d/actor/d_a_player.h"
@@ -11,8 +13,6 @@
 //
 // External References:
 //
-
-UNK_REL_DATA;
 
 static const char* l_arcName = "K_saku00";
 
@@ -90,7 +90,7 @@ int daObjBmSh_c::CreateHeap() {
 
 /* 80BB9CC0-80BB9DB4 0002E0 00F4+00 1/1 0/0 0/0 .text            create__11daObjBmSh_cFv */
 int daObjBmSh_c::create() {
-    fopAcM_SetupActor(this, daObjBmSh_c);
+    fopAcM_ct(this, daObjBmSh_c);
 
     if (!mIsInitialized) {
         mHomeX = home.angle.x;
@@ -115,7 +115,7 @@ int daObjBmSh_c::create() {
 }
 
 /* 80BB9DB4-80BB9F34 0003D4 0180+00 1/0 0/0 0/0 .text            Execute__11daObjBmSh_cFPPA3_A4_f */
-int daObjBmSh_c::Execute(f32 (**param_0)[3][4]) {
+int daObjBmSh_c::Execute(Mtx** param_0) {
     daPy_py_c* player = dComIfGp_getLinkPlayer();
     if (player->checkFrontRollCrash()) {
         cXyz min = l_check_area[0];

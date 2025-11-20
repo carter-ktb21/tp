@@ -15,6 +15,16 @@ class JKRSolidHeap;
 struct ResTIMG;
 class Z2Creature;
 
+namespace mDoExt {
+    extern u8 HeapAdjustVerbose;
+    extern u8 HeapAdjustQuiet;
+};
+
+#if DEBUG
+void DummyCheckHeap_create();
+void DummyCheckHeap_destroy();
+#endif
+
 class mDoExt_baseAnm {
 public:
     mDoExt_baseAnm() {}
@@ -207,6 +217,9 @@ public:
 
     J3DAnmCluster* getBlkAnm() { return mpAnm; }
 
+    void entryFrame() { entryFrame(getFrame()); }
+    void entryFrame(f32 frame) { mpAnm->setFrame(frame); }
+
 private:
     /* 0x14 */ J3DAnmCluster* mpAnm;
 };
@@ -252,6 +265,7 @@ private:
 
 class mDoExt_invisibleModel {
 public:
+    mDoExt_invisibleModel() {}
     /* 8000E53C */ int create(J3DModel* i_model, u8 param_1);
     /* 8000E6C8 */ void entryJoint(cXyz*);
     /* 8000E7C0 */ void entryDL(cXyz*);
@@ -286,7 +300,7 @@ public:
 
     J3DAnmTransform* getAnm() { return mpAnm; }
     void changeAnm(J3DAnmTransform* anm) { mpAnm = anm; }
-    u8 getPlayMode() { return mFrameCtrl.getAttribute(); }
+    int getPlayMode() { return mFrameCtrl.getAttribute(); }
     void setPlayMode(int mode) { mFrameCtrl.setAttribute(mode); }
     BOOL isStop() { return mFrameCtrl.checkState(1) || mFrameCtrl.getRate() == 0.0f; }
     bool isLoop() { return mFrameCtrl.checkState(2); }
@@ -400,11 +414,17 @@ public:
     /* 800113FC */ virtual ~mDoExt_McaMorf2();
     /* 800116F4 */ virtual void calc();
 
+    inline f32 getAnmRate() { return mAnmRate; }
+    inline void changeAnm(J3DAnmTransform* anm, J3DAnmTransform* anm2) {
+        mpAnm = anm;
+        field_0x40 = anm2;
+    }
+    inline J3DModel* getModel() { return mpModel; }
 private:
     /* 0x38 */ mDoExt_McaMorfCallBack1_c* mpCallback1;
     /* 0x3C */ mDoExt_McaMorfCallBack2_c* mpCallback2;
     /* 0x40 */ J3DAnmTransform* field_0x40;
-    /* 0x44 */ f32 field_0x44;
+    /* 0x44 */ f32 mAnmRate;
     /* 0x48 */ Z2Creature* mpSound;
     /* 0x4C */ void* mpBas;
 };
@@ -488,19 +508,30 @@ struct mDoExt_MtxCalcAnmBlendTblOld : public mDoExt_MtxCalcAnmBlendTbl {
 
 STATIC_ASSERT(sizeof(mDoExt_MtxCalcAnmBlendTblOld) == 0x10);
 
+struct mDoExt_3Dline_field_0x10_c {
+    s8 x;
+    s8 y;
+    s8 z;
+};
+
+struct mDoExt_3Dline_field_0x18_c {
+    f32 field_0x0;
+    f32 field_0x4;
+};
+
 class mDoExt_3Dline_c {
 public:
-    /* 800123D0 */ int init(u16, int, int);
-    /* 800126BC */ mDoExt_3Dline_c();
+    /* 800123D0 */ int init(u16, int, BOOL);
+    /* 800126BC */ mDoExt_3Dline_c() {}
 
     /* 0x00 */ cXyz* field_0x0;
     /* 0x04 */ f32* field_0x4;
     /* 0x08 */ cXyz* field_0x8;
     /* 0x0C */ cXyz* field_0xc;
-    /* 0x10 */ u8* field_0x10;
-    /* 0x14 */ void* field_0x14;
-    /* 0x18 */ f32* field_0x18;
-    /* 0x1C */ f32* field_0x1c;
+    /* 0x10 */ mDoExt_3Dline_field_0x10_c* field_0x10;
+    /* 0x14 */ mDoExt_3Dline_field_0x10_c* field_0x14;
+    /* 0x18 */ mDoExt_3Dline_field_0x18_c* field_0x18;
+    /* 0x1C */ mDoExt_3Dline_field_0x18_c* field_0x1c;
 };
 
 class mDoExt_3DlineMat_c {
@@ -521,7 +552,7 @@ public:
 
     /* 80014738 */ void setMat(mDoExt_3DlineMat_c*);
     virtual void draw();
-    virtual ~mDoExt_3DlineMatSortPacket();
+    virtual ~mDoExt_3DlineMatSortPacket() {}
 
 private:
     /* 0x10 */ mDoExt_3DlineMat_c* mp3DlineMat;
@@ -533,7 +564,7 @@ public:
     /* 80013360 */ int init(u16, u16, ResTIMG*, int);
     /* 80013FB0 */ void update(int, GXColor&, dKy_tevstr_c*);
     /* 8001373C */ void update(int, f32, GXColor&, u16, dKy_tevstr_c*);
-    /* 80014E7C */ int getMaterialID();
+    /* 80014E7C */ int getMaterialID() { return 1; }
     /* 800134F8 */ void setMaterial();
     /* 800135D0 */ void draw();
 
@@ -557,7 +588,7 @@ public:
     /* 80012874 */ void update(int, f32, _GXColor&, u16, dKy_tevstr_c*);
     /* 80012E3C */ void update(int, _GXColor&, dKy_tevstr_c*);
 
-    /* 80014E84 */ virtual int getMaterialID();
+    /* 80014E84 */ virtual int getMaterialID() { return 0; }
     /* 800126C0 */ virtual void setMaterial();
     /* 80012774 */ virtual void draw();
 
@@ -576,12 +607,7 @@ private:
 
 class mDoExt_cubePacket : public J3DPacket {
 public:
-    mDoExt_cubePacket(cXyz& i_position, cXyz& i_size, csXyz& i_angle, const GXColor& i_color) {
-        mPosition = i_position;
-        mSize = i_size;
-        mAngle = i_angle;
-        mColor = i_color;
-    }
+    mDoExt_cubePacket(cXyz& i_position, cXyz& i_size, csXyz& i_angle, const GXColor& i_color);
 
     virtual void draw();
     virtual ~mDoExt_cubePacket() {}
@@ -594,13 +620,7 @@ public:
 
 class mDoExt_cylinderPacket : public J3DPacket {
 public:
-    mDoExt_cylinderPacket(cXyz& i_position, f32 i_radius, f32 i_height, const GXColor& i_color, u8 i_clipZ) {
-        mPosition = i_position;
-        mRadius = i_radius;
-        mHeight = i_height;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-    }
+    mDoExt_cylinderPacket(cXyz& i_position, f32 i_radius, f32 i_height, const GXColor& i_color, u8 i_clipZ);
 
     virtual void draw();
     virtual ~mDoExt_cylinderPacket() {}
@@ -614,12 +634,7 @@ public:
 
 class mDoExt_spherePacket : public J3DPacket {
 public:
-    mDoExt_spherePacket(cXyz& i_position, f32 i_size, const GXColor& i_color, u8 i_clipZ) {
-        mPosition = i_position;
-        mSize = i_size;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-    }
+    mDoExt_spherePacket(cXyz& i_position, f32 i_size, const GXColor& i_color, u8 i_clipZ);
 
     virtual void draw();
     virtual ~mDoExt_spherePacket() {}
@@ -632,17 +647,7 @@ public:
 
 class mDoExt_cube8pPacket : public J3DPacket {
 public:
-    mDoExt_cube8pPacket(cXyz* i_points, const GXColor& i_color) {
-        cXyz* pnt_array = i_points;
-
-        for (int i = 0; i < 8; i++) {
-            mPoints[i] = *pnt_array;
-            pnt_array++;
-        }
-
-        DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 8);
-        mColor = i_color;
-    }
+    mDoExt_cube8pPacket(cXyz* i_points, const GXColor& i_color);
 
     virtual void draw();
     virtual ~mDoExt_cube8pPacket() {}
@@ -653,18 +658,7 @@ public:
 
 class mDoExt_trianglePacket : public J3DPacket {
 public:
-    mDoExt_trianglePacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ) {
-        cXyz* pnt_array = i_points;
-
-        for (int i = 0; i < 3; i++) {
-            mPoints[i] = *pnt_array;
-            pnt_array++;
-        }
-
-        DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 3);
-        mColor = i_color;
-        mClipZ = i_clipZ;
-    }
+    mDoExt_trianglePacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ);
 
     virtual void draw();
     virtual ~mDoExt_trianglePacket() {}
@@ -676,18 +670,7 @@ public:
 
 class mDoExt_quadPacket : public J3DPacket {
 public:
-    mDoExt_quadPacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ) {
-        cXyz* pnt_array = i_points;
-
-        for (int i = 0; i < 4; i++) {
-            mPoints[i] = *pnt_array;
-            pnt_array++;
-        }
-
-        DCStoreRangeNoSync(mPoints, sizeof(cXyz) * 4);
-        mColor = i_color;
-        mClipZ = i_clipZ;
-    }
+    mDoExt_quadPacket(cXyz* i_points, const GXColor& i_color, u8 i_clipZ);
 
     virtual void draw();
     virtual ~mDoExt_quadPacket() {}
@@ -699,13 +682,7 @@ public:
 
 class mDoExt_linePacket : public J3DPacket {
 public:
-    mDoExt_linePacket(cXyz& i_start, cXyz& i_end, const GXColor& i_color, u8 i_clipZ, u8 i_width) {
-        mStart = i_start;
-        mEnd = i_end;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-        mWidth = i_width;
-    }
+    mDoExt_linePacket(cXyz& i_start, cXyz& i_end, const GXColor& i_color, u8 i_clipZ, u8 i_width);
 
     virtual void draw();
     virtual ~mDoExt_linePacket() {}
@@ -719,11 +696,7 @@ public:
 
 class mDoExt_cylinderMPacket : public J3DPacket {
 public:
-    mDoExt_cylinderMPacket(Mtx i_mtx, const GXColor& i_color, u8 i_clipZ) {
-        PSMTXCopy(i_mtx, mMatrix);
-        mColor = i_color;
-        mClipZ = i_clipZ;
-    }
+    mDoExt_cylinderMPacket(Mtx i_mtx, const GXColor& i_color, u8 i_clipZ);
 
     virtual void draw();
     virtual ~mDoExt_cylinderMPacket() {}
@@ -735,13 +708,7 @@ public:
 
 class mDoExt_circlePacket : public J3DPacket {
 public:
-    mDoExt_circlePacket(cXyz& i_position, f32 i_radius, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
-        mPosition = i_position;
-        mRadius = i_radius;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-        mLineWidth = i_lineWidth;
-    }
+    mDoExt_circlePacket(cXyz& i_position, f32 i_radius, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth);
 
     virtual void draw();
     virtual ~mDoExt_circlePacket() {}
@@ -755,32 +722,21 @@ public:
 
 class mDoExt_ArrowPacket : public J3DPacket {
 public:
-    mDoExt_ArrowPacket(cXyz& i_position, cXyz& param_1, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
-        mPosition = i_position;
-        field_0x1c = param_1;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-        m_lineWidth = i_lineWidth;
-    }
+    mDoExt_ArrowPacket(cXyz& i_position, cXyz& param_1, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth);
 
     virtual void draw();
     virtual ~mDoExt_ArrowPacket() {}
 
-    /* 0x10 */ cXyz mPosition;
-    /* 0x1C */ cXyz field_0x1c;
+    /* 0x10 */ cXyz mStart;
+    /* 0x1C */ cXyz mEnd;
     /* 0x28 */ GXColor mColor;
     /* 0x2C */ u8 mClipZ;
-    /* 0x2D */ u8 m_lineWidth;
+    /* 0x2D */ u8 mLineWidth;
 };
 
 class mDoExt_pointPacket : public J3DPacket {
 public:
-    mDoExt_pointPacket(cXyz& i_position, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth) {
-        mPosition = i_position;
-        mColor = i_color;
-        mClipZ = i_clipZ;
-        mLineWidth = i_lineWidth;
-    }
+    mDoExt_pointPacket(cXyz& i_position, const GXColor& i_color, u8 i_clipZ, u8 i_lineWidth);
 
     virtual void draw();
     virtual ~mDoExt_pointPacket() {}
@@ -828,11 +784,22 @@ JKRSolidHeap* mDoExt_createSolidHeapFromSystem(u32 i_size, u32 i_alignment);
 u32 mDoExt_adjustSolidHeapToSystem(JKRSolidHeap* i_heap);
 JKRHeap* mDoExt_getCurrentHeap();
 void mDoExt_removeMesgFont();
+
+// TODO: make a better name. this flag setup is used for a majority of models which makes it seem like it was a macro
+// maybe a macro for the mDoExt_J3DModel__create call itself?
+#define BMD_DEFAULT_DIFF_FLAGS J3D_DIFF_FLAG(FALSE, FALSE, TRUE, 8, 0, FALSE, 0, 0, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE)
+
 void mDoExt_modelUpdate(J3DModel* i_model);
 void mDoExt_modelUpdateDL(J3DModel* i_model);
 J3DModel* mDoExt_J3DModel__create(J3DModelData* i_modelData, u32 i_modelFlag,
                                   u32 i_differedDlistFlag);
+
+extern u32 aram_cache_size;
 void mDoExt_setAraCacheSize(u32 size);
+inline u32 mDoExt_getAraCacheSize() {
+    return aram_cache_size;
+}
+
 int mDoExt_resIDToIndex(JKRArchive* p_archive, u16 id);
 void mDoExt_modelEntryDL(J3DModel* i_model);
 void mDoExt_brkAnmRemove(J3DModelData* i_modelData);
@@ -840,10 +807,12 @@ void mDoExt_setupStageTexture(J3DModelData* i_modelData);
 OSThread* mDoExt_GetCurrentRunningThread();
 void mDoExt_setupShareTexture(J3DModelData* i_modelData, J3DModelData* i_shareModelData);
 void mDoExt_btkAnmRemove(J3DModelData* i_modelData);
+void mDoExt_modelTexturePatch(J3DModelData* i_modelData);
 
 #if VERSION == VERSION_SHIELD_DEBUG
 s32 mDoExt_getSafeZeldaHeapSize();
 void mDoExt_addSafeZeldaHeapSize(s32);
+JKRHeap* mDoExt_createHostIOHeap(u32, JKRHeap*);
 #endif
 
 struct JUTFont;

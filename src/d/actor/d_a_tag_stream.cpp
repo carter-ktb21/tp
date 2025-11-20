@@ -3,13 +3,15 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_stream.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_procname.h"
 
 /* 80D638F8-80D63A78 000078 0180+00 1/1 0/0 0/0 .text            create__13daTagStream_cFv */
 int daTagStream_c::create() {
-    fopAcM_SetupActor(this, daTagStream_c);
+    fopAcM_ct(this, daTagStream_c);
 
     mPriority = fopAcM_GetParam(this) >> 8;
     mPower = fopAcM_GetParam(this);

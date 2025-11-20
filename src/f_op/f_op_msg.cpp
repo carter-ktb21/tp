@@ -49,6 +49,10 @@ static int fopMsg_Delete(void* i_this) {
     return ret;
 }
 
+#if DEBUG
+u8 fopMsg::MemCheck;
+#endif
+
 /* 80450CF0-80450CF8 0001F0 0004+04 1/1 0/0 0/0 .sbss            fopMsg_MSG_TYPE */
 static int fopMsg_MSG_TYPE;
 
@@ -75,7 +79,7 @@ int fopMsg_Create(void* i_this) {
 
     int ret = fpcMtd_Create(&a_this->sub_method->base, a_this);
     if (ret == cPhs_COMPLEATE_e) {
-        s32 priority = fpcLf_GetPriority(a_this);
+        s32 priority = fpcM_DrawPriority(a_this);
         fopDwTg_ToDrawQ(&a_this->draw_tag, priority);
     }
 

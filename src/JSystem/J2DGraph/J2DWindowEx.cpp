@@ -3,6 +3,8 @@
 // Translation Unit: J2DWindowEx
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/J2DGraph/J2DWindowEx.h"
 #include "JSystem/JUtility/JUTTexture.h"
 #include "JSystem/JSupport/JSURandomInputStream.h"
@@ -656,10 +658,7 @@ bool J2DWindowEx::setBlackWhite(JUtility::TColor black, JUtility::TColor white) 
         return false;
     }
 
-    bool bVar1 = false;
-    if ((u32)black != 0 || (u32)white != 0xffffffff) {
-        bVar1 = true;
-    }
+    bool bVar1 = (u32)black != 0 || (u32)white != 0xffffffff;
     u8 uVar3 = bVar1 ? 2 : 1;
     for (int i = 0; i < 4; i++) {
         mFrameMaterial[i]->getTevBlock()->setTevStageNum(uVar3);
@@ -920,7 +919,7 @@ void J2DWindowEx::setAnimation(J2DAnmVtxColor* param_0) {
                 for (u16 j = 0; j < uVar3; j++) {
                     J3DAnmVtxColorIndexData* puVar1 = param_0->getAnmVtxColorIndexData(0, j);
                     u16* indexPointer = param_0->getVtxColorIndexPointer(0);
-                    u16* indexPointer2 = indexPointer + (u32)puVar1->mpData;
+                    u16* indexPointer2 = indexPointer + (uintptr_t)puVar1->mpData;
                     for (u16 k = 0; k < puVar1->mNum; k++) {
                         if (indexPointer2[k] == field_0x168[i]) {
                             mAnmVtxColor = param_0;
@@ -964,7 +963,7 @@ const J2DAnmTransform* J2DWindowEx::animationPane(J2DAnmTransform const* param_0
                 for (u16 j = 0; j < uVar3; j++) {
                     J3DAnmVtxColorIndexData* puVar1 = mAnmVtxColor->getAnmVtxColorIndexData(0, j);
                     u16* indexPointer = mAnmVtxColor->getVtxColorIndexPointer(0);
-                    u16* indexPointer2 = indexPointer + (u32)puVar1->mpData;
+                    u16* indexPointer2 = indexPointer + (uintptr_t)puVar1->mpData;
                     for (u16 k = 0; k < puVar1->mNum; k++) {
                         if (indexPointer2[k] == field_0x168[i]) {
                             mAnmVtxColor->getColor(0, j, local_38[i]);

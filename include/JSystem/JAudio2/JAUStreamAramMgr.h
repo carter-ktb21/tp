@@ -28,7 +28,7 @@ public:
                 JASHeap* heap = &mHeaps[0];  // should probably be mHeaps[i] but that doesn't match
                 heap->free();
                 if (!heap) {
-                    JUT_ASSERT(47, 0);
+                    JUT_ASSERT(47, FALSE);
                 }
             }
         }
@@ -64,7 +64,7 @@ public:
             if (!this->field_0x4.test(i)) {
                 continue;
             }
-            if ((u32)this->mHeaps[i].getBase() != param_0) {
+            if ((uintptr_t)this->mHeaps[i].getBase() != param_0) {
                 continue;
             }
             this->field_0x4.reset(i);

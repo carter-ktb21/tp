@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_hhashi.h"
 #include "d/actor/d_a_e_fm.h"
 #include "d/d_cc_d.h"
@@ -10,6 +12,7 @@
 #include "d/d_bg_w.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_lib.h"
 #include "SSystem/SComponent/c_math.h"
 
@@ -226,7 +229,7 @@ bool daObjHHASHI_c::checkViewArea(int param_1) {
     Vec local_20;
     mDoLib_project(&field_0x5b0[param_1], &local_20);
     bool rv = false;
-    if (local_20.x >= 0.0f && local_20.x <= 608.0f && local_20.y >= 0.0f && local_20.y <= 448.0f) {
+    if (local_20.x >= 0.0f && local_20.x <= FB_WIDTH && local_20.y >= 0.0f && local_20.y <= FB_HEIGHT) {
         rv = true;
     }
     return rv;
@@ -296,9 +299,9 @@ static char* l_arcName = "L_hhashi";
 /* 80580DA4-80580EA0 001464 00FC+00 1/0 0/0 0/0 .text            CreateHeap__13daObjHHASHI_cFv */
 int daObjHHASHI_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "L_hhashi00.bmd");
-    JUT_ASSERT(90, modelData != 0);
+    JUT_ASSERT(90, modelData != NULL);
     J3DModelData* modelData2 = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "L_hhashi02.bmd");
-    JUT_ASSERT(93, modelData2 != 0);
+    JUT_ASSERT(93, modelData2 != NULL);
     for (int i = 0; i < 50; i++) {
         mShardModels[i] = mDoExt_J3DModel__create(modelData2, 0x20000, 0x11000084);
         if (mShardModels[i] == NULL) {
@@ -311,7 +314,7 @@ int daObjHHASHI_c::CreateHeap() {
 
 /* 80580EA0-8058112C 001560 028C+00 1/1 0/0 0/0 .text            create__13daObjHHASHI_cFv */
 int daObjHHASHI_c::create() {
-    fopAcM_SetupActor(this, daObjHHASHI_c);
+    fopAcM_ct(this, daObjHHASHI_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
         gravity = -9.0f;
@@ -324,7 +327,7 @@ int daObjHHASHI_c::create() {
         initCcCylinder();
         fopAcM_SetMtx(this, mModel->getBaseTRMtx());
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "L_hhashi02.bmd");
-        JUT_ASSERT(1133, modelData != 0);
+        JUT_ASSERT(1133, modelData != NULL);
         dComIfGp_addSimpleModel(modelData, fopAcM_GetRoomNo(this), 0);
         field_0x1199 = 1;
         daObjHHASHI_Execute(this);

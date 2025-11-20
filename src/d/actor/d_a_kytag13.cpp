@@ -3,10 +3,13 @@
  * Blowing Snow Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag13.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 8085F1F8-8085F200 000078 0008+00 1/0 0/0 0/0 .text            daKytag13_Draw__FP13kytag13_class
  */
@@ -361,7 +364,7 @@ static int daKytag13_Delete(kytag13_class* i_this) {
 /* 80860210-80860450 001090 0240+00 1/0 0/0 0/0 .text            daKytag13_Create__FP10fopAc_ac_c */
 static int daKytag13_Create(fopAc_ac_c* i_this) {
     kytag13_class* a_this = (kytag13_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag13_class);
+    fopAcM_ct(i_this, kytag13_class);
 
     if (i_this->home.roomNo != dComIfGp_roomControl_getStayNo()) {
         return 0;

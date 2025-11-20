@@ -3,6 +3,7 @@
 
 #include "d/actor/d_a_npc.h"
 
+class daNpc_zrA_HIO_c;
 /**
  * @ingroup actors-npcs
  * @class daNpc_zrA_Path_c
@@ -10,7 +11,8 @@
  *
  * @details
  *
- */
+*/
+
 class daNpc_zrA_Path_c : public daNpcF_Path_c {
 public:
     /* 80B7850C */ BOOL getDstPosDst2(cXyz, cXyz&);
@@ -321,7 +323,7 @@ public:
     int getType() { return mType; }
     u32 getAngleNoFromParam() { return (u8)(fopAcM_GetParam(this) >> 8); }
     void setBlastFlag(u8 i_flag) { mBlastFlag = i_flag; }
-    MtxP getHeadMtx() { return mpMorf->getModel()->getAnmMtx(4); }
+    MtxP getHeadMtx() { return mAnm_p->getModel()->getAnmMtx(4); }
 
     /* 0x0B48 */ Z2Creature mCreatureSound;
     /* 0x0BD8 */ J3DModel* mpObjectModel[3];
@@ -332,7 +334,7 @@ public:
     /* 0x1248 */ daNpcF_Lookat_c mLookat;
     /* 0x12E4 */ dPaPo_c mPaPo;
     /* 0x131C */ daNpcF_ActorMngr_c mActorMngr[3];
-    /* 0x1334 */ u8 field_0x1334[4];
+    /* 0x1334 */ daNpc_zrA_HIO_c* mpHIO;
     /* 0x1338 */ dCcD_Cyl mCcCyl;
     /* 0x1474 */ ActionFn mpNextActionFn;
     /* 0x1480 */ ActionFn mpActionFn;

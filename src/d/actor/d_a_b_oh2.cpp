@@ -3,6 +3,8 @@
  * Morpheel Tentacle
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_oh2.h"
 #include "d/actor/d_a_b_ob.h"
 #include "SSystem/SComponent/c_math.h"
@@ -236,7 +238,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    _this->mpMorf->getModel()->setUserArea((u32)i_this);
+    _this->mpMorf->getModel()->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < _this->mpMorf->getModel()->getModelData()->getJointNum(); i++) {
         _this->mpMorf->getModel()->getModelData()->getJointNodePointer(i)->setCallBack(
@@ -274,7 +276,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 8061E868-8061E9EC 000C28 0184+00 1/0 0/0 0/0 .text            daB_OH2_Create__FP10fopAc_ac_c */
 static int daB_OH2_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, b_oh2_class);
+    fopAcM_ct(i_this, b_oh2_class);
     b_oh2_class* _this = static_cast<b_oh2_class*>(i_this);
 
     int phase = dComIfG_resLoad(&_this->mPhase, "B_oh");

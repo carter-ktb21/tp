@@ -3,18 +3,12 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_zant.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "f_op/f_op_actor_mng.h"
 #include "SSystem/SComponent/c_counter.h"
-
-/* 80B6ED28-80B6ED34 000008 000C+00 1/1 0/0 0/0 .bss             @3811 */
-static u8 lit_3811[12];
-
-/* 80B6ED34-80B6ED38 000014 0004+00 1/1 0/0 0/0 .bss             l_HIO */
-static u8 l_HIO[4];
-
-UNK_REL_DATA
 
 /* 80B6EAB4-80B6EABC 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[2] = {
@@ -73,6 +67,9 @@ daNpc_Zant_c::cutFunc daNpc_Zant_c::mCutList[1] = {
     NULL
 };
 
+/* 80B6ED34-80B6ED38 000014 0004+00 1/1 0/0 0/0 .bss             l_HIO */
+static daNpc_Zant_Param_c l_HIO;
+
 /* 80B6C1AC-80B6C2D0 0000EC 0124+00 1/0 0/0 0/0 .text            __dt__12daNpc_Zant_cFv */
 daNpc_Zant_c::~daNpc_Zant_c() {
     OS_REPORT("|%06d:%x|daNpc_Zant_c -> デストラクト\n", g_Counter.mCounter0, this);
@@ -96,7 +93,7 @@ daNpc_Zant_Param_c::Data const daNpc_Zant_Param_c::m  = {
 int daNpc_Zant_c::create() {
     int rv;
 
-    fopAcM_SetupActor2(this, daNpc_Zant_c, &l_faceMotionAnmData, &l_motionAnmData, l_faceMotionSequenceData, 
+    daNpcT_ct(this, daNpc_Zant_c, &l_faceMotionAnmData, &l_motionAnmData, l_faceMotionSequenceData, 
         4, l_motionSequenceData, 4, l_evtList, l_resNameList);
         
     mType = getType();
@@ -125,7 +122,7 @@ int daNpc_Zant_c::create() {
             mAcch.CrrPos(dComIfG_Bgsp());
             mGndChk = mAcch.m_gnd;
             mGroundH = mAcch.m_ground_h;
-            if (mGroundH != -1000000000.0f) {
+            if (mGroundH != -G_CM3D_F_INF) {
                 setEnvTevColor();
                 setRoomNo();
             }
@@ -159,7 +156,7 @@ int daNpc_Zant_c::CreateHeap() {
         modelData->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
 
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     if (setFaceMotionAnm(0, false) && setMotionAnm(0, 0.0f, 0))
     {
@@ -187,7 +184,7 @@ int daNpc_Zant_c::Draw() {
         J3DModelData* modelData = mpMorf[0]->getModel()->getModelData();
         modelData->getMaterialNodePointer(getEyeballMaterialNo())->setMaterialAnm(mpMatAnm[0]);
     }
-    return daNpcT_c::draw(0, 0, field_0xde8, NULL, 0.0f, 1, 0, 0);
+    return daNpcT_c::draw(0, 0, mRealShadowSize, NULL, 0.0f, 1, 0, 0);
 }
 
 /* 80B6C7E8-80B6C808 000728 0020+00 1/1 0/0 0/0 .text createHeapCallBack__12daNpc_Zant_cFP10fopAc_ac_c */
@@ -270,7 +267,7 @@ void daNpc_Zant_c::setParam() {
     attention_info.distances[1] = attention_info.distances[0];
     attention_info.distances[3] = daNpcT_getDistTableIdx(sVar1, sVar2);
 
-    attention_info.flags = 10;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
 
     scale.setall(daNpc_Zant_Param_c::m.field_0x8);
 
@@ -283,9 +280,9 @@ void daNpc_Zant_c::setParam() {
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daNpc_Zant_Param_c::m.field_0x18);
 
-    field_0xde8 = daNpc_Zant_Param_c::m.field_0xc;
+    mRealShadowSize = daNpc_Zant_Param_c::m.field_0xc;
     gravity = daNpc_Zant_Param_c::m.field_0x4;
-    field_0xa80 = daNpc_Zant_Param_c::m.field_0x6c;
+    mExpressionMorfFrame = daNpc_Zant_Param_c::m.field_0x6c;
     mMorfFrames = daNpc_Zant_Param_c::m.field_0x44;
 }
 
@@ -444,7 +441,7 @@ void daNpc_Zant_c::drawGhost() {
 /* 80B6D21C-80B6D264 00115C 0048+00 1/1 0/0 0/0 .text            selectAction__12daNpc_Zant_cFv */
 int daNpc_Zant_c::selectAction() {
     field_0xf84 = NULL;
-    field_0xf84 = &daNpc_Zant_c::talk;
+    field_0xf84 = &daNpc_Zant_c::wait;
     return 1;
 }
 
@@ -487,7 +484,7 @@ int daNpc_Zant_c::wait(void* param_1) {
                     if (chkActorInSight(mPlayerActorMngr.getActorP(), mAttnFovY, mCurAngle.y)) {
                         mJntAnm.lookPlayer(0);
                     }
-                
+
                     if (!srchPlayerActor() && home.angle.y == mCurAngle.y) {
                         mMode = 1;
                     }
@@ -534,7 +531,7 @@ int daNpc_Zant_c::talk(void* param_1) {
                         dComIfGp_event_reset();
                         mMode = 3;
                     }
-                
+
                     mJntAnm.lookPlayer(0);
                     if (mTwilight) {
                         mJntAnm.lookNone(0);

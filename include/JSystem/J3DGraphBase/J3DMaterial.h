@@ -4,7 +4,7 @@
 #include "JSystem/J3DGraphBase/J3DMatBlock.h"
 #include "JSystem/J3DGraphBase/J3DPacket.h"
 #include "JSystem/J3DGraphBase/J3DShape.h"
-#include "dolphin/types.h"
+#include <stdint.h>
 
 class J3DJoint;
 class J3DMaterialAnm;
@@ -56,7 +56,7 @@ public:
     J3DIndBlock* getIndBlock() { return mIndBlock; }
     J3DJoint* getJoint() { return mJoint; }
     J3DMaterialAnm* getMaterialAnm() {
-        if ((u32)mMaterialAnm < 0xC0000000) {
+        if ((uintptr_t)mMaterialAnm < 0xC0000000) {
             return mMaterialAnm;
         } else {
             return NULL;
@@ -78,6 +78,7 @@ public:
     J3DZMode* getZMode() { return mPEBlock->getZMode(); }
     J3DBlend* getBlend() { return mPEBlock->getBlend(); }
     J3DColorChan* getColorChan(u32 idx) { return getColorBlock()->getColorChan(idx); }
+    J3DGXColor* getMatColor(u32 i) { return mColorBlock->getMatColor(i); }
 
     void setTevColor(u32 i, const J3DGXColorS10* i_color) { mTevBlock->setTevColor(i, i_color); }
     void setTevKColor(u32 i, const J3DGXColor* i_color) { mTevBlock->setTevKColor(i, i_color); }
@@ -88,6 +89,21 @@ public:
     void setTexMtx(u32 idx, J3DTexMtx* mtx) { mTexGenBlock->setTexMtx(idx, mtx); }
     void setZCompLoc(u8 i_comploc) { mPEBlock->setZCompLoc(i_comploc); }
     void setMaterialMode(u32 i_mode) { mMaterialMode = i_mode; }
+
+    void addShape(J3DShape* pShape) {
+        J3D_ASSERT_NULLPTR(618, pShape != NULL);
+        mShape = pShape;
+    }
+
+    void setNext(J3DMaterial* pMaterial) {
+        J3D_ASSERT_NULLPTR(623, pMaterial != NULL);
+        mNext = pMaterial;
+    }
+
+    void setJoint(J3DJoint* pJoint) {
+        J3D_ASSERT_NULLPTR(628, pJoint != NULL);
+        mJoint = pJoint;
+    }
 
 public:
     /* 0x04 */ J3DMaterial* mNext;

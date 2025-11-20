@@ -3,6 +3,8 @@
  * Strong Wind Column
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_tornado2.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
@@ -216,7 +218,7 @@ int daObjTrnd2_c::Create() {
 
 /* 80D1CC80-80D1CD78 000820 00F8+00 1/1 0/0 0/0 .text            create__12daObjTrnd2_cFv */
 int daObjTrnd2_c::create() {
-    fopAcM_SetupActor(this, daObjTrnd2_c);
+    fopAcM_ct(this, daObjTrnd2_c);
     if (!Create()) {
         return cPhs_ERROR_e;
     }

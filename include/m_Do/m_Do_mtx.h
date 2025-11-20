@@ -24,7 +24,7 @@ void mDoMtx_ZrotM(Mtx mtx, s16 z);
 bool mDoMtx_inverseTranspose(f32 const (*param_0)[4], f32 (*param_1)[4]);
 void mDoMtx_QuatConcat(Quaternion const* param_0, Quaternion const* param_1, Quaternion* param_2);
 
-inline void mDoMtx_multVecSR(Mtx m, const Vec* src, Vec* dst) {
+inline void mDoMtx_multVecSR(const Mtx m, const Vec* src, Vec* dst) {
     MTXMultVecSR(m, src, dst);
 }
 
@@ -45,7 +45,7 @@ inline void mDoMtx_multVecArray(Mtx m, const Vec* src, Vec* dst, u32 count) {
 }
 
 inline void mDoMtx_copy(const Mtx src, Mtx dst) {
-    MTXCopy(src, dst);
+    PSMTXCopy(src, dst);
 }
 
 inline void mDoMtx_trans(Mtx m, f32 x, f32 y, f32 z) {
@@ -100,7 +100,11 @@ inline void cMtx_multVecArray(Mtx mtx, const Vec* src, Vec* dst, u32 count) {
     mDoMtx_multVecArray(mtx, src, dst, count);
 }
 
-inline void mDoMtx_multVecZero(MtxP param_0, Vec* param_1) {
+inline void cMtx_inverseTranspose(const Mtx a, Mtx b) {
+    mDoMtx_inverseTranspose(a, b);
+}
+
+inline void mDoMtx_multVecZero(CMtxP param_0, Vec* param_1) {
     param_1->x = param_0[0][3];
     param_1->y = param_0[1][3];
     param_1->z = param_0[2][3];
@@ -339,7 +343,7 @@ public:
      * Copies a given matrix `m` to the `now` matrix
      * @param m The source matrix to copy
      */
-    static void copy(const Mtx m) { MTXCopy(m, now); }
+    static void copy(const Mtx m) { PSMTXCopy(m, now); }
 
     static void rotAxisRadS(const Vec* axis, f32 rad) {
         MTXRotAxisRad(now, axis, rad);

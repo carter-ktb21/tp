@@ -6,7 +6,10 @@
  * @details Group of several small fish spawned in a group. Used in Fishing Pond.
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_lf.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80A6AA1C-80A6AA28 000000 000C+00 1/1 0/0 0/0 .data            wp$3976 */
 static f32 wp[3] = {
@@ -262,13 +265,13 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     lf_s* fish = a_this->mFish;
 
     for (int i = 0; i < a_this->mIter; i++, fish++) {        
-        fish->mpModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_Unk80000,0x11000084);
+        fish->mpModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_DifferedDLBuffer,0x11000084);
 
         if (!fish->mpModel) {
             return 0;
         }
 
-        fish->mpModel->setUserArea((u32)fish);
+        fish->mpModel->setUserArea((uintptr_t)fish);
     }
 
     return 1;
@@ -276,7 +279,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80A6A650-80A6A8A4 000BD0 0254+00 1/0 0/0 0/0 .text            daNPC_LF_Create__FP10fopAc_ac_c */
 static cPhs__Step daNPC_LF_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, npc_lf_class);
+    fopAcM_ct(i_this, npc_lf_class);
     npc_lf_class* a_this = static_cast<npc_lf_class*>(i_this);
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&a_this->mPhase, "NPC_LF");

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_no_chg_room.h"
 #include "d/d_s_room.h"
 #include "d/actor/d_a_horse.h"
@@ -31,7 +33,7 @@ static bool isLoadRoom(int i_roomNo) {
             if (dComIfGp_roomControl_checkStatusFlag(load_room_index, 9) == (u32)TRUE) {
                 room_of_scene_class* roomScene = (room_of_scene_class*)fopScnM_SearchByID(
                     dStage_roomControl_c::getStatusProcID(load_room_index));
-                JUT_ASSERT(0, roomScene != 0);
+                JUT_ASSERT(0, roomScene != NULL);
 
                 if (roomScene->field_0x1d4 >= 0 || !fpcNd_IsDeleteTiming(&roomScene->base)) {
                     // "Room <%d> objects loading!\n"
@@ -65,7 +67,7 @@ int daNocrm_c::execute() {
 
     if (sp14.y < 0.0f || sp14.y > scale.y || fabsf(sp14.x) > scale.x || fabsf(sp14.z) > scale.z)
     {
-        if (subtype == 0 || !mRoomLoading ||
+        if (argument == 0 || !mRoomLoading ||
             dStage_stagInfo_GetSTType(dComIfGp_getStage()->getStagInfo()) != 0)
         {
             return 1;
@@ -85,7 +87,7 @@ int daNocrm_c::execute() {
                                                              player_p->shape_angle.y, 1);
     }
 
-    if (subtype == 0) {
+    if (argument == 0) {
         dStage_roomControl_c::setRoomReadId(getReadRoomId());
     } else {
         dStage_roomControl_c::onNoChangeRoom();
@@ -117,7 +119,7 @@ int daNocrm_c::getRoomNo(int param_0) {
 }
 
 int daNocrm_c::create() {
-    if (subtype == 0 && getReadRoomId() < 0) {
+    if (argument == 0 && getReadRoomId() < 0) {
         // "Room Load Rectangle: Load ID is -1, so destroy self!\n"
         OSReport_Warning("部屋読み込み矩形：読み込みＩＤが−１ですので、自滅します！\n");
         return cPhs_ERROR_e;
@@ -136,7 +138,7 @@ int daNocrm_c::create() {
 
 /* 801455A8-801456A4 13FEE8 00FC+00 1/0 0/0 0/0 .text            daNocrm_create__FP9daNocrm_c */
 static int daNocrm_create(daNocrm_c* i_this) {
-    fopAcM_SetupActor(i_this, daNocrm_c);
+    fopAcM_ct(i_this, daNocrm_c);
     return i_this->create();
 }
 

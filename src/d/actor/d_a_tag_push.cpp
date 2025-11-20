@@ -3,6 +3,8 @@
 // Translation Unit: d_a_tag_push
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_push.h"
 #include "d/d_procname.h"
 
@@ -13,31 +15,31 @@ void* daTag_Push_c::srchActor(void* param_0, void* param_1) {
         if (fopAcM_IsExecuting(fopAcM_GetID(param_0))) {
             switch (((daTag_Push_c*)param_1)->getId()) {
             case 1:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_TARO;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_TARO;
                 break;
             case 2:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_JAGAR;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_JAGAR;
                 break;
             case 3:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_LEN;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_LEN;
                 break;
             case 4:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_TARO;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_TARO;
                 break;
             case 5:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_MARO;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_MARO;
                 break;
             case 6:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_BESU;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_BESU;
                 break;
             case 7:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_BOU;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_BOU;
                 break;
             case 8:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_GRS;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_GRS;
                 break;
             case 9:
-                bVar1 = ((daTag_Push_c*)param_0)->base.name == PROC_NPC_GRO;
+                bVar1 = fopAcM_GetName(param_0) == PROC_NPC_GRO;
                 break;
             }
         }
@@ -51,7 +53,7 @@ void* daTag_Push_c::srchActor(void* param_0, void* param_1) {
 
 /* 80490418-804904D4 0001D8 00BC+00 1/1 0/0 0/0 .text            create__12daTag_Push_cFv */
 int daTag_Push_c::create() {
-    fopAcM_SetupActor(this, daTag_Push_c);
+    fopAcM_ct(this, daTag_Push_c);
     scale.x *= 100.0f;
     scale.y *= 100.0f;
     scale.z = scale.x;

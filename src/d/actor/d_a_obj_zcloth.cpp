@@ -3,6 +3,8 @@
  * Object - Zora Armor
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_zcloth.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item_data.h"
@@ -32,7 +34,7 @@ int daObjZCloth_c::Create() {
 
 /* 80D3EF0C-80D3F0AC 00016C 01A0+00 1/1 0/0 0/0 .text            create__13daObjZCloth_cFv */
 int daObjZCloth_c::create() {
-    fopAcM_SetupActor(this, daObjZCloth_c);
+    fopAcM_ct(this, daObjZCloth_c);
     m_itemNo = 0x31;
     int phase = dComIfG_resLoad(&mPhase, dItem_data::getFieldArc(m_itemNo));
     if (phase == cPhs_COMPLEATE_e) {

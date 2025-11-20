@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_bg_w_kcol.h"
 #include "d/d_com_inf_game.h"
 #include "dol2asm.h"
@@ -7,7 +9,10 @@
 #include <algorithm.h>
 #include <cmath.h>
 
+#include "SSystem/SComponent/c_bg_s_shdw_draw.h"
 #include "SSystem/SComponent/c_m2d.h"
+
+#define MAX_DRAW_BIT 0x200
 
 /* 8007E6F4-8007E74C 079034 0058+00 0/0 0/0 1/1 .text            __ct__8dBgWKColFv */
 dBgWKCol::dBgWKCol() {
@@ -19,23 +24,23 @@ dBgWKCol::~dBgWKCol() {}
 
 /* 8007E7D0-8007E804 079110 0034+00 0/0 1/1 0/0 .text            initKCollision__8dBgWKColFPv */
 void* dBgWKCol::initKCollision(void* i_kclData) {
-    ((KC_Header*)i_kclData)->m_pos_data = (Vec*)((u32)((KC_Header*)i_kclData) + (u32)((KC_Header*)i_kclData)->m_pos_data);
-    ((KC_Header*)i_kclData)->m_nrm_data = (Vec*)((u32)((KC_Header*)i_kclData) + (u32)((KC_Header*)i_kclData)->m_nrm_data);
-    ((KC_Header*)i_kclData)->m_prism_data = (KC_PrismData*)((u32)((KC_Header*)i_kclData) + (u32)((KC_Header*)i_kclData)->m_prism_data);
-    ((KC_Header*)i_kclData)->m_block_data = (KC_PrismData*)((u32)((KC_Header*)i_kclData) + (u32)((KC_Header*)i_kclData)->m_block_data);
+    ((KC_Header*)i_kclData)->m_pos_data = (Vec*)((uintptr_t)((KC_Header*)i_kclData) + (uintptr_t)((KC_Header*)i_kclData)->m_pos_data);
+    ((KC_Header*)i_kclData)->m_nrm_data = (Vec*)((uintptr_t)((KC_Header*)i_kclData) + (uintptr_t)((KC_Header*)i_kclData)->m_nrm_data);
+    ((KC_Header*)i_kclData)->m_prism_data = (KC_PrismData*)((uintptr_t)((KC_Header*)i_kclData) + (uintptr_t)((KC_Header*)i_kclData)->m_prism_data);
+    ((KC_Header*)i_kclData)->m_block_data = (KC_PrismData*)((uintptr_t)((KC_Header*)i_kclData) + (uintptr_t)((KC_Header*)i_kclData)->m_block_data);
 
     return i_kclData;
 }
 
 /* 8007E804-8007E850 079144 004C+00 0/0 0/0 1/1 .text            create__8dBgWKColFPvPv */
 void dBgWKCol::create(void* pprism, void* plc) {
-    JUT_ASSERT(0x43, pprism != 0);
-    JUT_ASSERT(0x44, plc != 0);
+    JUT_ASSERT(0x43, pprism != NULL);
+    JUT_ASSERT(0x44, plc != NULL);
 
     ClrDBgWBase();
     m_pkc_head = (KC_Header*)pprism;
 
-    u32 poly_num = ((u32)m_pkc_head->m_block_data - (u32)m_pkc_head->m_prism_data) / 0xC;
+    u32 poly_num = ((uintptr_t)m_pkc_head->m_block_data - (uintptr_t)m_pkc_head->m_prism_data) / 0xC;
     poly_num++;
     JUT_ASSERT(0x50, poly_num <= 0x4000);
 
@@ -172,7 +177,7 @@ void dBgWKCol::getPolyCode(int poly_index, dBgPc* ppoly) const {
  * chkPolyThrough__8dBgWKColCFP5dBgPcP16cBgS_PolyPassChkP15cBgS_GrpPassChkR4cXyz */
 bool dBgWKCol::chkPolyThrough(dBgPc* ppoly, cBgS_PolyPassChk* ppolypasschk,
                                   cBgS_GrpPassChk* pgrppasschk, cXyz& param_4) const {
-    JUT_ASSERT(279, ppoly != 0);
+    JUT_ASSERT(279, ppoly != NULL);
 
     if (pgrppasschk != NULL) {
         dBgS_GrpPassChk* var_r28 = (dBgS_GrpPassChk*)pgrppasschk;
@@ -590,7 +595,7 @@ bool dBgWKCol::GroundCross(cBgS_GndChk* i_chk) {
     cXyz sp4C;
     int sp2C = 0;
     do {
-        u32 block = (u32)m_pkc_head->m_block_data;
+        uintptr_t block = (uintptr_t)m_pkc_head->m_block_data;
         u32 shift = m_pkc_head->m_block_width_shift;
         int sp20 = 4 * (((u32)sp34 >> shift) << m_pkc_head->m_area_xy_blocks_shift |
                        ((u32)sp30 >> shift) << m_pkc_head->m_area_x_blocks_shift |
@@ -648,9 +653,240 @@ bool dBgWKCol::GroundCross(cBgS_GndChk* i_chk) {
 }
 
 /* 8007F9A4-8007FF00 07A2E4 055C+00 1/0 0/0 0/0 .text ShdwDraw__8dBgWKColFP13cBgS_ShdwDraw */
+// NONMATCHING
 void dBgWKCol::ShdwDraw(cBgS_ShdwDraw* param_0) {
-    // NONMATCHING
+    dBgPc polyCode_sp108;
+
+    cM3dGAab* bnd_spAC = param_0->GetBndP();
+    cXyz* minP_spA8 = bnd_spAC->GetMinP();
+    cXyz* maxP_spA4 = bnd_spAC->GetMaxP();
+
+    Vec offset1_sp134;
+    Vec offset2_sp128;
+    Vec prismPos_sp11C;
+
+    cXyz localMin_spD4;
+    cXyz localMax_spC8;
+    PSVECSubtract(minP_spA8, &m_pkc_head->m_area_min_pos, &localMin_spD4);
+    PSVECSubtract(maxP_spA4, &m_pkc_head->m_area_min_pos, &localMax_spC8);
+
+    localMin_spD4.x -= 1.0f;
+    localMin_spD4.y -= 1.0f;
+    localMin_spD4.z -= 1.0f;
+    localMax_spC8.x += 1.0f;
+    localMax_spC8.y += 1.0f;
+    localMax_spC8.z += 1.0f;
+
+    s32 minX_spA0 = (u32)localMin_spD4.x;
+    if (minX_spA0 < 0) {
+        minX_spA0 = 0;
+    }
+    s32 maxX_sp9C = (u32)localMax_spC8.x;
+    if (maxX_sp9C > (s32)~m_pkc_head->m_area_x_width_mask) {
+        maxX_sp9C = ~m_pkc_head->m_area_x_width_mask;
+    }
+
+    if (minX_spA0 < maxX_sp9C) {
+        s32 minY_sp98 = (u32)localMin_spD4.y;
+        if (minY_sp98 < 0) {
+            minY_sp98 = 0;
+        }
+        s32 maxY_sp94 = (u32)localMax_spC8.y;
+        if (maxY_sp94 > (s32)~m_pkc_head->m_area_y_width_mask) {
+            maxY_sp94 = ~m_pkc_head->m_area_y_width_mask;
+        }
+
+        if (minY_sp98 < maxY_sp94) {
+            s32 minZ_sp90 = (u32)localMin_spD4.z;
+            if (minZ_sp90 < 0) {
+                minZ_sp90 = 0;
+            }
+            s32 maxZ_sp8C = (u32)localMax_spC8.z;
+            if (maxZ_sp8C > (s32)~m_pkc_head->m_area_z_width_mask) {
+                maxZ_sp8C = ~m_pkc_head->m_area_z_width_mask;
+            }
+
+            if (minZ_sp90 < maxZ_sp8C) {
+                u32 drawBits_sp140[512];
+                for (u32* el_sp88 = drawBits_sp140; el_sp88 < drawBits_sp140 + 512; el_sp88++) {
+                    *el_sp88 = 0;
+                }
+
+                s32 remX_sp84;
+                s32 remY_sp80;
+                s32 remZ_sp7C;
+
+                s32 stepY_sp78;
+                s32 stepZ_sp74;
+
+                s32 best1_sp70;
+                s32 best2_sp6C;
+                s32 best3_sp68;
+
+                u16* topPrism1_sp64 = NULL;
+                u16* topPrism2_sp60 = NULL;
+                u16* topPrism3_sp5C = NULL;
+
+                u16* prev1_sp58 = NULL;
+                u16* prev2_sp54 = NULL;
+                u16* prev3_sp50;
+
+                prev3_sp50 = NULL;
+                s32 z_sp4C = minZ_sp90;
+                do {
+                    stepZ_sp74 = 1000000;
+                    s32 y_sp48 = minY_sp98;
+
+                    do {
+                        stepY_sp78 = 1000000;
+                        best1_sp70 = NULL;
+                        best2_sp6C = NULL;
+                        best3_sp68 = NULL;
+
+                        s32 x_sp44 = minX_spA0;
+                        do {
+                            u32 block_sp40 = (u32)m_pkc_head->m_block_data;
+                            u32 shift_sp3C = m_pkc_head->m_block_width_shift;
+                            s32 offset_sp38 = 4 * (((u32)z_sp4C >> shift_sp3C) << m_pkc_head->m_area_xy_blocks_shift |
+                                        ((u32)y_sp48 >> shift_sp3C) << m_pkc_head->m_area_x_blocks_shift |
+                                        (u32)x_sp44 >> shift_sp3C);
+
+                            while ((offset_sp38 = *(u32*)(block_sp40 + offset_sp38)) >= 0) {
+                                block_sp40 += offset_sp38;
+                                shift_sp3C--;
+                                offset_sp38 = (((u32)z_sp4C >> shift_sp3C & 1) << 2 |
+                                               ((u32)y_sp48 >> shift_sp3C & 1) << 1 |
+                                               ((u32)x_sp44 >> shift_sp3C & 1) << 0) << 2;
+                            }
+
+                            u16* prism_sp34 = (u16*)(block_sp40 + (offset_sp38 & 0x7fffffff));
+
+                            shift_sp3C = 1 << shift_sp3C;
+                            u32 mask_sp30 = shift_sp3C - 1;
+                            remX_sp84 = shift_sp3C - (x_sp44 & mask_sp30);
+                            remY_sp80 = shift_sp3C - (y_sp48 & mask_sp30);
+                            remZ_sp7C = shift_sp3C - (z_sp4C & mask_sp30);
+
+                            if (remZ_sp7C < stepZ_sp74) {
+                                stepZ_sp74 = remZ_sp7C;
+                            }
+                            if (remY_sp80 < stepY_sp78) {
+                                stepY_sp78 = remY_sp80;
+                            }
+
+                            if (prism_sp34[1] != 0 && remY_sp80 > best3_sp68) {
+                                if (remY_sp80 > best2_sp6C) {
+                                    if (remY_sp80 > best1_sp70) {
+                                        best3_sp68 = best2_sp6C;
+                                        best2_sp6C = best1_sp70;
+                                        best1_sp70 = remY_sp80;
+                                        topPrism3_sp5C = topPrism2_sp60;
+                                        topPrism2_sp60 = topPrism1_sp64;
+                                        topPrism1_sp64 = prism_sp34;
+                                    } else {
+                                        best3_sp68 = best2_sp6C;
+                                        best2_sp6C = remY_sp80;
+                                        topPrism3_sp5C = topPrism2_sp60;
+                                        topPrism2_sp60 = prism_sp34;
+                                    }
+                                } else {
+                                    best3_sp68 = remY_sp80;
+                                    topPrism3_sp5C = prism_sp34;
+                                }
+                            }
+
+                            if (prism_sp34 == prev1_sp58 || prism_sp34 == prev2_sp54 || prism_sp34 == prev3_sp50) {
+                            } else {
+                                while (*++prism_sp34 != 0) {
+                                    u32 bitMask_sp28 = 1 << (prism_sp34[0] & 0x1f);
+                                    void* unk_sp24;
+
+                                    KC_PrismData* prismData_sp20;
+                                    Vec* nrm1_sp1C;
+                                    Vec* nrm2_sp18;
+                                    Vec* unk_sp14;
+                                    Vec* temp_sp10;
+
+                                    u32 temp_sp0C;
+                                    bool temp2_sp08 = true;
+
+                                    if ((s32)(prism_sp34[0] >> 5) > (s32)MAX_DRAW_BIT) {
+                                        OS_PANIC(0x47c,
+                                                 "Failed assertion shift <= MAX_DRAW_BIT");
+
+                                        temp_sp0C = 0;
+                                        if (temp_sp0C == 0) {
+                                            temp2_sp08 = false;
+                                        }
+                                    }
+
+                                    unk_sp24 = drawBits_sp140 + (prism_sp34[0] >> 5);
+                                    if ((*(u32*)((uintptr_t)unk_sp24 + 0) & bitMask_sp28) == 0) {
+                                        *(u32*)((uintptr_t)unk_sp24 + 0) |= bitMask_sp28;
+
+                                        getPolyCode(prism_sp34[0], &polyCode_sp108);
+
+                                        Vec cross1_spBC;
+                                        Vec cross2_spB0;
+
+                                        if (!ChkShdwDrawThrough(&polyCode_sp108)) {
+                                            prismData_sp20 = getPrismData(prism_sp34[0]);
+
+                                            prismPos_sp11C =
+                                                m_pkc_head->m_pos_data[prismData_sp20->pos_i];
+
+                                            nrm1_sp1C =
+                                                m_pkc_head->m_nrm_data + prismData_sp20->fnrm_i;
+                                            nrm2_sp18 = m_pkc_head->m_nrm_data +
+                                                        prismData_sp20->enrm1_i;
+
+                                            unk_sp14 = m_pkc_head->m_nrm_data +
+                                                       prismData_sp20->enrm3_i;
+                                            PSVECCrossProduct(nrm1_sp1C, nrm2_sp18,
+                                                              &cross1_spBC);
+                                            f32 dot = PSVECDotProduct(&cross1_spBC, unk_sp14);
+                                            if (!cM3d_IsZero(dot)) {
+                                                PSVECScale(&cross1_spBC, &cross1_spBC,
+                                                           prismData_sp20->height / dot);
+                                                PSVECAdd(&cross1_spBC, &prismPos_sp11C,
+                                                         &offset1_sp134);
+
+                                                // Second edge direction
+                                                temp_sp10 = m_pkc_head->m_nrm_data +
+                                                            prismData_sp20->enrm2_i;
+                                                PSVECCrossProduct(temp_sp10, nrm1_sp1C,
+                                                                  &cross2_spB0);
+                                                f32 dot2 =
+                                                    PSVECDotProduct(&cross2_spB0, unk_sp14);
+                                                if (!cM3d_IsZero(dot2)) {
+                                                    PSVECScale(&cross2_spB0, &cross2_spB0,
+                                                               prismData_sp20->height / dot2);
+                                                    PSVECAdd(&cross2_spB0, &prismPos_sp11C,
+                                                             &offset2_sp128);
+
+                                                    cM3dGPla pla_spF4;
+                                                    pla_spF4 = GetTriPla(prism_sp34[0]);
+                                                    (param_0->mCallbackFun)(
+                                                        param_0, (cBgD_Vtx_t*)&prismPos_sp11C,
+                                                        0, 1, 2, &pla_spF4);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } while ((x_sp44 += remX_sp84) <= (u32)maxX_sp9C);
+
+                        prev1_sp58 = topPrism1_sp64;
+                        prev2_sp54 = topPrism2_sp60;
+                        prev3_sp50 = topPrism3_sp5C;
+                    } while ((y_sp48 += stepY_sp78) <= (u32)maxY_sp94);
+                } while ((z_sp4C += stepZ_sp74) <= (u32)maxZ_sp8C);
+            }
+        }
+    }
 }
+
 
 /* 8007FF00-8007FF1C 07A840 001C+00 1/1 0/0 0/0 .text ChkShdwDrawThrough__8dBgWKColFP5dBgPc */
 bool dBgWKCol::ChkShdwDrawThrough(dBgPc* pcode) {
@@ -1261,15 +1497,7 @@ bool dBgWKCol::WallCorrectSort(dBgS_Acch* pwi) {
                                     pwi->SetWallAngleY(cir_index_8c, sp_14);
                                     sp_10 = true;
                                     pwi->SetWallHit();
-                                } else {
-                                    if (sp_30 > sp_3c) {
-                                        break;
-                                    }
-
-                                    if (fabsf(sp_30 - sp_3c) < 0.008f) {
-                                        break;
-                                    }
-
+                                } else if (!(sp_30 > sp_3c || fabsf(sp_30 - sp_3c) < 0.008f)) {
                                     f32 sp_1c;
                                     f32 sp_18;
                                     JUT_ASSERT(0x7e2, !(fpclassify(cx1_58) == FP_QNAN));
@@ -1310,26 +1538,793 @@ bool dBgWKCol::WallCorrectSort(dBgS_Acch* pwi) {
 
 /* 800811A0-80081E18 07BAE0 0C78+00 1/0 0/0 0/0 .text            WallCorrect__8dBgWKColFP9dBgS_Acch
  */
-bool dBgWKCol::WallCorrect(dBgS_Acch* param_0) {
-    // NONMATCHING
+bool dBgWKCol::WallCorrect(dBgS_Acch* pwi) {
+    bool sp10 = false;
+
+    cM3dGCyl* sp114 = pwi->GetWallBmdCylP();
+    cXyz sp16C;
+    cXyz sp160;
+    sp114->calcMinMax(&sp16C, &sp160);
+    sp16C.x -= 1.0f;
+    sp16C.y -= 1.0f;
+    sp16C.z -= 1.0f;
+    sp160.x += 1.0f;
+    sp160.y += 1.0f;
+    sp160.z += 1.0f;
+    Vec* sp110 = &m_pkc_head->m_area_min_pos;
+    PSVECSubtract(&sp16C, sp110, &sp16C);
+    PSVECSubtract(&sp160, sp110, &sp160);
+
+    int sp10C = (u32)sp16C.x;
+    if (sp10C < 0) {
+        sp10C = 0;
+    }
+
+    int sp108 = (u32)sp160.x;
+    if (sp108 > (int)~m_pkc_head->m_area_x_width_mask) {
+        sp108 = (int)~m_pkc_head->m_area_x_width_mask;
+    }
+
+    if (sp10C >= sp108) {
+        return false;
+    }
+
+    int sp104 = (u32)sp16C.y;
+    if (sp104 < 0) {
+        sp104 = 0;
+    }
+
+    int sp100 = (u32)sp160.y;
+    if (sp100 > (int)~m_pkc_head->m_area_y_width_mask) {
+        sp100 = ~m_pkc_head->m_area_y_width_mask;
+    }
+
+    if (sp104 >= sp100) {
+        return false;
+    }
+
+    int spFC = (u32)sp16C.z;
+    if (spFC < 0) {
+        spFC = 0;
+    }
+
+    int spF8 = (u32)sp160.z;
+    if (spF8 > ~m_pkc_head->m_area_z_width_mask) {
+        spF8 = ~m_pkc_head->m_area_z_width_mask;
+    }
+
+    if (spFC >= spF8) {
+        return false;
+    }
+
+    u16* spF4 = NULL;
+    u16* spF0 = NULL;
+    u16* spEC = NULL;
+    u16* spE8 = NULL;
+    u16* spE4 = NULL;
+    u16* spE0 = NULL;
+
+    Vec sp154;
+    sp154.y = 0.0f;
+
+    int spDC;
+    int spD8;
+    int spD4;
+    int spD0;
+    int spCC;
+    int spC8;
+    int spC4;
+    int spC0;
+    u32 spBC = spFC;
+    do {
+        spCC = 1000000;
+
+        u32 spB8 = sp104;
+        do {
+            spD0 = 1000000;
+            spC8 = 0;
+            spC4 = 0;
+            spC0 = 0;
+            u32 spB4 = sp10C;
+
+            do {
+                uintptr_t spB0 = (uintptr_t)m_pkc_head->m_block_data;
+                int spAC = m_pkc_head->m_block_width_shift;
+                intptr_t spA8 = (((spBC >> spAC) << m_pkc_head->m_area_xy_blocks_shift) |
+                        ((spB8 >> spAC) << m_pkc_head->m_area_x_blocks_shift) |
+                         (spB4 >> spAC)) * 4;
+
+                while ((spA8 = *(int*)(spB0 + spA8)) >= 0) {
+                    spB0 += spA8;
+                    spAC--;
+                    spA8 = (((spBC >> spAC) & 1) << 2 |
+                            ((spB8 >> spAC) & 1) << 1 |
+                            ((spB4 >> spAC) & 1) << 0) * 4;
+                }
+
+                u16* spA4 = (u16*)((int)spB0 + (spA8 & 0x7fffffff));
+                spAC = 1 << spAC;
+                u32 spA0 = spAC - 1;
+                spDC = spAC - (spB4 & spA0);
+                spD8 = spAC - (spB8 & spA0);
+                spD4 = spAC - (spBC & spA0);
+
+                if (spD4 < spCC) {
+                    spCC = spD4;
+                }
+
+                if (spD8 < spD0) {
+                    spD0 = spD8;
+                }
+
+                if (spA4[1] != 0 && spD8 > spC0) {
+                    if (spD8 > spC4) {
+                        if (spD8 > spC8) {
+                            spC0 = spC4;
+                            spC4 = spC8;
+                            spC8 = spD8;
+                            spE0 = spE4;
+                            spE4 = spE8;
+                            spE8 = spA4;
+                        }
+                        else {
+                            spC0 = spC4;
+                            spC4 = spD8;
+                            spE0 = spE4;
+                            spE4 = spA4;
+                        }
+                    } else {
+                        spC0 = spD8;
+                        spE0 = spA4;
+                    }
+                }
+
+                if (spA4 == spF4 || spA4 == spF0 || spA4 == spEC) {
+                    continue;
+                }
+
+                while (*++spA4 != 0) {
+                    KC_PrismData* sp9C = getPrismData(*spA4);
+                    Vec* sp98 = m_pkc_head->m_nrm_data + sp9C->fnrm_i;
+                    if (cBgW_CheckBGround(sp98->y)) {
+                        continue;
+                    }
+
+                    f32 sp94 = JMAFastSqrt(sp98->x * sp98->x +
+                                                 sp98->z * sp98->z);
+                    if (cM3d_IsZero(sp94)) {
+                        continue;
+                    }
+
+                    dBgPc adStack_58;
+                    getPolyCode(*spA4, &adStack_58);
+                    cXyz cStack_88 = *sp98;
+                    if (chkPolyThrough(&adStack_58, pwi->GetPolyPassChk(),
+                                        pwi->GetGrpPassChk(), cStack_88)) {
+                        continue;
+                    }
+
+                    cXyz sp13C;
+                    cXyz sp130;
+                    cXyz sp124;
+                    if (!GetTriPnt(sp9C, &sp13C, &sp130, &sp124)) {
+                        continue;
+                    }
+
+                    f32 sp90 = 1.0f / sp94;
+                    for (int sp8C = 0; sp8C < pwi->GetTblSize(); sp8C++) {
+                        f32 sp88 = sp90 * pwi->GetWallR(sp8C);
+                        sp154.x = sp98->x * sp88;
+                        sp154.z = sp98->z * sp88;
+
+                        f32 sp84;
+                        if (!pwi->ChkWallHDirect(sp8C)) {
+                            sp84 = pwi->GetWallAddY(sp154) +
+                                   (pwi->GetPos()->y + pwi->GetWallH(sp8C)) -
+                                   pwi->GetSpeedY();
+                        } else {
+                            sp84 = pwi->GetWallHDirect(sp8C);
+                        }
+
+
+                        f32 sp118[3];
+                        sp118[0] = sp13C.y - sp84;
+                        sp118[1] = sp130.y - sp84;
+                        sp118[2] = sp124.y - sp84;
+                        if (sp118[0] > 0.0f && sp118[1] > 0.0f && sp118[2] > 0.0f ||
+                            sp118[0] < 0.0f && sp118[1] < 0.0f && sp118[2] < 0.0f) {
+                            continue;
+                        }
+
+                        int sp80;
+                        int sp7C;
+                        int sp78;
+                        int sp74 = 0;
+                        if (cM3d_IsZero(sp118[0])) {
+                            sp74++;
+                        }
+                        if (cM3d_IsZero(sp118[1])) {
+                            sp74++;
+                        }
+                        if (cM3d_IsZero(sp118[2])) {
+                            sp74++;
+                        }
+
+                        if (sp74 == 1) {
+                            continue;
+                        }
+
+                        if (sp118[0] > 0.0f && sp118[1] <= 0.0f &&
+                                sp118[2] <= 0.0f ||
+                            sp118[0] < 0.0f && sp118[1] >= 0.0f &&
+                                sp118[2] >= 0.0f)
+                        {
+                            sp80 = 0;
+                            sp7C = 1;
+                            sp78 = 2;
+                        } else if (sp118[1] > 0.0f && sp118[0] <= 0.0f && sp118[2] <= 0.0f ||
+                                   sp118[1] < 0.0f && sp118[0] >= 0.0f && sp118[2] >= 0.0f)
+                        {
+                            sp80 = 1;
+                            sp7C = 0;
+                            sp78 = 2;
+                        } else {
+                            sp80 = 2;
+                            sp7C = 0;
+                            sp78 = 1;
+                        }
+
+                        f32 sp70 = sp118[sp80] - sp118[sp7C];
+                        if (cM3d_IsZero(sp70)) {
+                            continue;
+                        }
+
+                        f32 sp6C = sp118[sp80] - sp118[sp78];
+                        if (cM3d_IsZero(sp6C)) {
+                            continue;
+                        }
+
+                        f32 sp68 = -sp118[sp7C] / sp70;
+                        f32 sp64 = -sp118[sp78] / sp6C;
+                        f32 cx0;
+                        f32 cy0;
+                        f32 cx1;
+                        f32 cy1;
+                        if (sp80 == 0) {
+                            cx0 = sp130.x + sp68 * (sp13C.x - sp130.x);
+                            cy0 = sp130.z + sp68 * (sp13C.z - sp130.z);
+                            cx1 = sp124.x + sp64 * (sp13C.x - sp124.x);
+                            cy1 = sp124.z + sp64 * (sp13C.z - sp124.z);
+                        } else if (sp80 == 1) {
+                            cx0 = sp13C.x + sp68 * (sp130.x - sp13C.x);
+                            cy0 = sp13C.z + sp68 * (sp130.z - sp13C.z);
+                            cx1 = sp124.x + sp64 * (sp130.x - sp124.x);
+                            cy1 = sp124.z + sp64 * (sp130.z - sp124.z);
+                        } else {
+                            cx0 = sp13C.x + sp68 * (sp124.x - sp13C.x);
+                            cy0 = sp13C.z + sp68 * (sp124.z - sp13C.z);
+                            cx1 = sp130.x + sp64 * (sp124.x - sp130.x);
+                            cy1 = sp130.z + sp64 * (sp124.z - sp130.z);
+                        }
+
+                        cx0 += sp154.x;
+                        cy0 += sp154.z;
+                        cx1 += sp154.x;
+                        cy1 += sp154.z;
+                        f32 sp50;
+                        f32 sp4C;
+                        f32 sp48;
+                        bool sp0F = cM3d_Len2dSqPntAndSegLine(pwi->GetCx(), pwi->GetCz(), cx0, cy0,
+                                                              cx1, cy1, &sp4C, &sp48, &sp50);
+
+                        f32 sp44 = sp4C - pwi->GetCx();
+                        f32 sp40 = sp48 - pwi->GetCz();
+                        f32 sp3C = pwi->GetWallRR(sp8C);
+                        if (sp50 > sp3C || sp44 * sp154.x + sp40 * sp154.z < 0.0f) {
+                            continue;
+                        }
+
+                        if (sp0F == true) {
+                            pwi->SetWallHit();
+                            f32 sp38 = sp90 * std::sqrt(sp50);
+                            sp38 -= 1.0f;
+                            if (sp38 < 0.0f) {
+                                sp38 = 0.0f;
+                            }
+                            pwi->GetPos()->x += sp38 * sp98->x;
+                            pwi->GetPos()->z += sp38 * sp98->z;
+                            JUT_ASSERT(0x989, fpclassify(pwi->GetPos()->x) != FP_QNAN);
+                            JUT_ASSERT(0x98a, fpclassify(pwi->GetPos()->z) != FP_QNAN);
+                            JUT_ASSERT(0x98d, -INFINITY < pwi->GetPos()->x && pwi->GetPos()->x < INFINITY);
+                            JUT_ASSERT(0x98f, -INFINITY < pwi->GetPos()->z && pwi->GetPos()->z < INFINITY);
+                            pwi->CalcMovePosWork();
+                            pwi->SetWallCirHit(sp8C);
+                            pwi->SetWallPolyIndex(sp8C,
+                                                  *spA4);
+                            s16 sp16 = cM_atan2s(sp98->x, sp98->z);
+                            pwi->SetWallAngleY(sp8C, sp16);
+                            sp10 = true;
+                        } else {
+                            cx0 -= sp154.x;
+                            cy0 -= sp154.z;
+                            cx1 -= sp154.x;
+                            cy1 -= sp154.z;
+                            JUT_ASSERT(0x9a2, pwi->GetPos()->x == pwi->GetWallCirP(sp8C)->GetCx());
+                            JUT_ASSERT(0x9a4, pwi->GetPos()->z == pwi->GetWallCirP(sp8C)->GetCy());
+                            f32 sp34 = cM3d_Len2dSq(cx0, cy0, pwi->GetPos()->x, pwi->GetPos()->z);
+                            f32 sp30 = cM3d_Len2dSq(cx1, cy1, pwi->GetPos()->x, pwi->GetPos()->z);
+                            f32 onx = -sp98->x;
+                            f32 ony = -sp98->z;
+                            JUT_ASSERT(0x9b3, !(cM3d_IsZero(onx) && cM3d_IsZero(ony)));
+                            if (sp34 < sp30) {
+                                if (sp34 > sp3C || fabsf(sp34 - sp3C) < 0.008f) {
+                                    continue;
+                                }
+
+                                JUT_ASSERT(0x9be, !(fpclassify(cx0) == FP_QNAN));
+                                JUT_ASSERT(0x9bf, !(fpclassify(cy0) == FP_QNAN));
+                                f32 sp24;
+                                f32 sp20;
+                                cM2d_CrossCirLin(*pwi->GetWallCirP(sp8C), cx0, cy0, onx, ony,
+                                                 &sp24, &sp20);
+                                pwi->GetPos()->x += cx0 - sp24;
+                                pwi->GetPos()->z += cy0 - sp20;
+                                JUT_ASSERT(0x9d1, !(fpclassify(pwi->GetPos()->x) == FP_QNAN));
+                                JUT_ASSERT(0x9d2, !(fpclassify(pwi->GetPos()->z) == FP_QNAN));
+
+
+                                JUT_ASSERT(0x9d5, -INFINITY < pwi->GetPos()->x && pwi->GetPos()->x < INFINITY);
+
+                                JUT_ASSERT(0x9d7, -INFINITY < pwi->GetPos()->z && pwi->GetPos()->z < INFINITY);
+
+                                pwi->CalcMovePosWork();
+                                pwi->SetWallCirHit(sp8C);
+                                pwi->SetWallPolyIndex(sp8C, *spA4);
+                                s16 sp14 = cM_atan2s(sp98->x, sp98->z);
+                                pwi->SetWallAngleY(sp8C, sp14);
+                                sp10 = true;
+                                pwi->SetWallHit();
+                            } else {
+                                if (sp30 > sp3C || fabsf(sp30 - sp3C) < 0.008f) {
+                                    continue;
+                                }
+
+                                JUT_ASSERT(0x9f4, !(fpclassify(cx1) == FP_QNAN));
+                                JUT_ASSERT(0x9f5, !(fpclassify(cy1) == FP_QNAN));
+                                f32 sp1C;
+                                f32 sp18;
+                                cM2d_CrossCirLin(*pwi->GetWallCirP(sp8C), cx1, cy1, onx, ony, &sp1C,
+                                                 &sp18);
+                                pwi->GetPos()->x += cx1 - sp1C;
+                                pwi->GetPos()->z += cy1 - sp18;
+                                JUT_ASSERT(0xa06, !(fpclassify(pwi->GetPos()->x) == FP_QNAN));
+                                JUT_ASSERT(0xa07, !(fpclassify(pwi->GetPos()->z) == FP_QNAN));
+
+                                JUT_ASSERT(0xa0a, -INFINITY < pwi->GetPos()->x && pwi->GetPos()->x < INFINITY);
+
+                                JUT_ASSERT(0xa0c, -INFINITY < pwi->GetPos()->z && pwi->GetPos()->z < INFINITY);
+
+                                pwi->CalcMovePosWork();
+                                pwi->SetWallCirHit(sp8C);
+                                pwi->SetWallPolyIndex(sp8C, *spA4);
+                                s16 sp12 = cM_atan2s(sp98->x, sp98->z);
+                                pwi->SetWallAngleY(sp8C, sp12);
+                                sp10 = true;
+                                pwi->SetWallHit();
+                            }
+                        }
+                    }
+                }
+            } while ((spB4 += spDC) <= sp108);
+
+            spF4 = spE8;
+            spF0 = spE4;
+            spEC = spE0;
+        } while ((spB8 += spD0) <= sp100);
+    } while ((spBC += spCC) <= spF8);
+
+    return sp10;
 }
 
 /* 80081E18-80082184 07C758 036C+00 1/0 0/0 0/0 .text            RoofChk__8dBgWKColFP12dBgS_RoofChk
  */
 bool dBgWKCol::RoofChk(dBgS_RoofChk* param_0) {
-    // NONMATCHING
+    KC_PrismData* local_94;
+    dBgPc adStack_4c;
+
+    Vec* sp40 = param_0->GetPosP();
+    cXyz sp74;
+    PSVECSubtract(sp40, &m_pkc_head->m_area_min_pos, &sp74);
+
+    u32 sp3C = sp74.x;
+    if ((s32)sp3C < 0) {
+        return false;
+    }
+
+    if ((s32)sp3C > (s32)~m_pkc_head->m_area_x_width_mask) {
+        return false;
+    }
+
+    u32 sp38 = sp74.z;
+    if ((s32)sp38 < 0) {
+        return false;
+    }
+
+    if ((s32)sp38 > (s32)~m_pkc_head->m_area_z_width_mask) {
+        return false;
+    }
+
+    u32 sp34 = sp74.y;
+    if ((int)sp34 < 0) {
+        sp34 = 0;
+    }
+    if ((int)sp34 > (int)~m_pkc_head->m_area_y_width_mask) {
+        return false;
+    }
+
+    bool sp0A = false;
+    u32 sp30 = ~m_pkc_head->m_area_y_width_mask;
+    do {
+        uintptr_t sp2C = (uintptr_t)m_pkc_head->m_block_data;
+        u32 sp28 = m_pkc_head->m_block_width_shift;
+        s32 sp24 = 4 * (((u32)sp38 >> sp28) << m_pkc_head->m_area_xy_blocks_shift |
+                       ((u32)sp34 >> sp28) << m_pkc_head->m_area_x_blocks_shift |
+                       (u32)sp3C >> sp28);
+        while ((sp24 = (*(s32*)(sp2C + (sp24 & 0x7fffffff)))) >= 0) {
+            sp2C += sp24;
+            sp28--;
+            sp24 = (((u32)sp38 >> sp28 & 1) << 2 |
+                    ((u32)sp34 >> sp28 & 1) << 1 |
+                    ((u32)sp3C >> sp28 & 1) << 0) << 2;
+        }
+
+        u16* sp20 = (u16*)(sp2C + (sp24 & 0x7fffffff));
+
+        KC_PrismData* sp1C;
+        Vec* sp18;
+        Vec* sp14;
+        s32 sp10;
+        s32 sp0C;
+
+        while (*++sp20 != 0) {
+            sp1C = getPrismData(*sp20);
+            sp18 = m_pkc_head->m_nrm_data + sp1C->fnrm_i;
+            if (cBgW_CheckBRoof(sp18->y)) {
+                sp14 = m_pkc_head->m_pos_data + sp1C->pos_i;
+
+                cXyz sp5C;
+                sp5C.x = sp40->x - sp14->x;
+                sp5C.z = sp40->z - sp14->z;
+                sp5C.y = -(sp5C.x * sp18->x + sp5C.z * sp18->z) / sp18->y;
+
+                if (PSVECDotProduct(&sp5C, &m_pkc_head->m_nrm_data[sp1C->enrm1_i]) >
+                    0.0075f)
+                {
+                    continue;
+                }
+
+                if (PSVECDotProduct(&sp5C,
+                                    &m_pkc_head->m_nrm_data[sp1C->enrm2_i]) > 0.0075f)
+                {
+                    continue;
+                }
+
+                f32 dot_f30 = PSVECDotProduct(&sp5C, &m_pkc_head->m_nrm_data[sp1C->enrm3_i]);
+                if (dot_f30 < -0.0075f || dot_f30 > sp1C->height + 0.0075f) {
+                    continue;
+                }
+
+                cXyz sp58;
+                PSVECSubtract(sp40, sp14, &sp58);
+                if (PSVECDotProduct(&sp58, sp18) < 0.0f) {
+                    continue;
+                }
+
+                getPolyCode(*sp20, &adStack_4c);
+                cXyz sp44 = *sp18;
+                if (!chkPolyThrough(&adStack_4c, param_0->GetPolyPassChk(), param_0->GetGrpPassChk(), sp44)) {
+                    f32 tmp_height_kcw = sp5C.y + sp14->y;
+                    if (param_0->GetNowY() > tmp_height_kcw && sp40->y < tmp_height_kcw) {
+                        param_0->SetPolyIndex(*sp20);
+                        param_0->SetNowY(tmp_height_kcw);
+                        sp0A = true;
+                        JUT_ASSERT(0xac8, fpclassify(tmp_height_kcw) != FP_QNAN);
+                        JUT_ASSERT(0xacb, -FP_INFINITE < tmp_height_kcw && tmp_height_kcw < FP_INFINITE);
+                        bool sp08 = true;
+                        if (!(tmp_height_kcw - m_pkc_head->m_area_min_pos.y >= 0.0f)) {
+                            OS_PANIC(0xacf, "Failed assertion tmp_height_kcw - m_pkc_head->m_area_min_pos.y >= 0.0f");
+                            sp0C = 0;
+                            if (sp0C == 0) {
+                                sp08 = false;
+                            }
+                        }
+                        sp30 = tmp_height_kcw - m_pkc_head->m_area_min_pos.y;
+                    }
+                }
+            }
+        }
+
+        sp28 = 1 << sp28;
+        sp10 = sp28 - 1;
+        sp34 += sp28 - (sp34 & sp10);
+    } while ((s32)sp34 <= (s32)sp30);
+
+    return sp0A;
 }
 
 /* 80082184-800824EC 07CAC4 0368+00 1/0 0/0 0/0 .text SplGrpChk__8dBgWKColFP14dBgS_SplGrpChk */
+// NONMATCHING - regalloc + missing mr
 bool dBgWKCol::SplGrpChk(dBgS_SplGrpChk* param_0) {
-    // NONMATCHING
+    Vec* sp3C = &param_0->GetPosP();
+    cXyz sp54;
+    PSVECSubtract(sp3C, &m_pkc_head->m_area_min_pos, &sp54);
+
+    u32 sp38 = sp54.x;
+    if ((s32)sp38 < 0) {
+        return false;
+    }
+
+    if ((s32)sp38 > (s32)~m_pkc_head->m_area_x_width_mask) {
+        return false;
+    }
+
+    u32 sp34 = sp54.z;
+    if ((s32)sp34 < 0) {
+        return false;
+    }
+
+    if ((s32)sp34 > (s32)~m_pkc_head->m_area_z_width_mask) {
+        return false;
+    }
+
+    u32 sp30 = sp54.y;
+    if ((s32)sp30 < 0) {
+        sp30 = 0;
+    }
+
+    u32 sp2C = param_0->GetRoof() - m_pkc_head->m_area_min_pos.y;
+    if ((s32)sp2C > (s32)~m_pkc_head->m_area_y_width_mask) {
+        sp2C = ~m_pkc_head->m_area_y_width_mask;
+    }
+    if ((s32)sp30 >= (s32)sp2C) {
+        return false;
+    }
+
+    bool sp09 = false;
+    do {
+        u32 sp28 = (u32)m_pkc_head->m_block_data;
+        u32 sp24 = m_pkc_head->m_block_width_shift;
+        s32 sp20 = 4 * (((u32)sp34 >> sp24) << m_pkc_head->m_area_xy_blocks_shift |
+                         ((u32)sp2C >> sp24) << m_pkc_head->m_area_x_blocks_shift |
+                         (u32)sp38 >> sp24);
+        while ((sp20 = *(s32*)(sp28 + sp20)) >= 0) {
+            sp28 += sp20;
+            sp24--;
+            sp20 = 4 *
+                (((u32)sp34 >> sp24 & 1) << 2 |
+                 ((u32)sp2C >> sp24 & 1) << 1 |
+                 ((u32)sp38 >> sp24 & 1) << 0);
+        }
+
+        u16* sp1C = (u16*)(sp28 + (sp20 & 0x7fffffff));
+        while (*++sp1C != 0) {
+            KC_PrismData* sp18 = getPrismData(*sp1C);
+            Vec* sp14 = m_pkc_head->m_nrm_data + sp18->fnrm_i;
+            if (!(sp14->y <= 0.0f) && !cM3d_IsZero(sp14->y)) {
+                dBgPc sp64;
+                getPolyCode(*sp1C, &sp64);
+                cXyz sp4C = *sp14;
+                if (!chkPolyThrough(&sp64, param_0->GetPolyPassChk(),
+                                    param_0->GetGrpPassChk(), sp4C))
+                {
+                    Vec* sp10 = m_pkc_head->m_pos_data + sp18->pos_i;
+                    cXyz sp40;
+                    sp40.x = sp3C->x - sp10->x;
+                    sp40.z = sp3C->z - sp10->z;
+                    sp40.y = -(sp40.x * sp14->x + sp40.z * sp14->z) / sp14->y;
+                    if (PSVECDotProduct(&sp40, &m_pkc_head->m_nrm_data[sp18->enrm1_i]) >
+                        0.0075f)
+                    {
+                        continue;
+                    }
+
+                    if (PSVECDotProduct(&sp40, &m_pkc_head->m_nrm_data[sp18->enrm2_i]) >
+                            0.0075f)
+                    {
+                        continue;
+                    }
+
+                    f32 var_f30 = PSVECDotProduct(&sp40, &m_pkc_head->m_nrm_data[sp18->enrm3_i]);
+                    if (var_f30 < -0.0075f || var_f30 > sp18->height + 0.0075f) {
+                        continue;
+                    }
+
+                    f32 tmp_height_kcw = sp40.y + sp10->y;
+                    if (param_0->GetHeight() < tmp_height_kcw && sp3C->y < tmp_height_kcw &&
+                        param_0->GetRoof() > tmp_height_kcw)
+                    {
+                        param_0->SetHeight(tmp_height_kcw);
+                        param_0->SetPolyIndex(*sp1C);
+
+                        sp09 = true;
+
+                        JUT_ASSERT(0xb73, fpclassify(tmp_height_kcw) != FP_QNAN);
+                        JUT_ASSERT(0xb76,
+                                   -FP_INFINITE < tmp_height_kcw && tmp_height_kcw < FP_INFINITE);
+                    }
+                }
+            }
+        }
+
+        //sp28 = 1 << sp28;
+        //sp10 = sp28 - 1;
+        //sp34 += sp28 - (sp34 & sp10);
+        sp24 = 1 << sp24;
+        u32 sp0C = sp24 - 1;
+        sp2C = sp2C & ~sp0C;
+        sp2C--;
+    } while ((s32)sp2C >= (s32)sp30);
+
+    return sp09;
 }
 
 /* 800824EC-800829AC 07CE2C 04C0+00 1/0 0/0 0/0 .text            SphChk__8dBgWKColFP11dBgS_SphChkPv
  */
+// NONMATCHING
 bool dBgWKCol::SphChk(dBgS_SphChk* param_0, void* param_1) {
-    // NONMATCHING
     static Vec vtx_tbl[3];
+
+    dBgPc spD4;
+
+    cXyz spB0;
+    cXyz spA4;
+    param_0->GetMinMaxCube(spB0, spA4);
+    PSVECSubtract(&spB0, &m_pkc_head->m_area_min_pos, &spB0);
+    PSVECSubtract(&spA4, &m_pkc_head->m_area_min_pos, &spA4);
+    spB0.x -= 1.0f;
+    spB0.y -= 1.0f;
+    spB0.z -= 1.0f;
+    spA4.x += 1.0f;
+    spA4.y += 1.0f;
+    spA4.z += 1.0f;
+
+    int sp64;
+    int sp60;
+    int sp5C;
+    int sp58;
+    int sp54;
+    int sp50;
+
+    sp64 = spB0.x;
+    if (sp64 < 0) {
+        sp64 = 0;
+    }
+
+    sp58 = spA4.x;
+    if (sp58 > (int)~m_pkc_head->m_area_x_width_mask) {
+        sp58 = ~m_pkc_head->m_area_x_width_mask;
+    }
+    if (sp64 >= sp58) {
+        return false;
+    }
+
+    sp60 = spB0.y;
+    if (sp60 < 0) {
+        sp60 = 0;
+    }
+
+    sp54 = spA4.y;
+    if (sp54 > (int)~m_pkc_head->m_area_y_width_mask) {
+        sp54 = ~m_pkc_head->m_area_y_width_mask;
+    }
+
+    if (sp60 >= sp54) {
+        return false;
+    }
+
+    sp5C = spB0.z;
+    if (sp5C < 0) {
+        sp5C = 0;
+    }
+
+    sp50 = spA4.z;
+    if (sp50 > (int)~m_pkc_head->m_area_z_width_mask) {
+        sp50 = ~m_pkc_head->m_area_z_width_mask;
+    }
+
+    if (sp5C >= sp50) {
+        return false;
+    }
+
+    bool sp0D = false;
+    cXyz sp98;
+    int sp4C;
+    int sp48;
+    int sp44;
+    int sp40;
+    int sp3C;
+    int sp38;
+    u16* sp34 = NULL;
+    u16* sp30 = NULL;
+    bool sp0C = false;
+    int sp2C = sp5C;
+    do {
+        sp3C = 1000000;
+        int sp28 = sp60;
+        do {
+            sp40 = 1000000;
+            sp38 = 0;
+            int sp24 = sp64;
+            do {
+                uintptr_t sp20 = (uintptr_t)m_pkc_head->m_block_data;
+                u32 var_r29 = m_pkc_head->m_block_width_shift;
+                int sp1C = (((u32)sp2C >> var_r29 << m_pkc_head->m_area_xy_blocks_shift) |
+                            ((u32)sp28 >> var_r29 << m_pkc_head->m_area_x_blocks_shift) |
+                            ((u32)sp24 >> var_r29)) * 4;
+                while ((sp1C = *(int*)(sp20 + sp1C)) >= 0) {
+                    sp20 += sp1C;
+                    var_r29--;
+                    sp1C = (((u32)sp2C >> var_r29 & 1) << 2 |
+                            ((u32)sp28 >> var_r29 & 1) << 1 |
+                            ((u32)sp24 >> var_r29 & 1)) * 4;
+                }
+
+                u16* var_r28 = (u16*)(sp20 + (sp1C & 0x7fffffff));
+                var_r29 = 1 << var_r29;
+                int sp18 = var_r29 - 1;
+                sp4C = var_r29 - (sp24 & sp18);
+                sp48 = var_r29 - (sp28 & sp18);
+                sp44 = var_r29 - (sp2C & sp18);
+                if (sp44 < sp3C) {
+                    sp3C = sp44;
+                }
+                if (sp48 < sp40) {
+                    sp40 = sp48;
+                }
+                if (sp48 > sp38 && *(var_r28 + 1) != 0) {
+                    sp38 = sp48;
+                    sp34 = var_r28;
+                }
+                if (var_r28 != sp30) {
+                    while (*++var_r28 != 0) {
+                        KC_PrismData* sp14 = getPrismData(*var_r28);
+                        Vec* sp10 = &m_pkc_head->m_nrm_data[sp14->fnrm_i];
+                        getPolyCode(*var_r28, &spD4);
+                        cXyz sp90 = *sp10;
+                        if (!chkPolyThrough(&spD4, param_0->GetPolyPassChk(),
+                                            param_0->GetGrpPassChk(), sp90))
+                        {
+                            cM3dGTri spE8;
+                            cXyz sp80;
+                            cXyz sp74;
+                            cXyz sp68;
+                            if (!GetTriPnt(*var_r28, &sp80, &sp74, &sp68)) {
+                                continue;
+                            }
+
+                            spE8.set(&sp80, &sp74, &sp68, sp10);
+                            if (param_0->cross(&spE8)) {
+                                vtx_tbl[0] = sp80;
+                                vtx_tbl[1] = sp74;
+                                vtx_tbl[2] = sp68;
+                                cM3dGPla spBC;
+                                spBC = spE8;
+                                (param_0->mCallback)(param_0, (cBgD_Vtx_t*)vtx_tbl, 0, 1, 2,
+                                                     &spBC, param_1);
+                                param_0->SetPolyIndex(*var_r28);
+                                sp0C = true;
+                            }
+                        }
+                    }
+                }
+            } while ((u32)(sp24 += sp4C) <= sp58);
+
+            sp30 = sp34;
+        } while ((u32)(sp28 += sp40) <= sp54);
+
+    } while ((u32)(sp2C += sp3C) <= sp50);
+
+    return sp0C;
 }
 
 /* 800829AC-800829F0 07D2EC 0044+00 1/0 0/0 0/0 .text            GetTopUnder__8dBgWKColCFPfPf */

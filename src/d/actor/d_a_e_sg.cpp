@@ -1,7 +1,9 @@
 /**
- * @file d_a_e_sg.cpp
+* @file d_a_e_sg.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_sg.h"
 #include "Z2AudioLib/Z2Instances.h"
@@ -106,9 +108,6 @@ static int daE_SG_Draw(e_sg_class* i_this) {
 
     return 1;
 }
-
-/* 8078E0A0-8078E0DC 000008 0001+03 3/3 0/0 0/0 .bss             @1109 */
-UNK_REL_BSS;
 
 /* 8078E0DC-8078E0E0 -00001 0004+00 2/2 0/0 0/0 .bss             None */
 static bool hio_init;
@@ -233,8 +232,8 @@ static obj_kbox_class* search_box(e_sg_class* i_this) {
 static dmg_rod_class* search_esa(e_sg_class* i_this) {
     dmg_rod_class* rod = (dmg_rod_class*)fopAcM_SearchByName(PROC_MG_ROD);
 
-    if (rod != NULL && rod->field_0xf7c == 1 && rod->field_0xf7e != 5 && rod->field_0x100d != 0 &&
-        rod->current.pos.y < rod->field_0x590 - 20.0f)
+    if (rod != NULL && rod->kind == 1 && rod->action != 5 && rod->field_0x100d != 0 &&
+        rod->actor.current.pos.y < rod->field_0x590 - 20.0f)
     {
         return rod;
     }
@@ -344,7 +343,7 @@ static void e_sg_move(e_sg_class* i_this) {
 
     BOOL bg_check = fopAcM_otherBgCheck(actor, player);
     if ((i_this->mRandomSeed & 0x7) == (fopAcM_GetID(actor) & 0x7)) {
-        target = search_box(i_this);
+        target = (fopAc_ac_c*)search_box(i_this);
 
         if (target != NULL) {
             i_this->mTargetActorID = fopAcM_GetID(target);
@@ -537,7 +536,7 @@ static void e_sg_b_search(e_sg_class* i_this) {
                 i_this->mTimers[1] = cM_rndF(30.0f) + 10.0f;
                 kbox_ac->field_0x598 = (s16)(cM_rndF(700.0f) + 300.0f);
             }
-            cLib_addCalc2(&kbox_ac->field_0x5a8.y, -100.0f, 1.0f, 0.05f);
+            cLib_addCalc2(&kbox_ac->field_0x5ac, -100.0f, 1.0f, 0.05f);
             if ((i_this->mRandomSeed & 0xf) == 0) {
                 i_this->mSound.startCreatureSound(Z2SE_EN_SG_BITE, 0, -1);
             }
@@ -704,7 +703,7 @@ static void e_sg_drop(e_sg_class* i_this) {
     cXyz local_3c;
     cXyz local_48;
 
-    if (fopAcM_checkStatus(i_this, 0x100000) == 0) {
+    if (fopAcM_CheckStatus(i_this, 0x100000) == 0) {
         i_this->mStepSpeed = 1.2f;
         if (i_this->mAcch.ChkGroundHit()) {
             local_3c = i_this->home.pos - i_this->current.pos;
@@ -909,10 +908,10 @@ static void action(e_sg_class* i_this) {
 
     if (att_flag) {
         fopAcM_OnStatus(i_this, 0);
-        i_this->attention_info.flags = 0x4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(i_this, 0);
-        i_this->attention_info.flags = 0x0;
+        i_this->attention_info.flags = 0;
     }
 
     if (link_search_flag) {
@@ -1025,7 +1024,7 @@ static int daE_SG_Execute(e_sg_class* i_this) {
     gnd_chk.SetPos(&local_138);
 
     f32 fVar71 = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (fVar71 != -1000000000.0f && i_this->mGroundY != fVar71) {
+    if (fVar71 != -G_CM3D_F_INF && i_this->mGroundY != fVar71) {
         i_this->mGroundY = fVar71;
         i_this->home.pos.y = i_this->mGroundY - 250.0f + cM_rndFX(50.0f);
     }
@@ -1177,7 +1176,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    a_this->mpModel->setUserArea((u32)i_this);
+    a_this->mpModel->setUserArea((uintptr_t)i_this);
     if (a_this->mJoint.init(a_this, &jc_data, a_this->mpModel, 1) == 0) {
         return 0;
     }
@@ -1201,7 +1200,7 @@ static int daE_SG_Create(fopAc_ac_c* i_this) {
     };
 
     e_sg_class* a_this = static_cast<e_sg_class*>(i_this);
-    fopAcM_SetupActor(i_this, e_sg_class);
+    fopAcM_ct(i_this, e_sg_class);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&a_this->mPhaseReq, "E_sg");
 
@@ -1216,7 +1215,7 @@ static int daE_SG_Create(fopAc_ac_c* i_this) {
             l_HIO.mUnk0 = -1;
         }
 
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(a_this, a_this->mpModel->getBaseTRMtx());
 

@@ -3,6 +3,8 @@
  * Tag - Midna Stop
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_mstop.h"
 #include "d/actor/d_a_midna.h"
 #include "d/actor/d_a_player.h"
@@ -11,7 +13,7 @@
 
 /* 805A6138-805A6318 000078 01E0+00 1/1 0/0 0/0 .text            create__12daTagMstop_cFv */
 int daTagMstop_c::create() {
-    fopAcM_SetupActor(this, daTagMstop_c);
+    fopAcM_ct(this, daTagMstop_c);
 
     field_0x56b = fopAcM_GetParam(this) >> 16;
     field_0x56a = (fopAcM_GetParam(this) >> 24) & 0xF;

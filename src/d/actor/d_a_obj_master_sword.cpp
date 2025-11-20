@@ -3,12 +3,12 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_master_sword.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
-
-// NONMATCHING - vtable order. I think it has something to do with the inline functions.
 
 /* 80C91940-80C91944 000000 0004+00 2/2 0/0 0/0 .rodata          mAttr__18daObjMasterSword_c */
 daObjMasterSword_Attr_c const daObjMasterSword_c::mAttr = {1.0f};
@@ -27,14 +27,13 @@ void daObjMasterSword_c::initBaseMtx() {
 
 /* 80C90AF8-80C90B50 000078 0058+00 1/0 0/0 0/0 .text            initWait__18daObjMasterSword_cFv */
 void daObjMasterSword_c::initWait() {
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     current.pos = home.pos;
     current.angle = home.angle;
     shape_angle = home.angle;
 }
 
-/* 80C90B50-80C90C50 0000D0 0100+00 1/0 0/0 0/0 .text            executeWait__18daObjMasterSword_cFv
- */
+/* 80C90B50-80C90C50 0000D0 0100+00 1/0 0/0 0/0 .text            executeWait__18daObjMasterSword_cFv */
 void daObjMasterSword_c::executeWait() {
     if (daPy_getPlayerActorClass()->checkPriActorOwn(this)) {
         for (int i = 0; i < dComIfGp_getAttention()->GetActionCount(); i++) {
@@ -54,19 +53,15 @@ void daObjMasterSword_c::executeWait() {
     }
 }
 
-/* 80C90C50-80C90C70 0001D0 0020+00 1/1 0/0 0/0 .text
- * createHeapCallBack__18daObjMasterSword_cFP10fopAc_ac_c       */
+/* 80C90C50-80C90C70 0001D0 0020+00 1/1 0/0 0/0 .text            createHeapCallBack__18daObjMasterSword_cFP10fopAc_ac_c */
 int daObjMasterSword_c::createHeapCallBack(fopAc_ac_c* i_this) {
     return static_cast<daObjMasterSword_c*>(i_this)->CreateHeap();
 }
 
-UNK_REL_DATA
-
 /* 80C9199C-80C919A0 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "MstrSword";
 
-/* 80C90C70-80C90D98 0001F0 0128+00 1/1 0/0 0/0 .text            CreateHeap__18daObjMasterSword_cFv
- */
+/* 80C90C70-80C90D98 0001F0 0128+00 1/1 0/0 0/0 .text            CreateHeap__18daObjMasterSword_cFv */
 int daObjMasterSword_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
@@ -96,36 +91,6 @@ actionFunc daObjMasterSword_c::ActionTable[] = {
     &daObjMasterSword_c::initWait, &daObjMasterSword_c::executeWait,
 };
 
-/* 80C90DB8-80C90F6C 000338 01B4+00 1/1 0/0 0/0 .text            create__18daObjMasterSword_cFv */
-int daObjMasterSword_c::create() {
-    fopAcM_SetupActor(this, daObjMasterSword_c);
-
-    if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[getFlagNo()])) {
-        return cPhs_ERROR_e;
-    }
-
-    int phase = dComIfG_resLoad(&mPhase, l_arcName);
-    if (phase == cPhs_COMPLEATE_e) {
-        if (!fopAcM_entrySolidHeap(this, daObjMasterSword_c::createHeapCallBack, 0x1830)) {
-            return cPhs_ERROR_e;
-        }
-
-        create_init();
-    }
-
-    return phase;
-}
-
-void daObjMasterSword_c::callInit() {
-    (this->**mActionFunc)();
-}
-
-void daObjMasterSword_c::setAction(daObjMasterSword_c::Mode_e i_mode) {
-    mMode = i_mode;
-    mActionFunc = &ActionTable[2 * mMode];
-    callInit();
-}
-
 void daObjMasterSword_c::initCollision() {
     static dCcD_SrcCyl ccCylSrc = {
         {
@@ -146,15 +111,24 @@ void daObjMasterSword_c::initCollision() {
     mCyl.SetStts(&mCcStts);
 }
 
-/* 80C90F6C-80C9120C 0004EC 02A0+00 1/1 0/0 0/0 .text            create_init__18daObjMasterSword_cFv
- */
+void daObjMasterSword_c::callInit() {
+    (this->**mActionFunc)();
+}
+
+void daObjMasterSword_c::setAction(daObjMasterSword_c::Mode_e i_mode) {
+    mMode = i_mode;
+    mActionFunc = &ActionTable[2 * mMode];
+    callInit();
+}
+
+/* 80C90F6C-80C9120C 0004EC 02A0+00 1/1 0/0 0/0 .text            create_init__18daObjMasterSword_cFv */
 void daObjMasterSword_c::create_init() {
     fopAcM_setCullSizeBox2(this, mpModel->getModelData());
     initCollision();
     initBaseMtx();
 
     fopAcM_OnCarryType(this, fopAcM_CARRY_UNK_30);
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     attention_info.distances[fopAc_attn_CARRY_e] = 74;
     attention_info.position = current.pos;
     attention_info.position.y += 100.0f;
@@ -174,8 +148,27 @@ void daObjMasterSword_c::create_init() {
     setAction(MODE_0_e);
 }
 
-/* 80C91420-80C91448 0009A0 0028+00 1/0 0/0 0/0 .text
- * daObjMasterSword_Delete__FP18daObjMasterSword_c              */
+/* 80C90DB8-80C90F6C 000338 01B4+00 1/1 0/0 0/0 .text            create__18daObjMasterSword_cFv */
+int daObjMasterSword_c::create() {
+    fopAcM_ct(this, daObjMasterSword_c);
+
+    if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[getFlagNo()])) {
+        return cPhs_ERROR_e;
+    }
+
+    int phase = dComIfG_resLoad(&mPhase, l_arcName);
+    if (phase == cPhs_COMPLEATE_e) {
+        if (!fopAcM_entrySolidHeap(this, daObjMasterSword_c::createHeapCallBack, 0x1830)) {
+            return cPhs_ERROR_e;
+        }
+
+        create_init();
+    }
+
+    return phase;
+}
+
+/* 80C91420-80C91448 0009A0 0028+00 1/0 0/0 0/0 .text            daObjMasterSword_Delete__FP18daObjMasterSword_c */
 static int daObjMasterSword_Delete(daObjMasterSword_c* i_this) {
     i_this->~daObjMasterSword_c();
     return 1;

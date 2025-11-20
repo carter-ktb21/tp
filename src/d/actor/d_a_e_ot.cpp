@@ -3,10 +3,25 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_ot.h"
 #include "Z2AudioLib/Z2Instances.h"
-UNK_REL_DATA
 #include "f_op/f_op_actor_enemy.h"
+
+class daE_OT_HIO_c {
+public:
+    /* 8073A2CC */ daE_OT_HIO_c();
+    /* 8073C9B0 */ virtual ~daE_OT_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mAttackSpeed;
+    /* 0x0C */ f32 mHeartDropRate;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+};
 
 enum Animation {
     /* 0x6 */ ANM_BORN = 6,
@@ -79,26 +94,8 @@ static dCcD_SrcSph cc_ot_at_src = {
 
 }  // namespace
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-
 /* 8073D2AC-8073D2B0 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 8073D2AC 0001+00 data_8073D2AC @1009 */
 /* 8073D2AD 0003+00 data_8073D2AD None */
-static u8 data_8073D2AC;
 static bool hioInit;
 
 /* 8073D2BC-8073D2DC 000054 0020+00 4/4 0/0 0/0 .bss             l_HIO */
@@ -170,7 +167,6 @@ void daE_OT_c::setActionMode(int i_action, int i_mode) {
 }
 
 /* 8073A510-8073A7B0 000330 02A0+00 1/1 0/0 0/0 .text            damage_check__8daE_OT_cFv */
-// NONMATCHING regswap
 void daE_OT_c::damage_check() {
     if (mAction == ACT_DAMAGE) {
         return;
@@ -185,7 +181,7 @@ void daE_OT_c::damage_check() {
 
     if (mCcSph.ChkCoHit()) {
         fopAc_ac_c* hit_actor = dCc_GetAc(mCcSph.GetCoHitObj()->GetAc());
-        if (fopAcM_GetName(hit_actor) == PROC_E_DT
+        if (fopAcM_GetName(dCc_GetAc(hit_actor)) == PROC_E_DT
             && static_cast<daE_DT_c*>(hit_actor)->isFlyingAttack())
         {
             setActionMode(ACT_DAMAGE, 10);
@@ -200,7 +196,7 @@ void daE_OT_c::damage_check() {
 
     if (mCcSph.ChkTgHit()) {
         mAtInfo.mpCollider = mCcSph.GetTgHitObj();
-        dCc_GetAc(mAtInfo.mpCollider->GetAc());
+        fopAc_ac_c* ac = dCc_GetAc(mAtInfo.mpCollider->GetAc());
         cc_at_check(this, &mAtInfo);
         dScnPly_c::setPauseTimer(0);
         if (mAtInfo.mpCollider->ChkAtType(AT_TYPE_SHIELD_ATTACK)) {
@@ -342,7 +338,7 @@ void daE_OT_c::executeEgg() {
                 if (mWaterSurface >= current.pos.y) {
                     setWaterEffect();
                 }
-                attention_info.flags = 4;
+                attention_info.flags = fopAc_AttnFlag_BATTLE_e;
                 if (mMode == 5) {
                     setActionMode(ACT_BORN, 0);
                 } else {
@@ -787,7 +783,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 8073C31C-8073C77C 00213C 0460+00 1/1 0/0 0/0 .text            create__8daE_OT_cFv */
 cPhs__Step daE_OT_c::create() {
-    fopAcM_SetupActor(this, daE_OT_c);
+    fopAcM_ct(this, daE_OT_c);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "E_OT");
     if (step == cPhs_COMPLEATE_e) {
@@ -801,7 +797,7 @@ cPhs__Step daE_OT_c::create() {
             l_HIO.field_0x4 = -1;
         }
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(this, 200.0f, 200.0f, 200.0f);

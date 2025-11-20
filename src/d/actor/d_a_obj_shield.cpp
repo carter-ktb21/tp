@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_shield.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_math.h"
@@ -25,8 +27,6 @@ const static dCcD_SrcCyl l_cyl_src = {
         40.0f // mHeight
     } // mCyl
 };
-
-UNK_REL_DATA
 
 /* 80CD6A58-80CD6D54 000078 02FC+00 1/1 0/0 0/0 .text            Reflect__FP4cXyzRC13cBgS_PolyInfof
  */
@@ -90,7 +90,7 @@ int daItemShield_c::Create() {
     mCcCyl.SetStts(&mCcStts);
     mCcCyl.SetR(dItem_data::getR(m_itemNo));
     mCcCyl.SetH(dItem_data::getH(m_itemNo));
-    fopAcM_SetCullSize(this, 15);
+    fopAcM_SetCullSize(this, fopAc_CULLSPHERE_0_e);
     actionWaitInit();
     if (fopAcM_isSwitch(this, getSwBit())) {
         field_0x94a = 3;
@@ -113,7 +113,7 @@ int daItemShield_c::__CreateHeap() {
 
 /* 80CD7254-80CD7420 000874 01CC+00 1/1 0/0 0/0 .text            create__14daItemShield_cFv */
 int daItemShield_c::create() {
-    fopAcM_SetupActor(this, daItemShield_c);
+    fopAcM_ct(this, daItemShield_c);
     m_itemNo = fpcNm_ITEM_WOOD_SHIELD;
     if (fopAcM_isSwitch(this, getSwBit2())) {
         OS_REPORT("木の盾：もう取ったので出ません\n");
@@ -248,7 +248,7 @@ int daItemShield_c::actionWait() {
 /* 80CD7C68-80CD7D04 001288 009C+00 1/1 0/0 0/0 .text initActionOrderGetDemo__14daItemShield_cFv
  */
 int daItemShield_c::initActionOrderGetDemo() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCcCyl.OffTgSPrmBit(1);
     mCcCyl.OffCoSPrmBit(1);
     daItemBase_c::hide();
@@ -346,7 +346,7 @@ int daItemShield_c::execute() {
     setBaseMtx();
     if (fopAcM_searchPlayerDistance(this) < 500.0f) {
         daPy_getPlayerActorClass()->setLookPos(&attention_info.position);
-        attention_info.flags = 0x100;
+        attention_info.flags = fopAc_AttnFlag_CHECK_e;
     } else {
         attention_info.flags = 0;
     }

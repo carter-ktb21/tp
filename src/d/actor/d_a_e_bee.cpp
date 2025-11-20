@@ -3,104 +3,20 @@
  * Enemy - Bees
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_bee.h"
 #include "d/actor/d_a_e_nest.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
+#include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 #include "SSystem/SComponent/c_math.h"
-
-/* 80685638-8068563C 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 8068563C-80685640 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685640-80685644 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685644-80685648 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685648-8068564C 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 8068564C-80685650 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685650-80685654 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685654-80685658 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685658-8068565C 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 8068565C-80685660 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685660-80685664 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685664-80685668 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685668-8068566C 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 8068566C-80685670 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 80685670-80685674 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
+#include "Z2AudioLib/Z2Instances.h"
 
 /* 80685674-80685678 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 80685674 0001+00 data_80685674 @1009 */
 /* 80685675 0003+00 data_80685675 None */
-static u8 struct_80685674;
 static bool hioInit;
 
 /* 80685684-80685694 000054 0010+00 6/6 0/0 0/0 .bss             l_HIO */
@@ -541,40 +457,48 @@ static void bee_start(e_bee_class* i_this, bee_s* i_bee) {
 }
 
 /* 80684248-80684A94 001AC8 084C+00 1/1 0/0 0/0 .text            bee_control__FP11e_bee_class */
-// NONMATCHING regalloc
 static void bee_control(e_bee_class* i_this) {
-    s8 nest_health = 0;
+    fopAc_ac_c* a_this;
+    a_this = (fopAc_ac_c*)i_this;
+
+    s8 nest_health;
+    nest_health = 0;
 
     static cXyz non(-20000.0f, 30000.0f, -15000.0f);
-    i_this->mCcSph.SetC(i_this->current.pos + non);
+    i_this->mCcSph.SetC(a_this->current.pos + non);
 
-    fopAc_ac_c* parent = fopAcM_SearchByID(i_this->parentActorID);
-    e_nest_class* nest = NULL;
+    e_nest_class* parent;
+    parent = (e_nest_class*)fopAcM_SearchByID(a_this->parentActorID);
+    e_nest_class* nest;
+    nest = NULL;
     if (parent != NULL) {
         if (parent != NULL && parent->health != 0) {
             nest_health = parent->health;
         }
-        nest = static_cast<e_nest_class*>(parent);
-        i_this->home.pos = nest->mCenterPos;
+        nest = parent;
+        a_this->home.pos = nest->mCenterPos;
     }
 
     dComIfG_Ccsp()->Set(&i_this->mCcCyl);
 
+    cXyz* hit_pos_p;
+    hit_pos_p = NULL;
     cXyz hit_pos;
-    cXyz* hit_pos_p = NULL;
     f32 hit_radius = 120.0f;
-
+    
     if (i_this->mCcCyl.ChkTgHit()) {
+        cXyz vec1, vec2;
         hit_pos_p = &hit_pos;
-        cCcD_Obj* hit_obj = i_this->mCcCyl.GetTgHitObj();
+        cCcD_Obj* hit_obj;
+        hit_obj = i_this->mCcCyl.GetTgHitObj();
         if (hit_obj->ChkAtType(AT_TYPE_BOMB) || hit_obj->ChkAtType(AT_TYPE_BOOMERANG)
                                              || hit_obj->ChkAtType(AT_TYPE_IRON_BALL)) {
             fopAc_ac_c* hit_actor = dCc_GetAc(hit_obj->GetAc());
             if (hit_obj->ChkAtType(AT_TYPE_BOMB)) {
-                hit_radius = 300.0f;
+                hit_radius = 300.0f + TREG_F(19);
                 hit_pos = hit_actor->current.pos;
             } else if (hit_obj->ChkAtType(AT_TYPE_IRON_BALL)) {
-                hit_radius = 100.0f;
+                hit_radius = 100.0f+ TREG_F(19);
                 daPy_py_c* player = static_cast<daPy_py_c*>(dComIfGp_getPlayer(0));
                 cXyz* center = player->getIronBallCenterPos();
                 if (center != NULL) {
@@ -582,18 +506,17 @@ static void bee_control(e_bee_class* i_this) {
                 }
             } else {
                 hit_pos = hit_actor->current.pos;
-                hit_radius = 150.0f;
+                hit_radius = 150.0f + TREG_F(19);
             }
         } else {
-            cXyz vec1, vec2;
             daPy_py_c* player = daPy_getPlayerActorClass();
             if (cc_pl_cut_bit_get() == 0x80) {
-                i_this->mBoomerangAngle += 0x1400;
-                vec1.z = 150.0f;
+                i_this->mBoomerangAngle += (s16)0x1400;
+                vec1.z = 150.0f + TREG_F(15);
             } else {
-                vec1.z = 100.0f;
+                vec1.z = 100.0f + TREG_F(12);
             }
-            mDoMtx_YrotS(*calc_mtx, player->shape_angle.y + i_this->mBoomerangAngle);
+            cMtx_YrotS(*calc_mtx, player->shape_angle.y + i_this->mBoomerangAngle);
             vec1.x = 0.0f;
             vec1.y = 100.0f;
             MtxPosition(&vec1, &vec2);
@@ -603,12 +526,18 @@ static void bee_control(e_bee_class* i_this) {
         i_this->mBoomerangAngle = 0;
     }
 
-    bee_s* bee = i_this->mBees;
-    s8 active_bees = 0;
+    bee_s* bee;
+    bee = i_this->mBees;
+    s8 active_bees;
+    active_bees = 0;
+    cXyz vec3;
     ccCylSet = 0;
-    s8 bees_in_nest = 0;
-    s8 bees_flying = 0;
-    camera_class* camera = dComIfGp_getCamera(0);
+    s8 bees_in_nest;
+    bees_in_nest = 0;
+    s8 bees_flying;
+    bees_flying = 0;
+    camera_class* camera;
+    camera = (camera_class*)dComIfGp_getCamera(0);
 
     if ((nest != NULL && nest->mDemoStage == 0 && dComIfGp_event_runCheck())
                     || !daPy_getPlayerActorClass()->checkSwimUp()
@@ -624,14 +553,13 @@ static void bee_control(e_bee_class* i_this) {
 
     for (int i = 0; i < i_this->mNumBees; i++, bee++) {
         if (bee->mAction != bee_s::ACT_DEAD) {
-            bee->mNoDraw = false;
             active_bees++;
-            cXyz vec3;
+            bee->mNoDraw = false;
             
             if (dComIfGp_checkPlayerStatus0(0, 0x200000)) {
                 vec3.x = bee->mPos.x - camera->lookat.eye.x;
                 vec3.z = bee->mPos.z - camera->lookat.eye.z;
-                if (JMAFastSqrt(vec3.x * vec3.x + vec3.z * vec3.z) > 2500.0f) {
+                if (JMAFastSqrt(vec3.x * vec3.x + vec3.z * vec3.z) > NREG_F(0) + 2500.0f) {
                     bee->mNoDraw = true;
                 }
             }
@@ -646,7 +574,7 @@ static void bee_control(e_bee_class* i_this) {
             } else if (bee->mAction <= bee_s::ACT_FLY_HOME_B) {
                 bee->mCounter++;
                 if (bee_fly_action(i_this, bee)) {
-                    i_this->current.pos = bee->mPos;
+                    a_this->current.pos = bee->mPos;
                     bees_flying++;
                 }
                 if (hit_pos_p != NULL) {
@@ -654,7 +582,7 @@ static void bee_control(e_bee_class* i_this) {
                     if (vec3.abs() < hit_radius) {
                         bee->mAction = bee_s::ACT_FAIL;
                         bee->mMode = 0;
-                        mDoMtx_YrotS(*calc_mtx, cM_atan2s(vec3.x, vec3.z));
+                        cMtx_YrotS(*calc_mtx, cM_atan2s(vec3.x, vec3.z));
                         vec3.x = 0.0f;
                         vec3.y = cM_rndF(10.0f) + 20.0f;
                         vec3.z = cM_rndF(10.0f) + 20.0f;
@@ -664,7 +592,7 @@ static void bee_control(e_bee_class* i_this) {
                         bee->mTimer = 0;
                         bee->mSound.startSound(Z2SE_EN_BE_DEATH, 0, -1);
                         cXyz hit_mark_scale(0.35f, 0.35f, 0.35f);
-                        dComIfGp_setHitMark(1, i_this, &bee->mPos, NULL, &hit_mark_scale, 0);
+                        dComIfGp_setHitMark(1, a_this, &bee->mPos, NULL, &hit_mark_scale, 0);
                     }
                 }
             } else if (bee->mAction == bee_s::ACT_FAIL) {
@@ -673,12 +601,13 @@ static void bee_control(e_bee_class* i_this) {
                 bees_flying++;
                 bee_start(i_this, bee);
             }
-            bee->mSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(i_this)));
+            bee->mSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(a_this)));
         }
     }
 
     if (active_bees == 0) {
-        fopAcM_delete(i_this);
+        fopAcM_delete(a_this);
+        OS_REPORT("E_BEE DELETED \n");
     } else {
         if (bees_flying != 0) {
             if (dComIfGp_event_runCheck()) {
@@ -687,19 +616,20 @@ static void bee_control(e_bee_class* i_this) {
                 i_this->mSound.playBeeGroupSound(Z2SE_EN_BE_FLY, bees_flying);
             }
         }
-        i_this->mSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(i_this)));
+        i_this->mSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(a_this)));
         if (nest != NULL) {
             if (bees_in_nest != 0) {
                 nest->mBeeSound.playBeeGroupSound(Z2SE_EN_BE_STAY, bees_in_nest);
             }
-            nest->mBeeSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(i_this)));
+            nest->mBeeSound.framework(0, dComIfGp_getReverb(fopAcM_GetRoomNo(a_this)));
         }
     }
 
     if (!dComIfGp_event_runCheck()) {
         dComIfG_Ccsp()->Set(&i_this->mCcSph);
         if (i_this->mCcSph.ChkAtHit()) {
-            fopAc_ac_c* hit_actor = dCc_GetAc(i_this->mCcSph.GetAtHitObj()->GetAc());
+            cCcD_Obj* hitObj = i_this->mCcSph.GetAtHitObj();
+            fopAc_ac_c* hit_actor = dCc_GetAc(hitObj->GetAc());
             if (hit_actor != NULL && fopAcM_GetName(hit_actor) == PROC_ALINK) {
                 dComIfGp_getVibration().StartShock(4, 0x1f, cXyz(0.0f, 1.0f, 0.0f));
             }
@@ -808,7 +738,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 80684E24-80685224 0026A4 0400+00 1/0 0/0 0/0 .text            daE_Bee_Create__FP10fopAc_ac_c */
 static cPhs__Step daE_Bee_Create(fopAc_ac_c* i_this) {
     e_bee_class* _this = static_cast<e_bee_class*>(i_this);
-    fopAcM_SetupActor(_this, e_bee_class);
+    fopAcM_ct(_this, e_bee_class);
     
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhase, "E_bee");
     if (step == cPhs_COMPLEATE_e) {
@@ -895,179 +825,6 @@ static cPhs__Step daE_Bee_Create(fopAc_ac_c* i_this) {
     return step;
 }
 
-/* 806856B4-806856B8 000084 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_806856B4[4];
-#pragma pop
-
-/* 806856B8-806856BC 000088 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_806856B8[4];
-#pragma pop
-
-/* 806856BC-806856C0 00008C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_806856BC[4];
-#pragma pop
-
-/* 806856C0-806856C4 000090 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_806856C0[4];
-#pragma pop
-
-/* 806856C4-806856C8 000094 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_806856C4[4];
-#pragma pop
-
-/* 806856C8-806856CC 000098 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_806856C8[4];
-#pragma pop
-
-/* 806856CC-806856D0 00009C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_806856CC[4];
-#pragma pop
-
-/* 806856D0-806856D4 0000A0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_806856D0[4];
-#pragma pop
-
-/* 806856D4-806856D8 0000A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_806856D4[4];
-#pragma pop
-
-/* 806856D8-806856DC 0000A8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_806856D8[4];
-#pragma pop
-
-/* 806856DC-806856E0 0000AC 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_806856DC[4];
-#pragma pop
-
-/* 806856E0-806856E4 0000B0 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_806856E0[4];
-#pragma pop
-
-/* 806856E4-806856E8 0000B4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_806856E4[4];
-#pragma pop
-
-/* 806856E8-806856EC 0000B8 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_806856E8[4];
-#pragma pop
-
-/* 806856EC-806856F0 0000BC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_806856EC[4];
-#pragma pop
-
-/* 806856F0-806856F4 0000C0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_806856F0[4];
-#pragma pop
-
-/* 806856F4-806856F8 0000C4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_806856F4[4];
-#pragma pop
-
-/* 806856F8-806856FC 0000C8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_806856F8[4];
-#pragma pop
-
-/* 806856FC-80685700 0000CC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_806856FC[4];
-#pragma pop
-
-/* 80685700-80685704 0000D0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_80685700[4];
-#pragma pop
-
-/* 80685704-80685708 0000D4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80685704[4];
-#pragma pop
-
-/* 80685708-8068570C 0000D8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80685708[4];
-#pragma pop
-
-/* 8068570C-80685710 0000DC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8068570C[4];
-#pragma pop
-
-/* 80685710-80685714 0000E0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80685710[4];
-#pragma pop
-
-/* 80685714-80685718 0000E4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_80685714[4];
-#pragma pop
-
-/* 80685524-80685524 0000F0 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
-
 /* 806855B0-806855D0 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_Bee_Method */
 static actor_method_class l_daE_Bee_Method = {
     (process_method_func)daE_Bee_Create,
@@ -1094,3 +851,5 @@ extern actor_process_profile_definition g_profile_E_BEE = {
     fopAc_ACTOR_e,
     fopAc_CULLBOX_CUSTOM_e,
 };
+
+AUDIO_INSTANCES;

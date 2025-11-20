@@ -3,16 +3,10 @@
 // Translation Unit: d/d_save_HIO
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_save_HIO.h"
 #include "d/d_com_inf_game.h"
-
-//
-// Forward References:
-//
-
-//
-// Declarations:
-//
 
 /* 8025BB78-8025BBAC 2564B8 0034+00 1/1 0/0 0/0 .text __ct__29dSvBit_childSwPerfectionHIO_cFv */
 dSvBit_childSwPerfectionHIO_c::dSvBit_childSwPerfectionHIO_c() {
@@ -224,6 +218,7 @@ void dSvBit_HIO_c::init() {
     mDarkness.init();
     mTransform.init();
     mOther.init();
+                                   /* Main Event - Get shadow crystal (can now transform) */
     mTransformFlag = field_0x49d = dComIfGs_isEventBit(dSv_event_flag_c::M_077);
 }
 

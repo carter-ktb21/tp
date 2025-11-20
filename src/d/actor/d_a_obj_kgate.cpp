@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kgate.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_bg_w.h"
@@ -212,24 +214,6 @@ void daObjKGate_c::setBaseMtx() {
     }
 }
 
-/* 8058AD24-8058AD30 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 8058AD30-8058AD44 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 8058AD44-8058AD50 -00001 000C+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName[] = {
     "D_Kgate00",
@@ -270,7 +254,7 @@ int daObjKGate_c::Create() {
 
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
 
     initBaseMtx();
     fopAcM_SetMtx(this, field_0xb18);
@@ -301,7 +285,7 @@ int daObjKGate_c::Create() {
 int daObjKGate_c::CreateHeap() {
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[mNameArg], l_gateBmdIdx[mNameArg]);
-    JUT_ASSERT(500, modelData != 0);
+    JUT_ASSERT(500, modelData != NULL);
 
     mpGateModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     mpGateModel2 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -312,11 +296,11 @@ int daObjKGate_c::CreateHeap() {
     if ((mNameArg == 0 || mNameArg == 2) && getSwNo() != 0xFF) {
         modelData =
             (J3DModelData*)dComIfG_getObjectRes(l_arcName[mNameArg], l_gateKeyIdx[mNameArg]);
-        JUT_ASSERT(524, modelData != 0);
+        JUT_ASSERT(524, modelData != NULL);
 
         J3DModelData* modelData2 =
             (J3DModelData*)dComIfG_getObjectRes(l_arcName[mNameArg], l_gateBmdIdx[mNameArg]);
-        JUT_ASSERT(530, modelData2 != 0);
+        JUT_ASSERT(530, modelData2 != NULL);
 
         mDoExt_setupShareTexture(modelData, modelData2);
         mpKeyModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -326,7 +310,7 @@ int daObjKGate_c::CreateHeap() {
 
         modelData =
             (J3DModelData*)dComIfG_getObjectRes(l_arcName[mNameArg], l_gateHookIdx[mNameArg]);
-        JUT_ASSERT(546, modelData != 0);
+        JUT_ASSERT(546, modelData != NULL);
 
         mDoExt_setupShareTexture(modelData, modelData2);
         mpHookModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -960,7 +944,7 @@ void daObjKGate_c::demoProc() {
 int daObjKGate_c::getDemoAction() {
     static char* action_table[] = {"WAIT", "ADJUSTMENT", "UNLOCK", "OPEN"};
 
-    return dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZE(action_table), 0, 0);
+    return dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZEU(action_table), 0, 0);
 }
 
 /* 8058A550-8058A5B8 002550 0068+00 1/0 0/0 0/0 .text            Execute__12daObjKGate_cFPPA3_A4_f
@@ -1020,7 +1004,7 @@ int daObjKGate_c::Delete() {
 
 /* 8058A768-8058A81C 002768 00B4+00 1/0 0/0 0/0 .text daObjKGate_create1st__FP12daObjKGate_c */
 static int daObjKGate_create1st(daObjKGate_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKGate_c);
+    fopAcM_ct(i_this, daObjKGate_c);
     return i_this->create1st();
 }
 

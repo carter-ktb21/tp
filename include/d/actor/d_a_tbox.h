@@ -1,6 +1,7 @@
 #ifndef D_A_TBOX_H
 #define D_A_TBOX_H
 
+#include "SSystem/SComponent/c_lib.h"
 #include "d/d_cc_d.h"
 #include "d/d_bg_s_acch.h"
 #include "d/d_bg_s_movebg_actor.h"
@@ -120,7 +121,7 @@ public:
     /* 804956EC */ void mode_exec_wait();
     /* 80495818 */ void mode_exec();
     /* 80495910 */ cPhs__Step create1st();
-    /* 804959EC */ int Execute(f32 (**)[3][4]);
+    /* 804959EC */ int Execute(Mtx**);
     /* 80495AF0 */ int Draw();
     /* 80495C9C */ int Delete();
     /* 804961B0 */ int Create();
@@ -141,6 +142,10 @@ public:
     u16 flagCheck(u16 i_flag) { return mFlags & i_flag; }
     void setAction(daTbox_actionFn i_actionFn) { mpActionFn = i_actionFn; }
     void action() { (this->*mpActionFn)(); }
+    void setDrawMtx(Mtx i_mtx) {
+        MTXCopy(i_mtx, mDrawMtx);
+        field_0x9fc = 1;
+    }
 
 private:
     /* 0x718 */ u8 field_0x718;
@@ -187,7 +192,7 @@ private:
     /* 0x9F8 */ u32 mOpenSeId;
     /* 0x9FC */ u8 field_0x9fc;
     /* 0x9FD */ u8 field_0x9fd;
-    /* 0xA00 */ Mtx field_0xa00;
+    /* 0xA00 */ Mtx mDrawMtx;
 };
 
 STATIC_ASSERT(sizeof(daTbox_c) == 0xA30);

@@ -2,6 +2,7 @@
 #define JKREXPHEAP_H
 
 #include "JSystem/JKernel/JKRHeap.h"
+#include <stdint.h>
 
 /**
  * @ingroup jsystem-jkernel
@@ -27,14 +28,14 @@ public:
 
         void newGroupId(u8 groupId) { mGroupId = groupId; }
         bool isValid() const { return mMagic == 'HM'; }
-        bool _isTempMemBlock() const { return (mFlags & 0x80) ? true : false; }
+        bool isTempMemBlock() const { return mFlags & 0x80; }
         int getAlignment() const { return mFlags & 0x7f; }
         void* getContent() const { return (void*)(this + 1); }
         CMemBlock* getPrevBlock() const { return mPrev; }
         CMemBlock* getNextBlock() const { return mNext; }
         u32 getSize() const { return size; }
         u8 getGroupId() const { return mGroupId; }
-        static CMemBlock* getBlock(void* data) { return (CMemBlock*)((u32)data + -0x10); }
+        static CMemBlock* getBlock(void* data) { return (CMemBlock*)((uintptr_t)data + -0x10); }
 
     private:
         /* 0x0 */ u16 mMagic;
@@ -65,7 +66,7 @@ public:
     s32 getUsedSize(u8 groupId) const;
     s32 getTotalUsedSize(void) const;
     
-    CMemBlock* getHeadUsedList() const { return mHeadUsedList; }
+    CMemBlock* getUsedFirst() { return mHeadUsedList; }
     void setAllocationMode(EAllocMode mode) {
         mAllocMode = mode;
     }

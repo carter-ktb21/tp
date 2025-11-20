@@ -3,6 +3,8 @@
  * Odor generation tag / rail
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag03.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "SSystem/SComponent/c_math.h"
@@ -10,6 +12,7 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80855ED8-808560DC 000078 0204+00 1/1 0/0 0/0 .text dEnvSe_getNearPathPos__FP4cXyzP4cXyzP5dPath
  */
@@ -150,7 +153,7 @@ static void odour_move(kytag03_class* i_this) {
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
 
     dPath* var_r27;
-    dKankyo_odour_Packet* packet = kankyo->mpOdourPacket;
+    dKankyo_odour_Packet* packet = kankyo->mOdourData.mpOdourPacket;
     dPath* var_r25;
 
     cXyz sp94;
@@ -376,13 +379,13 @@ static int daKytag03_Execute(kytag03_class* i_this) {
                     daPy_py_c::checkNowWolf() && !var_r28)
                 {
                     i_this->attention_info.distances[fopAc_attn_ETC_e] = 0x3D;
-                    a_this->attention_info.flags |= 0x80;
+                    a_this->attention_info.flags |= fopAc_AttnFlag_ETC_e;
                 } else {
-                    a_this->attention_info.flags &= ~0x80;
+                    a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
                 }
 
                 if (i_this->field_0x588 == 1) {
-                    a_this->attention_info.flags &= ~0x80;
+                    a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
                     i_this->field_0x587 = 1;
                     i_this->field_0x58a = 30;
                 }
@@ -397,7 +400,7 @@ static int daKytag03_Execute(kytag03_class* i_this) {
                 i_this->field_0x587 = 0;
             }
         } else {
-            a_this->attention_info.flags &= ~0x80;
+            a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
         }
     }
 
@@ -425,7 +428,7 @@ static int daKytag03_Delete(kytag03_class* i_this) {
 /* 80857470-80857648 001610 01D8+00 1/0 0/0 0/0 .text            daKytag03_Create__FP10fopAc_ac_c */
 static int daKytag03_Create(fopAc_ac_c* i_this) {
     kytag03_class* a_this = (kytag03_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag03_class);
+    fopAcM_ct(i_this, kytag03_class);
 
     a_this->field_0x584 = (fopAcM_GetParam(i_this) >> 0x18) & 3;
     a_this->field_0x585 = fopAcM_GetParam(i_this);
@@ -449,7 +452,7 @@ static int daKytag03_Create(fopAc_ac_c* i_this) {
         a_this->mpPath = set_path_info(i_this);
         a_this->field_0x570 = 0.0f;
         a_this->field_0x580 = 0;
-        g_env_light.field_0xf21 = 1;
+        g_env_light.mOdourData.field_0xf21 = 1;
     } else {
         if (a_this->field_0x585 == 0xFF) {
             return cPhs_UNK3_e;

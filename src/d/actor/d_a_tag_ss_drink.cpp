@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_ss_drink.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
@@ -11,7 +13,7 @@
 
 /* 80D62DB8-80D62E5C 000078 00A4+00 1/1 0/0 0/0 .text            create__15daTag_SSDrink_cFv */
 int daTag_SSDrink_c::create() {
-    fopAcM_SetupActor(this, daTag_SSDrink_c);
+    fopAcM_ct(this, daTag_SSDrink_c);
     field_0x5D2 = getTypeFromParam();
     setFlowNodeNumber(getFlowNodeNum());
     setValueNumber(getValue());
@@ -186,12 +188,12 @@ int daTag_SSDrink_c::orderEvent() {
     if (!dComIfGp_getLinkPlayer()->checkWolf() && fopAcM_isSwitch(this, getSwitchFromParam()) &&
         field_0x5D3 != 0x60 && getFlowNodeNum() != 0xFFFF)
     {
-        attention_info.flags = 0x40000008;
+        attention_info.flags = (fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e);
     } else {
         attention_info.flags = 0;
     }
 
-    if (attention_info.flags == 0x40000008) {
+    if (attention_info.flags == (fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e)) {
         if (fopAcM_searchPlayerDistanceXZ(this) <= 160.0f && fopAcM_seenPlayerAngleY() <= 0x2000) {
             attention_info.distances[fopAc_attn_TALK_e] = 0x9D;
             attention_info.distances[fopAc_attn_SPEAK_e] = 0x9D;

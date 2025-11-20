@@ -5,20 +5,35 @@
  * 
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_yk.h"
 #include "c/c_damagereaction.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_s_play.h"
 #include "SSystem/SComponent/c_math.h"
-UNK_REL_DATA
 #include "f_op/f_op_actor_enemy.h"
 
-/* 80807EF8-80807EFC 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 data_80807EF8;
+/**
+ * @class daE_YK_HIO_c
+ * @brief Shadow Keese Host Input Output class.
+ * 
+ */
+class daE_YK_HIO_c : public JORReflexible {
+public:
+    /* 8080482C */ daE_YK_HIO_c();
+    /* 808077E0 */ virtual ~daE_YK_HIO_c() {}
+    void genMessage(JORMContext*);
 
-/* 80807F08-80807F24 000018 001C+00 9/9 0/0 0/0 .bss             l_HIO */
-static daE_YK_HIO_c l_HIO;
+    /* 0x00 */ // vtable
+    /* 0x04 */ s8 field_0x04;       ///< @brief Initialized to -1, appears unused.
+    /* 0x08 */ f32 mModelScale;     ///< @brief Base model scale factor (default: 1.0).
+    /* 0x0C */ f32 mFlySpeed;       ///< @brief Base flying speed (default: 15.0).
+    /* 0x10 */ f32 mAttackRange;    ///< @brief Distance threshold for entering attack state (default: 250.0).
+    /* 0x14 */ f32 mCruiseSpeed;    ///< @brief Speed when flying normally (default: 15.0).
+    /* 0x18 */ f32 mChargeSpeed;    ///< @brief Speed when charging at player (default: 40.0).
+};
 
 /**
  * @brief Constructor for Shadow Keese HIO (Host Input Output) configuration class
@@ -38,6 +53,24 @@ daE_YK_HIO_c::daE_YK_HIO_c() {
     mCruiseSpeed = 15.0f;
     mChargeSpeed = 40.0f;   
 }
+
+/* 80807EF8-80807EFC 000008 0004+00 2/2 0/0 0/0 .bss             None */
+static u8 data_80807EF8;
+
+/* 80807F08-80807F24 000018 001C+00 9/9 0/0 0/0 .bss             l_HIO */
+static daE_YK_HIO_c l_HIO;
+
+#ifdef DEBUG
+void daE_YK_HIO_c::genMessage(JORMContext* ctx) {
+  ctx->genLabel("闇キース", 0x80000001, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
+  ctx->genSlider("基本サイズ", &mModelScale, 0.0f, 3.0f, 0, NULL, 0xFFFF, 0xFFFF, 0x512, 24);
+  ctx->genSlider("飛行速度", &mFlySpeed, 0.0f, 50.0f, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
+  ctx->genSlider("戦闘開始範囲", &mAttackRange, 0.0f, 600.0f,0, NULL, 0xFFFF, 0xFFFF, 512, 24);
+  ctx->genSlider("戦闘速度", &mCruiseSpeed, 0.0f, 50.0f, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
+  ctx->genSlider("突進速度", &mChargeSpeed, 0.0f, 50.0f, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
+}
+#endif
+
 
 /**
  * @brief Makes a Shadow Keese disappear with effects and item drops
@@ -1280,7 +1313,7 @@ static int daE_YK_Execute(e_yk_class* i_this) {
             mDoMtx_stack_c::multVecZero(&_this->current.pos);
         } else {
             if (_this->health > 0 && i_this->mDeathFlag == 0 && player->current.pos.y < _this->current.pos.y) {
-                _this->attention_info.flags = 4;
+                _this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             } else {
                 fopAcM_OffStatus(i_this,0);
                 _this->attention_info.flags = 0;
@@ -1441,7 +1474,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
  */
 /* 808071F4-808075CC 002AB4 03D8+00 1/0 0/0 0/0 .text            daE_YK_Create__FP10fopAc_ac_c */
 static int daE_YK_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_yk_class);
+    fopAcM_ct(i_this, e_yk_class);
     e_yk_class* yk = (e_yk_class*)i_this;
 
     int phase_step = dComIfG_resLoad(&yk->mPhase,"E_YK");
@@ -1477,7 +1510,7 @@ static int daE_YK_Create(fopAc_ac_c* i_this) {
         } else {
             if (yk->mPathIdx != 0xff) {
                 yk->mpPath = dPath_GetRoomPath(yk->mPathIdx,fopAcM_GetRoomNo(yk));
-                
+
                 if (!yk->mpPath) {
                     return cPhs_ERROR_e;
                 }
@@ -1498,7 +1531,7 @@ static int daE_YK_Create(fopAc_ac_c* i_this) {
                 l_HIO.field_0x04 = -1;
             }
 
-            yk->attention_info.flags = 4;
+            yk->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
             fopAcM_SetMtx(yk,yk->mpMorfSO->getModel()->getBaseTRMtx());
             fopAcM_SetMin(yk,-200.0f,-200.0f,-200.0f);

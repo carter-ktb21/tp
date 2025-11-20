@@ -23,7 +23,7 @@ public:
     /* 80C212CC */ int create();
     /* 80C2157C */ int CreateHeap();
     /* 80C215F4 */ int Create();
-    /* 80C21634 */ int Execute(f32 (**)[3][4]);
+    /* 80C21634 */ int Execute(Mtx**);
     /* 80C21964 */ int Draw();
     /* 80C21A08 */ int Delete();
 
@@ -60,7 +60,7 @@ STATIC_ASSERT(sizeof(daObjIce_s_c) == 0x644);
 class daOBJ_ICE_S_HIO_c {
 public:
     /* 80C209AC */ daOBJ_ICE_S_HIO_c();
-    /* 80C21A60 */ virtual ~daOBJ_ICE_S_HIO_c();
+    /* 80C21A60 */ virtual ~daOBJ_ICE_S_HIO_c() {}
 
     /* 0x4 */ s8 field_0x4;
     /* 0x8 */ f32 field_0x8;

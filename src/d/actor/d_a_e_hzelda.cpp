@@ -3,10 +3,13 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_hzelda.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "SSystem/SComponent/c_math.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 #include "m_Do/m_Do_graphic.h"
 #include "d/d_s_play.h"
@@ -94,8 +97,6 @@ enum hzelda_action {
 enum hzelda_timer {
     TIMER_ATTACK_WAIT = 0,
 };
-
-UNK_REL_DATA
 
 /* 806F0D4C-806F0D70 0000EC 0024+00 1/1 0/0 0/0 .text            __ct__16daE_HZELDA_HIO_cFv */
 daE_HZELDA_HIO_c::daE_HZELDA_HIO_c() {
@@ -709,7 +710,7 @@ static void action(e_hzelda_class* i_this) {
 
     if (on_attention) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -1049,7 +1050,7 @@ static int daE_HZELDA_Execute(e_hzelda_class* i_this) {
     BOOL on_player_at_sph = FALSE;
 
     if (daPy_py_c::checkMasterSwordEquip()) {
-        if (daPy_getPlayerActorClass()->getCutType() != 0) {
+        if (daPy_getPlayerActorClass()->getCutType() != daPy_py_c::CUT_TYPE_NONE) {
             i_this->mSwordAtTimer++;
             if (i_this->mSwordAtTimer < 6) {
                 on_player_at_sph = TRUE;
@@ -1337,32 +1338,32 @@ static int daE_HZELDA_Delete(e_hzelda_class* i_this) {
 }
 
 /* 806F47C4-806F4AD4 003B64 0310+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
-// NONMATCHING - equivalent. r30/r31 regswap
 static int useHeapInit(fopAc_ac_c* i_this) {
     e_hzelda_class* a_this = (e_hzelda_class*)i_this;
-    J3DModelData* modelData;
 
-    a_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1B), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("Hzelda", 0x15), 2, 1.0f, 0, -1, &a_this->mSound, 0x80000, 0x11000284);
+    a_this->mpModelMorf = new mDoExt_McaMorfSO(static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1B)), NULL, NULL,
+                                               static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("Hzelda", 0x15)),
+                                               J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1, &a_this->mSound, 0x80000, 0x11000284);
     if (a_this->mpModelMorf == NULL || a_this->mpModelMorf->getModel() == NULL) {
         return 0;
     }
 
     J3DModel* model = a_this->mpModelMorf->getModel();
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1C);
-    JUT_ASSERT(2129, modelData != 0);
+    J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1C));
+    JUT_ASSERT(2129, modelData != NULL);
     a_this->mpSwordModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (a_this->mpSwordModel == NULL) {
         return 0;
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1A);
-    JUT_ASSERT(2149, modelData != 0);
+    modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1A));
+    JUT_ASSERT(2149, modelData != NULL);
     a_this->mpTriangleAtModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (a_this->mpTriangleAtModel == NULL) {
         return 0;
@@ -1373,7 +1374,8 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpTriangleAtBrk->init(modelData, (J3DAnmTevRegKey*)dComIfG_getObjectRes("Hzelda", 0x1F), TRUE, 2, 1.0f, 0, -1)) {
+    if (a_this->mpTriangleAtBrk->init(modelData, static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("Hzelda", 0x1F)),
+                                       TRUE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
@@ -1382,7 +1384,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpTriangleAtBtk->init(a_this->mpTriangleAtModel->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes("Hzelda", 0x23), TRUE, 2, 1.0f, 0, -1)) {
+    if (a_this->mpTriangleAtBtk->init(a_this->mpTriangleAtModel->getModelData(),
+                                       static_cast<J3DAnmTextureSRTKey*>(dComIfG_getObjectRes("Hzelda", 0x23)),
+                                       TRUE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
@@ -1395,7 +1399,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
  */
 static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
     e_hzelda_class* a_this = (e_hzelda_class*)i_this;
-    fopAcM_SetupActor(a_this, e_hzelda_class);
+    fopAcM_ct(a_this, e_hzelda_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "Hzelda");
     a_this->mPrm0 = fopAcM_GetParam(i_this);
@@ -1483,7 +1487,7 @@ static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
 
         a_this->mBallSphAt.Set(ball_at_sph_src);
         a_this->mBallSphAt.SetStts(&a_this->field_0xd3c);
-        a_this->mBallSphAt.SetAtMtrl(dCcD_MTRL_UNK_5);
+        a_this->mBallSphAt.SetAtMtrl(dCcD_MTRL_ELECTRIC);
 
         static dCcD_SrcSph ball_tg_sph_src = {
             {

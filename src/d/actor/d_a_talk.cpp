@@ -3,21 +3,11 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_talk.h"
 #include "d/d_msg_object.h"
 #include "f_op/f_op_msg_mng.h"
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* 80D66378-80D663E4 000078 006C+00 1/1 0/0 0/0 .text            __dt__8daTalk_cFv */
 daTalk_c::~daTalk_c() {
@@ -26,7 +16,7 @@ daTalk_c::~daTalk_c() {
 
 /* 80D663E4-80D664AC 0000E4 00C8+00 1/1 0/0 0/0 .text            create__8daTalk_cFv */
 int daTalk_c::create() {
-    fopAcM_SetupActor(this, daTalk_c);
+    fopAcM_ct(this, daTalk_c);
 
     if (getStatus() != 1) {
         return cPhs_ERROR_e;

@@ -3,8 +3,6 @@
 
 #include "JSystem/J3DGraphAnimator/J3DMaterialAnm.h"
 #include "JSystem/J3DGraphBase/J3DMatBlock.h"
-#include "JSystem/J3DGraphBase/J3DMaterial.h"
-#include "Z2AudioLib/Z2Creature.h"
 #include "Z2AudioLib/Z2WolfHowlMgr.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_tag_mmsg.h"
@@ -14,6 +12,7 @@
 #include "d/d_particle_copoly.h"
 #include "d/d_save.h"
 #include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 
 class J2DAnmColorKey;
 class J2DAnmTransformKey;
@@ -223,10 +222,17 @@ public:
     /* 0x0 */ u8 unk_0x0;
 };
 
-class daAlinkHIO_c {
+class daAlinkHIO_c
+#ifdef DEBUG
+: public mDoHIO_entry_c
+#endif
+{
 public:
     /* 80140B88 */ daAlinkHIO_c();
     /* 80140C10 */ virtual ~daAlinkHIO_c();
+
+    void genMessage(JORMContext*);
+    void jumpStateUpdate(const cXyz*, const cXyz*, f32);
 
     /* 0x04 */ u8 field_0x4[0xC - 0x4];
     /* 0x0C */ daAlinkHIO_cut_c mCut;
@@ -3464,25 +3470,25 @@ public:
     }
 
     s32 checkPlayerDemoMode() const { return mDemo.getDemoType(); }
-    BOOL checkSpecialDemoMode() const { return mDemo.getDemoType() == 5; }
+    BOOL checkSpecialDemoMode() const { return mDemo.getDemoType() == daPy_demo_c::DEMO_TYPE_SPECIAL_e; }
     static bool checkMidnaChargeAttack() { return dComIfGs_isEventBit(0x501); }
     u16 getMidnaMsgNum() const { return mMidnaMsgNum; }
     u32 getStartEvent() { return fopAcM_GetParam(this) >> 0x18; }
     BOOL checkClimbFall() { return checkLadderFall(); }
 
-    bool checkMidnaWolfDashAnime() { return checkNoResetFlg1(FLG1_DASH_MODE); }
-    bool checkMidnaClingAnime() { return mMidnaAnm == 1; }
-    bool checkMidnaLowClingAnime() { return mMidnaAnm == 2; }
-    bool checkMidnaLookAroundAnime() { return mMidnaAnm == 3; }
-    bool checkMidnaPanicAnime() { return mMidnaAnm == 5; }
-    bool checkMidnaWolfDeadAnime() { return mMidnaAnm == 6; }
-    bool checkMidnaWolfSwimDeadAnime() { return mMidnaAnm == 7; }
-    bool checkMidnaRopeWaitStaggerAnime() { return mMidnaAnm == 8; }
-    bool checkMidnaRopeMoveStaggerAnime() { return mMidnaAnm == 9; }
-    bool checkMidnaGanonCatchAnm() { return mMidnaAnm == 10; }
-    bool checkMidnaGanonThrowLeftAnm() { return mMidnaAnm == 11; }
-    bool checkMidnaGanonThrowRightAnm() { return mMidnaAnm == 12; }
-    bool checkMidnaDigInAnime() { return mMidnaAnm == 13; }
+    bool checkMidnaWolfDashAnime() const { return checkNoResetFlg1(FLG1_DASH_MODE); }
+    bool checkMidnaClingAnime() const { return mMidnaAnm == 1; }
+    bool checkMidnaLowClingAnime() const { return mMidnaAnm == 2; }
+    bool checkMidnaLookAroundAnime() const { return mMidnaAnm == 3; }
+    bool checkMidnaPanicAnime() const { return mMidnaAnm == 5; }
+    bool checkMidnaWolfDeadAnime() const { return mMidnaAnm == 6; }
+    bool checkMidnaWolfSwimDeadAnime() const { return mMidnaAnm == 7; }
+    bool checkMidnaRopeWaitStaggerAnime() const { return mMidnaAnm == 8; }
+    bool checkMidnaRopeMoveStaggerAnime() const { return mMidnaAnm == 9; }
+    bool checkMidnaGanonCatchAnm() const { return mMidnaAnm == 10; }
+    bool checkMidnaGanonThrowLeftAnm() const { return mMidnaAnm == 11; }
+    bool checkMidnaGanonThrowRightAnm() const { return mMidnaAnm == 12; }
+    bool checkMidnaDigInAnime() const { return mMidnaAnm == 13; }
 
     void clearMidnaMsgNum() {
         mMidnaMsgNum = 0xffff;
@@ -3559,6 +3565,36 @@ public:
         return var_r4;
     }
 
+    BOOL setCanoeCast() {
+        if (mProcVar2.field_0x300c == 0 && checkCanoeFishingWaitAnime()) {
+            mProcVar2.field_0x300c = 1;
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    bool checkFishingRodGrabLeft() const { return mItemVar0.field_0x3018 == 0; }
+
+    void setCanoeFishingWaitAngle(s16 i_angle) { field_0x311a = i_angle; }
+
+    void setFishingArnmAngle(s16 i_angle) { field_0x3160.set(0, 0, i_angle); }
+    void setFishingArm1Angle(const csXyz& i_angle) { mFishingArm1Angle = i_angle; }
+    void setFishingArm2Angle(const csXyz& i_angle) { field_0x3160 = i_angle; }
+
+    void onFishingRodCastingEnd() { onNoResetFlg1(FLG1_UNK_8000); }
+    void endFishingCastWait() { offNoResetFlg2(FLG2_UNK_20000000); }
+
+    void startFishingCastWait() {
+        if (checkFishingRodItem(mEquipItem)) {
+            onNoResetFlg2(FLG2_UNK_20000000);
+        }
+    }
+
+    f32 getFishingReelFrame() const { return mUpperFrameCtrl[2].getFrame(); }
+
+    void changeFishGetFace(u8 param_0) { field_0x2fc8 = param_0; }
+
     BOOL checkSlideMode() {
         return mProcID == PROC_SLIDE || mProcID == PROC_SLIDE_LAND ||
                mProcID == PROC_WOLF_SLIDE_READY || mProcID == PROC_WOLF_SLIDE_LAND ||
@@ -3571,6 +3607,22 @@ public:
 
     bool checkFisingRodJewl() const {
         return (mEquipItem == 0x5C || mEquipItem == 0x5F) || mEquipItem == 0x5E;
+    }
+
+    bool checkFisingRodWorm() const { return mItemMode == 0x74; }
+
+    bool checkFisingRodBee() const { return mItemMode == 0x76; }
+
+    void fishingCastWaitAnimeStart() {
+        if (mProcID == PROC_FISHING_CAST) {
+            mProcVar3.field_0x300e = 0;
+        }
+    }
+
+    void fishingCastWaitAnimeStop() {
+        if (mProcID == PROC_FISHING_CAST) {
+            mProcVar3.field_0x300e = 1;
+        }
     }
 
     MtxP getCopyRodMtx() {
@@ -3587,6 +3639,9 @@ public:
     void clearIronBallActor() { field_0x173c.SetActor(this); }
     BOOL checkCanoeRideOwn(const fopAc_ac_c* param_0) const {
         return checkCanoeRide() && mRideAcKeep.getActorConst() == param_0;
+    }
+    BOOL checkBoarRideOwn(const fopAc_ac_c* i_actorP) const { 
+        return checkBoarRide() && mRideAcKeep.getActorConst() == i_actorP;
     }
     bool checkWolfDashMode() const { return checkNoResetFlg1(FLG1_DASH_MODE); }
     bool checkWolfLieWaterIn() const { return mWaterY > current.pos.y + 20.5f; }
@@ -3695,9 +3750,9 @@ public:
     s16 getHookshotStopTime() const { return field_0x3026; }
     bool getHookshotLeft() const { return field_0x3020 == 0; }
 
-    static int getBallModelIdx() { return 0x25; }
-    static int getBallBtkIdx() { return 0x49; }
-    static int getBallBrkIdx() { return 0x41; }
+    static u16 getBallModelIdx() { return 0x25; }
+    static u16 getBallBtkIdx() { return 0x49; }
+    static u16 getBallBrkIdx() { return 0x41; }
 
     bool checkRootTransClearMode() { return field_0x2f99 & 7; }
     bool checkRootTransZClearMode() { return field_0x2f99 & 4; }
@@ -3772,6 +3827,8 @@ public:
     inline void startRestartRoomFromOut(int, u32, int);
 
     u16 getReadyItem() { return dComIfGp_getSelectItem(mSelectItemId); }
+
+    static u32 getOtherHeapSize() { return 0xF0A60; }
 
     static daAlink_BckData const m_mainBckShield[20];
     static daAlink_BckData const m_mainBckSword[5];
@@ -3907,6 +3964,9 @@ public:
     /* 0x02018 */ daPy_frameCtrl_c mUpperFrameCtrl[3];
     /* 0x02060 */ mDoExt_MtxCalcOldFrame* field_0x2060;
     /* 0x02064 */ daAlink_sight_c mSight;
+    #if PLATFORM_WII
+        u8 unk_0x20f0[4];
+    #endif
     /* 0x020F0 */ daPy_anmHeap_c mAnmHeap3;
     /* 0x02104 */ daPy_anmHeap_c mAnmHeap4;
     /* 0x02118 */ daPy_anmHeap_c mFaceBtpHeap;
@@ -4228,7 +4288,7 @@ public:
     /* 0x03178 */ int field_0x3178;
     /* 0x0317C */ int field_0x317c;
     /* 0x03180 */ int field_0x3180;
-    /* 0x03184 */ int field_0x3184;
+    /* 0x03184 */ int mAlinkStaffId;
     /* 0x03188 */ int field_0x3188;
     /* 0x0318C */ int field_0x318c;
     /* 0x03190 */ int field_0x3190;
@@ -4274,7 +4334,7 @@ public:
     /* 0x032C0 */ s16 field_0x32c0[2];
     /* 0x032C4 */ u16 field_0x32c4[2];
     /* 0x032C8 */ u32 field_0x32c8;
-    /* 0x032CC */ u32 field_0x32cc;
+    /* 0x032CC */ uintptr_t field_0x32cc;
     /* 0x032D0 */ u32 field_0x32d0;
     /* 0x032D4 */ u32 field_0x32d4;
     /* 0x032D8 */ firePointEff_c field_0x32d8[4];

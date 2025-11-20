@@ -1,7 +1,9 @@
 /**
  * @file d_a_obj_flag2.cpp
- * 
+ *
 */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_flag2.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
@@ -10,7 +12,6 @@
 #include "d/d_a_obj.h"
 #include "d/d_cc_d.h"
 #include "d/d_com_inf_game.h"
-#include "dol2asm.h"
 
 #ifdef DEBUG
 class daObjFlag2_Hio_c : public JORReflexible {
@@ -397,7 +398,7 @@ int daObjFlag2_c::createHeap() {
         shape_angle.setall(0);
         current.angle.setall(0);
         ResTIMG* image = (ResTIMG*)dComIfG_getObjectRes(mFlagName, "flag.bti");
-        JUT_ASSERT(838, image != 0);
+        JUT_ASSERT(838, image != NULL);
         GXInitTexObj(mFlagCloth.getImageTexObj(), (u8*)image + image->imageOffset, image->width,
                      image->height, (GXTexFmt)image->format, (GXTexWrapMode)image->wrapS,
                      (GXTexWrapMode)image->wrapT, image->mipmapCount > 1 ? GX_TRUE : GX_FALSE);
@@ -412,11 +413,11 @@ int daObjFlag2_c::createHeap() {
         } else if (image->width == (image->height << 1)) {
             mFlagCloth.setTexCoord_p(l_texCoord);
         } else {
-            JUT_ASSERT(861, 0);
+            JUT_ASSERT(861, FALSE);
         }
     }
     J3DModelData* modelData_pole = (J3DModelData*)dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), "model0.bmd");
-    JUT_ASSERT(865, modelData_pole != 0);
+    JUT_ASSERT(865, modelData_pole != NULL);
     mModel = mDoExt_J3DModel__create(modelData_pole, 0x80000, 0x11000084);
     return mModel != NULL ? TRUE : FALSE;
 }
@@ -426,16 +427,9 @@ static int createSolidHeap(fopAc_ac_c* i_this) {
     return static_cast<daObjFlag2_c*>(i_this)->createHeap();
 }
 
-/* ############################################################################################## */
-/* 80BEE1E8-80BEE1E8 00010C 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
-#pragma push
-#pragma force_active on
-SECTION_DEAD static char const* const stringBase_80BEE212 = "FlagObj%02d";
-#pragma pop
-
 /* 80BED6A0-80BED7A4 0010C0 0104+00 1/1 0/0 0/0 .text            create__12daObjFlag2_cFv */
 int daObjFlag2_c::create() {
-    fopAcM_SetupActor(this, daObjFlag2_c);
+    fopAcM_ct(this, daObjFlag2_c);
     s8 flagNum = (u8)shape_angle.x;
     if (flagNum <= -1 || flagNum > 99) {
         mFlagValid = false;
@@ -458,9 +452,6 @@ int daObjFlag2_c::create() {
     }
     return rv;
 }
-
-/* 80BED7A4-80BED9C4 0011C4 0220+00 1/1 0/0 0/0 .text            __ct__12daObjFlag2_cFv */
-daObjFlag2_c::daObjFlag2_c() {}
 
 /* 80BEDCE0-80BEDDA0 001700 00C0+00 1/1 0/0 0/0 .text            draw__12daObjFlag2_cFv */
 int daObjFlag2_c::draw() {

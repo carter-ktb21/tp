@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kbacket.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "d/actor/d_a_npc.h"
@@ -14,8 +16,6 @@
 //
 // Declarations:
 //
-
-UNK_REL_DATA
 
 static s32 l_bmdData[4] = { 8, 0, 9, 0 };
 
@@ -65,7 +65,7 @@ daObj_KBacket_c::~daObj_KBacket_c() {
 
 /* 80586048-805863F0 0002E8 03A8+00 1/1 0/0 0/0 .text            create__15daObj_KBacket_cFv */
 int daObj_KBacket_c::create() {
-    fopAcM_SetupActor(this, daObj_KBacket_c);
+    fopAcM_ct(this, daObj_KBacket_c);
 
     field_0x9d0 = getType();
 
@@ -103,7 +103,7 @@ int daObj_KBacket_c::create() {
         mObjAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mObjAcch.m_gnd;
         field_0xa00 = mObjAcch.GetGroundH();
-        if (field_0xa00 != -1e+09f) {
+        if (field_0xa00 != -G_CM3D_F_INF) {
             setEnvTevColor();
             setRoomNo();
         }
@@ -230,7 +230,7 @@ int daObj_KBacket_c::Execute() {
             s16 unkShort1 = 0x80;
 
             fopAcM_getWaterY(&current.pos, &field_0xa04);
-            if (field_0xa04 != -1e+09f &&
+            if (field_0xa04 != -G_CM3D_F_INF &&
                 movePMag < field_0xa04 - field_0xa00 &&
                 current.pos.y <= field_0xa04)
             {
@@ -402,7 +402,7 @@ int daObj_KBacket_c::Execute() {
         }
 
         if (field_0xa48 == 0x0 && field_0xa47 == 0x0 && field_0xa4a == 0x0) {
-            cLib_onBit(attention_info.flags, (u32)0x10);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         }
 
         field_0x9d4 = speed;
@@ -470,7 +470,7 @@ int daObj_KBacket_c::Execute() {
         mGndChk = mObjAcch.m_gnd;
         field_0xa00 = mObjAcch.GetGroundH();
 
-        if (field_0xa00 != -1e+09f) {
+        if (field_0xa00 != -G_CM3D_F_INF) {
             field_0xa16 = daNpcF_getGroundAngle(&mGndChk, shape_angle.y);
 
             setEnvTevColor();

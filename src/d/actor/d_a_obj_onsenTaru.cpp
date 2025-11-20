@@ -3,29 +3,13 @@
  * Object - Hotspring Water Barrel
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_onsenTaru.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
 #include "f_op/f_op_kankyo_mng.h"
-
-/* 80CA9C18-80CA9C24 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80CA9C24-80CA9C38 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80CA85CC-80CA861C 0000EC 0050+00 1/1 0/0 0/0 .text            __ct__15daOnsTaru_HIO_cFv */
 daOnsTaru_HIO_c::daOnsTaru_HIO_c() {
@@ -67,7 +51,7 @@ void daOnsTaru_c::setBaseMtx() {
 /* 80CA8748-80CA87B4 000268 006C+00 1/0 0/0 0/0 .text            CreateHeap__11daOnsTaru_cFv */
 int daOnsTaru_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("maroTaru", 3);
-    JUT_ASSERT(231, modelData != 0);
+    JUT_ASSERT(231, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
@@ -79,7 +63,7 @@ int daOnsTaru_c::CreateHeap() {
 
 /* 80CA87B4-80CA8A54 0002D4 02A0+00 1/1 0/0 0/0 .text            create__11daOnsTaru_cFv */
 int daOnsTaru_c::create() {
-    fopAcM_SetupActor(this, daOnsTaru_c);
+    fopAcM_ct(this, daOnsTaru_c);
 
     if (fopAcM_isSwitch(this, getSw())) {
         return cPhs_ERROR_e;
@@ -109,7 +93,7 @@ int daOnsTaru_c::create() {
         mCcCyl.OffAtSetBit();
 
         fopAcM_OnCarryType(this, fopAcM_CARRY_TYPE_1);
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         attention_info.distances[fopAc_attn_CARRY_e] = 42;
         mIsCarryNow = fopAcM_checkCarryNow(this);
 
@@ -269,7 +253,7 @@ void daOnsTaru_c::mode_proc_call() {
 
 /* 80CA929C-80CA92CC 000DBC 0030+00 2/2 0/0 0/0 .text            mode_init_wait__11daOnsTaru_cFv */
 void daOnsTaru_c::mode_init_wait() {
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     gravity = -7.0f;
     mMode = MODE_WAIT_e;
@@ -283,7 +267,7 @@ void daOnsTaru_c::mode_proc_wait() {
 /* 80CA92F0-80CA9320 000E10 0030+00 1/1 0/0 0/0 .text            mode_init_carry__11daOnsTaru_cFv */
 void daOnsTaru_c::mode_init_carry() {
     mCcCyl.OffCoSetBit();
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     mMode = MODE_CARRY_e;
 }
@@ -307,7 +291,7 @@ void daOnsTaru_c::mode_proc_carry() {
 void daOnsTaru_c::mode_init_drop() {
     mCcCyl.OnAtSetBit();
     mCollisionRadius = l_HIO.mCollisionRadius;
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     gravity = -7.0f;
     mMode = MODE_DROP_e;
 }
@@ -334,7 +318,7 @@ void daOnsTaru_c::mode_proc_break() {}
 
 /* 80CA9518-80CA9530 001038 0018+00 2/2 0/0 0/0 .text            mode_init_sink__11daOnsTaru_cFv */
 void daOnsTaru_c::mode_init_sink() {
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mMode = MODE_SINK_e;
 }
 
@@ -356,9 +340,9 @@ void daOnsTaru_c::mode_proc_sink() {
     fopAcM_posMoveF(this, mCcStts.GetCCMoveP());
 
     if (mAcch.ChkGroundHit()) {
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     } else {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 }
 
@@ -377,7 +361,7 @@ void daOnsTaru_c::breakEffSet() {
     cXyz scale(0.75f, 0.75f, 0.75f);
 
     J3DModelData* kibako_bmd = (J3DModelData*)dComIfG_getObjectRes("Always", "BreakWoodBox.bmd");
-    JUT_ASSERT(0x310, kibako_bmd != 0);
+    JUT_ASSERT(784, kibako_bmd != NULL);
 
     JPABaseEmitter* emitter =
         dComIfGp_particle_set(0x8A99, &pos, NULL, NULL, 0xFF, &dPa_modelEcallBack::getEcallback(),

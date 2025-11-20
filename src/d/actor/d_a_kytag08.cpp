@@ -3,6 +3,8 @@
  * Fog Avoidance Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag08.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -223,7 +225,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     kytag08_class* a_this = (kytag08_class*)i_this;
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Kytag08", 3);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     a_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11020202);
 
@@ -242,7 +244,7 @@ static int daKytag08_Create(fopAc_ac_c* i_this) {
     cXyz scale(1.0f, 1.0f, 1.0f);
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
 
-    fopAcM_SetupActor(a_this, kytag08_class);
+    fopAcM_ct(a_this, kytag08_class);
 
     int phase = dComIfG_resLoad(&a_this->mPhase, "Kytag08");
     if (phase == cPhs_COMPLEATE_e) {

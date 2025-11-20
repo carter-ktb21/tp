@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_drop.cpp
+* @file d_a_obj_drop.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_drop.h"
 #include "SSystem/SComponent/c_math.h"
@@ -15,6 +17,7 @@
 #include "m_Do/m_Do_graphic.h"
 #include "d/actor/d_a_e_ym.h"
 #include "d/actor/d_a_e_ymb.h"
+#include "f_op/f_op_camera_mng.h"
 
 #ifdef DEBUG
 daObjDrop_HIO_c l_HIO;
@@ -77,27 +80,9 @@ int daObjDrop_c::Create() {
     return 1;
 }
 
-/* 80BE2060-80BE206C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BE206C-80BE2080 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80BDFE58-80BE005C 0001F8 0204+00 1/1 0/0 0/0 .text            create__11daObjDrop_cFv */
 int daObjDrop_c::create() {
-    fopAcM_SetupActor(this, daObjDrop_c);
+    fopAcM_ct(this, daObjDrop_c);
 
     if (dComIfGs_isTbox(getSave())) {
         return cPhs_ERROR_e;
@@ -124,6 +109,7 @@ void daObjDrop_c::dropGet() {
         if (dComIfGp_getStartStageDarkArea() == 2 &&
             dComIfGs_getLightDropNum(dComIfGp_getStartStageDarkArea()) == 15)
         {
+            /* dSv_event_flag_c::F_0005 - Misc. - Gathered 14 Tears of Light in area 4 */
             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[9]);
         }
 

@@ -3,224 +3,33 @@
 // Translation Unit: d_a_ni
 //
 
-/**
- * Basically entirely matching except for ONE float reg alloc in play_camera,
- * and some extra dtors being emitted that shouldnt be after daNi_Create
- */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/d_msg_flow.h"
 #include "d/d_s_play.h"
-#include "dol2asm.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_ni.h"
+#include "d/actor/d_a_npc_moir.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_math.h"
 #include "c/c_damagereaction.h"
+#include "Z2AudioLib/Z2Instances.h"
+#include "f_op/f_op_camera_mng.h"
 
-//
-// Forward References:
-//
-
-extern "C" void __ct__10daNi_HIO_cFv();
-extern "C" static void anm_init__FP8ni_classifUcf();
-extern "C" static void hane_set__FP8ni_classff();
-extern "C" static void nodeCallBack__FP8J3DJointi();
-extern "C" static void daNi_Draw__FP8ni_class();
-extern "C" void __dt__4cXyzFv();
-extern "C" static void s_play_sub__FPvPv();
-extern "C" static void damage_check__FP8ni_class();
-extern "C" static void s_t_sub__FPvPv();
-extern "C" static void search_test__FP8ni_class();
-extern "C" static void ni_carry_check__FP8ni_class();
-extern "C" static void move_gake_check__FP8ni_classf();
-extern "C" static void ni_normal__FP8ni_class();
-extern "C" static void ni_away__FP8ni_class();
-extern "C" static void ni_swim__FP8ni_class();
-extern "C" static void ni_carry__FP8ni_class();
-extern "C" static void ni_fly__FP8ni_class();
-extern "C" static void ni_drop__FP8ni_class();
-extern "C" static void ni_return__FP8ni_class();
-extern "C" static void ni_damage__FP8ni_class();
-extern "C" static void s_b_sub__FPvPv();
-extern "C" static void ni_windspin__FP8ni_class();
-extern "C" static void ni_demo0__FP8ni_class();
-extern "C" static void ni_message__FP8ni_class();
-extern "C" static void playwallcheck__FP8ni_class();
-extern "C" static void ni_play__FP8ni_class();
-extern "C" static void play_camera__FP8ni_class();
-extern "C" static void action__FP8ni_class();
-extern "C" static void message__FP8ni_class();
-extern "C" static void daNi_Execute__FP8ni_class();
-extern "C" static bool daNi_IsDelete__FP8ni_class();
-extern "C" static void daNi_Delete__FP8ni_class();
-extern "C" static void useHeapInit__FP10fopAc_ac_c();
-extern "C" void __dt__12J3DFrameCtrlFv();
-extern "C" static void daNi_Create__FP10fopAc_ac_c();
-extern "C" void __dt__8cM3dGSphFv();
-extern "C" void __dt__8cM3dGAabFv();
-extern "C" void __dt__10dCcD_GSttsFv();
-extern "C" void __dt__12dBgS_ObjAcchFv();
-extern "C" void __dt__12dBgS_AcchCirFv();
-extern "C" void __dt__10cCcD_GSttsFv();
-extern "C" void __dt__10daNi_HIO_cFv();
-extern "C" void __sinit_d_a_ni_cpp();
-extern "C" static void func_8095119C();
-extern "C" static void func_809511A4();
-extern "C" extern char const* const d_a_ni__stringBase0;
-
-//
-// External References:
-//
-
-extern "C" void fadeOut__13mDoGph_gInf_cFfR8_GXColor();
-extern "C" void mDoMtx_XrotM__FPA4_fs();
-extern "C" void mDoMtx_YrotS__FPA4_fs();
-extern "C" void mDoMtx_YrotM__FPA4_fs();
-extern "C" void mDoMtx_ZrotM__FPA4_fs();
-extern "C" void transM__14mDoMtx_stack_cFfff();
-extern "C" void scaleM__14mDoMtx_stack_cFfff();
-extern "C" void init__13mDoExt_btkAnmFP16J3DMaterialTableP19J3DAnmTextureSRTKeyiifss();
-extern "C" void entry__13mDoExt_btkAnmFP16J3DMaterialTablef();
-extern "C" void
-__ct__14mDoExt_McaMorfFP12J3DModelDataP25mDoExt_McaMorfCallBack1_cP25mDoExt_McaMorfCallBack2_cP15J3DAnmTransformifiiiPvUlUl();
-extern "C" void setAnm__14mDoExt_McaMorfFP15J3DAnmTransformiffffPv();
-extern "C" void play__14mDoExt_McaMorfFP3VecUlSc();
-extern "C" void entryDL__14mDoExt_McaMorfFv();
-extern "C" void modelCalc__14mDoExt_McaMorfFv();
-extern "C" void cDmrNowMidnaTalk__Fv();
-extern "C" void __ct__10fopAc_ac_cFv();
-extern "C" void fopAc_IsActor__FPv();
-extern "C" void fopAcIt_Judge__FPFPvPv_PvPv();
-extern "C" void fopAcM_entrySolidHeap__FP10fopAc_ac_cPFP10fopAc_ac_c_iUl();
-extern "C" void fopAcM_searchActorAngleY__FPC10fopAc_ac_cPC10fopAc_ac_c();
-extern "C" void fopAcM_searchActorDistance__FPC10fopAc_ac_cPC10fopAc_ac_c();
-extern "C" void fopAcM_orderPotentialEvent__FP10fopAc_ac_cUsUsUs();
-extern "C" void fopAcM_wayBgCheck__FPC10fopAc_ac_cff();
-extern "C" void fopAcM_effHamonSet__FPUlPC4cXyzff();
-extern "C" bool fopAcM_riverStream__FP4cXyzPsPff();
-extern "C" void fopAcM_carryOffRevise__FP10fopAc_ac_c();
-extern "C" void gndCheck__11fopAcM_gc_cFPC4cXyz();
-extern "C" void fpcEx_Search__FPFPvPv_PvPv();
-extern "C" void fpcSch_JudgeForPName__FPvPv();
-extern "C" void fpcSch_JudgeByID__FPvPv();
-extern "C" void dComIfG_resLoad__FP30request_of_phase_process_classPCc();
-extern "C" void dComIfG_resDelete__FP30request_of_phase_process_classPCc();
-extern "C" void dComIfGp_getReverb__Fi();
-extern "C" void
-dComIfGd_setShadow__FUlScP8J3DModelP4cXyzffffR13cBgS_PolyInfoP12dKy_tevstr_csfP9_GXTexObj();
-extern "C" void isEventBit__11dSv_event_cCFUs();
-extern "C" void getRes__14dRes_control_cFPCclP11dRes_info_ci();
-extern "C" void reset__14dEvt_control_cFv();
-extern "C" void forceOnEventMove__Q213dPa_control_c7level_cFUl();
-extern "C" void getEmitter__Q213dPa_control_c7level_cFUl();
-extern "C" void
-set__13dPa_control_cFUlUcUsPC4cXyzPC12dKy_tevstr_cPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyzf();
-extern "C" void LineCross__4cBgSFP11cBgS_LinChk();
-extern "C" void GroundCross__4cBgSFP11cBgS_GndChk();
-extern "C" void __ct__12dBgS_AcchCirFv();
-extern "C" void SetWall__12dBgS_AcchCirFff();
-extern "C" void __dt__9dBgS_AcchFv();
-extern "C" void __ct__9dBgS_AcchFv();
-extern "C" void Set__9dBgS_AcchFP4cXyzP4cXyzP10fopAc_ac_ciP12dBgS_AcchCirP4cXyzP5csXyzP5csXyz();
-extern "C" void CrrPos__9dBgS_AcchFR4dBgS();
-extern "C" void __ct__11dBgS_GndChkFv();
-extern "C" void __dt__11dBgS_GndChkFv();
-extern "C" void __ct__18dBgS_ObjGndChk_SplFv();
-extern "C" void __dt__18dBgS_ObjGndChk_SplFv();
-extern "C" void __ct__11dBgS_LinChkFv();
-extern "C" void __dt__11dBgS_LinChkFv();
-extern "C" void Set__11dBgS_LinChkFPC4cXyzPC4cXyzPC10fopAc_ac_c();
-extern "C" void __ct__14dBgS_CamLinChkFv();
-extern "C" void __dt__14dBgS_CamLinChkFv();
-extern "C" void SetObj__16dBgS_PolyPassChkFv();
-extern "C" void __ct__10dCcD_GSttsFv();
-extern "C" void Move__10dCcD_GSttsFv();
-extern "C" void Init__9dCcD_SttsFiiP10fopAc_ac_c();
-extern "C" void __ct__12dCcD_GObjInfFv();
-extern "C" void ChkTgHit__12dCcD_GObjInfFv();
-extern "C" void GetTgHitObj__12dCcD_GObjInfFv();
-extern "C" void Set__8dCcD_SphFRC11dCcD_SrcSph();
-extern "C" void at_power_check__FP11dCcU_AtInfo();
-extern "C" void checkBoomerangCharge__9daPy_py_cFv();
-extern "C" void Start__9dCamera_cFv();
-extern "C" void Stop__9dCamera_cFv();
-extern "C" void SetTrimSize__9dCamera_cFl();
-extern "C" void Set__9dCamera_cF4cXyz4cXyzfs();
-extern "C" void Reset__9dCamera_cF4cXyz4cXyzfs();
-extern "C" void settingTevStruct__18dScnKy_env_light_cFiP4cXyzP12dKy_tevstr_c();
-extern "C" void setLightTevColorType_MAJI__18dScnKy_env_light_cFP12J3DModelDataP12dKy_tevstr_c();
-extern "C" void __ct__10dMsgFlow_cFv();
-extern "C" void init__10dMsgFlow_cFP10fopAc_ac_ciiPP10fopAc_ac_c();
-extern "C" void doFlow__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_ci();
-extern "C" void Set__4cCcSFP8cCcD_Obj();
-extern "C" void __mi__4cXyzCFRC3Vec();
-extern "C" void cM_atan2s__Fff();
-extern "C" void cM_rndF__Ff();
-extern "C" void cM_rndFX__Ff();
-extern "C" void SetPos__11cBgS_GndChkFPC4cXyz();
-extern "C" void __dt__13cBgS_PolyInfoFv();
-extern "C" void __dt__8cM3dGCirFv();
-extern "C" void SetC__8cM3dGSphFRC4cXyz();
-extern "C" void SetR__8cM3dGSphFf();
-extern "C" void cLib_addCalc2__FPffff();
-extern "C" void cLib_addCalc0__FPfff();
-extern "C" void cLib_addCalcAngleS2__FPssss();
-extern "C" void MtxPosition__FP4cXyzP4cXyz();
-extern "C" void deleteObject__14Z2SoundObjBaseFv();
-extern "C" void __ct__16Z2SoundObjSimpleFv();
-extern "C" void* __nw__FUl();
-extern "C" void __dl__FPv();
-extern "C" void init__12J3DFrameCtrlFs();
-extern "C" void checkPass__12J3DFrameCtrlFf();
-extern "C" void _savegpr_22();
-extern "C" void _savegpr_24();
-extern "C" void _savegpr_26();
-extern "C" void _savegpr_27();
-extern "C" void _savegpr_28();
-extern "C" void _savegpr_29();
-extern "C" void _restgpr_22();
-extern "C" void _restgpr_24();
-extern "C" void _restgpr_26();
-extern "C" void _restgpr_27();
-extern "C" void _restgpr_28();
-extern "C" void _restgpr_29();
-extern "C" u8 saveBitLabels__16dSv_event_flag_c[1644 + 4 /* padding */];
-extern "C" extern void* __vt__8dCcD_Sph[36];
-extern "C" extern void* __vt__9dCcD_Stts[11];
-extern "C" extern void* __vt__12cCcD_SphAttr[25];
-extern "C" extern void* __vt__14cCcD_ShapeAttr[22];
-extern "C" extern void* __vt__9cCcD_Stts[8];
-extern "C" u8 m_cpadInfo__8mDoCPd_c[256];
-extern "C" u8 now__14mDoMtx_stack_c[48];
-extern "C" u8 mSimpleTexObj__21dDlst_shadowControl_c[32];
-extern "C" u8 mCurrentMtx__6J3DSys[48];
-extern "C" u8 sincosTable___5JMath[65536];
-extern "C" f32 mGroundY__11fopAcM_gc_c;
-extern "C" void __register_global_object();
-
-//
-// Declarations:
-//
-
-/* 80951330-8095133C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+enum Joint {
+    /* 0x0 */ JNT_WAIST,
+    /* 0x1 */ JNT_LEGL,
+    /* 0x2 */ JNT_FOOTL,
+    /* 0x3 */ JNT_LEGR,
+    /* 0x4 */ JNT_FOOTR,
+    /* 0x5 */ JNT_NECK,
+    /* 0x6 */ JNT_HEAD,
+    /* 0x7 */ JNT_WINGL,
+    /* 0x8 */ JNT_WINGR,
 };
-
-/* 8095133C-80951350 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 8094BC2C-8094BCA8 0000EC 007C+00 1/1 0/0 0/0 .text            __ct__10daNi_HIO_cFv */
 daNi_HIO_c::daNi_HIO_c() {
@@ -405,102 +214,6 @@ static void damage_check(ni_class* i_this) {
     }
 }
 
-/* ############################################################################################## */
-/* 80951550-80951554 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 80951554-80951558 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951558-8095155C 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 8095155C-80951560 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951560-80951564 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951564-80951568 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951568-8095156C 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 8095156C-80951570 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951570-80951574 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951574-80951578 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951578-8095157C 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 8095157C-80951580 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951580-80951584 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951584-80951588 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 80951588-8095158C 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 8095158C-80951590 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 8095158C 0001+00 data_8095158C @1009 */
-/* 8095158D 0003+00 data_8095158D None */
-#pragma push
-#pragma force_active on
-static u8 struct_8095158C;
-#pragma pop
-
 static u8 data_8095158d;
 
 /* 8095159C-809515D8 000054 003C+00 9/9 0/0 0/0 .bss             l_HIO */
@@ -570,7 +283,7 @@ static void ni_carry_check(ni_class* i_this) {
     dComIfGp_getPlayer(0);
 
     if (fopAcM_checkCarryNow(i_this)) {
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->mAction = ACTION_CARRY_e;
         i_this->mMode = 0;
         i_this->speed.y = 0.0f;
@@ -1120,13 +833,6 @@ static void ni_windspin(ni_class* i_this) {
     i_this->speed.y = 0.0f;
 }
 
-class daNpcMoiR_c : public fopAc_ac_c {
-public:
-    MtxP getHandRMtx() { return mpMorf->getModel()->getAnmMtx(0x11); }
-
-    /* 0x568 */ mDoExt_McaMorfSO* mpMorf;
-};
-
 /* 8094DED0-8094E2B0 002390 03E0+00 1/2 0/0 0/0 .text            ni_demo0__FP8ni_class */
 static int ni_demo0(ni_class* i_this) {
     cXyz sp28;
@@ -1485,7 +1191,7 @@ static int ni_play(ni_class* i_this) {
 
 /* 8094ED90-8094F5D8 003250 0848+00 1/1 0/0 0/0 .text            play_camera__FP8ni_class */
 static void play_camera(ni_class* i_this) {
-    fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;  // necessary for reg alloc
+    fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     camera_class* camera0 = (camera_class*)dComIfGp_getCamera(0);
@@ -1497,8 +1203,15 @@ static void play_camera(ni_class* i_this) {
 
     int var_r27 = 0;
 
-    f32 analog_l = i_this->mPadAnalogL;
     f32 var_f31;
+    f32 var_f29;
+    f32 var_f28;
+    f32 var_f27;
+    f32 temp;
+    f32 var_f3;
+    f32 temp_f30_2;
+    f32 temp_f1_4;
+    f32 analog_l = i_this->mPadAnalogL;
 
     BOOL hold_l = i_this->mPadHoldL;
     cXyz sp208(0.0f, 0.0f, 0.0f);
@@ -1539,16 +1252,16 @@ static void play_camera(ni_class* i_this) {
         i_this->mPlayCamMode = 3;
         i_this->mPlayCamModeTimer = 0;
         // fallthrough
-    case 3:
+    case 3: {
         var_r25 = 1;
         i_this->field_0xaec = 55.0f;
         sp1D8 = i_this->field_0xac8 - a_this->current.pos;
 
         s16 var_r4_2 = cM_atan2s(-sp1D8.x, -sp1D8.z);
         var_f31 = TREG_F(12) + 0.3f;
-        f32 var_f29 = i_this->field_0xafc;
-        f32 var_f28 = 180.0f;
-        f32 var_f27 = 100.0f;
+        var_f29 = i_this->field_0xafc;
+        var_f28 = 180.0f;
+        var_f27 = 100.0f;
 
         if (analog_l > TREG_F(12) + 0.5f) {
             var_r4_2 = a_this->shape_angle.y;
@@ -1562,7 +1275,7 @@ static void play_camera(ni_class* i_this) {
                 i_this->field_0xafc = 500.0f;
             }
         } else {
-            f32 temp = i_this->mPadSubStickX;
+            temp = i_this->mPadSubStickX;
 
             temp *= TREG_F(3) + 5000.0f;
             i_this->field_0xaf4 += (s16)temp;
@@ -1590,7 +1303,6 @@ static void play_camera(ni_class* i_this) {
         cLib_addCalc2(&i_this->field_0xac8.x, sp1F0.x, var_f31, 1000.0f);
         cLib_addCalc2(&i_this->field_0xac8.z, sp1F0.z, var_f31, 1000.0f);
 
-        f32 var_f3;
         if (i_this->field_0xac8.y < sp1F0.y) {
             var_f3 = 1000.0f;
         } else {
@@ -1622,20 +1334,21 @@ static void play_camera(ni_class* i_this) {
             mDoGph_gInf_c::fadeOut(0.05f, g_blackColor);
         }
         break;
+    }
     case 4:
         var_r25 = 1;
         if (i_this->mPlayCamModeTimer == 30) {
-            player = (daPy_py_c*)dComIfGp_getPlayer(0);
+            daPy_py_c* upc_pl = (daPy_py_c*)dComIfGp_getPlayer(0);
             mDoGph_gInf_c::fadeOut(-0.05f, g_blackColor);
 
-            cMtx_YrotS(*calc_mtx, player->shape_angle.y);
+            cMtx_YrotS(*calc_mtx, upc_pl->shape_angle.y);
             sp1D8.x = 0.0f;
             sp1D8.y = JREG_F(1) + 200.0f;
             sp1D8.z = JREG_F(2) + -250.0f;
             MtxPosition(&sp1D8, &i_this->field_0xac8);
-            i_this->field_0xac8 += player->current.pos;
+            i_this->field_0xac8 += upc_pl->current.pos;
 
-            i_this->field_0xad4 = player->current.pos;
+            i_this->field_0xad4 = upc_pl->current.pos;
             i_this->field_0xad4.y += 120.0f;
 
             camera->mCamera.Reset(i_this->field_0xad4, i_this->field_0xac8, i_this->field_0xaec, 0);
@@ -1643,7 +1356,7 @@ static void play_camera(ni_class* i_this) {
             camera->mCamera.SetTrimSize(0);
             dComIfGp_event_reset();
 
-            player->cancelOriginalDemo();
+            upc_pl->cancelOriginalDemo();
 
             i_this->mPlayCamMode = 0;
             i_this->mAction = ACTION_NORMAL_e;
@@ -1685,11 +1398,10 @@ static void play_camera(ni_class* i_this) {
                 sp1E4.z = sp214.z;
 
                 gnd_chk.SetPos(&sp1E4);
-                f32 temp_f30_2 = dComIfG_Bgsp().GroundCross(&gnd_chk);
-                temp_f30_2 = temp_f30_2;
+                temp_f30_2 = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
                 gnd_chk_spl.SetPos(&sp1E4);
-                f32 temp_f1_4 = dComIfG_Bgsp().GroundCross(&gnd_chk_spl);
+                temp_f1_4 = dComIfG_Bgsp().GroundCross(&gnd_chk_spl);
 
                 if (temp_f30_2 < temp_f1_4) {
                     sp214.y = temp_f1_4;
@@ -1817,10 +1529,10 @@ static void action(ni_class* i_this) {
         }
 
         if (var_r25) {
-            cLib_onBit<u32>(a_this->attention_info.flags, 0x10);
+            cLib_onBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
             ni_carry_check(i_this);
         } else {
-            cLib_offBit<u32>(a_this->attention_info.flags, 0x10);
+            cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         }
     }
 
@@ -2049,11 +1761,11 @@ static int message(ni_class* i_this) {
 
     if (i_this->field_0xa50 == 2 && i_this->mFlowNo != -1 && daPy_py_c::checkNowWolf()) {
         fopAcM_OnStatus(i_this, 0);
-        cLib_onBit<u32>(i_this->attention_info.flags, 10);
+        cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         i_this->eventInfo.onCondition(1);
     } else {
         fopAcM_OffStatus(i_this, 0);
-        cLib_offBit<u32>(i_this->attention_info.flags, 10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
     }
 
     return 0;
@@ -2190,7 +1902,7 @@ static BOOL useHeapInit(fopAc_ac_c* i_this) {
 
     J3DModel* model = a_this->mpMorf->getModel();
     a_this->model = model;
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -2215,7 +1927,7 @@ static BOOL useHeapInit(fopAc_ac_c* i_this) {
 /* 80950B30-80950F04 004FF0 03D4+00 1/0 0/0 0/0 .text            daNi_Create__FP10fopAc_ac_c */
 static int daNi_Create(fopAc_ac_c* i_this) {
     ni_class* a_this = (ni_class*)i_this;
-    fopAcM_SetupActor(a_this, ni_class);
+    fopAcM_ct(a_this, ni_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "Ni");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -2289,7 +2001,7 @@ static int daNi_Create(fopAc_ac_c* i_this) {
             a_this->mCcSph.OffTgSetBit();
         }
 
-        i_this->attention_info.distances[fopAc_attn_SPEAK_e] = 7;
+        i_this->attention_info.distances[fopAc_attn_CARRY_e] = 7;
         a_this->mCounter = cM_rndF(0x10000);
 
         cXyz sp34(i_this->current.pos);
@@ -2301,13 +2013,14 @@ static int daNi_Create(fopAc_ac_c* i_this) {
         }
 
         if (strcmp(dComIfGp_getStartStageName(), "F_SP108") == 0 &&
+             /* dSv_event_flag_c::F_0528 - Faron Woods - Resistance Rusl summoned golden cucco */
             !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[528]))
         {
             a_this->mAction = ACTION_DEMO0_e;
             a_this->mTimers[0] = 10;
         }
 
-        a_this->mSplGroundH = -1000000000.0f;
+        a_this->mSplGroundH = -G_CM3D_F_INF;
 
         daNi_Execute(a_this);
     }
@@ -2315,194 +2028,31 @@ static int daNi_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 80951620-80951624 0000D8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_80951620[4];
-#pragma pop
-
-/* 80951624-80951628 0000DC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_80951624[4];
-#pragma pop
-
-/* 80951628-8095162C 0000E0 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80951628[4];
-#pragma pop
-
-/* 8095162C-80951630 0000E4 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8095162C[4];
-#pragma pop
-
-/* 80951630-80951634 0000E8 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951630[4];
-#pragma pop
-
-/* 80951634-80951638 0000EC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951634[4];
-#pragma pop
-
-/* 80951638-8095163C 0000F0 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951638[4];
-#pragma pop
-
-/* 8095163C-80951640 0000F4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_8095163C[4];
-#pragma pop
-
-/* 80951640-80951644 0000F8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_80951640[4];
-#pragma pop
-
-/* 80951644-80951648 0000FC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_80951644[4];
-#pragma pop
-
-/* 80951648-8095164C 000100 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80951648[4];
-#pragma pop
-
-/* 8095164C-80951650 000104 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_8095164C[4];
-#pragma pop
-
-/* 80951650-80951654 000108 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_80951650[4];
-#pragma pop
-
-/* 80951654-80951658 00010C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951654[4];
-#pragma pop
-
-/* 80951658-8095165C 000110 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_80951658[4];
-#pragma pop
-
-/* 8095165C-80951660 000114 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_8095165C[4];
-#pragma pop
-
-/* 80951660-80951664 000118 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_80951660[4];
-#pragma pop
-
-/* 80951664-80951668 00011C 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_80951664[4];
-#pragma pop
-
-/* 80951668-8095166C 000120 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951668[4];
-#pragma pop
-
-/* 8095166C-80951670 000124 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_8095166C[4];
-#pragma pop
-
-/* 80951670-80951674 000128 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951670[4];
-#pragma pop
-
-/* 80951674-80951678 00012C 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951674[4];
-#pragma pop
-
-/* 80951678-8095167C 000130 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80951678[4];
-#pragma pop
-
-/* 8095167C-80951680 000134 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_8095167C[4];
-#pragma pop
-
-/* 80951680-80951684 000138 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_80951680[4];
-#pragma pop
-
-/* 8095131C-8095131C 00015C 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
+AUDIO_INSTANCES;
 
 /* 80951480-809514A0 -00001 0020+00 1/0 0/0 0/0 .data            l_daNi_Method */
-SECTION_DATA static void* l_daNi_Method[8] = {
-    (void*)daNi_Create__FP10fopAc_ac_c,
-    (void*)daNi_Delete__FP8ni_class,
-    (void*)daNi_Execute__FP8ni_class,
-    (void*)daNi_IsDelete__FP8ni_class,
-    (void*)daNi_Draw__FP8ni_class,
-    (void*)NULL,
-    (void*)NULL,
-    (void*)NULL,
+static actor_method_class l_daNi_Method = {
+    (process_method_func)daNi_Create,
+    (process_method_func)daNi_Delete,
+    (process_method_func)daNi_Execute,
+    (process_method_func)daNi_IsDelete,
+    (process_method_func)daNi_Draw,
 };
 
-/* 809514A0-809514D0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_NI */
-SECTION_DATA extern void* g_profile_NI[12] = {
-    (void*)0xFFFFFFFD, (void*)0x0007FFFD,     (void*)0x01080000, (void*)&g_fpcLf_Method,
-    (void*)0x00000B0C, (void*)NULL,           (void*)NULL,       (void*)&g_fopAc_Method,
-    (void*)0x02B70000, (void*)&l_daNi_Method, (void*)0x080C4000, (void*)0x04000000,
+/* 80AD5464-80AD5494 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_NPC_SERA2 */
+extern actor_process_profile_definition g_profile_NI = {
+  fpcLy_CURRENT_e,          // mLayerID
+  7,                        // mListID
+  fpcPi_CURRENT_e,          // mListPrio
+  PROC_NI,                  // mProcName
+  &g_fpcLf_Method.base,     // sub_method
+  sizeof(ni_class),         // mSize
+  0,                        // mSizeOther
+  0,                        // mParameters
+  &g_fopAc_Method.base,     // sub_method
+  695,                      // mPriority
+  &l_daNi_Method,           // sub_method
+  0x80c4000,                // mStatus
+  fopAc_NPC_e,              // mActorType
+  fopAc_ACTOR_e,            // cullType
 };

@@ -1,7 +1,9 @@
 /**
- * @file d_a_coach_fire.cpp
+* @file d_a_coach_fire.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_coach_fire.h"
 
@@ -20,7 +22,7 @@ CoachFireAttr const daCoachFire_c::M_attr = {
 void daCoachFire_c::create_init() {
     fopAcM_setStageLayer(this);
     fopAcM_setCullSizeBox(this, -100.0, -10.0, -100.0, 100.0, 200.0, 100.0);
-    attention_info.flags = 0x101;
+    attention_info.flags = fopAc_AttnFlag_CHECK_e | fopAc_AttnFlag_LOCK_e;
     attention_info.distances[fopAc_attn_LOCK_e] = 0x24;
     attention_info.distances[fopAc_attn_CHECK_e] = 0x22;
     mLightInfluence.mPosition = current.pos;
@@ -85,7 +87,7 @@ int daCoachFire_c::draw() {
         speed.y = 0.0f;
         speed *= 0.9f;
         emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-        emitter->setUserWork((u32)(&speed));
+        emitter->setUserWork((uintptr_t)(&speed));
     }
     return 1;
 }
@@ -103,10 +105,6 @@ void daCoachFire_c::setCcSphere() {
         mSph.SetC(current.pos);
         dComIfG_Ccsp()->Set(&mSph);
     }
-}
-
-void daCoachFire_c::setNoHitTimer() {
-    noHitTimer = 20;
 }
 
 int daCoachFire_c::execute() {
@@ -166,7 +164,7 @@ static int daCoachFire_Delete(daCoachFire_c* i_this) {
 /* 806581C0-806582AC 0006C0 00EC+00 1/0 0/0 0/0 .text            daCoachFire_Create__FP10fopAc_ac_c
  */
 static int daCoachFire_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, daCoachFire_c);
+    fopAcM_ct(i_this, daCoachFire_c);
     static_cast<daCoachFire_c*>(i_this)->create_init();
     return cPhs_COMPLEATE_e;
 }

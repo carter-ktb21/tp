@@ -3,6 +3,8 @@
  * Tag - Guard
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_guard.h"
 #include "d/d_stage.h"
 
@@ -30,7 +32,7 @@ void daTagGuard_c::createGuard(u32 i_parameters) {
 }
 
 int daTagGuard_c::create() {
-    fopAcM_SetupActor(this, daTagGuard_c);
+    fopAcM_ct(this, daTagGuard_c);
     create_init();
     return cPhs_COMPLEATE_e;
 }

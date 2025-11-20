@@ -1,12 +1,16 @@
 /**
- * @file d_a_obj_crvgate.cpp
+* @file d_a_obj_crvgate.cpp
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_crvgate.h"
 
+#include "d/d_camera.h"
 #include "d/actor/d_a_obj_eff.h"
 #include "d/actor/d_a_player.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80BD30C0-80BD3100 000000 0040+00 12/12 0/0 0/0 .rodata          ccCylSrc$3774 */
 const static dCcD_SrcSph ccSphSrc = {
@@ -719,7 +723,7 @@ void daObjCRVGATE_c::SetDoor() {
 
     if (mKeyParam == 0xff) {
         attention_info.position = mPos;
-        attention_info.flags = 0x20;
+        attention_info.flags = fopAc_AttnFlag_DOOR_e;
         attention_info.distances[5] = 0x0F;
 
         mKeyParam = 0x01;
@@ -739,7 +743,7 @@ void daObjCRVGATE_c::SetDoor() {
 
 /* 80BD28C0-80BD2BE4 0025A0 0324+00 1/1 0/0 0/0 .text            create__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::create() {
-    fopAcM_SetupActor(this, daObjCRVGATE_c);
+    fopAcM_ct(this, daObjCRVGATE_c);
     int ret = dComIfG_resLoad(&mPhaseReq, l_arcName);
 
     if (ret == cPhs_COMPLEATE_e) {
@@ -800,7 +804,7 @@ int daObjCRVGATE_c::Create() {
 
 /* 80BD2ECC-80BD2FB8 002BAC 00EC+00 1/0 0/0 0/0 .text Execute__14daObjCRVGATE_cFPPA3_A4_f
  */
-int daObjCRVGATE_c::Execute(f32 (**param_0)[3][4]) {
+int daObjCRVGATE_c::Execute(Mtx** param_0) {
     s_CoCount = 0;
 
     if (mKeyParam == 0x01) {

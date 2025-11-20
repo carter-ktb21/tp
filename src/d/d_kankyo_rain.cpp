@@ -1,13 +1,16 @@
-#include "d/d_kankyo_rain.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
+#include "JSystem/JUtility/JUTTexture.h"
 #include "SSystem/SComponent/c_counter.h"
+#include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
-#include "m_Do/m_Do_lib.h"
-#include "JSystem/JUtility/JUTTexture.h"
-#include "SSystem/SComponent/c_math.h"
-#include "m_Do/m_Do_graphic.h"
 #include "d/d_demo.h"
+#include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_kankyo_mng.h"
+#include "m_Do/m_Do_graphic.h"
+#include "m_Do/m_Do_lib.h"
 
 /* 8005B660-8005B708 055FA0 00A8+00 3/3 0/0 0/0 .text            vectle_calc__FP10DOUBLE_POSP4cXyz
  */
@@ -53,7 +56,7 @@ static void dKy_set_eyevect_calc(camera_class* i_camera, Vec* o_out, f32 param_2
 
 /* 8005B830-8005B92C 056170 00FC+00 6/6 0/0 0/0 .text
  * dKy_set_eyevect_calc2__FP12camera_classP3Vecff               */
-static void dKy_set_eyevect_calc2(camera_class* i_camera, Vec* o_out, f32 param_2, f32 param_3) {
+void dKy_set_eyevect_calc2(camera_class* i_camera, Vec* o_out, f32 param_2, f32 param_3) {
     cXyz calc;
     DOUBLE_POS pos;
 
@@ -121,8 +124,8 @@ void dKyr_lenzflare_move() {
     cXyz center;
     mDoLib_project(lenz_packet->mPositions, &proj);
 
-    center.x = 304.0f;
-    center.y = 224.0f;
+    center.x = FB_WIDTH / 2;
+    center.y = FB_HEIGHT / 2;
     center.z = 0.0f;
     dKyr_get_vectle_calc(&center, &proj, &vect);
 
@@ -236,7 +239,7 @@ void dKyr_sun_move() {
             chkpnt.x -= sun_chkpnt[i][0];
             chkpnt.y -= sun_chkpnt[i][1];
 
-            if (chkpnt.x > 0.0f && chkpnt.x < 608.0f && chkpnt.y > border_y && chkpnt.y < 458.0f - border_y) {
+            if (chkpnt.x > 0.0f && chkpnt.x < FB_WIDTH && chkpnt.y > border_y && chkpnt.y < 458.0f - border_y) {
                 if (sun_packet->field_0x44[i] >= 0xFFFFFF) {
                     numPointsVisible++;
                     if (i == 0) {
@@ -264,12 +267,12 @@ void dKyr_sun_move() {
 
         lenz_packet->field_0x84 = lenz_packet->field_0x8c;
         lenz_packet->field_0x88 = lenz_packet->field_0x90;
-        lenz_packet->field_0x8c = 1000000000.0f;
+        lenz_packet->field_0x8c = 1000000000.0f; // This is not G_CM3D_F_INF
         lenz_packet->field_0x90 = 0.0f;
 
         cXyz center;
-        center.x = 304.0f;
-        center.y = 224.0f;
+        center.x = FB_WIDTH / 2;
+        center.y = FB_HEIGHT / 2;
         center.z = 0.0f;
 
         lenz_packet->mDistFalloff = center.abs(proj);
@@ -505,7 +508,7 @@ static BOOL forward_overhead_bg_chk(cXyz* ppos, f32 dist) {
     *ppos = chk_pos;
 
     roofchk.SetPos(chk_pos);
-    if (1000000000.0f != dComIfG_Bgsp().RoofChk(&roofchk)) {
+    if (G_CM3D_F_INF != dComIfG_Bgsp().RoofChk(&roofchk)) {
         chk = TRUE;
         if (strcmp(dComIfGp_getStartStageName(), "F_SP122") == 0) {
             if (dStage_roomControl_c::getStayNo() == 17) {
@@ -526,49 +529,56 @@ static BOOL forward_overhead_bg_chk(cXyz* ppos, f32 dist) {
 /* 8005D18C-8005E8B0 057ACC 1724+00 0/0 1/1 0/0 .text            dKyr_rain_move__Fv */
 // NONMATCHING reg alloc, equivalent?
 void dKyr_rain_move() {
+    dKankyo_rain_Packet* rain_packet;
     camera_class* camera;
 
-    dKankyo_rain_Packet* rain_packet = g_env_light.mpRainPacket;
+    rain_packet = g_env_light.mpRainPacket;
     camera = (camera_class*)dComIfGp_getCamera(0);
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
+    cXyz spFC;
+    cXyz spF0;
+    cXyz spE4;
+    cXyz spD8;
+    cXyz spCC = dKyw_get_wind_vecpow();
 
-    cXyz spE0;
-    cXyz spD4;
-    cXyz spC8 = dKyw_get_wind_vecpow();
-    cXyz spBC;
-    cXyz spB0;
+    cXyz spC0;
+    cXyz spB4;
+    cXyz spA8;
+    cXyz sp9C;
+    cXyz sp90;
 
-    BOOL var_r20;
-    BOOL var_r21;
-    BOOL var_r22;
-    BOOL var_r23;
-    BOOL var_r24;
+    cXyz* sp3C;
+    f32 sp38;
+    BOOL sp34;
+    BOOL sp30;
+    BOOL sp2C;
+    u32 sp28;
+    BOOL sp24 = 0;
+    f32 sp20;
+    BOOL sp1C = 0;
 
-    var_r21 = 0;
-    var_r20 = 0;
+    f32 var_f31;
+    f32 var_f30;
+    f32 var_f29;
+    f32 var_f28;
 
-    dStage_stagInfo_GetSTType(dComIfGp_getStage()->getStagInfo());
+    sp28 = dStage_stagInfo_GetSTType(dComIfGp_getStage()->getStagInfo());
 
-    cXyz spA4;
-    cXyz sp98;
-    cXyz sp8C;
-
-    spA4.x = 0.0f;
-    spA4.y = -2.5f;
-    spA4.z = 0.0f;
+    spA8.x = 0.0f;
+    spA8.y = -2.5f;
+    spA8.z = 0.0f;
 
     if (rain_packet->raincnt <= g_env_light.raincnt) {
         rain_packet->raincnt = g_env_light.raincnt;
     }
 
     if (rain_packet->raincnt != 0) {
-        dKyr_get_vectle_calc(&camera->lookat.center, &rain_packet->mCamCenterPos, &spB0);
+        dKyr_get_vectle_calc(&camera->lookat.center, &rain_packet->mCamCenterPos, &spB4);
 
-        f32 var_f1 = rain_packet->mCamEyePos.abs(camera->lookat.eye);
+        var_f30 = rain_packet->mCamEyePos.abs(camera->lookat.eye);
 
-        f32 var_f30;
-        if (var_f1 > 10.0f) {
-            var_f30 = (var_f1 - 10.0f) / 50.0f;
+        if (var_f30 > 10.0f) {
+            var_f30 = (var_f30 - 10.0f) / 50.0f;
             if (var_f30 > 1.0f) {
                 var_f30 = 1.0f;
             }
@@ -579,193 +589,182 @@ void dKyr_rain_move() {
         rain_packet->mCamEyePos.x = camera->lookat.eye.x;
         rain_packet->mCamEyePos.z = camera->lookat.eye.z;
 
-        f32 var_f1_2 = rain_packet->mCamEyePos.abs(camera->lookat.eye);
-        f32 var_f2 = var_f1_2 / 20.0f;
-        if (var_f2 > 1.0f) {
-            var_f2 = 1.0f;
+        var_f28 = rain_packet->mCamEyePos.abs(camera->lookat.eye);
+        var_f28 = var_f28 / 20.0f;
+        if (var_f28 > 1.0f) {
+            var_f28 = 1.0f;
         }
 
-        spA4.y -= var_f2 * 15.0f;
+        spA8.y += -(var_f28 * 15.0f);
         rain_packet->mCamEyePos = camera->lookat.eye;
 
-        f32 var_f1_3 = rain_packet->mCamCenterPos.abs(camera->lookat.center);
-
-        f32 var_f1_4;
-        if (var_f1_3 > 10.0f) {
-            var_f1_4 = (var_f1_3 - 10.0f) / 50.0f;
-            if (var_f1_4 > 1.0f) {
-                var_f1_4 = 1.0f;
+        var_f29 = rain_packet->mCamCenterPos.abs(camera->lookat.center);
+        if (var_f29 > 10.0f) {
+            var_f29 = (var_f29 - 10.0f) / 50.0f;
+            if (var_f29 > 1.0f) {
+                var_f29 = 1.0f;
             }
         } else {
-            var_f1_4 = 0.0f;
+            var_f29 = 0.0f;
         }
 
-        cLib_addCalc(&rain_packet->mCenterDeltaMul, var_f30 * var_f1_4, 0.2f, 0.1f, 0.01f);
+        cLib_addCalc(&rain_packet->mCenterDeltaMul, var_f30 * var_f29, 0.2f, 0.1f, 0.01f);
         if (rain_packet->mCenterDeltaMul > 0.3f) {
             rain_packet->mCenterDeltaMul = 0.3f;
         }
 
-        cLib_addCalc(&rain_packet->mCenterDelta.x, spB0.x, 0.2f, 0.1f, 0.01f);
-        cLib_addCalc(&rain_packet->mCenterDelta.y, spB0.y, 0.2f, 0.1f, 0.01f);
-        cLib_addCalc(&rain_packet->mCenterDelta.z, spB0.z, 0.2f, 0.1f, 0.01f);
+        cLib_addCalc(&rain_packet->mCenterDelta.x, spB4.x, 0.2f, 0.1f, 0.01f);
+        cLib_addCalc(&rain_packet->mCenterDelta.y, spB4.y, 0.2f, 0.1f, 0.01f);
+        cLib_addCalc(&rain_packet->mCenterDelta.z, spB4.z, 0.2f, 0.1f, 0.01f);
         rain_packet->mCamCenterPos = camera->lookat.center;
 
-        dKy_set_eyevect_calc2(camera, &spE0, 700.0f, 600.0f);
-        spD4.z = 0.0f;
-        spD4.y = 0.0f;
-        spD4.x = 0.0f;
+        dKy_set_eyevect_calc2(camera, &spFC, 700.0f, 600.0f);
+        spD8.x = spD8.y = spD8.z = 0.0f;
 
-        dKyw_get_wind_vec();
-        dKyw_get_wind_pow();
+        sp3C = dKyw_get_wind_vec();
+        sp38 = dKyw_get_wind_pow();
 
         rain_packet->field_0x36cc = 0;
         rain_packet->field_0x36c8 = 0;
         rain_packet->mStatus = 0;
 
-        var_r22 = 0;
-        var_r23 = 0;
-        var_r24 = 0;
-        f32 var_f29;
+        sp34 = 0;
+        sp30 = 0;
+        sp2C = 0;
 
         if (strcmp(dComIfGp_getStartStageName(), "R_SP30") == 0) {
             if (dComIfGp_roomControl_getStayNo() == 0 || dComIfGp_roomControl_getStayNo() == 4) {
-                var_r20 = 1;
+                sp1C = 1;
             }
         } else if (strcmp(dComIfGp_getStartStageName(), "R_SP107") == 0 &&
                    dComIfGp_roomControl_getStayNo() == 1)
         {
-            var_r20 = 2;
+            sp1C = 2;
         } else if (strcmp(dComIfGp_getStartStageName(), "R_SP127") == 0) {
-            var_r20 = 3;
+            sp1C = 3;
         }
 
-        if (var_r20 == 0) {
-            var_r24 = overhead_bg_chk();
-            var_r23 = forward_overhead_bg_chk(&sp98, 700.0f);
-            var_r22 = forward_overhead_bg_chk(&sp8C, 1400.0f);
+        if (sp1C == 0) {
+            sp34 = overhead_bg_chk();
+            sp30 = forward_overhead_bg_chk(&sp9C, 700.0f);
+            sp2C = forward_overhead_bg_chk(&sp90, 1400.0f);
 
-            if (var_r24) {
-                rain_packet->mStatus |= 1;
-            } else if (var_r23) {
-                rain_packet->mStatus |= 2;
+            if (sp34) {
+                rain_packet->mStatus |= (u8)1;
+            } else if (sp30) {
+                rain_packet->mStatus |= (u8)2;
             }
         } else {
-            var_r21 = 1;
-            rain_packet->mStatus |= 1;
-            var_f29 = 1200.0f;
+            sp24 = 1;
+            rain_packet->mStatus |= (u8)1;
+            sp20 = 1200.0f;
         }
 
-        if (var_r24) {
+        if (sp34) {
             cLib_addCalc(&rain_packet->mOverheadFade, 0.0f, 0.5f, 0.2f, 0.01f);
         } else {
             cLib_addCalc(&rain_packet->mOverheadFade, 1.0f, 0.1f, 0.1f, 0.001f);
         }
 
-        if (var_r23) {
+        if (sp30) {
             cLib_addCalc(&rain_packet->mFwdFade1, 0.0f, 0.5f, 0.2f, 0.01f);
         } else {
             cLib_addCalc(&rain_packet->mFwdFade1, 1.0f, 0.1f, 0.1f, 0.001f);
         }
 
-        if (var_r22) {
+        if (sp2C) {
             cLib_addCalc(&rain_packet->mFwdFade2, 0.0f, 0.5f, 0.2f, 0.01f);
         } else {
             cLib_addCalc(&rain_packet->mFwdFade2, 1.0f, 0.1f, 0.1f, 0.001f);
         }
 
-        f32 temp_f30 = 1.0f;
         for (int i = rain_packet->raincnt - 1; i >= 0; i--) {
-            rain_packet->mRainEff[i].mBasePos.y = spE0.y;
-            RAIN_EFF* effect = &rain_packet->mRainEff[i];
+            rain_packet->mRainEff[i].mBasePos.y = spFC.y;
 
             switch (rain_packet->mRainEff[i].mStatus) {
             case 0:
-                effect->field_0x24 = -(cM_rndF(10.0f) + 35.5f);
-                effect->mTimer = 0;
-                effect->mBasePos = spE0;
-                effect->mPosition.x = cM_rndFX(800.0f);
-                effect->mPosition.y = cM_rndF(600.0f);
-                effect->mPosition.z = cM_rndFX(800.0f);
-                effect->mAlpha = 1.0f;
-                effect->field_0x1c = cM_rndF(360.0f);
-                effect->field_0x20 = cM_rndF(360.0f);
+                rain_packet->mRainEff[i].field_0x24 = -(cM_rndF(10.0f) + 35.5f);
+                rain_packet->mRainEff[i].mTimer = 0;
+                rain_packet->mRainEff[i].mBasePos.x = spFC.x;
+                rain_packet->mRainEff[i].mBasePos.y = spFC.y;
+                rain_packet->mRainEff[i].mBasePos.z = spFC.z;
+                rain_packet->mRainEff[i].mPosition.x = cM_rndFX(800.0f);
+                rain_packet->mRainEff[i].mPosition.y = cM_rndF(600.0f);
+                rain_packet->mRainEff[i].mPosition.z = cM_rndFX(800.0f);
+                rain_packet->mRainEff[i].mAlpha = 1.0f;
+                rain_packet->mRainEff[i].field_0x1c = cM_rndF(360.0f);
+                rain_packet->mRainEff[i].field_0x20 = cM_rndF(360.0f);
 
                 rain_bg_chk(rain_packet, i);
-                effect->mStatus++;
+                rain_packet->mRainEff[i].mStatus++;
                 break;
             case 1:
             case 2:
             case 3:
-                f32 target = cM_rndFX(0.1f);
-                f32* temp_r27 = &effect->field_0x24;
-                target = effect->field_0x24 - target;
+                cLib_addCalc(&rain_packet->mRainEff[i].field_0x24, rain_packet->mRainEff[i].field_0x24 - cM_rndFX(0.1f), 0.5f, 0.1f, 0.01f);
 
-                cLib_addCalc(temp_r27, target, 0.5f, 0.1f, 0.01f);
-
-                effect->mPosition.x +=
+                rain_packet->mRainEff[i].mPosition.x +=
                     20.0f *
-                    ((spC8.x + (10.0f * (rain_packet->mCenterDelta.x * rain_packet->mCenterDeltaMul))) +
-                     (spA4.x + (0.08f * (f32)(i & 7))));
+                    ((spCC.x + (10.0f * (rain_packet->mCenterDelta.x * rain_packet->mCenterDeltaMul))) +
+                     (spA8.x + (0.08f * (f32)(i & 7))));
 
-                effect->mPosition.y +=
+                rain_packet->mRainEff[i].mPosition.y +=
                     ((f32)(i & 7) * -2.0f) +
                     (20.0f *
-                     (spA4.y +
-                      (spC8.y + ((rain_packet->mCenterDelta.y * rain_packet->mCenterDeltaMul) * 10.0f))));
+                     (spA8.y +
+                      (spCC.y + ((rain_packet->mCenterDelta.y * rain_packet->mCenterDeltaMul) * 10.0f))));
 
-                effect->mPosition.z +=
+                rain_packet->mRainEff[i].mPosition.z +=
                     20.0f *
-                    ((spC8.z + (10.0f * (rain_packet->mCenterDelta.z * rain_packet->mCenterDeltaMul))) +
-                     (spA4.z + (0.08f * (f32)(i & 3))));
+                    ((spCC.z + (10.0f * (rain_packet->mCenterDelta.z * rain_packet->mCenterDeltaMul))) +
+                     (spA8.z + (0.08f * (f32)(i & 3))));
 
-                spBC.x = effect->mBasePos.x + effect->mPosition.x;
-                spBC.y = spE0.y;
-                spBC.z = effect->mBasePos.z + effect->mPosition.z;
+                spC0.x = rain_packet->mRainEff[i].mBasePos.x + rain_packet->mRainEff[i].mPosition.x;
+                spC0.y = spFC.y;
+                spC0.z = rain_packet->mRainEff[i].mBasePos.z + rain_packet->mRainEff[i].mPosition.z;
 
-                f32 var_f1_5 = spBC.abs(spE0);
+                f32 var_f1 = spC0.abs(spFC);
 
-                if (effect->mTimer == 0) {
-                    if (var_f1_5 > 800.0f) {
-                        effect->mTimer = 10;
-                        *temp_r27 = -(cM_rndF(10.0f) + 35.5f);
-                        effect->mBasePos = spE0;
+                if (rain_packet->mRainEff[i].mTimer == 0) {
+                    if (var_f1 > 800.0f) {
+                        rain_packet->mRainEff[i].mTimer = 10;
+                        rain_packet->mRainEff[i].field_0x24 = -(cM_rndF(10.0f) + 35.5f);
+                        rain_packet->mRainEff[i].mBasePos = spFC;
 
-                        f32 var_f1_6 = spBC.abs(spE0);
-                        if (var_f1_6 > 850.0f) {
-                            effect->mPosition.x = cM_rndFX(800.0f);
-                            effect->mPosition.y = cM_rndFX(800.0f);
-                            effect->mPosition.z = cM_rndFX(800.0f);
+                        if (spC0.abs(spFC) > 850.0f) {
+                            rain_packet->mRainEff[i].mPosition.x = cM_rndFX(800.0f);
+                            rain_packet->mRainEff[i].mPosition.y = cM_rndFX(800.0f);
+                            rain_packet->mRainEff[i].mPosition.z = cM_rndFX(800.0f);
                         } else {
-                            f32 temp_f31 = cM_rndFX(40.0f);
-                            get_vectle_calc(&spBC, &spE0, &spB0);
+                            var_f31 = cM_rndFX(40.0f);
+                            get_vectle_calc(&spC0, &spFC, &spB4);
 
-                            effect->mPosition.x = spB0.x * (temp_f31 + 800.0f);
-                            effect->mPosition.y = spB0.y * (temp_f31 + 800.0f);
-                            effect->mPosition.z = spB0.z * (temp_f31 + 800.0f);
+                            rain_packet->mRainEff[i].mPosition.x = spB4.x * (var_f31 + 800.0f);
+                            rain_packet->mRainEff[i].mPosition.y = spB4.y * (var_f31 + 800.0f);
+                            rain_packet->mRainEff[i].mPosition.z = spB4.z * (var_f31 + 800.0f);
                         }
 
-                        effect->mStatus = 1;
+                        rain_packet->mRainEff[i].mStatus = 1;
                         rain_bg_chk(rain_packet, i);
                     }
 
-                    spBC.y = effect->mBasePos.y + effect->mPosition.y;
-                    if (spBC.y < effect->field_0x30 + 20.0f) {
-                        effect->mBasePos = spE0;
-                        effect->mPosition.x = cM_rndFX(800.0f);
-                        effect->mPosition.y = 200.0f;
-                        effect->mPosition.z = cM_rndFX(800.0f);
+                    spC0.y = rain_packet->mRainEff[i].mBasePos.y + rain_packet->mRainEff[i].mPosition.y;
+                    if (spC0.y < rain_packet->mRainEff[i].field_0x30 + 20.0f) {
+                        rain_packet->mRainEff[i].mBasePos = spFC;
+                        rain_packet->mRainEff[i].mPosition.x = cM_rndFX(800.0f);
+                        rain_packet->mRainEff[i].mPosition.y = 200.0f;
+                        rain_packet->mRainEff[i].mPosition.z = cM_rndFX(800.0f);
                         rain_bg_chk(rain_packet, i);
-                        effect->mTimer = 10;
+                        rain_packet->mRainEff[i].mTimer = 10;
                     }
                 } else {
-                    effect->mTimer--;
+                    rain_packet->mRainEff[i].mTimer--;
                 }
-                break;
             }
 
-            spBC.x = effect->mBasePos.x + effect->mPosition.x;
-            spBC.y = effect->mBasePos.y + effect->mPosition.y;
-            spBC.z = effect->mBasePos.z + effect->mPosition.z;
+            spC0.x = rain_packet->mRainEff[i].mBasePos.x + rain_packet->mRainEff[i].mPosition.x;
+            spC0.y = rain_packet->mRainEff[i].mBasePos.y + rain_packet->mRainEff[i].mPosition.y;
+            spC0.z = rain_packet->mRainEff[i].mBasePos.z + rain_packet->mRainEff[i].mPosition.z;
 
             if (i > g_env_light.raincnt - 1) {
                 if (i == rain_packet->raincnt - 1) {
@@ -773,69 +772,72 @@ void dKyr_rain_move() {
                 }
             }
 
-            f32 var_f31 = 1.0f;
-            if (var_r24 || rain_packet->mOverheadFade < 1.0f) {
+            var_f31 = 1.0f;
+            if (sp34 || rain_packet->mOverheadFade < 1.0f) {
                 cXyz sp80;
-                sp80 = spBC;
+                f32 sp10 = 800.0f;
+                sp80 = spC0;
                 sp80.y = camera->lookat.eye.y;
 
-                if (camera->lookat.eye.abs(sp80) < 800.0f) {
+                if (camera->lookat.eye.abs(sp80) < sp10) {
                     var_f31 *= rain_packet->mOverheadFade * 1.0f;
                 }
             }
 
-            if (var_r23 || rain_packet->mFwdFade1 < 1.0f) {
+            if (sp30 || rain_packet->mFwdFade1 < 1.0f) {
                 cXyz sp74;
-                sp74 = spBC;
-                sp74.y = sp98.y;
+                f32 sp0C = 550.0f;
+                sp74 = spC0;
+                sp74.y = sp9C.y;
 
-                if (sp98.abs(sp74) < 550.0f) {
+                if (sp9C.abs(sp74) < sp0C) {
                     var_f31 *= rain_packet->mFwdFade1;
                 }
             }
 
-            if (var_r22 || rain_packet->mFwdFade2 < 1.0f) {
+            if (sp2C || rain_packet->mFwdFade2 < 1.0f) {
                 cXyz sp68;
-                sp68 = spBC;
-                sp68.y = sp8C.y;
+                f32 sp08 = 550.0f;
+                sp68 = spC0;
+                sp68.y = sp90.y;
 
-                if (sp8C.abs(sp68) < 550.0f) {
+                if (sp90.abs(sp68) < sp08) {
                     var_f31 *= rain_packet->mFwdFade2;
                 }
             }
 
-            if (var_r21) {
+            if (sp24) {
                 cXyz sp5C;
                 if (strcmp(dComIfGp_getStartStageName(), "R_SP30") == 0) {
                     if (dComIfGp_roomControl_getStayNo() == 0) {
-                        if (spBC.x > -2680.0f && spBC.z < 2200.0f) {
+                        if (spC0.x > -2680.0f && spC0.z < 2200.0f) {
                             var_f31 = 0.0f;
                         }
-                    } else if (dComIfGp_roomControl_getStayNo() == 4 && spBC.z > 1600.0f) {
+                    } else if (dComIfGp_roomControl_getStayNo() == 4 && spC0.z > 1600.0f) {
                         var_f31 = 0.0f;
                     }
-                } else if (var_r20 == 2) {
+                } else if (sp1C == 2) {
                     cXyz sp50;
                     sp50.x = 27453.0f;
-                    sp50.y = spBC.y;
+                    sp50.y = spC0.y;
                     sp50.z = 8528.0f;
 
-                    if (spBC.y < 1300.0f || player->current.pos.y < 1100.0f) {
-                        if (spBC.abs(sp50) > 80.0f) {
+                    if (spC0.y < 1300.0f || player->current.pos.y < 1100.0f) {
+                        if (spC0.abs(sp50) > 80.0f) {
                             var_f31 = 0.0f;
                         }
                     } else {
-                        if (spBC.abs(sp50) > 500.0f) {
+                        if (spC0.abs(sp50) > 500.0f) {
                             var_f31 = 0.0f;
                         }
                     }
-                } else if (var_r20 == 3) {
+                } else if (sp1C == 3) {
                     cXyz sp44;
                     sp44.x = -228.0f;
-                    sp44.y = spBC.y;
+                    sp44.y = spC0.y;
                     sp44.z = 795.0f;
 
-                    if (spBC.abs(sp44) < 1500.0f) {
+                    if (spC0.abs(sp44) < 1500.0f) {
                         var_f31 = 0.0f;
                     }
 
@@ -843,40 +845,40 @@ void dKyr_rain_move() {
                         var_f31 = 0.0f;
                     }
                 } else {
-                    sp5C = spBC;
+                    sp5C = spC0;
                     sp5C.y = 0.0f;
 
-                    if (sp5C.abs() < var_f29) {
+                    if (sp5C.abs() < sp20) {
                         var_f31 = 0.0f;
                     }
                 }
             } else if (strcmp(dComIfGp_getStartStageName(), "F_SP113") == 0 &&
                        dComIfGp_roomControl_getStayNo() == 1)
             {
-                if (spBC.z < 5100.0f || (spBC.x < -3250.0f && spBC.y < -50.0f) ||
-                    (spBC.x < -2700.0f && spBC.z > 15750.0f))
+                if (spC0.z < 5100.0f || (spC0.x < -3250.0f && spC0.y < -50.0f) ||
+                    (spC0.x < -2700.0f && spC0.z > 15750.0f))
                 {
                     var_f31 = 0.0f;
-                    rain_packet->mStatus |= 1;
+                    rain_packet->mStatus |= (u8)1;
                 }
             } else if (strcmp(dComIfGp_getStartStageName(), "D_MN09") == 0 &&
                        dComIfGp_roomControl_getStayNo() == 9)
             {
-                if (spBC.x < -3680.0f && spBC.z > -11975.0f && spBC.z < -10530.0f) {
+                if (spC0.x < -3680.0f && spC0.z > -11975.0f && spC0.z < -10530.0f) {
                     var_f31 = 0.0f;
-                    rain_packet->mStatus |= 1;
-                } else if (spBC.x > 3350.0f && spBC.z > -13027.0f && spBC.z < -11430.0f) {
+                    rain_packet->mStatus |= (u8)1;
+                } else if (spC0.x > 3350.0f && spC0.z > -13027.0f && spC0.z < -11430.0f) {
                     var_f31 = 0.0f;
-                    rain_packet->mStatus |= 1;
+                    rain_packet->mStatus |= (u8)1;
                 }
             } else if (strcmp(dComIfGp_getStartStageName(), "R_SP107") == 0 &&
-                       dComIfGp_roomControl_getStayNo() == 2 && spBC.z > 36900.0f)
+                       dComIfGp_roomControl_getStayNo() == 2 && spC0.z > 36900.0f)
             {
                 var_f31 = 0.0f;
-                rain_packet->mStatus |= 1;
+                rain_packet->mStatus |= (u8)1;
             }
 
-            effect->mAlpha = var_f31 * (temp_f30 + cM_rndFX(0.5f));
+            rain_packet->mRainEff[i].mAlpha = var_f31 * (1.0f + cM_rndFX(0.5f));
         }
     }
 }
@@ -1273,12 +1275,8 @@ void dKyr_snow_init() {
 }
 
 /* 8005FD48-80061324 05A688 15DC+00 0/0 1/1 0/0 .text            dKyr_snow_move__Fv */
-// NONMATCHING mostly matches, 1 out of order instruction
 void dKyr_snow_move() {
-    f32* temp_r26;
-    cXyz* temp_r25;
     dKankyo_snow_Packet* snow_packet = g_env_light.mpSnowPacket;
-    SNOW_EFF* effect;
     camera_class* camera = (camera_class*)dComIfGp_getCamera(0);
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
 
@@ -1315,9 +1313,7 @@ void dKyr_snow_move() {
     }
 
     snow_packet->field_0x6d74 = camera->lookat.eye;
-    spA0.z = 0.0f;
-    spA0.y = 0.0f;
-    spA0.x = 0.0f;
+    spA0.x = spA0.y = spA0.z = 0.0f;
 
     cXyz* temp_r21 = dKyw_get_wind_vec();
     f32 var_f20 = dKyw_get_wind_pow();
@@ -1349,37 +1345,31 @@ void dKyr_snow_move() {
         f32 gravity = -(2.0f + cM_rndF(6.5f));
         f32 speed = 2.0f * (5.0f + (f32)(i & 15));
 
-        effect = &snow_packet->mSnowEff[i];
         switch (snow_packet->mSnowEff[i].mStatus) {
         case 0:
-            effect->mWindSpeed = speed;
-            effect->mGravity = gravity;
-            effect->mTimer = 0;
-            effect->mBasePos.x = spAC.x + cM_rndFX(1100.0f);
-            effect->mBasePos.y = spAC.y + 1100.0f;
-            effect->mBasePos.z = spAC.z + cM_rndFX(1100.0f);
-            effect->mPosition.x = spB8.x + cM_rndFX(550.0f);
-            effect->mPosition.y = spB8.y + 550.0f;
-            effect->mPosition.z = spB8.z + cM_rndFX(550.0f);
-            effect->mScale = 0.0f;
-            effect->mPosWaveX = cM_rndF(65536.0f);
-            effect->mPosWaveZ = cM_rndF(65536.0f);
-            effect->mStatus++;
+            snow_packet->mSnowEff[i].mWindSpeed = speed;
+            snow_packet->mSnowEff[i].mGravity = gravity;
+            snow_packet->mSnowEff[i].mTimer = 0;
+            snow_packet->mSnowEff[i].mBasePos.x = spAC.x + cM_rndFX(1100.0f);
+            snow_packet->mSnowEff[i].mBasePos.y = spAC.y + 1100.0f;
+            snow_packet->mSnowEff[i].mBasePos.z = spAC.z + cM_rndFX(1100.0f);
+            snow_packet->mSnowEff[i].mPosition.x = spB8.x + cM_rndFX(550.0f);
+            snow_packet->mSnowEff[i].mPosition.y = spB8.y + 550.0f;
+            snow_packet->mSnowEff[i].mPosition.z = spB8.z + cM_rndFX(550.0f);
+            snow_packet->mSnowEff[i].mScale = 0.0f;
+            snow_packet->mSnowEff[i].mPosWaveX = cM_rndF(65536.0f);
+            snow_packet->mSnowEff[i].mPosWaveZ = cM_rndF(65536.0f);
+            snow_packet->mSnowEff[i].mStatus++;
             break;
         case 1:
-            f32 target = cM_rndFX(0.08f);
-            temp_r26 = &effect->mWindSpeed;
-            target = effect->mWindSpeed - target;
-
-            cLib_addCalc(temp_r26, target, 0.5f, 0.1f, 0.01f);
+            cLib_addCalc(&snow_packet->mSnowEff[i].mWindSpeed, snow_packet->mSnowEff[i].mWindSpeed - cM_rndFX(0.08f), 0.5f, 0.1f, 0.01f);
 
             cXyz sp4C;
             sp88 = sp94;
-            temp_r25 = &effect->mPosition;
-            if (camera->lookat.eye.abs(*temp_r25) < 500.0f &&
-                effect->mPosition.y < temp_f19 + 250.0f)
+            if (camera->lookat.eye.abs(snow_packet->mSnowEff[i].mPosition) < 500.0f &&
+                snow_packet->mSnowEff[i].mPosition.y < temp_f19 + 250.0f)
             {
-                f32 var_f1_3 = ((temp_f19 + 250.0f) - effect->mPosition.y) / 250.0f;
+                f32 var_f1_3 = ((temp_f19 + 250.0f) - snow_packet->mSnowEff[i].mPosition.y) / 250.0f;
                 if (var_f1_3 > 1.0f) {
                     var_f1_3 = 1.0f;
                 }
@@ -1387,26 +1377,26 @@ void dKyr_snow_move() {
                 sp88.y = var_f1_3 * 0.45f;
             }
 
-            s16 wave_x = effect->mPosWaveX;
-            s16 wave_z = effect->mPosWaveZ;
+            s16 wave_x = snow_packet->mSnowEff[i].mPosWaveX;
+            s16 wave_z = snow_packet->mSnowEff[i].mPosWaveZ;
 
             sp4C.x = cM_scos(wave_x) * cM_ssin(wave_z);
             sp4C.y = cM_ssin(wave_x);
             sp4C.z = cM_scos(wave_x) * cM_scos(wave_z);
 
-            effect->mPosition.x += sp88.x * *temp_r26;
-            effect->mPosition.z += sp88.z * *temp_r26;
-            effect->mPosition.y += effect->mGravity + (sp88.y * *temp_r26);
+            snow_packet->mSnowEff[i].mPosition.x += sp88.x * snow_packet->mSnowEff[i].mWindSpeed;
+            snow_packet->mSnowEff[i].mPosition.z += sp88.z * snow_packet->mSnowEff[i].mWindSpeed;
+            snow_packet->mSnowEff[i].mPosition.y += snow_packet->mSnowEff[i].mGravity + (sp88.y * snow_packet->mSnowEff[i].mWindSpeed);
 
-            effect->mPosition.x += sp4C.x * 5.3f;
-            effect->mPosition.y += sp4C.y * 5.3f;
-            effect->mPosition.z += sp4C.z * 5.3f;
+            snow_packet->mSnowEff[i].mPosition.x += sp4C.x * 5.3f;
+            snow_packet->mSnowEff[i].mPosition.y += sp4C.y * 5.3f;
+            snow_packet->mSnowEff[i].mPosition.z += sp4C.z * 5.3f;
 
             sp88 = sp94;
-            if (camera->lookat.eye.abs(*temp_r25) < 500.0f &&
-                effect->mBasePos.y < temp_f19 + 250.0f)
+            if (camera->lookat.eye.abs(snow_packet->mSnowEff[i].mPosition) < 500.0f &&
+                snow_packet->mSnowEff[i].mBasePos.y < temp_f19 + 250.0f)
             {
-                f32 var_f1_5 = ((temp_f19 + 250.0f) - effect->mBasePos.y) / 250.0f;
+                f32 var_f1_5 = ((temp_f19 + 250.0f) - snow_packet->mSnowEff[i].mBasePos.y) / 250.0f;
                 if (var_f1_5 > 1.0f) {
                     var_f1_5 = 1.0f;
                 }
@@ -1414,73 +1404,74 @@ void dKyr_snow_move() {
                 sp88.y = var_f1_5 * 0.35f;
             }
 
-            effect->mBasePos.x += sp88.x * *temp_r26;
-            effect->mBasePos.z += sp88.z * *temp_r26;
-            effect->mBasePos.y += effect->mGravity + (sp88.y * *temp_r26);
+            snow_packet->mSnowEff[i].mBasePos.x += sp88.x * snow_packet->mSnowEff[i].mWindSpeed;
+            snow_packet->mSnowEff[i].mBasePos.z += sp88.z * snow_packet->mSnowEff[i].mWindSpeed;
+            snow_packet->mSnowEff[i].mBasePos.y += snow_packet->mSnowEff[i].mGravity + (sp88.y * snow_packet->mSnowEff[i].mWindSpeed);
 
-            effect->mBasePos.x += sp4C.x * 5.3f;
-            effect->mBasePos.y += sp4C.y * 5.3f;
-            effect->mBasePos.z += sp4C.z * 5.3f;
+            snow_packet->mSnowEff[i].mBasePos.x += sp4C.x * 5.3f;
+            snow_packet->mSnowEff[i].mBasePos.y += sp4C.y * 5.3f;
+            snow_packet->mSnowEff[i].mBasePos.z += sp4C.z * 5.3f;
 
-            cLib_addCalc(&effect->mPosWaveX, effect->mPosWaveX + cM_rndF(3000.0f), 0.25f,
+            cLib_addCalc(&snow_packet->mSnowEff[i].mPosWaveX, snow_packet->mSnowEff[i].mPosWaveX + cM_rndF(3000.0f), 0.25f,
                          1500.0f, 0.001f);
-            cLib_addCalc(&effect->mPosWaveZ, effect->mPosWaveZ + cM_rndF(3000.0f), 0.25f,
+            cLib_addCalc(&snow_packet->mSnowEff[i].mPosWaveZ, snow_packet->mSnowEff[i].mPosWaveZ + cM_rndF(3000.0f), 0.25f,
                          1500.0f, 0.001f);
 
-            sp7C = effect->mPosition;
+            sp7C = snow_packet->mSnowEff[i].mPosition;
             f32 var_f1_6 = sp7C.abs(spB8);
 
-            if (effect->mTimer == 0) {
+            if (snow_packet->mSnowEff[i].mTimer == 0) {
                 if (var_f1_6 > 550.0f) {
-                    effect->mTimer = 10;
-                    *temp_r26 = speed;
-                    effect->mGravity = gravity;
+                    snow_packet->mSnowEff[i].mTimer = 10;
+                    snow_packet->mSnowEff[i].mWindSpeed = speed;
+                    snow_packet->mSnowEff[i].mGravity = gravity;
 
                     if (sp7C.abs(spB8) > 600.0f) {
-                        effect->mPosition.x = spB8.x + cM_rndFX(550.0f);
-                        effect->mPosition.y = spB8.y + cM_rndFX(550.0f);
-                        effect->mPosition.z = spB8.z + cM_rndFX(550.0f);
+                        snow_packet->mSnowEff[i].mPosition.x = spB8.x + cM_rndFX(550.0f);
+                        snow_packet->mSnowEff[i].mPosition.y = spB8.y + cM_rndFX(550.0f);
+                        snow_packet->mSnowEff[i].mPosition.z = spB8.z + cM_rndFX(550.0f);
                     } else {
                         f32 temp_f26_2 = cM_rndFX(27.5f);
                         get_vectle_calc(&sp7C, &spB8, &sp70);
 
-                        effect->mPosition.x = spB8.x + sp70.x * (temp_f26_2 + 550.0f);
-                        effect->mPosition.y = spB8.y + sp70.y * (temp_f26_2 + 550.0f);
-                        effect->mPosition.z = spB8.z + sp70.z * (temp_f26_2 + 550.0f);
+                        snow_packet->mSnowEff[i].mPosition.x = spB8.x + sp70.x * (temp_f26_2 + 550.0f);
+                        snow_packet->mSnowEff[i].mPosition.y = spB8.y + sp70.y * (temp_f26_2 + 550.0f);
+                        snow_packet->mSnowEff[i].mPosition.z = spB8.z + sp70.z * (temp_f26_2 + 550.0f);
                     }
                 }
             } else {
-                effect->mTimer--;
+                snow_packet->mSnowEff[i].mTimer--;
             }
 
-            sp7C = effect->mBasePos;
-            if (sp7C.abs(spAC) > 1100.0f) {
+            sp7C = snow_packet->mSnowEff[i].mBasePos;
+            f32 sp18 = sp7C.abs(spAC);
+            if (sp18 > 1100.0f) {
                 if (sp7C.abs(spAC) > 1150.0f) {
-                    effect->mBasePos.x = spAC.x + cM_rndFX(1100.0f);
-                    effect->mBasePos.y = spAC.y + cM_rndFX(1100.0f);
-                    effect->mBasePos.z = spAC.z + cM_rndFX(1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.x = spAC.x + cM_rndFX(1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.y = spAC.y + cM_rndFX(1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.z = spAC.z + cM_rndFX(1100.0f);
                 } else {
                     f32 temp_f26_3 = cM_rndFX(55.0f);
                     get_vectle_calc(&sp7C, &spAC, &sp70);
 
-                    effect->mBasePos.x = spAC.x + sp70.x * (temp_f26_3 + 1100.0f);
-                    effect->mBasePos.y = spAC.y + sp70.y * (temp_f26_3 + 1100.0f);
-                    effect->mBasePos.z = spAC.z + sp70.z * (temp_f26_3 + 1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.x = spAC.x + sp70.x * (temp_f26_3 + 1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.y = spAC.y + sp70.y * (temp_f26_3 + 1100.0f);
+                    snow_packet->mSnowEff[i].mBasePos.z = spAC.z + sp70.z * (temp_f26_3 + 1100.0f);
                 }
             }
-            break;
         }
 
-        sp7C = effect->mPosition;
+        sp7C = snow_packet->mSnowEff[i].mPosition;
 
-        f32 var_f26 = sp7C.abs(camera->lookat.eye) / 100.0f;
+        f32 var_f1_11 = sp7C.abs(camera->lookat.eye);
+        f32 var_f26 = var_f1_11 / 100.0f;
         if (var_f26 > 1.0) {
             var_f26 = 1.0;
         }
 
         var_f26 *= 0.4f;
 
-        f32 var_f1_11 = sp7C.abs(spB8);
+        var_f1_11 = sp7C.abs(spB8);
         if (var_f1_11 > 300.0f) {
             f32 var_f1_12 = (550.0f - var_f1_11) / 250.0f;
             if (var_f1_12 < 0.0f) {
@@ -1491,12 +1482,13 @@ void dKyr_snow_move() {
         }
 
         if (i > g_env_light.mSnowCount - 1) {
-            cLib_addCalc(&effect->mScale, 0.0f, 0.2f, 0.1f, 0.01f);
+            var_f26 = 0.0f;
+            cLib_addCalc(&snow_packet->mSnowEff[i].mScale, var_f26, 0.2f, 0.1f, 0.01f);
         } else {
-            effect->mScale = var_f26;
+            snow_packet->mSnowEff[i].mScale = var_f26;
         }
 
-        if (i > g_env_light.mSnowCount - 1 && effect->mScale < 0.01f) {
+        if (i > g_env_light.mSnowCount - 1 && snow_packet->mSnowEff[i].mScale < 0.01f) {
             if (i == snow_packet->field_0x6d88 - 1) {
                 snow_packet->field_0x6d88--;
             }
@@ -1504,46 +1496,48 @@ void dKyr_snow_move() {
 
         if (strcmp(dComIfGp_getStartStageName(), "R_SP127") == 0) {
             if (sp7C.z > -340.0f) {
-                effect->mScale = 0.0f;
+                snow_packet->mSnowEff[i].mScale = 0.0f;
             }
         } else if (strcmp(dComIfGp_getStartStageName(), "F_SP127") == 0) {
             if (sp7C.z > 9800.0f) {
-                effect->mScale = 0.0f;
+                snow_packet->mSnowEff[i].mScale = 0.0f;
             }
         }
 
-        sp7C = effect->mBasePos;
+        sp7C = snow_packet->mSnowEff[i].mBasePos;
 
-        f32 var_f26_3 = sp7C.abs(camera->lookat.eye) / 100.0f;
-        if (var_f26_3 > 1.0) {
-            var_f26_3 = 1.0;
+        var_f1_11 = sp7C.abs(camera->lookat.eye);
+        f32 temp_f29 = var_f1_11 / 100.0f;
+        if (temp_f29 > 1.0) {
+            temp_f29 = 1.0;
         }
 
-        var_f26_3 *= 0.38f;
+        temp_f29 *= 0.38f;
 
-        f32 var_f1_14 = sp7C.abs(spAC);
-        if (var_f1_14 > 850.0f) {
-            f32 var_f1_15 = (1100.0f - var_f1_14) / 250.0f;
+        var_f1_11 = sp7C.abs(spAC);
+        if (var_f1_11 > 850.0f) {
+            f32 var_f1_15 = (1100.0f - var_f1_11) / 250.0f;
             if (var_f1_15 < 0.0f) {
                 var_f1_15 = 0.0f;
             }
 
-            var_f26_3 *= var_f1_15;
+            temp_f29 *= var_f1_15;
         }
 
         if (i > g_env_light.mSnowCount - 1) {
-            cLib_addCalc(&effect->field_0x30, 0.0f, 0.2f, 0.1f, 0.01f);
+            temp_f29 = 0.0f;
+            cLib_addCalc(&snow_packet->mSnowEff[i].field_0x30, temp_f29, 0.2f, 0.1f, 0.01f);
         } else {
-            effect->field_0x30 = var_f26_3;
+            snow_packet->mSnowEff[i].field_0x30 = temp_f29;
         }
 
         if (strcmp(dComIfGp_getStartStageName(), "R_SP127") == 0) {
             if (sp7C.z > -340.0f) {
-                effect->field_0x30 = 0.0f;
+                snow_packet->mSnowEff[i].field_0x30 = 0.0f;
             }
         } else if (strcmp(dComIfGp_getStartStageName(), "F_SP127") == 0) {
             if (sp7C.z > 9800.0f) {
-                effect->field_0x30 = 0.0f;
+                snow_packet->mSnowEff[i].field_0x30 = 0.0f;
             }
         }
     }
@@ -1616,7 +1610,7 @@ void cloud_shadow_move() {
                 cLib_addCalc(&g_env_light.field_0xebc, 0.3f, 0.1f, 0.01f, 0.000001f);
             }
 
-            if (g_env_light.field_0x12cc >= 3) {
+            if (g_env_light.wether >= 3) {
                 cLib_addCalc(&g_env_light.field_0xebc, 1.0f, 0.5f, 0.1f, 0.000001f);
             }
         }
@@ -1836,7 +1830,6 @@ void cloud_shadow_move() {
 }
 
 /* 800620AC-80062ADC 05C9EC 0A30+00 0/0 1/1 0/0 .text            vrkumo_move__Fv */
-// NONMATCHING - switch case issue, fsubs instead of fsub
 void vrkumo_move() {
     cXyz wind_vecpow = dKyw_get_wind_vecpow();
     dKankyo_vrkumo_Packet* vrkumo_packet = g_env_light.mpVrkumoPacket;
@@ -1896,6 +1889,13 @@ void vrkumo_move() {
 
         if (filelist != NULL) {
             sp2C = dStage_FileList_dt_SeaLevel(filelist);
+            #ifdef DEBUG
+            if (g_kankyoHIO.vrbox.field_0x14) {
+                sp2C = g_kankyoHIO.vrbox.m_horizonHeight;
+            } else {
+                g_kankyoHIO.vrbox.m_horizonHeight = sp2C;
+            }
+            #endif
         }
 
         sp6C -= 0.09f * (camera->lookat.eye.y - sp2C);
@@ -1911,7 +1911,8 @@ void vrkumo_move() {
             }
 
             f32 var_f31 = sp34 * cM_ssin(sp8);
-            if (fabsf(var_f31 < 5000.0f)) {
+            // @bug - parenthesis should not be on the condition
+            if ((f32)fabs(var_f31 < 5000.0f)) {
                 if (var_f31 > 0.0f) {
                     var_f31 += 5000.0f;
                 } else {
@@ -1923,7 +1924,8 @@ void vrkumo_move() {
             vrkumo_packet->mVrkumoEff[i].mPosition.y = 0.0f;
 
             var_f31 = sp34 * cM_scos(sp8);
-            if (fabsf(var_f31 < 5000.0f)) {
+            // @bug - parenthesis should not be on the condition
+            if ((f32)fabs(var_f31 < 5000.0f)) {
                 if (var_f31 > 0.0f) {
                     var_f31 += 5000.0f;
                 } else {
@@ -1951,7 +1953,8 @@ void vrkumo_move() {
                     }
                     var_f31 = sp34 * cM_ssin(sp8);
 
-                    if (fabsf(var_f31 < 5000.0f)) {
+                    // @bug - parenthesis should not be on the condition
+                    if ((f32)fabs(var_f31 < 5000.0f)) {
                         if (var_f31 > 0.0f) {
                             var_f31 += 5000.0f;
                         } else {
@@ -1963,7 +1966,9 @@ void vrkumo_move() {
                     vrkumo_packet->mVrkumoEff[i].mPosition.y = 0.0f;
 
                     var_f31 = sp34 * cM_scos(sp8);
-                    if (fabsf(var_f31 < 5000.0f)) {
+
+                    // @bug - parenthesis should not be on the condition
+                    if ((f32)fabs(var_f31 < 5000.0f)) {
                         if (var_f31 > 0.0f) {
                             var_f31 += 5000.0f;
                         } else {
@@ -1994,7 +1999,7 @@ void vrkumo_move() {
                 vrkumo_packet->mVrkumoEff[i].mPosition.z += wind_vecpow.z * (sp70 * vrkumo_packet->mVrkumoEff[i].mSpeed) * vrkumo_packet->mVrkumoEff[i].mDistFalloff;
             }
             break;
-        case 2:
+        case 3:
             break;
         }
 
@@ -2349,6 +2354,12 @@ void dKyr_drawSun(Mtx drawMtx, cXyz* ppos, GXColor& unused, u8** tex) {
     u8 draw_sun = false;
     u16 date = dComIfGs_getDate();
 
+#if VERSION == VERSION_GCN_JPN
+    if (g_env_light.hide_vrbox) {
+        return;
+    }
+#endif
+
     if (strcmp(dComIfGp_getStartStageName(), "F_SP200") == 0) {
         sun_packet->mMoonAlpha = 1.0f;
         sun_packet->mSunAlpha = 0.0f;
@@ -2590,7 +2601,7 @@ void dKyr_drawSun(Mtx drawMtx, cXyz* ppos, GXColor& unused, u8** tex) {
                         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
                         GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
                         GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_ONE, GX_LO_COPY);
-                        
+
                         size *= 2.3f;
                         color_reg0.a = 40.0f * sun_packet->mMoonAlpha;
 
@@ -2693,7 +2704,6 @@ void dKyr_drawSun(Mtx drawMtx, cXyz* ppos, GXColor& unused, u8** tex) {
 
 /* 8006444C-8006562C 05ED8C 11E0+00 0/0 1/1 0/0 .text
  * dKyr_drawLenzflare__FPA4_fP4cXyzR8_GXColorPPUc               */
-// NONMATCHING - some issue with sp5C and float to int conversions
 void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
     dKankyo_sunlenz_Packet* lenz_packet = g_env_light.mpSunLenzPacket;
     dKankyo_sun_Packet* sun_packet = g_env_light.mpSunPacket;
@@ -2701,6 +2711,12 @@ void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
 
     static s16 S_rot_work1 = 0;
     static s16 S_rot_work2 = 0;
+
+#if VERSION == VERSION_GCN_JPN
+    if (g_env_light.hide_vrbox) {
+        return;
+    }
+#endif
 
     Mtx camMtx;
     Mtx rotMtx;
@@ -2720,7 +2736,7 @@ void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
 
     if (!(sun_visibility < 0.1f)) {
         dKy_set_eyevect_calc2(camera, &spFC, 8000.0f, 8000.0f);
- 
+
         GXColor color_reg0;
         color_reg0.r = sun_packet->mColor.r;
         color_reg0.g = sun_packet->mColor.g;
@@ -2764,7 +2780,7 @@ void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
         MTXConcat(camMtx, rotMtx, camMtx);
         GXLoadPosMtxImm(drawMtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-    
+
         if (sun_packet->field_0x6c > 0.0f) {
             spC = S_rot_work1 - 0x7F6;
             spA = S_rot_work2 + 0x416B;
@@ -2779,7 +2795,7 @@ void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
             GXSetChanCtrl(GX_COLOR0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
             GXSetNumTexGens(0);
             GXSetNumTevStages(1);
-            
+
             color_reg0.a = sun_packet->field_0x6c * (15.0f * (spA8 * spA8 * spA8));
             GXSetTevColor(GX_TEVREG0, color_reg0);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -2983,8 +2999,8 @@ void dKyr_drawLenzflare(Mtx drawMtx, cXyz* ppos, GXColor& param_2, u8** tex) {
 
                     GXColor sp60;
                     sp60.r = 0xFF;
+                    sp60.g = 0xFF;
                     sp60.b = 0xFF;
-                    sp60.a = 0xFF;
 
                     f32 sp5C = 0.12f;
                     color_reg0.r = ((f32)spD0.r * (1.0f - sp5C)) + ((f32)sp60.r * sp5C);
@@ -3750,7 +3766,6 @@ void dKyr_drawHousi(Mtx drawMtx, u8** tex) {
 }
 
 /* 80067488-800685DC 061DC8 1154+00 0/0 1/1 0/0 .text            dKyr_drawSnow__FPA4_fPPUc */
-// NONMATCHING - small branching issue
 void dKyr_drawSnow(Mtx drawMtx, u8** tex) {
     camera_class* camera = (camera_class*)dComIfGp_getCamera(0);
     dKankyo_snow_Packet* snow_packet = g_env_light.mpSnowPacket;
@@ -3900,7 +3915,7 @@ void dKyr_drawSnow(Mtx drawMtx, u8** tex) {
                                 if (strcmp(dComIfGp_getStartStageName(), "D_MN11") == 0) {
                                     if (dComIfGp_roomControl_getStayNo() == 4) {
                                         if ((sp7C.x > 2079.0f && sp7C.x < 3013.0f && sp7C.y < 864.0f && sp7C.z > -6000.0f && sp7C.z < -4145.0f) ||
-                                            (sp7C.x > -2960.0f && sp7C.z > -880.0f && sp7C.z < -6000.0f) ||
+                                            sp7C.x < -2960.0f || sp7C.z > -880.0f || sp7C.z < -6000.0f ||
                                             (sp7C.z < -4920.0f && sp7C.y < 864.0f && sp7C.x < -2000.0f))
                                         {
                                             continue;
@@ -4086,16 +4101,22 @@ void dKyr_drawStar(Mtx drawMtx, u8** tex) {
         csXyz(0, 30000, 19000),
     };
 
+#if VERSION == VERSION_GCN_JPN
+    if (g_env_light.hide_vrbox) {
+        return;
+    }
+#endif
+
     if (star_packet->mEffectNum != 0) {
         if (strcmp(dComIfGp_getStartStageName(), "F_SP200") == 0 && dComIfG_play_c::getLayerNo(0) == 0) {
             gwolf_howl_stage = true;
-        } else if (strcmp(dComIfGp_getStartStageName(), "F_SP127") == 0 || 
+        } else if (strcmp(dComIfGp_getStartStageName(), "F_SP127") == 0 ||
                    ((strcmp(dComIfGp_getStartStageName(), "F_SP103") == 0) && dComIfGp_roomControl_getStayNo() == 0))
         {
             // draw stars on the opposite skybox hemisphere as well for water reflections
             draw_mirrored = true;
         }
-    
+
         if (strcmp(dComIfGp_getStartStageName(), "F_SP103") == 0 && dKy_daynight_check()) {
             sp38 = true;
         }
@@ -4122,7 +4143,7 @@ void dKyr_drawStar(Mtx drawMtx, u8** tex) {
                 moon_pos.z = -9072.0f + camera->lookat.eye.z;
             }
         }
-    
+
         mDoLib_project(&moon_pos, &moon_proj);
 
         GXSetNumChans(1);
@@ -4417,6 +4438,9 @@ void drawCloudShadow(Mtx drawMtx, u8** tex) {
 
             f32 scale = 0.49f;
             C_MTXLightPerspective(sp120, window_cam->fovy, window_cam->aspect, scale, -scale, 0.5f, 0.5f);
+            #if WIDESCREEN_SUPPORT
+            mDoGph_gInf_c::setWideZoomLightProjection(sp120);
+            #endif
             cMtx_concat(sp120, j3dSys.getViewMtx(), spF0);
 
             rot += 2.0f;
@@ -4567,11 +4591,16 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
     GXTexObj texobj;
     cXyz proj;
 
-    int j;
-    int k;
+    f32 rot;
+    f32 spCC;
     int pass = 1;
-
     f32 spC4 = 0.0f;
+
+#if VERSION == VERSION_GCN_JPN
+    if (g_env_light.hide_vrbox) {
+        return;
+    }
+#endif
 
     cXyz sp15C;
     cXyz sp150;
@@ -4583,7 +4612,27 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
     cXyz sp108;
     cXyz spFC;
 
+    f32 spC0;
+    f32 spBC;
+    f32 spB8;
+    f32 spB4;
+    f32 spB0;
+    f32 spAC;
+    f32 spA8;
+    f32 spA4;
+    f32 spA0;
+    f32 sp9C;
+    f32 sp98;
+    f32 sp94;
+    f32 sp90;
+    f32 sp8C;
+
+    int sp88;
+    int sp84;
     int sp80 = 0;
+    GXColor color_reg1;
+
+    int j, k;
 
     if (camera2 != NULL) {
         spC4 = camera2->mCamera.TrimHeight();
@@ -4596,11 +4645,14 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
         return;
     }
 
-    f32 rot = cAngle::s2d(fopCamM_GetBank(camera));
-    int sp88 = 0;
-    f32 spCC = 100000.0f;
+    rot = cAngle::s2d(fopCamM_GetBank(camera));
+
+    sp88 = 0;
+    spCC = 100000.0f;
 
     f32 unused;
+    f32 y_pos;
+
     if (dComIfGd_getView() != NULL) {
         f32 sp70 = 0.0f;
         dStage_FileList_dt_c* filelist = NULL;
@@ -4612,12 +4664,20 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
             sp70 = dStage_FileList_dt_SeaLevel(filelist);
         }
 
+#ifdef DEBUG
+        if (g_kankyoHIO.vrbox.field_0x14) {
+            sp70 = g_kankyoHIO.vrbox.m_horizonHeight;
+        } else {
+            g_kankyoHIO.vrbox.m_horizonHeight = sp70;
+        }
+#endif
+
         unused = 1.0f - (0.09f * (camera->lookat.eye.y - sp70));
     }
 
     if (g_env_light.daytime > 105.0f && g_env_light.daytime < 240.0f && !dComIfGp_event_runCheck() && sun_packet != NULL && sun_packet->mSunAlpha > 0.0f) {
         mDoLib_project(&sun_packet->mPos[0], &proj);
-        if (proj.x > 0.0f && proj.x < 608.0f && proj.y > spC4 && proj.y < (458.0f - spC4)) {
+        if (proj.x > 0.0f && proj.x < FB_WIDTH && proj.y > spC4 && proj.y < (458.0f - spC4)) {
             pass = 0;
         }
     }
@@ -4635,7 +4695,6 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
             color.g = g_env_light.vrbox_kumo_bottom_col.g;
             color.b = g_env_light.vrbox_kumo_bottom_col.b;
 
-            GXColor color_reg1;
             color_reg1.r = 0;
             color_reg1.g = 0;
             color_reg1.b = 0;
@@ -4654,7 +4713,7 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
             GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
             GXSetFog(GX_FOG_NONE, 0.0f, 1.0f, 0.1f, 1.0f, color);
             GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
-            
+
             if (pass == 0) {
                 GXSetAlphaCompare(GX_GREATER, 0, GX_AOP_OR, GX_GREATER, 0);
                 GXSetZCompLoc(GX_FALSE);
@@ -4684,21 +4743,6 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
                 cXyz pos[4];
 
                 if (!(vrkumo_packet->mVrkumoEff[k].mAlpha <= 0.0000000001f) && (pass != 0 || !(vrkumo_packet->mVrkumoEff[k].mAlpha < 0.45f))) {
-                    f32 spC0;
-                    f32 spBC;
-                    f32 spB8;
-                    f32 spB4;
-                    f32 spB0;
-                    f32 spAC;
-                    f32 spA8;
-                    f32 spA4;
-                    f32 spA0;
-                    f32 sp9C;
-                    f32 sp98;
-                    f32 sp94;
-                    f32 sp90;
-                    f32 sp8C;
-
                     f32 sp68;
                     f32 sp64;
                     f32 sp60;
@@ -4710,8 +4754,14 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
 
                     static f32 howa_loop_cnt = 0.0f;
 
+#ifdef DEBUG
+                    spAC = g_kankyoHIO.navy.cloud_sunny_size;
+                    spA8 = g_kankyoHIO.navy.cloud_cloudy_size;
+#else
                     spAC = 0.6f;
                     spA8 = 0.84f;
+#endif
+
                     if (dKy_darkworld_check()) {
                         spAC = 0.8f;
                         spA8 = 0.8f;
@@ -4759,7 +4809,7 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
                         sp60 = sp68 * (0.2f + (0.2f * (k / 100.0f)));
                         sp5C = sp68 * (0.55f + (0.3f * (k / 100.0f)));
                         spFC = vrkumo_packet->mVrkumoEff[k].mPosition;
-                        
+
                         spA4 = 0.0f;
                         spA0 = 0.0f;
 
@@ -4879,18 +4929,21 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
                         pos[2] += camera->lookat.eye;
                         pos[3] += camera->lookat.eye;
 
-                        int sp84 = 0;
+                        sp84 = 0;
                         if (dComIfGd_getView()->fovy > 40.0f) {
                             cXyz spF0;
+
+                            f32 x;
+                            f32 y;
+                            f32 z;
                             for (int sp3C = 0; sp3C < 4; sp3C++) {
                                 spF0 = pos[sp3C];
-                                Vec sp48;
-                                sp48.x = 100.0f;
-                                sp48.y = 100.0f;
-                                sp48.z = 100.0f;
+                                x = 100.0f;
+                                y = 100.0f;
+                                z = 100.0f;
                                 mDoLib_project(&spF0, &proj);
 
-                                if (proj.x > -sp48.x && proj.x < (608.0f + sp48.x) && proj.y > -sp48.y && proj.y < (458.0f + sp48.z)) {
+                                if (proj.x > -x && proj.x < (FB_WIDTH + x) && proj.y > -y && proj.y < (458.0f + z)) {
                                     break;
                                 }
 
@@ -4927,17 +4980,20 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
                             sp84 = 0;
                             if (dComIfGd_getView()->fovy > 40.0f) {
                                 cXyz spE4;
+
+                                f32 x;
+                                f32 y;
+                                f32 z;
                                 for (int sp2C = 0; sp2C < 4; sp2C++) {
                                     spE4 = pos[sp2C];
                                     spE4.y = -pos[sp2C].y;
 
-                                    Vec sp38;
-                                    sp38.x = 100.0f;
-                                    sp38.y = 100.0f;
-                                    sp38.z = 100.0f;
+                                    x = 100.0f;
+                                    y = 100.0f;
+                                    z = 100.0f;
                                     mDoLib_project(&spE4, &proj);
 
-                                    if (proj.x > -sp38.x && proj.x < (608.0f + sp38.x) && proj.y > -sp38.y && proj.y < (458.0f + sp38.z)) {
+                                    if (proj.x > -x && proj.x < (FB_WIDTH + x) && proj.y > -y && proj.y < (458.0f + z)) {
                                         break;
                                     }
 
@@ -4948,7 +5004,6 @@ void drawVrkumo(Mtx drawMtx, GXColor& color, u8** tex) {
                             }
 
                             if (sp84 == 0) {
-                                f32 y_pos;
                                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
                                 y_pos = -pos[0].y;
@@ -5187,7 +5242,7 @@ void dKyr_shstar_move() {}
 /* 8006B8E4-8006B924 066224 0040+00 0/0 1/1 0/0 .text            dKyr_odour_init__Fv */
 void dKyr_odour_init() {
     dScnKy_env_light_c* envlight = dKy_getEnvlight();
-    dKankyo_odour_Packet* odour_packet = envlight->mpOdourPacket;
+    dKankyo_odour_Packet* odour_packet = envlight->mOdourData.mpOdourPacket;
 
     for (int i = 0; i < 2000; i++) {
         odour_packet->mOdourEff[i].mStatus = 0;
@@ -5198,10 +5253,10 @@ void dKyr_odour_init() {
 }
 
 /* 8006B924-8006BE0C 066264 04E8+00 0/0 1/1 0/0 .text            dKyr_odour_move__Fv */
-// NONMATCHING - some small regalloc
 void dKyr_odour_move() {
     dScnKy_env_light_c* envlight = dKy_getEnvlight();
-    dKankyo_odour_Packet* odour_packet = envlight->mpOdourPacket;
+    dKy_Odour_Data* pOdourData = &envlight->mOdourData;
+    dKankyo_odour_Packet* odour_packet = pOdourData->mpOdourPacket;
     
     Mtx camMtx;
     cXyz sp20(0.0f, 1.0f, 0.0f);
@@ -5213,8 +5268,8 @@ void dKyr_odour_move() {
         return;
     }
 
-    odour_packet->field_0x17724 -= (int)cM_rndF(150.0f) + 430;
-    odour_packet->field_0x17726 -= (int)cM_rndF(50.0f) + 200;
+    odour_packet->field_0x17724 -= ((int)cM_rndF(150.0f) + 430);
+    odour_packet->field_0x17726 -= ((int)cM_rndF(50.0f) + 200);
 
     for (int i = 0; i < 2000; i++) {
         EF_ODOUR_EFF* effect = &odour_packet->mOdourEff[i];
@@ -5241,13 +5296,15 @@ void dKyr_odour_move() {
             }
             temp_f31 = 0.3f;
 
-            f32 temp_f30 = cM_scos(odour_packet->field_0x17724 + ((s16)(int)temp_f29 * 38));
+            f32 temp_f30 = cM_scos(odour_packet->field_0x17724 + 38 * (s16)temp_f29);
             effect->mPosition.x = 60.0f * (temp_f30 * temp_f31);
             effect->mPosition.z = 60.0f * (temp_f30 * temp_f31);
 
             if (effect->mStatus < 10) {
-                effect->mPosition.y = 90.0f * ((0.8f + cM_scos(odour_packet->field_0x17724 + ((int)temp_f29 * 160))) * temp_f31);
-                effect->mPosition.y += 110.0f * ((0.8f + cM_ssin(odour_packet->field_0x17726 + ((int)temp_f29 * 45))) * temp_f31);
+                temp_f30 = cM_scos(odour_packet->field_0x17724 + ((s16)temp_f29 * 160));
+                effect->mPosition.y = 90.0f * ((0.8f + temp_f30) * temp_f31);
+                temp_f30 = cM_ssin(odour_packet->field_0x17726 + ((s16)temp_f29 * 45));
+                effect->mPosition.y += 110.0f * ((0.8f + temp_f30) * temp_f31);
             } else {
                 temp_f30 = cM_scos((int)(78.0f * temp_f29) + (int)(f32)odour_packet->field_0x17724);
 
@@ -5255,7 +5312,7 @@ void dKyr_odour_move() {
                 effect->mPosition.x = 150.0f * (temp_f30 * temp_f31);
                 effect->mPosition.z = 140.0f * (temp_f30 * temp_f31);
 
-                temp_f30 = cM_ssin(((int)temp_f29 * 45) + (int)(f32)odour_packet->field_0x17726);
+                temp_f30 = cM_ssin(((s16)temp_f29 * 45) + (int)(f32)odour_packet->field_0x17726);
                 effect->mPosition.x += 100.0f * (temp_f30 * temp_f31);
                 effect->mPosition.z += 100.0f * (temp_f30 * temp_f31);
             }
@@ -5288,7 +5345,7 @@ void dKyr_odour_move() {
 // NONMATCHING - regalloc
 void dKyr_odour_draw(Mtx drawMtx, u8** tex) {
     dScnKy_env_light_c* envlight = dKy_getEnvlight();
-    dKankyo_odour_Packet* odour_packet = envlight->mpOdourPacket;
+    dKankyo_odour_Packet* odour_packet = envlight->mOdourData.mpOdourPacket;
     camera_class* camera = (camera_class*)dComIfGp_getCamera(0);
 
     static f32 rot = 0.0f;
@@ -5424,7 +5481,7 @@ void dKyr_odour_draw(Mtx drawMtx, u8** tex) {
 
     for (int i = 0; i < 2000; i++) {
         EF_ODOUR_EFF* effect = &odour_packet->mOdourEff[i];
-        camera_class* camera = dComIfGp_getCamera(0);
+        camera_class* camera = (camera_class*)dComIfGp_getCamera(0);
         cXyz pos[4];
         Vec sp64, sp58;
         cXyz sp4C;
@@ -5986,7 +6043,7 @@ static void dKyr_evil_draw2(Mtx drawMtx, u8** tex) {
 
                         mDoLib_project(&sp7C, &proj);
 
-                        if (!(proj.x > -sp34.x) || !(proj.x < (608.0f + sp34.x)) ||
+                        if (!(proj.x > -sp34.x) || !(proj.x < (FB_WIDTH + sp34.x)) ||
                             !(proj.y > -sp34.y) || !(proj.y < (458.0f + sp34.z)))
                         {
                             continue;
@@ -6214,7 +6271,7 @@ void dKyr_evil_draw(Mtx drawMtx, u8** tex) {
 
                         mDoLib_project(&spA4, &proj);
 
-                        if (!(proj.x > -sp44.x) || !(proj.x < (608.0f + sp44.x)) ||
+                        if (!(proj.x > -sp44.x) || !(proj.x < (FB_WIDTH + sp44.x)) ||
                             !(proj.y > -sp44.y) || !(proj.y < (458.0f + sp44.z)))
                         {
                             continue;

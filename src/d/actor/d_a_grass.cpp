@@ -3,20 +3,16 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_grass.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
-#include "dol2asm.h"
-#include "m_Do/m_Do_lib.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include <string.h>
-#include <dolphin/gd.h>
 
-UNK_REL_DATA
-UNK_REL_BSS;
-
-#include "d/actor/d_grass.inc"
+#include "d/actor/d_grass.inc" // IWYU pragma: keep
 #include "d/actor/d_flower.inc"
 
 /* 8051BD4C-8051BEFC 0000EC 01B0+00 1/1 0/0 0/0 .text            randam_addcol_set__FPs */
@@ -85,6 +81,9 @@ void daGrass_c::deleteGrass() {
         delete m_grass;
         m_grass = NULL;
     }
+}
+
+dGrass_packet_c::~dGrass_packet_c() {
 }
 
 /* 8051C040-8051C074 0003E0 0034+00 1/1 0/0 0/0 .text            executeGrass__9daGrass_cFv */
@@ -156,7 +155,7 @@ static void dGrass_Tex_Change() {}
 
 /* 8051C2B0-8051C304 000650 0054+00 1/0 0/0 0/0 .text            daGrass_create__FP9daGrass_c */
 static int daGrass_create(daGrass_c* i_this) {
-    fopAcM_SetupActor(i_this, daGrass_c);
+    fopAcM_ct(i_this, daGrass_c);
     return i_this->create();
 }
 

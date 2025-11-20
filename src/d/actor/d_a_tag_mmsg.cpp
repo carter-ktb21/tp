@@ -3,6 +3,8 @@
 // Translation Unit: d_a_tag_mmsg
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_mmsg.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -11,7 +13,7 @@
 /* ############################################################################################## */
 /* 80D5B918-80D5BA94 000078 017C+00 1/1 0/0 0/0 .text            create__11daTagMmsg_cFv */
 int daTagMmsg_c::create() {
-    fopAcM_SetupActor(this, daTagMmsg_c);
+    fopAcM_ct(this, daTagMmsg_c);
 
     field_0x570 = fpcM_GetParam(this) & 0x3FF;
     field_0x572 = (fpcM_GetParam(this) >> 10) & 0x3FF;

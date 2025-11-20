@@ -3,10 +3,13 @@
  * NPC - Zora
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_zra.h"
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
+#include "Z2AudioLib/Z2Instances.h"
 #include "f_op/f_op_actor_mng.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include "d/d_com_inf_game.h"
@@ -16,102 +19,20 @@
 #include "d/actor/d_a_npc_hoz.h"
 #include "d/actor/d_a_obj_zraMark.h"
 
+class daNpc_zrA_HIO_c {
+public:
+    daNpc_zrA_Param_c::param m;
+};
+
+#if DEBUG
+#define HIO_PARAM(i_this) (i_this->mpHIO->m)
+#else
+#define HIO_PARAM(_) (daNpc_zrA_Param_c::m)
+#endif
+
 //
 // Declarations:
 //
-
-/* 80B8DA48-80B8DA4C 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-static u8 lit_1109[1 + 3 /* padding */];
-
-/* 80B8DA4C-80B8DA50 00000C 0001+03 0/0 0/0 0/0 .bss             @1107 */
-#pragma push
-#pragma force_active on
-static u8 lit_1107[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA50-80B8DA54 000010 0001+03 0/0 0/0 0/0 .bss             @1105 */
-#pragma push
-#pragma force_active on
-static u8 lit_1105[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA54-80B8DA58 000014 0001+03 0/0 0/0 0/0 .bss             @1104 */
-#pragma push
-#pragma force_active on
-static u8 lit_1104[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA58-80B8DA5C 000018 0001+03 0/0 0/0 0/0 .bss             @1099 */
-#pragma push
-#pragma force_active on
-static u8 lit_1099[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA5C-80B8DA60 00001C 0001+03 0/0 0/0 0/0 .bss             @1097 */
-#pragma push
-#pragma force_active on
-static u8 lit_1097[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA60-80B8DA64 000020 0001+03 0/0 0/0 0/0 .bss             @1095 */
-#pragma push
-#pragma force_active on
-static u8 lit_1095[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA64-80B8DA68 000024 0001+03 0/0 0/0 0/0 .bss             @1094 */
-#pragma push
-#pragma force_active on
-static u8 lit_1094[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA68-80B8DA6C 000028 0001+03 0/0 0/0 0/0 .bss             @1057 */
-#pragma push
-#pragma force_active on
-static u8 lit_1057[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA6C-80B8DA70 00002C 0001+03 0/0 0/0 0/0 .bss             @1055 */
-#pragma push
-#pragma force_active on
-static u8 lit_1055[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA70-80B8DA74 000030 0001+03 0/0 0/0 0/0 .bss             @1053 */
-#pragma push
-#pragma force_active on
-static u8 lit_1053[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA74-80B8DA78 000034 0001+03 0/0 0/0 0/0 .bss             @1052 */
-#pragma push
-#pragma force_active on
-static u8 lit_1052[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA78-80B8DA7C 000038 0001+03 0/0 0/0 0/0 .bss             @1014 */
-#pragma push
-#pragma force_active on
-static u8 lit_1014[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA7C-80B8DA80 00003C 0001+03 0/0 0/0 0/0 .bss             @1012 */
-#pragma push
-#pragma force_active on
-static u8 lit_1012[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA80-80B8DA84 000040 0001+03 0/0 0/0 0/0 .bss             @1010 */
-#pragma push
-#pragma force_active on
-static u8 lit_1010[1 + 3 /* padding */];
-#pragma pop
-
-/* 80B8DA84-80B8DA88 000044 0001+03 0/0 0/0 0/0 .bss             @1009 */
-#pragma push
-#pragma force_active on
-static u8 lit_1009[1 + 3 /* padding */];
-#pragma pop
 
 /* 80B8DA94-80B8DA98 000054 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daNpc_zrA_Param_c l_HIO;
@@ -308,7 +229,7 @@ f32 daNpc_zrA_Path_c::chkPassDst(u16 i_idx, cXyz i_pos) {
         daNpcF_pntVsLineSegmentLengthSquare2D(i_pos.x, i_pos.z, prev_pos.x, prev_pos.z,
                                               next_pos.x, next_pos.z, &proj_x, &proj_z, &dist);
         if (cM3d_IsZero(dist)) {
-            return -1e9f;
+            return -G_CM3D_F_INF;
         } else {
             daNpcF_pntVsLineSegmentLengthSquare2D(cur_pos.x, cur_pos.z, prev_pos.x, prev_pos.z,
                                                 next_pos.x, next_pos.z, &proj2_x, &proj2_z, &dist);
@@ -328,25 +249,9 @@ f32 daNpc_zrA_Path_c::chkPassDst(u16 i_idx, cXyz i_pos) {
             }
         }
     } else {
-        return -1e9f;
+        return -G_CM3D_F_INF;
     }
 }
-
-/* 80B8CE90-80B8CE9C 000000 000C+00 10/10 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80B8CE9C-80B8CEB4 00000C 0004+14 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 5 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-    0x00000000,
-};
 
 /* 80B8CEB4-80B8CEE4 000024 0030+00 0/1 0/0 0/0 .data            l_bmdGetParamList */
 static daNpc_GetParam1 l_bmdGetParamList[6] = {
@@ -566,23 +471,20 @@ char* daNpc_zrA_c::mEvtCutNameList[11] = {
 
 daNpc_zrA_c::EventFn daNpc_zrA_c::mEvtCutList[11] = {
     NULL,
-    &ECut_talkSwim,
-    &ECut_beforeBlastzrR,
-    &ECut_afterBlastzrR,
-    &ECut_thanksBlast,
-    &ECut_resultAnnounce,
-    &ECut_carryWaterfall,
-    &ECut_carryWaterfallSkip,
-    &ECut_searchPrince1,
-    &ECut_searchPrince2,
-    &ECut_talkMulti,
+    &daNpc_zrA_c::ECut_talkSwim,
+    &daNpc_zrA_c::ECut_beforeBlastzrR,
+    &daNpc_zrA_c::ECut_afterBlastzrR,
+    &daNpc_zrA_c::ECut_thanksBlast,
+    &daNpc_zrA_c::ECut_resultAnnounce,
+    &daNpc_zrA_c::ECut_carryWaterfall,
+    &daNpc_zrA_c::ECut_carryWaterfallSkip,
+    &daNpc_zrA_c::ECut_searchPrince1,
+    &daNpc_zrA_c::ECut_searchPrince2,
+    &daNpc_zrA_c::ECut_talkMulti,
 };
 
 /* 80B7956C-80B79798 00114C 022C+00 1/1 0/0 0/0 .text            __ct__11daNpc_zrA_cFv */
-// NONMATCHING daNpcF_c needs to not be inlined
-daNpc_zrA_c::daNpc_zrA_c() {
-    /* empty function */
-}
+daNpc_zrA_c::daNpc_zrA_c() {}
 
 /* 80B79828-80B79B58 001408 0330+00 1/0 0/0 0/0 .text            __dt__11daNpc_zrA_cFv */
 daNpc_zrA_c::~daNpc_zrA_c() {
@@ -610,13 +512,13 @@ daNpc_zrA_c::~daNpc_zrA_c() {
     }
 
     if (heap != NULL) {
-        mpMorf->stopZelAnime();
+        mAnm_p->stopZelAnime();
     }
 }
 
 /* 80B79B58-80B79F38 001738 03E0+00 1/1 0/0 0/0 .text            create__11daNpc_zrA_cFv */
 cPhs__Step daNpc_zrA_c::create() {
-    fopAcM_SetupActor(this, daNpc_zrA_c);
+    fopAcM_ct(this, daNpc_zrA_c);
 
     mType = getTypeFromArgument();
     if (home.angle.x != 0xffff) {
@@ -681,7 +583,7 @@ cPhs__Step daNpc_zrA_c::create() {
             return cPhs_ERROR_e;
         }
 
-        fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
+        fopAcM_SetMtx(this, mAnm_p->getModel()->getBaseTRMtx());
         fopAcM_setCullSizeBox(this, -300.0f, -50.0f, -300.0f, 300.0f, 450.0f, 300.0f);
         mCreatureSound.init(&current.pos, &eyePos, 3, 1);
         mAcchCir.SetWall(daNpc_zrA_Param_c::m.mWallR, daNpc_zrA_Param_c::m.mWallH);
@@ -726,17 +628,17 @@ int daNpc_zrA_c::CreateHeap() {
         }
         model_flag = 0;
     }
-    mpMorf = new mDoExt_McaMorfSO(model_data, NULL, NULL, NULL, -1, 1.0f, 0, -1,
+    mAnm_p = new mDoExt_McaMorfSO(model_data, NULL, NULL, NULL, -1, 1.0f, 0, -1,
                                   &mCreatureSound, model_flag, 0x11020285);
-    if (mpMorf != NULL && mpMorf->getModel() == NULL) {
-        mpMorf->stopZelAnime();
-        mpMorf = NULL;
+    if (mAnm_p != NULL && mAnm_p->getModel() == NULL) {
+        mAnm_p->stopZelAnime();
+        mAnm_p = NULL;
     }
-    if (mpMorf == NULL) {
+    if (mAnm_p == NULL) {
         return 0;
     }
 
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     for (u16 i = 0; i < model_data->getJointNum(); i++) {
         switch (i) {
         case 0:
@@ -752,7 +654,7 @@ int daNpc_zrA_c::CreateHeap() {
             model_data->getJointNodePointer(i)->setCallBack(NULL);
         }
     }
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     mpMatAnm = new daNpcF_MatAnm_c();
     if (mpMatAnm == NULL) {
@@ -809,7 +711,7 @@ int daNpc_zrA_c::Execute() {
 /* 80B7A570-80B7A864 002150 02F4+00 1/1 0/0 0/0 .text            Draw__11daNpc_zrA_cFv */
 int daNpc_zrA_c::Draw() {
     BOOL bvar2 = false;
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     J3DModelData* model_data = model->getModelData();
     model_data->getMaterialNodePointer(1)->setMaterialAnm(mpMatAnm);
 
@@ -852,10 +754,10 @@ int daNpc_zrA_c::Draw() {
 
             if (mTwilight) {
                 dComIfGd_setListDark();
-                mpMorf->entryDL();
+                mAnm_p->entryDL();
                 dComIfGd_setList();
             } else {
-                mpMorf->entryDL();
+                mAnm_p->entryDL();
             }
 
             if (mAnmFlags & ANM_PLAY_BTP) {
@@ -923,11 +825,11 @@ int daNpc_zrA_c::ctrlJoint(J3DJoint* i_joint, J3DModel* i_model) {
     int lookat_joints[3] = {1, 3, 4};
 
     if (jnt_no == 0) {
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(1));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(1));
         mDoMtx_stack_c::multVecZero(&mLookatPos[0]);
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(3));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(3));
         mDoMtx_stack_c::multVecZero(&mLookatPos[1]);
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(4));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(4));
         mDoMtx_stack_c::multVecZero(&mLookatPos[2]);
     }
 
@@ -954,8 +856,8 @@ int daNpc_zrA_c::ctrlJoint(J3DJoint* i_joint, J3DModel* i_model) {
 
     if ((jnt_no == 4 || jnt_no == 14) && (mAnmFlags & ANM_PLAY_BCK)) {
         J3DAnmTransform* bck_anm = mBckAnm.getBckAnm();
-        mBckAnm.changeBckOnly(mpMorf->getAnm());
-        mpMorf->changeAnm(bck_anm);
+        mBckAnm.changeBckOnly(mAnm_p->getAnm());
+        mAnm_p->changeAnm(bck_anm);
     }
 
     return 1;
@@ -982,10 +884,10 @@ int daNpc_zrA_c::ctrlJointCallBack(J3DJoint* i_joint, int param_1) {
 
 /* 80B7AC08-80B7ADF0 0027E8 01E8+00 1/0 0/0 0/0 .text            setParam__11daNpc_zrA_cFv */
 void daNpc_zrA_c::setParam() {
-    u32 attn_flags = 0xa;
+    u32 attn_flags = (fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
     BOOL in_water = mAcch.ChkWaterIn();
     if (mTwilight) {
-        attn_flags = 0x80000a;
+        attn_flags = (fopAc_AttnFlag_UNK_0x800000 | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
     }
 
     selectAction();
@@ -998,7 +900,7 @@ void daNpc_zrA_c::setParam() {
         field_0x14d0 = 0;
         field_0x14d4 = 0;
 
-        attn_flags = 2;
+        attn_flags = fopAc_AttnFlag_TALK_e;
         if (daPy_getPlayerActorClass()->checkSwimUp()) {
             attn_flags = 0;
         }
@@ -1160,7 +1062,7 @@ void daNpc_zrA_c::setAttnPos() {
         }
     }
 
-    J3DModelData* model_data = mpMorf->getModel()->getModelData();
+    J3DModelData* model_data = mAnm_p->getModel()->getModelData();
 
     for (u16 i = 0; i < model_data->getJointNum(); i++) {
         switch (i) {
@@ -1183,7 +1085,7 @@ void daNpc_zrA_c::setAttnPos() {
     lookat();
     setPrtcl();
 
-    mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(4));
+    mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(4));
     mDoMtx_stack_c::multVecZero(&mHeadPos);
     mDoMtx_stack_c::multVec(&eyeOffset, &eyePos);
     eyeOffset.y = 0.0f;
@@ -1211,7 +1113,7 @@ void daNpc_zrA_c::setAttnPos() {
                                     || mActionType == ACT_TYPE_2
                                     || mActionType == ACT_TYPE_3)))
         {
-            mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(29));
+            mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(29));
             mDoMtx_stack_c::multVecZero(&center);
             center.y = current.pos.y;
             extra_radius = 70.0f;
@@ -1219,7 +1121,7 @@ void daNpc_zrA_c::setAttnPos() {
             center = current.pos;
         }
 
-        mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(4));
+        mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(4));
         mDoMtx_stack_c::multVecZero(&vec5);
         attention_info.position.set(vec5.x, vec5.y + 40.0f, vec5.z);
     } else {
@@ -1277,20 +1179,20 @@ void daNpc_zrA_c::setAttnPos() {
 
 /* 80B7B91C-80B7B9D4 0034FC 00B8+00 1/0 0/0 0/0 .text            setMtx__11daNpc_zrA_cFv */
 void daNpc_zrA_c::setMtx() {
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     cXyz pos = current.pos;
     pos += mModulationOffset;
     mDoMtx_stack_c::transS(pos);
     mDoMtx_stack_c::ZXYrotM(mCurAngle);
     mDoMtx_stack_c::scaleM(scale);
     model->setBaseTRMtx(mDoMtx_stack_c::get());
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     if (mAnmFlags & ANM_PLAY_BCK) {
         mBckAnm.getBckAnm()->setFrame(mBckAnm.getFrame());
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     } else {
-        mpMorf->modelCalc();
+        mAnm_p->modelCalc();
     }
 }
 
@@ -1436,7 +1338,7 @@ bool daNpc_zrA_c::setExpressionBtp(int i_idx) {
         return true;
     }
 
-    if (setBtpAnm(btp_anm, mpMorf->getModel()->getModelData(), 1.0f, attr)) {
+    if (setBtpAnm(btp_anm, mAnm_p->getModel()->getModelData(), 1.0f, attr)) {
         mAnmFlags |= ANM_PLAY_BTP | ANM_PAUSE_BTP;
         if (i_idx == 0) {
             mAnmFlags |= ANM_FLAG_800;
@@ -1537,7 +1439,7 @@ void daNpc_zrA_c::setMotionAnm(int i_idx, f32 i_morf) {
                                    l_btkGetParamList[btk_idx].fileIdx);
     }
 
-    if (btk_anm != NULL && setBtkAnm(btk_anm, mpMorf->getModel()->getModelData(), 1.0f, 2)) {
+    if (btk_anm != NULL && setBtkAnm(btk_anm, mAnm_p->getModel()->getModelData(), 1.0f, 2)) {
         mAnmFlags |= ANM_PLAY_BTK | ANM_PAUSE_BTK;
     }
     
@@ -1585,7 +1487,7 @@ void daNpc_zrA_c::setMotionWaterAnm(int i_idx) {
     if (brk_anm != NULL) {
         if (mBrkAnm.getBrkAnm() == brk_anm) {
             mAnmFlags |= ANM_PLAY_BRK;
-        } else if (setBrkAnm(brk_anm, mpMorf->getModel()->getModelData(), 1.0f, 2)) {
+        } else if (setBrkAnm(brk_anm, mAnm_p->getModel()->getModelData(), 1.0f, 2)) {
             mAnmFlags |= ANM_PLAY_BRK | ANM_PAUSE_BRK;
         }
     }
@@ -1600,7 +1502,7 @@ void daNpc_zrA_c::setMotionWaterAnm(int i_idx) {
     if (btk_anm != NULL) {
         if (mWaterBtkAnm.getBtkAnm() == btk_anm) {
             mWaterAnmFlags |= ANM_PLAY_BTK;
-        } else if (mWaterBtkAnm.init(mpMorf->getModel()->getModelData(),
+        } else if (mWaterBtkAnm.init(mAnm_p->getModel()->getModelData(),
                                      btk_anm, 1, 2, 1.0f, 0, -1)) {
             mWaterAnmFlags |= ANM_PLAY_BTK | ANM_PAUSE_BTK;
         }
@@ -1615,7 +1517,7 @@ void daNpc_zrA_c::setMotionWaterAnm(int i_idx) {
     if (bpk_anm != NULL) {
         if (mWaterBpkAnm.getBpkAnm() == bpk_anm) {
             mWaterAnmFlags |= ANM_PLAY_BPK;
-        } else if (mWaterBpkAnm.init(mpMorf->getModel()->getModelData(),
+        } else if (mWaterBpkAnm.init(mAnm_p->getModel()->getModelData(),
                                      bpk_anm, 1, 2, 1.0f, 0, -1)) {
             mWaterAnmFlags |= ANM_PLAY_BPK | ANM_PAUSE_BPK;
         }
@@ -1654,7 +1556,7 @@ void daNpc_zrA_c::drawOtherMdls() {
             J3DModel* model = mpObjectModel[i];
             if (model != NULL && jnt_no >= 0) {
                 g_env_light.setLightTevColorType_MAJI(model, &tevStr);
-                mDoMtx_stack_c::copy(mpMorf->getModel()->getAnmMtx(jnt_no));
+                mDoMtx_stack_c::copy(mAnm_p->getModel()->getAnmMtx(jnt_no));
                 mDoMtx_stack_c::scaleM(scale);
                 model->setBaseTRMtx(mDoMtx_stack_c::get());
                 mDoExt_modelUpdateDL(model);
@@ -1666,7 +1568,7 @@ void daNpc_zrA_c::drawOtherMdls() {
 
 /* 80B7C44C-80B7C4B4 00402C 0068+00 2/1 0/0 0/0 .text getTypeFromArgument__11daNpc_zrA_cFv */
 daNpc_zrA_c::Type daNpc_zrA_c::getTypeFromArgument() {
-    switch (subtype) {
+    switch (argument) {
     case 0:
         return TYPE_WAIT;
     case 1:
@@ -2063,93 +1965,93 @@ bool daNpc_zrA_c::setAction(ActionFn i_action) {
 bool daNpc_zrA_c::selectAction() {
     mpNextActionFn = NULL;
     if (daNpc_zrA_Param_c::m.mTest) {
-        mpNextActionFn = &test;
+        mpNextActionFn = &daNpc_zrA_c::test;
     } else {
         switch (mType) {
         case TYPE_SWIM:
-            mpNextActionFn = &swim;
+            mpNextActionFn = &daNpc_zrA_c::swim;
             break;
         case TYPE_WATERFALL:
             switch (mActionSelect) {
             case 0:
-                mpNextActionFn = &waitWaterfall;
+                mpNextActionFn = &daNpc_zrA_c::waitWaterfall;
                 break;
             case 1:
-                mpNextActionFn = &swimWaterfall;
+                mpNextActionFn = &daNpc_zrA_c::swimWaterfall;
                 break;
             case 2:
                 break;
             case 3:
-                mpNextActionFn = &diveWaterfall;
+                mpNextActionFn = &daNpc_zrA_c::diveWaterfall;
                 break;
             }
             break;
         case TYPE_RIVER:
             switch (mActionSelect) {
             case 0:
-                mpNextActionFn = &waitRiverDescend;
+                mpNextActionFn = &daNpc_zrA_c::waitRiverDescend;
                 break;
             case 1:
-                mpNextActionFn = &swimRiverDescend;
+                mpNextActionFn = &daNpc_zrA_c::swimRiverDescend;
                 break;
             case 6:
-                mpNextActionFn = &returnRiverDescend;
+                mpNextActionFn = &daNpc_zrA_c::swimRiverDescend2;
                 break;
             case 3:
-                mpNextActionFn = &diveRiverDescend;
+                mpNextActionFn = &daNpc_zrA_c::diveRiverDescend;
                 break;
             case 4:
-                mpNextActionFn = &swimGoalRiverDescend;
+                mpNextActionFn = &daNpc_zrA_c::swimGoalRiverDescend;
                 break;
             default:
-                mpNextActionFn = &swimRiverDescend2;
+                mpNextActionFn = &daNpc_zrA_c::returnRiverDescend;
                 break;
             }
             break;
         case TYPE_TOBIKOMI:
             switch (mActionSelect) {
             case 0:
-                mpNextActionFn = &tobiSearch;
+                mpNextActionFn = &daNpc_zrA_c::tobiSearch;
                 break;
             case 1:
-                mpNextActionFn = &tobiWait;
+                mpNextActionFn = &daNpc_zrA_c::tobiWait;
                 break;
             case 2:
-                mpNextActionFn = &tobikomi1;
+                mpNextActionFn = &daNpc_zrA_c::tobikomi1;
                 break;
             case 3:
-                mpNextActionFn = &tobikomi2;
+                mpNextActionFn = &daNpc_zrA_c::tobikomi2;
                 break;
             case 4:
-                mpNextActionFn = &tobikomi3;
+                mpNextActionFn = &daNpc_zrA_c::tobikomi3;
                 break;
             case 5:
-                mpNextActionFn = &tobiJump;
+                mpNextActionFn = &daNpc_zrA_c::tobiJump;
                 break;
             case 6:
-                mpNextActionFn = &tobiEnd;
+                mpNextActionFn = &daNpc_zrA_c::tobiEnd;
                 break;
             }
             break;
         case TYPE_SEARCH:
             switch (mActionSelect) {
             case 0:
-                mpNextActionFn = &waitSearch;
+                mpNextActionFn = &daNpc_zrA_c::waitSearch;
                 break;
             }
             break;
         case TYPE_SPA:
-            mpNextActionFn = &waitSpa;
+            mpNextActionFn = &daNpc_zrA_c::waitSpa;
             break;
         case TYPE_WAIT:
             if (mActionType == ACT_TYPE_6) {
-                mpNextActionFn = &waitLake;
+                mpNextActionFn = &daNpc_zrA_c::waitLake;
             } else {
-                mpNextActionFn = &wait;
+                mpNextActionFn = &daNpc_zrA_c::wait;
             }
             break;
         default:
-            mpNextActionFn = &waitLake;
+            mpNextActionFn = &daNpc_zrA_c::wait;
             break;
         }
     }
@@ -2157,12 +2059,13 @@ bool daNpc_zrA_c::selectAction() {
 }
 
 /* 80B7DF40-80B7E668 005B20 0728+00 1/1 0/0 0/0 .text            doEvent__11daNpc_zrA_cFv */
-// NONMATCHING regalloc
 BOOL daNpc_zrA_c::doEvent() {
+    dEvent_manager_c* event_manager = NULL;
     BOOL ret = false;
+    int staff_id;
 
-    if (dComIfGp_event_runCheck() != false) {
-        dEvent_manager_c& event_manager = dComIfGp_getEventManager();
+    if (dComIfGp_event_runCheck() != FALSE) {
+        event_manager = &dComIfGp_getEventManager();
         if (eventInfo.checkCommandTalk() || eventInfo.checkCommandDemoAccrpt()) {
             mOrderNewEvt = false;
         }
@@ -2174,10 +2077,10 @@ BOOL daNpc_zrA_c::doEvent() {
                             l_evtNames[l_evtGetParamList[mOrderEvtNo].fileIdx], 1, 0xffff);
                 mStaffName = l_myName[1];
             } else if (mType == TYPE_WATERFALL) {
-                if (chkAction(&talkSwim)) {
+                if (chkAction(&daNpc_zrA_c::talkSwim)) {
                     (this->*mpActionFn)(NULL);
                 } else if (dComIfGp_event_chkTalkXY() == false || dComIfGp_evmng_ChkPresentEnd()) {
-                    setAction(&talkSwim);
+                    setAction(&daNpc_zrA_c::talkSwim);
                 }
             } else if (mType == TYPE_SEARCH) {
                 mOrderEvtNo = EVT_SEARCH_PRINCE;
@@ -2191,33 +2094,31 @@ BOOL daNpc_zrA_c::doEvent() {
                 }
                 changeEvent(l_resNames[l_evtGetParamList[mOrderEvtNo].arcIdx],
                             l_evtNames[l_evtGetParamList[mOrderEvtNo].fileIdx], 1, 0xffff);
-            } else {
-                if (chkAction(&talk)) {
-                    (this->*mpActionFn)(NULL);
-                } else if (dComIfGp_event_chkTalkXY()) {
-                    if (dComIfGp_evmng_ChkPresentEnd()) {
-                        if (dComIfGp_event_getPreItemNo() == 0x91) {
-                            if (mSoldierType != SOLDIER_NONE) {
-                                if (home.angle.x == 0x6d) {
-                                    mFlowID = 4;
-                                } else {
-                                    mFlowID = 5;
-                                }
+            } else if (chkAction(&daNpc_zrA_c::talk)) {
+                (this->*mpActionFn)(NULL);
+            } else if (dComIfGp_event_chkTalkXY()) {
+                if (dComIfGp_evmng_ChkPresentEnd()) {
+                    if (dComIfGp_event_getPreItemNo() == 0x91) {
+                        if (mSoldierType != SOLDIER_NONE) {
+                            if (home.angle.x == 0x6d) {
+                                mFlowID = 4;
                             } else {
-                                mFlowID = 6;
+                                mFlowID = 5;
                             }
-                            setAction(&talk);
                         } else {
-                            s16 event_idx =
-                                dComIfGp_getEventManager().getEventIdx(this, "NO_RESPONSE", 0xff);
-                            dComIfGp_getEvent().reset(this);
-                            fopAcM_orderChangeEventId(this, event_idx, 1, 0xffff);
-                            field_0x9ec = true;
+                            mFlowID = 6;
                         }
+                        setAction(&daNpc_zrA_c::talk);
+                    } else {
+                        s16 event_idx =
+                            dComIfGp_getEventManager().getEventIdx(this, "NO_RESPONSE", 0xff);
+                        dComIfGp_getEvent().reset(this);
+                        fopAcM_orderChangeEventId(this, event_idx, 1, 0xffff);
+                        field_0x9ec = true;
                     }
-                } else {
-                    setAction(&talk);
                 }
+            } else {
+                setAction(&daNpc_zrA_c::talk);
             }
             ret = true;
         } else {
@@ -2226,23 +2127,25 @@ BOOL daNpc_zrA_c::doEvent() {
                 mItemID = -1;
             }
 
-            int staff_id = event_manager.getMyStaffId(mStaffName, this, 0);
+            staff_id = event_manager->getMyStaffId(mStaffName, this, 0);
             if (staff_id != -1) {
                 mStaffID = staff_id;
-                int act_idx = event_manager.getMyActIdx(staff_id, mEvtCutNameList,
-                                                        ARRAY_SIZE(mEvtCutNameList), 0, 0);
+                int act_idx = event_manager->getMyActIdx(staff_id, mEvtCutNameList,
+                                                        ARRAY_SIZEU(mEvtCutNameList), 0, 0);
+                JUT_ASSERT(0xf0e, act_idx >= 0 && act_idx < 11);
+                JUT_ASSERT(0xf0f, mEvtCutList[act_idx] != NULL);
                 if ((this->*mEvtCutList[act_idx])(staff_id)) {
-                    event_manager.cutEnd(staff_id);
+                    event_manager->cutEnd(staff_id);
                 }
                 ret = true;
             }
 
             if (eventInfo.checkCommandDemoAccrpt()) {
-                if (mEventIdx != -1 && event_manager.endCheck(mEventIdx)) {
+                if (mEventIdx != -1 && event_manager->endCheck(mEventIdx)) {
                     switch (mOrderEvtNo) {
                     case EVT_TALK_SWIM:
                         dComIfGp_event_reset();
-                        setAction(&swim);
+                        setAction(&daNpc_zrA_c::swim);
                         mOrderEvtNo = 0;
                         mEventIdx = -1;
                         mStaffName = l_myName[0];
@@ -2251,7 +2154,7 @@ BOOL daNpc_zrA_c::doEvent() {
                     case EVT_RESULT_ANNOUNCE:
                         dComIfGp_event_reset();
                         mActionSelect = 5;
-                        setAction(&returnRiverDescend);
+                        setAction(&daNpc_zrA_c::returnRiverDescend);
                         mOrderEvtNo = 0;
                         mEventIdx = -1;
                         dComIfGs_offSwitch(mSwitch1, fopAcM_GetRoomNo(this));
@@ -2261,7 +2164,7 @@ BOOL daNpc_zrA_c::doEvent() {
                     case EVT_CARRY_WATERFALL_NIGHT:
                         dComIfGp_event_reset();
                         mActionSelect = 3;
-                        setAction(&diveWaterfall);
+                        setAction(&daNpc_zrA_c::diveWaterfall);
                         mOrderEvtNo = 0;
                         mEventIdx = -1;
                         break;
@@ -2284,17 +2187,15 @@ BOOL daNpc_zrA_c::doEvent() {
             }
         }
 
-        int prev_msg_timer = mMsgTimer;
         int expression, motion;
+        int prev_msg_timer = mMsgTimer;
         if (ctrlMsgAnm(expression, motion, this, false)) {
             if (!field_0x9eb) {
                 setExpression(expression, -1.0f);
                 setMotion(motion, -1.0f, false);
             }
-        } else {
-            if (!field_0x9eb && prev_msg_timer != 0 && mMsgTimer == 0) {
-                setExpressionTalkAfter();
-            }
+        } else if (!field_0x9eb && prev_msg_timer != 0 && mMsgTimer == 0) {
+            setExpressionTalkAfter();
         }
     }
 
@@ -2328,7 +2229,7 @@ void daNpc_zrA_c::setLookMode(int i_lookMode) {
 /* 80B7E718-80B7E9E0 0062F8 02C8+00 1/1 0/0 0/0 .text            lookat__11daNpc_zrA_cFv */
 void daNpc_zrA_c::lookat() {
     fopAc_ac_c* attn_actor = NULL;
-    J3DModel* model = mpMorf->getModel();
+    J3DModel* model = mAnm_p->getModel();
     BOOL snap = false;
     f32 body_down_angle = daNpc_zrA_Param_c::m.mBodyDownAngle;
     f32 body_up_angle = daNpc_zrA_Param_c::m.mBodyUpAngle;
@@ -2495,177 +2396,7 @@ static int daNpc_zrA_IsDelete(void* i_this) {
 
 #include "d/actor/d_a_npc_zra.inc"
 
-/* ############################################################################################## */
-/* 80B8DAB4-80B8DAB8 000074 0004+00 0/0 0/0 0/0 .bss
- * sInstance__40JASGlobalInstance<19JASDefaultBankTable>        */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAB4[4];
-#pragma pop
-
-/* 80B8DAB8-80B8DABC 000078 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14JASAudioThread>             */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAB8[4];
-#pragma pop
-
-/* 80B8DABC-80B8DAC0 00007C 0004+00 0/0 0/0 0/0 .bss sInstance__27JASGlobalInstance<7Z2SeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DABC[4];
-#pragma pop
-
-/* 80B8DAC0-80B8DAC4 000080 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8Z2SeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAC0[4];
-#pragma pop
-
-/* 80B8DAC4-80B8DAC8 000084 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SceneMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAC4[4];
-#pragma pop
-
-/* 80B8DAC8-80B8DACC 000088 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2StatusMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAC8[4];
-#pragma pop
-
-/* 80B8DACC-80B8DAD0 00008C 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2DebugSys>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DACC[4];
-#pragma pop
-
-/* 80B8DAD0-80B8DAD4 000090 0004+00 0/0 0/0 0/0 .bss
- * sInstance__36JASGlobalInstance<15JAISoundStarter>            */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAD0[4];
-#pragma pop
-
-/* 80B8DAD4-80B8DAD8 000094 0004+00 0/0 0/0 0/0 .bss
- * sInstance__35JASGlobalInstance<14Z2SoundStarter>             */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAD4[4];
-#pragma pop
-
-/* 80B8DAD8-80B8DADC 000098 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12Z2SpeechMgr2>               */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAD8[4];
-#pragma pop
-
-/* 80B8DADC-80B8DAE0 00009C 0004+00 0/0 0/0 0/0 .bss sInstance__28JASGlobalInstance<8JAISeMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DADC[4];
-#pragma pop
-
-/* 80B8DAE0-80B8DAE4 0000A0 0004+00 0/0 0/0 0/0 .bss sInstance__29JASGlobalInstance<9JAISeqMgr> */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAE0[4];
-#pragma pop
-
-/* 80B8DAE4-80B8DAE8 0000A4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAIStreamMgr>               */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAE4[4];
-#pragma pop
-
-/* 80B8DAE8-80B8DAEC 0000A8 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2SoundMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAE8[4];
-#pragma pop
-
-/* 80B8DAEC-80B8DAF0 0000AC 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAISoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAEC[4];
-#pragma pop
-
-/* 80B8DAF0-80B8DAF4 0000B0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13JAUSoundTable>              */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAF0[4];
-#pragma pop
-
-/* 80B8DAF4-80B8DAF8 0000B4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__38JASGlobalInstance<17JAUSoundNameTable>          */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAF4[4];
-#pragma pop
-
-/* 80B8DAF8-80B8DAFC 0000B8 0004+00 0/0 0/0 0/0 .bss
- * sInstance__33JASGlobalInstance<12JAUSoundInfo>               */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAF8[4];
-#pragma pop
-
-/* 80B8DAFC-80B8DB00 0000BC 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SoundInfo>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DAFC[4];
-#pragma pop
-
-/* 80B8DB00-80B8DB04 0000C0 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2SoundObjMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB00[4];
-#pragma pop
-
-/* 80B8DB04-80B8DB08 0000C4 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2Audience>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB04[4];
-#pragma pop
-
-/* 80B8DB08-80B8DB0C 0000C8 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2FxLineMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB08[4];
-#pragma pop
-
-/* 80B8DB0C-80B8DB10 0000CC 0004+00 0/0 0/0 0/0 .bss sInstance__31JASGlobalInstance<10Z2EnvSeMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB0C[4];
-#pragma pop
-
-/* 80B8DB10-80B8DB14 0000D0 0004+00 0/0 0/0 0/0 .bss sInstance__32JASGlobalInstance<11Z2SpeechMgr>
- */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB10[4];
-#pragma pop
-
-/* 80B8DB14-80B8DB18 0000D4 0004+00 0/0 0/0 0/0 .bss
- * sInstance__34JASGlobalInstance<13Z2WolfHowlMgr>              */
-#pragma push
-#pragma force_active on
-static u8 data_80B8DB14[4];
-#pragma pop
+AUDIO_INSTANCES
 
 /* 80B8D8DC-80B8D8FC -00001 0020+00 1/0 0/0 0/0 .data            daNpc_zrA_MethodTable */
 static actor_method_class daNpc_zrA_MethodTable = {

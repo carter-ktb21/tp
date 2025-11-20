@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_pillar.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -59,8 +61,6 @@ static const daPillar_c::sdata_t l_shake_data[] = {
     /* WEAK        */ {255, 0, 400, 20, 5000, 200, 30},
     /* CRASH       */ {5, 0, 800, 120, 7000, 30, 15},
 };
-
-UNK_REL_DATA
 
 /* 80CB0B08-80CB0B10 -00001 0008+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName[] = {
@@ -177,7 +177,7 @@ int daPillar_c::Create() {
 /* 80CAF7A8-80CAF8A4 000568 00FC+00 1/0 0/0 0/0 .text            CreateHeap__10daPillar_cFv */
 int daPillar_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[mMdlType], l_bmd[mMdlType]);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -185,7 +185,7 @@ int daPillar_c::CreateHeap() {
 
     if (checkShadow() == 0xFF) {
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[mMdlType], l_shadowBmd[mMdlType]);
-        JUT_ASSERT(0, modelData != 0);
+        JUT_ASSERT(0, modelData != NULL);
         mpShadowModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
         if (mpShadowModel == NULL) {
             return 0;
@@ -197,7 +197,7 @@ int daPillar_c::CreateHeap() {
 
 /* 80CAF8A4-80CAFA58 000664 01B4+00 1/1 0/0 0/0 .text            create1st__10daPillar_cFv */
 int daPillar_c::create1st() {
-    fopAcM_SetupActor(this, daPillar_c);
+    fopAcM_ct(this, daPillar_c);
 
     if (!mIsPrmInit) {
         mIsPrmInit = true;
@@ -448,7 +448,7 @@ int daPillar_c::Execute(Mtx** param_0) {
         }
         break;
     default:
-        JUT_ASSERT(0, 0);
+        JUT_ASSERT(0, FALSE);
     }
 
     if (shape_angle.x != 0) {
@@ -490,7 +490,7 @@ int daPillar_c::Delete() {
 /* 80CB0780-80CB0874 001540 00F4+00 1/0 0/0 0/0 .text            daPillar_create1st__FP10daPillar_c
  */
 static int daPillar_create1st(daPillar_c* i_this) {
-    fopAcM_SetupActor(i_this, daPillar_c);
+    fopAcM_ct(i_this, daPillar_c);
     return i_this->create1st();
 }
 

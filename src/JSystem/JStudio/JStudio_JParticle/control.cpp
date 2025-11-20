@@ -2,6 +2,8 @@
 // control
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio_JParticle/control.h"
 #include "JSystem/JParticle/JPAEmitterManager.h"
 #include "JSystem/JGadget/pointer.h"
@@ -16,7 +18,7 @@ JStudio_JParticle::TCreateObject::~TCreateObject() {}
 bool
 JStudio_JParticle::TCreateObject::create(JStudio::TObject** ppObject,
                                          JStudio::stb::data::TParse_TBlock_object const& param_2) {
-    JUT_ASSERT(40, ppObject!=0);
+    JUT_ASSERT(40, ppObject!=NULL);
     CreateFunc func;
     switch (param_2.get_type()) {
     case 'JPTC':

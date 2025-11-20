@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_swBallB.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_carry.h"
@@ -42,16 +44,25 @@ static GXColor const l_color = {0x03, 0x96, 0xFF, 0xFF};
 
 /* 80CF59D4-80CF59E0 000004 000C+00 0/1 0/0 0/0 .rodata          l_event_bitA */
 static u16 const l_event_bitA[6] = {
-    0x4304, 0x4302, 0x4301, 0x4480, 0x4440, 0x4420,
+    0x4304, /* dSv_event_flag_c::F_0551 - Palace of Twilight - Palace of Twilight control use 1 */
+    0x4302, /* dSv_event_flag_c::F_0552 - Palace of Twilight - Palace of Twilight control use 2 */
+    0x4301, /* dSv_event_flag_c::F_0553 - Palace of Twilight - Palace of Twilight control use 3 */
+    0x4480, /* dSv_event_flag_c::F_0554 - Palace of Twilight - Palace of Twilight control use 4 */
+    0x4440, /* dSv_event_flag_c::F_0555 - Palace of Twilight - Palace of Twilight control use 5 */
+    0x4420, /* dSv_event_flag_c::F_0556 - Palace of Twilight - Palace of Twilight control use 6 */
 };
 
 /* 80CF59E0-80CF59EC 000010 000C+00 0/1 0/0 0/0 .rodata          l_event_bitB */
 static u16 const l_event_bitB[6] = {
-    0x4410, 0x4408, 0x4404, 0x4402, 0x4401, 0x4580,
+    0x4410, /* dSv_event_flag_c::F_0557 - Palace of Twilight - Palace of Twilight control use 7 */
+    0x4408, /* dSv_event_flag_c::F_0558 - Palace of Twilight - Palace of Twilight control use 8 */
+    0x4404, /* dSv_event_flag_c::F_0559 - Palace of Twilight - Palace of Twilight control use 9 */
+    0x4402, /* dSv_event_flag_c::F_0560 - Palace of Twilight - Palace of Twilight control use 10 */
+    0x4401, /* dSv_event_flag_c::F_0561 - Palace of Twilight - Palace of Twilight control use 11 */
+    0x4580, /* dSv_event_flag_c::F_0562 - Palace of Twilight - Palace of Twilight control use 12 */
 };
 
-/* 80CF466C-80CF47BC 00012C 0150+00 1/1 0/0 0/0 .text
- * checkArea_sub__14daObjSwBallB_cFP10fopAc_ac_c                */
+/* 80CF466C-80CF47BC 00012C 0150+00 1/1 0/0 0/0 .text            checkArea_sub__14daObjSwBallB_cFP10fopAc_ac_c */
 int daObjSwBallB_c::checkArea_sub(fopAc_ac_c* param_1) {
     if (param_1 == NULL) {
         return 0;
@@ -160,21 +171,19 @@ int daObjSwBallB_c::Create() {
     return 1;
 }
 
-UNK_REL_DATA
-
 /* 80CF5A40-80CF5A44 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "P_LBswBC";
 
 /* 80CF4B74-80CF4CA0 000634 012C+00 1/1 0/0 0/0 .text            CreateHeap__14daObjSwBallB_cFv */
 int daObjSwBallB_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(427, modelData != 0);
+    JUT_ASSERT(427, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mModel == 0) {
         return 0;
     }
     J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 9);
-    JUT_ASSERT(441, pbtk != 0);
+    JUT_ASSERT(441, pbtk != NULL);
     field_0x588 = new mDoExt_btkAnm();
     if (field_0x588 == NULL || field_0x588->init(modelData, pbtk, 1, 0, 1.0f, 0, -1) == 0) {
         return 0;
@@ -185,7 +194,7 @@ int daObjSwBallB_c::CreateHeap() {
 
 /* 80CF4CE8-80CF4E08 0007A8 0120+00 1/1 0/0 0/0 .text            create__14daObjSwBallB_cFv */
 int daObjSwBallB_c::create() {
-    fopAcM_SetupActor(this, daObjSwBallB_c);
+    fopAcM_ct(this, daObjSwBallB_c);
     if (field_0x5a0 == 0) {
         field_0x5a0 = 1;
         field_0x5a2 = home.angle.x;
@@ -373,7 +382,6 @@ void daObjSwBallB_c::PutCrrPos() {
 }
 
 /* 80CF56A4-80CF582C 001164 0188+00 1/1 0/0 0/0 .text            draw__14daObjSwBallB_cFv */
-// NONMATCHING
 int daObjSwBallB_c::draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mModel, &tevStr);

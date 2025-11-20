@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_life_container.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -23,8 +25,6 @@ const static dCcD_SrcCyl l_cyl_src = {
         40.0f // mHeight
     } // mCyl
 };
-
-UNK_REL_DATA
 
 /* 804CC7D8-804CCAD4 000078 02FC+00 1/1 0/0 0/0 .text            Reflect__FP4cXyzRC13cBgS_PolyInfof
  */
@@ -144,7 +144,7 @@ int daObjLife_c::__CreateHeap() {
 
 /* 804CCFE0-804CD258 000880 0278+00 1/1 0/0 0/0 .text            create__11daObjLife_cFv */
 int daObjLife_c::create() {
-    fopAcM_SetupActor(this, daObjLife_c);
+    fopAcM_ct(this, daObjLife_c);
 
     if (!mIsPrmsInit) {
         field_0x938 = home.angle.x;

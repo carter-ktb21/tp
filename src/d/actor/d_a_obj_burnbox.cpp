@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_burnbox.cpp
+* @file d_a_obj_burnbox.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_burnbox.h"
 #include "d/d_com_inf_game.h"
@@ -100,9 +102,9 @@ const char* l_arcName[3] = {
 int daObjBurnBox_c::CreateHeap() {
     u8 type = getType();
     J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes(l_arcName[type], l_bmd[type]);
-    JUT_ASSERT(0x106, modelData != 0);
+    JUT_ASSERT(0x106, modelData != NULL);
 
-    mpBoxModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_Unk80000, 0x11000084);
+    mpBoxModel = mDoExt_J3DModel__create(modelData, J3DMdlFlag_DifferedDLBuffer, 0x11000084);
     if (mpBoxModel == NULL) {
         return 0;
     }
@@ -187,7 +189,7 @@ int daObjBurnBox_c::Delete() {
 /* 8046EC50-8046ED44 000630 00F4+00 1/0 0/0 0/0 .text daObjBurnBox_create1st__FP14daObjBurnBox_c
  */
 int daObjBurnBox_create1st(daObjBurnBox_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjBurnBox_c);
+    fopAcM_ct(i_this, daObjBurnBox_c);
     return i_this->create1st();
 }
 

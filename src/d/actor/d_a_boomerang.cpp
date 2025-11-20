@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_boomerang.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "d/actor/d_a_alink.h"
@@ -115,7 +117,7 @@ static u8 const l_blurTop[12] = {
 
 /* 804A2868-804A287A 000018 000C+06 0/0 0/0 0/0 .rodata          l_blurRoot */
 // unused
-static u8 const l_blurRoot[12 + 6] = {
+static u8 const l_blurRoot[12] = {
     0xC2,
     0x20,
     0x00,
@@ -128,6 +130,10 @@ static u8 const l_blurRoot[12 + 6] = {
     0x00,
     0x00,
     0x00,
+};
+
+// TODO: what is this?
+static const u8 lbl_46_rodata_24[6] = {
     0xB4,
     0xA0,
     0x8C,
@@ -661,7 +667,7 @@ void daBoomerang_c::setRoomInfo() {
     mGroundY = dComIfG_Bgsp().GroundCross(&m_gndChk);
 
     int roomNo;
-    if (mGroundY != -1000000000.0f) {
+    if (mGroundY != -G_CM3D_F_INF) {
         roomNo = dComIfG_Bgsp().GetRoomId(m_gndChk);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(m_gndChk);
     } else {
@@ -820,9 +826,6 @@ JPABaseEmitter* daBoomerang_c::setEffectTraceMatrix(u32* i_emitterID, u16 i_name
     return emitter;
 }
 
-UNK_REL_DATA;
-UNK_REL_BSS;
-
 /* 804A2D10-804A2D14 000040 0001+03 0/0 0/0 0/0 .bss             l_HIO */
 static daBoomerang_HIO_c0 l_HIO;
 
@@ -933,7 +936,6 @@ void daBoomerang_c::setEffect() {
 }
 
 /* 804A0874-804A0F0C 002834 0698+00 2/0 0/0 0/0 .text            procWait__13daBoomerang_cFv */
-// NONMATCHING - small regalloc
 int daBoomerang_c::procWait() {
     daAlink_c* player = daAlink_getAlinkActorClass();
     speedF = 0.0f;
@@ -974,7 +976,7 @@ int daBoomerang_c::procWait() {
             offStateFlg0(FLG0_10);
         }
     
-        current.angle.y += 0x1830;
+        current.angle.y += (s16)0x1830;
         shape_angle.x = current.angle.x;
         shape_angle.y = current.angle.y;
         shape_angle.z = 0x1000;
@@ -994,7 +996,7 @@ int daBoomerang_c::procWait() {
         procMove();
     } else if (dCam_getBody()->Mode() != 8) {
         if (dComIfGp_checkPlayerStatus0(0, 0x80000) && player->getAtnActor() != NULL && m_lockCnt < BOOMERANG_LOCK_MAX) {
-            fpc_ProcID atn_actor_id = fopAcM_GetID(player->getAtnActor());
+            fpc_ProcID atn_actor_id = (fpc_ProcID)fopAcM_GetID(player->getAtnActor());
             
             int var_r27 = 0;
             while (var_r27 < m_lockCnt) {
@@ -1296,7 +1298,7 @@ int daBoomerang_c::execute() {
         if (fopAcM_rc_c::roofCheck(&spC) && dComIfG_Bgsp().GetUnderwaterRoofCode(*fopAcM_rc_c::getRoofCheck()) == 0) {
             roof_y = fopAcM_rc_c::getRoofY();
         } else {
-            roof_y = 1000000000.0f;
+            roof_y = G_CM3D_F_INF;
         }
 
         if (roof_y > fopAcM_wt_c::getWaterY() && current.pos.y < fopAcM_wt_c::getWaterY() - 50.0f) {
@@ -1415,21 +1417,21 @@ int daBoomerang_c::createHeap() {
     m_sight.initialize();
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x1F);
-    JUT_ASSERT(2882, modelData != 0);
+    JUT_ASSERT(2882, modelData != NULL);
     mp_boomModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mp_boomModel == NULL) {
         return 0;
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x34);
-    JUT_ASSERT(2898, modelData != 0);
+    JUT_ASSERT(2898, modelData != NULL);
     mp_shippuModel = mDoExt_J3DModel__create(modelData, 0, 0x11000284);
     if (mp_shippuModel == NULL) {
         return 0;
     }
 
     J3DAnmTransform* transAnm = (J3DAnmTransform*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x13);
-    JUT_ASSERT(2911, transAnm != 0);
+    JUT_ASSERT(2911, transAnm != NULL);
     if (m_shippuBck.init(transAnm, 0, 2, 1.0f, 0, -1, false) == 0) {
         return 0;
     }
@@ -1484,7 +1486,7 @@ static dCcD_SrcCyl l_windAtCylSrc = {
 /* 804A2084-804A230C 004044 0288+00 1/1 0/0 0/0 .text            create__13daBoomerang_cFv */
 int daBoomerang_c::create() {
     fpc_ProcID id = fopAcM_GetID(this);
-    fopAcM_SetupActor(this, daBoomerang_c);
+    fopAcM_ct(this, daBoomerang_c);
 
     if (!fopAcM_entrySolidHeap(this, daBoomerang_createHeap, 0xC0D0)) {
         return cPhs_ERROR_e;
@@ -1521,7 +1523,7 @@ int daBoomerang_c::create() {
     m_windBtk->searchUpdateMaterialID(mp_shippuModel->getModelData());
     mp_shippuModel->getModelData()->entryTexMtxAnimator(m_windBtk);
     mp_shippuModel->getModelData()->getJointNodePointer(4)->setCallBack(daBoomeang_windModelCallBack);
-    mp_shippuModel->setUserArea((u32)this);
+    mp_shippuModel->setUserArea((uintptr_t)this);
 
     m_waitEffBtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x47);
     JUT_ASSERT(3011, m_waitEffBtk);
@@ -1583,3 +1585,6 @@ extern actor_process_profile_definition g_profile_BOOMERANG = {
 };
 
 AUDIO_INSTANCES;
+class JAUSectionHeap;
+template<>
+JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;

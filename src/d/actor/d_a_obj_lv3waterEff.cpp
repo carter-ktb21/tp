@@ -3,6 +3,8 @@
  * Lakebed Temple Pre-Deku Toad Room Water Bubbles
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv3waterEff.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -29,7 +31,7 @@ int daObjWaterEff_c::Create() {
 
 /* 80C5C5DC-80C5C670 00015C 0094+00 1/1 0/0 0/0 .text            create__15daObjWaterEff_cFv */
 int daObjWaterEff_c::create() {
-    fopAcM_SetupActor(this, daObjWaterEff_c);
+    fopAcM_ct(this, daObjWaterEff_c);
 
     if (!Create()) {
         return cPhs_ERROR_e;

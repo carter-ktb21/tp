@@ -3,6 +3,8 @@
  * Time Control Tag
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag11.h"
 #include "d/d_procname.h"
 #include "d/d_kankyo_static.h"
@@ -97,7 +99,7 @@ static int daKytag11_Delete(kytag11_class* i_this) {
 /* 805297A8-80529854 000308 00AC+00 1/0 0/0 0/0 .text            daKytag11_Create__FP10fopAc_ac_c */
 static int daKytag11_Create(fopAc_ac_c* i_this) {
     kytag11_class* a_this = (kytag11_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag11_class);
+    fopAcM_ct(i_this, kytag11_class);
 
     a_this->mNewTime = fopAcM_GetParam(i_this) & 0x1F;
     a_this->mStopTime = (fopAcM_GetParam(i_this) >> 5) & 0x1F;

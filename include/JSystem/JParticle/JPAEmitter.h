@@ -2,6 +2,7 @@
 #define JPAEMITTER_H
 
 #include <dolphin/gx.h>
+#include <stdint.h>
 #include "JSystem/JParticle/JPAResource.h"
 #include "JSystem/JParticle/JPAList.h"
 #include "JSystem/JParticle/JPARandom.h"
@@ -120,6 +121,7 @@ public:
     u8 getResourceManagerID() const { return mResMgrID; }
     u8 getGroupID() const { return mGroupID; }
     u8 getDrawTimes() const { return mDrawTimes; }
+    f32 getRate() const { return mRate; }
     void setRate(f32 rate) { mRate = rate; }
     void setDirectionalSpeed(f32 i_speed) { mDirSpeed = i_speed; }
     void setRandomDirectionSpeed(f32 i_speed) { mRndmDirSpeed = i_speed; }
@@ -137,8 +139,9 @@ public:
     }
     void getGlobalTranslation(JGeometry::TVec3<f32>* out) const { out->set(mGlobalTrs); }
     void setGlobalDynamicsScale(const JGeometry::TVec3<f32>& i_scale) { mGlobalScl.set(i_scale); }
+    void getGlobalDynamicsScale(JGeometry::TVec3<f32>* i_scale) const { i_scale->set(mGlobalScl); }
     void setGlobalAlpha(u8 alpha) { mGlobalPrmClr.a = alpha; }
-    u8 getGlobalAlpha() { return mGlobalPrmClr.a; }
+    u8 getGlobalAlpha() const { return mGlobalPrmClr.a; }
     void getGlobalPrmColor(GXColor& color) { color = mGlobalPrmClr; }
     void setGlobalPrmColor(u8 r, u8 g, u8 b) { mGlobalPrmClr.r = r; mGlobalPrmClr.g = g; mGlobalPrmClr.b = b; }
     void setGlobalEnvColor(u8 r, u8 g, u8 b) { mGlobalEnvClr.r = r; mGlobalEnvClr.g = g; mGlobalEnvClr.b = b; }
@@ -160,7 +163,7 @@ public:
     void setGlobalParticleScale(f32 scaleX, f32 scaleY) {
         mGlobalPScl.set(scaleX, scaleY);
     }
-    void getGlobalParticleScale(JGeometry::TVec3<f32>& scale) {
+    void getGlobalParticleScale(JGeometry::TVec3<f32>& scale) const {
         scale.set(mGlobalPScl.x, mGlobalPScl.y, 1.0f);
     }
     void setGlobalScale(const JGeometry::TVec3<f32>& scale) {
@@ -196,12 +199,12 @@ public:
     void stopDrawParticle() { setStatus(JPAEmtrStts_StopDraw); }
     void playDrawParticle() { clearStatus(JPAEmtrStts_StopDraw); }
 
-    u32 getUserWork() { return mpUserWork; }
-    void setUserWork(u32 userWork) { mpUserWork = userWork; }
-    u32 getParticleNumber() {
+    uintptr_t getUserWork() { return mpUserWork; }
+    void setUserWork(uintptr_t userWork) { mpUserWork = userWork; }
+    u32 getParticleNumber() const {
         return mAlivePtclBase.getNum() + mAlivePtclChld.getNum();
     }
-    bool isEnableDeleteEmitter() {
+    bool isEnableDeleteEmitter() const {
         return checkStatus(JPAEmtrStts_EnableDeleteEmitter) && getParticleNumber() == 0;
     }
     void setDrawTimes(u8 drawTimes) { mDrawTimes = drawTimes; }
@@ -212,6 +215,10 @@ public:
 
     void setVolumeMiniRadius(f32 param_1) {
         mVolumeMinRad = param_1;
+    }
+
+    void setMaxFrame(s32 maxFrame) {
+        mMaxFrame = maxFrame;
     }
 
 public:

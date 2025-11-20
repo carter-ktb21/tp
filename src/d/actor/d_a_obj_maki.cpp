@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_maki.cpp
+* @file d_a_obj_maki.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_maki.h"
 #include "JSystem/J3DGraphAnimator/J3DAnimation.h"
@@ -187,7 +189,7 @@ daObj_Maki_HIO_c l_HIO;
 /* 80C9058C-80C9080C 00086C 0280+00 1/0 0/0 0/0 .text            daObj_Maki_Create__FP10fopAc_ac_c
  */
 cPhs__Step daObj_Maki_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, obj_maki_class);
+    fopAcM_ct(i_this, obj_maki_class);
     obj_maki_class* a_this = (obj_maki_class*)i_this;
     static dCcD_SrcSph cc_sph_src = {
         {

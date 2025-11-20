@@ -1,7 +1,9 @@
 /**
- * @file d_a_e_tk_ball.cpp
+* @file d_a_e_tk_ball.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_tk_ball.h"
 #include "d/actor/d_a_player.h"
@@ -141,13 +143,13 @@ static void e_tk_ball_move(e_tk_ball_class* i_this) {
         dAttention_c* attention = dComIfGp_getAttention();
         if (attention->Lockon() && parent_actor == attention->LockonTarget(0)) {
             actor_lockon = true;
-            parent_actor->attention_info.flags |= 0x200000;
+            parent_actor->attention_info.flags |= fopAc_AttnFlag_UNK_0x200000;
         }
     }
     if (i_this->mTgSph.ChkTgHit() || i_this->mAtSph.ChkAtShieldHit()) {
         impact_eff_set(i_this);
         actor->current.angle.x *= -1;
-        if (actor_lockon && daPy_getPlayerActorClass()->getCutType() != 0x00) {
+        if (actor_lockon && daPy_getPlayerActorClass()->getCutType() != daPy_py_c::CUT_TYPE_NONE) {
             i_this->mAction = ACT_TK_BALL_RETURN;
             i_this->mMode = MODE_TK_BALL_INIT;
             actor->current.angle.y -= 0x8000;
@@ -168,7 +170,7 @@ static void e_tk_ball_move(e_tk_ball_class* i_this) {
         i_this->mInitalDistance = direction_vec.abs();
         speed_vec.x = 0.0;
         speed_vec.y = 0.0;
-        if (daPy_getPlayerActorClass()->getCutType() != 0x00) {
+        if (daPy_getPlayerActorClass()->getCutType() != daPy_py_c::CUT_TYPE_NONE) {
             speed_vec.z = 60.0f;
         }
         cMtx_YrotS(*calc_mtx, actor->current.angle.y);
@@ -283,7 +285,7 @@ static void action(e_tk_ball_class* i_this) {
                 particle_emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
                 i_this->mParticleDirection = particle_position - i_this->mPreviousPosition;
                 i_this->mParticleDirection *= 0.8f;
-                particle_emitter->setUserWork((u32)&i_this->mParticleDirection);
+                particle_emitter->setUserWork((uintptr_t)&i_this->mParticleDirection);
                 i_this->mPreviousPosition = particle_position;
                 break;
             }
@@ -393,7 +395,7 @@ static int daE_TK_BALL_Create(fopAc_ac_c* i_this) {
         }  // mSphAttr
     };
 
-    fopAcM_SetupActor(i_this, e_tk_ball_class);
+    fopAcM_ct(i_this, e_tk_ball_class);
     e_tk_ball_class* a_this = static_cast<e_tk_ball_class*>(i_this);
 
     a_this->mType = fopAcM_GetParam(a_this);

@@ -3,6 +3,8 @@
  * Object - Dungeon Prize
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ystone.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
@@ -263,7 +265,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
  */
 static cPhs__Step daObj_Ystone_Create(fopAc_ac_c* i_this) {
     obj_ystone_class* _this = static_cast<obj_ystone_class*>(i_this);
-    fopAcM_SetupActor(_this, obj_ystone_class);
+    fopAcM_ct(_this, obj_ystone_class);
     _this->mLevel = getNowLevel() - 1;
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhaseReq, l_arcName[_this->mLevel]);
 

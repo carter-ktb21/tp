@@ -3,14 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wdStick.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include <cmath.h>
-
-UNK_REL_DATA
 
 /* 80D34424-80D34430 000014 000C+00 2/2 0/0 0/0 .bss             l_HIO */
 static daWdStick_HIO_c l_HIO;
@@ -37,7 +37,7 @@ void daWdStick_c::setBaseMtx() {
 /* 80D31C58-80D31CC4 0001F8 006C+00 1/0 0/0 0/0 .text            CreateHeap__11daWdStick_cFv */
 int daWdStick_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("H_Kinobou", 4);
-    JUT_ASSERT(245, modelData != 0);
+    JUT_ASSERT(245, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != 0 ? 1 : 0;
 }
@@ -53,7 +53,7 @@ dCcD_SrcGObjInf const daWdStick_c::mCcDObjInfo = {
 
 /* 80D31CC4-80D31F9C 000264 02D8+00 1/1 0/0 0/0 .text            create__11daWdStick_cFv */
 int daWdStick_c::create() {
-    fopAcM_SetupActor(this, daWdStick_c);
+    fopAcM_ct(this, daWdStick_c);
     int rv = dComIfG_resLoad(&mPhase, "H_Kinobou");
     if (rv == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, createHeapCallBack, 0x820) == 0) {
@@ -80,7 +80,7 @@ int daWdStick_c::create() {
         mSph2.Set(mCcDSph);
         mSph2.SetStts(&mStts);
         fopAcM_OnCarryType(this, fopAcM_CARRY_UNK_30);
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         attention_info.distances[4] = 59;
         misCarrying = fopAcM_checkCarryNow(this);
         mode_init_wait();
@@ -137,7 +137,7 @@ void daWdStick_c::setFire() {
             JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(field_0xae4[i]);
             if (emitter != NULL) {
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&field_0xa94);
+                emitter->setUserWork((uintptr_t)&field_0xa94);
             }
         }
     }
@@ -150,7 +150,7 @@ void daWdStick_c::setFire() {
             JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(field_0xaec[i]);
             if (emitter != NULL) {
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&field_0xaa0);
+                emitter->setUserWork((uintptr_t)&field_0xaa0);
             }
         }
     }
@@ -214,7 +214,7 @@ int daWdStick_c::Execute() {
         OS_REPORT("=== 木の棒再セット (%f) ===\n", current.pos.y - home.pos.y);
         field_0xaac = 0;
         field_0xaad = 0;
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         current.pos = home.pos;
         mode_init_wait();
     }
@@ -321,7 +321,7 @@ void daWdStick_c::mode_proc_call() {
 
 /* 80D3350C-80D3353C 001AAC 0030+00 4/4 0/0 0/0 .text            mode_init_wait__11daWdStick_cFv */
 void daWdStick_c::mode_init_wait() {
-    cLib_onBit(attention_info.flags, 0x10UL);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     gravity = -10.0f;
     mMode = MODE_WAIT;
@@ -336,7 +336,7 @@ void daWdStick_c::mode_proc_wait() {
 
 /* 80D33588-80D335AC 001B28 0024+00 1/1 0/0 0/0 .text            mode_init_carry__11daWdStick_cFv */
 void daWdStick_c::mode_init_carry() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     mMode = MODE_CARRY;
 }
@@ -393,7 +393,7 @@ void daWdStick_c::mode_proc_carry() {
 
 /* 80D3386C-80D33890 001E0C 0024+00 1/1 0/0 0/0 .text            mode_init_drop__11daWdStick_cFv */
 void daWdStick_c::mode_init_drop() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     gravity = -5.0f;
     mMode = MODE_DROP;
 }
@@ -407,7 +407,7 @@ void daWdStick_c::mode_proc_drop() {
 
 /* 80D338DC-80D338F4 001E7C 0018+00 2/2 0/0 0/0 .text            mode_init_roll__11daWdStick_cFv */
 void daWdStick_c::mode_init_roll() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mMode = MODE_ROLL;
 }
 
@@ -425,7 +425,7 @@ void daWdStick_c::mode_proc_roll() {
     cM3dGPla cStack_ec;
     fopAcM_gc_c::gndCheck(&cStack_f8);
     bool iVar7 = fopAcM_gc_c::getTriPla(&cStack_ec);
-    if ((groundCross != -1000000000.0f) && iVar7 != 0) {
+    if ((groundCross != -G_CM3D_F_INF) && iVar7 != 0) {
         f32 dVar11 = cM_scos(cM_deg2s(dVar14 - 0.5f));
         cStack_104 = cStack_ec.mNormal;
         if (cStack_104.y < dVar11) {
@@ -455,7 +455,7 @@ void daWdStick_c::mode_proc_roll() {
             mode_init_wait();
         }
     } else {
-        cLib_offBit(attention_info.flags, 0x10UL);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
     mAcch.CrrPos(dComIfG_Bgsp());
     bgCheck();
@@ -472,7 +472,7 @@ BOOL daWdStick_c::chkWaterLineIn() {
 void daWdStick_c::mode_init_sink() {
     field_0xab0 = 0;
     field_0xaae = 0;
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mMode = MODE_SINK;
 }
 
@@ -491,12 +491,12 @@ void daWdStick_c::mode_proc_sink() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
     f32 waterHeight = mAcch.m_wtr.GetHeight();
     if (current.pos.y < waterHeight + 100.0f) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         current.pos = home.pos;
         mode_init_wait();
     }
     if (mAcch.ChkGroundHit()) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 }
 

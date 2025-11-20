@@ -3,11 +3,31 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_gi.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_GI_HIO_c : public JORReflexible {
+public:
+    /* 806CD48C */ daE_GI_HIO_c();
+    /* 806D098C */ virtual ~daE_GI_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 id;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 move_speed;
+    /* 0x10 */ f32 player_detect_range;
+    /* 0x14 */ f32 player_attack_range;
+    /* 0x18 */ f32 attack_angle;
+    /* 0x1C */ f32 link_stun_time;
+    /* 0x20 */ f32 wolf_stun_time;
+    /* 0x24 */ f32 scream_prevention_time;
+    /* 0x28 */ f32 lever_spin_time;
+};
 
 enum daE_GI_ACTION_e {
     ACTION_SLEEP_e,
@@ -322,7 +342,7 @@ void daE_GI_c::setDragSwordEffect() {
     gndchk.SetPos(&pos);
     
     f32 ground_height = dComIfG_Bgsp().GroundCross(&gndchk);
-    if (-1000000000.0f != ground_height) {
+    if (-G_CM3D_F_INF != ground_height) {
         pos.y = ground_height;
     }
 
@@ -793,7 +813,7 @@ void daE_GI_c::action() {
     damage_check();
 
     u8 is_battle_on = FALSE;
-    attention_info.flags = 4;
+    attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
     switch (mActionMode) {
     case ACTION_SLEEP_e:
@@ -824,11 +844,11 @@ void daE_GI_c::action() {
     mIsBattleOn = is_battle_on;
     mSound.setLinkSearch(is_battle_on);
 
-    if (attention_info.flags & 4) {
+    if (attention_info.flags & fopAc_AttnFlag_BATTLE_e) {
         dBgS_LinChk linecheck;
         linecheck.Set(&dComIfGp_getCamera(0)->lookat.eye, &attention_info.position, this);
         if (dComIfG_Bgsp().LineCross(&linecheck)) {
-            attention_info.flags &= ~0x4;
+            attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
         }
     }
 
@@ -1005,7 +1025,7 @@ static int daE_GI_Delete(daE_GI_c* a_this) {
 /* 806D00E8-806D025C 002D48 0174+00 1/1 0/0 0/0 .text            CreateHeap__8daE_GI_cFv */
 int daE_GI_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_GI", 0x13);
-    JUT_ASSERT(1621, modelData != 0);
+    JUT_ASSERT(1621, modelData != NULL);
 
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("E_GI", 0xB), 0, 1.0f, 0, -1, &mSound, 0x80000, 0x11000084);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -1013,7 +1033,7 @@ int daE_GI_c::CreateHeap() {
     }
 
     J3DModel* model = mpModelMorf->getModel();
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
 
     for (u16 i = 1; i < model->getModelData()->getJointNum(); i++) {
         if (i == 3) {
@@ -1022,7 +1042,7 @@ int daE_GI_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("E_GI", 0x14);
-    JUT_ASSERT(1652, modelData != 0);
+    JUT_ASSERT(1652, modelData != NULL);
     mpSwordModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpSwordModel == NULL) {
         return 0;
@@ -1038,7 +1058,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 806D027C-806D0608 002EDC 038C+00 1/1 0/0 0/1 .text            create__8daE_GI_cFv */
 int daE_GI_c::create() {
-    fopAcM_SetupActor(this, daE_GI_c);
+    fopAcM_ct(this, daE_GI_c);
 
     OS_REPORT("E_GI PARAM %x\n", fopAcM_GetParam(this));
     mSwbit = fopAcM_GetParam(this);
@@ -1068,7 +1088,7 @@ int daE_GI_c::create() {
             l_HIO.id = mDoHIO_CREATE_CHILD("ギブド", &l_HIO);
         }
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(this, mpModelMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(this, 200.0f, 200.0f, 200.0f);
@@ -1080,7 +1100,7 @@ int daE_GI_c::create() {
         health = 240;
         field_0x560 = 240;
 
-        mCcStts.Init(254, 0, this);
+        mCcStts.Init(0xFE, 0, this);
     
         mCcSph[0].Set(cc_gi_src);
         mCcSph[0].SetStts(&mCcStts);

@@ -3,11 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_L7demo_dr.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_lv7bridge.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_overlap_mng.h"
 
 /* 805A9238-805A92DC 000078 00A4+00 5/5 0/0 0/0 .text            setAction__6daDr_cFM6daDr_cFPCvPv_v
@@ -323,7 +326,7 @@ static int daDr_Delete(daDr_c* i_this) {
 /* 805AA084-805AA17C 000EC4 00F8+00 1/1 0/0 0/0 .text            CreateHeap__6daDr_cFv */
 int daDr_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_dr", 0x49);
-    JUT_ASSERT(655, modelData != 0);
+    JUT_ASSERT(655, modelData != NULL);
 
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_dr", 0x1E), 0, 0.0f, 0, -1, &mSound, 0, 0x11000084);
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -358,7 +361,7 @@ BOOL daDr_c::check_start() {
 
 /* 805AA224-805AA42C 001064 0208+00 1/1 0/0 0/0 .text            create__6daDr_cFv */
 int daDr_c::create() {
-    fopAcM_SetupActor(this, daDr_c);
+    fopAcM_ct(this, daDr_c);
 
     int phase_state;
     if (dComIfG_play_c::getLayerNo(0) == 3) {

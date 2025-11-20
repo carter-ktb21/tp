@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_snow_soup.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
@@ -51,7 +53,7 @@ int daObjSnowSoup_c::createHeap() {
 
 /* 80CDFA3C-80CDFB70 00025C 0134+00 1/1 0/0 0/0 .text            create__15daObjSnowSoup_cFv */
 cPhs__Step daObjSnowSoup_c::create() {
-    fopAcM_SetupActor(this, daObjSnowSoup_c);
+    fopAcM_ct(this, daObjSnowSoup_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(this, l_arcName);
     if (step == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, daObjSnowSoup_c_createHeap, 0x6500)) {
@@ -91,6 +93,7 @@ int daObjSnowSoup_c::execute() {
     mDoAud_seStartLevel(Z2SE_OBJ_FIREWOOD_BURNING, &mFirewoodPos, 0, dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
     switch (mState) {
     case 0:
+            /* dSv_event_flag_c::F_0003 - Snowpeak Ruins - Handed over tomato puree and left room */
         if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[7])) {
             deleteSmkEmtChange(mState);
             mState = 1;
@@ -101,6 +104,7 @@ int daObjSnowSoup_c::execute() {
         }
         break;
     case 1:
+            /* dSv_event_flag_c::F_0004 - Snowpeak Ruins - Handed over secret ingredient and left room */
         if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[8])) {
             deleteSmkEmtChange(mState);
             mState = 2;
@@ -120,8 +124,10 @@ int daObjSnowSoup_c::execute() {
 /* 80CDFE14-80CDFEA4 000634 0090+00 1/1 0/0 0/0 .text            init__15daObjSnowSoup_cFv */
 void daObjSnowSoup_c::init() {
     mState = 0;
+        /* dSv_event_flag_c::F_0004 - Snowpeak Ruins - Handed over secret ingredient and left room */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[8])) {
         mState = 2;
+               /* dSv_event_flag_c::F_0003 - Snowpeak Ruins - Handed over tomato puree and left room */
     } else if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[7])) {
         mState = 1;
     }
@@ -180,7 +186,7 @@ void daObjSnowSoup_c::deleteSmkEmtChange(int i_state) {
 /* 80CE0180-80CE01D4 0009A0 0054+00 1/0 0/0 0/0 .text daObjSnowSoup_create__FP15daObjSnowSoup_c */
 
 static cPhs__Step daObjSnowSoup_create(daObjSnowSoup_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjSnowSoup_c);
+    fopAcM_ct(i_this, daObjSnowSoup_c);
     return i_this->create();
 }
 

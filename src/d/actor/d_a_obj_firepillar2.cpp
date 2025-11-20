@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_firepillar2.h"
 #include "JSystem/J3DGraphAnimator/J3DModelData.h"
 #include "SSystem/SComponent/c_xyz.h"
@@ -39,24 +41,6 @@ void daObjFPillar2_c::setBaseMtx() {
         mModel->setBaseTRMtx(mDoMtx_stack_c::get());
     }
 }
-
-/* 80BEB528-80BEB534 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BEB534-80BEB548 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BEB548-80BEB54C -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Obj_yogan";
@@ -133,19 +117,19 @@ int daObjFPillar2_c::Create() {
 /* 80BEA034-80BEA1E0 0003F4 01AC+00 1/1 0/0 0/0 .text            CreateHeap__15daObjFPillar2_cFv */
 int daObjFPillar2_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 8);
-    JUT_ASSERT(363, modelData != 0);
+    JUT_ASSERT(363, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (mModel == NULL) {
         return 0;
     }
     J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 11);
-    JUT_ASSERT(377, pbtk != 0);
+    JUT_ASSERT(377, pbtk != NULL);
     mBtk = new mDoExt_btkAnm();
     if (mBtk == NULL || !mBtk->init(modelData, pbtk, 1, 2, 1.0f, 0, -1)) {
         return 0;
     }
     J3DAnmTransform* pbck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(389, pbck != 0);
+    JUT_ASSERT(389, pbck != NULL);
     mBck = new mDoExt_bckAnm();
     if (mBck == NULL || !mBck->init(pbck, 1, 0, 1.0f, 0, -1, false)) {
         return 0;
@@ -155,7 +139,7 @@ int daObjFPillar2_c::CreateHeap() {
 
 /* 80BEA228-80BEA400 0005E8 01D8+00 1/1 0/0 0/0 .text            create__15daObjFPillar2_cFv */
 int daObjFPillar2_c::create() {
-    fopAcM_SetupActor(this, daObjFPillar2_c);
+    fopAcM_ct(this, daObjFPillar2_c);
     if (mInitAngles == 0) {
         field_0x97a = home.angle.x;
         field_0x97c = home.angle.z;

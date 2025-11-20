@@ -3,11 +3,25 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_rb.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+
+class daE_RB_HIO_c : public JORReflexible {
+public:
+    /* 8076238C */ daE_RB_HIO_c();
+    /* 80764838 */ virtual ~daE_RB_HIO_c() {}
+
+#if DEBUG
+    void genMessage(JORMContext*);
+#endif
+
+    /* 0x4 */ s8 id;
+    /* 0x8 */ f32 base_size;
+    /* 0xC */ f32 ground_depth;
+};
 
 enum daE_RB_ACTION {
     ACTION_STAY,
@@ -468,7 +482,7 @@ static void action(e_rb_class* i_this) {
 
     if (attention_ON) {
         fopAcM_OnStatus(enemy, 0);
-        enemy->attention_info.flags = 4;
+        enemy->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(enemy, 0);
         enemy->attention_info.flags = 0;
@@ -601,7 +615,7 @@ static void e_rb_base_1(e_rb_class* i_this) {
                         sp108.SetPos(&sp68);
                         
                         f32 ground_y = dComIfG_Bgsp().GroundCross(&sp108);
-                        if (-1000000000.0f != ground_y) {
+                        if (-G_CM3D_F_INF != ground_y) {
                             child[i]->enemy.current.pos = child[i]->enemy.old.pos = child[i]->field_0xa10;
                             child[i]->enemy.old.pos.y = ground_y;
                             child[i]->enemy.current.pos.y = ground_y;
@@ -776,7 +790,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 8076424C-80764624 001FAC 03D8+00 1/0 0/0 0/0 .text            daE_RB_Create__FP10fopAc_ac_c */
 static int daE_RB_Create(fopAc_ac_c* i_this) {
     e_rb_class* a_this = (e_rb_class*)i_this;
-    fopAcM_SetupActor(i_this, e_rb_class);
+    fopAcM_ct(i_this, e_rb_class);
 
     int phase_state = dComIfG_resLoad(&a_this->phase, "E_rb");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -829,10 +843,10 @@ static int daE_RB_Create(fopAc_ac_c* i_this) {
         if (!l_HIOInit) {
             a_this->HIOInit = TRUE;
             l_HIOInit = TRUE;
-            //l_HIO.id = mDoHIO_CREATE_CHILD("リーバ", &l_HIO);
+            l_HIO.id = mDoHIO_CREATE_CHILD("リーバ", &l_HIO);
         }
-    
-        i_this->attention_info.flags = 4;
+
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(i_this, a_this->modelMorf->getModel()->getBaseTRMtx());
         i_this->health = 1;
         i_this->field_0x560 = 1;

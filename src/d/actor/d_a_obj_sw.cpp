@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_sw.cpp
+* @file d_a_obj_sw.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 // #define VIRTUAL_3DLINEMAT
 #include "d/actor/d_a_obj_sw.h"
@@ -10,6 +12,7 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
 #include "d/d_s_play.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_ext.h"
 
 /* 80CF0638-80CF0774 000078 013C+00 1/0 0/0 0/0 .text            daObj_Sw_Draw__FP12obj_sw_class */
@@ -692,7 +695,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 
             if (i == 2) {
                 J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Npc_ksw", 18);
-                JUT_ASSERT(1220, modelData != 0);
+                JUT_ASSERT(1220, modelData != NULL);
                 i_this->field_0x8c8 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
                 if (i_this->field_0x8c8 == NULL) {
                     return 0;
@@ -723,7 +726,7 @@ static int daObj_Sw_Create(fopAc_ac_c* a_this) {
     obj_sw_class* i_this = (obj_sw_class*)a_this;
     int phase;
     u32 i_size;
-    fopAcM_SetupActor(a_this, obj_sw_class);
+    fopAcM_ct(a_this, obj_sw_class);
 
     i_this->field_0x570 = fopAcM_GetParam(a_this);
     if (i_this->field_0x570 == 0xFF) {

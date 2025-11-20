@@ -3,6 +3,8 @@
  * Tag - Spinner
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_spinner.h"
 #include "d/d_procname.h"
 
@@ -53,7 +55,7 @@ int daTagSpinner_c::CreateHeap() {
 int daTagSpinner_c::create() {
     int iVar1;
     int iVar2;
-    fopAcM_SetupActor(this, daTagSpinner_c);
+    fopAcM_ct(this, daTagSpinner_c);
 
     if (!fopAcM_entrySolidHeap(this, CheckCreateHeap, 0)) {
         iVar2 = 5;

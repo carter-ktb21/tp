@@ -1,9 +1,10 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/J2DGraph/J2DPrint.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "JSystem/JUtility/JUTFont.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "global.h"
 
 /* 80451580-80451584 000A80 0004+00 3/3 0/0 0/0 .sbss            mStrBuff__8J2DPrint */
 char* J2DPrint::mStrBuff;
@@ -237,7 +238,7 @@ f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
             b2ByteCharacter = true;
         }
 
-        if (iCharacter == 0 || ((u32)pString - (u32)pStringStart) > length) {
+        if (iCharacter == 0 || ((uintptr_t)pString - (uintptr_t)pStringStart) > length) {
             if (!param_6 && param_3 != NULL) {
                 param_3[someIndex] = 0.5f + f31;
             }
@@ -284,7 +285,7 @@ f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
                         f31 = 0.0f;
                     }
                 }
-            } else if (b2ByteCharacter && ((u32)pString - (u32)pStringStart > (u32)length)) {
+            } else if (b2ByteCharacter && ((uintptr_t)pString - (uintptr_t)pStringStart > (u32)length)) {
                 if (!param_6 && param_3 != NULL) {
                     param_3[someIndex] = 0.5f + f31;
                 }
@@ -560,8 +561,8 @@ s32 J2DPrint::getNumberS32(const u8** ppu8String, s32 defaultValue, s32 errorVal
         number = strtol((char*)*ppu8String, &pEnd, base);
     } else if (base == 16) {
         number = strtoul((char*)*ppu8String, &pEnd, base);
-        if ((u32)pEnd - (u32)*ppu8String != 8) {
-            if ((u32)pEnd - (u32)*ppu8String == 6) {
+        if ((uintptr_t)pEnd - (uintptr_t)*ppu8String != 8) {
+            if ((uintptr_t)pEnd - (uintptr_t)*ppu8String == 6) {
                 number = (number << 8) | 0xFF;
             } else {
                 *ppu8String = pStringStart;
@@ -600,8 +601,8 @@ f32 J2DPrint::getNumberF32(const u8** ppu8String, f32 defaultValue, f32 errorVal
         number = strtol((char*)*ppu8String, &pEnd, base);
     } else if (base == 16) {
         number = strtoul((char*)*ppu8String, &pEnd, base);
-        if ((u32)pEnd - (u32)*ppu8String != 8) {
-            if ((u32)pEnd - (u32)*ppu8String == 6) {
+        if ((uintptr_t)pEnd - (uintptr_t)*ppu8String != 8) {
+            if ((uintptr_t)pEnd - (uintptr_t)*ppu8String == 6) {
                 number = (number << 8) | 0xFF;
             } else {
                 *ppu8String = pStringStart;

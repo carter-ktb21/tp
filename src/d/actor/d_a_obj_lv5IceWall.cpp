@@ -3,27 +3,11 @@
  * Snowpeak Ruins Ice Wall
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv5IceWall.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
-
-/* 80C6C6C8-80C6C6D4 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C6C6D4-80C6C6E8 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80C6B42C-80C6B478 0000EC 004C+00 1/1 0/0 0/0 .text            __ct__15daIceWall_HIO_cFv */
 daIceWall_HIO_c::daIceWall_HIO_c() {
@@ -49,7 +33,7 @@ void daIceWall_c::setBaseMtx() {
 /* 80C6B5E4-80C6B69C 0002A4 00B8+00 1/0 0/0 0/0 .text            CreateHeap__11daIceWall_cFv */
 int daIceWall_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("l5IceWall", 4);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpModel[0] = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpModel[0] == NULL) {
@@ -57,7 +41,7 @@ int daIceWall_c::CreateHeap() {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("l5IceWall", 5);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpModel[1] = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpModel[1] == NULL) {
@@ -93,7 +77,7 @@ static const int l_bmdIdx[] = {4, 5};
 
 /* 80C6B69C-80C6B924 00035C 0288+00 1/1 0/0 0/0 .text            create__11daIceWall_cFv */
 int daIceWall_c::create() {
-    fopAcM_SetupActor(this, daIceWall_c);
+    fopAcM_ct(this, daIceWall_c);
 
     mIsBreakSwBit = getSwBit1();
     mIsBreakingSwBit = getSwBit1();

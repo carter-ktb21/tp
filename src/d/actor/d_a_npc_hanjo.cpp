@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_hanjo.h"
 #include "d/actor/d_a_npc_tk.h"
 #include "d/actor/d_a_player.h"
@@ -17,8 +19,6 @@
 //
 // Declarations:
 //
-
-UNK_REL_DATA;
 
 /* 80A00960-80A00980 000020 0020+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[4][2] = {
@@ -194,7 +194,7 @@ dCcD_SrcGObjInf const daNpc_Hanjo_c::mStoneCcDObjInfo = {
 /* 809F9278-809F9578 0002D8 0300+00 1/1 0/0 0/0 .text            create__13daNpc_Hanjo_cFv */
 int daNpc_Hanjo_c::create() {
     static int const heapSize[5] = {0x61B0, 0x41D0, 0x39D0, 0x39C0, 0};
-    fopAcM_SetupActor2(this, daNpc_Hanjo_c, l_faceMotionAnmData,
+    daNpcT_ct(this, daNpc_Hanjo_c, l_faceMotionAnmData,
                        (daNpcT_motionAnmData_c*)l_motionAnmData, l_faceMotionSequenceData, 4,
                        l_motionSequenceData, 4, l_evtList, l_resNameList);
     mType = getType();
@@ -231,7 +231,7 @@ int daNpc_Hanjo_c::create() {
         mAcch.CrrPos(dComIfG_Bgsp());
         mGndChk = mAcch.m_gnd;
         mGroundH = mAcch.GetGroundH();
-        if (mGroundH != -1e9f) {
+        if (mGroundH != -G_CM3D_F_INF) {
             setEnvTevColor();
             setRoomNo();
         }
@@ -263,7 +263,7 @@ int daNpc_Hanjo_c::CreateHeap() {
     for (u16 i = 0; i < modelData->getJointNum(); i++) {
         modelData->getJointNodePointer(i)->setCallBack(ctrlJointCallBack);
     }
-    model->setUserArea((u32)this);
+    model->setUserArea((uintptr_t)this);
     mpMatAnm[0] = new daNpcT_MatAnm_c();
     if (mpMatAnm[0] == NULL) {
         return 0;
@@ -340,7 +340,7 @@ int daNpc_Hanjo_c::Draw() {
         J3DModelData* modelData = mpMorf[0]->getModel()->getModelData();
         modelData->getMaterialNodePointer(getEyeballMaterialNo())->setMaterialAnm(mpMatAnm[0]);
     }
-    return daNpcT_c::draw(0, 0, field_0xde8, NULL, 100.0f, 0, 0, 0);
+    return daNpcT_c::draw(0, 0, mRealShadowSize, NULL, 100.0f, 0, 0, 0);
 }
 
 /* 809F9C20-809F9C40 000C80 0020+00 1/1 0/0 0/0 .text
@@ -477,7 +477,7 @@ void daNpc_Hanjo_c::setParam() {
     attention_info.distances[0] = daNpcT_getDistTableIdx(sVar4, sVar1);
     attention_info.distances[1] = attention_info.distances[0];
     attention_info.distances[3] = daNpcT_getDistTableIdx(sVar6, sVar5);
-    attention_info.flags = 0xa;
+    attention_info.flags = fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e;
     scale.set(daNpc_Hanjo_Param_c::m.field_0x08, daNpc_Hanjo_Param_c::m.field_0x08,
               daNpc_Hanjo_Param_c::m.field_0x08);
     mCcStts.SetWeight(daNpc_Hanjo_Param_c::m.field_0x10);
@@ -486,8 +486,8 @@ void daNpc_Hanjo_c::setParam() {
     mAttnFovY = daNpc_Hanjo_Param_c::m.field_0x50;
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daNpc_Hanjo_Param_c::m.field_0x18);
-    field_0xde8 = daNpc_Hanjo_Param_c::m.field_0x0c;
-    field_0xa80 = daNpc_Hanjo_Param_c::m.field_0x6c;
+    mRealShadowSize = daNpc_Hanjo_Param_c::m.field_0x0c;
+    mExpressionMorfFrame = daNpc_Hanjo_Param_c::m.field_0x6c;
     mMorfFrames = daNpc_Hanjo_Param_c::m.field_0x44;
     gravity = daNpc_Hanjo_Param_c::m.field_0x04;
 }
@@ -699,8 +699,6 @@ void daNpc_Hanjo_c::afterMoved() {
         }
     }
 }
-
-UNK_REL_BSS;
 
 /* 80A012D4-80A012D8 000054 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daNpc_Hanjo_Param_c l_HIO;
@@ -1172,7 +1170,7 @@ int daNpc_Hanjo_c::cutConversation(int param_1) {
             }
             if (iVar6 == 1) {
                 fopAc_ac_c* actor_p =field_0x10c8[0].getActorP();
-                JUT_ASSERT(2650, 0 != actor_p);
+                JUT_ASSERT(2650, NULL != actor_p);
                 dComIfGp_getEvent().setPt2(actor_p);
             }
             break;
@@ -1234,7 +1232,7 @@ int daNpc_Hanjo_c::cutPursuitBee(int param_1) {
         case 0:
             setAngle(home.angle.y);
             actor_p = field_0x10c8[0].getActorP();
-            JUT_ASSERT(2748, 0 != actor_p);
+            JUT_ASSERT(2748, NULL != actor_p);
             dComIfGp_getEvent().setPt2(actor_p);
             for (int i = 0; i < 4; i++) {
                 if (mStones[i].chkActive()) {
@@ -1408,7 +1406,7 @@ int daNpc_Hanjo_c::cutAppearHawker(int param_1) {
         case 6: {
             mEventTimer = iVar7;
             fopAc_ac_c* actor_p = field_0x10c8[2].getActorP();
-            JUT_ASSERT(3005, 0 != actor_p);
+            JUT_ASSERT(3005, NULL != actor_p);
             ((daNPC_TK_c*)actor_p)->setAttackLink();
             field_0x1722 = 1;
             break;
@@ -1418,7 +1416,7 @@ int daNpc_Hanjo_c::cutAppearHawker(int param_1) {
                                             0);
             dComIfGs_onSaveSwitch(0x2b);
             actor_p = field_0x10c8[2].getActorP();
-            JUT_ASSERT(3014, 0 != actor_p);
+            JUT_ASSERT(3014, NULL != actor_p);
             ((daNPC_TK_c*)actor_p)->setQuickHanjoHand();
             field_0x1722 = 1;
             daNpcT_onTmpBit(0x27);
@@ -1450,7 +1448,7 @@ int daNpc_Hanjo_c::cutAppearHawker(int param_1) {
             if (cLib_calcTimer(&mEventTimer) == 0) {
                 mMotionSeqMngr.setNo(12, 8.0f, 0, 0);
                 actor_p = field_0x10c8[2].getActorP();
-                JUT_ASSERT(3068, 0 != actor_p);
+                JUT_ASSERT(3068, NULL != actor_p);
                 ((daNPC_TK_c*)actor_p)->setHanjoHand();
             }
         } else if (mMotionSeqMngr.checkEndSequence()) {
@@ -1463,7 +1461,7 @@ int daNpc_Hanjo_c::cutAppearHawker(int param_1) {
     case 4:
         mJntAnm.lookNone(0);
         actor_p = field_0x10c8[2].getActorP();
-        JUT_ASSERT(3090, 0 != actor_p);
+        JUT_ASSERT(3090, NULL != actor_p);
         if (((daNPC_TK_c*)actor_p)->isHanjoHand()) {
             rv = 1;
         }

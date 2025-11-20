@@ -2,14 +2,16 @@
 // JKRDvdRipper
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRDvdRipper.h"
 #include "JSystem/JKernel/JKRDvdFile.h"
 #include "JSystem/JKernel/JKRDecomp.h"
 #include "JSystem/JUtility/JUTException.h"
 #include "string.h"
 #include <dolphin/os.h>
-#include <dolphin/os.h>
 #include "dolphin/vi.h"
+#include <stdint.h>
 
 static int JKRDecompressFromDVD(JKRDvdFile*, void*, u32, u32, u32, u32, u32*);
 static int decompSZS_subroutine(u8*, u8*);
@@ -66,7 +68,7 @@ void* JKRDvdRipper::loadToMainRAM(JKRDvdFile* dvdFile, u8* dst, JKRExpandSwitch 
     if (expandSwitch == EXPAND_SWITCH_UNKNOWN1)
     {
         u8 buffer[0x40];
-        u8 *bufPtr = (u8 *)ALIGN_NEXT((u32)buffer, 32);
+        u8 *bufPtr = (u8 *)ALIGN_NEXT((uintptr_t)buffer, 32);
         while (true)
         {
             int readBytes = DVDReadPrio(dvdFile->getFileInfo(), bufPtr, 0x20, 0, 2);
@@ -134,7 +136,7 @@ void* JKRDvdRipper::loadToMainRAM(JKRDvdFile* dvdFile, u8* dst, JKRExpandSwitch 
         if (offset != 0)
         {
             u8 buffer[0x40];
-            u8 *bufPtr = (u8 *)ALIGN_NEXT((u32)buffer, 32);
+            u8 *bufPtr = (u8 *)ALIGN_NEXT((uintptr_t)buffer, 32);
             while (true)
             {
                 int readBytes = DVDReadPrio(dvdFile->getFileInfo(), bufPtr, 32, (s32)offset, 2);
@@ -534,7 +536,7 @@ static u8* nextSrcData(u8* src) {
         buf = szpBuf;
 
     memcpy(buf, src, limit);
-    u32 transSize = (u32)(szpEnd - (buf + limit));
+    u32 transSize = (uintptr_t)(szpEnd - (buf + limit));
     if (transSize > transLeft)
         transSize = transLeft;
     while (true)

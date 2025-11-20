@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_fireWood.h"
 #include "d/d_s_play.h"
 
@@ -48,7 +50,7 @@ static cull_box l_cull_box = {
 
 /* 80BE7708-80BE7910 0001C8 0208+00 1/1 0/0 0/0 .text            create__12daFireWood_cFv */
 int daFireWood_c::create() {
-    fopAcM_SetupActor(this, daFireWood_c);
+    fopAcM_ct(this, daFireWood_c);
 
     setBaseMtx();
     mCcStts.Init(0xFF, 0xFF, this);

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_catdoor.h"
 #include "d/d_com_inf_game.h"
 
@@ -83,7 +85,7 @@ static int createSolidHeap(fopAc_ac_c* i_this) {
 }
 
 int daObjCatDoor_c::create() {
-    fopAcM_SetupActor(this, daObjCatDoor_c);
+    fopAcM_ct(this, daObjCatDoor_c);
 
     int phase_state = dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {

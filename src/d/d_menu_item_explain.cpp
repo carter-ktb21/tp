@@ -3,6 +3,8 @@
  * Menu - Item Explain
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_item_explain.h"
 #include "JSystem/J2DGraph/J2DTextBox.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
@@ -21,11 +23,6 @@
 #include "m_Do/m_Do_graphic.h"
 #include "d/d_msg_scrn_3select.h"
 #include "d/d_msg_scrn_arrow.h"
-
-/* 803BD8C8-803BD8D4 01A9E8 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_ItemExplain_c::*initFunc)();
 static initFunc init_process[] = {
@@ -107,14 +104,24 @@ dMenu_ItemExplain_c::dMenu_ItemExplain_c(JKRExpHeap* i_heap, JKRArchive* i_archi
     mDescAlpha = 0.0f;
     field_0x78 = 0;
     mAlphaRatio = 201.0f;
+#if VERSION == VERSION_GCN_JPN
+    mpInfoText = new CPaneMgr(mpInfoScreen, 'i_text4', 0, NULL);
+    mpInfoScreen->search('i_text1')->hide();
+#else
     mpInfoText = new CPaneMgr(mpInfoScreen, 'i_text1', 0, NULL);
     mpInfoScreen->search('i_text4')->hide();
+#endif
     ((J2DTextBox*)(mpInfoText->getPanePtr()))->setFont(mDoExt_getMesgFont());
     ((J2DTextBox*)(mpInfoText->getPanePtr()))->setString(0x200, "");
     mpInfoText->show();
     for (int i = 0; i < 4; i++) {
+#if VERSION == VERSION_GCN_JPN
+        mpNameText[i] = new CPaneMgr(mpInfoScreen, name_tag[i], 0, NULL);
+        mpInfoScreen->search(fame_tag[i])->hide();
+#else
         mpNameText[i] = new CPaneMgr(mpInfoScreen, fame_tag[i], 0, NULL);
         mpInfoScreen->search(name_tag[i])->hide();
+#endif
         ((J2DTextBox*)(mpNameText[i]->getPanePtr()))->setFont(mDoExt_getMesgFont());
         ((J2DTextBox*)(mpNameText[i]->getPanePtr()))->setString(0x20, "");
     }
@@ -308,7 +315,7 @@ void dMenu_ItemExplain_c::draw(J2DOrthoGraph* i_graph) {
         mpLabel->scale(g_ringHIO.mItemDescTitleScale, g_ringHIO.mItemDescTitleScale);
         mpLabel->paneTrans(g_ringHIO.mItemDescTitlePosX, g_ringHIO.mItemDescTitlePosY);
         if (mpBackTex != NULL) {
-            mpBackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, false, false, false);
+            mpBackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, false, false, false);
         }
         if (field_0xc8 != field_0xd0) {
             field_0xd0 = field_0xc8;

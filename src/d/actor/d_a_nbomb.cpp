@@ -3,13 +3,14 @@
  * Bomb Actor
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_nbomb.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/actor/d_a_alink.h"
 #include "d/d_com_inf_game.h"
-#include "dol2asm.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include "d/actor/d_a_mirror.h"
 
@@ -39,13 +40,13 @@ static u8 const lit_3767[12] = {
 static Vec const l_localCenterOffset = {0.0f, 30.0f, 0.0f};
 
 /* 804CC358-804CC360 000018 0006+02 1/0 0/0 0/0 .rodata          l_arcNameBombF */
-SECTION_RODATA static char const l_arcNameBombF[] = "Bombf";
+static char const l_arcNameBombF[] = "Bombf";
 
 /* 804CC360-804CC368 000020 0005+03 1/1 0/0 0/0 .rodata          l_arcNameBombE */
-SECTION_RODATA static char const l_arcNameBombE[] = "E_BI";
+static char const l_arcNameBombE[] = "E_BI";
 
 /* 804CC368-804CC370 000028 0005+03 1/1 0/0 0/0 .rodata          l_arcNameBombEW */
-SECTION_RODATA static char const l_arcNameBombEW[] = "E_BG";
+static char const l_arcNameBombEW[] = "E_BG";
 
 /* 804C6E34-804C6F78 000154 0144+00 1/1 0/0 0/0 .text tgHitCallback__9daNbomb_cFP12dCcD_GObjInf */
 void daNbomb_c::tgHitCallback(dCcD_GObjInf* i_hitObj) {
@@ -55,7 +56,7 @@ void daNbomb_c::tgHitCallback(dCcD_GObjInf* i_hitObj) {
         {
             procBoomerangMoveInit(i_hitObj);
         }
-    } else if (i_hitObj->ChkAtType(AT_TYPE_HOOKSHOT) && fopAcM_checkStatus(this, 0x80000)) {
+    } else if (i_hitObj->ChkAtType(AT_TYPE_HOOKSHOT) && fopAcM_CheckStatus(this, 0x80000)) {
         if (fopAcM_checkCarryNow(this)) {
             fopAcM_cancelCarryNow(this);
         }
@@ -90,7 +91,7 @@ static void daNbomb_tgHitCallback(fopAc_ac_c* i_tgActor, dCcD_GObjInf* i_tgObjIn
 int daNbomb_c::searchEnemy(fopAc_ac_c* i_enemy) {
     mDoMtx_multVec(field_0xa70, &i_enemy->current.pos, &field_0xc14);
 
-    if (i_enemy->attention_info.flags & 5 && field_0xc14.abs2XZ() < 250000.0f &&
+    if (i_enemy->attention_info.flags & (fopAc_AttnFlag_BATTLE_e | fopAc_AttnFlag_LOCK_e) && field_0xc14.abs2XZ() < 250000.0f &&
         fabsf(field_0xc14.y) < 100.0f)
     {
         if (abs(field_0xc14.atan2sX_Z()) < 0x4000) {
@@ -140,7 +141,7 @@ int daNbomb_c::createHeap() {
 
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(m_arcNameList[mType], bmdIdx[mType]);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -182,7 +183,7 @@ static int daNbomb_createHeap(fopAc_ac_c* i_this) {
 /* 804C7324-804C7B44 000644 0820+00 1/1 0/0 0/0 .text            create__9daNbomb_cFv */
 int daNbomb_c::create() {
     fopAcM_GetID(this);
-    fopAcM_SetupActor(this, daNbomb_c);
+    fopAcM_ct(this, daNbomb_c);
 
     BOOL is_octaeel_bomb = false;
 
@@ -267,7 +268,7 @@ int daNbomb_c::create() {
         mExTime *= 0.75f;
     }
 
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     fopAcM_OnCarryType(this, fopAcM_CARRY(fopAcM_CARRY_LIGHT | fopAcM_CARRY_SIDE));
     field_0xb5c = shape_angle.y;
 
@@ -384,11 +385,6 @@ int daNbomb_c::create() {
     return cPhs_COMPLEATE_e;
 }
 
-/* 804C7B44-804C7CC8 000E64 0184+00 1/1 0/0 0/0 .text            __ct__9daNbomb_cFv */
-daNbomb_c::daNbomb_c() {
-    /* empty function */
-}
-
 /* 804C7E94-804C7EB4 0011B4 0020+00 1/0 0/0 0/0 .text            daNbomb_Create__FP10fopAc_ac_c */
 static int daNbomb_Create(fopAc_ac_c* i_this) {
     return ((daNbomb_c*)i_this)->create();
@@ -483,7 +479,7 @@ BOOL daNbomb_c::checkExplode() {
 /* 804C8430-804C84D8 001750 00A8+00 5/5 0/0 0/0 .text            setRoomInfo__9daNbomb_cFv */
 void daNbomb_c::setRoomInfo() {
     int room_no;
-    if (mAcch.GetGroundH() != -1000000000.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
         room_no = dComIfG_Bgsp().GetRoomId(mAcch.m_gnd);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mAcch.m_gnd);
         mPolySound = dKy_pol_sound_get(&mAcch.m_gnd);
@@ -508,23 +504,6 @@ void daNbomb_c::setSmokePos() {
 
     field_0xbe4 = (mEffectPosition - mEffectLastPosition) * 0.5f;
 }
-
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
 
 /* 804C8588-804C87F0 0018A8 0268+00 1/1 0/0 0/0 .text            setEffect__9daNbomb_cFv */
 void daNbomb_c::setEffect() {
@@ -556,7 +535,7 @@ void daNbomb_c::setEffect() {
         JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(mEffectEmitterIDs[0]);
         if (emitter != NULL) {
             emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-            emitter->setUserWork((u32)&field_0xbe4);
+            emitter->setUserWork((uintptr_t)&field_0xbe4);
         }
 
         mEffectEmitterIDs[1] =
@@ -731,7 +710,7 @@ BOOL daNbomb_c::procExplodeInit() {
     speed = cXyz::Zero;
     gravity = 0.0f;
     fopAcM_SetParam(this, PRM_NORMAL_BOMB_EXPLODE);
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     mCcSph.OffTgSetBit();
     mCcSph.OffCoSetBit();
@@ -834,7 +813,7 @@ BOOL daNbomb_c::procCarryInit() {
 
     speedF = 0.0f;
     speed = cXyz::Zero;
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCcSph.OffCoSetBit();
     return true;
 }
@@ -1102,14 +1081,14 @@ BOOL daNbomb_c::procWait() {
                 if (field_0xc20.abs2() < 1.0f && field_0xc2c.abs2() < 1.0f &&
                     !checkStateFlg0(FLG0_FROZEN))
                 {
-                    cLib_onBit<u32>(attention_info.flags, 0x10);
+                    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
                 } else {
-                    cLib_offBit<u32>(attention_info.flags, 0x10);
+                    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
                 }
             }
         }
     } else {
-        cLib_offBit<u32>(attention_info.flags, 0x10);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 
     offStateFlg0(FLG0_UNK_20000);
@@ -1122,7 +1101,7 @@ BOOL daNbomb_c::procFlowerWaitInit() {
 
     mCcSph.OnCoSetBit();
     mCcSph.OffTgSetBit();
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     scale.set(0.1f, 0.1f, 0.1f);
     mCcStts.SetWeight(0xFE);
     mpModel->setBaseScale(scale);
@@ -1137,7 +1116,7 @@ BOOL daNbomb_c::procFlowerWait() {
         scale.z = scale.x;
         mpModel->setBaseScale(scale);
     } else {
-        cLib_onBit<u32>(attention_info.flags, 0x10);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         mCcSph.OnTgSetBit();
 
         if (checkExplode()) {
@@ -1170,7 +1149,7 @@ BOOL daNbomb_c::procBoomerangMoveInit(dCcD_GObjInf* unused) {
         fopAcM_SetParam(this, PRM_BOMB_BOOMERANG_MOVE);
     }
 
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mCcStts.SetWeight(30);
     mCcSph.OnCoSetBit();
     mCcSph.SetCoHitCallback(daNbomb_coHitCallback);
@@ -1241,7 +1220,7 @@ BOOL daNbomb_c::procInsectMoveInit() {
     setHitPolygon(0);
     mCcSph.OnCoSetBit();
     mCcSph.SetCoHitCallback(daNbomb_coHitCallback);
-    cLib_offBit<u32>(attention_info.flags, 0x10);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
 
     speedF = 20.0f;
     old.pos = current.pos;
@@ -1722,7 +1701,7 @@ int daNbomb_c::draw() {
         mat->setTevColor(1, &bomb_color);
     }
 
-    if (mAcch.GetGroundH() != -1000000000.0f && !fopAcM_checkCarryNow(this)) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF && !fopAcM_checkCarryNow(this)) {
         cM3dGPla ground_poly;
         if (dComIfG_Bgsp().GetTriPla(mAcch.m_gnd, &ground_poly)) {
             dComIfGd_setSimpleShadow(&current.pos, mAcch.GetGroundH(), scale.x * 25.0f,

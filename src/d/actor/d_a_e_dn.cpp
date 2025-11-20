@@ -3,9 +3,10 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_dn.h"
 #include "d/d_cc_d.h"
-UNK_REL_DATA;
 #include "d/d_bomb.h"
 #include "f_op/f_op_kankyo_mng.h"
 #include "d/actor/d_a_player.h"
@@ -13,6 +14,26 @@ UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
 #include "Z2AudioLib/Z2Instances.h"
 
+class daE_DN_HIO_c : public JORReflexible {
+public:
+    /* 804E51AC */ daE_DN_HIO_c();
+    /* 804EE39C */ virtual ~daE_DN_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 model_size;          // 基本サイズ
+    /* 0x0C */ f32 movement_speed;      // 移動速度
+    /* 0x10 */ f32 dash_speed;          // 突進速度
+    /* 0x14 */ f32 battle_init_range;   // 戦闘開始範囲
+    /* 0x18 */ f32 attack_init_range;   // 攻撃開始範囲
+    /* 0x1C */ s16 field_0x1c;          // 防御静止間
+    /* 0x1E */ s16 field_0x1e;          // 魂抜間 弱
+    /* 0x20 */ s16 field_0x20;          // 魂抜間 強
+    /* 0x22 */ u8 field_0x22;
+    /* 0x23 */ u8 invulnerable;         // 不死身
+    /* 0x24 */ u8 field_0x24;           // 学習なし
+};
 
 enum Action {
     /* 0x00 */ ACTION_NORMAL       = 0,
@@ -287,8 +308,6 @@ static BOOL other_bg_check2(e_dn_class* i_this, cXyz* param_2) {
 
     return FALSE;
 }
-
-UNK_REL_BSS;
 
 /* 804EEF2D 0003+00 data_804EEF2D None */
 u8 l_initHIO;
@@ -2381,7 +2400,7 @@ static void action(e_dn_class* i_this) {
         a_this->attention_info.flags = 0;
     } else {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     }
 
     switch (i_this->mAction) {
@@ -2793,14 +2812,14 @@ static void action(e_dn_class* i_this) {
             gnd_chk.SetPos(&sp264);
             sp264.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-            if (sp264.y != -1000000000.0f) {
+            if (sp264.y != -G_CM3D_F_INF) {
                 sp258.x = sp264.x;
                 sp258.y = sp264.y + 100.0f;
                 sp258.z = sp264.z + fVar1;
                 gnd_chk.SetPos(&sp258);
                 sp258.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-                if (sp258.y != -1000000000.0f) {
+                if (sp258.y != -G_CM3D_F_INF) {
                     sVar7 = -cM_atan2s(sp258.y - sp264.y, sp258.z - sp264.z);
                     if (sVar7 > 0x3000 || sVar7 < -0x3000) {
                         sVar7 = 0;
@@ -2812,7 +2831,7 @@ static void action(e_dn_class* i_this) {
                 sp258.z = sp264.z;
                 gnd_chk.SetPos(&sp258);
                 sp258.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-                if (sp258.y != -1000000000.0f) {
+                if (sp258.y != -G_CM3D_F_INF) {
                     sVar6 = cM_atan2s(sp258.y - sp264.y, sp258.x - sp264.x);
                     if (sVar6 > 0x3000 || sVar6 < -0x3000) {
                         sVar6 = 0;
@@ -2928,7 +2947,6 @@ int c_start;
 
 /* 804ECB50-804ED83C 007A90 0CEC+00 2/1 0/0 0/0 .text            daE_DN_Execute__FP10e_dn_class */
 static int daE_DN_Execute(e_dn_class* i_this) {
-    // NONMATCHING
     if (i_this->field_0x10d8 != 0) {
         return 1;
     }
@@ -3162,8 +3180,7 @@ static int daE_DN_Execute(e_dn_class* i_this) {
             def_se_set(&i_this->mSound, i_this->field_0xf7c.GetTgHitObj(), 40, 0);
             dScnPly_c::setPauseTimer(l_HIO.field_0x1c);
             i_this->field_0x6ec = 10;
-            // The following s16 cast makes ALL the difference in terms of regalloc!
-            cMtx_YrotS(*calc_mtx, (s16) a_this->shape_angle.y);
+            cMtx_YrotS(*calc_mtx, (s16)a_this->shape_angle.y);
             sp2c.x = KREG_F(0);
             sp2c.y = 120.0f + KREG_F(1);
             sp2c.z = 50.0f + KREG_F(2);
@@ -3199,7 +3216,7 @@ static int daE_DN_Execute(e_dn_class* i_this) {
     sp80.y += 180.0f;
     ((fopEn_enemy_c*) i_this)->setHeadLockPos(&sp80);
 
-    a_this->attention_info.flags |= 0x200000;
+    a_this->attention_info.flags |= fopAc_AttnFlag_UNK_0x200000;
 
     if ((a_this->current.pos.y - a_this->home.pos.y) < -5000.0f) {
         fopAcM_delete(a_this);
@@ -3270,7 +3287,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
-    model->setUserArea((u32)i_this);
+    model->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         if (i != 0) {
@@ -3283,14 +3300,14 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_dn", 39);
-    JUT_ASSERT(5420, modelData != 0);
+    JUT_ASSERT(5420, modelData != NULL);
     i_this->mpKnifeModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpKnifeModel == NULL) {
         return 0;
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("E_dn", 41);
-    JUT_ASSERT(5432, modelData != 0);
+    JUT_ASSERT(5432, modelData != NULL);
     i_this->mpShieldModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpShieldModel == NULL) {
         return 0;
@@ -3298,7 +3315,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 
     if (i_this->field_0x5b7 == 1) {
         modelData = (J3DModelData*)dComIfG_getObjectRes("E_dn", 40);
-        JUT_ASSERT(5443, modelData != 0);
+        JUT_ASSERT(5443, modelData != NULL);
         i_this->mpSkullModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
         if (i_this->mpSkullModel == NULL) {
             return 0;
@@ -3312,7 +3329,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 static cPhs__Step daE_DN_Create(fopAc_ac_c* a_this) {
     e_dn_class* i_this = (e_dn_class*)a_this;
 
-    fopAcM_SetupActor(a_this, e_dn_class);
+    fopAcM_ct(a_this, e_dn_class);
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&i_this->mPhase, "E_dn");
     if (phase == cPhs_COMPLEATE_e) {
@@ -3353,8 +3370,8 @@ static cPhs__Step daE_DN_Create(fopAc_ac_c* a_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_000100);
-        a_this->attention_info.flags = 4;
+        fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_0x100);
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(a_this, i_this->mpModelMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(a_this, 200.0f, 200.0f, 200.0f);
@@ -3425,7 +3442,7 @@ static cPhs__Step daE_DN_Create(fopAc_ac_c* a_this) {
         if ((i_this->field_0x5b6 == 13 || i_this->field_0x5b6 == 14) || (i_this->field_0x5b6 == 15 || i_this->field_0x5b6 == 16)) {
             i_this->field_0x10d8 = 1;
             i_this->mAction = ACTION_REG;
-            fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_004000);
+            fopAcM_OnStatus(a_this, fopAcM_STATUS_UNK_0x4000);
             i_this->mAcchCir.SetWall(80.0f, 2.0f);
         }
 

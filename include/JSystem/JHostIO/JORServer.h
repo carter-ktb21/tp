@@ -7,6 +7,9 @@
 #include "JSystem/JUtility/JUTAssert.h"
 
 void JOR_MESSAGELOOP();
+void JOR_INIT();
+void JOR_SETROOTNODE(const char*, JORReflexible*, u32, u32);
+
 u32 JORMessageBox(const char* message, const char* title, u32 style);
 
 struct JOREventCallbackListNode {
@@ -56,12 +59,12 @@ public:
     void releaseMCTX(JORMContext*);
 
     void appendEventCallbackListNode(JOREventCallbackListNode* p) {
-        JUT_ASSERT(256, p!=0);
+        JUT_ASSERT(256, p!=NULL);
         m_eventCallbackList.Push_front(p);
     }
 
     void removeEventCallbackListNode(JOREventCallbackListNode* p) {
-        JUT_ASSERT(257, p!=0);
+        JUT_ASSERT(257, p!=NULL);
         m_eventCallbackList.Remove(p);
     }
 

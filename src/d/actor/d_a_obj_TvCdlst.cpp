@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_TvCdlst.h"
 #include "dol2asm.h"
 #include "include/d/d_com_inf_game.h"
@@ -66,7 +68,7 @@ const dCcD_SrcGObjInf daTvCdlst_c::mCcDObjInfo = {
 
 /* 80B9EE34-80B9F0B4 000254 0280+00 1/1 0/0 0/0 .text            create__11daTvCdlst_cFv */
 int daTvCdlst_c::create() {
-    fopAcM_SetupActor(this, daTvCdlst_c);
+    fopAcM_ct(this, daTvCdlst_c);
     int phase = dComIfG_resLoad(&mPhaseReq,"HShokudai");
     if (phase == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this,createHeapCallBack,0x820) == 0) {

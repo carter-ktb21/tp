@@ -1,13 +1,27 @@
 /**
- * @file d_a_e_df.cpp
+* @file d_a_e_df.cpp
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_df.h"
 #include "d/actor/d_a_obj_carry.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_DF_HIO_c : public JORReflexible {
+public:
+    /* 806A76EC */ daE_DF_HIO_c();
+    /* 806A9A84 */ virtual ~daE_DF_HIO_c() {};
+
+    void genMessage(JORMContext*);
+
+    /* 0x4 */ s8 mNo;
+    /* 0x8 */ f32 field_0x8;
+};
+
+STATIC_ASSERT(sizeof(daE_DF_HIO_c) == 0xC);
 
 #ifdef DEBUG
 inline void daE_DF_HIO_c::genMessage(JORMContext* i_ctx) {
@@ -25,7 +39,7 @@ daE_DF_HIO_c::daE_DF_HIO_c() {
 /* 806A7710-806A7808 000110 00F8+00 1/1 0/0 0/0 .text            CreateHeap__8daE_DF_cFv */
 int daE_DF_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("E_DF", 0xD);
-    JUT_ASSERT(161, modelData != 0);
+    JUT_ASSERT(161, modelData != NULL);
 
     mpMorfSO = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                     (J3DAnmTransform*)dComIfG_getObjectRes("E_DF", 10), 2, 1.0f, 0,
@@ -669,7 +683,7 @@ static int daE_DF_Delete(daE_DF_c* i_this) {
 
 /* 806A9678-806A9930 002078 02B8+00 1/1 0/0 0/0 .text            Create__8daE_DF_cFv */
 int daE_DF_c::Create() {
-    fopAcM_SetupActor(this, daE_DF_c);
+    fopAcM_ct(this, daE_DF_c);
 
     cPhs__Step rv = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "E_DF");
     if (rv == cPhs_COMPLEATE_e) {
@@ -690,7 +704,7 @@ int daE_DF_c::Create() {
             mHIOInit = TRUE;
             l_HIO.mNo = mDoHIO_CREATE_CHILD("デクレシア", &l_HIO);
         }
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(this, mpMorfSO->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, -200.0f, -200.0f);
@@ -711,7 +725,7 @@ int daE_DF_c::Create() {
 
         initCcCylinder();
         J3DModel* model = mpMorfSO->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
 
         for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
             if (i != 0) {

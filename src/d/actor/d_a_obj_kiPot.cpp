@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_kiPot.cpp
+* @file d_a_obj_kiPot.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_kiPot.h"
 #include "d/d_com_inf_game.h"
@@ -27,7 +29,7 @@ void daKiPot_c::setBaseMtx() {
 
 /* 80C44DD0-80C44E7C 0001B0 00AC+00 1/1 0/0 0/0 .text            create__9daKiPot_cFv */
 int daKiPot_c::create() {
-    fopAcM_SetupActor(this, daKiPot_c);
+    fopAcM_ct(this, daKiPot_c);
 
     setBaseMtx();
 

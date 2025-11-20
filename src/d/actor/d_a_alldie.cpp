@@ -3,6 +3,8 @@
  * Activates a switch when all enemies are defeated 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_alldie.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
@@ -157,7 +159,7 @@ static int daAlldie_Delete(daAlldie_c* i_this) {
 
 /* 804D5BF0-804D5D1C 000450 012C+00 1/0 0/0 0/0 .text            daAlldie_Create__FP10fopAc_ac_c */
 int daAlldie_c::create() {
-    fopAcM_SetupActor(this, daAlldie_c);
+    fopAcM_ct(this, daAlldie_c);
 
     s8 roomNo = fopAcM_GetRoomNo(this);
 

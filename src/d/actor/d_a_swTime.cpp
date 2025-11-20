@@ -3,6 +3,8 @@
  * Switch Time
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_swTime.h"
 #include "d/d_procname.h"
 
@@ -17,7 +19,7 @@ int daSwTime_c::Create() {
 
 /* 80D4F660-80D4F6C8 0000A0 0068+00 1/1 0/0 0/0 .text            create__10daSwTime_cFv */
 int daSwTime_c::create() {
-    fopAcM_SetupActor(this, daSwTime_c);
+    fopAcM_ct(this, daSwTime_c);
     if (!Create()) {
         return cPhs_ERROR_e;
     }

@@ -2,6 +2,8 @@
 // Boss Door Level 5
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_bossL5.h"
 #include "d/actor/d_a_obj_keyhole.h"
 #include "d/d_com_inf_game.h"
@@ -65,24 +67,6 @@ static char const l_door_open_demo_1st[26] = "DEFAULT_BS_SHUTTER_L5_1ST";
 /* 806724FC-8067250C 000034 000D+03 3/3 0/0 0/0 .rodata          l_staff_name */
 static char const l_staff_name[13] = "SHUTTER_DOOR";
 
-/* 806725F4-80672600 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80672600-80672614 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80672614-8067264C -00001 0038+00 1/1 0/0 0/0 .data            action_table$3861 */
 static char* action_table[14] = {
     "WAIT",
@@ -104,14 +88,14 @@ static char* action_table[14] = {
 /* 80670D10-80670EC0 000150 01B0+00 1/1 0/0 0/0 .text            CreateHeap__11daBdoorL5_cFv */
 int daBdoorL5_c::CreateHeap() {
     J3DModelData* modelData = getDoorModelData();
-    JUT_ASSERT(313, modelData != 0);
+    JUT_ASSERT(313, modelData != NULL);
     field_0x580 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (field_0x580 == NULL) {
         return 0;
     }
 
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(354, anm != 0);
+    JUT_ASSERT(354, anm != NULL);
     field_0x584 = new mDoExt_bckAnm();
     if (field_0x584 == NULL || !field_0x584->init(anm, 1, 0, 1.0f, 0, -1, false)) {
         return 0;
@@ -143,7 +127,7 @@ int daBdoorL5_c::CreateInit() {
     setAction(ACTION_CLOSE_WAIT);
     attention_info.position.y += 250.0f;
     eyePos.y += 250.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     field_0x588->Move();
     door_param2_c::getSwbit(this);
@@ -158,7 +142,7 @@ int daBdoorL5_c::CreateInit() {
 
 /* 8067106C-806711FC 0004AC 0190+00 1/1 0/0 0/0 .text            create__11daBdoorL5_cFv */
 int daBdoorL5_c::create() {
-    fopAcM_SetupActor(this, daBdoorL5_c);
+    fopAcM_ct(this, daBdoorL5_c);
     int rv = dComIfG_resLoad(&mPhase1, getArcName());
     if (rv != cPhs_COMPLEATE_e) {
         return rv;
@@ -281,7 +265,7 @@ void daBdoorL5_c::demoProc() {
 int daBdoorL5_c::openInit() {
     dComIfG_Bgsp().Release(field_0x588);
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(454, anm != 0);
+    JUT_ASSERT(454, anm != NULL);
     int rt = field_0x584->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(456, rt == 0);
     return 1;
@@ -304,7 +288,7 @@ int daBdoorL5_c::openEnd() {
 /* 80671720-806717FC 000B60 00DC+00 1/1 0/0 0/0 .text            closeInit__11daBdoorL5_cFv */
 int daBdoorL5_c::closeInit() {
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getCloseAnm());
-    JUT_ASSERT(511, anm != 0);
+    JUT_ASSERT(511, anm != NULL);
     int rt = field_0x584->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(513, rt == 0);
     mDoAud_seStart(Z2SE_OBJ_LV3_SHTR_CL, &current.pos, 0, dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
@@ -330,7 +314,7 @@ int daBdoorL5_c::unlockInit() {
     obj_keyhole_class* keyHole = (obj_keyhole_class*)fopAcM_SearchByID(mKeyHoleId);
     if (keyHole != NULL) {
         keyHole->setOpen();
-        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN_LV5, &keyHole->current.pos, 0, 0);
+        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN_LV5, &keyHole->actor.current.pos, 0, 0);
     }
     dComIfGs_onSwitch(door_param2_c::getSwbit(this), fopAcM_GetRoomNo(this));
     return 1;
@@ -496,7 +480,7 @@ int daBdoorL5_c::actionEnd() {
 int daBdoorL5_c::execute() {
     static actionFunc l_action[4] = {&daBdoorL5_c::actionWait, &daBdoorL5_c::actionCloseWait, &daBdoorL5_c::actionOpen, &daBdoorL5_c::actionEnd};
     field_0x59c = -1;
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         field_0x59c = dComIfGp_evmng_getMyStaffId(l_staff_name, 0, 0);
         dMeter2Info_onGameStatus(2);
         demoProc();

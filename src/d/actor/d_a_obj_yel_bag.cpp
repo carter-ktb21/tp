@@ -3,13 +3,13 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_yel_bag.h"
 #include "d/actor/d_a_npc.h"
 #include "d/d_com_inf_game.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "SSystem/SComponent/c_lib.h"
-
-UNK_REL_DATA
 
 /* 80D3DD94-80D3DD9C 000020 0008+00 1/1 0/0 0/0 .data            l_bmdGetParamList */
 static int l_bmdGetParamList[2] = {
@@ -68,7 +68,7 @@ f32 const daObj_YBag_Param_c::m[11] = {
 
 /* 80D3C610-80D3C898 000610 0288+00 1/1 0/0 0/0 .text            create__12daObj_YBag_cFv */
 int daObj_YBag_c::create() {
-    fopAcM_SetupActor(this, daObj_YBag_c);
+    fopAcM_ct(this, daObj_YBag_c);
     mType = getTypeFromParam();
     int successfulLoads = 0;
     int i = 0;
@@ -166,7 +166,7 @@ int daObj_YBag_c::Execute() {
             field_0xa33 = 1;
         } else {
             fopAcM_getWaterY(&current.pos, &field_0x9f4);
-            if (field_0x9f4 != -1e9f && daObj_YBag_Param_c::m[10] < field_0x9f4 - field_0x9f0 &&
+            if (field_0x9f4 != -G_CM3D_F_INF && daObj_YBag_Param_c::m[10] < field_0x9f4 - field_0x9f0 &&
                 current.pos.y <= field_0x9f4 && field_0xa32 == 0)
             {
                 if (field_0xa33 != 0) {
@@ -248,7 +248,7 @@ int daObj_YBag_c::Execute() {
                     }
                     if (mAcch.ChkGroundLanding()) {
                         if (field_0x9c4.y < -30.0f) {
-                            if (field_0x9f4 != -1e9f && current.pos.y <= field_0x9f4) {
+                            if (field_0x9f4 != -G_CM3D_F_INF && current.pos.y <= field_0x9f4) {
                                 setWaterPrtcl();
                             } else {
                                 setSmokePrtcl();
@@ -263,7 +263,7 @@ int daObj_YBag_c::Execute() {
                 }
             }
             if (field_0xa33 == 0) {
-                cLib_onBit(attention_info.flags, 0x10UL);
+                cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
                 fopAcM_OnCarryType(this, fopAcM_CARRY_ITEM);
             }
             
@@ -318,7 +318,7 @@ int daObj_YBag_c::Execute() {
     mAcch.CrrPos(dComIfG_Bgsp());
     mGndChk = mAcch.m_gnd;
     field_0x9f0 = mAcch.GetGroundH();
-    if (field_0x9f0 != -1e9f) {
+    if (field_0x9f0 != -G_CM3D_F_INF) {
         field_0xa02 = daNpcF_getGroundAngle(&mGndChk, shape_angle.y);
         setEnvTevColor();
         setRoomNo();
@@ -347,7 +347,7 @@ int daObj_YBag_c::Draw() {
                                                   mModel,
                                                   &tevStr);
     mDoExt_modelUpdateDL(mModel);
-    if (field_0x9f0 != -1e9f) {
+    if (field_0x9f0 != -G_CM3D_F_INF) {
         fopAc_ac_c* grabActor = NULL;
         s32 grabActorId = daPy_getPlayerActorClass()->getGrabActorID();
         fopAcM_SearchByID(grabActorId, &grabActor);
@@ -493,23 +493,6 @@ void daObj_YBag_c::setSmokePrtcl() {
     dComIfGp_particle_levelEmitterOnEventMove(field_0xa10);
     dComIfGp_particle_levelEmitterOnEventMove(field_0xa14);
 }
-
-UNK_BSS(1109);
-UNK_BSS(1107);
-UNK_BSS(1105);
-UNK_BSS(1104);
-UNK_BSS(1099);
-UNK_BSS(1097);
-UNK_BSS(1095);
-UNK_BSS(1094);
-UNK_BSS(1057);
-UNK_BSS(1055);
-UNK_BSS(1053);
-UNK_BSS(1052);
-UNK_BSS(1014);
-UNK_BSS(1012);
-UNK_BSS(1010);
-UNK_BSS(1009);
 
 /* 80D3DF1C-80D3DF20 000054 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daObj_YBag_Param_c l_HIO;

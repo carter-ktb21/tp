@@ -3,6 +3,8 @@
  * Generic Wolf Digging Spots
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_digplace.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -10,7 +12,7 @@
 
 /* 8057BF98-8057C138 000078 01A0+00 1/1 0/0 0/0 .text            create__12daObjDigpl_cFv */
 int daObjDigpl_c::create() {
-    fopAcM_SetupActor(this, daObjDigpl_c);
+    fopAcM_ct(this, daObjDigpl_c);
 
     mType = (fopAcM_GetParam(this) >> 8) & 0xF;
     mSwitch = fopAcM_GetParam(this) & 0xFF;
@@ -97,7 +99,7 @@ int daObjDigpl_c::execute() {
         }
     }
 
-    attention_info.flags &= ~0x80;
+    attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
 
     if (mpDigPoints != NULL) {
         current.pos.y = player_p->current.pos.y + 100000.0f;
@@ -145,7 +147,7 @@ int daObjDigpl_c::execute() {
             f32 dist_to_player = fopAcM_searchPlayerDistanceXZ2(this);
 
             if (seen_angle <= 0x2800 || dist_to_player < 1600.0f) {
-                attention_info.flags |= 0x80;
+                attention_info.flags |= fopAc_AttnFlag_ETC_e;
             }
 
             if (dist_to_player < 250000.0f &&

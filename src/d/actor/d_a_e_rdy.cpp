@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_rdy.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/actor/d_a_e_arrow.h"
@@ -13,12 +15,43 @@
 #include "d/d_cc_d.h"
 #include "d/d_msg_object.h"
 #include "d/d_camera.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_kankyo_mng.h"
-#if VERSION != VERSION_SHIELD_DEBUG
-UNK_REL_DATA;
-#endif
 #include "f_op/f_op_actor_enemy.h"
 #include "m_Do/m_Do_graphic.h"
+
+class daE_RDY_HIO_c : public JORReflexible {
+public:
+    /* 8076BDCC */ daE_RDY_HIO_c();
+    /* 80779880 */ virtual ~daE_RDY_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mScale;
+    /* 0x0C */ f32 field_0xc;
+    /* 0x10 */ f32 mWalkSpeed;
+    /* 0x14 */ f32 mRunSpeed;
+    /* 0x18 */ f32 field_0x18;
+    /* 0x1C */ f32 field_0x1c;
+    /* 0x20 */ f32 mAttackAnmSpeed;
+    /* 0x24 */ s16 field_0x24;
+    /* 0x28 */ f32 field_0x28;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ f32 field_0x34;
+    /* 0x38 */ u8 field_0x38;
+    /* 0x39 */ u8 field_0x39;
+    /* 0x3A */ u8 mDrawEyeModel;
+    /* 0x3B */ u8 field_0x3b;
+    /* 0x3C */ f32 field_0x3c;
+    /* 0x40 */ f32 field_0x40;
+    /* 0x44 */ f32 field_0x44;
+    /* 0x48 */ f32 field_0x48;
+    /* 0x4C */ f32 field_0x4c;
+};
+
+STATIC_ASSERT(sizeof(daE_RDY_HIO_c) == 0x50);
 
 enum Action {
     /* 0x00 */ ACT_NORMAL,
@@ -157,25 +190,6 @@ enum Joint {
     /* 3 */ WEAPON_BOW_FIRE,
     /* 4 */ WEAPON_BOW_BOMB,
  };
-
-#if VERSION != VERSION_SHIELD_DEBUG
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
-UNK_BSS(1009)
-#endif
 
 /* 8077A870-8077A874 000048 0004+00 1/1 0/0 0/0 .bss             boss */
 static e_rdy_class* boss;
@@ -348,7 +362,9 @@ static int nodeCallBack_bow(J3DJoint* i_joint, int param_1) {
 /* 8076C54C-8076C9D0 00086C 0484+00 1/0 0/0 0/0 .text            daE_RDY_Draw__FP11e_rdy_class */
 static int daE_RDY_Draw(e_rdy_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
-    if (i_this->field_0x5b8 == 12 && !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[239])) {
+    if (i_this->field_0x5b8 == 12
+            /* dSv_event_flag_c::T_0239 - Lake Hylia - Spoke with Fyer (start dark carge) */
+        && !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[239])) {
         return 1;
     }
     
@@ -465,8 +481,15 @@ static void* s_b_sub(void* i_proc, void* i_this) {
     return NULL;
 }
 
+// The bit is sort of a fakematch. This gets GCN to match, but this function doesn't inline in Debug:
+inline u16 absoluteValue(s16 num) {
+    if (num < 0) {
+        num = -1*num;
+    }
+    return num;
+}
+
 /* 8076CB24-8076CE10 000E44 02EC+00 2/2 0/0 0/0 .text            search_bomb__FP11e_rdy_classi */
-// NONMATCHING regalloc
 static dBomb_c* search_bomb(e_rdy_class* i_this, BOOL param_1) {
     if ((i_this->field_0xaf0 & 0x10000000) == 0) {
         return NULL;
@@ -499,11 +522,7 @@ static dBomb_c* search_bomb(e_rdy_class* i_this, BOOL param_1) {
                     f32 abs_res = fabsf(50.0f + bomb->current.pos.y - a_this->eyePos.y);
                     if (abs_res <= 300.0f) {
                         s16 ang_y = a_this->shape_angle.y - cM_atan2s(vec1.x, vec1.z);
-                        if (ang_y < 0) {
-                            ang_y = -1*ang_y;
-                        }
-
-                        if ((u16)ang_y < 20000) {
+                        if (absoluteValue(ang_y) < 20000) {
                             return bomb;
                         }
 
@@ -1536,7 +1555,6 @@ static void* s_kusa_sub(void* i_proc, void* i_this) {
 }
 
 /* 8076F71C-807701F4 003A3C 0AD8+00 2/1 0/0 0/0 .text            e_rdy_tkusa__FP11e_rdy_class */
-// NONMATCHING regswap
 static void e_rdy_tkusa(e_rdy_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
     cXyz vec;
@@ -1547,7 +1565,7 @@ static void e_rdy_tkusa(e_rdy_class* i_this) {
         i_this->mKargarokID = fopAcM_GetID(fopAcM_SearchByName(PROC_E_YC));
     }
 
-    fopAc_ac_c* a_karg = fopAcM_SearchByID(i_this->mKargarokID);
+    fopAc_ac_c* a_karg = (fopAc_ac_c*) fopAcM_SearchByID(i_this->mKargarokID);
     e_yc_class* kargarok = (e_yc_class*) a_karg;
     if (kargarok != NULL) {
         kargarok->mRiderID = fopAcM_GetID(i_this);
@@ -3210,7 +3228,7 @@ static void action(e_rdy_class* i_this) {
 
     if (i_this->mRideState == 0) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -3740,7 +3758,7 @@ static void fire_eff_set(e_rdy_class* i_this) {
             JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(i_this->mFireParticleKey[i]);
             if (emitter != NULL) {
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&i_this->field_0x1358);
+                emitter->setUserWork((uintptr_t)&i_this->field_0x1358);
             }
         }
     }
@@ -3771,7 +3789,6 @@ static void* s_adel_sub(void* i_proc, void* i_this) {
 }
 
 /* 80775B50-80777330 009E70 17E0+00 2/1 0/0 0/0 .text            demo_camera__FP11e_rdy_class */
-// NONMATCHING regalloc
 static void demo_camera(e_rdy_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -4220,7 +4237,7 @@ static void demo_camera(e_rdy_class* i_this) {
     }
 
     if (cVar12 != 0) {
-        fopAc_ac_c* a_arr = fopAcM_SearchByName(PROC_E_ARROW);
+        fopAc_ac_c* a_arr = (fopAc_ac_c*) fopAcM_SearchByName(PROC_E_ARROW);
         if (a_arr != NULL) {
             e_arrow_class* arrow = (e_arrow_class*) a_arr;
             if (cVar12 == 3) {
@@ -4316,7 +4333,6 @@ static void demo_camera(e_rdy_class* i_this) {
 static BOOL c_start;
 
 /* 80777330-8077892C 00B650 15FC+00 2/1 0/0 0/0 .text            daE_RDY_Execute__FP11e_rdy_class */
-// NONMATCHING regalloc
 static int daE_RDY_Execute(e_rdy_class* i_this) {
     f32 scale;
     fopEn_enemy_c* a_this = &i_this->actor;
@@ -4482,7 +4498,7 @@ static int daE_RDY_Execute(e_rdy_class* i_this) {
         cLib_addCalc2(&i_this->mEyeScale, i_this->mTargetEyeScale, 1.0f, 0.02f);
         i_this->mTargetEyeScale = 1.0f;
         MTXCopy(model->getAnmMtx(JNT_HEAD), *calc_mtx);
-        camera_class* camera = dComIfGp_getCamera(0);
+        camera_class* camera = (camera_class*) dComIfGp_getCamera(0);
         s16 ang_x, ang_y;
         for (int i = 0; i < 2; i++) {
             MtxPush();
@@ -4792,7 +4808,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     }
 
     J3DModel* model = _this->mpMorf->getModel();
-    model->setUserArea((u32)_this);
+    model->setUserArea((uintptr_t)_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
@@ -4816,7 +4832,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         }
 
         J3DModel* bow_model = _this->mpBowMorf->getModel();
-        bow_model->setUserArea((u32)_this);
+        bow_model->setUserArea((uintptr_t)_this);
         for (u16 i = 0; i < bow_model->getModelData()->getJointNum(); i++) {
             if (i == 2 || i == 3) {
                 bow_model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack_bow);
@@ -4856,7 +4872,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 80778D90-80779340 00D0B0 05B0+00 1/0 0/0 0/0 .text            daE_RDY_Create__FP10fopAc_ac_c */
 static cPhs__Step daE_RDY_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_rdy_class);
+    fopAcM_ct(i_this, e_rdy_class);
     e_rdy_class* _this = (e_rdy_class*)i_this;
 
     _this->field_0x5b6 = fopAcM_GetParam(_this) & 0xff;
@@ -4910,6 +4926,8 @@ static cPhs__Step daE_RDY_Create(fopAc_ac_c* i_this) {
         } else if (_this->field_0x5b8 == 11) {
             _this->mAction = ACT_BOW_IKKI2;
         } else if (_this->field_0x5b8 == 12) {
+                /* dSv_event_flag_c::M_051 - Main Event - Shadow Kargorok (?) (Large) event complete 
+                                             (Horse grass appears in various places) */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[84])) {
                 return cPhs_ERROR_e;
             }
@@ -4934,7 +4952,7 @@ static cPhs__Step daE_RDY_Create(fopAc_ac_c* i_this) {
         }
 
         fopAcM_OnStatus(i_this, fopAcStts_CULL_e);
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         u8 path_id = i_this->home.angle.x & 0xff;
         if (path_id != 0xff) {

@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRArchive.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "ctype.h"
@@ -190,7 +192,7 @@ void JKRArchive::CArcName::store(const char* name) {
     while (*name) {
         s32 ch = tolower(*name);
         mHash = ch + mHash * 3;
-        if (length < (s32)ARRAY_SIZE(mData)) {
+        if (length < ARRAY_SIZE(mData)) {
             mData[length++] = ch;
         }
         name++;
@@ -208,7 +210,7 @@ const char* JKRArchive::CArcName::store(const char* name, char endChar) {
     while (*name && *name != endChar) {
         s32 lch = tolower((int)*name);
         mHash = lch + mHash * 3;
-        if (length < (s32)ARRAY_SIZE(mData)) {
+        if (length < ARRAY_SIZE(mData)) {
             mData[length++] = lch;
         }
         name++;

@@ -136,6 +136,7 @@ public:
         FLG0_UNK_4 = 4,
         FLG0_UNK_2 = 2,
         FLG0_UNK_1 = 1,
+        FLG0_TAG_PORTAL = FLG0_TAG_WAIT | FLG0_PORTAL_OBJ_CALL,
     };
 
     enum daMidna_FLG1 {
@@ -213,6 +214,7 @@ public:
     };
 
     void onForcePanic() { onEndResetStateFlg0(ERFLG0_FORCE_PANIC); }
+    void onRatBody(int) { onForcePanic(); }
     u32 checkForceNormalColor() const { return checkStateFlg1(FLG1_FORCE_NORMAL_COL); }
     u32 checkForceTiredColor() const { return checkStateFlg1(FLG1_FORCE_TIRED_COL); }
     void onNoServiceWait() { onEndResetStateFlg0(ERFLG0_NO_SERVICE_WAIT); }
@@ -298,6 +300,11 @@ public:
         onEndResetStateFlg0(ERFLG0_UNK_2);
     }
 
+    void onTagWaitPosPortalObj(const cXyz& i_pos) {
+        mTagWaitPos = i_pos;
+        onStateFlg0(FLG0_TAG_PORTAL);
+    }
+
     void onTagWaitPos(const cXyz* param_0) {
         mTagWaitPos = *param_0;
         onStateFlg0(FLG0_TAG_WAIT);
@@ -312,7 +319,7 @@ public:
 
     MtxP getMtxHairTop() { return mpShadowModel->getAnmMtx(10); }
 
-    bool checkSetAnime(int param_0, daMidna_ANM i_anm) {
+    bool checkSetAnime(int param_0, daMidna_ANM i_anm) const {
         return mBckHeap[param_0].getIdx() == m_anmDataTable[i_anm].mResID;
     }
 
@@ -357,17 +364,34 @@ public:
     }
 
     static bool checkMidnaTired() {
+                                                   /* dSv_event_flag_c::F_0250 - Cutscene - [cutscene: 21] reunion with Zelda / Midna revived (Hyrule Castle barrier appears) */
         return dComIfGs_isTransformLV(3) && !dComIfGs_isEventBit(0x1E08);
     }
 
     void resetRatBody() {}
 
     bool checkFlyWaitAnime() const {
-        return mBckHeap[0].getIdx() == 0x1CB || mBckHeap[0].getIdx() == 0x1C7
-            || mBckHeap[0].getIdx() == 0x1C8 || mBckHeap[0].getIdx() == 0x1C9;
+        // fakematch (doesn't match in debug)
+        return (u16)mBckHeap[0].getIdx() == 0x1CB || ((u16)mBckHeap[0].getIdx() == 0x1C7
+            || (u16)mBckHeap[0].getIdx() == 0x1C8 || (u16)mBckHeap[0].getIdx() == 0x1C9);
     }
 
     void onForceMorfCancel() { onEndResetStateFlg0(ERFLG0_FORCE_MORF_CANCEL); }
+
+    void setCargoActor(fopAc_ac_c* i_actor) {
+        mpKago = (daKago_c*)i_actor;
+    }
+
+    void offCargoActor() {
+        mpKago = NULL;
+    }
+
+    void onTagWaitPosPortalObj(const cXyz* i_pos) {
+        mTagWaitPos = *i_pos;
+        onStateFlg0(daMidna_FLG0(FLG0_PORTAL_OBJ_CALL | FLG0_TAG_WAIT));
+    }
+
+    static u32 getOtherHeapSize() { return 0x1D0; }
 
     static daMidna_texData_s const m_texDataTable[21];
     static daMidna_anmData_s const m_anmDataTable[53];

@@ -3,6 +3,8 @@
 // Object - Altar
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_saidan.h"
 
 #include "d/d_com_inf_game.h"
@@ -12,24 +14,6 @@
 //
 
 static daSaidan_HIO_c l_HIO;
-
-/* 80CC454C-80CC4558 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80CC4558-80CC456C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80CC3DAC-80CC3DE0 0000EC 0034+00 1/1 0/0 0/0 .text            __ct__14daSaidan_HIO_cFv */
 daSaidan_HIO_c::daSaidan_HIO_c() {
@@ -59,7 +43,7 @@ int daSaidan_c::CreateHeap() {
 
 /* 80CC3F1C-80CC4054 00025C 0138+00 1/1 0/0 0/0 .text            create__10daSaidan_cFv */
 cPhs__Step daSaidan_c::create() {
-    fopAcM_SetupActor(this, daSaidan_c);
+    fopAcM_ct(this, daSaidan_c);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "H_Saidan");
     if (step == cPhs_COMPLEATE_e) {

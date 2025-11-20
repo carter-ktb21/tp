@@ -3,14 +3,29 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_th.h"
 #include "d/actor/d_a_e_th_ball.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item.h"
 #include "c/c_damagereaction.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_TH_HIO_c : public JORReflexible {
+public:
+    /* 807B038C */ daE_TH_HIO_c();
+    /* 807B3FA4 */ virtual ~daE_TH_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 base_size;
+    /* 0x0C */ u8 unk_0xC[0x10 - 0xC];
+    /* 0x10 */ f32 move_range;
+    /* 0x14 */ f32 middle_move_range;
+};
 
 enum daE_TH_ACTION {
     ACTION_WAIT,
@@ -627,7 +642,7 @@ static void action(e_th_class* i_this) {
 
     if (on_attention) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -1194,7 +1209,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model_p = i_this->mpModelMorf->getModel();
-    model_p->setUserArea((u32)i_this);
+    model_p->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model_p->getModelData()->getJointNum(); i++) {
         model_p->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -1210,7 +1225,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 /* 807B36D0-807B3B58 003430 0488+00 1/0 0/0 0/0 .text            daE_TH_Create__FP10fopAc_ac_c */
 static int daE_TH_Create(fopAc_ac_c* a_this) {
     e_th_class* i_this = (e_th_class*)a_this;
-    fopAcM_SetupActor(i_this, e_th_class);
+    fopAcM_ct(i_this, e_th_class);
 
     int phase_state = dComIfG_resLoad(&i_this->mPhase, "E_th");
     if (phase_state == cPhs_COMPLEATE_e) {

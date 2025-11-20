@@ -3,25 +3,9 @@
 // Translation Unit: JASOscillator
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JAudio2/JASOscillator.h"
-
-//
-// Types:
-//
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
-
-/* ############################################################################################## */
 
 /* 8029BE94-8029BEC4 2967D4 0030+00 0/0 1/1 0/0 .text            __ct__13JASOscillatorFv */
 JASOscillator::JASOscillator() {

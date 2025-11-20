@@ -3,6 +3,8 @@
  * Enemy spawner
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_enemy_create.h"
 #include "d/actor/d_a_player.h"
 #include "f_op/f_op_actor_mng.h"
@@ -223,7 +225,7 @@ void daObjE_CREATE_c::NameChk() {
 
 /* 80BE3770-80BE3878 000670 0108+00 1/1 0/0 0/0 .text            create__15daObjE_CREATE_cFv */
 int daObjE_CREATE_c::create() {
-    fopAcM_SetupActor(this, daObjE_CREATE_c);
+    fopAcM_ct(this, daObjE_CREATE_c);
 
     NameChk();
     u32 enemyType = fopAcM_GetParam(this) & 0xF;

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_mbossL1.h"
 #include "d/actor/d_a_obj_stopper.h"
 #include "d/actor/d_a_obj_keyhole.h"
@@ -15,7 +17,7 @@
 
 /* 80672838-80672844 000078 000C+00 15/15 0/0 0/0 .text            getNowLevel__FP10fopAc_ac_c */
 static int getNowLevel(fopAc_ac_c* i_this) {
-    return static_cast<daMBdoorL1_c*>(i_this)->subtype;
+    return static_cast<daMBdoorL1_c*>(i_this)->argument;
 }
 
 /* 80672844-80672894 000084 0050+00 1/1 0/0 0/0 .text            searchStop__FPvPv */
@@ -60,21 +62,6 @@ static u16 const l_door_heap_size[12] = {
 static u16 const l_stop_heap_size[12] = {
     0x0000, 0x0000, 0x0800, 0x0000, 0x1540, 0x1BD0,
     0x0EA0, 0x0800, 0x0EB0, 0x0800, 0x0800, 0x1BD0,
-};
-
-/* 80677970-8067797C 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 8067797C-80677990 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
 };
 
 /* 80677990-806779BC -00001 002C+00 0/1 0/0 0/0 .data            l_door_open_demo */
@@ -218,7 +205,7 @@ void dDoor_stop2_c::draw(fopAc_ac_c* param_1) {
 f32 dDoor_stop2_c::getHeight() {
     if (mModel != NULL) {
         J3DJoint* root_jnt = mModel->getModelData()->getJointNodePointer(0);
-        JUT_ASSERT(360, root_jnt != 0);
+        JUT_ASSERT(360, root_jnt != NULL);
         return root_jnt->getMax()->y;
     }
     return 300.0f;
@@ -338,7 +325,7 @@ J3DModelData* daMBdoorL1_c::getDoorModelData() {
 int daMBdoorL1_c::CreateHeap() {
     int level = getNowLevel(this);
     J3DModelData* modelData = getDoorModelData();
-    JUT_ASSERT(579, modelData != 0);
+    JUT_ASSERT(579, modelData != NULL);
     if (getDoorType() == DOOR_TYPE_2) {
         for (int i = 0; i < 2; i++) {
             mModels[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -347,7 +334,7 @@ int daMBdoorL1_c::CreateHeap() {
             }
             J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(
                 getAlwaysArcName(), "FDoorA.bck");
-            JUT_ASSERT(597, anm != 0);
+            JUT_ASSERT(597, anm != NULL);
             mBckAnms[i] = new mDoExt_bckAnm();
             if (mBckAnms[i] == NULL || !mBckAnms[i]->init(anm, 1, 0, 1.0f, 0, -1, false)) {
                 return 0;
@@ -368,7 +355,7 @@ int daMBdoorL1_c::CreateHeap() {
         }
         J3DAnmTransform* anm =
             (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-        JUT_ASSERT(628, anm != 0);
+        JUT_ASSERT(628, anm != NULL);
         mBckAnms[0] = new mDoExt_bckAnm();
         if (mBckAnms[0] == NULL || !mBckAnms[0]->init(anm, 1, 0, 1.0f, 0, -1, false)) {
             return 0;
@@ -378,7 +365,7 @@ int daMBdoorL1_c::CreateHeap() {
     }
     if (level == 8) {
         J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getStageRes(getBtk());
-        JUT_ASSERT(646, pbtk != 0);
+        JUT_ASSERT(646, pbtk != NULL);
         field_0x594 = new mDoExt_btkAnm();
         if (field_0x594 == NULL ||
             !field_0x594->init(mModels[0]->getModelData(), pbtk, 1, 0, 1.0f, 0, -1))
@@ -388,7 +375,7 @@ int daMBdoorL1_c::CreateHeap() {
     }
     if (checkMakeStop()) {
         J3DModelData* mdl = (J3DModelData*)dComIfG_getStageRes("door-stop.bmd");
-        JUT_ASSERT(671, mdl != 0);
+        JUT_ASSERT(671, mdl != NULL);
         if (!mDoorStop.create(mdl)) {
             return 0;
         }
@@ -488,7 +475,7 @@ int daMBdoorL1_c::CreateInit() {
     setAction(ACTION_INIT);
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     field_0x598->Move();
     eventInfo.setArchiveName(getArcName());
@@ -536,7 +523,7 @@ int daMBdoorL1_c::CreateInit() {
 
 /* 80673B9C-80673D98 0013DC 01FC+00 1/1 0/0 0/0 .text            create__12daMBdoorL1_cFv */
 int daMBdoorL1_c::create() {
-    fopAcM_SetupActor(this, daMBdoorL1_c);
+    fopAcM_ct(this, daMBdoorL1_c);
     int rv = dComIfG_resLoad(&mPhase1, getArcName());
     if (rv != cPhs_COMPLEATE_e) {
         return rv;
@@ -968,7 +955,7 @@ int daMBdoorL1_c::openInit() {
         dComIfG_Bgsp().Release(field_0x598);
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(1550, anm != 0);
+    JUT_ASSERT(1550, anm != NULL);
     int rt = mBckAnms[0]->init(anm, TRUE, J3DFrameCtrl::EMode_NONE, 1.0f, 0, -1, true);
     JUT_ASSERT(1552, rt == 0);
     int level = getNowLevel(this);
@@ -1004,7 +991,7 @@ int daMBdoorL1_c::openInit() {
                 }
             }
         }
-        if (fopAcM_checkStatus(this, 0x1000)) {
+        if (fopAcM_CheckStatus(this, 0x1000)) {
             fopAcM_onSwitch(this, swBit3);
         }
         field_0x5e1 = 1;
@@ -1081,7 +1068,7 @@ int daMBdoorL1_c::closeInit() {
         smokeInit2();
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getCloseAnm());
-    JUT_ASSERT(1762, anm != 0);
+    JUT_ASSERT(1762, anm != NULL);
     int rt = mBckAnms[0]->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(1764, rt != 0);
     return 1;
@@ -1133,7 +1120,7 @@ int daMBdoorL1_c::openInitKnob(int param_1) {
     };
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(
         getAlwaysArcName(), bck_table[param_1]);
-    JUT_ASSERT(1847, anm != 0);
+    JUT_ASSERT(1847, anm != NULL);
     if ((field_0x5df == 0 && param_1 == 0) || (field_0x5df == 1 && param_1 == 2)) {
         field_0x590 = mBckAnms[0];
     } else if ((field_0x5df == 1 && param_1 == 0) || (field_0x5df == 0 && param_1 == 2)) {
@@ -1344,7 +1331,7 @@ void daMBdoorL1_c::setStart(f32 param_1, f32 param_2) {
 
 static f32 dummy(f32 param_0) {
     dBgS_ObjGndChk gnd_chk;
-    return param_0 + -1e9f + 50.0f;
+    return param_0 + -G_CM3D_F_INF + 50.0f;
 }
 
 /* 80676004-806760B4 003844 00B0+00 1/1 0/0 0/0 .text            smokeInit2__12daMBdoorL1_cFv */
@@ -1690,7 +1677,7 @@ int daMBdoorL1_c::actionOpen() {
 
 /* 80676ED8-80676FE4 004718 010C+00 1/0 0/0 0/0 .text            actionInit__12daMBdoorL1_cFv */
 int daMBdoorL1_c::actionInit() {
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         setAction(ACTION_START_DEMO);
         actionStartDemo();
     } else {
@@ -1717,7 +1704,7 @@ int daMBdoorL1_c::actionInit() {
 int daMBdoorL1_c::actionStartDemo() {
     field_0x5e8 = dComIfGp_evmng_getMyStaffId(l_staff_name, NULL, 0);
     demoProc();
-    if (!fopAcM_checkStatus(this, 0x1000)) {
+    if (!fopAcM_CheckStatus(this, 0x1000)) {
         setAction(ACTION_CLOSE_WAIT);
     }
     return 1;

@@ -3,13 +3,15 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_lv5soup.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 
 /* 80D5AD58-80D5ADEC 000078 0094+00 1/1 0/0 0/0 .text            create__15daTag_Lv5Soup_cFv */
 int daTag_Lv5Soup_c::create() {
-    fopAcM_SetupActor(this, daTag_Lv5Soup_c);
+    fopAcM_ct(this, daTag_Lv5Soup_c);
     fopAcM_setCullSizeBox(this, -30.0f, -15.0f, -30.0f, 30.0f, 45.0f, 30.0f);
     attention_info.flags = 0;
     return cPhs_COMPLEATE_e;

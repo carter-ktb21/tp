@@ -3,12 +3,22 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_kg.h"
 #include "d/d_cc_d.h"
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
 
-// NONMATCHING - weak function order
+class daE_KG_HIO_c {
+public:
+    /* 806F7EEC */ daE_KG_HIO_c();
+    /* 806F9EE8 */ virtual ~daE_KG_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mSize;
+    /* 0x0c */ f32 field_0xc;
+    /* 0x10 */ f32 mCheckRange;
+};
 
 /* 806F7EEC-806F7F24 0000EC 0038+00 1/1 0/0 0/0 .text            __ct__12daE_KG_HIO_cFv */
 daE_KG_HIO_c::daE_KG_HIO_c() {
@@ -698,7 +708,7 @@ static int daE_KG_Create(fopAc_ac_c* i_this) {
         } // mSphAttr
     };
 
-    fopAcM_SetupActor(i_this, e_kg_class);
+    fopAcM_ct(i_this, e_kg_class);
     e_kg_class* a_this = (e_kg_class*) i_this;
     int phase = dComIfG_resLoad(&a_this->mPhase, "E_kg");
     if (phase == cPhs_COMPLEATE_e) {
@@ -724,7 +734,7 @@ static int daE_KG_Create(fopAc_ac_c* i_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(i_this, a_this->mpMorf->getModel()->getBaseTRMtx());
         i_this->health = 0x50;
         i_this->field_0x560 = 0x50;

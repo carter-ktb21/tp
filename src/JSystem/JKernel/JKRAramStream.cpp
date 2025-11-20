@@ -1,7 +1,10 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRAramStream.h"
 #include "JSystem/JKernel/JKRAramPiece.h"
 #include "JSystem/JSupport/JSUFileStream.h"
 #include "JSystem/JUtility/JUTException.h"
+#include <stdint.h>
 
 /* ############################################################################################## */
 /* 80451408-8045140C 000908 0004+00 1/1 0/0 0/0 .sbss            sAramStreamObject__13JKRAramStream
@@ -40,7 +43,7 @@ JKRAramStream::~JKRAramStream() {}
 
 /* 802D3C68-802D3CD8 2CE5A8 0070+00 1/0 0/0 0/0 .text            run__13JKRAramStreamFv */
 void* JKRAramStream::run() {
-    OSInitMessageQueue(&sMessageQueue, sMessageBuffer, ARRAY_SIZE(sMessageBuffer));
+    OSInitMessageQueue(&sMessageQueue, sMessageBuffer, ARRAY_SIZEU(sMessageBuffer));
 
     for (;;) {
         OSMessage message;
@@ -115,7 +118,7 @@ s32 JKRAramStream::writeToAram(JKRAramStreamCommand* command) {
                 break;
             }
 
-            JKRAramPcs(0, (u32)buffer, destination, length, NULL);
+            JKRAramPcs(0, (uintptr_t)buffer, destination, length, NULL);
             dstSize -= length;
             writtenLength += length;
             destination += length;
@@ -205,7 +208,7 @@ void JKRAramStream::setTransBuffer(u8* buffer, u32 bufferSize, JKRHeap* heap) {
     transHeap = NULL;
 
     if (buffer) {
-        transBuffer = (u8*)ALIGN_NEXT((u32)buffer, 0x20);
+        transBuffer = (u8*)ALIGN_NEXT((uintptr_t)buffer, 0x20);
     }
 
     if (bufferSize) {
@@ -222,9 +225,6 @@ JKRAramStreamCommand::JKRAramStreamCommand() {
     mAllocatedTransferBuffer = false;
 }
 
-/* 802D4094-802D40F0 2CE9D4 005C+00 0/0 3/0 0/0 .text getAvailable__20JSURandomInputStreamCFv */
-// s32 JSURandomInputStream::getAvailable() const {
-// should be an inline function
-extern "C" s32 getAvailable__20JSURandomInputStreamCFv(JSURandomInputStream* self) {
-    return self->getLength() - self->getPosition();
+static void dummy(JSURandomInputStream* stream) {
+    stream->getAvailable();
 }

@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_metalbox.h"
 #include "dol2asm.h"
 #include "d/d_com_inf_game.h"
@@ -49,7 +51,7 @@ int daObjMBox_c::CreateHeap() {
 
 /* 80593044-805931C4 000224 0180+00 1/1 0/0 0/0 .text            create__11daObjMBox_cFv */
 int daObjMBox_c::create() {
-    fopAcM_SetupActor(this, daObjMBox_c);
+    fopAcM_ct(this, daObjMBox_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -63,7 +65,7 @@ int daObjMBox_c::create() {
 }
 
 /* 805932C4-805932F0 0004A4 002C+00 1/0 0/0 0/0 .text            Execute__11daObjMBox_cFPPA3_A4_f */
-int daObjMBox_c::Execute(f32 (**param_0)[3][4]) {
+int daObjMBox_c::Execute(Mtx** param_0) {
     *param_0 = &mBgMtx;
     setBaseMtx();
 

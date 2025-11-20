@@ -3,6 +3,8 @@
  * Mirror of Twilight
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_mirror.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
@@ -204,7 +206,7 @@ void dMirror_packet_c::modelDraw(J3DModel* i_model, Mtx param_1) {
     }
 
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-    JUT_ASSERT(0, kankyo != 0);
+    JUT_ASSERT(0, kankyo != NULL);
 
     GXColor color = {0};
     color.r = kankyo->bg_amb_col[0].r;
@@ -340,16 +342,16 @@ void dMirror_packet_c::mainDraw() {
         f32 var_f5;
         f32 var_f6;
         if (view_port->x_orig != 0.0f) {
-            var_f3 = (((view_port->x_orig * 2.0f) + view_port->width) * 0.5f) - (608.0f / 2);
-            var_f5 = 608.0f;
+            var_f3 = (((view_port->x_orig * 2.0f) + view_port->width) * 0.5f) - (FB_WIDTH / 2);
+            var_f5 = FB_WIDTH;
         } else {
             var_f3 = view_port->x_orig;
             var_f5 = view_port->width;
         }
 
         if (view_port->y_orig != 0.0f) {
-            var_f4 = (((view_port->y_orig * 2.0f) + view_port->height) * 0.5f) - (448.0f / 2);
-            var_f6 = 448.0f;
+            var_f4 = (((view_port->y_orig * 2.0f) + view_port->height) * 0.5f) - (FB_HEIGHT / 2);
+            var_f6 = FB_HEIGHT;
         } else {
             var_f4 = view_port->y_orig;
             var_f6 = view_port->height;
@@ -480,7 +482,7 @@ void daMirror_c::setModelMtx() {
 
 /* 80872018-8087206C 0014D8 0054+00 1/0 0/0 0/0 .text            daMirror_create__FP10daMirror_c */
 static int daMirror_create(daMirror_c* i_this) {
-    fopAcM_SetupActor(i_this, daMirror_c);
+    fopAcM_ct(i_this, daMirror_c);
     return i_this->daMirror_c::create();
 }
 
@@ -595,7 +597,7 @@ int daMirror_c::execute() {
     }
 
     daPy_py_c* player = daPy_getLinkPlayerActorClass();
-    JUT_ASSERT(0, player != 0);
+    JUT_ASSERT(0, player != NULL);
 
     if (mPacket.getViewScale().y > 0.0f && player->getKandelaarFlamePos() &&
         fopAcM_searchActorDistance2(this, player) < 40000.0f)

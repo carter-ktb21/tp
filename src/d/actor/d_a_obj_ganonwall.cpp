@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ganonwall.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
@@ -94,7 +96,7 @@ int daObjGWall_c::CreateHeap() {
 
 /* 80BF4FF0-80BF50A4 000370 00B4+00 1/1 0/0 0/0 .text            create__12daObjGWall_cFv */
 int daObjGWall_c::create() {
-    fopAcM_SetupActor(this, daObjGWall_c);
+    fopAcM_ct(this, daObjGWall_c);
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, CheckCreateHeap, 0x3500)) {

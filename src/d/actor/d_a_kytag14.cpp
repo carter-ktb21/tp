@@ -4,9 +4,12 @@
  * Sets savefile spawn location
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag14.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
+#include "d/d_debug_viewer.h"
 
 /* 80529998-805299A0 000078 0008+00 1/0 0/0 0/0 .text            daKytag14_Draw__FP13kytag14_class
  */
@@ -16,6 +19,7 @@ static int daKytag14_Draw(kytag14_class*) {
 
 /* 805299A0-80529B34 000080 0194+00 1/0 0/0 0/0 .text daKytag14_Execute__FP13kytag14_class */
 static int daKytag14_Execute(kytag14_class* i_this) {
+    fopAc_ac_c* actor = i_this;
     BOOL event1_set = true;
     BOOL event2_unset = true;
     BOOL switch1_set = true;
@@ -26,7 +30,7 @@ static int daKytag14_Execute(kytag14_class* i_this) {
     }
 
     if (i_this->mEventID1 != 0xFFFF) {
-        if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[i_this->mEventID1])) {
+        if (dComIfGs_isEventBit((u16)dSv_event_flag_c::saveBitLabels[i_this->mEventID1])) {
             event1_set = true;
         } else {
             event1_set = false;
@@ -34,7 +38,7 @@ static int daKytag14_Execute(kytag14_class* i_this) {
     }
 
     if (i_this->mEventID2 != 0xFFFF) {
-        if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[i_this->mEventID2])) {
+        if (!dComIfGs_isEventBit((u16)dSv_event_flag_c::saveBitLabels[i_this->mEventID2])) {
             event2_unset = true;
         } else {
             event2_unset = false;
@@ -59,6 +63,15 @@ static int daKytag14_Execute(kytag14_class* i_this) {
 
     if (event1_set == true && event2_unset == true && switch1_set == true && switch2_unset == true)
     {
+        #ifdef DEBUG
+        if (!g_kankyoHIO.navy.display_save_location) {
+            dDbVw_Report(20, 16, "TAG SavMem STAGE[%s] Room[%d] Lp[%d]", dComIfGp_getStartStageName(), i_this->mSaveRoomNo, i_this->mSavePoint);
+            if (i_this->mSaveRoomNo == -1) {
+                OSReport_Error("\n セーブ復帰位置タグの部屋指定に－１指定!\n");
+                JUT_ASSERT(250, FALSE);
+            }
+        }
+        #endif
         g_dComIfG_gameInfo.info.getPlayer().getPlayerReturnPlace().set(
             dComIfGp_getStartStageName(), i_this->mSaveRoomNo, i_this->mSavePoint);
     }
@@ -79,7 +92,7 @@ static int daKytag14_Delete(kytag14_class*) {
 
 /* 80529B44-80529BE0 000224 009C+00 1/0 0/0 0/0 .text            daKytag14_Create__FP10fopAc_ac_c */
 static int daKytag14_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, kytag14_class);
+    fopAcM_ct(i_this, kytag14_class);
     kytag14_class* a_this = static_cast<kytag14_class*>(i_this);
 
     a_this->mSavePoint = fopAcM_GetParam(a_this) & 0xFF;

@@ -3,24 +3,11 @@
  * Object - Lakebed Temple Gate
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_bsGate.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
-
-/* 80BC31CC-80BC31D8 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BC31D8-80BC31EC 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80BC288C-80BC28C8 0000EC 003C+00 1/1 0/0 0/0 .text            __ct__14daBsGate_HIO_cFv */
 daBsGate_HIO_c::daBsGate_HIO_c() {
@@ -50,7 +37,7 @@ int daBsGate_c::CreateHeap() {
 
 /* 80BC2A18-80BC2B6C 000278 0154+00 1/1 0/0 0/0 .text            create__10daBsGate_cFv */
 cPhs__Step daBsGate_c::create() {
-    fopAcM_SetupActor(this, daBsGate_c);
+    fopAcM_ct(this, daBsGate_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "S_Zgate");
     if (step == cPhs_COMPLEATE_e) {
         if (MoveBGCreate("S_Zgate", 7, dBgS_MoveBGProc_TypicalRotY, 0xf00, NULL) == cPhs_ERROR_e) {
@@ -89,9 +76,9 @@ static daBsGate_HIO_c l_HIO;
 void daBsGate_c::moveGate() {
     typedef void (daBsGate_c::*daBsGate_modeFunc)();
     static daBsGate_modeFunc mode_proc[3] = {
-        &modeWait,
-        &modeOpen,
-        &modeClose,
+        &daBsGate_c::modeWait,
+        &daBsGate_c::modeOpen,
+        &daBsGate_c::modeClose,
     };
     u8 was_open = mOpen;
     mOpen = fopAcM_isSwitch(this, fopAcM_GetParam(this) & 0xff);

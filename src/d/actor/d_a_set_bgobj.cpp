@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_set_bgobj.h"
 #include "stdio.h"
 #include "f_op/f_op_actor_mng.h"
@@ -25,7 +27,7 @@ int daSetBgObj_c::CreateInit() {
 
 /* 80485DFC-80485E88 0000FC 008C+00 1/1 0/0 0/0 .text            create__12daSetBgObj_cFv */
 int daSetBgObj_c::create() {
-    fopAcM_SetupActor(this, daSetBgObj_c);
+    fopAcM_ct(this, daSetBgObj_c);
 
     sprintf(mArcName, "%s", getArcName(this));
 

@@ -3,25 +3,11 @@
  * Arbiter's Grounds Poe Gate
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv4PoGate.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
-
-/* 80C60854-80C60860 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C60860-80C60874 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-// unused data ?
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80C5FBEC-80C5FC5C 0000EC 0070+00 1/1 0/0 0/0 .text            __ct__17daLv4PoGate_HIO_cFv */
 daLv4PoGate_HIO_c::daLv4PoGate_HIO_c() {
@@ -61,7 +47,7 @@ int daLv4PoGate_c::CreateHeap() {
 
 /* 80C5FDAC-80C5FEDC 0002AC 0130+00 1/1 0/0 0/0 .text            create__13daLv4PoGate_cFv */
 int daLv4PoGate_c::create() {
-    fopAcM_SetupActor(this, daLv4PoGate_c);
+    fopAcM_ct(this, daLv4PoGate_c);
 
     int phase = dComIfG_resLoad(&mPhase, "L4R02Gate");
     if (phase == cPhs_COMPLEATE_e) {
@@ -92,7 +78,7 @@ int daLv4PoGate_c::create() {
 
 /* 80C5FEDC-80C5FF2C 0003DC 0050+00 1/0 0/0 0/0 .text            Execute__13daLv4PoGate_cFPPA3_A4_f
  */
-int daLv4PoGate_c::Execute(f32 (**param_0)[3][4]) {
+int daLv4PoGate_c::Execute(Mtx** param_0) {
     moveGate();
     *param_0 = &mpModel->getBaseTRMtx();
     setBaseMtx();

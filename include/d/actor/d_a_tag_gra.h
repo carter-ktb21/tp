@@ -21,6 +21,10 @@ public:
         return home.pos;
     }
 
+    csXyz getGraAngle() {
+        return home.angle;
+    }
+    
     f32 getGraExtent() {
         return scale.x * 100.0f;
     }
@@ -30,7 +34,7 @@ public:
     }
 
     int create() {
-        fopAcM_SetupActor(this, daTagGra_c);
+        fopAcM_ct(this, daTagGra_c);
 
         if (getMode() == 2) {
             if (dComIfGs_isSwitch(getSwBit(),fopAcM_GetRoomNo(this))) {

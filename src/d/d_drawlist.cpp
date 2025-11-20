@@ -3,18 +3,21 @@
 // Translation Unit: d/d_drawlist
 //
 
-#include "d/d_drawlist.h"
-#include "d/d_s_play.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
+#include "JSystem/J2DGraph/J2DAnimation.h"
+#include "JSystem/J2DGraph/J2DGrafContext.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "SSystem/SComponent/c_bg_s_shdw_draw.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
+#include "d/d_drawlist.h"
+#include "d/d_s_play.h"
 #include "dol2asm.h"
 #include "m_Do/m_Do_graphic.h"
 #include "m_Do/m_Do_lib.h"
 #include "m_Do/m_Do_mtx.h"
-#include "JSystem/J2DGraph/J2DGrafContext.h"
 
 class dDlst_blo_c : public dDlst_base_c {
 public:
@@ -29,7 +32,7 @@ public:
 
     J2DPicture* getPicture(u64 i_tag) {
         J2DPane* pane = getPane(i_tag);
-        JUT_ASSERT(1553, pane != 0);
+        JUT_ASSERT(1553, pane != NULL);
         if (pane->getTypeID() != 0x12) {
             return NULL;
         }
@@ -546,11 +549,6 @@ void dDlst_2DT2_c::draw() {
     dComIfGp_getCurrentGrafPort()->setup2D();
 }
 
-/* 803A87A0-803A87C0 0058C0 000C+14 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
 /* 803A87C0-803A8800 0058E0 003C+04 0/0 0/0 0/0 .data            l_frontZMat */
 static u8 l_frontZMat[] ALIGN_DECL(32) = {
     0x61, 0x40, 0x00, 0x00, 0x07, 0x10, 0x00, 0x00, 0x10, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x10,
@@ -911,6 +909,11 @@ void dDlst_2DMt_c::draw() {
     }
 }
 
+// stand-in for a stripped function that calls J2DPicture::getTexture
+JUTTexture* dummy_getTexture(J2DPicture* picture) {
+    return picture->getTexture(0);
+}
+
 /* 80053A00-80053A9C 04E340 009C+00 0/0 1/1 0/0 .text            __ct__10dDlst_2D_cFP7ResTIMGssssUc
  */
 dDlst_2D_c::dDlst_2D_c(ResTIMG* i_timg, s16 i_posX, s16 i_posY, s16 i_sizeX, s16 i_sizeY,
@@ -932,6 +935,21 @@ void dDlst_2D_c::draw() {
 /* 80053B64-80053BA0 04E4A4 003C+00 1/0 0/0 0/0 .text            draw__11dDlst_blo_cFv */
 void dDlst_blo_c::draw() {
     mScreen.draw(field_0x120, field_0x124, dComIfGp_getCurrentGrafPort());
+}
+
+// stand-in for a function that pulls in a bunch of inline functions but was presumably stripped
+static void dummy_misc() {
+    J2DScreen* screen;
+    J2DPane* pane;
+    J2DPicture* picture;
+    J2DAnmBase* anmBase;
+    delete anmBase;
+    picture->setBlack(JUtility::TColor(0, 0, 0, 0));
+    picture->setWhite(JUtility::TColor(0, 0, 0, 0));
+    pane->getTypeID();
+    pane->makeMatrix(0.0f, 0.0f);
+    pane->calcMtx();
+    screen->clearAnmTransform();
 }
 
 /* 80053CDC-80053CEC 04E61C 0010+00 0/0 2/2 0/0 .text            init__8cM_rnd_cFiii */
@@ -1078,7 +1096,7 @@ static J3DDrawBuffer* J3DDrawBuffer__create(u32 size) {
     J3DDrawBuffer* buffer = new J3DDrawBuffer();
 
     if (buffer) {
-        J3DError error = buffer->allocBuffer(size);
+        int error = buffer->allocBuffer(size);
         if (error == kJ3DError_Success) {
             return buffer;
         }
@@ -1615,20 +1633,16 @@ void dDlst_shadowControl_c::draw(Mtx param_0) {
     GXSetAlphaUpdate(GX_DISABLE);
 }
 
-/* 803A8D9C-803A8DCC 005EBC 0030+00 0/0 0/0 0/0 .data            mtx_adj$5842 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static Mtx mtx_adj = {
-    {0.5f, 0.0f, 0.0f, 0.5f},
-    {0.0f, -0.5f, 0.0f, 0.5f},
-    {0.0f, 0.0f, 1.0f, 0.0f},
-};
-#pragma pop
-
 /* 80055C74-80055F1C 0505B4 02A8+00 0/0 1/1 1/1 .text
  * setReal__21dDlst_shadowControl_cFUlScP8J3DModelP4cXyzffP12dKy_tevstr_c */
 int dDlst_shadowControl_c::setReal(u32 param_1, s8 param_2, J3DModel* param_3, cXyz* param_4,
                                        f32 param_5, f32 param_6, dKy_tevstr_c* param_7) {
+    static Mtx mtx_adj = {
+        {0.5f, 0.0f, 0.0f, 0.5f},
+        {0.0f, -0.5f, 0.0f, 0.5f},
+        {0.0f, 0.0f, 1.0f, 0.0f},
+    };
+
     f32 fVar1;
     f32 dVar16 = (param_2 == 0) ? 1.0f : (1.0f - 0.003000000026077032f * param_6);
     if (dVar16 <= 0.0f) {

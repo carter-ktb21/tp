@@ -3,25 +3,12 @@
  * Object - Zora River Stalactite Debris
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_zrTuraraRock.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
-
-/* 80D42440-80D4244C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D4244C-80D42460 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
 
 /* 80D425AC-80D425CC 000014 0020+00 2/2 0/0 0/0 .bss             l_HIO */
 static daZrTuraRc_HIO_c l_HIO;
@@ -77,7 +64,7 @@ int daZrTuraRc_c::CreateHeap() {
 
 /* 80D41A40-80D41D24 0002A0 02E4+00 1/1 0/0 0/0 .text            create__12daZrTuraRc_cFv */
 cPhs__Step daZrTuraRc_c::create() {
-    fopAcM_SetupActor(this, daZrTuraRc_c);
+    fopAcM_ct(this, daZrTuraRc_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "M_DRockHn");
     if (step == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, createHeapCallBack, 0x840)) {
@@ -125,8 +112,8 @@ int daZrTuraRc_c::Execute() {
 void daZrTuraRc_c::move() {
     typedef void (daZrTuraRc_c::*daZrTuraRc_modeFunc)();
     static daZrTuraRc_modeFunc mode_proc[2] = {
-        &modeDrop,
-        &modeDropEnd,
+        &daZrTuraRc_c::modeDrop,
+        &daZrTuraRc_c::modeDropEnd,
     };
     (this->*mode_proc[mMode])();
     mCcSph.SetR(mScaleF * 130.0f);

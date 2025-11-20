@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_swhit0.h"
 #include "d/d_com_inf_game.h"
 
@@ -67,7 +69,7 @@ void daSwhit0_c::makeEventId() {
 /* 804860EC-80486214 00016C 0128+00 1/1 0/0 0/0 .text            CreateHeap__10daSwhit0_cFv */
 int daSwhit0_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 8);
-    JUT_ASSERT(193, modelData != 0);
+    JUT_ASSERT(193, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000202);
     if (mpModel == NULL) {
@@ -134,9 +136,9 @@ static int CheckCreateHeap(fopAc_ac_c* i_this) {
 
 /* 804863B0-804865B4 000430 0204+00 1/1 0/0 0/0 .text            create__10daSwhit0_cFv */
 int daSwhit0_c::create() {
-    fopAcM_SetupActor(this, daSwhit0_c);
+    fopAcM_ct(this, daSwhit0_c);
 
-    if (subtype != 0) {
+    if (argument != 0) {
         setDrawMtx();
         cMtx_copy(mDoMtx_stack_c::get(), field_0x5a8);
         fopAcM_SetMtx(this, field_0x5a8);
@@ -436,7 +438,7 @@ int daSwhit0_c::draw() {
 
 /* 80487138-80487228 0011B8 00F0+00 1/0 0/0 0/0 .text            daSwhit0_Draw__FP10daSwhit0_c */
 static int daSwhit0_Draw(daSwhit0_c* i_this) {
-    if (i_this->subtype != 0) {
+    if (i_this->argument != 0) {
         return 1;
     }
 
@@ -485,7 +487,7 @@ static int daSwhit0_Execute(daSwhit0_c* i_this) {
 
 /* 804872E4-8048732C 001364 0048+00 1/0 0/0 0/0 .text            daSwhit0_Delete__FP10daSwhit0_c */
 static int daSwhit0_Delete(daSwhit0_c* i_this) {
-    if (i_this->subtype == 0) {
+    if (i_this->argument == 0) {
         dComIfG_resDelete(i_this, l_arcName);
     }
 

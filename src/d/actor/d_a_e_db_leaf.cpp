@@ -1,5 +1,7 @@
 // Translation Unit: d_a_e_db_leaf
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_db_leaf.h"
 #include "d/d_procname.h"
 
@@ -49,7 +51,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 /* 806A205C-806A210C 00029C 00B0+00 1/0 0/0 0/0 .text daE_DB_LEAF_Create__FP10fopAc_ac_c */
 static int daE_DB_LEAF_Create(fopAc_ac_c* i_this) {
     e_db_leaf_class* leaf = (e_db_leaf_class*)i_this;
-    fopAcM_SetupActor(leaf, e_db_leaf_class);
+    fopAcM_ct(leaf, e_db_leaf_class);
 
     int ret = dComIfG_resLoad(&leaf->mPhase, "E_DB");
     if (ret == cPhs_COMPLEATE_e) {

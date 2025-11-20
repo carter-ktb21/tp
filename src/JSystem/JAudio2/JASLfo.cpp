@@ -3,24 +3,10 @@
 // Translation Unit: JASLfo
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JAudio2/JASLfo.h"
 #include "SSystem/SComponent/c_math.h"
-
-//
-// Types:
-//
-
-//
-// Forward References:
-//
-
-//
-// External References:
-//
-
-//
-// Declarations:
-//
 
 /* ############################################################################################## */
 

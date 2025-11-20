@@ -3,12 +3,15 @@
  * Object - Golden Butterfly
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cho.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
 /* 80BCC750-80BCC754 000008 0004+00 2/2 0/0 0/0 .bss             None */
 static bool hioInit;
@@ -287,12 +290,12 @@ void daObjCHO_c::checkGroundPos() {
 
 /* 80BCB310-80BCB320 0010F0 0010+00 1/0 0/0 0/0 .text            Insect_Release__10daObjCHO_cFv */
 void daObjCHO_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = ACT_MOVE;
 }
 
 /* 80BCC630-80BCC634 0000B8 0002+02 1/2 0/0 0/0 .rodata          l_cho_itemno */
-static u8 const l_cho_itemno[2] = {0xC2, 0xC3};
+static u8 const l_cho_itemno[2] = {fpcNm_ITEM_M_BUTTERFLY, fpcNm_ITEM_F_BUTTERFLY};
 
 // Some unused function went here.
 // This fake function is here in its place to make the literals match
@@ -313,7 +316,7 @@ void daObjCHO_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -515,7 +518,10 @@ static int daObjCHO_Execute(daObjCHO_c* i_this) {
 }
 
 /* 80BCC670-80BCC674 0000F8 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x0193, 0x0194};
+static u16 const l_musiya_num[2] = {
+    0x0193, /* dSv_event_flag_c::F_0403 - Misc. - Butterfly (M) */
+    0x0194, /* dSv_event_flag_c::F_0404 - Misc. - Butterfly (F) */
+};
 
 /* 80BCBE70-80BCC01C 001C50 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjCHO_cFv */
 bool daObjCHO_c::CreateChk() {
@@ -554,13 +560,13 @@ bool daObjCHO_c::CreateChk() {
 
 /* 80BCC01C-80BCC3C8 001DFC 03AC+00 1/1 0/0 0/0 .text            create__10daObjCHO_cFv */
 cPhs__Step daObjCHO_c::create() {
-    fopAcM_SetupActor(this, daObjCHO_c);
+    fopAcM_ct(this, daObjCHO_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "I_Cho");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
             mTargetSpeedY = -2.0f;

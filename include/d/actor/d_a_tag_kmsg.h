@@ -70,7 +70,7 @@ public:
     }
 
     u32 getTalkAngle() {
-        u32 talkAngle = (fopAcM_GetParam(this) & 0xe0) >> 5;
+        u32 talkAngle = (fopAcM_GetParam(this) >> 5) & 0x7;
         if (talkAngle == 7) {
             return 0;
         } else {
@@ -90,7 +90,7 @@ public:
     f32 getAttnPosOffset() {
         u32 attnPosOffset = (fopAcM_GetParam(this) & 0xff0000) >> 0x10;
         if (attnPosOffset == 0xff) {
-            return 1000000000.0f;
+            return G_CM3D_F_INF;
         } else {
             return attnPosOffset;
         }

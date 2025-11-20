@@ -3,6 +3,7 @@
 
 #include "JSystem/JKernel/JKRDisposer.h"
 #include <dolphin/os.h>
+#include "global.h"
 
 class JKRHeap;
 typedef void (*JKRErrorHandler)(void*, u32, int);
@@ -89,8 +90,8 @@ public:
 
     void setDebugFill(bool debugFill) { mDebugFill = debugFill; }
     bool getDebugFill() const { return mDebugFill; }
-    void* getStartAddr() const { return (void*)mStart; }
-    void* getEndAddr() const { return (void*)mEnd; }
+    void* getStartAddr() { return (void*)mStart; }
+    void* getEndAddr() { return (void*)mEnd; }
     u32 getSize() const { return mSize; }
     bool getErrorFlag() const { return mErrorFlag; }
     void callErrorHandler(JKRHeap* heap, u32 size, int alignment) {
@@ -149,7 +150,8 @@ public:
     static void* getUserRamEnd(void) { return mUserRamEnd; }
     static u32 getMemorySize(void) { return mMemorySize; }
     static JKRHeap* getRootHeap() { return sRootHeap; }
-#ifdef DEBUG
+
+#if PLATFORM_WII || PLATFORM_SHIELD
     static JKRHeap* getRootHeap2() { return sRootHeap2; }
 #endif
 
@@ -173,7 +175,8 @@ public:
     static u32 mMemorySize;
 
     static JKRHeap* sRootHeap;
-#ifdef DEBUG
+
+#if PLATFORM_WII || PLATFORM_SHIELD
     static JKRHeap* sRootHeap2;
 #endif
 
@@ -249,6 +252,20 @@ inline s32 JKRResizeMemBlock(JKRHeap* heap, void* ptr, u32 size) {
 inline JKRHeap* JKRGetRootHeap() {
     return JKRHeap::getRootHeap();
 }
+
+inline JKRErrorHandler JKRSetErrorHandler(JKRErrorHandler errorHandler) {
+    return JKRHeap::setErrorHandler(errorHandler);
+}
+
+inline bool JKRSetErrorFlag(JKRHeap* heap, bool flag) {
+    return heap->setErrorFlag(flag);
+}
+
+#if PLATFORM_WII || PLATFORM_SHIELD
+inline JKRHeap* JKRGetRootHeap2() {
+    return JKRHeap::getRootHeap2();
+}
+#endif
 
 #ifdef DEBUG
 inline void JKRSetDebugFillNotuse(u8 status) { data_804508B1 = status; }

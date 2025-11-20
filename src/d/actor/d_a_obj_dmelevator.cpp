@@ -3,17 +3,13 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_dmelevator.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_bg_w.h"
 #include "d/d_path.h"
-
-/* 80BDFB38-80BDFB70 000008 0001+03 1/1 0/0 0/0 .bss             @1109 */
-UNK_REL_BSS;
-
-/* 80BDF950-80BDF964 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-UNK_REL_DATA;
 
 /* 80BDF870-80BDF87C 000000 000C+00 11/11 0/0 0/0 .rodata          l_swOffset */
 static const Vec l_swOffset = {
@@ -28,7 +24,7 @@ static void rideCallBack(dBgW* param_0, fopAc_ac_c* param_1, fopAc_ac_c* param_2
     daObjDmElevator_c* pthis = (daObjDmElevator_c*)param_1;
 
     daPy_py_c* pdVar1 = daPy_getPlayerActorClass();
-    if (fopAcM_checkStatus(param_2, 0x400) != 0 && fopAcM_GetName(param_2) == 0xfd) {
+    if (fopAcM_CheckStatus(param_2, 0x400) != 0 && fopAcM_GetName(param_2) == 0xfd) {
         static cXyz l_push_check_pos0[4] = {
             cXyz(-50.0f, 0.0f, -50.0f),
             cXyz(50.0f, 0.0f, -50.0f),
@@ -180,11 +176,11 @@ int daObjDmElevator_c::Create() {
         
         mpElevatorModel->mModelData->getJointTree().getJointNodePointer(2)->setCallBack(
             nodeCallBack);
-        mpElevatorModel->setUserArea((u32)this);
+        mpElevatorModel->setUserArea((uintptr_t)this);
         
         mpSwitchModel->mModelData->getJointTree().getJointNodePointer(1)->setCallBack(
             nodeCallBackForSw);
-        mpSwitchModel->setUserArea((u32)this);
+        mpSwitchModel->setUserArea((uintptr_t)this);
         
         mpBgW->SetRideCallback(rideCallBack);
         mpBgW->Move();
@@ -561,7 +557,7 @@ void daObjDmElevator_c::actionEvent() {
 
 /* 80BDF068-80BDF0A0 0017E8 0038+00 1/0 0/0 0/0 .text actionStartEvent__17daObjDmElevator_cFv */
 void daObjDmElevator_c::actionStartEvent() {
-    if ( fopAcM_checkStatus(this, 0x1000) != 0) {
+    if ( fopAcM_CheckStatus(this, 0x1000) != 0) {
         demoProc();
     } else {
         mAction = 0;
@@ -725,7 +721,7 @@ int daObjDmElevator_c::Delete() {
 /* 80BDF764-80BDF7D8 001EE4 0074+00 1/0 0/0 0/0 .text
  * daObjDmElevator_create1st__FP17daObjDmElevator_c             */
 static int daObjDmElevator_create1st(daObjDmElevator_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjDmElevator_c);
+    fopAcM_ct(i_this, daObjDmElevator_c);
     return i_this->create1st();
 }
 

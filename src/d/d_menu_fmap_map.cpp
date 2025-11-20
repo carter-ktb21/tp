@@ -3,10 +3,12 @@
 // Translation Unit: d/d_menu_fmap_map
 //
 
-#include "d/d_menu_fmap_map.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "JSystem/JUtility/JUTTexture.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
+#include "d/d_menu_fmap_map.h"
 #include "m_Do/m_Do_graphic.h"
 
 /* 801CE068-801CE0CC 1C89A8 0064+00 1/1 0/0 0/0 .text            twoValueLineInterpolation__FUcUcf
@@ -366,9 +368,6 @@ void dMenu_FmapMap_c::setPointColor(f32 i_param) {
         }
     }
 }
-
-extern void* __vt__15dMenu_FmapMap_c[26];
-extern void* __vt__15renderingFmap_c[26];
 
 /* 801CEC24-801CED38 1C9564 0114+00 0/0 1/1 0/0 .text            __ct__15dMenu_FmapMap_cFv */
 dMenu_FmapMap_c::dMenu_FmapMap_c() {

@@ -1,7 +1,9 @@
 /**
- * @file d_a_e_tk.cpp
+* @file d_a_e_tk.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_tk.h"
 #include "d/actor/d_a_e_tk_ball.h"
@@ -645,7 +647,7 @@ static int daE_TK_Execute(e_tk_class* i_this) {
         i_this->attention_info.flags = 0;
     } else {
         fopAcM_OnStatus(i_this, 0);
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     }
 
     MTXCopy(model->getAnmMtx(2), *calc_mtx);
@@ -708,7 +710,7 @@ static dCcD_SrcSph cc_sph_src = {
 
 /* 807B9DB8-807BA0C4 001CB8 030C+00 1/0 0/0 0/0 .text            daE_TK_Create__FP10fopAc_ac_c */
 static int daE_TK_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_tk_class);
+    fopAcM_ct(i_this, e_tk_class);
     e_tk_class* const a_this = static_cast<e_tk_class*>(i_this);
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&a_this->mPhaseReq, "E_tk");
@@ -736,7 +738,7 @@ static int daE_TK_Create(fopAc_ac_c* i_this) {
             hioInit = true;
             l_HIO.field_0x04 = -1;
         }
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(a_this, a_this->mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -100.0f, -100.0f, -100.0f);

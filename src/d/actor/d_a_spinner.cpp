@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_spinner.h"
 #include "d/actor/d_a_tag_sppath.h"
 #include "dol2asm.h"
@@ -55,7 +57,7 @@ static dCcD_SrcCyl l_cylSrc = {
 
 /* 804D1A70-804D1D60 0001D0 02F0+00 1/1 0/0 0/0 .text            create__11daSpinner_cFv */
 int daSpinner_c::create() {
-    fopAcM_SetupActor(this, daSpinner_c);
+    fopAcM_ct(this, daSpinner_c);
 
     if (!fopAcM_entrySolidHeap(this, daSpinner_createHeap, 0x900)) {
         return cPhs_ERROR_e;
@@ -123,7 +125,7 @@ static int daSpinner_Delete(daSpinner_c* i_this) {
 /* 804D21E0-804D2278 000940 0098+00 2/2 0/0 0/0 .text            setRoomInfo__11daSpinner_cFv */
 void daSpinner_c::setRoomInfo() {
     int roomNo;
-    if (mAcch.GetGroundH() != -1000000000.0f) {
+    if (mAcch.GetGroundH() != -G_CM3D_F_INF) {
         roomNo = dComIfG_Bgsp().GetRoomId(mAcch.m_gnd);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mAcch.m_gnd);
     } else {
@@ -146,8 +148,6 @@ void daSpinner_c::setMatrix() {
     mBck.entry(mpModel->getModelData());
     mpModel->calc();
 }
-
-UNK_REL_BSS
 
 /* 804D2320-804D25F4 000A80 02D4+00 1/1 0/0 0/0 .text            setEffect__11daSpinner_cFv */
 void daSpinner_c::setEffect() {
@@ -985,4 +985,5 @@ extern actor_process_profile_definition g_profile_SPINNER = {
 
 AUDIO_INSTANCES
 struct JAUSectionHeap;
+template<>
 JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance; 

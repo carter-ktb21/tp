@@ -3,12 +3,14 @@
  * Object - Goron Adult Wall (Deleted)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_graWall.h"
 #include "d/d_procname.h"
 
 /* 80C10BF8-80C10D48 000078 0150+00 1/1 0/0 0/0 .text            Create__14daObjGraWall_cFv */
 int daObjGraWall_c::Create() {
-    fopAcM_SetupActor(this, daObjGraWall_c);
+    fopAcM_ct(this, daObjGraWall_c);
     field_0x6e0 = fopAcM_GetParam(this);
 
     if (field_0x6e0 != 0xff) {
@@ -16,7 +18,8 @@ int daObjGraWall_c::Create() {
             return cPhs_ERROR_e;
         }
     } else {
-        if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[62]) != 0) {
+            /* dSv_event_flag_c::M_029 - Death Mountain (room) - Win wrestle match against Gor Coron */
+        if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[62])) {
             return cPhs_ERROR_e;
         }
     }
@@ -33,7 +36,8 @@ int daObjGraWall_c::Execute() {
             return 1;
         }
     } else {
-        if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[62]) != 0) {
+            /* dSv_event_flag_c::M_029 - Death Mountain (room) - Win wrestle match against Gor Coron */
+        if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[62])) {
             fopAcM_delete(this);
             return 1;
         }

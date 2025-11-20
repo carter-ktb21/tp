@@ -3,6 +3,8 @@
  * Mirror Chamber Pedestal & Mirror
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_mirror_table.h"
 #include "d/actor/d_a_mirror.h"
 #include "d/d_com_inf_game.h"
@@ -23,41 +25,50 @@ static int createSolidHeap(fopAc_ac_c* i_this) {
     return static_cast<daObjMirrorTable_c*>(i_this)->createHeap();
 }
 
-/* 80C99938-80C99F34 000098 05FC+00 1/1 0/0 0/0 .text            createHeap__18daObjMirrorTable_cFv
- */
-// NONMATCHING error with mirror_res_id calculation
+/* 80C99938-80C99F34 000098 05FC+00 1/1 0/0 0/0 .text            createHeap__18daObjMirrorTable_cFv */
 int daObjMirrorTable_c::createHeap() {
-    J3DModelData* table_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 21);
-    mpTableModel = mDoExt_J3DModel__create(table_model_data, 0x80000, 0x11000084);
+    J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 21);
+    JUT_ASSERT(105, modelData != NULL);
+    mpTableModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpTableModel == NULL) {
         return 0;
     }
 
-    int mirror_res_id = dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354]) ? 13 : 14;
-    J3DModelData* mirror_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, mirror_res_id);
-    mpMirrorModel = mDoExt_J3DModel__create(mirror_model_data, 0, 0x11000084);
+    enum MIRROR_RES_ENUM {
+        TRUE_RES = 13,
+        FALSE_RES = 14,
+    };
+    /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
+    int mirror_res_id = dComIfGs_isEventBit(u16(dSv_event_flag_c::saveBitLabels[354])) ? TRUE_RES : FALSE_RES;
+    modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, mirror_res_id);
+    JUT_ASSERT(114, modelData != NULL);
+    mpMirrorModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpMirrorModel == NULL) {
         return 0;
     }
 
-    J3DAnmTransform* table_up_anm = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 10);
+    J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 10);
+    JUT_ASSERT(123, bck != NULL);
     mpTableUpBckAnm = new mDoExt_bckAnm();
     f32 rate = isSwitch() ? 1.0f : 0.0f;
-    if (mpTableUpBckAnm == NULL || !mpTableUpBckAnm->init(table_up_anm, 1, 0, rate, 0, -1, false)) {
+    if (mpTableUpBckAnm == NULL || !mpTableUpBckAnm->init(bck, 1, 0, rate, 0, -1, false)) {
         return 0;
     }
     if (isSwitch()) {
-        mpTableUpBckAnm->setFrame(table_up_anm->getFrameMax());
+        mpTableUpBckAnm->setFrame(bck->getFrameMax());
     }
 
-    cBgD_t* table_dzb = (cBgD_t*)dComIfG_getObjectRes(l_arcName, 34);
-    if (mBgW[0].Set(table_dzb, 1, &mMtx[0])) {
+    if (mBgW[0].Set((cBgD_t*)dComIfG_getObjectRes(l_arcName, 34), 1, &mMtx[0])) {
         return 0;
     }
 
-    int mirror_dzb_id = dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354]) ? 31 : 32;
-    cBgD_t* mirror_dzb = (cBgD_t*)dComIfG_getObjectRes(l_arcName, mirror_dzb_id);
-    if (mBgW[1].Set(mirror_dzb, 1, &mMtx[1])) {
+    enum MIRROR_DZB_ENUM {
+        TRUE_DZB = 31,
+        FALSE_DZB = 32,
+    };
+    /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
+    int mirror_dzb_id = dComIfGs_isEventBit(u16(dSv_event_flag_c::saveBitLabels[354])) ? TRUE_DZB : FALSE_DZB;
+    if (mBgW[1].Set((cBgD_t*)dComIfG_getObjectRes(l_arcName, mirror_dzb_id), 1, &mMtx[1])) {
         return 0;
     }
 
@@ -70,52 +81,60 @@ int daObjMirrorTable_c::createHeap() {
     mpMSquareBckAnm = NULL;
     mpLightBtkAnm = NULL;
 
-    if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354])) {
-        J3DModelData* stair_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 20);
-        mpStairModel = mDoExt_J3DModel__create(stair_model_data, 0x80000, 0x11000084);
+    /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
+    if (dComIfGs_isEventBit(u16(dSv_event_flag_c::saveBitLabels[354]))) {
+        modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 20);
+        JUT_ASSERT(153, modelData != NULL);
+        mpStairModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
 
-        J3DAnmTevRegKey* stair_anm = (J3DAnmTevRegKey*)dComIfG_getObjectRes(l_arcName, 25);
+        J3DAnmTevRegKey* brk = (J3DAnmTevRegKey*)dComIfG_getObjectRes(l_arcName, 25);
+        JUT_ASSERT(160, brk != NULL);
         mpStairBrkAnm = new mDoExt_brkAnm();
         if (mpStairBrkAnm == NULL ||
-            !mpStairBrkAnm->init(stair_model_data, stair_anm, 1, 0, 1.0f, 0, -1))
+            !mpStairBrkAnm->init(modelData, brk, 1, 0, 1.0f, 0, -1))
         {
             return 0;
         }
 
-        cBgD_t* stair_dzb = (cBgD_t*)dComIfG_getObjectRes(l_arcName, 33);
-        if (mBgW[2].Set(stair_dzb, 1, &mMtx[2])) {
+        if (mBgW[2].Set((cBgD_t*)dComIfG_getObjectRes(l_arcName, 33), 1, &mMtx[2])) {
             return 0;
         }
 
-        J3DModelData* panel_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 19);
-        mpPanelModel = mDoExt_J3DModel__create(panel_model_data, 0x80000, 0x11000084);
+        modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 19);
+        JUT_ASSERT(173, modelData != NULL);
+        mpPanelModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
 
-        J3DModelData* light_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 17);
-        mpLightModel = mDoExt_J3DModel__create(light_model_data, 0x80000, 0x11000284);
+        modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 17);
+        JUT_ASSERT(180, modelData != NULL);
+        mpLightModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
 
-        J3DAnmTextureSRTKey* light_anm = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 28);
+        J3DAnmTextureSRTKey* btk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 28);
+        JUT_ASSERT(187, btk != NULL);
         mpLightBtkAnm = new mDoExt_btkAnm();
         if (mpLightBtkAnm == NULL ||
-            !mpLightBtkAnm->init(light_model_data, light_anm, 1, 0, 1.0f, 0, -1))
+            !mpLightBtkAnm->init(modelData, btk, 1, 0, 1.0f, 0, -1))
         {
             return 0;
         }
 
-        J3DModelData* msquare_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 18);
-        mpMSquareModel = mDoExt_J3DModel__create(msquare_model_data, 0x80000, 0x11000084);
+        modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 18);
+        JUT_ASSERT(195, modelData != NULL);
+        mpMSquareModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
 
-        J3DAnmTevRegKey* msquare_tev_anm = (J3DAnmTevRegKey*)dComIfG_getObjectRes(l_arcName, 24);
+        brk = (J3DAnmTevRegKey*)dComIfG_getObjectRes(l_arcName, 24);
+        JUT_ASSERT(202, brk != NULL);
         mpMSquareBrkAnm = new mDoExt_brkAnm();
         if (mpMSquareBrkAnm == NULL ||
-            !mpMSquareBrkAnm->init(msquare_model_data, msquare_tev_anm, 1, 0, 1.0f, 0, -1))
+            !mpMSquareBrkAnm->init(modelData, brk, 1, 0, 1.0f, 0, -1))
         {
             return 0;
         }
 
-        J3DAnmTransform* msquare_anm = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 9);
+        bck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 9);
+        JUT_ASSERT(210, bck != NULL);
         mpMSquareBckAnm = new mDoExt_bckAnm();
         if (mpMSquareBckAnm == NULL ||
-            !mpMSquareBckAnm->init(msquare_anm, 1, 0, 1.0f, 0, -1, false))
+            !mpMSquareBckAnm->init(bck, 1, 0, 1.0f, 0, -1, false))
         {
             return 0;
         }
@@ -127,7 +146,9 @@ int daObjMirrorTable_c::createHeap() {
 /* 80C99F7C-80C9A040 0006DC 00C4+00 1/1 0/0 0/0 .text            isSwitch__18daObjMirrorTable_cFv */
 bool daObjMirrorTable_c::isSwitch() {
     return fopAcM_isSwitch(this, getSwitchNo())
+           /* dSv_event_flag_c::F_0361 - Arbiter's Grounds - Spun the spinning pillars */
         || dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[361])
+           /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
         || dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354])
         ? 1 : 0;
 }
@@ -306,6 +327,7 @@ int daObjMirrorTable_c::execute() {
         Z2GetAudioMgr()->seStartLevel(Z2SE_OBJ_MR_TBLE, &pos, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     }
 
+         /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
     if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354])) {
         if (!mBgW[0].ChkUsed() && mpTableUpBckAnm->getPlaySpeed() > 0.0f) {
             dComIfG_Bgsp().Regist(&mBgW[0], this);
@@ -381,7 +403,7 @@ static cPhs__Step daObjMirrorTable_Create(fopAc_ac_c* i_this) {
 
 /* 80C9AB30-80C9ABFC 001290 00CC+00 1/1 0/0 0/0 .text            create__18daObjMirrorTable_cFv */
 cPhs__Step daObjMirrorTable_c::create() {
-    fopAcM_SetupActor(this, daObjMirrorTable_c);
+    fopAcM_ct(this, daObjMirrorTable_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (step == cPhs_COMPLEATE_e) {
         if (!fopAcM_entrySolidHeap(this, createSolidHeap, 0xdb50)) {
@@ -395,6 +417,7 @@ cPhs__Step daObjMirrorTable_c::create() {
 /* 80C9ABFC-80C9AFD0 00135C 03D4+00 1/1 0/0 0/0 .text            create_init__18daObjMirrorTable_cFv
  */
 void daObjMirrorTable_c::create_init() {
+                                /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
     bool mirror_complete_flag = dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354]);
     mpTableUpBckAnm->setPlaySpeed(0.0f);
 
@@ -435,7 +458,9 @@ void daObjMirrorTable_c::create_init() {
 
     field_0x874 = false;
 
+         /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
     if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354])
+           /* dSv_event_flag_c::F_0361 - Arbiter's Grounds - Spun the spinning pillars */
         && dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[361]))
     {
         cXyz pos(1760.0f, 4714.3f, -20624.0f);

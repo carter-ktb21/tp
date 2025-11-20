@@ -3,34 +3,19 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_insect.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
+#include "f_op/f_op_camera_mng.h"
 #include "m_Do/m_Do_lib.h"
 #include "dol2asm.h"
-
-#if VERSION == VERSION_GCN_USA
-// This is a HACK to get d_insect data at correct address due to
-// issues with the d_a_obj_item vtable. TODO: fix daItem_c vtable
-#pragma push
-#pragma force_active on
-SECTION_DATA extern void* __vt__8daItem_c__HACK[] = {
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-};
-#pragma pop
-#endif
 
 /* 8015E010-8015E078 158950 0068+00 0/0 0/0 13/13 .text            __ct__9dInsect_cFv */
 dInsect_c::dInsect_c() {
     m_itemId = -1;
-    field_0x56C = 0;
+    field_0x56c = 0;
     mDraw = true;
     m_mode = 0;
     m_itemNo = fpcNm_ITEM_M_MAYFLY;
@@ -44,7 +29,7 @@ void dInsect_c::Insect_GetDemoMain() {
     switch (m_mode) {
     case 0:
         if (fopAcM_checkCarryNow(this)) {
-            cLib_offBit<u32>(attention_info.flags, 0x10);
+            cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
             fopAcM_cancelCarryNow(this);
             fopAcM_orderItemEvent(this, 0, 0);
             eventInfo.onCondition(dEvtCnd_CANGETITEM_e);
@@ -57,7 +42,7 @@ void dInsect_c::Insect_GetDemoMain() {
                 field_0x585 = 1;
             }
         } else {
-            cLib_onBit<u32>(attention_info.flags, 0x10);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         }
         break;
     case 1:
@@ -110,8 +95,8 @@ void dInsect_c::CalcZBuffer(f32 param_0) {
         camera_trim_height = 0.0f;
     }
 
-    if (pos_projected.x > 0.0f && pos_projected.x < 608.0f &&
-        pos_projected.y > camera_trim_height && pos_projected.y < 448.0f - camera_trim_height)
+    if (pos_projected.x > 0.0f && pos_projected.x < FB_WIDTH &&
+        pos_projected.y > camera_trim_height && pos_projected.y < FB_HEIGHT - camera_trim_height)
     {
         dComIfGd_peekZ(pos_projected.x, pos_projected.y, &field_0x578);
     } else {
@@ -127,7 +112,7 @@ void dInsect_c::CalcZBuffer(f32 param_0) {
         pos_projected.z = -10.0f;
     }
 
-    field_0x57C =
+    field_0x57c =
         (((view_near + ((view_far * view_near) / pos_projected.z)) / (view_far - view_near)) +
          1.0f) *
         16777215.0f;

@@ -1,7 +1,9 @@
 #ifndef DYNAMICLINK_H
 #define DYNAMICLINK_H
 
-#include "dolphin/os.h"
+#include <dolphin/os.h>
+#include "JSystem/JKernel/JKRHeap.h"
+#include "global.h"
 
 class JKRArchive;
 class JKRFileCache;
@@ -23,6 +25,8 @@ struct DynamicModuleControlBase {
     virtual void dump();
 #endif
     /* 80262470 */ static void dump();
+    static void dump(char*);
+
     /* 802631FC */ virtual void dump2() {};
     /* 802631DC */ virtual bool do_load() {return true;};
     /* 802631F4 */ virtual BOOL do_load_async() {return true;};
@@ -34,13 +38,29 @@ struct DynamicModuleControlBase {
     /* 80262364 */ BOOL unlink();
     /* 802623EC */ BOOL load_async();
     /* 8026242C */ bool force_unlink();
+    static JKRHeap* createHeap(u32, JKRHeap*);
 
     static inline DynamicModuleControlBase* getFirstClass() { return mFirst; }
     inline DynamicModuleControlBase* getNextClass() { return mNext; }
     bool isLinked() const { return mLinkCount != 0; }
 
+    #if DEBUG
+    static void resetDoLinkCount() {} // TODO
+    static void dumpTag() {} // TODO
+    #endif
+
     static DynamicModuleControlBase* mFirst;
     static DynamicModuleControlBase* mLast;
+
+    #if DEBUG
+    static u8 verbose;
+    #endif
+
+    #if PLATFORM_WII || PLATFORM_SHIELD
+    static JKRHeap* getHeap() { return m_heap; }
+
+    static JKRHeap* m_heap;
+    #endif
 };
 
 struct DynamicModuleControl : DynamicModuleControlBase {

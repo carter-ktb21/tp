@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_swBall.h"
 #include "d/actor/d_a_obj_carry.h"
 #include "d/d_com_inf_game.h"
@@ -131,7 +133,7 @@ int daSwBall_c::Create() {
 
 /* 80D4E42C-80D4E494 0004CC 0068+00 1/1 0/0 0/0 .text            create__10daSwBall_cFv */
 int daSwBall_c::create() {
-    fopAcM_SetupActor(this, daSwBall_c);
+    fopAcM_ct(this, daSwBall_c);
 
     if (!Create()) {
         return cPhs_ERROR_e;
@@ -139,8 +141,6 @@ int daSwBall_c::create() {
 
     return cPhs_COMPLEATE_e;
 }
-
-UNK_REL_DATA
 
 /* 80D4E494-80D4E524 000534 0090+00 2/2 0/0 0/0 .text            execute__10daSwBall_cFv */
 int daSwBall_c::execute() {

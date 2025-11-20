@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_vrbox.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "f_op/f_op_actor_mng.h"
@@ -134,7 +136,7 @@ static int daVrbox_solidHeapCB(fopAc_ac_c* i_this) {
 
 /* 804988DC-80498988 00043C 00AC+00 1/0 0/0 0/0 .text            daVrbox_Create__FP10fopAc_ac_c */
 static int daVrbox_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, vrbox_class);
+    fopAcM_ct(i_this, vrbox_class);
     vrbox_class* this_ = (vrbox_class*)i_this;
 
     this_->field_0x574 = 0;

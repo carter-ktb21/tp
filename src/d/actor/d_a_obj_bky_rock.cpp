@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_bky_rock.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_bg_w.h"
@@ -14,24 +16,6 @@
 static int daBkyRock_c_createHeap(fopAc_ac_c* i_this) {
     return static_cast<daBkyRock_c*>(i_this)->createHeap();
 }
-
-/* 80BB801C-80BB8028 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BB8028-80BB803C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
 
 /* 80BB803C-80BB8040 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "BYRock";
@@ -57,7 +41,7 @@ daBkyRock_c::~daBkyRock_c() {
 
 /* 80BB6C4C-80BB6D60 00048C 0114+00 1/1 0/0 0/0 .text            create__11daBkyRock_cFv */
 int daBkyRock_c::create() {
-    fopAcM_SetupActor(this, daBkyRock_c);
+    fopAcM_ct(this, daBkyRock_c);
     u8 swBit0 = getSwBit0();
     if (fopAcM_isSwitch(this, swBit0)) {
         return cPhs_ERROR_e;
@@ -182,7 +166,7 @@ int daBkyRock_c::createHeap() {
     for (int i = 0; i < 3; i++) {
         J3DModelData* a_model_data_p =
             (J3DModelData*)dComIfG_getObjectRes(l_arcName, BMD_IDX[nameNo][i]);
-        JUT_ASSERT(481, a_model_data_p != 0);
+        JUT_ASSERT(481, a_model_data_p != NULL);
         mModels[i] = mDoExt_J3DModel__create(a_model_data_p, 0x80000, 0x11000084);
         if (mModels[i] == NULL) {
             return 0;
@@ -457,7 +441,7 @@ void daBkyRock_c::callBombEmt(int particleNum, u16 const* particleIds) {
 /* 80BB7D50-80BB7DA4 001590 0054+00 1/0 0/0 0/0 .text            daBkyRock_create__FP11daBkyRock_c
  */
 static int daBkyRock_create(daBkyRock_c* i_this) {
-    fopAcM_SetupActor(i_this, daBkyRock_c);
+    fopAcM_ct(i_this, daBkyRock_c);
     return i_this->create();
 }
 

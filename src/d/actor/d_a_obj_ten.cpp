@@ -3,11 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ten.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
-#include "f_op//f_op_actor_mng.h"
+#include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "d/d_cc_d.h"
 #include "SSystem/SComponent/c_lib.h"
 #include "m_Do/m_Do_lib.h"
@@ -60,7 +63,7 @@ void daObjTEN_c::SetCcSph() {
 static int useHeapInit(fopAc_ac_c* actor) {
     daObjTEN_c* i_this = static_cast<daObjTEN_c*>(actor);
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("I_Ten", 10);
-    JUT_ASSERT(246, modelData != 0);
+    JUT_ASSERT(246, modelData != NULL);
     i_this->mMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, NULL, 2, 1.0f, 0, -1,
                                          &i_this->mCreature, 0, 0x11000284);
     if (i_this->mMorf == NULL || i_this->mMorf->getModel() == NULL) {
@@ -453,7 +456,7 @@ void daObjTEN_c::checkGroundPos() {
 
 /* 80D0A13C-80D0A154 001A5C 0018+00 1/0 0/0 0/0 .text            Insect_Release__10daObjTEN_cFv */
 void daObjTEN_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     field_0x624 = 2;
     mAction = ACTION_MOVE;
 }
@@ -621,8 +624,8 @@ void daObjTEN_c::Z_BufferChk() {
     } else {
         trimHeight = 0.0f;
     }
-    if (local_5c.x > 0.0f && local_5c.x < 608.0f && local_5c.y > trimHeight &&
-        local_5c.y < 448.0f - trimHeight)
+    if (local_5c.x > 0.0f && local_5c.x < FB_WIDTH && local_5c.y > trimHeight &&
+        local_5c.y < FB_HEIGHT - trimHeight)
     {
         dComIfGd_peekZ(local_5c.x, local_5c.y, &field_0x61c);
     }
@@ -686,7 +689,10 @@ static int daObjTEN_Execute(daObjTEN_c* i_this) {
 
 /* ############################################################################################## */
 /* 80D0B9D0-80D0B9D4 0000E0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = { 0x19F, 0x1A0};
+static u16 const l_musiya_num[2] = {
+    0x19F, /* dSv_event_flag_c::F_0415 - Misc. - Ladybug (M) */
+    0x1A0, /* dSv_event_flag_c::F_0416 - Misc. - Ladybug (F) */
+};
 
 /* 80D0AD9C-80D0AF48 0026BC 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjTEN_cFv */
 bool daObjTEN_c::CreateChk() {
@@ -724,14 +730,14 @@ static daObj_TenHIO_c l_HIO;
 
 /* 80D0AF48-80D0B740 002868 07F8+00 1/1 0/0 0/0 .text            create__10daObjTEN_cFv */
 int daObjTEN_c::create() {
-    fopAcM_SetupActor(this, daObjTEN_c);
+    fopAcM_ct(this, daObjTEN_c);
     int rv = dComIfG_resLoad(&mPhase, "I_Ten");
     if (rv == cPhs_COMPLEATE_e) {
         field_0x624 = fopAcM_GetParam(this) & 0xf;
         if (field_0x624 == 2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
-            fopAcM_OnStatus(this, fopAcM_STATUS_UNK_004000);
+            fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x4000);
         } else {
             mDraw = true;
         }

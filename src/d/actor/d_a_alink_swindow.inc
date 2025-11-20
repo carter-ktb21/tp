@@ -278,7 +278,7 @@ void daAlink_c::initStatusWindow() {
 
     J3DAnmTransform* bck = (J3DAnmTransform*)J3DAnmLoaderDataBase::load(tmpBuffer, J3DLOADER_UNK_FLAG0);
     if (!m_sWindowBck->init(bck, 1, 2, 1.0f, 0, -1, false)) {
-        JUT_ASSERT(0x1B1, 0);
+        JUT_ASSERT(433, FALSE);
     }
 
     tmpBuffer = new (0x20) void*[0x100];
@@ -330,11 +330,10 @@ void daAlink_c::statusWindowExecute(const cXyz* i_pos, s16 i_angle) {
     }
 }
 
-/* 804531E8-804531F0 0017E8 0008+00 1/1 0/0 0/0 .sdata2          waterColor$53845 */
-static const GXColorS10 waterColor = {0, 0, 0, 0};
-
 /* 80140984-80140AC8 13B2C4 0144+00 0/0 1/1 0/0 .text            statusWindowDraw__9daAlink_cFv */
 void daAlink_c::statusWindowDraw() {
+    static const GXColorS10 waterColor = {0, 0, 0, 0};
+
     if (mClothesChangeWaitTimer == 0) {
         g_env_light.settingTevStruct(12, &current.pos, &tevStr);
         initTevCustomColor();

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_wara_howl.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -16,7 +18,7 @@ daTagWrHowl_c::~daTagWrHowl_c() {}
 
 /* 80D63FD4-80D6402C 000114 0058+00 1/1 0/0 0/0 .text            create__13daTagWrHowl_cFv */
 int daTagWrHowl_c::create() {
-    fopAcM_SetupActor(this, daTagWrHowl_c);
+    fopAcM_ct(this, daTagWrHowl_c);
     init();
     return cPhs_COMPLEATE_e;
 }
@@ -36,7 +38,7 @@ int daTagWrHowl_c::execute() {
     attention_info.flags = 0;
 
     if (chkWlfInTag()) {
-        attention_info.flags |= 0x80;
+        attention_info.flags |= fopAc_AttnFlag_ETC_e;
         attention_info.distances[fopAc_attn_ETC_e] = 65;
     }
 
@@ -67,7 +69,7 @@ bool daTagWrHowl_c::chkWlfInTag() {
 
 /* 80D64144-80D64198 000284 0054+00 1/0 0/0 0/0 .text daTagWrHowl_create__FP13daTagWrHowl_c */
 static int daTagWrHowl_create(daTagWrHowl_c* i_this) {
-    fopAcM_SetupActor(i_this, daTagWrHowl_c);
+    fopAcM_ct(i_this, daTagWrHowl_c);
     return i_this->create();
 }
 

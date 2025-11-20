@@ -31,7 +31,7 @@ BOOL daAlink_c::checkSpecialNpc(fopAc_ac_c* i_actor) {
 
 /* 800DC5DC-800DC678 0D6F1C 009C+00 1/1 0/0 0/0 .text checkShieldAttackEmphasys__9daAlink_cFv */
 BOOL daAlink_c::checkShieldAttackEmphasys() {
-    return mTargetedActor != NULL && (mTargetedActor->attention_info.flags & 0x200000) &&
+    return mTargetedActor != NULL && (mTargetedActor->attention_info.flags & fopAc_AttnFlag_UNK_0x200000) &&
            !checkCutHeadState() &&
            (fopAcM_GetGroup(mTargetedActor) != fopAc_ENEMY_e ||
             !static_cast<fopEn_enemy_c*>(mTargetedActor)->checkDownFlg());
@@ -280,7 +280,7 @@ int daAlink_c::procGuardSlipInit(int param_0, dCcD_GObjInf* param_1) {
         mProcVar2.field_0x300c = 0;
         mProcVar3.field_0x300e = 0;
     } else {
-        const daAlinkHIO_guard_c1* var_r27 = &daAlinkHIO_guard_c0::m;
+        const daAlinkHIO_anm_c* var_r27 = &daAlinkHIO_guard_c0::m.mGuardHitAnm;
         daAlink_ANM var_r28;
         if (field_0x2f98 == 2) {
             var_r28 = ANM_GUARD_LEFT;
@@ -288,7 +288,7 @@ int daAlink_c::procGuardSlipInit(int param_0, dCcD_GObjInf* param_1) {
             var_r28 = ANM_GUARD_RIGHT;
         }
 
-        setSingleAnimeParam(var_r28, &var_r27->mGuardHitAnm);
+        setSingleAnimeParam(var_r28, var_r27);
         setUpperGuardAnime(-1.0f);
 
         mProcVar2.field_0x300c = (current.angle.y + 0x8000) - shape_angle.y;
@@ -311,7 +311,7 @@ int daAlink_c::procGuardSlipInit(int param_0, dCcD_GObjInf* param_1) {
     mProcVar4.field_0x3010 = 0;
     mProcVar5.field_0x3012 = 0;
 
-    if (param_1 != NULL && param_1->GetTgHitAc() != NULL && fopAcM_GetName(param_1->GetTgHitAc()) == PROC_E_MM_MT && param_1->GetTgHitAc()->subtype == 1) {
+    if (param_1 != NULL && param_1->GetTgHitAc() != NULL && fopAcM_GetName(param_1->GetTgHitAc()) == PROC_E_MM_MT && param_1->GetTgHitAc()->argument == 1) {
         if (checkBootsOrArmorHeavy()) {
             mNormalSpeed = daAlinkHIO_guard_c0::m.mMagneHvyGuardSpeed;
             mProcVar5.field_0x3012 = 1;
@@ -478,7 +478,7 @@ int daAlink_c::procGuardAttack() {
 
     if (checkAnmEnd(temp_r30)) {
         if (mDemo.getDemoMode() == 0x4B) {
-            dComIfGp_evmng_cutEnd(field_0x3184);
+            dComIfGp_evmng_cutEnd(mAlinkStaffId);
         } else {
             checkNextAction(0);
         }

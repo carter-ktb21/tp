@@ -3,7 +3,7 @@
  * File Select Screen File Info
  */
 
-#define NO_INLINE_DLSTBASE_DRAW
+#include "d/dolzel.h" // IWYU pragma: keep
 
 #include "d/d_file_sel_info.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
@@ -12,26 +12,6 @@
 #include "d/d_meter2_info.h"
 #include "d/d_pane_class_alpha.h"
 #include "stdio.h"
-
-// Need 0xC bytes of padding with no symbol between dFile_info_c::__vtable and the end of .data
-// This is likely caused by the vtable of an abstract base class getting put there and then stripped out.
-// Not sure which abstract base class could go there though, so we simulate it with some dummy classes for now.
-class dummy_abstract_class {
-public:
-    virtual void virt_func_0() = 0;
-};
-class dummy_child_class : dummy_abstract_class {
-    virtual void virt_func_0();
-};
-static dummy_child_class dummy() {
-    dummy_child_class temp;
-    return temp;
-}
-
-/* 803BB498-803BB4A8 0185B8 000C+04 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 /* 80192434-801924A0 18CD74 006C+00 0/0 3/3 0/0 .text __ct__12dFile_info_cFP10JKRArchiveUc */
 dFile_info_c::dFile_info_c(JKRArchive* i_archive, u8 param_1) {
@@ -54,7 +34,7 @@ dFile_info_c::~dFile_info_c() {
 /* 80192570-80192954 18CEB0 03E4+00 1/1 0/0 0/0 .text            screenSet__12dFile_info_cFv */
 void dFile_info_c::screenSet() {
     mFileInfo.Scr = new J2DScreen();
-    JUT_ASSERT(0, mFileInfo.Scr != 0);
+    JUT_ASSERT(0, mFileInfo.Scr != NULL);
 
     mFileInfo.Scr->setPriority("zelda_file_select_info_text.blo", 0x1100000, mArchive);
     mFileInfo.mFont = mDoExt_getMesgFont();
@@ -197,7 +177,15 @@ void dFile_info_c::setSaveDate(dSv_save_c* i_savedata) {
     #if (VERSION == VERSION_GCN_JPN) || (VERSION == VERSION_WII_JPN)
     sprintf(mSaveDate, "%d.%02d.%02d %02d:%02d", time.year, time.mon + 1, time.mday,
             time.hour, time.min);
-    #else
+    #elif VERSION == VERSION_GCN_PAL
+    if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_ENGLISH) {
+        sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mon + 1, time.mday, time.year, time.hour,
+                time.min);
+    } else {
+        sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mday, time.mon + 1, time.year, time.hour,
+                time.min);
+    }
+#else
     sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mon + 1, time.mday, time.year,
             time.hour, time.min);
     #endif

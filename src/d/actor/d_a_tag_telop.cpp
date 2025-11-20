@@ -3,13 +3,15 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_telop.h"
 #include "f_op/f_op_actor_mng.h"
 #include "f_op/f_op_msg_mng.h"
 
 /* 80490A58-80490AF8 000078 00A0+00 1/1 0/0 0/0 .text            create__13daTag_Telop_cFv */
 int daTag_Telop_c::create() {
-    fopAcM_SetupActor(this, daTag_Telop_c);
+    fopAcM_ct(this, daTag_Telop_c);
 
     mMessageNo = getMessageNo();
 

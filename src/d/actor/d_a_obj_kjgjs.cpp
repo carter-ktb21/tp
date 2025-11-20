@@ -3,6 +3,8 @@
  * Object - Kjgjs
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kjgjs.h"
 #include "d/d_bg_w.h"
 #include "d/d_procname.h"
@@ -95,7 +97,7 @@ int daObjKJgjs_c::Delete() {
 
 /* 80C46400-80C46460 0003E0 0060+00 1/0 0/0 0/0 .text daObjKJgjs_create1st__FP12daObjKJgjs_c */
 static int daObjKJgjs_create1st(daObjKJgjs_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjKJgjs_c);
+    fopAcM_ct(i_this, daObjKJgjs_c);
     return i_this->create1st();
 }
 

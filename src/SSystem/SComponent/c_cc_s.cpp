@@ -6,9 +6,7 @@
 #include "SSystem/SComponent/c_cc_s.h"
 #include "JSystem/JUtility/JUTAssert.h"
 
-#define CHECK_FLOAT_CLASS(line, x)                                                                 \
-    JUT_ASSERT(line, !(((sizeof(x) == sizeof(float)) ? __fpclassifyf((float)(x)) :                 \
-                                                       __fpclassifyd((double)(x))) == 1));
+#define CHECK_FLOAT_CLASS(line, x) JUT_ASSERT(line, !isnan(x));
 #define CHECK_FLOAT_RANGE(line, x) JUT_ASSERT(line, -1.0e32f < x && x < 1.0e32f);
 
 /* 80264A6C-80264A94 25F3AC 0028+00 0/0 1/1 0/0 .text            __ct__4cCcSFv */
@@ -16,22 +14,22 @@ cCcS::cCcS() {}
 
 /* 80264A94-80264B60 25F3D4 00CC+00 1/1 1/1 0/0 .text            Ct__4cCcSFv */
 void cCcS::Ct() {
-    for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + ARRAY_SIZE(mpObjAt); ++obj) {
+    for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + ARRAY_SIZEU(mpObjAt); ++obj) {
         *obj = NULL;
     }
     mObjAtCount = 0;
 
-    for (cCcD_Obj** obj = mpObjTg; obj < mpObjTg + ARRAY_SIZE(mpObjTg); ++obj) {
+    for (cCcD_Obj** obj = mpObjTg; obj < mpObjTg + ARRAY_SIZEU(mpObjTg); ++obj) {
         *obj = NULL;
     }
     mObjTgCount = 0;
 
-    for (cCcD_Obj** obj = mpObjCo; obj < mpObjCo + ARRAY_SIZE(mpObjCo); ++obj) {
+    for (cCcD_Obj** obj = mpObjCo; obj < mpObjCo + ARRAY_SIZEU(mpObjCo); ++obj) {
         *obj = NULL;
     }
     mObjCoCount = 0;
 
-    for (cCcD_Obj** obj = mpObj; obj < mpObj + ARRAY_SIZE(mpObj); ++obj) {
+    for (cCcD_Obj** obj = mpObj; obj < mpObj + ARRAY_SIZEU(mpObj); ++obj) {
         *obj = NULL;
     }
     mObjCount = 0;
@@ -56,9 +54,9 @@ WeightType cCcS::GetWt(u8 param_0) const {
 /* 80264BA8-80264C5C 25F4E8 00B4+00 0/0 7/7 454/454 .text            Set__4cCcSFP8cCcD_Obj */
 void cCcS::Set(cCcD_Obj* obj) {
     if (obj->ChkAtSet()) {
-        if (mObjAtCount >= ARRAY_SIZE(mpObjAt)) {
+        if (mObjAtCount >= ARRAY_SIZEU(mpObjAt)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set AT Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjAt));
+            OS_REPORT("cCcS::Set AT Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjAt));
             OS_REPORT("\x1b[m");
         } else {
             mpObjAt[mObjAtCount] = obj;
@@ -67,9 +65,9 @@ void cCcS::Set(cCcD_Obj* obj) {
     }
 
     if (obj->ChkTgSet()) {
-        if (mObjTgCount >= ARRAY_SIZE(mpObjTg)) {
+        if (mObjTgCount >= ARRAY_SIZEU(mpObjTg)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set TG Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjTg));
+            OS_REPORT("cCcS::Set TG Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjTg));
             OS_REPORT("\x1b[m");
         } else {
             mpObjTg[mObjTgCount] = obj;
@@ -78,9 +76,9 @@ void cCcS::Set(cCcD_Obj* obj) {
     }
 
     if (obj->ChkCoSet()) {
-        if (mObjCoCount >= ARRAY_SIZE(mpObjCo)) {
+        if (mObjCoCount >= ARRAY_SIZEU(mpObjCo)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set CO Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjCo));
+            OS_REPORT("cCcS::Set CO Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjCo));
             OS_REPORT("\x1b[m");
         } else {
             mpObjCo[mObjCoCount] = obj;
@@ -88,9 +86,9 @@ void cCcS::Set(cCcD_Obj* obj) {
         }
     }
 
-    if (mObjCount >= ARRAY_SIZE(mpObj)) {
+    if (mObjCount >= ARRAY_SIZEU(mpObj)) {
         OS_REPORT("\x1b[43;30m");
-        OS_REPORT("cCcS::Set SET Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObj));
+        OS_REPORT("cCcS::Set SET Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObj));
         OS_REPORT("\x1b[m");
     } else {
         mpObj[mObjCount] = obj;
@@ -165,7 +163,7 @@ void cCcS::ChkAtTg() {
             continue;
 
         cCcD_ShapeAttr* pat_sa = (*pat_obj)->GetShapeAttr();
-        JUT_ASSERT(0, pat_sa != 0);
+        JUT_ASSERT(0, pat_sa != NULL);
 
         for (cCcD_Obj** ptg_obj = mpObjTg; ptg_obj < objTgEnd; ++ptg_obj) {
             if (*ptg_obj == NULL || !(*ptg_obj)->ChkTgSet())
@@ -176,7 +174,7 @@ void cCcS::ChkAtTg() {
                 continue;
 
             cCcD_ShapeAttr* ptg_sa = (*ptg_obj)->GetShapeAttr();
-            JUT_ASSERT(0, ptg_sa != 0);
+            JUT_ASSERT(0, ptg_sa != NULL);
 
             static cXyz cross;
             bool didCross = pat_sa->CrossAtTg(*ptg_sa, &cross);
@@ -225,7 +223,7 @@ void cCcS::ChkCo() {
             continue;
 
         cCcD_ShapeAttr* pco1_sa = (*pco1_obj)->GetShapeAttr();
-        JUT_ASSERT(0, pco1_sa != 0);
+        JUT_ASSERT(0, pco1_sa != NULL);
 
         for (cCcD_Obj** pco2_obj = pco1_obj + 1; pco2_obj < objCoEnd; ++pco2_obj) {
             if (*pco2_obj == NULL || !(*pco2_obj)->ChkCoSet())
@@ -236,7 +234,7 @@ void cCcS::ChkCo() {
                 continue;
 
             cCcD_ShapeAttr* pco2_sa = (*pco2_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pco2_sa != 0);
+            JUT_ASSERT(0, pco2_sa != NULL);
 
             f32 cross_len;
             if (pco1_sa->CrossCo(*pco2_sa, &cross_len)) {
@@ -456,7 +454,7 @@ void cCcS::CalcArea() {
     for (cCcD_Obj** pset_obj = mpObj; pset_obj < mpObj + mObjCount; ++pset_obj) {
         if (*pset_obj != NULL) {
             cCcD_ShapeAttr* pset_sa = (*pset_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pset_sa != 0);
+            JUT_ASSERT(0, pset_sa != NULL);
 
             pset_sa->CalcAabBox();
             aab.SetMinMax(pset_sa->GetWorkAab());
@@ -467,7 +465,7 @@ void cCcS::CalcArea() {
     for (cCcD_Obj** pset_obj = mpObj; pset_obj < mpObj + mObjCount; ++pset_obj) {
         if (*pset_obj != NULL) {
             const cCcD_ShapeAttr* pset_sa = (*pset_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pset_sa != 0);
+            JUT_ASSERT(0, pset_sa != NULL);
 
             cCcD_DivideInfo* divideInfo = &(*pset_obj)->GetDivideInfo();
             mDivideArea.CalcDivideInfo(divideInfo, pset_sa->GetWorkAab(),

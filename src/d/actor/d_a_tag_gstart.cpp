@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_gstart.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
@@ -10,7 +12,7 @@
 
 /* 805A3478-805A34F4 000078 007C+00 1/1 0/0 0/0 .text            create__13daTagGstart_cFv */
 int daTagGstart_c::create() {
-    fopAcM_SetupActor(this, daTagGstart_c);
+    fopAcM_ct(this, daTagGstart_c);
 
     mSwNo = fopAcM_GetParam(this);
     mSwNo2 = fopAcM_GetParam(this) >> 8;

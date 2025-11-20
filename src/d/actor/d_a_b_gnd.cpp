@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_gnd.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_alink.h"
@@ -14,6 +16,21 @@
 #include "d/actor/d_a_mg_rod.h"
 
 #include "Z2AudioLib/Z2Instances.h"
+
+class daB_GND_HIO_c : public JORReflexible {
+public:
+    /* 805F4A4C */ daB_GND_HIO_c();
+    /* 80602230 */ virtual ~daB_GND_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 field_0xc;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+};
 
 enum B_GND_RES_FILE_ID { // IDs and indexes are synced
     /* BCK */
@@ -175,9 +192,6 @@ enum daB_GND_ACTION {
     ACTION_DOWN = 21,
     ACTION_END = 22,
 };
-
-UNK_REL_DATA;
-UNK_REL_BSS;
 
 static u8 l_initHIO;
 
@@ -659,13 +673,12 @@ static void b_gnd_h_wait2(b_gnd_class* i_this) {
 static cXyz b_path[8];
 
 /* 805F6290-805F6FA4 001930 0D14+00 2/1 0/0 0/0 .text            b_gnd_h_run_a__FP11b_gnd_class */
-// NONMATCHING - regswap, equivalent
 static void b_gnd_h_run_a(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    cXyz sp8C;
-    cXyz sp80;
+    cXyz sp8C, sp80;
 
+    f32 var_f30;
     f32 player_distxz = i_this->mPlayerDistXZ;
     f32 speed_target = 0.0f;
     f32 speed_step = 1.0f;
@@ -686,8 +699,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
     s8 sp8 = false;
     s16 spE = 0x80;
-    cXyz sp74;
-    cXyz sp68;
+    cXyz sp74, sp68;
 
     switch (i_this->mMoveMode) {
     case 0:
@@ -836,7 +848,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
     if (i_this->mMoveMode < 20) {
         sp8C = b_path[i_this->field_0xc60] - a_this->current.pos;
 
-        f32 var_f30 = JMAFastSqrt(sp8C.x * sp8C.x + sp8C.z * sp8C.z);
+        var_f30 = JMAFastSqrt(sp8C.x * sp8C.x + sp8C.z * sp8C.z);
         if (var_f30 < 800.0f) {
             sp8C = b_path[(i_this->field_0xc60 + 1) & 7] - a_this->current.pos;
 
@@ -855,14 +867,11 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
         i_this->field_0x5cc = cM_atan2s(sp8C.x, sp8C.z);
         if (i_this->field_0x1e0a >= 1 && i_this->mMoveMode <= 2) {
-            speed_target = (var_f30 - 800.0f) * 2.0f;
-            var_f30 = 7000.0f;
-            if (speed_target > 7000.0f) {
-                speed_target = 7000.0f;
-            } else {
-                if (speed_target < 0.0f) {
-                    speed_target = 0.0f;
-                }
+            var_f30 = (var_f30 - 800.0f) * (AREG_F(8) + 2.0f);
+            if (var_f30 > 7000.0f) {
+                var_f30 = 7000.0f;
+            } else if (var_f30 < 0.0f) {
+                var_f30 = 0.0f;
             }
 
             i_this->field_0xc90 = i_this->field_0xc90 + i_this->field_0xc92;
@@ -870,7 +879,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
                 i_this->field_0xc92 = cM_rndF(600.0f) + 300.0f;
             }
 
-            i_this->field_0x5cc += (s16)(speed_target * cM_ssin(i_this->field_0xc90));
+            i_this->field_0x5cc += (s16)(var_f30 * cM_ssin(i_this->field_0xc90));
         }
 
         if (i_this->field_0xc72 != 0) {
@@ -900,7 +909,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
                 speed_target = l_HIO.field_0xc;
             }
 
-            if (fopAcM_searchPlayerDistanceXZ(a_this) < 2000.0f) {
+            if (fopAcM_searchPlayerDistanceXZ(a_this) < KREG_F(0) + 2000.0f) {
                 speed_target *= 1.2f;
             }
 
@@ -927,7 +936,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
     cLib_addCalc2(&a_this->speedF, speed_target, 1.0f, speed_step);
     if (speed_target > 10.0f) {
-        sp12 = (a_this->current.angle.y - sp12) * -8;
+        sp12 = (AREG_S(7) + -8) * (a_this->current.angle.y - sp12);
         if (sp12 > 2000) {
             sp12 = 2000;
         } else if (sp12 < -2000) {
@@ -938,8 +947,8 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
     }
 
     if (i_this->mAnmID == B_GND_BCK_EGND_RRUN) {
-        i_this->mpModelMorf->setPlaySpeed(i_this->mPlaySpeed);
-        i_this->mpHorseMorf->setPlaySpeed(i_this->mPlaySpeed);
+        i_this->mpModelMorf->setPlaySpeed(i_this->mPlaySpeed * (JREG_F(11) + 1.0f));
+        i_this->mpHorseMorf->setPlaySpeed(i_this->mPlaySpeed * (JREG_F(11) + 1.0f));
     }
 
     cLib_addCalc2(&i_this->mPlaySpeed, anm_speed_target, 1.0f, 0.1f);
@@ -1246,7 +1255,7 @@ static void b_gnd_g_wait(b_gnd_class* i_this) {
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
     dmg_rod_class* mgrod_p = (dmg_rod_class*)fopAcM_SearchByName(PROC_MG_ROD);
 
-    if (mgrod_p != NULL && mgrod_p->field_0xf7e != 0) {
+    if (mgrod_p != NULL && mgrod_p->action != 0) {
         if (i_this->mMoveMode < 5 && i_this->mPlayerDistXZ < 600.0f) {
             i_this->mMoveMode = 5;
             i_this->field_0xc44[0] = 10;
@@ -1332,7 +1341,7 @@ static void b_gnd_g_wait(b_gnd_class* i_this) {
         }
 
         i_this->field_0xc7d = 2;
-        i_this->field_0xc80 = mgrod_p->mHookPosition;
+        i_this->field_0xc80 = mgrod_p->hook_pos;
         break;
     case 6:
         angle_step = 0;
@@ -2552,7 +2561,7 @@ static void action(b_gnd_class* i_this) {
 #ifdef DEBUG
     if (mDoCPd_c::getTrigR(PAD_2)) {
         dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-        kankyo->field_0x12cc = 1;
+        kankyo->wether = 1;
 
         i_this->mActionMode = ACTION_WAIT;
         i_this->mMoveMode = 0;
@@ -2596,7 +2605,7 @@ static void action(b_gnd_class* i_this) {
 
     if (attn_on) {
         fopAcM_OnStatus(i_this, 0);
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(i_this, 0);
         i_this->attention_info.flags = 0;
@@ -3262,9 +3271,10 @@ static void demo_camera(b_gnd_class* i_this) {
         if (i_this->mDemoCamTimer == 290) {
             anm_init(i_this, B_GND_BCK_EGND_KAMAE, 3.0f, 0, 1.0f);
             i_this->mGndEyeBtkNo = 5;
+            // Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_04, 0, 0);
             Z2GetAudioMgr()->bgmStreamPrepare(0x2000014); // ZREO Gnd Reorch Replacement File
             Z2GetAudioMgr()->bgmStreamPlay();
-            kankyo->field_0x12cc = 3;
+            kankyo->wether = 3;
         }
 
         if (i_this->mDemoCamTimer == 320) {
@@ -3286,7 +3296,7 @@ static void demo_camera(b_gnd_class* i_this) {
             dComIfGs_onOneZoneSwitch(15, -1);
             dComIfGs_onSaveDunSwitch(1);
             Z2GetAudioMgr()->setDemoName("force_end");
-            kankyo->field_0x12cc = 1;
+            kankyo->wether = 1;
         }
         break;
     case 50:
@@ -3922,7 +3932,7 @@ static int daB_GND_Execute(b_gnd_class* i_this) {
         i_this->mNoDrawTimer--;
         if (i_this->mNoDrawTimer == 0) {
             dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-            kankyo->field_0x12cc = 1;
+            kankyo->wether = 1;
 
             i_this->mActionMode = ACTION_WAIT;
             i_this->mMoveMode = 0;
@@ -4080,7 +4090,7 @@ static int daB_GND_Execute(b_gnd_class* i_this) {
         sp6C->setBaseTRMtx(mDoMtx_stack_c::get());
 
         u32 sp68;
-        if (i_this->mAcch.GetGroundH() != -1000000000.0f) {
+        if (i_this->mAcch.GetGroundH() != -G_CM3D_F_INF) {
             if (i_this->mAcch.ChkWaterHit() && i_this->mAcch.m_wtr.GetHeight() > a_this->current.pos.y) {
                 sp68 = dKy_pol_sound_get(&i_this->mAcch.m_wtr);
             } else if (i_this->mAcch.ChkGroundHit()) {
@@ -4639,7 +4649,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
-    model->setUserArea((u32)i_this);
+    model->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -4684,7 +4694,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
         
     J3DModelData* modelData;
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 0x62);
-    JUT_ASSERT(6612, modelData != 0);
+    JUT_ASSERT(6612, modelData != NULL);
     i_this->mpSwordModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpSwordModel == NULL) {
         return 0;
@@ -4694,7 +4704,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     i_this->mpSwordModel->setBaseTRMtx(mDoMtx_stack_c::get());
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 0x61);
-    JUT_ASSERT(6626, modelData != 0);
+    JUT_ASSERT(6626, modelData != NULL);
     i_this->mpSheathModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpSheathModel == NULL) {
         return 0;
@@ -4705,7 +4715,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 
     for (int i = 0; i < 2; i++) {
         modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", blur_model[i]);
-        JUT_ASSERT(6647, modelData != 0);
+        JUT_ASSERT(6647, modelData != NULL);
         i_this->mpSwordBlurModel[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
         if (i_this->mpSwordBlurModel[i] == NULL) {
             return 0;
@@ -4716,7 +4726,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 99);
-    JUT_ASSERT(6670, modelData != 0);
+    JUT_ASSERT(6670, modelData != NULL);
 
     for (int i = 0; i < 36; i++) {
         i_this->mpMantShadowModel[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -4736,7 +4746,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
     
     model = i_this->mpHorseMorf->getModel();
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(h_nodeCallBack);
     }
@@ -4802,7 +4812,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 /* 806014B0-80601960 00CB50 04B0+00 1/0 0/0 0/0 .text            daB_GND_Create__FP10fopAc_ac_c */
 static int daB_GND_Create(fopAc_ac_c* a_this) {
     b_gnd_class* i_this = (b_gnd_class*)a_this;
-    fopAcM_SetupActor(i_this, b_gnd_class);
+    fopAcM_ct(i_this, b_gnd_class);
 
     int phase_state = dComIfG_resLoad(&i_this->mPhaseReq, "B_gnd");
     int h_phase_state = dComIfG_resLoad(&i_this->mHorsePhaseReq, "B_hg");
@@ -4855,7 +4865,7 @@ static int daB_GND_Create(fopAc_ac_c* a_this) {
         a_this->health = 24; // Horseback Ganondorf Health
         i_this->field_0x560 = 24;
 
-        i_this->mGndCcStts.Init(254, 0, a_this);
+        i_this->mGndCcStts.Init(0xFE, 0, a_this);
         i_this->mHorseCcStts.Init(150, 0, a_this);
 
         static dCcD_SrcSph h_cc_sph_src = {
@@ -5012,5 +5022,7 @@ extern actor_process_profile_definition g_profile_B_GND = {
   fopAc_ENEMY_e,          // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
+
+static int unk_bss_0xF0;
 
 AUDIO_INSTANCES;

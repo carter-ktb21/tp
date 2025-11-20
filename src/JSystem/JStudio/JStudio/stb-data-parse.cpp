@@ -3,6 +3,8 @@
 // Translation Unit: stb-data-parse
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio/stb-data-parse.h"
 #include "JSystem/JUtility/JUTAssert.h"
 #include "dolphin/os.h"
@@ -12,7 +14,7 @@ namespace stb {
 namespace data {
 
 void TParse_TSequence::getData(TData* pData) const {
-    ASSERT(pData != 0);
+    ASSERT(pData != NULL);
 
     pData->content = NULL;
     pData->next = NULL;
@@ -33,7 +35,7 @@ void TParse_TSequence::getData(TData* pData) const {
 }
 
 void TParse_TParagraph::getData(TData* pData) const {
-    ASSERT(pData != 0);
+    ASSERT(pData != NULL);
 
     const void* data = getRaw();
     u32 result;
@@ -49,7 +51,7 @@ void TParse_TParagraph::getData(TData* pData) const {
 }
 
 void TParse_TParagraph_data::getData(TParse_TParagraph_data::TData* pData) const {
-    JUT_ASSERT(104, pData!=0);
+    JUT_ASSERT(104, pData!=NULL);
     pData->entrySize = 0;
     pData->entryCount = 0;
     pData->content = NULL;

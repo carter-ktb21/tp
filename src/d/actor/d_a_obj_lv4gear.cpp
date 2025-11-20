@@ -3,6 +3,8 @@
 // Spinner gear (Arbiter's Grounds)
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv4gear.h"
 #include "d/d_procname.h"
 
@@ -17,7 +19,7 @@ static void* searchSwSpinSub(void* i_actor, void* i_data) {
     daObjLv4Gear_c* gear = (daObjLv4Gear_c*)i_data;
 
     if (sw != NULL && fopAc_IsActor(sw) && fpcM_GetProfName(sw) == PROC_Obj_SwSpinner) {
-        u8 sw_bit = sw->getSwBit();
+        u8 sw_bit = sw->getSwbit();
         if (sw_bit != 0xFF && sw_bit == gear->getSwBit()) {
             return sw;
         }
@@ -57,7 +59,7 @@ static char* l_arcName = "P_Gear";
 /* 80C680A4-80C68124 000204 0080+00 1/1 0/0 0/0 .text            CreateHeap__14daObjLv4Gear_cFv */
 int daObjLv4Gear_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[mType]);
-    JUT_ASSERT(213, modelData != 0);
+    JUT_ASSERT(213, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -77,7 +79,7 @@ static int const l_heap_size[] = {0xF00, 0xF00};
 
 /* 80C68124-80C681F4 000284 00D0+00 1/1 0/0 0/0 .text            create__14daObjLv4Gear_cFv */
 int daObjLv4Gear_c::create() {
-    fopAcM_SetupActor(this, daObjLv4Gear_c);
+    fopAcM_ct(this, daObjLv4Gear_c);
 
     mType = getType();
 

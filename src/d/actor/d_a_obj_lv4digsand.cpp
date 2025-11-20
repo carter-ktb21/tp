@@ -3,6 +3,8 @@
  * Arbiter's Grounds Dig Sand
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv4digsand.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -35,31 +37,13 @@ int daObjL4DigSand_c::Create() {
     return 1;
 }
 
-/* 80C675EC-80C675F8 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C675F8-80C6760C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
 /* 80C6760C-80C67610 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "P_DSand";
 
 /* 80C66C24-80C66C94 000184 0070+00 1/0 0/0 0/0 .text            CreateHeap__16daObjL4DigSand_cFv */
 int daObjL4DigSand_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
-    JUT_ASSERT(0x9B, modelData != 0);
+    JUT_ASSERT(0x9B, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
@@ -87,9 +71,9 @@ int daObjL4DigSand_c::create1st() {
 }
 
 /* 80C66D40-80C66DD0 0002A0 0090+00 1/0 0/0 0/0 .text Execute__16daObjL4DigSand_cFPPA3_A4_f */
-int daObjL4DigSand_c::Execute(f32 (**param_0)[3][4]) {
+int daObjL4DigSand_c::Execute(Mtx** param_0) {
     if (daPy_py_c::checkNowWolf() && checkItemGet(fpcNm_ITEM_SMELL_POH, 1)) {
-        attention_info.flags = 0x80;
+        attention_info.flags = fopAc_AttnFlag_ETC_e;
     } else {
         attention_info.flags = 0;
     }
@@ -129,11 +113,11 @@ void daObjL4DigSand_c::mode_wait() {
  */
 void daObjL4DigSand_c::mode_init_dig() {
     dBgS_ObjGndChk gndchk;
-    gndchk.SetActorPid(base.id);
+    gndchk.SetActorPid(base.base.id);
     gndchk.SetPos(&current.pos);
 
     f32 gnd_y = dComIfG_Bgsp().GroundCross(&gndchk);
-    if (gnd_y != -1000000000.0f) {
+    if (gnd_y != -G_CM3D_F_INF) {
         mGroundY = gnd_y;
     } else {
 #ifdef DEBUG
@@ -192,7 +176,7 @@ int daObjL4DigSand_c::Delete() {
 /* 80C671DC-80C67308 00073C 012C+00 1/0 0/0 0/0 .text
  * daObjL4DigSand_create1st__FP16daObjL4DigSand_c               */
 static int daObjL4DigSand_create1st(daObjL4DigSand_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjL4DigSand_c);
+    fopAcM_ct(i_this, daObjL4DigSand_c);
     return i_this->create1st();
 }
 

@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag02.h"
 #include "f_op/f_op_actor_mng.h"
 
@@ -102,7 +104,7 @@ static int daKytag02_Create(fopAc_ac_c* i_this) {
     dScnKy_env_light_c* env_light = dKy_getEnvlight();
     dKyw_get_wind_vec();
 
-    fopAcM_SetupActor(i_this, kytag02_class);
+    fopAcM_ct(i_this, kytag02_class);
     kytag02_class* a_this = (kytag02_class*)i_this;
 
     a_this->field_0x574 = 0;

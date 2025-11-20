@@ -3,10 +3,10 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_npc_seid.h"
 #include "SSystem/SComponent/c_counter.h"
-
-UNK_REL_DATA
 
 /* 80ACB450-80ACB458 000020 0008+00 1/1 0/0 0/0 .data            l_bmdData */
 static int l_bmdData[1][2] = {
@@ -129,7 +129,7 @@ static daNpc_seiD_Param_c l_HIO;
 
 /* 80AC9728-80AC9968 000188 0240+00 1/1 0/0 0/0 .text            create__12daNpc_seiD_cFv */
 int daNpc_seiD_c::create() {
-    fopAcM_SetupActor2(this, daNpc_seiD_c, l_faceMotionAnmData, l_motionAnmData, l_faceMotionSequenceData, 
+    daNpcT_ct(this, daNpc_seiD_c, l_faceMotionAnmData, l_motionAnmData, l_faceMotionSequenceData, 
         4, l_motionSequenceData, 4, l_evtList, l_resNameList);
 
     mType = getType();
@@ -180,7 +180,7 @@ int daNpc_seiD_c::create() {
 /* 80AC9968-80AC9AC0 0003C8 0158+00 1/1 0/0 0/0 .text            CreateHeap__12daNpc_seiD_cFv */
 int daNpc_seiD_c::CreateHeap() {
     J3DModelData* mdlData_p = (J3DModelData*)dComIfG_getObjectRes(l_resNameList[l_bmdData[0][1]], l_bmdData[0][0]);
-    JUT_ASSERT(424, 0 != mdlData_p);
+    JUT_ASSERT(424, NULL != mdlData_p);
 
     mpMorf[0] = new mDoExt_McaMorfSO(mdlData_p, NULL, NULL, NULL, -1, 1.0f, 0, -1, &mSound, 0, 0x11020284);
     if (mpMorf[0] != NULL && mpMorf[0]->getModel() == NULL) {
@@ -192,7 +192,7 @@ int daNpc_seiD_c::CreateHeap() {
         return 0;
     }
 
-    mpMorf[0]->getModel()->setUserArea((u32)this);
+    mpMorf[0]->getModel()->setUserArea((uintptr_t)this);
     if (setFaceMotionAnm(0, false) && setMotionAnm(0, 0.0f, FALSE)) {
         return 1;
     }
@@ -221,7 +221,7 @@ int daNpc_seiD_c::Draw() {
         J3DMaterial* material = modelData->getMaterialNodePointer(getEyeballMaterialNo());
         material->setMaterialAnm(matAnm);
     }
-    return draw(FALSE, TRUE, field_0xde8, NULL, 100.0f, FALSE, FALSE, FALSE);
+    return draw(FALSE, TRUE, mRealShadowSize, NULL, 100.0f, FALSE, FALSE, FALSE);
 }
 
 /* 80AC9BA8-80AC9BC8 000608 0020+00 1/1 0/0 0/0 .text            createHeapCallBack__12daNpc_seiD_cFP10fopAc_ac_c */
@@ -289,9 +289,9 @@ void daNpc_seiD_c::setParam() {
     mWallR = daNpc_seiD_Param_c::m.mWallR;
     mAcchCir.SetWallR(mWallR);
     mAcchCir.SetWallH(daNpc_seiD_Param_c::m.mWallH);
-    field_0xde8 = daNpc_seiD_Param_c::m.field_0x0c;
+    mRealShadowSize = daNpc_seiD_Param_c::m.field_0x0c;
     gravity = daNpc_seiD_Param_c::m.mGravity;
-    field_0xa80 = daNpc_seiD_Param_c::m.field_0x6c;
+    mExpressionMorfFrame = daNpc_seiD_Param_c::m.field_0x6c;
     mMorfFrames = daNpc_seiD_Param_c::m.mMorfFrames;
 }
 

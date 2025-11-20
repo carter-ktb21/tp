@@ -3,11 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_L7op_demo_dr.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
 #include "d/actor/d_a_npc.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 
 /* 805AB098-805AB13C 000078 00A4+00 2/2 0/0 0/0 .text setAction__9daL7ODR_cFM9daL7ODR_cFPCvPv_v */
@@ -156,7 +159,7 @@ void daL7ODR_c::pl_walk() {
                 field_0x898 = 2.0f;
                 
                 dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-                kankyo->field_0x12cc = 1;
+                kankyo->wether = 1;
                 field_0x888++;
             }
         } else if (field_0x888 == 2) {
@@ -704,7 +707,7 @@ void daL7ODR_c::dr_fly() {
             if (7.0f == mpModelMorf->getFrame() || 37.0f == mpModelMorf->getFrame()) {
                 mSound.startCreatureSound(Z2SE_EN_DR_WING, 0, -1);
             } else if (62.0f == mpModelMorf->getFrame()) {
-                subtype = 1;
+                argument = 1;
             }
 
             if (mpModelMorf->isStop()) {
@@ -772,7 +775,7 @@ static int daL7ODR_Delete(daL7ODR_c* i_this) {
 /* 805AD90C-805ADA0C 0028EC 0100+00 1/1 0/0 0/0 .text            CreateHeap__9daL7ODR_cFv */
 int daL7ODR_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_dr", 0x49);
-    JUT_ASSERT(1146, modelData != 0);
+    JUT_ASSERT(1146, modelData != NULL);
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_dr", 0x2F), 2, 1.0f, 0, -1, &mSound, 0, 0x11000084);
     field_0x890 = 0x2F;
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -803,7 +806,7 @@ BOOL daL7ODR_c::check_start() {
 
 /* 805ADAC0-805ADCD8 002AA0 0218+00 1/1 0/0 0/0 .text            create__9daL7ODR_cFv */
 int daL7ODR_c::create() {
-    fopAcM_SetupActor(this, daL7ODR_c);
+    fopAcM_ct(this, daL7ODR_c);
     field_0x8b7 = 0;
 
     int phase_state = dComIfG_resLoad(&mPhase, "B_DR");
@@ -830,7 +833,7 @@ int daL7ODR_c::create() {
         scale.setall(1.0f);
 
         attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-        attention_info.flags &= ~0x4;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     
         fopAcM_SetGroup(this, 0);
         fopAcM_OffStatus(this, 0);

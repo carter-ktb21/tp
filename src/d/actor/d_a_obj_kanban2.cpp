@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kanban2.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -653,7 +655,7 @@ void daObj_Kanban2_c::setGroundAngle() {
     gnd_chk.SetPos(&gnd_pos);
     gnd_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-    if (-1000000000.0f != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
+    if (-G_CM3D_F_INF != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
         field_0x5ee.x = -cM_atan2s(gnd_pos.y - sp8.y, gnd_pos.z - sp8.z);
     }
 
@@ -663,7 +665,7 @@ void daObj_Kanban2_c::setGroundAngle() {
     gnd_chk.SetPos(&gnd_pos);
     gnd_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-    if (-1000000000.0f != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
+    if (-G_CM3D_F_INF != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
         field_0x5ee.z = cM_atan2s(gnd_pos.y - sp8.y, gnd_pos.x - sp8.x);
     }
 }
@@ -702,7 +704,7 @@ bool daObj_Kanban2_c::checkPataGround(s16 param_0, s16 param_1) {
     sp24.SetPos(&spC);
 
     f32 ground_y = dComIfG_Bgsp().GroundCross(&sp24);
-    if (ground_y != -1000000000.0f && sp18.y < ground_y) {
+    if (ground_y != -G_CM3D_F_INF && sp18.y < ground_y) {
         return true;
     }
 
@@ -723,8 +725,6 @@ void daObj_Kanban2_c::setCullMtx() {
 void daObj_Kanban2_c::setSmokeEffect(cXyz i_pos) {
     fopAcM_effSmokeSet1(&field_0x9e0, &field_0x9e4, &i_pos, NULL, 0.02 * field_0x600, &tevStr, 1);
 }
-
-UNK_REL_BSS
 
 /* 80585CB4-80585CB8 -00001 0004+00 2/2 0/0 0/0 .bss             None */
 /* 80585CB5 0003+00 l_initHIO None */
@@ -812,7 +812,7 @@ void daObj_Kanban2_c::setCenterPos() {
 /* 80582E68-80582EF0 0017E8 0088+00 2/2 0/0 0/0 .text            checkCarryOn__15daObj_Kanban2_cFv
  */
 BOOL daObj_Kanban2_c::checkCarryOn() {
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     if (fopAcM_checkCarryNow(this)) {
         setActionMode(ACTION_CARRY_e, 0);
 
@@ -986,12 +986,12 @@ void daObj_Kanban2_c::executeNormal() {
     switch (field_0x9fe) {
     case 0:
         if (mFlowID != -1 && cLib_distanceAngleS(shape_angle.y, fopAcM_searchPlayerAngleY(this)) < 0x3000) {
-            cLib_onBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
             attention_info.distances[fopAc_attn_TALK_e] = 21;
             attention_info.distances[fopAc_attn_SPEAK_e] = 21;
             eventInfo.onCondition(1);
         } else {
-            cLib_offBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         }
 
         if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk()) {
@@ -1002,9 +1002,20 @@ void daObj_Kanban2_c::executeNormal() {
         break;
     case 1:
         mInvulnerabilityTimer = 3;
-        if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk()) {
+#if VERSION != VERSION_SHIELD_DEBUG
+        // TODO: gameInfo fake match to force reuse of pointer
+        dComIfG_play_c* play = &g_dComIfG_gameInfo.play;
+        if (play->getEvent().runCheck() && eventInfo.checkCommandTalk())
+#else
+        if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk())
+#endif
+        {
             if (mMsgFlow.doFlow(this, NULL, 0)) {
+#if VERSION != VERSION_SHIELD_DEBUG
+                play->getEvent().reset();
+#else
                 dComIfGp_event_reset();
+#endif
                 field_0x9fe = 0;
             }
         } else {
@@ -1392,7 +1403,7 @@ void daObj_Kanban2_c::executePart() {
 void daObj_Kanban2_c::executeFloat() {
     checkWaterSurface();
 
-    if (-1000000000.0f == field_0x604) {
+    if (-G_CM3D_F_INF == field_0x604) {
         setActionMode(ACTION_PART_e, 7);
         return;
     }
@@ -1736,7 +1747,7 @@ int daObj_Kanban2_c::CreateHeap() {
 
     if (part_flags == PARTS_ALL) {
         modelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[0]);
-        JUT_ASSERT(2214, modelData != 0);
+        JUT_ASSERT(2214, modelData != NULL);
 
         mpModel = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
         if (mpModel == NULL) {
@@ -1747,7 +1758,7 @@ int daObj_Kanban2_c::CreateHeap() {
     for (int i = 0; i < 18; i++) {
         if (part_flags & (1 << i)) {
             modelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[i + 1]);
-            JUT_ASSERT(2228, modelData != 0);
+            JUT_ASSERT(2228, modelData != NULL);
             void* shareModelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[0]);
             mDoExt_setupShareTexture((J3DModelData*)modelData, (J3DModelData*)shareModelData);
             mpPartModel[i] = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
@@ -1768,7 +1779,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
 
 /* 805850E8-80585458 003A68 0370+00 1/1 0/0 0/0 .text            create__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::create() {
-    fopAcM_SetupActor(this, daObj_Kanban2_c);
+    fopAcM_ct(this, daObj_Kanban2_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "Obj_kn2");
     if (phase_state == cPhs_COMPLEATE_e) {

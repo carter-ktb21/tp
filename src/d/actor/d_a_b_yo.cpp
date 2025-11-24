@@ -3543,5 +3543,3 @@ extern actor_process_profile_definition g_profile_B_YO = {
   fopAc_ENEMY_e,          // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-AUDIO_INSTANCES;

@@ -12,9 +12,9 @@ struct dKyd_l_vr_box_data_struct {
 /* 803A8E98-803A9198 005FB8 0300+00 1/1 0/0 0/0 .data            l_kydata_BloomInf_tbl */
 static dKydata_BloomInfo_c l_kydata_BloomInf_tbl[BLOOMINFO_MAX] = {
     {BLOOM_SOFT, 0xFF, 64, 128, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0},
-    {BLOOM_CLEAR, 40, 70, 135, 207, 177, 56, 210, 0xFF, 0xFF, 0xFF, 96},  // Twilight
-    {BLOOM_CLEAR, 45, 70, 115, 207, 177, 56, 210, 0xFF, 0xFF, 0xFF, 96},  // Twilight Weak
-    {BLOOM_CLEAR, 0, 64, 48, 96, 186, 236, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Senses
+    {BLOOM_SOFT, 40, 70, 135, 207, 177, 56, 210, 0xFF, 0xFF, 0xFF, 96},  // Twilight
+    {BLOOM_SOFT, 45, 70, 115, 207, 177, 56, 210, 0xFF, 0xFF, 0xFF, 96},  // Twilight Weak
+    {BLOOM_SOFT, 0, 64, 48, 96, 186, 236, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Senses
     {BLOOM_SOFT, 64, 80, 64, 134, 131, 150, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Field Normal (Morning 0)
     {BLOOM_SOFT, 100, 80, 80, 0xFF, 215, 150, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Field Normal (Morning 1)
     {BLOOM_SOFT, 160, 48, 200, 129, 119, 111, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Field Normal (Afternoon)
@@ -32,7 +32,10 @@ static dKydata_BloomInfo_c l_kydata_BloomInf_tbl[BLOOMINFO_MAX] = {
     {BLOOM_SOFT, 0, 125, 0xFF, 0xFF, 0xFF, 0xFF, 239, 0xFF, 0xFF, 0xFF, 0xFF},  // Sacred Grove Time Travel
     {BLOOM_CLEAR, 98, 105, 128, 178, 95, 0, 0xFF, 228, 0xFF, 0xFF, 144},  // Sewers
     {BLOOM_SOFT, 48, 64, 89, 0xFF, 239, 134, 206, 0xFF, 213, 140, 200},  // Flashback Scene
-    {BLOOM_SOFT, 110, 70, 154, 0xFF, 215, 6, 224, 0xFF, 220, 167, 73},  // Twilight Gate
+    // {BLOOM_SOFT, 110, 70, 154, 0xFF, 215, 6, 224, 0xFF, 220, 167, 73},  // Twilight Gate
+    // Modded ------
+    {BLOOM_SOFT, 0xFF, 0, 154, 0xFF, 215, 6, 224, 0xFF, 220, 167, 73},  // Twilight Gate
+    // -------------
     {BLOOM_SOFT, 64, 96, 64, 110, 128, 128, 0xFF, 0xFF, 0xFF, 0xFF, 0},  // Underwater (Normal)
     {BLOOM_CLEAR, 128, 64, 128, 0xFF, 0xFF, 0xFF, 243, 0xFF, 0xFF, 0xFF, 0},  // Empty
     {BLOOM_CLEAR, 128, 64, 128, 0xFF, 0xFF, 0xFF, 243, 0xFF, 0xFF, 0xFF, 0},  // Empty

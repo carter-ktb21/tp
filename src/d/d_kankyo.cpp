@@ -2482,132 +2482,132 @@ void dScnKy_env_light_c::setLight() {
             }
             }
 
-            u8 prev_bloom_start_id = prev_pal_start_p->bloom_tbl_id;
-            u8 next_bloom_start_id = next_pal_start_p->bloom_tbl_id;
-            u8 prev_bloom_end_id = prev_pal_end_p->bloom_tbl_id;
-            u8 next_bloom_end_id = next_pal_end_p->bloom_tbl_id;
+            // u8 prev_bloom_start_id = prev_pal_start_p->bloom_tbl_id;
+            // u8 next_bloom_start_id = next_pal_start_p->bloom_tbl_id;
+            // u8 prev_bloom_end_id = prev_pal_end_p->bloom_tbl_id;
+            // u8 next_bloom_end_id = next_pal_end_p->bloom_tbl_id;
 
-            #if DEBUG
-            if (g_kankyoHIO.light.m_HOSTIO_setting) {
-                prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = g_kankyoHIO.bloom.m_saturationPattern;
-            } else {
-                g_kankyoHIO.bloom.m_saturationPattern = prev_pal_end_p->bloom_tbl_id;
-            }
+            // #if DEBUG
+            // if (g_kankyoHIO.light.m_HOSTIO_setting) {
+            //     prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = g_kankyoHIO.bloom.m_saturationPattern;
+            // } else {
+            //     g_kankyoHIO.bloom.m_saturationPattern = prev_pal_end_p->bloom_tbl_id;
+            // }
 
-            if (g_kankyoHIO.navy.twilight_sense_saturation_mode && daPy_py_c::checkNowWolfPowerUp()) {
-                prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = g_kankyoHIO.navy.twilight_sense_saturation_mode;
-            }
-            #endif
+            // if (g_kankyoHIO.navy.twilight_sense_saturation_mode && daPy_py_c::checkNowWolfPowerUp()) {
+            //     prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = g_kankyoHIO.navy.twilight_sense_saturation_mode;
+            // }
+            // #endif
 
-            if (daPy_py_c::checkNowWolfPowerUp()) {
-                prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = 3;
-            }
+            // if (daPy_py_c::checkNowWolfPowerUp()) {
+            //     prev_bloom_start_id = next_bloom_start_id = prev_bloom_end_id = next_bloom_end_id = 3;
+            // }
 
-            f32 temp_f31;
-            if (g_env_light.field_0x12fc >= 0) {
-                prev_bloom_end_id = g_env_light.field_0x12fc;
-                next_bloom_end_id = g_env_light.field_0x12fc;
-                temp_f31 = color_ratio;
-                color_ratio = g_env_light.field_0x1278;
-            }
+            // f32 temp_f31;
+            // if (g_env_light.field_0x12fc >= 0) {
+            //     prev_bloom_end_id = g_env_light.field_0x12fc;
+            //     next_bloom_end_id = g_env_light.field_0x12fc;
+            //     temp_f31 = color_ratio;
+            //     color_ratio = g_env_light.field_0x1278;
+            // }
 
-            dKydata_BloomInfo_c* bloomInf0_p;
-            dKydata_BloomInfo_c* bloomInf1_p;
-            dKydata_BloomInfo_c* bloomInf2_p;
-            dKydata_BloomInfo_c* bloomInf3_p;
+            // dKydata_BloomInfo_c* bloomInf0_p;
+            // dKydata_BloomInfo_c* bloomInf1_p;
+            // dKydata_BloomInfo_c* bloomInf2_p;
+            // dKydata_BloomInfo_c* bloomInf3_p;
 
-            bloomInf0_p = dKyd_BloomInf_tbl_getp(prev_bloom_start_id);
-            bloomInf2_p = dKyd_BloomInf_tbl_getp(next_bloom_start_id);
-            bloomInf1_p = dKyd_BloomInf_tbl_getp(prev_bloom_end_id);
-            bloomInf3_p = dKyd_BloomInf_tbl_getp(next_bloom_end_id);
+            // bloomInf0_p = dKyd_BloomInf_tbl_getp(prev_bloom_start_id);
+            // bloomInf2_p = dKyd_BloomInf_tbl_getp(next_bloom_start_id);
+            // bloomInf1_p = dKyd_BloomInf_tbl_getp(prev_bloom_end_id);
+            // bloomInf3_p = dKyd_BloomInf_tbl_getp(next_bloom_end_id);
 
-            #if DEBUG
-            if (bloomInf0_p == NULL || bloomInf2_p == NULL || bloomInf1_p == NULL || bloomInf3_p == NULL) {
-                JUT_ASSERT(3839, FALSE);
-            }
-            #endif
+            // #if DEBUG
+            // if (bloomInf0_p == NULL || bloomInf2_p == NULL || bloomInf1_p == NULL || bloomInf3_p == NULL) {
+            //     JUT_ASSERT(3839, FALSE);
+            // }
+            // #endif
 
-            u8 bloom_point = kankyo_color_ratio_set(
-                bloomInf0_p->info.mThreshold, bloomInf1_p->info.mThreshold, color_ratio,
-                bloomInf2_p->info.mThreshold, bloomInf3_p->info.mThreshold, g_env_light.pat_ratio, 0, 1.0f);
-            mDoGph_gInf_c::getBloom()->setPoint(bloom_point);
+            // u8 bloom_point = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mThreshold, bloomInf1_p->info.mThreshold, color_ratio,
+            //     bloomInf2_p->info.mThreshold, bloomInf3_p->info.mThreshold, g_env_light.pat_ratio, 0, 1.0f);
+            // mDoGph_gInf_c::getBloom()->setPoint(bloom_point);
 
-            u8 blure_size = (u8)kankyo_color_ratio_set(
-                bloomInf0_p->info.mBlurAmount, bloomInf1_p->info.mBlurAmount, color_ratio,
-                bloomInf2_p->info.mBlurAmount, bloomInf3_p->info.mBlurAmount, g_env_light.pat_ratio, 0, 1.0f);
+            // u8 blure_size = (u8)kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mBlurAmount, bloomInf1_p->info.mBlurAmount, color_ratio,
+            //     bloomInf2_p->info.mBlurAmount, bloomInf3_p->info.mBlurAmount, g_env_light.pat_ratio, 0, 1.0f);
 
-            if (dKy_darkworld_check()) {
-                static s16 S_fuwan_sin;
+            // if (dKy_darkworld_check()) {
+            //     static s16 S_fuwan_sin;
 
-                f32 sin = cM_ssin(S_fuwan_sin);
-                S_fuwan_sin += (s16)cM_rndF(2000.0f) + 500;
+            //     f32 sin = cM_ssin(S_fuwan_sin);
+            //     S_fuwan_sin += (s16)cM_rndF(2000.0f) + 500;
 
-                blure_size += (u8)(sin * (0.2f * blure_size));
-            }
+            //     blure_size += (u8)(sin * (0.2f * blure_size));
+            // }
 
-            mDoGph_gInf_c::getBloom()->setBlureSize(blure_size);
-            u8 sp21 = kankyo_color_ratio_set(
-                bloomInf0_p->info.mDensity, bloomInf1_p->info.mDensity, color_ratio, bloomInf2_p->info.mDensity,
-                bloomInf3_p->info.mDensity, g_env_light.pat_ratio, 0, 1.0f);
-            mDoGph_gInf_c::getBloom()->setBlureRatio(sp21);
+            // mDoGph_gInf_c::getBloom()->setBlureSize(blure_size);
+            // u8 sp21 = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mDensity, bloomInf1_p->info.mDensity, color_ratio, bloomInf2_p->info.mDensity,
+            //     bloomInf3_p->info.mDensity, g_env_light.pat_ratio, 0, 1.0f);
+            // mDoGph_gInf_c::getBloom()->setBlureRatio(sp21);
 
-            GXColor bloom_blend_col;
-            bloom_blend_col.r = kankyo_color_ratio_set(
-                bloomInf0_p->info.mColorR, bloomInf1_p->info.mColorR, color_ratio, bloomInf2_p->info.mColorR,
-                bloomInf3_p->info.mColorR, g_env_light.pat_ratio, 0, 1.0f);
-            bloom_blend_col.g = kankyo_color_ratio_set(
-                bloomInf0_p->info.mColorG, bloomInf1_p->info.mColorG, color_ratio, bloomInf2_p->info.mColorG,
-                bloomInf3_p->info.mColorG, g_env_light.pat_ratio, 0, 1.0f);
-            bloom_blend_col.b = kankyo_color_ratio_set(
-                bloomInf0_p->info.mColorB, bloomInf1_p->info.mColorB, color_ratio, bloomInf2_p->info.mColorB,
-                bloomInf3_p->info.mColorB, g_env_light.pat_ratio, 0, 1.0f);
-            bloom_blend_col.a =
-                kankyo_color_ratio_set(bloomInf0_p->info.mOrigDensity, bloomInf1_p->info.mOrigDensity,
-                                       color_ratio, bloomInf2_p->info.mOrigDensity,
-                                       bloomInf3_p->info.mOrigDensity, g_env_light.pat_ratio, 0, 1.0f);
-            mDoGph_gInf_c::getBloom()->setBlendColor(bloom_blend_col);
+            // GXColor bloom_blend_col;
+            // bloom_blend_col.r = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mColorR, bloomInf1_p->info.mColorR, color_ratio, bloomInf2_p->info.mColorR,
+            //     bloomInf3_p->info.mColorR, g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_blend_col.g = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mColorG, bloomInf1_p->info.mColorG, color_ratio, bloomInf2_p->info.mColorG,
+            //     bloomInf3_p->info.mColorG, g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_blend_col.b = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mColorB, bloomInf1_p->info.mColorB, color_ratio, bloomInf2_p->info.mColorB,
+            //     bloomInf3_p->info.mColorB, g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_blend_col.a =
+            //     kankyo_color_ratio_set(bloomInf0_p->info.mOrigDensity, bloomInf1_p->info.mOrigDensity,
+            //                            color_ratio, bloomInf2_p->info.mOrigDensity,
+            //                            bloomInf3_p->info.mOrigDensity, g_env_light.pat_ratio, 0, 1.0f);
+            // mDoGph_gInf_c::getBloom()->setBlendColor(bloom_blend_col);
 
-            if (g_env_light.field_0x12fc >= 0) {
-                color_ratio = temp_f31;
-            }
+            // if (g_env_light.field_0x12fc >= 0) {
+            //     color_ratio = temp_f31;
+            // }
 
-            GXColor bloom_mono_col;
-            bloom_mono_col.r = kankyo_color_ratio_set(
-                bloomInf0_p->info.mSaturateSubtractR, bloomInf1_p->info.mSaturateSubtractR, color_ratio,
-                bloomInf2_p->info.mSaturateSubtractR, bloomInf3_p->info.mSaturateSubtractR,
-                g_env_light.pat_ratio, 0, 1.0f);
-            bloom_mono_col.g = kankyo_color_ratio_set(
-                bloomInf0_p->info.mSaturateSubtractG, bloomInf1_p->info.mSaturateSubtractG, color_ratio,
-                bloomInf2_p->info.mSaturateSubtractG, bloomInf3_p->info.mSaturateSubtractG,
-                g_env_light.pat_ratio, 0, 1.0f);
-            bloom_mono_col.b = kankyo_color_ratio_set(
-                bloomInf0_p->info.mSaturateSubtractB, bloomInf1_p->info.mSaturateSubtractB, color_ratio,
-                bloomInf2_p->info.mSaturateSubtractB, bloomInf3_p->info.mSaturateSubtractB,
-                g_env_light.pat_ratio, 0, 1.0f);
-            bloom_mono_col.a = kankyo_color_ratio_set(
-                bloomInf0_p->info.mSaturateSubtractA, bloomInf1_p->info.mSaturateSubtractA, color_ratio,
-                bloomInf2_p->info.mSaturateSubtractA, bloomInf3_p->info.mSaturateSubtractA,
-                g_env_light.pat_ratio, 0, 1.0f);
-            mDoGph_gInf_c::getBloom()->setMonoColor(bloom_mono_col);
+            // GXColor bloom_mono_col;
+            // bloom_mono_col.r = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mSaturateSubtractR, bloomInf1_p->info.mSaturateSubtractR, color_ratio,
+            //     bloomInf2_p->info.mSaturateSubtractR, bloomInf3_p->info.mSaturateSubtractR,
+            //     g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_mono_col.g = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mSaturateSubtractG, bloomInf1_p->info.mSaturateSubtractG, color_ratio,
+            //     bloomInf2_p->info.mSaturateSubtractG, bloomInf3_p->info.mSaturateSubtractG,
+            //     g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_mono_col.b = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mSaturateSubtractB, bloomInf1_p->info.mSaturateSubtractB, color_ratio,
+            //     bloomInf2_p->info.mSaturateSubtractB, bloomInf3_p->info.mSaturateSubtractB,
+            //     g_env_light.pat_ratio, 0, 1.0f);
+            // bloom_mono_col.a = kankyo_color_ratio_set(
+            //     bloomInf0_p->info.mSaturateSubtractA, bloomInf1_p->info.mSaturateSubtractA, color_ratio,
+            //     bloomInf2_p->info.mSaturateSubtractA, bloomInf3_p->info.mSaturateSubtractA,
+            //     g_env_light.pat_ratio, 0, 1.0f);
+            // mDoGph_gInf_c::getBloom()->setMonoColor(bloom_mono_col);
 
-            if (bloom_point >= 0xFF) {
-                mDoGph_gInf_c::getBloom()->setEnable(0);
-            } else {
-                u8 mode = 0;
-                mDoGph_gInf_c::getBloom()->setEnable(1);
+            // if (bloom_point >= 0xFF) {
+            //     mDoGph_gInf_c::getBloom()->setEnable(0);
+            // } else {
+            //     u8 mode = 0;
+            //     mDoGph_gInf_c::getBloom()->setEnable(1);
 
-                if (prev_bloom_start_id != 0 && bloomInf0_p->info.mType != 0) {
-                    mode = 1;
-                } else if (next_bloom_start_id != 0 && bloomInf2_p->info.mType != 0) {
-                    mode = 1;
-                } else if (prev_bloom_end_id != 0 && bloomInf1_p->info.mType != 0) {
-                    mode = 1;
-                } else if (next_bloom_end_id != 0 && bloomInf3_p->info.mType != 0) {
-                    mode = 1;
-                }
+            //     if (prev_bloom_start_id != 0 && bloomInf0_p->info.mType != 0) {
+            //         mode = 1;
+            //     } else if (next_bloom_start_id != 0 && bloomInf2_p->info.mType != 0) {
+            //         mode = 1;
+            //     } else if (prev_bloom_end_id != 0 && bloomInf1_p->info.mType != 0) {
+            //         mode = 1;
+            //     } else if (next_bloom_end_id != 0 && bloomInf3_p->info.mType != 0) {
+            //         mode = 1;
+            //     }
 
-                mDoGph_gInf_c::getBloom()->setMode(mode);
-            }
+            //     mDoGph_gInf_c::getBloom()->setMode(mode);
+            // }
 
             f32 var_f30;
             if (dKy_Outdoor_check() == true) {

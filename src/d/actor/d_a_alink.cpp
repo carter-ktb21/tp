@@ -12896,11 +12896,17 @@ void daAlink_c::posMove() {
             Vec spFC = {0.0f, 0.0f, 0.0f};
             spFC.z = speedF;
             mDoMtx_stack_c::multVecSR(&spFC, &speed);
-            current.pos += speed;
+            // Ogathereal: Scale Y velocity at application point for 60fps
+            current.pos.x += speed.x;
+            current.pos.y += speed.y * DELTA_TIME;
+            current.pos.z += speed.z;
             current.pos.x += field_0x342c;
             current.pos.z += field_0x3430;
         } else {
-            current.pos += speed;
+            // Ogathereal: Scale Y velocity at application point for 60fps
+            current.pos.x += speed.x;
+            current.pos.y += speed.y * DELTA_TIME;
+            current.pos.z += speed.z;
             current.pos.x += field_0x342c;
             current.pos.z += field_0x3430;
 

@@ -39,3 +39,6 @@ compile_commands.json
 
 # ISOs
 *.iso
+
+# Claude Code
+.claude

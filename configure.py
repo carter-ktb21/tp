@@ -455,7 +455,8 @@ def JSystemLib(lib_name: str, objects: List[Object], progress_category: str="thi
 
 Matching = True                   # Object matches and should be linked
 NonMatching = False               # Object does not match and should not be linked
-Equivalent = config.non_matching  # Object should be linked when configured with --non-matching
+Equivalent = False                # Object should be linked when configured with --non-matching
+Modded = config.non_matching
 
 
 ALL_GCN = ["GZ2E01", "GZ2P01", "GZ2J01"]
@@ -710,7 +711,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_ky_thunder.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_kantera_icon_meter.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_calibration.cpp"),
-            Object(NonMatching, "d/d_menu_collect.cpp"), # weak func order (dMenu_Collect2D_c::draw())
+            Object(Modded, "d/d_menu_collect.cpp"), # weak func order (dMenu_Collect2D_c::draw())
             Object(MatchingFor(ALL_GCN), "d/d_menu_dmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_dmap_map.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_map_common.cpp"),
@@ -850,7 +851,7 @@ config.libs = [
         "JFramework",
         [
             Object(MatchingFor("ShieldD"), "JSystem/JFramework/JFWSystem.cpp"), # retail-only regalloc
-            Object(NonMatching, "JSystem/JFramework/JFWDisplay.cpp"),
+            Object(Modded, "JSystem/JFramework/JFWDisplay.cpp"),
         ],
     ),
     JSystemLib(

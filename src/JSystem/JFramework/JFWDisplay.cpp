@@ -10,6 +10,46 @@
 #include <dolphin/vi.h>
 #include "global.h"
 
+// Boofener: Deltatime system implementation
+float g_deltaTime = 1.0f;
+float g_targetFrameTime = 1.0f / 60.0f;
+float g_targetFramerate = 60.0f;
+int g_shouldUpdateLogic = 1;
+
+static OSTime s_lastFrameTime = 0;
+
+void updateDeltaTime() {
+    OSTime currentTime = OSGetTime();
+    if (s_lastFrameTime == 0) {
+        s_lastFrameTime = currentTime;
+        g_deltaTime = 1.0f;
+        return;
+    }
+    OSTime deltaTicks = currentTime - s_lastFrameTime;
+    float deltaSeconds = (float)OSTicksToMilliseconds(deltaTicks) / 1000.0f;
+    g_deltaTime = deltaSeconds / g_targetFrameTime;
+    if (g_deltaTime > 4.0f) {
+        g_deltaTime = 4.0f;
+    }
+    s_lastFrameTime = currentTime;
+}
+
+void setTargetFramerate(float fps) {
+    if (fps <= 0.0f) {
+        fps = 60.0f;
+    }
+    g_targetFramerate = fps;
+    g_targetFrameTime = 1.0f / fps;
+}
+
+float getTargetFramerate() {
+    return g_targetFramerate;
+}
+
+int shouldUpdateGameLogic() {
+    return g_shouldUpdateLogic;
+}
+
 /* 80272040-802720F8 26C980 00B8+00 1/1 0/0 0/0 .text            ctor_subroutine__10JFWDisplayFb */
 void JFWDisplay::ctor_subroutine(bool enableAlpha) {
     mEnableAlpha = enableAlpha;

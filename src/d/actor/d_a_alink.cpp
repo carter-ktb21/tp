@@ -6604,6 +6604,7 @@ void daAlink_c::setFrameCtrl(daPy_frameCtrl_c* i_ctrl, u8 i_attr, s16 i_start, s
         }
     }
 
+    i_rate *= DELTA_TIME; // Boofener: Scale all animation rates for 60fps
     i_ctrl->setFrameCtrl(i_attr, i_start, i_end, i_rate, i_frame);
 }
 
@@ -12896,17 +12897,17 @@ void daAlink_c::posMove() {
             Vec spFC = {0.0f, 0.0f, 0.0f};
             spFC.z = speedF;
             mDoMtx_stack_c::multVecSR(&spFC, &speed);
-            // Ogathereal: Scale Y velocity at application point for 60fps
-            current.pos.x += speed.x;
+            // Ogathereal/Boofener: Movement scaled for 60fps
+            current.pos.x += speed.x * DELTA_TIME;
             current.pos.y += speed.y * DELTA_TIME;
-            current.pos.z += speed.z;
+            current.pos.z += speed.z * DELTA_TIME;
             current.pos.x += field_0x342c;
             current.pos.z += field_0x3430;
         } else {
-            // Ogathereal: Scale Y velocity at application point for 60fps
-            current.pos.x += speed.x;
+            // Ogathereal/Boofener: Movement scaled for 60fps
+            current.pos.x += speed.x * DELTA_TIME;
             current.pos.y += speed.y * DELTA_TIME;
-            current.pos.z += speed.z;
+            current.pos.z += speed.z * DELTA_TIME;
             current.pos.x += field_0x342c;
             current.pos.z += field_0x3430;
 

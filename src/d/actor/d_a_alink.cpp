@@ -12542,8 +12542,8 @@ void daAlink_c::setSpecialGravity(f32 i_gravity, f32 i_speed, int i_offFlag) {
         onNoResetFlg3(FLG3_UNK_4000);
     }
 
-    gravity = i_gravity;
-    maxFallSpeed = i_speed;
+    gravity = i_gravity * DELTA_TIME; // Boofener: applies delta time to gravity
+    maxFallSpeed = i_speed * DELTA_TIME; // Boofener: applies delta time to max fall speed
 }
 
 /* 800BB7A0-800BBD40 0B60E0 05A0+00 1/1 0/0 0/0 .text            transAnimeProc__9daAlink_cFP4cXyzff

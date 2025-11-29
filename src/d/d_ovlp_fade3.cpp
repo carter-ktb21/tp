@@ -132,7 +132,7 @@ dOvlpFd3_c::dOvlpFd3_c() {
 void dOvlpFd3_c::execFirstSnap() {
     if (cLib_calcTimer(&field_0x11f) == 0 && field_0x11c != 0) {
         if (cLib_calcTimer(&mTimer) == 0) {
-            setExecute(&execFadeOut);
+            setExecute(&dOvlpFd3_c::execFadeOut);
             fopOvlpM_Done(this);
             mTimer = 0xFF;
         }

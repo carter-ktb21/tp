@@ -519,7 +519,7 @@ int dMpath_c::setPointer(dDrawPath_c::room_class* i_room, s8* param_1, s8* param
 #pragma optimization_level 2
 void dMpath_c::setPointer(s8 i_roomNo, void* i_data, int i_mapLayerNo) {
     s32 roomNo;
-    dDrawPath_c::room_class* room = ((map_path_class*)i_data)->m_entries;
+    dDrawPath_c::room_class* room = (dDrawPath_c::room_class*)((map_path_class*)i_data)->m_entries;
 
     if (room != NULL) {
         roomNo = i_roomNo;
@@ -954,17 +954,17 @@ bool renderingPlusDoor_c::checkDispDoorS(int param_0, int param_1, f32 param_2) 
     return false;
 }
 
+static Vec const l_100x100BoxVertexList[4] = {
+    {-50.0f, -50.0f, 0.0f},
+    {50.0f, -50.0f, 0.0f},
+    {50.0f, 50.0f, 0.0f},
+    {-50.0f, 50.0f, 0.0f},
+};
+
 /* 80040838-800409B4 03B178 017C+00 1/1 0/0 0/0 .text
  * drawNormalDoorS__19renderingPlusDoor_cFPC21stage_tgsc_data_classiib */
 void renderingPlusDoor_c::drawNormalDoorS(stage_tgsc_data_class const* i_doorData, int i_roomNo,
                                           int param_2, bool param_3) {
-    static Vec const l_100x100BoxVertexList[4] = {
-        {-50.0f, -50.0f, 0.0f},
-        {50.0f, -50.0f, 0.0f},
-        {50.0f, 50.0f, 0.0f},
-        {-50.0f, 50.0f, 0.0f},
-    };
-
     if (i_roomNo == dComIfGp_roomControl_getStayNo() || param_2 == dComIfGp_roomControl_getStayNo())
     {
         GXSetTevColor(GX_TEVREG1, l_doorWhite);
@@ -1005,8 +1005,6 @@ bool renderingDAmap_c::isDrawRoomIcon(int param_0, int param_1) const {
 
 /* 800409E0-80040A94 03B320 00B4+00 3/0 3/0 0/0 .text
  * isDrawIconSingle__16renderingDAmap_cCFPCQ27dTres_c6data_siiibPC3Vec */
-// drawTreasure and drawTreasureAfterPlayer match required a change of param_3 to int rather than bool.
-// Nothing else made sense considering the assembly generated.
 bool renderingDAmap_c::isDrawIconSingle(dTres_c::data_s const* data, int param_1, int param_2,
                                         bool param_3, bool param_4, Vec const* param_5) const {
     bool draw_room_icon = isDrawRoomIcon(data->mRoomNo, param_1);
@@ -1096,7 +1094,7 @@ void renderingPlusDoorAndCursor_c::drawTreasure() {
         {5, 3, &l_destinationStartColor},
     };
 
-    bool rend_all_room = isRendAllRoom();
+    const bool rend_all_room = isRendAllRoom();
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -1172,7 +1170,7 @@ void renderingPlusDoorAndCursor_c::drawTreasureAfterPlayer() {
     static const u8 l_iconTex0[8] = {0x00, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00, 0x00};
     static const GXColor tboxNotStayColor = {0x80, 0x00, 0x00, 0x00};
 
-    bool rend_all_room = isRendAllRoom();
+    const bool rend_all_room = isRendAllRoom();
 
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);

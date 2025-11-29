@@ -1,202 +1,179 @@
-The Legend of Zelda: Twilight Princess
-[![Build Status]][actions] [![Code Progress]][progress] [![DOL Progress]][progress] [![RELs Progress]][progress] [![Discord Badge]][discord]
-=============
+<h1 align="center"><b>Twilight Princess Ultimate Edition (GCN USA)</b></h1>
+<p align="center">
+  <img src="https://github.com/TP-Ultimate-Edition/.github/raw/main/banner.png" width="720" alt="Twilight Princess Ultimate Edition Banner">
+</p>
 
-[Build Status]: https://github.com/zeldaret/tp/actions/workflows/build.yml/badge.svg
-[actions]: https://github.com/zeldaret/tp/actions/workflows/build.yml
-[Code Progress]: https://decomp.dev/zeldaret/tp.svg?mode=shield&category=all&measure=code&label=Code
-[DOL Progress]: https://decomp.dev/zeldaret/tp.svg?mode=shield&category=dol&measure=code&label=DOL
-[RELs Progress]: https://decomp.dev/zeldaret/tp.svg?mode=shield&category=modules&measure=code&label=RELs
-[progress]: https://decomp.dev/zeldaret/tp
-[Discord Badge]: https://img.shields.io/discord/688807550715560050?color=%237289DA&logo=discord&logoColor=%23FFFFFF
-[discord]: https://discord.gg/z4GKgyMDGn
+<hr>
 
-A work-in-progress fork of the decompilation for The Legend of Zelda: Twilight Princess (GCN USA).
+<h2><b>🚫 IMPORTANT LEGAL NOTICE — READ BEFORE CONTINUING</b></h2>
+<p>
+  <b>We do NOT distribute game assets or ISO files.</b><br>
+  <b>We will NEVER provide, upload, or link to copyrighted ROMs, ISOs, or extracted game data.</b><br>
+  You must supply your own <b>LEGITIMATE personal dump</b> of the GameCube USA version (GZ2E01).
+</p>
+<p>This project only provides:</p>
+<ul>
+  <li>Decompiled code</li>
+  <li>Tools</li>
+  <li>Scripts</li>
+  <li>Engine patches</li>
+  <li>Instructions</li>
+</ul>
+<p><b>You are responsible for obtaining your own legal copy of the game and dumping it yourself.</b></p>
 
-This repository does **not** contain any game assets or assembly whatsoever. An existing copy of the game is required.
+<hr>
 
-More information about the project can be found here: https://zsrtp.link
+<h2><b>⚠️ Version Compatibility Notice</b></h2>
+<p>
+  <b>This project only works with the GameCube USA version (GZ2E01).</b><br>
+  No PAL, Japanese, or Wii versions are supported.<br>
+  Using any ISO other than <b>GZ2E01</b> will result in errors or a broken build.
+</p>
 
-## Twilight Princess Ultimate Edition
+<hr>
 
-**Twilight Princess Ultimate Edition** is a modified version that implements a **deltatime-based physics system**, decoupling game logic from the framerate to allow the game to run at 60fps (and theoretically higher framerates like 120fps/144fps) while maintaining vanilla gameplay behavior.
+<h2><b>⭐ Features</b></h2>
+<ul>
+  <li>True 60FPS engine via delta-time physics</li>
+  <li>Correct animation & gameplay timing at 60FPS</li>
+  <li>Resolution scaling for modern hardware</li>
+  <li>QoL improvements inspired by Twilight Princess HD</li>
+  <li>Windows + Linux ISO building included</li>
+  <li>Dolphin-optimized output</li>
+</ul>
 
-### Key Features:
-- **Root-level scaling approach**: Gravity and velocity are scaled at their source points for clean, maintainable code
-- **Frame-rate independent physics**: All movement, jumping, gravity, and acceleration work identically at any framerate
-- **Vanilla-accurate behavior**: Physics match the original 30fps game exactly - same jump heights, distances, and timings
-- **Dynamic deltatime system**: Automatically adapts to the current framerate without hardcoding
+<hr>
 
-For complete technical documentation, see [Current 60fps Documentation.txt](Current%2060fps%20Documentation.txt).  
+<h2><b>🚨 IMPORTANT BUILD PREREQUISITE</b></h2>
+<p>
+  Before using any ISO build script:<br>
+  <b>You must successfully complete a normal decomp build using the USA (GZ2E01) ISO.</b><br>
+  If the standard build fails, the ISO build will also fail.
+</p>
 
-<!--ts-->
-* [Progress](https://zsrtp.link/progress)
-* [60fps Build Instructions](#60fps-build-instructions)
-* [Dependencies](#dependencies)
-* [Building](#building)
-* [Diffing](#diffing)
-* [Contributing](https://zsrtp.link/contribute)
-* [FAQ](https://zsrtp.link/about)
+<hr>
 
-60fps Build Instructions
-=========================
+<h2><b>🔧 Dependencies</b></h2>
 
-This fork includes a convenient batch file for Windows users to build and launch the game with 60fps modifications.
+<h3>🪟 Windows</h3>
+<ol>
+  <li>
+    <b>Install Python 3.14.0 (64-bit)</b><br>
+    Download: <a href="https://www.python.org/ftp/python/3.14.0/python-3.14.0-amd64.exe">Python 3.14.0</a><br>
+    Verify:
+    <pre>python --version
+pip --version</pre>
+  </li>
+  <li>
+    <b>Install Ninja</b><br>
+    <pre>winget install Ninja-build.Ninja</pre>
+    or
+    <pre>pip install ninja</pre>
+  </li>
+  <li>
+    <b>Install gclib</b><br>
+    <pre>pip install "gclib[speedups] @ git+https://github.com/LagoLunatic/gclib.git"</pre>
+  </li>
+</ol>
 
-### Prerequisites
-1. Follow the standard [Dependencies](#dependencies) setup below
-2. Ensure you have Dolphin Emulator installed
+<h3>🐧 Linux</h3>
+<p>Install Python + Ninja:</p>
+<pre>sudo apt install python3 python3-pip ninja-build</pre>
+<p>(or your distro equivalent)</p>
+<p>Install gclib:</p>
+<pre>pip3 install "gclib[speedups] @ git+https://github.com/LagoLunatic/gclib.git"</pre>
 
-### Easy Setup (Recommended for First-Time Users)
+<hr>
 
-<img src="Icon.png" alt="Setup Icon" width="64" height="64">
+<h2><b>🏗️ Standard Decomp Build (Required First)</b></h2>
+<p>Clone the repo:</p>
+<pre>git clone https://github.com/TP-Ultimate-Edition/Twilight-Princess-Ultimate-Edition.git
+cd Twilight-Princess-Ultimate-Edition</pre>
 
-**Quick Start:** Double-click `Setup.exe` in the root directory!
+<p>Place your own legally dumped USA ISO at:</p>
+<pre>orig/GZ2E01/baserom.iso</pre>
 
-Or run the Python script directly:
-```batch
-python setup/setup_60fps.py
-```
+<p>Configure the project:</p>
+<pre>python3 configure.py --version=GZ2E01</pre>
 
-The GUI will:
-1. Check and install Python if needed (using `python64.exe` on Windows)
-2. Guide you to select your USA Twilight Princess ISO (GZ2E01)
-3. Automatically copy it to `orig/GZ2E01/`
-4. Optionally configure your Dolphin emulator path
-5. Set the output ISO build location
-6. Install all required dependencies (ninja, gclib)
-7. Configure Dolphin settings (if Dolphin path provided):
-   - Set default ISO path to the build directory
-   - Enable CPU clock override at 200% for optimal 60fps performance
-8. Run the initial configuration
-9. Launch the build process
+<p>Build:</p>
+<pre>ninja</pre>
 
-After the initial setup, you can simply run `build_tp.bat` for future builds.
+<p>A successful build produces:</p>
+<ul>
+  <li>Compiled REL modules</li>
+  <li>build/GZ2E01/framework.iso</li>
+</ul>
 
-### Manual Setup
+<hr>
 
-1. **Edit build_tp.bat** to match your system paths:
-   - Open `build_tp.bat` in a text editor
-   - Update the Dolphin path (line ~3):
-     ```batch
-     set DOLPHIN_PATH=C:\Path\To\Your\Dolphin\Dolphin.exe
-     ```
-   - Update the ISO output path if needed (line ~4):
-     ```batch
-     set ISO_PATH=build\GZ2E01\framework.iso
-     ```
+<h2><b>💿 Windows ISO Build</b></h2>
+<p>Run:</p>
+<pre>build_iso.bat</pre>
 
-2. **Build and Run**:
-   - Simply run `build_tp.bat`
-   - The script will:
-     - Compile the modified game code with ninja
-     - Build the ISO from the compiled binaries
-     - Launch Dolphin with the new ISO
-     - Display any errors if the build fails
+<p>You will be prompted for:</p>
+<ul>
+  <li><b>Your Dolphin Emulator path only</b></li>
+</ul>
 
-### Manual Build (Advanced)
-If you prefer to build manually or are not on Windows:
-```sh
-# Build the modified code
-ninja
+<p>The script will:</p>
+<ul>
+  <li>Use your existing <code>orig/GZ2E01/baserom.iso</code></li>
+  <li>Rebuild all RELs</li>
+  <li>Produce the patched 60FPS Ultimate Edition ISO</li>
+  <li>Output a Dolphin-ready image</li>
+</ul>
 
-# The output ISO will be in build/GZ2E01/framework.iso
-# Launch with your emulator of choice
-```
+<h2><b>🐍 Linux ISO Build</b></h2>
+<p>Run the included script:</p>
+<pre>python3 build_iso_linux.py</pre>
 
-For detailed information about the 60fps physics modifications, see [Current 60fps Documentation.txt](Current%2060fps%20Documentation.txt).
+<p>It will:</p>
+<ul>
+  <li>Ask for your output ISO name</li>
+  <li>Compile a patched 60FPS ISO</li>
+  <li>Output a Dolphin-ready image</li>
+</ul>
 
-### Building the Setup GUI (Optional)
+<hr>
 
-To create standalone executables of the setup GUI:
+<h2><b>⚡ 60FPS Engine Overview</b></h2>
+<ul>
+  <li>Frame-rate–independent delta-time physics</li>
+  <li>Proper 60FPS animations & movement</li>
+  <li>Smooth, stable gameplay</li>
+  <li>Resolution scaling</li>
+  <li>Optional TPHD-style QoL enhancements</li>
+</ul>
 
-**Windows (.exe):**
-```batch
-cd setup
-build_gui.bat
-```
-Output: `setup\dist\TP_60fps_Setup.exe`
+<hr>
 
-**Linux (AppImage):**
-```bash
-cd setup
-chmod +x build_gui_linux.sh
-./build_gui_linux.sh
-```
-Output: `setup/TP_60fps_Setup-x86_64.AppImage`
+<h2><b>📘 Modding & Contributions</b></h2>
+<p>Before modifying RELs or engine code:</p>
+<p>→ Please read <b>Modding Guide.pdf</b>.</p>
+<p>It covers:</p>
+<ul>
+  <li>Correct REL editing workflow</li>
+  <li>Build system requirements</li>
+  <li>How to avoid incompatible or broken builds</li>
+  <li>Maintaining 60FPS engine stability</li>
+</ul>
 
-Both require PyInstaller, which will be installed automatically if not present.
+<hr>
 
-**Note:**
-- The AppImage must be built on a Linux system. The build script is provided for Linux users.
-- For Linux users, the setup GUI will ask you to select your distribution (Debian/Ubuntu, Arch, or Fedora) to ensure proper Python installation if needed.
-- Windows users can use `Setup.exe` in the root directory for a quick start.
+<h2><b>🙏 Credits</b></h2>
 
-Dependencies
-============
+<h3>🏹 Zelda Reverse Engineering Team</h3>
+<p>For fully decompiling the GameCube USA (GZ2E01) version of Twilight Princess.<br>
+This project exists thanks to their foundational work.</p>
 
-Windows
---------
+<h3>🔧 Carco</h3>
+<p>For essential research and documentation regarding:</p>
+<ul>
+  <li>REL internals</li>
+  <li>REL patching methodology</li>
+  <li>ISO rebuild processes</li>
+</ul>
+<p>Their work made advanced engine modifications possible.</p>
 
-On Windows, it's **highly recommended** to use native tooling. WSL or msys2 are **not** required.  
-When running under WSL, [objdiff](#diffing) is unable to get filesystem notifications for automatic rebuilds.
-
-- Install [Python](https://www.python.org/downloads/) and add it to `%PATH%`.
-  - Also available from the [Windows Store](https://apps.microsoft.com/store/detail/python-311/9NRWMJP3717K).
-- Download [ninja](https://github.com/ninja-build/ninja/releases) and add it to `%PATH%`.
-  - Quick install via pip: `pip install ninja`
-
-macOS
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages):
-
-  ```sh
-  brew install ninja
-  ```
-
-[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
-
-Linux
-------
-
-- Install [ninja](https://github.com/ninja-build/ninja/wiki/Pre-built-Ninja-packages).
-
-[wibo](https://github.com/decompals/wibo), a minimal 32-bit Windows binary wrapper, will be automatically downloaded and used.
-
-Building
-========
-
-- Clone the repository:
-
-  ```sh
-  git clone https://github.com/zeldaret/tp.git
-  ```
-
-- Copy your game's disc image to `orig/GZ2E01`.
-  - Supported formats: ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ, TGC.
-  - After the initial build, the disc image can be deleted to save space.
-
-- Configure:
-
-  ```sh
-  python configure.py
-  ```
-
-  To use a version other than `GZ2E01` (USA), specify it with `--version`.
-- Build:
-
-  ```sh
-  ninja
-  ```
-
-Diffing
-=======
-
-Once the initial build succeeds, an `objdiff.json` should exist in the project root.
-
-Download the latest release from [encounter/objdiff](https://github.com/encounter/objdiff). Under project settings, set `Project directory`. The configuration should be loaded automatically.
-
-Select an object from the left sidebar to begin diffing. Changes to the project will rebuild automatically: changes to source files, headers, `configure.py`, `splits.txt` or `symbols.txt`.
-
-![](assets/objdiff.png)
+<p align="center"><b>Enjoy Twilight Princess in smooth, modern 60FPS — using your own legitimate USA GCN dump!</b></p>

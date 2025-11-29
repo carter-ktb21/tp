@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(./build_iso.bat)",
-      "Bash(ninja -t commands:*)"
+      "Bash(python configure.py:*)",
+      "Bash(ninja:*)",
+      "Bash(tasklist:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []

@@ -86,6 +86,17 @@ if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 echo Output ISO will be: %OUTPUT_ISO%
 echo.
 
+REM Close Dolphin emulator if it's running and has the ISO open
+echo Checking for running Dolphin emulator...
+taskkill /F /IM Dolphin.exe >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo Dolphin closed successfully.
+    timeout /t 2 /nobreak >NUL
+) else (
+    echo No Dolphin instances running.
+)
+echo.
+
 echo [1/3] Configuring build...
 python configure.py --non-matching --map
 if errorlevel 1 (
@@ -97,8 +108,22 @@ echo.
 echo [2/3] Building with ninja...
 ninja
 if errorlevel 1 (
-    echo ERROR: Build failed
-    exit /b 1
+    echo Hash mismatch detected, cleaning build directory...
+    if exist "build\GZ2E01" (
+        rd /s /q "build\GZ2E01" 2>nul
+    )
+    echo Reconfiguring...
+    python configure.py --non-matching --map
+    if errorlevel 1 (
+        echo ERROR: Reconfigure failed
+        exit /b 1
+    )
+    echo Rebuilding...
+    ninja
+    if errorlevel 1 (
+        echo ERROR: Build failed after clean
+        exit /b 1
+    )
 )
 
 echo.

@@ -88,7 +88,7 @@ extern float g_deltaTime;
 extern float g_targetFrameTime;
 extern float g_targetFramerate;
 extern int g_shouldUpdateLogic;  // Skip logic updates on render-only frames (0=false, 1=true)
-#define FRAMERATE_SCALE g_deltaTime
+#define DELTA_TIME g_deltaTime
 void updateDeltaTime();
 void setTargetFramerate(float fps);
 float getTargetFramerate();

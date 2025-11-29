@@ -12,8 +12,31 @@ echo.
 set DECOMP_PATH=%~dp0
 REM Remove trailing backslash from DECOMP_PATH
 if "%DECOMP_PATH:~-1%"=="\" set DECOMP_PATH=%DECOMP_PATH:~0,-1%
-set VANILLA_ISO=%DECOMP_PATH%\orig\GZ2E01\baserom.iso
-set OUTPUT_ISO=%~1
+
+REM Load environment variables from .env file if it exists
+if exist "%DECOMP_PATH%\.env" (
+    echo Loading configuration from .env...
+    for /f "usebackq tokens=1,* delims==" %%a in ("%DECOMP_PATH%\.env") do (
+        set line=%%a
+        REM Skip empty lines and comments
+        if not "!line!"=="" (
+            if not "!line:~0,1!"=="#" (
+                set %%a=%%b
+            )
+        )
+    )
+    echo.
+)
+
+REM Set defaults if not provided in .env
+if not defined VANILLA_ISO set VANILLA_ISO=%DECOMP_PATH%\orig\GZ2E01\baserom.iso
+if not defined OUTPUT_ISO set OUTPUT_ISO=
+if not defined DOLPHIN_PATH set DOLPHIN_PATH=C:\Program Files\Dolphin-x64\Dolphin.exe
+if not defined LAUNCH set LAUNCH=true
+if not defined DUAL_BOOT set DUAL_BOOT=false
+
+REM Command line argument overrides .env OUTPUT_ISO
+if not "%~1"=="" set OUTPUT_ISO=%~1
 
 REM Set default output path if not provided
 if "%OUTPUT_ISO%"=="" (
@@ -88,8 +111,44 @@ if errorlevel 1 (
 
 echo.
 echo ========================================
-echo Build completed successfully!
-echo Output ISO: %OUTPUT_ISO%
+echo  Build complete!
+echo  Output: %OUTPUT_ISO%
 echo ========================================
+echo.
+
+REM Launch Dolphin if LAUNCH is enabled
+if /i "%LAUNCH%"=="true" (
+    REM Step 4: Launch Dolphin with dual boot if enabled
+    if /i "%DUAL_BOOT%"=="true" (
+        echo [4/4] Launching Dolphin in dual boot mode...
+        if exist "%DOLPHIN_PATH%" (
+            if exist "%VANILLA_ISO%" (
+                echo Starting vanilla ISO: %VANILLA_ISO%
+                start "" "%DOLPHIN_PATH%" -e "%VANILLA_ISO%"
+            ) else (
+                echo WARNING: Vanilla ISO not found at %VANILLA_ISO%
+            )
+            echo Starting modified ISO: %OUTPUT_ISO%
+            start "" "%DOLPHIN_PATH%" -e "%OUTPUT_ISO%"
+            echo Dolphin launched in dual boot mode.
+        ) else (
+            echo WARNING: Dolphin not found at %DOLPHIN_PATH%
+            echo Please update DOLPHIN_PATH in .env file.
+            pause
+        )
+    ) else (
+        echo [4/4] Launching Dolphin...
+        if exist "%DOLPHIN_PATH%" (
+            start "" "%DOLPHIN_PATH%" -e "%OUTPUT_ISO%"
+            echo Dolphin launched with modified ISO.
+        ) else (
+            echo WARNING: Dolphin not found at %DOLPHIN_PATH%
+            echo Please update DOLPHIN_PATH in .env file.
+            pause
+        )
+    )
+) else (
+    echo Skipping Dolphin launch (LAUNCH=false in .env)
+)
 
 endlocal

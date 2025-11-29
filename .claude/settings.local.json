@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./build_iso.bat)",
+      "Bash(ninja -t commands:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

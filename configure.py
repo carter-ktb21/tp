@@ -682,7 +682,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_error_msg.cpp"),
             Object(Equivalent, "d/d_debug_viewer.cpp"), # debug weak func order
             Object(NonMatching, "d/d_debug_camera.cpp"),
-            Object(NonMatching, "d/actor/d_a_alink.cpp"),
+            Object(Modded, "d/actor/d_a_alink.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_itembase.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_no_chg_room.cpp"),
             Object(NonMatching, "d/actor/d_a_npc.cpp"),

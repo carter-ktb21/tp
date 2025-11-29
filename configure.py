@@ -626,7 +626,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_demo.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_door_param2.cpp"), # debug weak func order
             Object(NonMatching, "d/d_resorce.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_map_path.cpp"),
+            Object(Modded, "d/d_map_path.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_map_path_fmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_map_path_dmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_event.cpp"),

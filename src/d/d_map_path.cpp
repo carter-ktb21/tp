@@ -270,7 +270,7 @@ dMpath_n::dTexObjAggregate_c dMpath_n::m_texObjAgg;
  * make the map look worse for extra speed in the emulator, especially in large
  * areas such as hyrule field.
  */
-// #define HYRULE_FIELD_SPEEDHACK
+#define HYRULE_FIELD_SPEEDHACK
 
 /* 8003D3C0-8003D68C 037D00 02CC+00 0/0 2/2 0/0 .text
  * renderingDecoration__18dRenderingFDAmap_cFPCQ211dDrawPath_c10line_class */

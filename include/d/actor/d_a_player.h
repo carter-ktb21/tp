@@ -118,6 +118,7 @@ class daPy_frameCtrl_c : public J3DFrameCtrl {
 public:
     /* 80140D24 */ virtual ~daPy_frameCtrl_c() {}
     /* 80140D80 */ daPy_frameCtrl_c() {}
+    
     bool checkAnmEnd();
     void updateFrame();
     void setFrameCtrl(u8, short, short, f32, f32);

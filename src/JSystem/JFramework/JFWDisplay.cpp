@@ -18,7 +18,7 @@ void JFWDisplay::ctor_subroutine(bool enableAlpha) {
     mZClear = 0xFFFFFF;
     mGamma = 0;
     mFader = NULL;
-    mFrameRate = 0;  // Boofener: Set to 0 to disable VBI-based frame limiting (was 1, causing 30fps lock)
+    mFrameRate = 1; 
     mTickRate = 0;
     mCombinationRatio = 0.0f;
     field_0x30 = 0;

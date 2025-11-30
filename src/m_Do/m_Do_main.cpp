@@ -260,7 +260,7 @@ int mDoMain::argument = -1;
 #endif
 
 /* 80450580-80450584 000000 0004+00 3/3 6/6 0/0 .sdata           None */
-s8 mDoMain::developmentMode = -1;
+s8 mDoMain::developmentMode = true;
 
 #ifdef DEBUG
 u32 mDoMain::gameHeapSize = 0xFFFFFFFF;

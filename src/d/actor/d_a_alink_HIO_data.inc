@@ -1916,7 +1916,7 @@ const daAlinkHIO_bottle_c1 daAlinkHIO_bottle_c0::m = {
 	},
 };
 
-/* 8038E9C0-8038EA30 01B020 0070+00 15/16 0/0 0/0 .rodata          m__22daAlinkHIO_hookshot_c0 */
+/* 8038E9C0-8038EA30 01B020 0078+00 15/16 0/0 0/0 .rodata          m__22daAlinkHIO_hookshot_c0 */
 const daAlinkHIO_hookshot_c1 daAlinkHIO_hookshot_c0::m = {
 	{ // no clue what this animation is
 		12,
@@ -1940,18 +1940,20 @@ const daAlinkHIO_hookshot_c1 daAlinkHIO_hookshot_c0::m = {
         7.0f,
 	},
     0,
-    1.0f, //No idea what this does
-    3.0f,
+    1.0f * DELTA_TIME, //Speed link moves when lock on and hold hook
+    3.0f, //No idea what this does
     2000.0f,
-    100.0f,
-    150.0f,
+    100.0f * DELTA_TIME,
+    150.0f * DELTA_TIME,
     60.0f * DELTA_TIME, // pulling link towards target
     5.0f * DELTA_TIME,
     13.0f * DELTA_TIME,
     3000.0f,
-    150.0f,
-    225.0f,
-    90.0f,
+    150.0f * DELTA_TIME,
+    225.0f * DELTA_TIME,
+    90.0f * DELTA_TIME,
+    1.0f * DELTA_TIME, // Hook tip animation speed
+    0.9f * DELTA_TIME, // Lock cursor spinner speed
 };
 
 /* 8038EA30-8038EA70 01B090 0040+00 10/10 0/0 0/0 .rodata          m__21daAlinkHIO_spinner_c0 */

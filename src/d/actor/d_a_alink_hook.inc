@@ -9,7 +9,10 @@
 #include "d/actor/d_a_b_dr.h"
 #include "d/actor/d_a_obj_chandelier.h"
 #include "d/actor/d_a_obj_swhang.h"
+#include "res/Object/AlAnm.h"
 
+class JKRHeap;
+class J3DAnmTransform;
 enum {
     HS_MODE_NONE_e,
     HS_MODE_READY_e,
@@ -425,7 +428,7 @@ void daAlink_c::setHookshotModel() {
     mpHookshotLinChk->OffFullGrp();
     mpHookshotLinChk->OnWaterGrp();
 
-    J3DAnmTransform* bck2 = (J3DAnmTransform*)loadAram(0x17F, 0x800);
+    J3DAnmTransform* bck2 = (J3DAnmTransform*)loadAram(dRes_ID_ALANM_BCK_HS_TIP_OPEN_e, 0x800);
     mHookTipBck.init(bck2, 0, 2, 1.0f, 0, -1, false);
     mDoExt_setCurrentHeap(heap);
 
@@ -586,7 +589,7 @@ void daAlink_c::setHookshotReadyAnime() {
         speed = daAlinkHIO_hookshot_c0::m.mWaitAnmSpeed;
     }
 
-    setUpperAnimeBaseSpeed(0x18D, speed, 3.0f);
+    setUpperAnimeBaseSpeed(dRes_INDEX_ALANM_BCK_HSWAIT_e, speed, 3.0f * DELTA_TIME);
     field_0x3020 = 0;
     initHookshotReady();
 }
@@ -834,7 +837,6 @@ static cXyz l_hookSnowSandHitScale(0.5f, 0.5f, 0.5f);
 
 /* 80109BDC-8010B2DC 10451C 1700+00 1/1 0/0 0/0 .text            setHookshotPos__9daAlink_cFv */
 void daAlink_c::setHookshotPos() {
-    OSReport("hookshotPos\n");
     mDoMtx_stack_c::copy(mpLinkModel->getAnmMtx(field_0x30c0));
     mDoMtx_stack_c::transM(-2.0f, 1.0f, 1.0f);
     mDoMtx_stack_c::XYZrotM(cM_deg2s(5.7f), cM_deg2s(162.0f), 0);
@@ -891,7 +893,7 @@ void daAlink_c::setHookshotPos() {
                 seStartOnlyReverb(Z2SE_AL_HS_OPEN);
             }
 
-            field_0x33e0 += 1.0f;
+            field_0x33e0 += daAlinkHIO_hookshot_c0::m.mHookTipAnimationSteps;
             if (field_0x33e0 > mHookTipBck.getBckAnm()->getFrameMax()) {
                 field_0x33e0 = mHookTipBck.getBckAnm()->getFrameMax();
             }
@@ -914,21 +916,21 @@ void daAlink_c::setHookshotPos() {
     f32 shoot_speed;
     f32 length;
     if (checkLv7BossRoom()) {
-        return_speed = daAlinkHIO_hookshot_c0::m.mBossReturnSpeed * DELTA_TIME ;
-        shoot_speed = daAlinkHIO_hookshot_c0::m.mBossShootSpeed * DELTA_TIME ;
+        return_speed = daAlinkHIO_hookshot_c0::m.mBossReturnSpeed;
+        shoot_speed = daAlinkHIO_hookshot_c0::m.mBossShootSpeed;
         length = daAlinkHIO_hookshot_c0::m.mBossMaxLength;
     } else {
-        return_speed = daAlinkHIO_hookshot_c0::m.mReturnSpeed * DELTA_TIME ;
-        shoot_speed = daAlinkHIO_hookshot_c0::m.mShootSpeed * DELTA_TIME ;
+        return_speed = daAlinkHIO_hookshot_c0::m.mReturnSpeed;
+        shoot_speed = daAlinkHIO_hookshot_c0::m.mShootSpeed;
         length = daAlinkHIO_hookshot_c0::m.mMaxLength;
     }
 
     if (mItemMode == HS_MODE_RETURN_e) {
         if (targetAc_p != NULL) {
             if (checkLv7BossRoom()) {
-                return_speed = daAlinkHIO_hookshot_c0::m.mBossStickReturnSpeed * DELTA_TIME ;
+                return_speed = daAlinkHIO_hookshot_c0::m.mBossStickReturnSpeed ;
             } else {
-                return_speed = daAlinkHIO_hookshot_c0::m.mStickReturnSpeed * DELTA_TIME ;
+                return_speed = daAlinkHIO_hookshot_c0::m.mStickReturnSpeed ;
             }
         }
 
@@ -1190,11 +1192,11 @@ void daAlink_c::setHookshotPos() {
     if (dComIfGp_checkPlayerStatus1(0, 0x10000)) {
         mDoMtx_stack_c::transS(mIronBallBgChkPos);
         mDoMtx_stack_c::ZXYrotM(-0x4000, field_0x3022, 0);
-        bck_frame = 14.0f;
+        bck_frame = 14.0f * DELTA_TIME;
     } else if (dComIfGp_checkPlayerStatus1(0, 0x2000000)) {
         mDoMtx_stack_c::transS(mIronBallBgChkPos);
         mDoMtx_stack_c::ZXYrotM(0, field_0x3022, 0);
-        bck_frame = 14.0f;
+        bck_frame = 14.0f * DELTA_TIME;
     } else {
         if (field_0x3024 != 0) {
             cLib_chasePos(&mIronBallBgChkPos, field_0x3810, 2.0f * return_speed);

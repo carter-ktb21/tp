@@ -736,7 +736,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_ev_camera.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_spline_path.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_item_data.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_item.cpp"),
+            Object(Modded, "d/d_item.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_tresure.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_model.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_eye_hl.cpp"),
@@ -749,7 +749,7 @@ config.libs = [
             Object(NonMatching, "d/actor/d_a_npc.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_npc_cd.cpp"),
             Object(NonMatching, "d/actor/d_a_npc_cd2.cpp"), # stripped vtable order
-            Object(MatchingFor(ALL_GCN), "d/actor/d_a_obj_item.cpp"),
+            Object(Modded, "d/actor/d_a_obj_item.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_insect.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_obj_ss_base.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_player.cpp"),

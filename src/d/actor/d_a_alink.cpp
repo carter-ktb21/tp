@@ -12901,18 +12901,18 @@ void daAlink_c::posMove() {
             current.pos.x += speed.x * DELTA_TIME;
             current.pos.y += speed.y * DELTA_TIME;
             current.pos.z += speed.z * DELTA_TIME;
-            current.pos.x += field_0x342c;
-            current.pos.z += field_0x3430;
+            current.pos.x += field_0x342c * DELTA_TIME;
+            current.pos.z += field_0x3430 * DELTA_TIME;
         } else {
             // Ogathereal/Boofener: Movement scaled for 60fps
             current.pos.x += speed.x * DELTA_TIME;
             current.pos.y += speed.y * DELTA_TIME;
             current.pos.z += speed.z * DELTA_TIME;
-            current.pos.x += field_0x342c;
-            current.pos.z += field_0x3430;
+            current.pos.x += field_0x342c * DELTA_TIME;
+            current.pos.z += field_0x3430 * DELTA_TIME;
 
             if (checkEndResetFlg1(ERFLG1_UNK_800) && checkStageName("F_SP113")) {
-                current.pos.y -= 50.0f;
+                current.pos.y -= 50.0f * DELTA_TIME; // Boofener: enter stage distance scaled for 60fps
             }
         }
     }

@@ -39,3 +39,8 @@ compile_commands.json
 
 # ISOs
 *.iso
+
+# Environment files
+.env
+# Claude Code
+.claude

@@ -687,7 +687,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_demo.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_door_param2.cpp"), # debug weak func order
             Object(NonMatching, "d/d_resorce.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_map_path.cpp"),
+            Object(Modded, "d/d_map_path.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_map_path_fmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_map_path_dmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_event.cpp"),
@@ -744,7 +744,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_error_msg.cpp"),
             Object(Equivalent, "d/d_debug_viewer.cpp"), # debug weak func order
             Object(NonMatching, "d/d_debug_camera.cpp"),
-            Object(NonMatching, "d/actor/d_a_alink.cpp"),
+            Object(Modded, "d/actor/d_a_alink.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_itembase.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_no_chg_room.cpp"),
             Object(NonMatching, "d/actor/d_a_npc.cpp"),
@@ -773,7 +773,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_ky_thunder.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_kantera_icon_meter.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_calibration.cpp"),
-            Object(NonMatching, "d/d_menu_collect.cpp"), # weak func order (dMenu_Collect2D_c::draw())
+            Object(Modded, "d/d_menu_collect.cpp"), # weak func order (dMenu_Collect2D_c::draw())
             Object(MatchingFor(ALL_GCN), "d/d_menu_dmap.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_dmap_map.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_map_common.cpp"),
@@ -913,7 +913,7 @@ config.libs = [
         "JFramework",
         [
             Object(MatchingFor("ShieldD"), "JSystem/JFramework/JFWSystem.cpp"), # retail-only regalloc
-            Object(MatchingFor(ALL_GCN), "JSystem/JFramework/JFWDisplay.cpp"),
+            Object(Modded, "JSystem/JFramework/JFWDisplay.cpp"),
         ],
     ),
     JSystemLib(
@@ -1679,7 +1679,7 @@ config.libs = [
     },
     Rel("f_pc_profile_lst", [Object(Matching, "f_pc/f_pc_profile_lst.cpp")]),
     ActorRel(MatchingFor(ALL_GCN), "d_a_andsw"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_bg"),
+    ActorRel(NonMatching, "d_a_bg"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_bg_obj"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_dmidna"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_door_dbdoor00"),

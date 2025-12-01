@@ -576,7 +576,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_graphic.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_machine.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_mtx.cpp"),
-            Object(Equivalent, "m_Do/m_Do_ext.cpp"), # weak func order
+            Object(Modded, "m_Do/m_Do_ext.cpp"), # weak func order
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_lib.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_Reset.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_dvd_thread.cpp"),
@@ -1253,7 +1253,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DModelData.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DMtxBuffer.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DModel.cpp"),
-            Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DAnimation.cpp"),
+            Object(Modded, "JSystem/J3DGraphAnimator/J3DAnimation.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DMaterialAnm.cpp"),
             Object(NonMatching, "JSystem/J3DGraphAnimator/J3DSkinDeform.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/J3DGraphAnimator/J3DCluster.cpp"),
@@ -1765,7 +1765,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_henna"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kakashi"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kkri"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kolin"),
+    ActorRel(Modded, "d_a_npc_kolin"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_maro"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_taro"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_tkj"),

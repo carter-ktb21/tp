@@ -2027,7 +2027,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_pachi_taro"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_passer"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_passer2"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_npc_post"),
+    ActorRel(Modded, "d_a_npc_post"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_pouya"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_prayer"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_raca"),

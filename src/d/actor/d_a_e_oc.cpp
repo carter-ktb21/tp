@@ -307,7 +307,7 @@ bool daE_OC_c::searchPlayer() {
     if (fopAcM_searchPlayerDistance(this) < mPlayerRange) {
         s16 diff = shape_angle.y - fopAcM_searchPlayerAngleY(this);
         if (fopAcM_searchPlayerDistance(this) < l_HIO.plyr_srch_min_radius) {
-            if (daPy_getPlayerActorClass()->speedF > 12.0f) {
+            if (daPy_getPlayerActorClass()->speedF > 12.0f * DELTA_TIME) {
                 return true;
             }
 
@@ -1537,9 +1537,9 @@ void daE_OC_c::executeDamage() {
             mSound.startCreatureVoice(Z2SE_EN_OC_V_DAMAGE, -1);
             mOcState = 5;
             if (s16(cLib_distanceAngleS(shape_angle.y, fopAcM_searchPlayerAngleY(this))) < 0x4000) {
-                speedF = -20.0f;
+                speedF = -20.0f * DELTA_TIME;
             } else {
-                speedF = 20.0f;
+                speedF = 20.0f * DELTA_TIME;
             }
             onHeadLockFlg();
             break;
@@ -1611,8 +1611,8 @@ void daE_OC_c::executeBigDamage() {
             }
             offTgSph();
             mOcState = 3;
-            speed.y = 40.0f;
-            speedF = 20.0f;
+            speed.y = 40.0f * DELTA_TIME;
+            speedF = 20.0f * DELTA_TIME;
             current.angle.y = mAtInfo.mHitDirection.y + 0x8000;
             shape_angle.y = mAtInfo.mHitDirection.y;
             field_0x6be = 0;
@@ -1986,8 +1986,8 @@ void daE_OC_c::executeDemoMaster() {
                     mOcState = 6;
                     setBck(0x10, 0, 5.0f, 1.0f);
                     mSound.startCreatureVoice(Z2SE_EN_OC_V_JUMP, -1);
-                    speedF = 10.0f;
-                    speed.y = 40.0f;
+                    speedF = 10.0f * DELTA_TIME;
+                    speed.y = 40.0f * DELTA_TIME;
                     field_0x6c0 = 0x28;
                     daPy_getPlayerActorClass()->changeDemoMode(1, 0, 0, 0);
                     daPy_getPlayerActorClass()->cancelOriginalDemo();
@@ -2079,8 +2079,8 @@ void daE_OC_c::executeDemoChild() {
                     setBck(0x10, 0, 5.0f, 1.0f);
                     mSound.startCreatureVoice(Z2SE_EN_OC_V_JUMP, -1);
                     mOcState = 6;
-                    speedF = 10.0f;
-                    speed.y = 40.0f;
+                    speedF = 10.0f * DELTA_TIME;
+                    speed.y = 40.0f * DELTA_TIME;
                 }
                 break;
             case 6:

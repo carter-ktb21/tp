@@ -421,7 +421,7 @@ int cLib_chaseAngleS(s16* pvalue, s16 target, s16 step) {
         if ((s16)(*pvalue - target) > 0) {
             step = -step;
         }
-        *pvalue += step;
+        *pvalue += step * DELTA_TIME;
         if (step * (s16)(*pvalue - target) >= 0) {
             *pvalue = target;
             return 1;

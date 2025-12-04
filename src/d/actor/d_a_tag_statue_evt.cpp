@@ -1,6 +1,6 @@
 /*
-/* Translation Unit: d_a_tag_statue_evt
-/* Owl Statue Event Tag -- Awarding Sky Characters
+* Translation Unit: d_a_tag_statue_evt
+* Owl Statue Event Tag -- Awarding Sky Characters
  */
 
 #include "d/dolzel_rel.h" // IWYU pragma: keep
@@ -69,7 +69,7 @@ static char* l_evArcName[6] = {
     "cs_ev_05"          // Ruined Theatre
 };
 
-static Vec l_cull_box[2] = {
+static cull_box l_cull_box = {
     {-300.0f, -100.0f, -300.0f}, // Min
     {300.0f, 400.0f, 300.0f}     // Max
 };
@@ -98,7 +98,7 @@ cPhs__Step daTagStatue_c::Create() {
 
     initBaseMtx();
     fopAcM_SetMtx(this, mpModel->getBaseTRMtx());
-    fopAcM_setCullSizeBox(this, l_cull_box[0].x, l_cull_box[0].y, l_cull_box[0].z, l_cull_box[1].x, l_cull_box[1].y, l_cull_box[1].z);
+    fopAcM_setCullSizeBox(this, l_cull_box.min.x, l_cull_box.min.y, l_cull_box.min.z, l_cull_box.max.x, l_cull_box.max.y, l_cull_box.max.z);
 
     char* ev_arc_name = l_evArcName[mSkyCharacterEventBitIdIndex]; 
 
@@ -272,18 +272,18 @@ int daTagStatue_c::demoProc() {
 
     if(dComIfGp_evmng_getIsAddvance(mStaffId)) {
         switch(act_id) {
-            case DEMO_ACTION_WAIT:
+            case DEMO_ACTION_WAIT: {
                 // Delay fading to black
                 int* timer_p = dComIfGp_evmng_getMyIntegerP(mStaffId, "Timer");
 
-                if(!timer_p) {
+                if (!timer_p) {
                     mTimer = 1;
-                }
-                else {
+                } else {
                     mTimer = *timer_p;
                 }
 
                 break;
+            }
             case DEMO_ACTION_MOVE_OWL_STATUE:
                 // Position and orient Owl Statue behind player
                 if(mSkyCharacterEventBitIdIndex != TAG_LOCATION_GERUDO_DESERT && mSkyCharacterEventBitIdIndex != TAG_LOCATION_LAKE_HYLIA && mSkyCharacterEventBitIdIndex != TAG_LOCATION_RUINED_THEATRE) {

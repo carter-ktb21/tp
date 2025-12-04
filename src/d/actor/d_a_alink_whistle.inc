@@ -67,7 +67,7 @@ int daAlink_c::procGrassWhistleGetInit() {
     current.angle.y = shape_angle.y;
     field_0x2f98 = 4;
 
-    setSingleAnimeParam(ANM_BOTTLE_SWING_DOWN, &daAlinkHIO_bottle_c0::m.mSwingDownAnm);
+    setSingleAnimeParam(ANM_BOTTLE_SWING_DOWN, &mpHIO->mItem.mBottle.m.mSwingDownAnm);
     field_0x2f92 = 0xFE;
     field_0x280c.setData(field_0x27f4);
 
@@ -146,7 +146,7 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
     mProcVar0.field_0x3008 = 0;
     mProcVar4.field_0x3010 = 0;
     mProcVar5.field_0x3012 = 0;
-    mMsgClassID = -1;
+    mMsgClassID = fpcM_ERROR_PROCESS_ID_e;
     mNormalSpeed = 0.0f;
     current.angle.y = shape_angle.y;
     field_0x2f98 = 4;
@@ -168,7 +168,6 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
 }
 
 
-// NONMATCHING - small regalloc
 int daAlink_c::procGrassWhistleWait() {
     if (mProcVar5.field_0x3012 != 0) {
         if (checkEndMessage(field_0x32cc)) {
@@ -189,7 +188,7 @@ int daAlink_c::procGrassWhistleWait() {
         mProcVar0.field_0x3008--;
 
         if (mProcVar0.field_0x3008 == 0) {
-            daHorse_c* horse_p = dComIfGp_getHorseActor();
+            daHorse_c* horse_p = (daHorse_c*)dComIfGp_getHorseActor();
             daNPC_TK_c* tk_p = (daNPC_TK_c*)fopAcIt_Judge((fopAcIt_JudgeFunc)daAlink_searchWhistle, NULL);
 
             if (tk_p != NULL) {
@@ -276,9 +275,9 @@ int daAlink_c::procCoHorseCallWaitInit(int param_0) {
     }
 
     if (checkWolf()) {
-        setSingleAnimeWolfBaseSpeed(WANM_WAIT, daAlinkHIO_wlMove_c0::m.mIdleAnmSpeed, 3.0f);
+        setSingleAnimeWolfBaseSpeed(WANM_WAIT, mpHIO->mWolf.mWlMove.m.mIdleAnmSpeed, 3.0f);
     } else {
-        setSingleAnimeBaseSpeed(ANM_WAIT, daAlinkHIO_move_c0::m.mWaitAnmSpeed, 3.0f);
+        setSingleAnimeBaseSpeed(ANM_WAIT, mpHIO->mMove.m.mWaitAnmSpeed, 3.0f);
     }
 
     setGrassCancelStatus(0);

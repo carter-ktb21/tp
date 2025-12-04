@@ -131,23 +131,23 @@ void daAlink_c::hsChainShape_c::draw() {
         const cXyz& chainTopPos = temp_r3->getHsChainTopPos();
         cXyz maxDistance = chainRootPos - chainTopPos;
 
-        f32 maxDistanceFloat = maxDistance.abs();
+        f32 maxDistanceF = maxDistance.abs();
         f32 var_f30;
         cXyz sp98;
         csXyz sp6C;
 
-        if (maxDistanceFloat > 1.0f) {
-            maxDistance *= (1.0f / maxDistanceFloat);
+        if (maxDistanceF > 1.0f) {
+            maxDistance *= (1.0f / maxDistanceF);
             var_f30 = 0.0f;
 
-            sp98 = chainTopPos; // whats the point of this one?
+            sp98 = chainTopPos;
             sp6C.set(maxDistance.atan2sY_XZ(), maxDistance.atan2sX_Z(), 0);
             sp98 = chainTopPos;
 
             csXyz sp64(sp6C);
 
-            f32 sp34 = M_PI / maxDistanceFloat;
-
+            f32 sp34 = M_PI / maxDistanceF;
+            
             f32 temp_f27;
             f32 var_f26 = 0.0f;
             f32 var_f28;
@@ -157,7 +157,7 @@ void daAlink_c::hsChainShape_c::draw() {
                 var_f28 *= -1.0f;
             }
 
-            while (maxDistanceFloat > var_f30) {
+            while (maxDistanceF > var_f30) {
                 temp_f27 = var_f28 * cM_fsin(sp34 * var_f30);
                 s16 spC = cM_atan2s(temp_f27 - var_f26, 5.0f);
                 sp64.x = sp6C.x + spC;
@@ -430,9 +430,9 @@ void daAlink_c::setHookshotSight() {
     cXyz sight_pos;
     f32 length;
     if (checkLv7BossRoom()) {
-        length = daAlinkHIO_hookshot_c0::m.mBossMaxLength;
+        length = mpHIO->mItem.mHookshot.m.mBossMaxLength;
     } else {
-        length = daAlinkHIO_hookshot_c0::m.mMaxLength;
+        length = mpHIO->mItem.mHookshot.m.mMaxLength;
     }
 
     BOOL line_cross = checkSightLine(length, &sight_pos);
@@ -523,7 +523,7 @@ int daAlink_c::initHookshotUpperAnimeSpeed(int param_0) {
             mUpperFrameCtrl[2].setFrame(tmp_0);
             getNowAnmPackUpper(UPPER_2)->setFrame(tmp_0);
         } else {
-            setWaterInAnmRate(&mUpperFrameCtrl[2], daAlinkHIO_hookshot_c0::m.mWaitAnmSpeed);
+            setWaterInAnmRate(&mUpperFrameCtrl[2], mpHIO->mItem.mHookshot.m.mWaitAnmSpeed);
         }
 
         return 1;
@@ -549,10 +549,10 @@ void daAlink_c::setHookshotReadyAnime() {
     if (!checkAttentionLock() && mFastShotTime == 0) {
         speed = 0.0f;
     } else {
-        speed = daAlinkHIO_hookshot_c0::m.mWaitAnmSpeed;
+        speed = mpHIO->mItem.mHookshot.m.mWaitAnmSpeed;
     }
 
-    setUpperAnimeBaseSpeed(dRes_INDEX_ALANM_BCK_HSWAIT_e, speed, 3.0f * DELTA_TIME);
+    setUpperAnimeBaseSpeed(dRes_INDEX_ALANM_BCK_HSWAIT_e, speed, 3.0f);
     field_0x3020 = 0;
     initHookshotReady();
 }
@@ -587,7 +587,7 @@ int daAlink_c::checkUpperItemActionHookshot() {
 
                 setSingleAnimeBaseMorf(anmID, 0.0f);
             } else if (checkModeFlg(0x40400)) {
-                setUpperAnimeParam(0x18C, UPPER_2, &daAlinkHIO_hookshot_c0::m.mShootAnm);
+                setUpperAnimeParam(0x18C, UPPER_2, &mpHIO->mItem.mHookshot.m.mShootAnm);
 
                 if (checkModeFlg(0x40000)) {
                     mNormalSpeed = 0.0f;
@@ -603,7 +603,7 @@ int daAlink_c::checkUpperItemActionHookshot() {
                 mSpeedModifier = tmp_0;
                 mNowAnmPackUpper[2].setRatio(tmp_0);
 
-                setSingleAnimeParam(ANM_HOOKSHOT_SHOOT, &daAlinkHIO_hookshot_c0::m.mShootAnm);
+                setSingleAnimeParam(ANM_HOOKSHOT_SHOOT, &mpHIO->mItem.mHookshot.m.mShootAnm);
             }
 
             if (!checkNoResetFlg3(FLG3_UNK_4)) {
@@ -705,7 +705,7 @@ void daAlink_c::setHookshotReturnEnd() {
         field_0x2060->initOldFrameMorf(3.0f, field_0x30a8, field_0x30aa);
     } else if (checkHookshotShootAnime()) {
         setUpperAnimeBaseSpeed(
-            0x18D, checkAttentionLock() ? daAlinkHIO_hookshot_c0::m.mWaitAnmSpeed : 0.0f,
+            0x18D, checkAttentionLock() ? mpHIO->mItem.mHookshot.m.mWaitAnmSpeed : 0.0f,
             (3.0f * DELTA_TIME ));
     }
 
@@ -845,7 +845,7 @@ void daAlink_c::setHookshotPos() {
                 seStartOnlyReverb(Z2SE_AL_HS_OPEN);
             }
 
-            field_0x33e0 += daAlinkHIO_hookshot_c0::m.mHookTipAnimationSteps;
+            field_0x33e0 += 1.0f * DELTA_TIME;
             if (field_0x33e0 > mHookTipBck.getBckAnm()->getFrameMax()) {
                 field_0x33e0 = mHookTipBck.getBckAnm()->getFrameMax();
             }
@@ -868,21 +868,21 @@ void daAlink_c::setHookshotPos() {
     f32 shoot_speed;
     f32 length;
     if (checkLv7BossRoom()) {
-        return_speed = daAlinkHIO_hookshot_c0::m.mBossReturnSpeed;
-        shoot_speed = daAlinkHIO_hookshot_c0::m.mBossShootSpeed;
-        length = daAlinkHIO_hookshot_c0::m.mBossMaxLength;
+        return_speed = mpHIO->mItem.mHookshot.m.mBossReturnSpeed;
+        shoot_speed = mpHIO->mItem.mHookshot.m.mBossShootSpeed;
+        length = mpHIO->mItem.mHookshot.m.mBossMaxLength;
     } else {
-        return_speed = daAlinkHIO_hookshot_c0::m.mReturnSpeed;
-        shoot_speed = daAlinkHIO_hookshot_c0::m.mShootSpeed;
-        length = daAlinkHIO_hookshot_c0::m.mMaxLength;
+        return_speed = mpHIO->mItem.mHookshot.m.mReturnSpeed;
+        shoot_speed = mpHIO->mItem.mHookshot.m.mShootSpeed;
+        length = mpHIO->mItem.mHookshot.m.mMaxLength;
     }
 
     if (mItemMode == HS_MODE_RETURN_e) {
         if (targetAc_p != NULL) {
             if (checkLv7BossRoom()) {
-                return_speed = daAlinkHIO_hookshot_c0::m.mBossStickReturnSpeed ;
+                return_speed = mpHIO->mItem.mHookshot.m.mBossStickReturnSpeed;
             } else {
-                return_speed = daAlinkHIO_hookshot_c0::m.mStickReturnSpeed ;
+                return_speed = mpHIO->mItem.mHookshot.m.mStickReturnSpeed;
             }
         }
 
@@ -1214,7 +1214,7 @@ void daAlink_c::hookshotRoofTurn() {
     BOOL play_sound = false;
     if (!dComIfGp_checkPlayerStatus0(0, 0x2000)) {
         f32 max_rise_y = (mIronBallBgChkPos.y + 15.0f) - 1.5f;
-        f32 min_descend_y = mIronBallBgChkPos.y - daAlinkHIO_hookshot_c0::m.mMaxLength;
+        f32 min_descend_y = mIronBallBgChkPos.y - mpHIO->mItem.mHookshot.m.mMaxLength;
 
         if (checkInputOnR()) {
             int stick_direction = getDirectionFromAngle(mStickAngle);
@@ -1228,7 +1228,7 @@ void daAlink_c::hookshotRoofTurn() {
             current.angle.y = shape_angle.y;
 
             if (stick_direction == DIR_FORWARD) {
-                current.pos.y += daAlinkHIO_hookshot_c0::m.mRoofHangRiseSpeed * field_0x33a8;
+                current.pos.y += mpHIO->mItem.mHookshot.m.mRoofHangRiseSpeed * field_0x33a8;
                 if (current.pos.y > max_rise_y) {
                     current.pos.y = max_rise_y;
                 } else {
@@ -1236,7 +1236,7 @@ void daAlink_c::hookshotRoofTurn() {
                     play_sound = true;
                 }
             } else if (stick_direction == DIR_BACKWARD) {
-                f32 descend_speed = daAlinkHIO_hookshot_c0::m.mRoofHangDecendSpeed * field_0x33ac;
+                f32 descend_speed = mpHIO->mItem.mHookshot.m.mRoofHangDecendSpeed * field_0x33ac;
                 if (checkBootsOrArmorHeavy()) {
                     descend_speed *= 1.5f;
                 }
@@ -1384,7 +1384,7 @@ int daAlink_c::procHookshotSubjectInit() {
 
     if (initHookshotUpperAnimeSpeed(1)) {
         setSingleAnimeBaseSpeed(ANM_ATN_WAIT_LEFT, 0.0f,
-                                daAlinkHIO_hookshot_c0::m.mStartInterpolation);
+                                mpHIO->mItem.mHookshot.m.mStartInterpolation);
     }
 
     dComIfGp_setPlayerStatus0(0, 0x4000);
@@ -1427,7 +1427,7 @@ int daAlink_c::procHookshotMoveInit() {
     }
 
     if (initHookshotUpperAnimeSpeed(0)) {
-        setBlendAtnMoveAnime(daAlinkHIO_hookshot_c0::m.mStartInterpolation);
+        setBlendAtnMoveAnime(mpHIO->mItem.mHookshot.m.mStartInterpolation);
     }
 
     dComIfGp_setPlayerStatus0(0, 0x4000);
@@ -1445,7 +1445,7 @@ int daAlink_c::procHookshotMove() {
 
             if (field_0x2f98 != 2) {
                 field_0x2f98 = 2;
-                blend = daAlinkHIO_basic_c0::m.mBasicInterpolation;
+                blend = mpHIO->mBasic.m.mBasicInterpolation;
             }
         } else {
             offModeFlg(1);
@@ -1536,7 +1536,7 @@ int daAlink_c::procHookshotFly() {
     } else {
         mProcVar0.field_0x3008 = 0;
         f32 temp_f31 = field_0x37d4.abs();
-        f32 temp_f30 = daAlinkHIO_hookshot_c0::m.mStickReturnSpeed + spAC.abs(mHookshotTopPos);
+        f32 temp_f30 = mpHIO->mItem.mHookshot.m.mStickReturnSpeed + spAC.abs(mHookshotTopPos);
 
         if (temp_f31 < temp_f30 || mProcVar1.field_0x300a == 0) {
             setHookshotReturnEnd();
@@ -1672,7 +1672,7 @@ int daAlink_c::procHookshotRoofWaitInit(int param_0, fopAc_ac_c* param_1, int pa
         }
 
         mProcVar2.field_0x300c = 0;
-        setSingleAnimeParam(anm, &daAlinkHIO_hookshot_c0::m.mRoofHangAnm);
+        setSingleAnimeParam(anm, &mpHIO->mItem.mHookshot.m.mRoofHangAnm);
     } else {
         setHookshotRoofWaitAnime();
         mProcVar2.field_0x300c = 1;
@@ -1744,7 +1744,7 @@ int daAlink_c::procHookshotRoofWait() {
         daPy_frameCtrl_c* frameCtrl_p = mUnderFrameCtrl;
         if (frameCtrl_p->checkAnmEnd() ||
             ((checkInputOnR() || mProcVar5.field_0x3012 != 0 || checkHookshotRoofLv7Boss()) &&
-             frameCtrl_p->getFrame() > daAlinkHIO_hookshot_c0::m.mRoofHangAnm.mCancelFrame))
+             frameCtrl_p->getFrame() > mpHIO->mItem.mHookshot.m.mRoofHangAnm.mCancelFrame))
         {
             setHookshotRoofWaitAnime();
             mProcVar2.field_0x300c = 1;
@@ -1937,7 +1937,7 @@ int daAlink_c::procHookshotWallWaitInit(int param_0, s16 param_1, int param_2) {
         }
 
         mProcVar2.field_0x300c = 0;
-        setSingleAnimeParam(anm, &daAlinkHIO_hookshot_c0::m.mWallHangAnm);
+        setSingleAnimeParam(anm, &mpHIO->mItem.mHookshot.m.mWallHangAnm);
     } else {
         setHookshotWallWaitAnime();
         mProcVar2.field_0x300c = 1;
@@ -2010,7 +2010,7 @@ int daAlink_c::procHookshotWallWait() {
         daPy_frameCtrl_c* frameCtrl_p = mUnderFrameCtrl;
         if (frameCtrl_p->checkAnmEnd() ||
             ((checkInputOnR() || mProcVar5.field_0x3012 != 0) &&
-             frameCtrl_p->getFrame() > daAlinkHIO_hookshot_c0::m.mWallHangAnm.mCancelFrame))
+             frameCtrl_p->getFrame() > mpHIO->mItem.mHookshot.m.mWallHangAnm.mCancelFrame))
         {
             setHookshotWallWaitAnime();
             mProcVar2.field_0x300c = 1;

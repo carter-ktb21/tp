@@ -41,9 +41,9 @@ static char* l_evName = "SNOW_COLLAPSE";
 
 static char* l_staffName = "Obj_ava";
 
-static f32 l_cull_box[6] = {
-    -500.0f, -500.0f, -700.0f,
-    500.0f, 1000.0f, 700.0f,
+static cull_box l_cull_box = {
+    {-500.0f, -500.0f, -700.0f},
+    {500.0f, 1000.0f, 700.0f},
 };
 
 int daObjAvalanche_c::Create() {
@@ -67,8 +67,8 @@ int daObjAvalanche_c::Create() {
     }
     initBaseMtx();
     fopAcM_SetMtx(this, mModel->getBaseTRMtx());
-    fopAcM_setCullSizeBox(this, l_cull_box[0], l_cull_box[1], l_cull_box[2], l_cull_box[3],
-                          l_cull_box[4], l_cull_box[5]);
+    fopAcM_setCullSizeBox(this, l_cull_box.min.x, l_cull_box.min.y, l_cull_box.min.z, l_cull_box.max.x,
+                          l_cull_box.max.y, l_cull_box.max.z);
     if (mpBgW2 != 0) {
         mpBgW2->Move();
     }
@@ -214,7 +214,7 @@ int daObjAvalanche_c::demoProc() {
     int actIdx = dComIfGp_evmng_getMyActIdx(mStaffId, action_table, 2, 0, 0);
     if (dComIfGp_evmng_getIsAddvance(mStaffId)) {
         switch (actIdx) {
-        case 0:
+        case 0: {
             int* puVar3 = dComIfGp_evmng_getMyIntegerP(mStaffId, "Timer");
             if (puVar3 == NULL) {
                 mTimer = 1;
@@ -222,11 +222,13 @@ int daObjAvalanche_c::demoProc() {
                 mTimer = *puVar3;
             }
             break;
+        }
         case 1:
             mBckAnm->setPlaySpeed(1.0f);
             eyePos = current.pos;
             fopAcM_seStart(this, Z2SE_OBJ_SNOW_SLIDE, 0);
             setEffect();
+            OS_REPORT("崩れる雪：ＳＥセット\n"); // Avalanche: SE Set
             break;
         }
     }

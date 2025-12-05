@@ -774,7 +774,7 @@ void daAlink_c::setSwimMoveAnime() {
         field_0x3198 = var_r29;
 
         if (checkUnderMove0BckNoArc(ANM_SWIM_DASH)) {
-            mWolfDashTimer = mpHIO->mSwim.m.field_0x5e;
+            mWolfDashTimer = mpHIO->mSwim.m.field_0x5e * SCALE_TIME;
         }
 
         if (var_r29 == ANM_SWIM_WAIT) {
@@ -793,9 +793,9 @@ void daAlink_c::setSwimMoveAnime() {
     if (var_r29 != ANM_SWIM_WAIT && var_r29 != ANM_SWIM_DASH) {
         f32 temp_f30 = var_f31 * fabsf(mNormalSpeed);
         if (temp_f30 > 1.0f && field_0x2f98 == 4) {
-            temp_r28->setRate(mpHIO->mSwim.m.mUnderwaterMaxAnmSpeed + ((temp_f30 - 1.0f) * mpHIO->mSwim.m.mUnderwaterAdditionalAnmSpeed));
+            temp_r28->setRate((mpHIO->mSwim.m.mUnderwaterMaxAnmSpeed + ((temp_f30 - 1.0f) * mpHIO->mSwim.m.mUnderwaterAdditionalAnmSpeed)) * DELTA_TIME);
         } else {
-            temp_r28->setRate(field_0x3478 + (field_0x347c * temp_f30));
+            temp_r28->setRate((field_0x3478 + (field_0x347c * temp_f30)) * DELTA_TIME);
         }
     }
 

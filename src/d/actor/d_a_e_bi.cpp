@@ -60,8 +60,8 @@ daE_BI_HIO_c::daE_BI_HIO_c() {
     basic_size = 1.0f;
     search_range = 400.0f;
     track_range = 600.0f;
-    time_to_get_going = 30;
-    movement_spd = 10.0f;
+    time_to_get_going = 30 * SCALE_TIME;
+    movement_spd = 10.0f * DELTA_TIME;
 }
 
 static void anm_init(e_bi_class* i_this, int i_index, f32 i_morf, u8 i_attr, f32 i_rate) {
@@ -82,7 +82,7 @@ static int daE_BI_Draw(e_bi_class* i_this) {
     J3DModelData* modelData = model->getModelData();
     modelData->getMaterialNodePointer(1)->getTevColor(1)->r = i_this->field_0x698;
 
-    if (i_this->field_0x694 != 0) {
+    if (i_this->explodeTimer != 0) {
         model->getModelData()->getMaterialNodePointer(0)->getShape()->hide();
         model->getModelData()->getMaterialNodePointer(2)->getShape()->hide();
         model->getModelData()->getMaterialNodePointer(1)->getShape()->show();
@@ -108,15 +108,15 @@ static int daE_BI_Draw(e_bi_class* i_this) {
     return 1;
 }
 
-static BOOL pl_check(e_bi_class* i_this, f32 param_2) {
+static BOOL pl_check(e_bi_class* i_this, f32 i_dist) {
     fopAc_ac_c* a_this = &i_this->actor;
 
-    if (i_this->field_0x5b5 == 1) {
+    if (i_this->arg1 == 1) {
         return FALSE;
     }
 
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    if (i_this->field_0x688 < param_2 && !fopAcM_otherBgCheck(a_this, player)) {
+    if (i_this->distToPl < i_dist && !fopAcM_otherBgCheck(a_this, player)) {
         return TRUE;
     }
 
@@ -128,13 +128,13 @@ static void damage_check(e_bi_class* i_this) {
     fopAc_ac_c* actor_p = dComIfGp_getPlayer(0);
     fopAc_ac_c* actor_p_2;
 
-    if (i_this->field_0x692 == 0) {
+    if (i_this->invulnerabilityTimer == 0) {
         i_this->mStts.Move();
 
         if (i_this->field_0x82c.ChkAtShieldHit()) {
             i_this->mAction = 5;
-            i_this->field_0x670 = 0;
-            i_this->field_0x692 = 60;
+            i_this->mode = 0;
+            i_this->invulnerabilityTimer = 60 * SCALE_TIME;
             a_this->speedF = 0.0f;
             i_this->field_0x6a6 = i_this->field_0x684 + 0x8000;
         } else if (i_this->field_0x6f0.ChkTgHit()) {
@@ -152,7 +152,7 @@ static void damage_check(e_bi_class* i_this) {
 
                     i_this->field_0x6b0 = 1;
                 }
-            }else if (i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
+             } else if (i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
                 actor_p = dBomb_c::createEnemyBombBoomerang(&a_this->eyePos, &a_this->current.angle, fopAcM_GetRoomNo(a_this));
                 if (actor_p != NULL) {
                     actor_p_2 = fopAcM_SearchByID(i_this->field_0xba4);
@@ -162,13 +162,13 @@ static void damage_check(e_bi_class* i_this) {
 
                     i_this->field_0x6b0 = 1;
                 }
-            } else if (i_this->field_0x694 != 0 || i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOMB)) {
+            } else if (i_this->explodeTimer != 0 || i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOMB)) {
                 dBomb_c::createNormalBombExplode(&a_this->eyePos);
                 i_this->field_0x6b0 = 1;
             } else {
                 i_this->mAction = 5;
-                i_this->field_0x670 = 0;
-                i_this->field_0x692 = 60;
+                i_this->mode = 0;
+                i_this->invulnerabilityTimer =  60 * SCALE_TIME;
                 a_this->speedF = 0.0f;
 
                 if (i_this->mAtInfo.mHitType == HIT_TYPE_STUN) {
@@ -191,27 +191,27 @@ static void e_bi_wait(e_bi_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
     cXyz sp28;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case -2:
             anm_init(i_this, BCK_BI_APPEAR, 1.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
-            i_this->field_0x670 = 1;
+            i_this->mode = 1;
             break;
 
         case 0:
             anm_init(i_this, BCK_BI_WAIT01TO02, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             i_this->mSound.startCreatureSound(Z2SE_EN_BI_CROUCH, 0, -1);
-            i_this->field_0x670 = 1;
+            i_this->mode = 1;
             break;
 
         case 1:
             if (i_this->mpModelMorf->isStop()) {
-                if (i_this->field_0x5b5 == 1) {
+                if (i_this->arg1 == 1) {
                     i_this->mAction = 1;
-                    i_this->field_0x670 = 0;
+                    i_this->mode = 0;
                 } else {
                     anm_init(i_this, BCK_BI_WAIT02, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
-                    i_this->field_0x670 = 2;
-                    i_this->field_0x68c[0] = l_HIO.time_to_get_going;
+                    i_this->mode = 2;
+                    i_this->timer[0] = l_HIO.time_to_get_going;
                 }
             }
             break;
@@ -224,10 +224,10 @@ static void e_bi_wait(e_bi_class* i_this) {
 
             if (sp28.abs() < 1.0f && !pl_check(i_this, l_HIO.search_range + 50.0f)) {
                 i_this->mAction = 1;
-                i_this->field_0x670 = 0;
-            } else if (i_this->field_0x68c[0] == 0) {
+                i_this->mode = 0;
+            } else if (i_this->timer[0] == 0) {
                 i_this->mAction = 2;
-                i_this->field_0x670 = 0;
+                i_this->mode = 0;
             }
             break;
     }
@@ -236,24 +236,24 @@ static void e_bi_wait(e_bi_class* i_this) {
 static void e_bi_up(e_bi_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case 0:
             anm_init(i_this, BCK_BI_WAIT02TO01, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             i_this->mSound.startCreatureSound(Z2SE_EN_BI_STAND, 0, -1);
-            i_this->field_0x670 = 1;
+            i_this->mode = 1;
             break;
 
         case 1:
             if (i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, BCK_BI_WAIT01, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
-                i_this->field_0x670 = 2;
+                i_this->mode = 2;
             }
             break;
 
         case 2:
             if (pl_check(i_this, l_HIO.search_range)) {
                 i_this->mAction = 0;
-                i_this->field_0x670 = 0;
+                i_this->mode = 0;
             }
             break;
     }
@@ -261,11 +261,11 @@ static void e_bi_up(e_bi_class* i_this) {
     cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x684, 4, 0x800);
     cLib_addCalcAngleS2(&a_this->shape_angle.y, a_this->current.angle.y, 4, 0x2000);
 
-    if (i_this->field_0x5b5 == 1 && i_this->field_0x670 >= 2) {
+    if (i_this->arg1 == 1 && i_this->mode >= 2) {
         fopAc_ac_c* actor_p = fopAcM_SearchByID(i_this->field_0xba8);
         if (actor_p != NULL && actor_p->field_0x567 != 0) {
             i_this->mAction = 7;
-            i_this->field_0x670 = 0;
+            i_this->mode = 0;
         }
     }
 }
@@ -276,15 +276,15 @@ static void e_bi_move(e_bi_class* i_this) {
     f32 fVar1 = 0.0f;
     sp40 = a_this->home.pos - a_this->current.pos;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case 0:
-            if (i_this->field_0x68c[0] == 0) {
+            if (i_this->timer[0] == 0) {
                 anm_init(i_this, BCK_BI_MOVE, 3.0f, J3DFrameCtrl::EMode_LOOP, 3.0f);
 
                 if (!pl_check(i_this, l_HIO.track_range)) {
-                    i_this->field_0x670 = 5;
+                    i_this->mode = 5;
                 } else {
-                    i_this->field_0x670 = 1;
+                    i_this->mode = 1;
                 }
             }
             break;
@@ -294,12 +294,12 @@ static void e_bi_move(e_bi_class* i_this) {
             i_this->field_0x680 = i_this->field_0x684;
 
             if (fopAcM_searchPlayerDistance(a_this) < KREG_F(7) + 150.0f) {
-                i_this->field_0x670 = 2;
+                i_this->mode = 2;
                 anm_init(i_this, BCK_BI_ATTACK, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 fVar1 = 0.0f;
                 a_this->speedF = fVar1;
             } else if (!pl_check(i_this, l_HIO.track_range)) {
-                i_this->field_0x670 = 5;
+                i_this->mode = 5;
             }
             break;
 
@@ -307,8 +307,8 @@ static void e_bi_move(e_bi_class* i_this) {
             i_this->field_0x988 = 1;
 
             if (i_this->mpModelMorf->isStop()) {
-                i_this->field_0x670 = 0;
-                i_this->field_0x68c[0] = cM_rndF(20.0f);
+                i_this->mode = 0;
+                i_this->timer[0] = cM_rndF(20.0f) * SCALE_TIME;
                 anm_init(i_this, BCK_BI_WAIT02, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             }
             break;
@@ -318,14 +318,14 @@ static void e_bi_move(e_bi_class* i_this) {
             i_this->field_0x680 = cM_atan2s(sp40.x, sp40.z);
             sp40.y = 0.0f;
 
-            if (i_this->field_0x694 == 0 && sp40.abs() < l_HIO.movement_spd * 1.5f) {
+            if (i_this->explodeTimer == 0 && sp40.abs() < l_HIO.movement_spd * (1.5f * DELTA_TIME)) {
                 i_this->mAction = 0;
                 anm_init(i_this, BCK_BI_WAIT02, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
-                i_this->field_0x670 = 2;
-                i_this->field_0x68c[0] = l_HIO.time_to_get_going;
+                i_this->mode = 2;
+                i_this->timer[0] = l_HIO.time_to_get_going;
             } else if (pl_check(i_this, l_HIO.search_range)) {
-                i_this->field_0x670 = 0;
-                i_this->field_0x68c[0] = 0;
+                i_this->mode = 0;
+                i_this->timer[0] = 0;
             }
             break;
     }
@@ -339,23 +339,23 @@ static void e_bi_ex(e_bi_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
     cXyz sp48, sp54;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case 0:
-            i_this->field_0x670 = 1;
-            i_this->field_0x694 = 160;
+            i_this->mode = 1;
+            i_this->explodeTimer = 160 * SCALE_TIME;
             anm_init(i_this, BCK_BI_BOMBPOSE, 10.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             f32 fVar1;
             fVar1 = cM_rndF(0.2f) + 0.9f;
             i_this->field_0x6a2 = 0;
             i_this->field_0x6a4 = (3800.0f + JREG_F(5)) * fVar1;
             i_this->field_0x6a8 = fVar1 * 20.0f;
-            a_this->speed.y = 23.0f;
+            a_this->speed.y = 23.0f * DELTA_TIME;
             break;
 
         case 1:
             if (i_this->mObjAcch.ChkGroundHit()) {
-                i_this->field_0x670 = 2;
-                a_this->speed.y = 10.0f;
+                i_this->mode = 2;
+                a_this->speed.y = 10.0f * DELTA_TIME;
             }
             // fallthrough
         case 2:
@@ -372,22 +372,22 @@ static void e_bi_ex(e_bi_class* i_this) {
     a_this->current.pos += sp54;
     i_this->field_0x6a2 += i_this->field_0x6a4;
 
-    if (i_this->field_0x694 != 0) {
-        i_this->field_0x694--;
+    if (i_this->explodeTimer != 0) {
+        i_this->explodeTimer--;
         i_this->mSound.startCreatureSoundLevel(Z2SE_OBJ_BOMB_IGNITION, 0, -1);
         i_this->field_0x696 += (s16) 0x1100;
 
-        if (i_this->field_0x694 < 45) {
+        if (i_this->explodeTimer < 45 * SCALE_TIME) {
             i_this->field_0x696 += (s16) 0x1100;
 
-            if (i_this->field_0x694 < 30) {
+            if (i_this->explodeTimer < 30 * SCALE_TIME) {
                 i_this->field_0x696 += (s16) 0x1100;
             }
         }
 
         i_this->field_0x698 = 128.0f - cM_scos(i_this->field_0x696) * 127.0f;
 
-        if (i_this->field_0x694 == 0) {
+        if (i_this->explodeTimer == 0) {
             dBomb_c::createNormalBombExplode(&a_this->eyePos);
             i_this->field_0x6b0 = 1;
         }
@@ -420,21 +420,21 @@ static void e_bi_water(e_bi_class* i_this) {
     cXyz sp34, sp40;
     sp34 = a_this->home.pos - a_this->current.pos;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case 0:
             anm_init(i_this, BCK_BI_MOVE, 3.0f, J3DFrameCtrl::EMode_LOOP, 3.0f);
-            i_this->field_0x670 = 1;
-            i_this->field_0x68c[0] = 20;
+            i_this->mode = 1;
+            i_this->timer[0] = 20 * SCALE_TIME;
             a_this->speed.y = 0.0f;
             // fallthrough
         case 1:
-            if (i_this->field_0x68c[0] == 0) {
+            if (i_this->timer[0] == 0) {
                 i_this->mpModelMorf->setPlaySpeed(0.0f);
                 a_this->current.pos.y += a_this->speed.y;
-                a_this->speed.y -= 0.1f;
+                a_this->speed.y -= 0.1f * DELTA_TIME;
 
-                if (a_this->speed.y < -2.0f) {
-                    a_this->speed.y = -2.0f;
+                if (a_this->speed.y < -2.0f * DELTA_TIME) {
+                    a_this->speed.y = -2.0f * DELTA_TIME;
                 }
 
                 cLib_addCalc0(&a_this->scale.x, 1.0f, 0.02f);
@@ -451,8 +451,8 @@ static void e_bi_water(e_bi_class* i_this) {
     a_this->current.pos.z += a_this->speed.z;
 
     i_this->mObjAcch.CrrPos(dComIfG_Bgsp());
-    a_this->speed.x *= 0.9f;
-    a_this->speed.z *= 0.9f;
+    a_this->speed.x *= 0.9f * DELTA_TIME;
+    a_this->speed.z *= 0.9f * DELTA_TIME;
 
     cXyz sp4c(a_this->current.pos);
     sp4c.y = i_this->field_0x6ac;
@@ -465,17 +465,17 @@ static void e_bi_water(e_bi_class* i_this) {
 static void e_bi_disap(e_bi_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
 
-    switch (i_this->field_0x670) {
+    switch (i_this->mode) {
         case 0:
             anm_init(i_this, BCK_BI_APPEAR, 10.0f, J3DFrameCtrl::EMode_NONE, 0.0f);
-            i_this->field_0x660 = 40.0f;
-            i_this->field_0x670 = 1;
-            i_this->field_0x68c[0] = 10;
+            i_this->field_0x660 = 40.0f * DELTA_TIME;
+            i_this->mode = 1;
+            i_this->timer[0] = 10 * SCALE_TIME;
             break;
 
         case 1:
-            if (i_this->field_0x68c[0] == 0) {
-                i_this->field_0x660 -= 1.0f;
+            if (i_this->timer[0] == 0) {
+                i_this->field_0x660 -= 1.0f * DELTA_TIME;
 
                 if (i_this->field_0x660 < 0.0f) {
                     fopAcM_delete(a_this);
@@ -512,7 +512,7 @@ static void action(e_bi_class* i_this) {
     cXyz sp9c, spa8;
 
     i_this->field_0x684 = fopAcM_searchPlayerAngleY(a_this);
-    i_this->field_0x688 = (a_this->home.pos - player->current.pos).abs();
+    i_this->distToPl = (a_this->home.pos - player->current.pos).abs();
 
     damage_check(i_this);
 
@@ -576,9 +576,9 @@ static void action(e_bi_class* i_this) {
     if (bVar2 != 0) {
         cXyz* ccMoveP = i_this->mStts.GetCCMoveP();
         if (ccMoveP != NULL) {
-            a_this->current.pos.x += ccMoveP->x * 0.5f;
-            a_this->current.pos.y += ccMoveP->y * 0.5f;
-            a_this->current.pos.z += ccMoveP->z * 0.5f;
+            a_this->current.pos.x += ccMoveP->x * 0.5f * DELTA_TIME;
+            a_this->current.pos.y += ccMoveP->y * 0.5f * DELTA_TIME;
+            a_this->current.pos.z += ccMoveP->z * 0.5f * DELTA_TIME;
         }
 
         cMtx_YrotS(*calc_mtx, a_this->current.angle.y);
@@ -589,7 +589,7 @@ static void action(e_bi_class* i_this) {
         a_this->speed.x = spa8.x;
         a_this->speed.z = spa8.z;
         a_this->current.pos += a_this->speed;
-        a_this->speed.y -= 5.0f;
+        a_this->speed.y -= 5.0f * DELTA_TIME;
         i_this->mObjAcch.CrrPos(dComIfG_Bgsp());
     }
 
@@ -623,8 +623,8 @@ static void action(e_bi_class* i_this) {
     }
 
     if (bVar4 != 0 && water_check(i_this)) {
-        i_this->mAction = 6;
-        i_this->field_0x670 = 0;
+        i_this->mAction = ACTION_WATER;
+        i_this->mode = 0;
         a_this->current.pos.y = i_this->field_0x6ac - (WREG_F(11) + 50.0f);
         cXyz i_pos(a_this->current.pos);
 
@@ -684,12 +684,12 @@ static void ride_movebg_init(e_bi_class* i_this) {
 static int daE_BI_Execute(e_bi_class* i_this) {
     fopAc_ac_c* a_this = &i_this->actor;
 
-    if (i_this->field_0x5b4 == 53) {
+    if (i_this->arg0 == 53) {
         return 1;
     }
 
     if (i_this->field_0xbad == 0) {
-        if (i_this->field_0x5b5 == 1) {
+        if (i_this->arg1 == 1) {
             if (i_this->field_0xbac == 0) {
                 ride_movebg_init(i_this);
             } else {
@@ -707,21 +707,21 @@ static int daE_BI_Execute(e_bi_class* i_this) {
 
     cXyz sp60, sp6c;
     
-    i_this->field_0x66c++;
+    i_this->frameCounter++;
 
     for (int i = 0; i < 3; i++) {
-        if (i_this->field_0x68c[i] != 0) {
-            i_this->field_0x68c[i]--;
+        if (i_this->timer[i] != 0) {
+            i_this->timer[i]--;
         }
     }
 
-    if (i_this->field_0x692 != 0) {
-        i_this->field_0x692--;
+    if (i_this->invulnerabilityTimer != 0) {
+        i_this->invulnerabilityTimer--;
     }
 
     action(i_this);
 
-    if (i_this->field_0x5b5 == 1) {
+    if (i_this->arg1 == 1) {
         obj_fw_class* fw_p = (obj_fw_class*)fopAcM_SearchByID(i_this->field_0xba8);
         if (fw_p != NULL) {
             mDoMtx_stack_c::transS(fw_p->actor.current.pos.x, fw_p->actor.current.pos.y + fw_p->field_0x594 + fw_p->field_0x588, fw_p->actor.current.pos.z);
@@ -794,7 +794,7 @@ static int daE_BI_Execute(e_bi_class* i_this) {
 
     sp6c = a_this->current.pos;
 
-    if (i_this->field_0x692 != 0) {
+    if (i_this->invulnerabilityTimer != 0) {
         sp6c.x += -20000.0f;
     }
 
@@ -874,9 +874,9 @@ static cPhs__Step daE_BI_Create(fopAc_ac_c* a_this) {
     if (phase == cPhs_COMPLEATE_e) {
         OS_REPORT("E_BI PARAM %x\n", fopAcM_GetParam(a_this));
 
-        i_this->field_0x5b4 = fopAcM_GetParam(a_this);
-        i_this->field_0x5b5 = fopAcM_GetParam(a_this) >> 8;
-        i_this->field_0x5b6 = fopAcM_GetParam(a_this) >> 16;
+        i_this->arg0 = fopAcM_GetParam(a_this);
+        i_this->arg1 = fopAcM_GetParam(a_this) >> 8;
+        i_this->arg2 = fopAcM_GetParam(a_this) >> 16;
 
         OS_REPORT("E_BI//////////////E_BI SET 1 !!\n");
 
@@ -892,7 +892,7 @@ static cPhs__Step daE_BI_Create(fopAc_ac_c* a_this) {
             return cPhs_ERROR_e;
         }
 
-        if (i_this->field_0x5b4 == 53) {
+        if (i_this->arg0 == 53) {
             return phase;
         }
 
@@ -950,11 +950,11 @@ static cPhs__Step daE_BI_Create(fopAc_ac_c* a_this) {
         i_this->mAtInfo.mPowerType = 1;
         i_this->mSound.setEnemyName("E_bi");
         
-        i_this->field_0x66c = cM_rndF(65535.0f);
+        i_this->frameCounter = cM_rndF(65535.0f);
         a_this->attention_info.distances[fopAc_attn_CARRY_e] = 42;
 
-        if (i_this->field_0x5b4 != 1) {
-            if (i_this->field_0x5b5 == 1) {
+        if (i_this->arg0 != 1) {
+            if (i_this->arg1 == 1) {
                 i_this->field_0xbac = 10;
             } else {
                 cXyz sp38(a_this->current.pos);
@@ -966,10 +966,10 @@ static cPhs__Step daE_BI_Create(fopAc_ac_c* a_this) {
                 }
             }
 
-            i_this->field_0xba4 = fopAcM_createChild(PROC_E_BI_LEAF, fopAcM_GetID(a_this), i_this->field_0x5b5, &a_this->current.pos,
+            i_this->field_0xba4 = fopAcM_createChild(PROC_E_BI_LEAF, fopAcM_GetID(a_this), i_this->arg1, &a_this->current.pos,
                                                         fopAcM_GetRoomNo(a_this), &a_this->shape_angle, NULL, -1, NULL);
         } else {
-            i_this->field_0x670 = -2;
+            i_this->mode = -2;
             i_this->field_0xba4 = a_this->parentActorID;
         }
 

@@ -47,8 +47,8 @@ daE_DB_HIO_c::daE_DB_HIO_c() {
     base_size = 1.0f;
     flower_size = 0.5f;
     appear_size = 1.2f;
-    roof_reappear_interval = 70;
-    attack_freq = 30;
+    roof_reappear_interval = 70 * SCALE_TIME;
+    attack_freq = 30 * SCALE_TIME;
 }
 
 static void anm_init(e_db_class* i_this, int i_anm, f32 i_morf, u8 i_mode, f32 i_speed) {
@@ -137,14 +137,14 @@ static void damage_check(e_db_class* i_this) {
 
         if (i_this->atSph.ChkAtShieldHit()) {
             if (i_this->action == ACTION_ESCAPE) {
-                actor->speed.y = 10.0f;
-                actor->speedF = -15.0f;
+                actor->speed.y = 10.0f * DELTA_TIME;
+                actor->speedF = -15.0f * DELTA_TIME;
 
                 i_this->field_0x860 = 0;
                 actor->shape_angle.x = -0x1000;
-                i_this->invulnerabilityTimer = 5;
+                i_this->invulnerabilityTimer = 5 * SCALE_TIME;
             } else {
-                i_this->invulnerabilityTimer = 6;
+                i_this->invulnerabilityTimer = 6 * SCALE_TIME;
                 i_this->action = ACTION_S_DAMAGE;
                 i_this->mode = 0;
 
@@ -161,7 +161,7 @@ static void damage_check(e_db_class* i_this) {
         if (i_this->action < ACTION_ESCAPE) {
             for (int i = 0; i < 4; i++) {
                 if (i_this->kukiSph[i].ChkTgHit()) {
-                    i_this->invulnerabilityTimer = 10;
+                    i_this->invulnerabilityTimer = 10 * SCALE_TIME;
                     i_this->atInfo.mpCollider = i_this->kukiSph[i].GetTgHitObj();
 
                     if (i_this->atInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
@@ -191,13 +191,13 @@ static void damage_check(e_db_class* i_this) {
             i_this->atInfo.mpCollider = i_this->ccSph.GetTgHitObj();
             cc_at_check(actor, &i_this->atInfo);
 
-            i_this->invulnerabilityTimer = 6;
+            i_this->invulnerabilityTimer = 6 * SCALE_TIME;
 
             if ((dComIfGp_event_runCheck() || i_this->field_0x850 != 0) && i_this->atInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG | AT_TYPE_40)) {
                 hit_type = 1;
             } else if (i_this->atInfo.mHitType == 16) {
                 if (i_this->action == ACTION_ESCAPE) {
-                    i_this->field_0x858 = 60.0f;
+                    i_this->field_0x858 = 60.0f * DELTA_TIME;
                     i_this->field_0x85c = i_this->atInfo.mHitDirection.y;
                     i_this->mode = 10;
                 } else {
@@ -217,7 +217,7 @@ static void damage_check(e_db_class* i_this) {
                     i_this->action = ACTION_E_DEAD;
                     return;
                 } else {
-                    i_this->field_0x858 = 60.0f;
+                    i_this->field_0x858 = 60.0f * DELTA_TIME;
                     i_this->field_0x85c = i_this->atInfo.mHitDirection.y;
                     i_this->mode = 10;
                 }
@@ -231,17 +231,17 @@ static void damage_check(e_db_class* i_this) {
 
         if (hit_type != 0) {
             if (i_this->action == ACTION_ESCAPE) {
-                i_this->field_0x858 = 30.0f;
+                i_this->field_0x858 = 30.0f * DELTA_TIME;
                 i_this->field_0x85c = -player->shape_angle.y;
                 i_this->mode = 10;
-                actor->speed.y = 5.0f;
+                actor->speed.y = 5.0f * DELTA_TIME;
             } else {
                 i_this->action = ACTION_ESCAPE;
                 i_this->mode = 0;
                 i_this->field_0x84e = 5000;
                 i_this->field_0x850 = 0;
                 actor->speedF = 0.0f;
-                i_this->timers[1] = 45;
+                i_this->timers[1] = 45 * SCALE_TIME;
 
                 dComIfGp_particle_set(0x81C1, &i_this->field_0x69c[4], NULL, NULL);
 
@@ -250,15 +250,15 @@ static void damage_check(e_db_class* i_this) {
 
                 if (i_this->arg0 == 1) {
                     i_this->field_0x864 = 20.0f;
-                    actor->speed.y = 5.0f;
+                    actor->speed.y = 5.0f * DELTA_TIME;
                     actor->field_0x560 = 10;
                     actor->health = 10;
                 } else if (i_this->arg0 == 2) {
                     i_this->field_0x864 = 20.0f;
-                    actor->speed.y = 5.0f;
+                    actor->speed.y = 5.0f * DELTA_TIME;
                 } else {
                     i_this->field_0x864 = -10.0f;
-                    actor->speed.y = 30.0f;
+                    actor->speed.y = 30.0f * DELTA_TIME;
                 }
             }
         }
@@ -273,7 +273,7 @@ static void e_db_stay(e_db_class* i_this) {
     fopAc_ac_c* actor = &i_this->enemy;
 
     cXyz sp14;
-    i_this->invulnerabilityTimer = 15;
+    i_this->invulnerabilityTimer = 15 * SCALE_TIME;
 
     switch (i_this->mode) {
     case 0:
@@ -284,7 +284,7 @@ static void e_db_stay(e_db_class* i_this) {
         if (leaf_anm_init(i_this, 0x14, 10.0f, 2, 0.0f)) {
             i_this->mode = 5;
             i_this->field_0x68c = 0.0f;
-            i_this->timers[0] = 50;
+            i_this->timers[0] = 50 * SCALE_TIME;
         }
         break;
     case 2:
@@ -391,7 +391,7 @@ static void e_db_appear_v(e_db_class* i_this) {
         anm_init(i_this, 5, 5.0f, 0, 1.0f);
         leaf_anm_init(i_this, 0x13, 5.0f, 2, 1.0f);
         i_this->mode = 1;
-        i_this->timers[0] = JREG_S(6) + 30;
+        i_this->timers[0] = (JREG_S(6) + 30) * SCALE_TIME;
         i_this->field_0x68c = 0.0f;
         i_this->modelMorf->setFrame(15.0f);
         /* fallthrough */
@@ -449,7 +449,7 @@ static void e_db_wait(e_db_class* i_this) {
         i_this->mode = 1;
 
         if (i_this->arg2 == 1) {
-            i_this->timers[1] = 30.0f + cM_rndF(20.0f);
+            i_this->timers[1] = (30.0f + cM_rndF(20.0f)) * SCALE_TIME;
         } else {
             i_this->timers[1] = l_HIO.attack_freq + cM_rndF(l_HIO.attack_freq);
         }
@@ -458,7 +458,7 @@ static void e_db_wait(e_db_class* i_this) {
         break;
     case 1:
         if (i_this->timers[0] == 0) {
-            i_this->timers[0] = 10.0f + cM_rndF(30.0f);
+            i_this->timers[0] = (10.0f + cM_rndF(30.0f)) * SCALE_TIME;
             i_this->field_0x674.x = actor->home.pos.x + cM_rndFX(100.0f);
             i_this->field_0x674.z = actor->home.pos.z + cM_rndFX(100.0f);
 
@@ -520,7 +520,7 @@ static void e_db_mk_roof(e_db_class* i_this) {
             anm_init(i_this, 0x12, 10.0f, 2, 1.0f);
             leaf_anm_init(i_this, 0x14, 10.0f, 2, 1.0f);
             i_this->mode = 1;
-            i_this->timers[1] = 50.0f + cM_rndF(50.0f);
+            i_this->timers[1] = (50.0f + cM_rndF(50.0f)) * SCALE_TIME;
             i_this->timers[0] = 0;
             i_this->size = l_HIO.appear_size;
         } else {
@@ -529,7 +529,7 @@ static void e_db_mk_roof(e_db_class* i_this) {
         break;
     case 1:
         if (i_this->timers[0] == 0) {
-            i_this->timers[0] = 10.0f + cM_rndF(30.0f);
+            i_this->timers[0] = (10.0f + cM_rndF(30.0f)) * SCALE_TIME;
             i_this->field_0x674.x = actor->home.pos.x + cM_rndFX(70.0f);
             i_this->field_0x674.z = actor->home.pos.z + cM_rndFX(70.0f);
             i_this->field_0x674.y = (actor->home.pos.y - 250.0f) + BREG_F(1);
@@ -564,7 +564,7 @@ static void e_db_attack(e_db_class* i_this) {
     switch (i_this->mode) {
     case 0:
         i_this->mode = 1;
-        i_this->timers[0] = 17;
+        i_this->timers[0] = 17 * SCALE_TIME;
         i_this->field_0x68c = 0.0f;
         i_this->field_0xb15 = 0;
 
@@ -598,7 +598,7 @@ static void e_db_attack(e_db_class* i_this) {
 
         if (i_this->timers[0] == 0) {
             i_this->mode = 2;
-            i_this->timers[1] = 10;
+            i_this->timers[1] = 10 * SCALE_TIME;
 
             if (i_this->field_0x850 != 0) {
                 cMtx_YrotS(*calc_mtx, (actor->shape_angle.y + 0x8000));
@@ -652,7 +652,7 @@ static void e_db_attack(e_db_class* i_this) {
             i_this->mode = 5;
             i_this->field_0x68c = 20.0f;
             anm_init(i_this, 7, 2.0f, 2, 1.0f);
-            i_this->timers[0] = 120;
+            i_this->timers[0] = 120 * SCALE_TIME;
 
             daPy_getPlayerActorClass()->setDkCaught(actor);
             dComIfGp_getVibration().StartShock(6, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
@@ -674,7 +674,7 @@ static void e_db_attack(e_db_class* i_this) {
         spA = 0;
 
         if (daPy_getPlayerActorClass()->getDkCaught()) {
-            if (i_this->timers[0] == 30) {
+            if (i_this->timers[0] == 30 * SCALE_TIME) {
                 dComIfGp_setItemLifeCount(-1.0f, 0);
             }
 
@@ -727,7 +727,7 @@ static void e_db_attack(e_db_class* i_this) {
             i_this->mode = -1;
             anm_init(i_this, 0x10, 2.0f, 0, 1.0f);
             i_this->sound.startCreatureVoice(Z2SE_EN_DB_V_RELEASE, -1);
-            i_this->field_0x858 = 20.0f;
+            i_this->field_0x858 = 20.0f * DELTA_TIME;
             i_this->field_0x85c = actor->shape_angle.y;
         }
         break;
@@ -769,7 +769,7 @@ static void e_db_attack_s(e_db_class* i_this) {
         anm_init(i_this, 6, 5.0f, 0, 1.0f);
         i_this->atSph.StartCAt(actor->current.pos);
 
-        i_this->timers[0] = YREG_S(7) + 15;
+        i_this->timers[0] = (YREG_S(7) + 15) * SCALE_TIME;
         i_this->field_0x68c = 0.0f;
         i_this->mode = 1;
         /* fallthrough */
@@ -810,7 +810,7 @@ static void e_db_chance(e_db_class* i_this) {
 
         leaf_anm_init(i_this, 0x14, 5.0f, 2, 1.0f);
         i_this->mode = 1;
-        i_this->timers[0] = 60;
+        i_this->timers[0] = 60 * SCALE_TIME;
         i_this->field_0x68c = 0.0f;
         /* fallthrough */
     case 1:
@@ -828,7 +828,7 @@ static void e_db_chance(e_db_class* i_this) {
 
         cLib_addCalc2(&i_this->field_0x68c, 1.0f, 1.0f, 0.1f);
 
-        if (i_this->timers[0] <= 50 && i_this->timers[0] >= 10) {
+        if (i_this->timers[0] <= 50 * SCALE_TIME && i_this->timers[0] >= 10 * SCALE_TIME) {
             i_this->sound.startCreatureSoundLevel(Z2SE_EN_DB_V_FAINT, 0, -1);
         }
 
@@ -874,11 +874,11 @@ static void e_db_s_damage(e_db_class* i_this) {
         }
 
         sp10.x = 0.0f;
-        sp10.y = 15.0f;
-        sp10.z = -50.0f + TREG_F(16);
+        sp10.y = 15.0f * DELTA_TIME;
+        sp10.z = (-50.0f + TREG_F(16)) * DELTA_TIME;
         MtxPosition(&sp10, &actor->speed);
         i_this->mode = 1;
-        i_this->timers[0] = 10;
+        i_this->timers[0] = 10 * SCALE_TIME;
         i_this->sound.startCreatureVoice(Z2SE_EN_DB_V_DAMAGE_S, -1);
         break;
     case 1:
@@ -889,9 +889,9 @@ static void e_db_s_damage(e_db_class* i_this) {
         if (JMAFastSqrt(SQUARE(sp10.x) + SQUARE(sp10.z)) > 250.0f + nREG_F(8)) {
             actor->speed.zero();
         } else {
-            actor->speed.x *= 0.92f;
-            actor->speed.y *= 0.92f;
-            actor->speed.z *= 0.92f;
+            actor->speed.x *= 0.92f * DELTA_TIME;
+            actor->speed.y *= 0.92f * DELTA_TIME;
+            actor->speed.z *= 0.92f * DELTA_TIME;
         }
 
         if (i_this->timers[0] == 0) {
@@ -922,14 +922,14 @@ static void e_db_damage(e_db_class* i_this) {
         sp1C.x = 0.0f;
         if (i_this->arg0 != 1) {
             if (i_this->arg0 == 2) {
-                sp1C.y = 20.0f + AREG_F(1);
+                sp1C.y = (20.0f + AREG_F(1)) * DELTA_TIME;
             } else {
-                sp1C.y = 30.0f;
+                sp1C.y = 30.0f * DELTA_TIME;
             }
-            sp1C.z = -50.0f;
+            sp1C.z = -50.0f * DELTA_TIME;
         } else {
             sp1C.y = 0.0f;
-            sp1C.z = -20.0f;
+            sp1C.z = -20.0f * DELTA_TIME;
         }
         MtxPosition(&sp1C, &actor->speed);
 
@@ -940,8 +940,8 @@ static void e_db_damage(e_db_class* i_this) {
         sp1C = actor->current.pos - actor->home.pos;
         if (sp1C.abs() > (450.0f + TREG_F(15))) {
             actor->current.pos = actor->old.pos;
-            actor->speed.x *= -0.1f;
-            actor->speed.z *= -0.1f;
+            actor->speed.x *= -0.1f * DELTA_TIME;
+            actor->speed.z *= -0.1f * DELTA_TIME;
             i_this->mode++;
         }
     case 2:
@@ -956,9 +956,9 @@ static void e_db_damage(e_db_class* i_this) {
 
         if (i_this->arg0 != 1) {
             if (i_this->arg0 == 2) {
-                actor->speed.y -= 1.0f + AREG_F(0);
+                actor->speed.y -= (1.0f + AREG_F(0)) * DELTA_TIME;
             } else {
-                actor->speed.y -= 5.0f;
+                actor->speed.y -= 5.0f * DELTA_TIME;
             }
         }
 
@@ -1229,11 +1229,11 @@ static s8 e_db_escape(e_db_class* i_this) {
         spC = 1;
         i_this->field_0x840 = 25.0f + TREG_F(8);
         if (i_this->acch.ChkGroundHit()) {
-            actor->speed.y = 20.0f;
+            actor->speed.y = 20.0f * DELTA_TIME;
             i_this->mode = 1;
             anm_init(i_this, 0xF, 10.0f, 2, 1.0f);
             i_this->atSph.StartCAt(actor->current.pos);
-            i_this->timers[0] = 200.0f + cM_rndF(100.0f);
+            i_this->timers[0] = (200.0f + cM_rndF(100.0f)) * SCALE_TIME;
             fopAcM_effSmokeSet1(&i_this->field_0x1258, &i_this->field_0x125c, &actor->current.pos, &actor->shape_angle, 1.0f + NREG_F(18), &actor->tevStr, 1);
         }
         break;
@@ -1254,8 +1254,8 @@ static s8 e_db_escape(e_db_class* i_this) {
                     i_this->field_0x860 = -0x4000;
                 }
 
-                actor->speed.y = 30.0f + KREG_F(8);
-                actor->speedF = 15.0f + KREG_F(9);
+                actor->speed.y = (30.0f + KREG_F(8)) * DELTA_TIME;
+                actor->speedF = (15.0f + KREG_F(9)) * DELTA_TIME;
                 actor->shape_angle.x = -0x2000;
                 i_this->sound.startCreatureVoice(Z2SE_EN_DB_V_ATTACK, -1);
             }
@@ -1268,7 +1268,7 @@ static s8 e_db_escape(e_db_class* i_this) {
 
         if (sp60.abs() < 100.0f) {
             i_this->mode = 3;
-            i_this->timers[0] = 25;
+            i_this->timers[0] = 25 * SCALE_TIME;
             leaf_anm_init(i_this, 0x13, 10.0f, 2, 1.0f);
             i_this->sound.startCreatureSound(Z2SE_EN_DB_GRASS, 0, -1);
         }
@@ -1276,8 +1276,9 @@ static s8 e_db_escape(e_db_class* i_this) {
     case 3:
         spC = 0;
         cLib_addCalc0(&i_this->field_0x840, 1.0f, 1.0f);
-        cLib_addCalc2(&actor->current.pos.x, actor->home.pos.x, 0.2f, fabsf(actor->speed.x));
-        cLib_addCalc2(&actor->current.pos.z, actor->home.pos.z, 0.2f, fabsf(actor->speed.z));
+        /* since maxStep is scaled in cLib function, the DELTA_TIME scaling on speed.x and speed.z here should be undone so as not to DELTA_TIME scale the values twice */
+        cLib_addCalc2(&actor->current.pos.x, actor->home.pos.x, 0.2f, fabsf(actor->speed.x * SCALE_TIME));
+        cLib_addCalc2(&actor->current.pos.z, actor->home.pos.z, 0.2f, fabsf(actor->speed.z * SCALE_TIME));
         cLib_addCalcAngleS2(&actor->shape_angle.x, -0x4000, 4, 0x400);
 
         if (i_this->timers[0] == 0) {
@@ -1319,7 +1320,7 @@ static s8 e_db_escape(e_db_class* i_this) {
                 OS_REPORT("E_DB//////////////AT  SET 1 %d !!\n", daPy_getPlayerActorClass()->getDkCaught2());
                 i_this->mode = 20;
                 i_this->field_0x68c = 15.0f;
-                i_this->timers[0] = 120;
+                i_this->timers[0] = 120 * SCALE_TIME;
 
                 daPy_getPlayerActorClass()->onDkCaught2();
                 OS_REPORT("E_DB//////////////AT  SET 2 %d !!\n", daPy_getPlayerActorClass()->getDkCaught2());
@@ -1332,9 +1333,9 @@ static s8 e_db_escape(e_db_class* i_this) {
         
         if (i_this->acch.ChkGroundHit()) {
             i_this->mode = 1;
-            i_this->timers[1] = 30;
+            i_this->timers[1] = 30 * SCALE_TIME;
             anm_init(i_this, 0xF, 10.0f, 2, 1.0f);
-            actor->speedF = 7.5f;
+            actor->speedF = 7.5f * DELTA_TIME;
             fopAcM_effSmokeSet1(&i_this->field_0x1258, &i_this->field_0x125c, &actor->current.pos, &actor->shape_angle, 1.0f + NREG_F(18), &actor->tevStr, 1);
         }
         break;
@@ -1349,7 +1350,7 @@ static s8 e_db_escape(e_db_class* i_this) {
         i_this->acch.CrrPos(dComIfG_Bgsp());
 
         if (!i_this->acch.ChkWallHit() && daPy_getPlayerActorClass()->getDkCaught2()) {
-            if (i_this->timers[0] == 30) {
+            if (i_this->timers[0] == 30 * SCALE_TIME) {
                 dComIfGp_setItemLifeCount(-1.0f, 0);
             }
 
@@ -1375,17 +1376,17 @@ static s8 e_db_escape(e_db_class* i_this) {
             cLib_addCalcAngleS2(&actor->shape_angle.x, 0, 2, 0x800);
         } else {
             i_this->mode = 21;
-            i_this->timers[1] = 30;
+            i_this->timers[1] = 30 * SCALE_TIME;
             anm_init(i_this, 0x10, 2.0f, 0, 1.0f);
             i_this->sound.startCreatureVoice(Z2SE_EN_DB_V_RELEASE, -1);
 
             if (i_this->acch.ChkWallHit()) {
                 actor->speedF = 0.0f;
             } else {
-                actor->speedF = -10.0f;
+                actor->speedF = -10.0f * DELTA_TIME;
             }
 
-            actor->speed.y = 15.0f;
+            actor->speed.y = 15.0f * DELTA_TIME;
             daPy_getPlayerActorClass()->offDkCaught2();
             spC = 1;
         }
@@ -1429,7 +1430,7 @@ static s8 e_db_escape(e_db_class* i_this) {
             cLib_addCalcAngleS2(&actor->shape_angle.x, 0, 2, 0x800);
             cLib_addCalcAngleS2(&actor->shape_angle.z, 0, 2, 0x800);
 
-            if (i_this->timers[1] < 10) {
+            if (i_this->timers[1] < 10 * SCALE_TIME) {
                 cLib_addCalc2(&actor->speedF, 7.5f, 1.0f, 1.0f);
             }
 
@@ -1446,13 +1447,13 @@ static s8 e_db_escape(e_db_class* i_this) {
         actor->speed.x = sp54.x;
         actor->speed.z = sp54.z;
         actor->current.pos += actor->speed;
-        actor->speed.y -= 3.0f;
+        actor->speed.y -= 3.0f * DELTA_TIME;
 
-        if (actor->speed.y < -80.0f) {
-            actor->speed.y = -80.0f;
+        if (actor->speed.y < -80.0f * DELTA_TIME) {
+            actor->speed.y = -80.0f * DELTA_TIME;
         }
 
-        if (i_this->field_0x858 > 0.1f) {
+        if (i_this->field_0x858 > 0.1f * DELTA_TIME) {
             sp60.x = 0.0f;
             sp60.y = 0.0f;
             sp60.z = -i_this->field_0x858;
@@ -1482,8 +1483,8 @@ static s8 e_db_escape(e_db_class* i_this) {
         i_this->field_0x852 = 1;
         daPy_getPlayerActorClass()->onEnemyDead();
 
-        i_this->invulnerabilityTimer = 200;
-        i_this->timers[0] = 80;
+        i_this->invulnerabilityTimer = 200 * SCALE_TIME;
+        i_this->timers[0] = 80 * SCALE_TIME;
 
         if (cM_rndF(1.0f) < 0.5f) {
             i_this->field_0x860 = 0x4000;
@@ -1491,8 +1492,8 @@ static s8 e_db_escape(e_db_class* i_this) {
             i_this->field_0x860 = -0x4000;
         }
 
-        if (actor->speed.y < -20.0f) {
-            actor->speed.y = -7.0f;
+        if (actor->speed.y < -20.0f * DELTA_TIME) {
+            actor->speed.y = -7.0f * DELTA_TIME;
         } else {
             actor->speed.y = 0.0f;
         }
@@ -1518,7 +1519,7 @@ static void e_db_e_dead(e_db_class* i_this) {
     fopAc_ac_c* actor = &i_this->enemy;
     cXyz sp24;
     cXyz sp18;
-    i_this->invulnerabilityTimer = 6;
+    i_this->invulnerabilityTimer = 6 * SCALE_TIME;
     dBgS_ObjGndChk_Spl sp30;
 
     sp24 = actor->current.pos;
@@ -1531,8 +1532,8 @@ static void e_db_e_dead(e_db_class* i_this) {
         i_this->field_0x840 = 25.0f + TREG_F(8);
         cMtx_YrotS(*calc_mtx, i_this->field_0x680);
         sp24.x = 0.0f;
-        sp24.y = 30.0f;
-        sp24.z = -40.0f;
+        sp24.y = 30.0f * DELTA_TIME;
+        sp24.z = -40.0f * DELTA_TIME;
         MtxPosition(&sp24, &actor->speed);
 
         anm_init(i_this, 0xC, 3.0f, 2, 1.0f);
@@ -1543,17 +1544,17 @@ static void e_db_e_dead(e_db_class* i_this) {
         break;
     case 1:
         if (i_this->acch.ChkWallHit()) {
-            actor->speed.x *= -0.3f;
-            actor->speed.z *= -0.3f;
+            actor->speed.x *= -0.3f * DELTA_TIME;
+            actor->speed.z *= -0.3f * DELTA_TIME;
             i_this->mode = 2;
         }
     case 2:
         if (i_this->acch.ChkGroundHit()) {
-            actor->speed.y = 20.0f;
+            actor->speed.y = 20.0f * DELTA_TIME;
             i_this->mode = 3;
-            i_this->timers[0] = 50;
-            actor->speed.x *= 0.2f;
-            actor->speed.z *= 0.2f;
+            i_this->timers[0] = 50 * SCALE_TIME;
+            actor->speed.x *= 0.2f * DELTA_TIME;
+            actor->speed.z *= 0.2f * DELTA_TIME;
 
             if (cM_rndF(1.0f) < 0.5f) {
                 i_this->field_0x860 = 0x4000;
@@ -1609,7 +1610,7 @@ static void e_db_e_dead(e_db_class* i_this) {
     cLib_addCalcAngleS2(&actor->shape_angle.x, 0, 2, 0x800);
 
     actor->current.pos += actor->speed;
-    actor->speed.y -= 3.0f;
+    actor->speed.y -= 3.0f * DELTA_TIME;
 
     f32 temp_f29 = 15.0f * cM_scos(actor->shape_angle.z);
     f32 temp_f31 = ((25.0f + temp_f29 + TREG_F(15)) * i_this->size) * l_HIO.base_size;
@@ -1628,8 +1629,8 @@ static void e_db_e_dead(e_db_class* i_this) {
         i_this->field_0x852 = 1;
         daPy_getPlayerActorClass()->onEnemyDead();
 
-        i_this->invulnerabilityTimer = 200;
-        i_this->timers[0] = 80;
+        i_this->invulnerabilityTimer = 200 * SCALE_TIME;
+        i_this->timers[0] = 80 * SCALE_TIME;
 
         if (cM_rndF(1.0f) < 0.5f) {
             i_this->field_0x860 = 0x4000;
@@ -1637,8 +1638,8 @@ static void e_db_e_dead(e_db_class* i_this) {
             i_this->field_0x860 = -0x4000;
         }
 
-        if (actor->speed.y < -20.0f) {
-            actor->speed.y = -7.0f;
+        if (actor->speed.y < -20.0f * DELTA_TIME) {
+            actor->speed.y = -7.0f * DELTA_TIME;
         } else {
             actor->speed.y = 0.0f;
         }
@@ -1820,8 +1821,8 @@ static void action(e_db_class* i_this) {
 
     cLib_addCalc0(&i_this->field_0x858, 1.0f, 5.0f + TREG_F(12));
 
-    if (actor->speed.y < -100.0f) {
-        actor->speed.y = -100.0f;
+    if (actor->speed.y < -100.0f * DELTA_TIME) {
+        actor->speed.y = -100.0f * DELTA_TIME;
     }
 
     cXyz effsize(1.0f, 1.0f, 1.0f);

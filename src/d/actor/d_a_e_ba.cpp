@@ -36,10 +36,10 @@ static daE_BA_HIO_c l_HIO;
 daE_BA_HIO_c::daE_BA_HIO_c() {
     field_0x04 = -1;
     mScale = 1.0f;
-    mFlySpeed = 15.0f;
+    mFlySpeed = 15.0f * DELTA_TIME;
     mFightDistance = 250.0f;
-    mFightSpeed = 15.0f;
-    mAttackSpeed = 40.0f;
+    mFightSpeed = 15.0f * DELTA_TIME;
+    mAttackSpeed = 40.0f * DELTA_TIME;
 }
 
 static void ba_disappear(fopAc_ac_c* i_this) {
@@ -136,7 +136,7 @@ static void damage_check(e_ba_class* i_this) {
                 if (i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_SHIELD_ATTACK)) {
                     i_this->mAction = e_ba_class::ACT_CHANCE;
                     i_this->mMode = 0;
-                    i_this->mKnockbackSpeed = 70.0f;
+                    i_this->mKnockbackSpeed = 70.0f * DELTA_TIME;
                     i_this->mKnockbackAngle = a_this->shape_angle.y;
                     i_this->mIsDying = false;
                     dComIfGp_getVibration().StartShock(2, 0x1f, cXyz(0.0f, 1.0f, 0.0f));
@@ -144,16 +144,16 @@ static void damage_check(e_ba_class* i_this) {
                                             && player->onWolfEnemyCatch(a_this)) {
                     i_this->mAction = e_ba_class::ACT_WOLFBITE;
                     i_this->mMode = 0;
-                    i_this->mIFrames = 200;
+                    i_this->mIFrames = 200 * SCALE_TIME;
                     dScnPly_c::setPauseTimer(0);
                     i_this->mCreatureSound.startCreatureVoice(Z2SE_EN_BA_V_BITE, -1);
                 } else {
                     if (i_this->mAtInfo.mpCollider->ChkAtType(AT_TYPE_UNK)) {
-                        i_this->mIFrames = 20;
+                        i_this->mIFrames = 20 * SCALE_TIME;
                     } else {
-                        i_this->mIFrames = 10;
+                        i_this->mIFrames = 10 * SCALE_TIME;
                     }
-                    i_this->mKnockbackSpeed = 80.0f;
+                    i_this->mKnockbackSpeed = 80.0f * DELTA_TIME;
                     i_this->mKnockbackAngle = i_this->mAtInfo.mHitDirection.y;
                     if (a_this->health <= 0) {
                         i_this->mCreatureSound.startCreatureVoice(Z2SE_EN_BA_V_DEATH, -1);
@@ -237,7 +237,7 @@ static void fly_move(e_ba_class* i_this) {
     s16 angle_x = -cM_atan2s(delta_y, dist_xz);
     cLib_addCalcAngleS2(&a_this->current.angle.y, angle_y, 10,
                         i_this->mBaseAngleSpeed * i_this->mSpeedRatio);
-    i_this->mBaseAngleSpeed = 2000.0f;
+    i_this->mBaseAngleSpeed = 2000.0f * DELTA_TIME;
     cLib_addCalcAngleS2(&a_this->current.angle.x, angle_x, 10,
                         i_this->mBaseAngleSpeed * i_this->mSpeedRatio);
     cLib_addCalc2(&i_this->mSpeedRatio, 1.0f, 1.0f, 0.04f);
@@ -269,9 +269,10 @@ static void e_ba_roof(e_ba_class* i_this) {
         break;
     }
 
-    cLib_addCalc2(&a_this->current.pos.x, a_this->home.pos.x, 0.5f, fabsf(a_this->speed.x));
-    cLib_addCalc2(&a_this->current.pos.y, a_this->home.pos.y, 0.5f, fabsf(a_this->speed.y));
-    cLib_addCalc2(&a_this->current.pos.z, a_this->home.pos.z, 0.5f, fabsf(a_this->speed.z));
+    /* since maxStep is scaled in cLib function, the DELTA_TIME scaling on speed.x, speed.y, and speed.z here should be undone so as not to DELTA_TIME scale the values twice */
+    cLib_addCalc2(&a_this->current.pos.x, a_this->home.pos.x, 0.5f, fabsf(a_this->speed.x * SCALE_TIME));
+    cLib_addCalc2(&a_this->current.pos.y, a_this->home.pos.y, 0.5f, fabsf(a_this->speed.y * SCALE_TIME));
+    cLib_addCalc2(&a_this->current.pos.z, a_this->home.pos.z, 0.5f, fabsf(a_this->speed.z * SCALE_TIME));
     
     if (pl_check(i_this, i_this->mFightFlyDistance, 1)) {
         i_this->mAction = e_ba_class::ACT_FIGHT_FLY;
@@ -335,7 +336,7 @@ static void e_ba_fight(e_ba_class* i_this) {
                  J3DFrameCtrl::EMode_LOOP, cM_rndF(0.1f) + 1.0f);
         i_this->mMode = 1;
         i_this->mTimer[0] = 0;
-        i_this->mTimer[1] = cM_rndF(100.0f) + 30.0f;
+        i_this->mTimer[1] = (cM_rndF(100.0f) + 30.0f) * SCALE_TIME;
         break;
 
     case 1:
@@ -355,12 +356,12 @@ static void e_ba_fight(e_ba_class* i_this) {
             vec.y = 0.0f;
             vec.z = l_HIO.mFightSpeed;
             MtxPosition(&vec, &a_this->speed);
-            i_this->mTimer[0] = cM_rndF(30.0f) + 10.0f;
+            i_this->mTimer[0] = (cM_rndF(30.0f) + 10.0f) * SCALE_TIME;
             i_this->mSpeedRatio = 0.0f;
         }
 
         if (i_this->mTimer[1] == 0) {
-            i_this->mTimer[1] = cM_rndF(100.0f) + 30.0f;
+            i_this->mTimer[1] = (cM_rndF(100.0f) + 30.0f) * SCALE_TIME;
             if (i_this->mHomeType != e_ba_class::HOME_APPEAR || cM_rndF(1.0f) < 0.2f) {
                 i_this->mAction = e_ba_class::ACT_ATTACK;
                 i_this->mMode = 0;
@@ -369,12 +370,13 @@ static void e_ba_fight(e_ba_class* i_this) {
         break;
     }
 
+    /* since maxStep is scaled in cLib function, the DELTA_TIME scaling on speed.x and speed.z here should be undone so as not to DELTA_TIME scale the values twice */
     cLib_addCalc2(&a_this->current.pos.x, i_this->mTargetPos.x, 0.2f,
-                  i_this->mSpeedRatio * fabsf(a_this->speed.x));
+                  i_this->mSpeedRatio * fabsf(a_this->speed.x * SCALE_TIME));
     cLib_addCalc2(&a_this->current.pos.y, i_this->mTargetPos.y, 0.2f,
-                  i_this->mSpeedRatio * fabsf(a_this->speed.y));
+                  i_this->mSpeedRatio * fabsf(a_this->speed.y * SCALE_TIME));
     cLib_addCalc2(&a_this->current.pos.z, i_this->mTargetPos.z, 0.2f,
-                  i_this->mSpeedRatio * fabsf(a_this->speed.z));
+                  i_this->mSpeedRatio * fabsf(a_this->speed.z * SCALE_TIME));
     cLib_addCalc2(&i_this->mSpeedRatio, 1.0f, 1.0f, 0.1f);
     cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->mPlayerAngleY, 4, 0x800);
 
@@ -406,7 +408,7 @@ static void e_ba_attack(e_ba_class* i_this) {
     case 0:
         anm_init(i_this, e_ba_class::ANM_FLY, 3.0f, J3DFrameCtrl::EMode_LOOP, 2.0f);
         i_this->mMode = 1;
-        i_this->mTimer[1] = 20;
+        i_this->mTimer[1] = 20 * SCALE_TIME;
         break;
 
     case 1:
@@ -415,7 +417,7 @@ static void e_ba_attack(e_ba_class* i_this) {
         i_this->mSpeedRatio = 2.0f;
         if (i_this->mTimer[1] == 0) {
             i_this->mMode = 2;
-            i_this->mTimer[0] = 15;
+            i_this->mTimer[0] = 15 * SCALE_TIME;
             i_this->mCreatureSound.startCreatureVoice(Z2SE_EN_BA_V_ATTACK, -1);
         }
         break;
@@ -425,7 +427,7 @@ static void e_ba_attack(e_ba_class* i_this) {
         if (i_this->mSph.ChkAtShieldHit()) {
             i_this->mAction = e_ba_class::ACT_CHANCE;
             i_this->mMode = 0;
-            i_this->mKnockbackSpeed = 70.0f;
+            i_this->mKnockbackSpeed = 70.0f * DELTA_TIME;
             i_this->mKnockbackAngle = a_this->shape_angle.y;
             i_this->mIsDying = false;
             dComIfGp_getVibration().StartShock(2, 0x1f, cXyz(0.0f, 1.0f, 0.0f));
@@ -437,7 +439,7 @@ static void e_ba_attack(e_ba_class* i_this) {
         break;
 
     case 3:
-        if (a_this->speedF <= 1.0f) {
+        if (a_this->speedF <= 1.0f * DELTA_TIME) {
             i_this->mAction = e_ba_class::ACT_FIGHT;
             i_this->mMode = 0;
         }
@@ -471,7 +473,7 @@ static void e_ba_fly(e_ba_class* i_this) {
             vec.y = 0.0f;
             vec.z = l_HIO.mFightSpeed;
             MtxPosition(&vec, &a_this->speed);
-            i_this->mTimer[0] = cM_rndF(30.0f) + 10.0f;
+            i_this->mTimer[0] = (cM_rndF(30.0f) + 10.0f) * SCALE_TIME;
             i_this->mSpeedRatio = 0.0f;
         }
         break;
@@ -577,7 +579,7 @@ static void e_ba_chance(e_ba_class* i_this) {
     case 0:
         anm_init(i_this, e_ba_class::ANM_HOVERING, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.5f);
         i_this->mMode = 1;
-        i_this->mTimer[0] = cM_rndF(30.0f) + 100.0f;
+        i_this->mTimer[0] = (cM_rndF(30.0f) + 100.0f) * SCALE_TIME;
         a_this->speed.x = 0.0f;
         a_this->speed.y = 0.0f;
         a_this->speed.z = 0.0f;
@@ -586,9 +588,9 @@ static void e_ba_chance(e_ba_class* i_this) {
 
     case 1:
         if (i_this->mAcch.ChkGroundHit()) {
-            a_this->speed.y = cM_rndF(10.0f) + 10.0f;
-            a_this->speed.x = cM_rndFX(10.0f);
-            a_this->speed.z = cM_rndFX(10.0f);
+            a_this->speed.y = (cM_rndF(10.0f) + 10.0f) * DELTA_TIME;
+            a_this->speed.x = cM_rndFX(10.0f) * DELTA_TIME;
+            a_this->speed.z = cM_rndFX(10.0f) * DELTA_TIME;
             if ( cM_rndF(1.0f) < 0.5f) {
                 i_this->mChanceAngle.z = 0;
             } else {
@@ -611,7 +613,7 @@ static void e_ba_chance(e_ba_class* i_this) {
     }
 
     a_this->current.pos += a_this->speed;
-    a_this->speed.y -= 2.0f;
+    a_this->speed.y -= 2.0f * DELTA_TIME;
     cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->mChanceAngle.y, 2, 0x1000);
     cLib_addCalcAngleS2(&a_this->current.angle.z, i_this->mChanceAngle.z, 2, 0x1000);
 }
@@ -633,11 +635,11 @@ static void e_ba_wolfbite(e_ba_class* i_this) {
             } else {
                 a_this->current.angle.y = player->shape_angle.y - 0x4000;
             }
-            a_this->speedF = 40.0f;
-            a_this->speed.y = -20.0f;
+            a_this->speedF = 40.0f * DELTA_TIME;
+            a_this->speed.y = -20.0f * DELTA_TIME;
             i_this->mCreatureSound.startCreatureVoice(Z2SE_EN_BA_V_DEATH, -1);
             anm_init(i_this, e_ba_class::ANM_DEAD, 1.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
-            i_this->mTimer[0] = 60;
+            i_this->mTimer[0] = 60 * SCALE_TIME;
             i_this->mMode = 2;
             a_this->health = 0;
         }
@@ -668,7 +670,7 @@ static void e_ba_wolfbite(e_ba_class* i_this) {
     a_this->speed.x = vec2.x;
     a_this->speed.z = vec2.z;
     a_this->current.pos += a_this->speed;
-    a_this->speed.y -= 4.0f;
+    a_this->speed.y -= 4.0f * DELTA_TIME;
     if (i_this->mAcch.ChkGroundHit()) {
         cLib_addCalc0(&a_this->speedF, 1.0f, 15.0f);
     }
@@ -683,7 +685,7 @@ static void e_ba_wind(e_ba_class* i_this) {
     case 0:
         anm_init(i_this, e_ba_class::ANM_FURA2, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
         i_this->mMode = 1;
-        i_this->mWindSpinSpeed = -(cM_rndFX(1000.0f) + 15000.0f);
+        i_this->mWindSpinSpeed = (-(cM_rndFX(1000.0f) + 15000.0f)) * DELTA_TIME;
         i_this->mWindOffset.x = cM_rndFX(50.0f);
         i_this->mWindOffset.y = cM_rndFX(50.0f);
         i_this->mWindOffset.z = cM_rndFX(50.0f);
@@ -692,7 +694,7 @@ static void e_ba_wind(e_ba_class* i_this) {
     case 1:
         if (boomerang == NULL) {
             i_this->mMode = 2;
-            i_this->mTimer[0] = 60;
+            i_this->mTimer[0] = 60 * SCALE_TIME;
         } else {
             a_this->current.pos = boomerang->current.pos + i_this->mWindOffset;
             i_this->mCreatureSound.startCreatureVoiceLevel(Z2SE_EN_BA_V_SPIN, -1);
@@ -715,14 +717,14 @@ static void e_ba_wind(e_ba_class* i_this) {
 static void e_ba_appear(e_ba_class* i_this) {
     fopEn_enemy_c* a_this = &i_this->mEnemy;
     cXyz vec;
-    i_this->mIFrames = 60;
+    i_this->mIFrames = 60 * SCALE_TIME;
 
     switch (i_this->mMode) {
     case 0:
         anm_init(i_this, e_ba_class::ANM_APPEAR, 0.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
         i_this->mMode = 1;
-        i_this->mTimer[0] = cM_rndF(20.0f) + 40.0f;
-        a_this->speedF = 30.0f;
+        i_this->mTimer[0] = (cM_rndF(20.0f) + 40.0f) * SCALE_TIME;
+        a_this->speedF = 30.0f * DELTA_TIME;
         mDoMtx_YrotS(*calc_mtx, a_this->current.angle.y);
         vec.x = 0.0f;
         vec.y = 0.0f;
@@ -733,7 +735,7 @@ static void e_ba_appear(e_ba_class* i_this) {
 
     case 1:
         cLib_addCalc0(&a_this->speedF, 1.0f, 0.7f);
-        if (i_this->mTimer[0] == 0 || a_this->speedF < 0.1f || i_this->mAcch.ChkWallHit()) {
+        if (i_this->mTimer[0] == 0 || a_this->speedF < 0.1f * DELTA_TIME || i_this->mAcch.ChkWallHit()) {
             i_this->mAction = e_ba_class::ACT_FIGHT_FLY;
             i_this->mMode = 0;
         }
@@ -804,7 +806,7 @@ static void action(e_ba_class* i_this) {
         i_this->mCreatureSound.setLinkSearch(false);
     }
 
-    if (i_this->mKnockbackSpeed > 0.1f) {
+    if (i_this->mKnockbackSpeed > 0.1f * DELTA_TIME) {
         vec1.x = 0.0f;
         vec1.y = 0.0f;
         vec1.z = -i_this->mKnockbackSpeed;
@@ -815,7 +817,7 @@ static void action(e_ba_class* i_this) {
         if (i_this->mIsDying) {
             a_this->shape_angle.y += 0x1300;
             a_this->shape_angle.z += 0x1700;
-            if (i_this->mKnockbackSpeed <= 1.0f || i_this->mAcch.ChkWallHit()) {
+            if (i_this->mKnockbackSpeed <= 1.0f * DELTA_TIME || i_this->mAcch.ChkWallHit()) {
                 fopAcM_delete(a_this);
                 if (i_this->mHomeType == e_ba_class::HOME_APPEAR) {
                     // should be fpcNm_ITEM_HEART : fpcNm_ITEM_ARROW_10 but that gives incorrect code
@@ -1053,7 +1055,7 @@ static cPhs__Step daE_BA_Create(fopAc_ac_c* i_this) {
                 _this->mAction = e_ba_class::ACT_FLY;
             } else if (_this->mHomeType == e_ba_class::HOME_APPEAR) {
                 _this->mAction = e_ba_class::ACT_APPEAR;
-                _this->mIFrames = 10;
+                _this->mIFrames = 10 * SCALE_TIME;
             }
         }
 

@@ -2010,7 +2010,7 @@ config.libs = [
     ActorRel(NonMatching, "d_a_npc_kn"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_knj"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kolinb"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_npc_ks"),
+    ActorRel(Modded, "d_a_npc_ks"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kyury"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_len"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_lf"),

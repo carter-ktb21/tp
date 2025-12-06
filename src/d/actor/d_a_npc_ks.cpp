@@ -6,6 +6,7 @@
 #include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_npc_ks.h"
+#include "../assets/GZ2E01/res/Object/Npc_ks.h"
 #include "d/actor/d_a_obj_kago.h"
 #include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
@@ -64,16 +65,16 @@ daNpc_Ks_HIO_c::daNpc_Ks_HIO_c() {
     field_0x4 = -1;
     basic_size = 0.8f;
     pull_distance = 200.0f;
-    holding_speed_l = 10.0f;
-    holding_speed_h = 25.0f;
-    demo_speed = 20.0f;
-    demo_speed_2 = 25.0f;
-    guided_movement_speed = 10.0f;
+    holding_speed_l = 10.0f * DELTA_TIME;
+    holding_speed_h = 25.0f * DELTA_TIME;
+    demo_speed = 20.0f * DELTA_TIME;
+    demo_speed_2 = 25.0f * DELTA_TIME;
+    guided_movement_speed = 10.0f * DELTA_TIME;
     link_approach_distance = 300.0f;
     lantern_size = 1.8f;
     field_0x24 = 600.0f;    // unused
     field_0x28 = 1;         // unused
-    lantern_swing_interval = 10.0f;
+    lantern_swing_interval = 10.0f * SCALE_TIME;
 }
 
 #if DEBUG
@@ -632,7 +633,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
         case 0:
             anm_init(i_this, 21, 10.0f, 2, 1.0f);
             i_this->mMode = 1;
-            i_this->mTimers[0] = cM_rndF(200.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(200.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 1:
@@ -644,7 +645,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0 && i_this->mpModelMorf->checkFrame(99.0f)) {
                 i_this->mMode = 2;
                 anm_init(i_this, 7, 5.0f, 0, 1.0f);
-                i_this->mTimers[0] = cM_rndF(60.0f) + 40.0f;
+                i_this->mTimers[0] = (cM_rndF(60.0f) + 40.0f) * SCALE_TIME;
             }
             break;
 
@@ -666,7 +667,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             MtxPosition(&sp30, &sp3c);
             a_this->current.pos += sp3c;
 
-            if (i_this->mTimers[1] == 1) {
+            if (i_this->mTimers[1] == 1 * SCALE_TIME) {
                 a_this->speedF = 0.0f;
                 anm_init(i_this, 51, 5.0f, 2, 1.0f);
             }
@@ -674,7 +675,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 a_this->health = 0;
                 i_this->mActionID = 100;
-                i_this->mTimers[0] = 20;
+                i_this->mTimers[0] = 20 * SCALE_TIME;
                 i_this->mMode = 11;
                 i_this->field_0x8fc.y = i_this->field_0x5c8;
                 fopAcM_setStageLayer(a_this);
@@ -685,18 +686,18 @@ static int npc_ks_ori(npc_ks_class* i_this) {
         case 11:
             rv = 1;
             if (i_this->mTimers[1] != 0) {
-                a_this->speedF = -20.0f + NREG_F(11);
+                a_this->speedF = (-20.0f + NREG_F(11)) * DELTA_TIME;
             } else {
                 a_this->speedF = 0.0f;
             }
 
-            if (i_this->mTimers[0] == 50) {
+            if (i_this->mTimers[0] == 50 * SCALE_TIME) {
                 anm_init(i_this, 11, 3.0f, 2, 1.0f);
             }
 
             if (i_this->mTimers[0] == 0) {
                 anm_init(i_this, 26, 3.0f, 2, 1.0f);
-                i_this->mTimers[0] = 15;
+                i_this->mTimers[0] = 15 * SCALE_TIME;
                 i_this->mMode++;
             }
             break;
@@ -711,19 +712,19 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             }
 
             if (i_this->field_0x5d0 == 26) {
-                a_this->speedF = 20.0f;
+                a_this->speedF = 20.0f * DELTA_TIME;
             }
 
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 a_this->speed.y = 35.0f;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
                 i_this->field_0xbe0 = 1;
                 i_this->mMode++;
-                i_this->mTimers[0] = 50;
+                i_this->mTimers[0] = 50 * SCALE_TIME;
             }
             break;
 
@@ -742,16 +743,16 @@ static int npc_ks_ori(npc_ks_class* i_this) {
                 dComIfGs_onTbox(i_this->bitTRB);
                 if (i_this->field_0x5b6 >= 5) {
                     i_this->mMode = 11;
-                    i_this->mTimers[0] = 80;
+                    i_this->mTimers[0] = 80 * SCALE_TIME;
                     anm_init(i_this, 51 ,5.0f, 2, 1.0f);
                     if (fopAcM_GetRoomNo(a_this) == 11) {
-                        i_this->mTimers[1] = 10;
+                        i_this->mTimers[1] = 10 * SCALE_TIME;
                     }
                 } else {
                     i_this->mMode = 10;
                     a_this->speedF = -10.0f + NREG_F(11);
-                    i_this->mTimers[0] = 110 + nREG_S(2);
-                    i_this->mTimers[1] = 15;
+                    i_this->mTimers[0] = (110 + nREG_S(2)) * SCALE_TIME;
+                    i_this->mTimers[1] = 15 * SCALE_TIME;
                 }
             }
         }
@@ -812,7 +813,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
 
     if (i_this->mMode <= 2 && cage_p->field_0x1054 != 0) {
         i_this->mMode = 3;
-        i_this->mTimers[0] = 90;
+        i_this->mTimers[0] = 90 * SCALE_TIME;
         int swBit = (fopAcM_GetParam(a_this) & 0xFF000000) >> 24;
         dComIfGs_onSwitch(swBit, fopAcM_GetRoomNo(a_this));
         dComIfGs_onTbox(i_this->bitTRB);
@@ -850,7 +851,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
 
             anm_init(i_this, 41, 5.0f, 2, 1.0f);
             i_this->mMode = 2;
-            i_this->mTimers[0] = cM_rndF(20.0f) + 40.0f;
+            i_this->mTimers[0] = (cM_rndF(20.0f) + 40.0f) * SCALE_TIME;
             break;
 
         case 2:
@@ -868,19 +869,19 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
                     if (daPy_getPlayerActorClass()->getCutAtFlg() == 0) break;
                 }
 
-                i_this->mTimers[0] = cM_rndF(20.0f) + 40.0f;
+                i_this->mTimers[0] = (cM_rndF(20.0f) + 40.0f) * SCALE_TIME;
             }
             break;
 
         case 3:
             fVar1 = -20.0f;
-            if (i_this->mTimers[0] == 50) {
+            if (i_this->mTimers[0] == 50 * SCALE_TIME) {
                 anm_init(i_this, 51, 3.0f, 2, 1.0f);
             }
 
-            if (i_this->mTimers[0] < 50) {
+            if (i_this->mTimers[0] < 50 * SCALE_TIME) {
                 cMtx_YrotS(*calc_mtx, a_this->shape_angle.y);
-                if (i_this->mTimers[0] < 25) {
+                if (i_this->mTimers[0] < 25 * SCALE_TIME) {
                     sp40.x = 200.0f;
                 } else {
                     sp40.x = -200.0f;
@@ -895,7 +896,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 anm_init(i_this, 30, 5.0f, 2, 1.0f);
                 i_this->mMode = 4;
-                i_this->mTimers[0] = 60;
+                i_this->mTimers[0] = 60 * SCALE_TIME;
                 i_this->field_0x93c = 0;
             }
             break;
@@ -929,7 +930,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             sVar1 += NPC_KS_45DEG_ROT;
             if (i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 a_this->speed.y = 35.0f;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -976,7 +977,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f + TREG_F(9);
+                a_this->speedF = (40.0f + TREG_F(9)) * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -986,7 +987,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             sp40 = i_this->field_0x8f0 - a_this->current.pos;
             i_this->field_0x8fc.y = cM_atan2s(sp40.x, sp40.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp40.y, JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z));
-            if (sp40.abs() < a_this->speedF * 1.2f) {
+            if (sp40.abs() * DELTA_TIME < a_this->speedF * (1.2f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
                 i_this->mMode = 11;
                 i_this->field_0xbe0 = 1;
@@ -1001,7 +1002,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             sp40.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp40.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp40.x, sp40.z);
-            if (JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z) < (a_this->speedF * 1.2f)) {
+            if (JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z) * DELTA_TIME < (a_this->speedF * (1.2f * DELTA_TIME))) {
                 i_this->field_0x904++;
                 i_this->mMode = 11;
             }
@@ -1010,7 +1011,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
     if (i_this->mMode >= 10) {
         i_this->field_0x5fc = 0;
         sVar1 = i_this->field_0x8fc.y;
-        if (a_this->speedF > 25.0f) {
+        if (a_this->speedF > 25.0f * DELTA_TIME) {
             i_this->field_0x90c = 1;
         }
     }
@@ -1157,14 +1158,14 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = cM_atan2s(sp3c.x, sp3c.z);
             cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x8fc.y, 2, 0x1000);
             sp3c.y = 0.0f;
-            if (sp3c.abs() <= a_this->speedF * 2.0f) {
+            if (sp3c.abs() * DELTA_TIME <= a_this->speedF * (2.0f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 if (i_this->field_0x904 < 5) {
                     i_this->mMode = 1;
                 } else {
                     i_this->mMode = 10;
                     anm_init(i_this, 25, 5.0f, 2, 1.0f);
-                    i_this->mTimers[0] = 35;
+                    i_this->mTimers[0] = 35 * SCALE_TIME;
                 }
             }
             break;
@@ -1186,8 +1187,8 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp3c.z = (90.0f + NREG_F(1)) * cage_p->actor.scale.x;
             MtxPosition(&sp3c, &sp48);
             sp48 += cage_p->actor.current.pos;
-            cLib_addCalc2(&a_this->current.pos.x, sp48.x, 1.0f, a_this->speedF);
-            cLib_addCalc2(&a_this->current.pos.z, sp48.z, 1.0f, a_this->speedF);
+            cLib_addCalc2(&a_this->current.pos.x, sp48.x, 1.0f, a_this->speedF * SCALE_TIME);
+            cLib_addCalc2(&a_this->current.pos.z, sp48.z, 1.0f, a_this->speedF * SCALE_TIME);
             sp3c.x = sp48.x - a_this->current.pos.x;
             sp3c.z = sp48.z - a_this->current.pos.z;
             sp3c.y = JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z);
@@ -1211,14 +1212,14 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp3c.z = 90.0f + NREG_F(1);
             MtxPosition(&sp3c, &sp48);
             sp48 += cage_p->actor.current.pos;
-            cLib_addCalc2(&a_this->current.pos.x, sp48.x, 1.0f, a_this->speedF);
-            cLib_addCalc2(&a_this->current.pos.y, sp48.y, 1.0f, a_this->speedF);
-            cLib_addCalc2(&a_this->current.pos.z, sp48.z, 1.0f, a_this->speedF);
+            cLib_addCalc2(&a_this->current.pos.x, sp48.x, 1.0f, a_this->speedF * SCALE_TIME);
+            cLib_addCalc2(&a_this->current.pos.y, sp48.y, 1.0f, a_this->speedF * SCALE_TIME);
+            cLib_addCalc2(&a_this->current.pos.z, sp48.z, 1.0f, a_this->speedF * SCALE_TIME);
             sp3c = sp48 - a_this->current.pos;
             if (sp3c.abs() < 1.0f + NREG_F(0)) {
                 i_this->mMode = 13;
                 anm_init(i_this, 23, 2.0f, 2, 1.0f);
-                i_this->mTimers[0] = 60;
+                i_this->mTimers[0] = 60 * SCALE_TIME;
             }
             break;
 
@@ -1257,12 +1258,12 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp48 += cage_p->actor.current.pos;
             cLib_addCalc2(&a_this->current.pos.x, sp48.x, 1.0f, 10.0f);
             cLib_addCalc2(&a_this->current.pos.z, sp48.z, 1.0f, 10.0f);
-            cLib_addCalc2(&a_this->current.pos.y, i_this->mObjAcch.GetGroundH(), 1.0f, l_HIO.demo_speed);
+            cLib_addCalc2(&a_this->current.pos.y, i_this->mObjAcch.GetGroundH(), 1.0f, l_HIO.demo_speed * SCALE_TIME);
             
             if (NPC_KS_FABSF(a_this->current.pos.y - i_this->mObjAcch.GetGroundH()) < 1.0f) {
                 anm_init(i_this, 26, 5.0f, 2, 1.0f);
                 a_this->speedF = 0.0f;
-                i_this->mTimers[0] = 20;
+                i_this->mTimers[0] = 20 * SCALE_TIME;
                 i_this->mMode = 15;
             }
             break;
@@ -1282,16 +1283,16 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 if (i_this->field_0x5d0 != 25) {
                     anm_init(i_this, 25, 5.0f, 2, 1.0f);
-                    i_this->mTimers[0] = 25;
+                    i_this->mTimers[0] = 25 * SCALE_TIME;
                 } else {
                     anm_init(i_this, 50, 5.0f, 2, 1.0f);
-                    i_this->mTimers[0] = cM_rndF(30.0f) + 30.0f;
+                    i_this->mTimers[0] = (cM_rndF(30.0f) + 30.0f) * SCALE_TIME;
                 }
             }
 
             cLib_addCalcAngleS2(&a_this->current.angle.y, cage_p->actor.shape_angle.y + 0x8000, 2, 0x1000);
             if (dComIfGp_checkPlayerStatus0(0, 0x40) != 0 || dComIfGp_checkPlayerStatus0(0, 0x2000) != 0) {
-                i_this->mTimers[2] = 20;
+                i_this->mTimers[2] = 20 * SCALE_TIME;
             }
 
             if (i_this->mTimers[2] == 0 && cage_p->field_0xdc4 == 0) {
@@ -1321,7 +1322,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
                     anm_init(i_this, 49, 3.0f, 0, 1.0f);
                 }
             } else {
-                fVar1 = 30.0f;
+                fVar1 = 30.0f * DELTA_TIME;
             }
 
             if (i_this->field_0x5d0 == 49 && i_this->mpModelMorf->isStop()) {
@@ -1343,8 +1344,8 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
                 pillar_p->setShake(daPillar_c::SHAKE_STRONG);
                 anm_init(i_this, 6, 5.0f, 0, 1.0f);
                 i_this->mMode = 18;
-                a_this->speedF = -20.0f + NREG_F(4);
-                a_this->speed.y = 30.0f + NREG_F(5);
+                a_this->speedF = (-20.0f + NREG_F(4)) * DELTA_TIME;
+                a_this->speed.y = (30.0f + NREG_F(5));
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_ATTACK_POLL, 0, -1);
                 if (cage_p != NULL) {
                     cage_p->field_0xdc8 = 1500.0f + NREG_F(8);
@@ -1354,14 +1355,14 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             break;
 
         case 18:
-            fVar1 = -20.0f + NREG_F(4);
+            fVar1 = (-20.0f + NREG_F(4)) * DELTA_TIME;
             cLib_addCalcAngleS2(&a_this->current.angle.x, ZREG_S(7) - 0x3830, 1, 0x600);
             if (a_this->speed.y <= 0.0f && i_this->mObjAcch.ChkGroundHit()) {
                 i_this->mMode = 19;
-                a_this->speed.y = 20.0f + NREG_F(6);
+                a_this->speed.y = (20.0f + NREG_F(6));
                 a_this->current.angle.x = ZREG_S(7) - 0x3830;
-                i_this->mTimers[0] = 40;
-                i_this->mTimers[1] = 10;
+                i_this->mTimers[0] = 40 * SCALE_TIME;
+                i_this->mTimers[1] = 10 * SCALE_TIME;
                 fopAcM_effSmokeSet1(&i_this->field_0x858, &i_this->field_0x85c, &a_this->eyePos, NULL, 1.7f + TREG_F(18), &a_this->tevStr, 1);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_CRUSHED, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_FALL_GROUND, 0, -1);
@@ -1371,7 +1372,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
 
         case 19:
             if (i_this->mTimers[1] != 0) {
-                fVar1 = a_this->speedF = -15.0f + NREG_F(14);
+                fVar1 = a_this->speedF = (-15.0f + NREG_F(14)) * DELTA_TIME;
             } else {
                 fVar1 = a_this->speedF = 0.0f;
             }
@@ -1390,7 +1391,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
                 if (leader->field_0xb42 != 0) {
                     leader->field_0xb42 = 100;
                 }
-                i_this->mTimers[2] = 30;
+                i_this->mTimers[2] = 30 * SCALE_TIME;
             }
             break;
     }
@@ -1402,8 +1403,8 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
     } else if (iVar1 != 0 && cage_p->actor.shape_angle.x > 0x200) {
         anm_init(i_this, 6, 5.0f, 0, 1.0f);
         i_this->mMode = 18;
-        a_this->speedF = -8.0f + NREG_F(4);
-        a_this->speed.y = 10.0f + NREG_F(5);
+        a_this->speedF = (-8.0f + NREG_F(4)) * DELTA_TIME;
+        a_this->speed.y = (10.0f + NREG_F(5));
         i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_PRISONED, -1);
     }
 
@@ -1430,21 +1431,21 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
         case 0:
             anm_init(i_this, 51, 5.0f, 2, 1.0f);
             i_this->mMode = 1;
-            i_this->mTimers[0] = 100;
+            i_this->mTimers[0] = 100 * SCALE_TIME;
             // fallthrough
         case 1:
             i_this->field_0x5fc = 1;
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 20;
                 anm_init(i_this, 30, 3.0f, 2, 1.0f);
-                i_this->mTimers[0] = 90;
+                i_this->mTimers[0] = 90 * SCALE_TIME;
                 fpcM_Search(s_resq_sub, i_this);
             }
             break;
 
         case 10:
             anm_init(i_this, 13, 2.0f, 2, 1.0f);
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
             i_this->mMode = 11;
             a_this->current.angle.x = ZREG_S(7) - 0x3830;
             // fallthrough
@@ -1463,7 +1464,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             if (i_this->mpModelMorf->isStop()) {
                 i_this->mMode = 20;
                 anm_init(i_this, 30, 3.0f, 2, 1.0f);
-                i_this->mTimers[0] = 90;
+                i_this->mTimers[0] = 90 * SCALE_TIME;
                 fpcM_Search(s_resq_sub, i_this);
             }
             break;
@@ -1477,7 +1478,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
         case 21:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 22;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             i_this->field_0xaec = 1;
             break;
 
@@ -1498,7 +1499,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             }
 
             if (bokoblin_p == NULL) {
-                i_this->mTimers[0] = cM_rndF(10.0f) + 30.0f;
+                i_this->mTimers[0] = (cM_rndF(10.0f) + 30.0f) * SCALE_TIME;
                 i_this->mMode = 23;
                 int swBit = (fopAcM_GetParam(a_this) & 0xFF000000) >> 24;
                 dComIfGs_onSwitch(swBit, fopAcM_GetRoomNo(a_this));
@@ -1513,7 +1514,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
                 else {
                     anm_init(i_this, 11, 3.0f, 2, 1.0f);
                 }
-                i_this->mTimers[0] = cM_rndF(25.0f) + 70.0f;
+                i_this->mTimers[0] = (cM_rndF(25.0f) + 70.0f) * SCALE_TIME;
                 i_this->mMode = 24;
             }
             break;
@@ -1522,7 +1523,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 i_this->mActionID = 114;
                 i_this->mMode = 0;
-                i_this->mTimers[2] = 60;
+                i_this->mTimers[2] = 60 * SCALE_TIME;
             }
     }
     
@@ -1588,14 +1589,14 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
         case 7:
             a_this->gravity = 0.0f;
             a_this->speed.y = 10.0f;
-            if ((i_this->field_0x5e6 & 31) == 0) {
+            if ((i_this->frameCounter & 31) == 0) {
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_WAIT, -1);
             }
             break;
 
         case 8:
             anm_init(i_this, 26, 5.0f, 2, 1.0f);
-            i_this->mTimers[0] = 35;
+            i_this->mTimers[0] = 35 * SCALE_TIME;
             i_this->mMode = 9;
             break;
 
@@ -1616,7 +1617,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
                 i_this->field_0x5e4 = 0;
                 anm_init(i_this, 26, 3.0f, 2, 1.0f);
                 i_this->mMode = 11;
-                i_this->mTimers[0] = 25 + KREG_S(7);
+                i_this->mTimers[0] = (25 + KREG_S(7)) * SCALE_TIME;
             }
             break;
 
@@ -1625,7 +1626,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             fVar2 = 4.0f;
             if (i_this->mTimers[0] == 0) {
                 anm_init(i_this, 7, 5.0f, 2, 1.0f);
-                i_this->mTimers[0] = 120;
+                i_this->mTimers[0] = 120 * SCALE_TIME;
                 i_this->mMode = 12;
             }
             break;
@@ -1688,7 +1689,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
                 a_this->speedF = 0.0f;
                 if (i_this->mpModelMorf->isStop()) {
                     anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                    a_this->speedF = 40.0f;
+                    a_this->speedF = 40.0f * DELTA_TIME;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -1699,7 +1700,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = cM_atan2s(sp24.x, sp24.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp24.y, JMAFastSqrt(sp24.x * sp24.x + sp24.z * sp24.z));
             cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x8fc.y, 1, 0x2000);
-            if (sp24.abs() <= a_this->speedF * 1.1f) {
+            if (sp24.abs() <= a_this->speedF * (1.1f * DELTA_TIME)) {
                 i_this->mMode = 10;
                 obj_sw_class* sw_p = i_this->field_0x934;
                 if (sw_p != NULL) {
@@ -1734,7 +1735,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
                 a_this->speedF = 0.0f;
                 if (i_this->mpModelMorf->isStop()) {
                     anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                    a_this->speedF = 30.0f;
+                    a_this->speedF = 30.0f * DELTA_TIME;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -1744,7 +1745,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
 
             i_this->field_0x8fc.y = cM_atan2s(sp24.x, sp24.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp24.y, JMAFastSqrt(sp24.x * sp24.x + sp24.z * sp24.z));
-            if (sp24.abs() <= a_this->speedF* 1.1f) {
+            if (sp24.abs() <= a_this->speedF * (1.1f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_END, 0, -1);
                 if (i_this->field_0x934->field_0x91c == 1) {
@@ -1753,12 +1754,12 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
                 } else {
                     i_this->mActionID = 21;
                     i_this->mMode = 0;
-                    i_this->mTimers[2] = 15;
+                    i_this->mTimers[2] = 15 * SCALE_TIME;
                 }
             }
     }
 
-    if (a_this->speedF> 25.0f) {
+    if (a_this->speedF > 25.0f * DELTA_TIME) {
         i_this->field_0x90c= 1;
     }
 }
@@ -1912,18 +1913,18 @@ static void npc_ks_hang(npc_ks_class* i_this) {
             }
 
             if (i_this->field_0x5b8 == 0 && i_this->field_0x5d0 != 16 && i_this->field_0x5c4 < 550.0f + YREG_F(9)) {
-                anm_init(i_this, 16, 5.0f, 2, 1.0f);
-                i_this->mTimers[0] = cM_rndF(50.0f) + 200.0f;
+                anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HANGCALL_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
+                i_this->mTimers[0] = (cM_rndF(50.0f) + 200.0f) * SCALE_TIME;
             }
 
             if (i_this->mTimers[0] == 0) {
-                i_this->mTimers[0] = cM_rndF(30.0f) + 50.0f;
+                i_this->mTimers[0] = (cM_rndF(30.0f) + 50.0f) * SCALE_TIME;
                 if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 17, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HANGWAIT_A_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 } else if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 18, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HANGWAIT_B_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 } else {
-                    anm_init(i_this, 19, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HANGWAIT_C_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 }
             }
 
@@ -1942,12 +1943,12 @@ static void npc_ks_hang(npc_ks_class* i_this) {
                 i_this->field_0x624 = obj_pos - i_this->field_0x614;
                 i_this->field_0x624 *= (0.075f + WREG_F(2));
                 i_this->mMode = 4;
-                i_this->mTimers[0] = 17 + WREG_S(8);
-                i_this->mTimers[1] = 25 + WREG_S(9);
+                i_this->mTimers[0] = (17 + WREG_S(8)) * SCALE_TIME;
+                i_this->mTimers[1] = (25 + WREG_S(9)) * SCALE_TIME;
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
                 i_this->field_0x604 = 0;
-                anm_init(i_this, 24, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HUNGING_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             }
 
             sVar1 = start_pya - sw_p->actor.current.angle.y;
@@ -1960,35 +1961,35 @@ static void npc_ks_hang(npc_ks_class* i_this) {
 
         case 2:
             i_this->mMode++;
-            i_this->mTimers[0] = 10 + BREG_S(6);
+            i_this->mTimers[0] = (10 + BREG_S(6)) * SCALE_TIME;
             // fallthrough
         case 3:
             i_this->field_0x5fa = 0x4000;
             i_this->field_0x60c = 8000.0f;
-            if (i_this->mTimers[0] == s16(8 + BREG_S(7))) {
+            if (i_this->mTimers[0] == (s16(8 + BREG_S(7))) * SCALE_TIME) {
                 fpcM_Search(s_next_get_sub, i_this);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
             }
 
-            if (i_this->mTimers[0] == s16(2 + ZREG_S(6))) {
-                i_this->mTimers[2] = 15 + ZREG_S(7);
+            if (i_this->mTimers[0] == (s16(2 + ZREG_S(6))) * SCALE_TIME) {
+                i_this->mTimers[2] = (15 + ZREG_S(7)) * SCALE_TIME;
             }
 
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode++;
-                i_this->mTimers[0] = 10 + BREG_S(8);
-                i_this->mTimers[1] = 18 + BREG_S(4);
+                i_this->mTimers[0] = (10 + BREG_S(8)) * SCALE_TIME;
+                i_this->mTimers[1] = (18 + BREG_S(4)) * SCALE_TIME;
             }
             break;
 
         case 4:
-            if (i_this->mTimers[0] > s16(8 + BREG_S(5))) {
+            if (i_this->mTimers[0] > (s16(8 + BREG_S(5))) * SCALE_TIME) {
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
             }
 
-            if (i_this->mTimers[0] == s16(8 + BREG_S(5))) {
-                anm_init(i_this, 48, 2.0f, 2, 1.0f);
+            if (i_this->mTimers[0] == (s16(8 + BREG_S(5))) * SCALE_TIME) {
+                anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_SWINGPOSE_e, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_CATCH, -1);
                 i_this->mSound.startCreatureSound(Z2SE_FN_ROPE_CREAK, 0, -1);
                 sw_p->field_0x8fc = 20.0f + XREG_F(0);
@@ -1996,14 +1997,14 @@ static void npc_ks_hang(npc_ks_class* i_this) {
             }
 
             if (mDoCPd_c::getTrigA(0) != 0) {
-                if (i_this->mTimers[1] <= 9 && i_this->field_0x604 < 0 && i_this->field_0x602 < 0) {
+                if (i_this->mTimers[1] <= 9 * SCALE_TIME && i_this->field_0x604 < 0 && i_this->field_0x602 < 0) {
                     leader->field_0x92c = 1;
                     fpcM_Search(s_next_do_sub, i_this);
                     if (i_this->field_0x5b8 == sw_p->field_0x91c -1) {
                         i_this->mMode = 5;
                     } else {
                         i_this->mMode = 10;
-                        anm_init(i_this, 24, 1.0f, 2, 1.0f);
+                        anm_init(i_this, dRes_INDEX_NPC_KS_BCK_SARU_HUNGING_e, 1.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                     }
                 } else {
                     leader->field_0xb42 = 100;
@@ -2018,19 +2019,19 @@ static void npc_ks_hang(npc_ks_class* i_this) {
             if (i_this->field_0x602 >= 0 || i_this->field_0x604 >= 0) break;
 
             i_this->field_0x620 = 0;
-            i_this->mTimers[0] = 15 + BREG_S(3);
+            i_this->mTimers[0] = (15 + BREG_S(3)) * SCALE_TIME;
             i_this->mMode = 6;
             i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
             player->changeDemoMode(24, 0, 0, 0);
             anm_init(i_this, 24, 1.0f, 2, 1.0f);
             // fallthrough
         case 6:
-            if (i_this->mTimers[0] == 8) {
+            if (i_this->mTimers[0] == 8 * SCALE_TIME) {
                 leader->field_0xb42 = 3;
                 leader->field_0xb44 = 0;
             }
 
-            if (i_this->mTimers[0] == 1) {
+            if (i_this->mTimers[0] == 1 * SCALE_TIME) {
                 iVar1 = 1;
             }
             break;
@@ -2098,11 +2099,11 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5d0 != 16 && i_this->field_0x5c4 < 550.0f + YREG_F(9)) {
                 anm_init(i_this, 16, 5.0f, 2, 1.0f);
-                i_this->mTimers[0] = cM_rndF(50.0f) + 200.0f;
+                i_this->mTimers[0] = (cM_rndF(50.0f) + 200.0f) * SCALE_TIME;
             }
 
             if (i_this->mTimers[0] == 0) {
-                i_this->mTimers[0] = cM_rndF(30.0f) + 50.0f;
+                i_this->mTimers[0] = (cM_rndF(30.0f) + 50.0f) * SCALE_TIME;
                 if (cM_rndF(1.0f) < 0.3f) {
                     anm_init(i_this, 17, 5.0f, 2, 1.0f);
                 } else if (cM_rndF(1.0f) < 0.3f) {
@@ -2126,8 +2127,8 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
                 i_this->field_0x624 *= (0.075f + WREG_F(2));
 
                 i_this->mMode = 2;
-                i_this->mTimers[0] = 17 + WREG_S(8);
-                i_this->mTimers[1] = 25 + WREG_S(9);
+                i_this->mTimers[0] = (17 + WREG_S(8)) * SCALE_TIME;
+                i_this->mTimers[1] = (25 + WREG_S(9)) * SCALE_TIME;
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
                 anm_init(i_this, 24, 3.0f, 2, 1.0f);
@@ -2142,12 +2143,12 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
             break;
 
         case 2:
-            if (i_this->mTimers[0] > s16(8 + BREG_S(5))) {
+            if (i_this->mTimers[0] > (s16(8 + BREG_S(5))) * SCALE_TIME) {
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
             }
 
-            if (i_this->mTimers[0] == s16(8 + BREG_S(5))) {
+            if (i_this->mTimers[0] == (s16(8 + BREG_S(5))) * SCALE_TIME) {
                 anm_init(i_this, 48, 2.0f, 2, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_CATCH, -1);
                 i_this->mSound.startCreatureSound(Z2SE_FN_ROPE_CREAK, 0, -1);
@@ -2159,7 +2160,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
                 if (i_this->field_0x604 < 0 && i_this->field_0x602 < 0) {
                     i_this->field_0x92c = 1;
                     i_this->field_0x620 = 0;
-                    i_this->mTimers[0] = 15 + BREG_S(3);
+                    i_this->mTimers[0] = (15 + BREG_S(3)) * SCALE_TIME;
                     i_this->mMode = 5;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
                     player->changeDemoMode(24, 0, 0, 0);
@@ -2168,7 +2169,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
                 } else {
                     leader->field_0xb42 = 100;
                     i_this->field_0x620 = 0;
-                    i_this->mTimers[0] = 15 + BREG_S(3);
+                    i_this->mTimers[0] = (15 + BREG_S(3)) * SCALE_TIME;
                     i_this->mMode = 5;
                     i_this->field_0x94e = 20;
                 }
@@ -2176,7 +2177,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
             break;
 
         case 5:
-            if (i_this->mTimers[0] == 1) {
+            if (i_this->mTimers[0] == 1 * SCALE_TIME) {
                 leader->field_0xb42 = 100;
                 i_this->field_0x620 = 0;
                 i_this->mMode = 0;
@@ -2220,8 +2221,8 @@ static void npc_ks_e_hang(npc_ks_class* i_this) {
 
             if (i_this->field_0x5b6 == 0) {
                 anm_init(i_this, 24, 3.0f, 2, 1.0f);
-                i_this->mTimers[0] = 10000;
-                i_this->mTimers[1] = 15;
+                i_this->mTimers[0] = 10000 * SCALE_TIME;
+                i_this->mTimers[1] = 15 * SCALE_TIME;
             }
             break;
 
@@ -2253,11 +2254,11 @@ static void npc_ks_e_hang(npc_ks_class* i_this) {
                     anm_init(i_this, 19, 10.0f, 2, 1.0f);
                 }
 
-                i_this->mTimers[0] = 10000;
-                i_this->mTimers[1] = 35;
+                i_this->mTimers[0] = 10000 * SCALE_TIME;
+                i_this->mTimers[1] = 35 * SCALE_TIME;
             }
 
-            if (i_this->mTimers[1] == 1) {
+            if (i_this->mTimers[1] == 1 * SCALE_TIME) {
                 anm_init(i_this, 24, 7.0f, 2, 1.0f);
             } else if (i_this->mTimers[1] == 0) {
                 i_this->field_0x5fa = 0x4000;
@@ -2316,7 +2317,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         if (i_this->field_0x5c4 > l_HIO.pull_distance) {
             anm_init(i_this, 28, 5.0f, 2, 1.0f);
             i_this->mMode = 1;
-            i_this->mTimers[0] = 20;
+            i_this->mTimers[0] = 20 * SCALE_TIME;
         } else {
             anm_init(i_this, 51, 5.0f, 2, 1.0f);
             i_this->mMode = 5;
@@ -2352,7 +2353,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
 
         if (go_jump_check(i_this->field_0x5b6) != 0) {
             anm_init(i_this, 26, 3.0f, 2, 1.0f);
-            i_this->mTimers[0] = 10;
+            i_this->mTimers[0] = 10 * SCALE_TIME;
             i_this->mMode = 6;
             i_this->field_0xaec = 0;
         }
@@ -2360,7 +2361,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
 
     case 6:
         i_this->field_0x5fd = 1;
-        a_this->speedF = 20.0f;
+        a_this->speedF = 20.0f * DELTA_TIME;
         rv = 1;
         if (i_this->mTimers[0] == 0) {
             anm_init(i_this, 32, 2.0f, 0, 1.0f);
@@ -2375,7 +2376,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
             a_this->speedF = 0.0f;
             if (i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
 
@@ -2391,13 +2392,13 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         i_this->field_0x8fc.x = -cM_atan2s(sp28.y, JMAFastSqrt(sp28.x * sp28.x + sp28.z * sp28.z));
         cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x8fc.y, 1, 0x2000);
 
-        if (a_this->speedF >= 40.0f) {
+        if (a_this->speedF >= 40.0f * DELTA_TIME) {
             i_this->field_0x90c = 1;
             cLib_addCalc2(&i_this->field_0x928, -183.0f + XREG_F(11), 1.0f, 15.0f + XREG_F(12));
             cLib_addCalcAngleS2(&a_this->current.angle.x, 0x1800, 4, 0x1800);
         }
 
-        if (sp28.abs() <= a_this->speedF * 1.2f) {
+        if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 10;
             anm_init(i_this, 48, 2.0f, 2, 1.0f);
@@ -2416,9 +2417,9 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
 
         if (fopAcM_GetRoomNo(a_this) == 2) {
-            a_this->speedF = 25.0f + NREG_F(16);
+            a_this->speedF = (25.0f + NREG_F(16)) * DELTA_TIME;
         } else {
-            a_this->speedF = 40.0f + NREG_F(15);
+            a_this->speedF = (40.0f + NREG_F(15)) * DELTA_TIME;
         }
 
         if (ks_p->field_0x5b6 == i_this->field_0x5b6 - 1) {
@@ -2442,7 +2443,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         i_this->field_0x8fc.y = cM_atan2s(sp28.x, sp28.z);
         i_this->field_0x8fc.x = -cM_atan2s(sp28.y, JMAFastSqrt(sp28.x * sp28.x + sp28.z * sp28.z));
 
-        if (sp28.abs() <= a_this->speedF * 1.2f) {
+        if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 12;
             anm_init(i_this, 24, 2.0f, 2, 1.0f);
@@ -2460,7 +2461,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
             } else {
                 i_this->mActionID = 21;
                 i_this->mMode = 0;
-                i_this->mTimers[2] = 15;
+                i_this->mTimers[2] = 15 * SCALE_TIME;
             }
         }
         break;
@@ -2474,7 +2475,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         i_this->field_0x8fc.y = cM_atan2s(sp28.x, sp28.z);
         i_this->field_0x8fc.x = -cM_atan2s(sp28.y, JMAFastSqrt(sp28.x * sp28.x + sp28.z * sp28.z));
 
-        if (sp28.abs() <= a_this->speedF * 1.2f) {
+        if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 10;
             anm_init(i_this, 48, 2.0f, 2, 1.0f);
@@ -3170,7 +3171,7 @@ static void demo_camera(npc_ks_class* i_this) {
                 i_this->field_0x8fc.y = player->shape_angle.y;
                 anm_init(i_this, 26, 3.0f, 2, 1.0f);
                 i_this->mMode = 230;
-                i_this->mTimers[0] = 65 + JREG_S(7);
+                i_this->mTimers[0] = (65 + JREG_S(7)) * SCALE_TIME;
             }
 
             if (i_this->field_0xb44 == 145) {
@@ -3395,7 +3396,7 @@ static void demo_camera(npc_ks_class* i_this) {
             i_this->field_0xbc4 = 0.0f;
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
             // fallthrough
         case 361:
             sp44.set(-36540.0f, 335.0f, -20870.0f);
@@ -3415,7 +3416,7 @@ static void demo_camera(npc_ks_class* i_this) {
 
         case 362:
             if (i_this->field_0xb44 == 15) {
-                i_this->mTimers[2] = 30;
+                i_this->mTimers[2] = 30 * SCALE_TIME;
             }
             if (i_this->field_0xb44 >= 30) {
                 cam_3d_morf(i_this, 0.2f + BREG_F(17));
@@ -3752,7 +3753,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
         case 0:
             i_this->mMode = 1;
             anm_init(i_this, 51, 5.0f, 2, 1.0f);
-            i_this->mTimers[0] = cM_rndF(100.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(100.0f) + 100.0f) * SCALE_TIME;
             fopAcM_setStageLayer(a_this);
             a_this->health = 0;
             // fallthrough
@@ -3761,12 +3762,12 @@ static int npc_ks_option(npc_ks_class* i_this) {
                 if (cM_rndF(1.0f) < 0.5f) {
                     if (i_this->field_0x5d0 != 51) {
                         anm_init(i_this, 51, 5.0f, 2, 1.0f);
-                        i_this->mTimers[0] = cM_rndF(100.0f) + 80.0f;
+                        i_this->mTimers[0] = (cM_rndF(100.0f) + 80.0f) * SCALE_TIME;
                         i_soundID = Z2SE_KOSARU_V_WAIT;
                     }
                 } else if (i_this->field_0x5d0 != 53) {
                     anm_init(i_this, 53, 8.0f, 2, 1.0f);
-                    i_this->mTimers[0] = cM_rndF(30.0f) + 40.0f;
+                    i_this->mTimers[0] = (cM_rndF(30.0f) + 40.0f) * SCALE_TIME;
                     i_soundID = Z2SE_KOSARU_V_WAIT;
                 }
 
@@ -3832,26 +3833,26 @@ static int npc_ks_option(npc_ks_class* i_this) {
             cLib_addCalc2(&a_this->current.pos.y, i_this->field_0x63c, 0.1f, 10.0f);
 
             if (i_this->field_0x5c4 > (dbg_f30 + 50.0f)) {
-                fVar3 = 5.0f + JREG_F(8);
+                fVar3 = (5.0f + JREG_F(8)) * DELTA_TIME;
             } else {
                 fVar3 = 0.0f;
             }
 
-            cLib_addCalc2(&i_this->field_0x5d4, fVar3 * 0.1f + 0.5f, 1.0f, 0.1f);
-            i_this->mpModelMorf->setPlaySpeed(i_this->field_0x5d4);
+            cLib_addCalc2(&i_this->field_0x5d4, fVar3 * (0.1f * DELTA_TIME) + (0.5f * DELTA_TIME), 1.0f, 0.1f);
+            i_this->mpModelMorf->setPlaySpeed(i_this->field_0x5d4 * SCALE_TIME);
 
             fVar4 = 0.1f;
             sVar1 = 0x100;
             i_this->field_0x8fc.y = i_this->field_0x5c8;
 
             if (i_this->mTimers[0] == 0) {
-                i_this->mTimers[0] = cM_rndF(30.0f) + 20.0f;
+                i_this->mTimers[0] = (cM_rndF(30.0f) + 20.0f) * SCALE_TIME;
                 i_soundID = Z2SE_KOSARU_V_WAIT;
             }
             break;
 
         case 10:
-            i_this->mTimers[0] = cM_rndF(30.0f) + 20.0f;
+            i_this->mTimers[0] = (cM_rndF(30.0f) + 20.0f) * SCALE_TIME;
             i_this->mMode = 11;
             i_this->field_0x8fc.y = i_this->field_0x5c8;
             // fallthrough
@@ -3919,7 +3920,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             // ditto.
             i_this->field_0x8fc.y += NPC_KS_180DEG_ROT;
             break;
@@ -3974,7 +3975,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             }
 
             i_this->field_0x8fc.y = i_this->field_0x5c8;
-            fVar3 = 4096.0f;
+            fVar3 = 4096.0f * DELTA_TIME;
             break;
 
         case 51:
@@ -3993,13 +3994,13 @@ static int npc_ks_option(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = i_this->field_0x8fc.y;
             sVar1 = 0x2000;
 
-            if (a_this->speedF > 25.0f) {
+            if (a_this->speedF > 25.0f * DELTA_TIME) {
                 i_this->field_0x90c = 1;
             }
 
-            if (sp140.abs() <= a_this->speedF * 1.2f) {
+            if (sp140.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->mMode = 0;
-                a_this->speedF *= 0.5f;
+                a_this->speedF *= 0.5f * DELTA_TIME;
                 i_this->field_0xbe0 = 1;
                 return retval;
             }
@@ -4010,7 +4011,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
     cLib_addCalc2(&a_this->speedF, fVar3, 1.0f, fVar4);
     if (i_this->mMode < 7) {
         i_this->field_0x5fc = 1;
-        if (fVar3 > 1.0f) {
+        if (fVar3 > 1.0f * DELTA_TIME) {
             i_this->field_0x8fc.y = i_this->field_0x5c8;
         } else {
             s16 sVar2 = a_this->current.angle.y - i_this->field_0x5c8;
@@ -4032,7 +4033,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
                 sp140 = actor_p->current.pos - a_this->current.pos;
                 i_this->field_0x8fc.y = cM_atan2s(sp140.x, sp140.z);
                 i_this->mMode = 20;
-                i_this->mTimers[0] = 60;
+                i_this->mTimers[0] = 60 * SCALE_TIME;
                 return retval;
             }
         }
@@ -4044,16 +4045,16 @@ static int npc_ks_option(npc_ks_class* i_this) {
                 i_this->field_0x938 = -1;
             }
 
-            i_this->mTimers[3] = cM_rndF(30.0f) + 30.0f;
+            i_this->mTimers[3] = (cM_rndF(30.0f) + 30.0f) * SCALE_TIME;
         }
 
-        if ((i_this->field_0x5e6 & 15) == 0 && bomb_view_check(i_this) != NULL) {
+        if ((i_this->frameCounter & 15) == 0 && bomb_view_check(i_this) != NULL) {
             i_this->mMode = 30;
             anm_init(i_this, 26, 3.0f, 2, 1.0f);
             return retval;
         }
 
-        if ((i_this->field_0x5e6 + 2 & 15) == 0 && enemy_view_check(i_this, fVar1 + 600.0f) != NULL) {
+        if ((i_this->frameCounter + 2 & 15) == 0 && enemy_view_check(i_this, fVar1 + 600.0f) != NULL) {
             i_this->mMode = 40;
             return retval;
         }
@@ -4066,7 +4067,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
     if (iVar2 != 0) {
         if (NPC_KS_FABSF(player_p3->current.pos.y - a_this->current.pos.y) > 3000.0f ||
             (fopAcM_CheckCondition(a_this, 4) != 0 && fopAcM_otherBgCheck(a_this, dComIfGp_getPlayer(0)))) {
-            if (iVar1 != 0 && player_p3->speedF > 2.0f) {
+            if (iVar1 != 0 && player_p3->speedF > 2.0f * DELTA_TIME) {
                 camera_class* camera = (camera_class*) dComIfGp_getCamera(0);
                 sp140.x = camera->lookat.eye.x - camera->lookat.center.x;
                 sp140.z = camera->lookat.eye.z - camera->lookat.center.z;
@@ -4133,11 +4134,11 @@ static int npc_ks_option(npc_ks_class* i_this) {
         if (i_this->mMode < 50 && i_this->field_0xbd8 != 0) {
             i_this->field_0xbd8--;
             i_this->mMode = 50;
-            i_this->mTimers[0] = 20 + YREG_S(3);
+            i_this->mTimers[0] = (20 + YREG_S(3)) * SCALE_TIME;
         }
     } else {
         f32 dbg_f25;
-        if (a_this->speedF >= 3.0f) {
+        if (a_this->speedF >= 3.0f * DELTA_TIME) {
             dbg_f25 = 0.2f + KREG_F(1);
         } else {
             dbg_f25 = 0.05f + KREG_F(0);
@@ -4162,7 +4163,7 @@ static void npc_ks_awaydoor(npc_ks_class* i_this) {
         case 0:
             anm_init(i_this, 26, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
             break;
 
         case 1:
@@ -4272,7 +4273,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
             sp2c.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp2c.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp2c.x, sp2c.z);
-            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -4323,7 +4324,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -4372,7 +4373,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, 800.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 42;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         } else {
             sp2c.x = enemy_p->current.pos.x - a_this->current.pos.x;
             sp2c.z = enemy_p->current.pos.z - a_this->current.pos.z;
@@ -4427,7 +4428,7 @@ static int npc_ks_guide_00_2(npc_ks_class* i_this) {
             sp34.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp34.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp34.x, sp34.z);
-            if (JMAFastSqrt(sp34.x * sp34.x + sp34.z * sp34.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp34.x * sp34.x + sp34.z * sp34.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 if (i_this->field_0x5b6 == 0 || i_this->field_0x5b6 == 1) {
                     i_this->field_0x904++;
                 }
@@ -4505,7 +4506,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
             sp2c.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp2c.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp2c.x, sp2c.z);
-            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -4534,7 +4535,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -4582,7 +4583,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, 700.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 42;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         } else {
             sp2c.x = enemy_p->current.pos.x - a_this->current.pos.x;
             sp2c.z = enemy_p->current.pos.z - a_this->current.pos.z;
@@ -4651,7 +4652,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -4661,7 +4662,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
             sp3c = i_this->field_0x8f0 - a_this->current.pos;
             i_this->field_0x8fc.y = cM_atan2s(sp3c.x, sp3c.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp3c.y, JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z));
-            if (sp3c.abs() < a_this->speedF * 1.2f) {
+            if (sp3c.abs() < a_this->speedF * (1.2f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
                 i_this->mMode = 1;
                 i_this->field_0xbe0 = 1;
@@ -4673,7 +4674,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
             sp3c.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp3c.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp3c.x, sp3c.z);
-            if (JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -4710,7 +4711,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -4748,7 +4749,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         i_this->mMode = 0;
     }
 
-    if (a_this->speedF > 30.0f) {
+    if (a_this->speedF > 30.0f * DELTA_TIME) {
         i_this->field_0x90c = 1;
     } else {
         s16 sVar1 = a_this->current.angle.y - i_this->field_0x8fc.y;
@@ -4761,7 +4762,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, fVar1 + 700.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 42;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         } else {
             sp3c.x = enemy_p->current.pos.x - a_this->current.pos.x;
 
@@ -4858,7 +4859,7 @@ static int npc_ks_guide_02(npc_ks_class* i_this) {
             sp3c.x = i_this->field_0x8f0.x - a_this->current.pos.x;
             sp3c.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp3c.x, sp3c.z);
-            if (JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -5008,7 +5009,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
             sp28.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp28.x, sp28.z);
 
-            if (JMAFastSqrt(sp28.x * sp28.x + sp28.z * sp28.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp28.x * sp28.x + sp28.z * sp28.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -5037,7 +5038,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -5074,7 +5075,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
         i_this->mMode = 0;
     }
 
-    if (a_this->speedF > 30.0f) {
+    if (a_this->speedF > 30.0f * DELTA_TIME) {
         i_this->field_0x90c = 1;
     } else {
         s16 sVar1 = a_this->current.angle.y - i_this->field_0x8fc.y;
@@ -5087,7 +5088,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, 700.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 42;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         } else {
             sp28.x = enemy_p->current.pos.x - a_this->current.pos.x;
             sp28.z = enemy_p->current.pos.z - a_this->current.pos.z;
@@ -5166,7 +5167,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -5176,7 +5177,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = cM_atan2s(sp40.x, sp40.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp40.y, JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z));
 
-            if (sp40.abs() < a_this->speedF * 1.2f) {
+            if (sp40.abs() < a_this->speedF * (1.2f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
                 i_this->mMode = 1;
                 i_this->field_0x904++;
@@ -5188,7 +5189,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
             sp40.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp40.x, sp40.z);
 
-            if (JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp40.x * sp40.x + sp40.z * sp40.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -5219,7 +5220,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -5256,7 +5257,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         i_this->mMode = 0;
     }
 
-    if (a_this->speedF > 30.0f) {
+    if (a_this->speedF > 30.0f * DELTA_TIME) {
         i_this->field_0x90c = 1;
     } else {
         s16 sVar1 = a_this->current.angle.y - i_this->field_0x8fc.y;
@@ -5269,7 +5270,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, 700.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 42;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         } else {
             sp40.x = enemy_p->current.pos.x - a_this->current.pos.x;
             sp40.z = enemy_p->current.pos.z - a_this->current.pos.z;
@@ -5337,7 +5338,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f;
+                a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -5348,7 +5349,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = cM_atan2s(sp48.x, sp48.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp48.y, JMAFastSqrt(sp48.x * sp48.x + sp48.z * sp48.z));
 
-            if (sp48.abs() < a_this->speedF * 1.2f) {
+            if (sp48.abs() < a_this->speedF * (1.2f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
                 i_this->mMode = 1;
                 i_this->field_0xbe0 = 1;
@@ -5361,7 +5362,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
             sp48.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp48.x, sp48.z);
 
-            if (JMAFastSqrt(sp48.x * sp48.x + sp48.z * sp48.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp48.x * sp48.x + sp48.z * sp48.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -5369,7 +5370,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
 
     cLib_addCalcAngleS2(&a_this->current.angle.x, 0, 1, 0x800);
 
-    if (a_this->speedF > 30.0f) {
+    if (a_this->speedF > 30.0f * DELTA_TIME) {
         i_this->field_0x90c = 1;
     } else {
         s16 sVar1 = a_this->current.angle.y - i_this->field_0x8fc.y;
@@ -5438,7 +5439,7 @@ static int npc_ks_guide_0409(npc_ks_class* i_this) {
             sp50.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp50.x, sp50.z);
 
-            if (JMAFastSqrt(sp50.x * sp50.x + sp50.z * sp50.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp50.x * sp50.x + sp50.z * sp50.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
             }
@@ -5513,7 +5514,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
     cXyz sp44, sp50;
     int rv = 1;
     int frame = i_this->mpModelMorf->getFrame();
-    f32 fVar2 = 1.25f + TREG_F(17);
+    f32 fVar2 = (1.25f + TREG_F(17)) * DELTA_TIME;
     f32 fVar1 = l_HIO.link_approach_distance;
 
     switch (i_this->mMode) {
@@ -5548,7 +5549,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
                     sp44 -= player->current.pos;
                     if (sp44.abs() < 7500.0f) {
                         i_this->mMode = 1;
-                        i_this->mTimers[0] = 10;
+                        i_this->mTimers[0] = 10 * SCALE_TIME;
                     }
                 }
             }
@@ -5557,7 +5558,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
         case 1:
             a_this->current.pos.y = a_this->home.pos.y + 10000.0f;
             a_this->speed.y = 0.0f;
-            if (i_this->mTimers[0] != 1) break;
+            if (i_this->mTimers[0] != 1 * SCALE_TIME) break;
 
             if (daPy_getPlayerActorClass()->checkKandelaarSwing(1) || (daPy_getPlayerActorClass()->getKandelaarFlamePos() != NULL && 
                 daPy_getPlayerActorClass()->checkUseKandelaar(0))) {
@@ -5581,25 +5582,25 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             break;
 
         case 230:
-            a_this->speedF = 20.0f;
+            a_this->speedF = 20.0f * DELTA_TIME;
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 231;
                 a_this->speedF = 0.0f;
                 anm_init(i_this, 51, 5.0f, 2, 1.0f);
-                i_this->mTimers[0] = 30;
+                i_this->mTimers[0] = 30 * SCALE_TIME;
             }
             break;
 
         case 231:
             if (i_this->mTimers[0] == 0) {
                 anm_init(i_this, 44, 3.0f, 2, 1.0f);
-                i_this->mTimers[0] = 110;
+                i_this->mTimers[0] = 110 * SCALE_TIME;
                 i_this->mMode = 232;
             }
             break;
 
         case 232:
-            if (i_this->mTimers[0] == 40) {
+            if (i_this->mTimers[0] == 40 * SCALE_TIME) {
                 anm_init(i_this, 51, 5.0f, 2, 1.0f);
             }
 
@@ -5615,7 +5616,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
                 i_this->mMode = 4;
                 i_this->field_0x904 = 1;
                 a_this->speedF = 0.0f;
-                i_this->mTimers[3] = l_HIO.lantern_swing_interval * 30.0f;
+                i_this->mTimers[3] = l_HIO.lantern_swing_interval * (30.0f * SCALE_TIME);
             }
             break;
 
@@ -5705,7 +5706,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -5750,13 +5751,13 @@ static int npc_ks_mori(npc_ks_class* i_this) {
         case 100:
             anm_init(i_this, 44, 3.0f, 2, 1.0f);
             i_this->mMode = 101;
-            i_this->mTimers[0] = 80;
+            i_this->mTimers[0] = 80 * SCALE_TIME;
             break;
 
         case 101:
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 4;
-                i_this->mTimers[3] = l_HIO.lantern_swing_interval * 30.0f;
+                i_this->mTimers[3] = l_HIO.lantern_swing_interval * (30.0f * SCALE_TIME);
             }
             break;
     }
@@ -5770,7 +5771,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
         fopAc_ac_c* enemy_p = enemy_check(i_this, 800.0f);
         if (enemy_p == NULL) {
             i_this->mMode = 53;
-            i_this->mTimers[0] = 30;
+            i_this->mTimers[0] = 30 * SCALE_TIME;
         }
     } else {
         fopAc_ac_c* enemy_p = enemy_view_check(i_this, 400.0f);
@@ -5863,7 +5864,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
                 anm_init(i_this, 33, 1.0f, 0, 1.0f);
-                a_this->speedF = 40.0f + TREG_F(9);
+                a_this->speedF = (40.0f + TREG_F(9)) * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_WIND, 0, -1);
@@ -5874,7 +5875,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             i_this->field_0x8fc.y = cM_atan2s(sp2c.x, sp2c.z);
             i_this->field_0x8fc.x = -cM_atan2s(sp2c.y, JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z));
 
-            if (sp2c.abs() < a_this->speedF * 1.2f) {
+            if (sp2c.abs() < a_this->speedF * (1.2f * DELTA_TIME)) {
                 a_this->current.pos = i_this->field_0x8f0;
 
                 if (i_this->field_0x904 == 0) {
@@ -5903,7 +5904,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             sp2c.z = i_this->field_0x8f0.z - a_this->current.pos.z;
             i_this->field_0x8fc.y = cM_atan2s(sp2c.x, sp2c.z);
 
-            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * 1.2f) {
+            if (JMAFastSqrt(sp2c.x * sp2c.x + sp2c.z * sp2c.z) < a_this->speedF * (1.2f * DELTA_TIME)) {
                 i_this->field_0x904++;
                 i_this->mMode = 1;
 
@@ -5958,7 +5959,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
         case 40:
             anm_init(i_this, 39, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
-            i_this->mTimers[0] = cM_rndF(80.0f) + 100.0f;
+            i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
 
         case 41:
@@ -5980,17 +5981,17 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             break;
 
         case 42:
-            if (i_this->mTimers[1] == 1) {
+            if (i_this->mTimers[1] == 1 * SCALE_TIME) {
                 i_this->field_0xb42 = 360;
             }
     }
 
     if ((i_this->mMode == 40 || i_this->mMode == 41) && fopAcM_SearchByName(PROC_E_FS) == NULL && i_this->field_0xb42 == 0) {
         i_this->mMode = 42;
-        i_this->mTimers[1] = 30;
+        i_this->mTimers[1] = 30 * SCALE_TIME;
     }
 
-    if (a_this->speedF > 25.0f) {
+    if (a_this->speedF > 25.0f * DELTA_TIME) {
         i_this->field_0x90c = 1;
     }
 
@@ -6522,7 +6523,7 @@ static void action(npc_ks_class* i_this) {
 
     if (i_this->field_0x5fc != 0) {
         if (i_this->field_0x93c == 0) {
-            if ((i_this->field_0x5e6 & 7U) == 0 && fopAcM_otoCheck(a_this, 2000.0f)) {
+            if ((i_this->frameCounter & 7U) == 0 && fopAcM_otoCheck(a_this, 2000.0f)) {
                 SND_INFLUENCE* sound = dKy_Sound_get();
                 i_this->field_0x940 = sound->position;
                 i_this->field_0x93c = cM_rndF(20.0f) + 30.0f;
@@ -6691,7 +6692,7 @@ static int daNpc_Ks_Execute(npc_ks_class* i_this) {
         dComIfGs_onSwitch(0x50, fopAcM_GetRoomNo(a_this));
     }
 
-    i_this->field_0x5e6++;
+    i_this->frameCounter++;
 
     for (int i = 0; i < 4; i++) {
         if (i_this->mTimers[i] != 0) {
@@ -7293,9 +7294,9 @@ static BOOL start_check(npc_ks_class* i_this) {
                 a_this->old = a_this->current = a_this->home;
             }
 
-            i_this->mTimers[1] = cM_rndF(20.0f) + 80.0f;
+            i_this->mTimers[1] = (cM_rndF(20.0f) + 80.0f) * SCALE_TIME;
         } else {
-            i_this->mTimers[1] = cM_rndF(20.0f) + 40.0f;
+            i_this->mTimers[1] = (cM_rndF(20.0f) + 40.0f) * SCALE_TIME;
         }
     }
 
@@ -7414,7 +7415,7 @@ static int daNpc_Ks_Create(fopAc_ac_c* a_this) {
         i_this->mObjAcch.Set(fopAcM_GetPosition_p(a_this), fopAcM_GetOldPosition_p(a_this), a_this, 1,
                                 &i_this->mAcchCir, fopAcM_GetSpeed_p(a_this), NULL, NULL);
         i_this->mAcchCir.SetWall(50.0f, 50.0f);
-        i_this->field_0x5e6 = cM_rndF(65536.0f);
+        i_this->frameCounter = cM_rndF(65536.0f);
         saru_p[i_this->field_0x5b6] = i_this;
 
         if (uVar1 != 0 && i_this->mRoomMonkeyID < 8) {

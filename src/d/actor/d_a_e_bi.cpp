@@ -576,9 +576,10 @@ static void action(e_bi_class* i_this) {
     if (bVar2 != 0) {
         cXyz* ccMoveP = i_this->mStts.GetCCMoveP();
         if (ccMoveP != NULL) {
-            a_this->current.pos.x += ccMoveP->x * 0.5f * DELTA_TIME;
-            a_this->current.pos.y += ccMoveP->y * 0.5f * DELTA_TIME;
-            a_this->current.pos.z += ccMoveP->z * 0.5f * DELTA_TIME;
+            a_this->current.pos.x += ccMoveP->x * 0.5f;
+            a_this->current.pos.y += ccMoveP->y * 0.5f;
+            a_this->current.pos.z += ccMoveP->z * 0.5f
+            ;
         }
 
         cMtx_YrotS(*calc_mtx, a_this->current.angle.y);

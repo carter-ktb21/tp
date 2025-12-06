@@ -101,7 +101,7 @@ public:
     /* 0x5E2 */ s16 field_0x5e2;
     /* 0x5E4 */ s8 field_0x5e4;
     /* 0x5E5 */ u8 field_0x5e5;
-    /* 0x5E6 */ s16 field_0x5e6;
+    /* 0x5E6 */ s16 frameCounter;
     /* 0x5E8 */ s16 mActionID;
     /* 0x5EA */ s16 mMode;
     /* 0x5EC */ u32 mShadowKey;

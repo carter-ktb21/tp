@@ -13,7 +13,8 @@
  * 
  * @details 
  * 
- */
+*/
+
 class daE_WS_c : public fopEn_enemy_c {
 public:
     enum daE_WS_Action_e {

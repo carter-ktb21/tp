@@ -246,7 +246,7 @@ int daNbomb_c::create() {
     mExTime = player->getBombExplodeTime();
 
     if (is_octaeel_bomb) {
-        mExTime *= 0.75f;
+        mExTime *= 0.75f * SCALE_TIME;
     }
 
     cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
@@ -301,7 +301,7 @@ int daNbomb_c::create() {
             procCarryInit();
         } else if (fopAcM_GetParam(this) == PRM_INSECT_BOMB_PLAYER) {
             onStateFlg0(daNbomb_FLG0(FLG0_INSECT_BOMB | FLG0_NO_HIT_PLAYER | FLG0_PLAYER_MAKE));
-            mExTime = player->getBombExplodeTime() * 2;
+            mExTime = player->getBombExplodeTime() * (2 * SCALE_TIME);
             shape_angle.y = player->shape_angle.y;
             current.angle.y = player->shape_angle.y;
 
@@ -434,7 +434,7 @@ BOOL daNbomb_c::checkExplode() {
             if (checkStateFlg0(FLG0_CARGO_CARRY)) {
                 daAlink_c* player = daAlink_getAlinkActorClass();
                 if (mExTime < player->getBombExplodeTime()) {
-                    mExTime = player->getBombExplodeTime() * 1.5f;
+                    mExTime = player->getBombExplodeTime() * (1.5f * SCALE_TIME);
                 }
             }
         }
@@ -533,7 +533,7 @@ void daNbomb_c::setHookshotOffset() {
 void daNbomb_c::setFreeze() {
     if (!checkStateFlg0(FLG0_FROZEN)) {
         onStateFlg0(FLG0_FROZEN);
-        mFreezeTimer = 90;
+        mFreezeTimer = 90 * SCALE_TIME;
     }
 }
 
@@ -743,7 +743,7 @@ BOOL daNbomb_c::procExplode() {
     if (mExplodeMode < 2) {
         mExTime--;
 
-        if (mExTime > -3) {
+        if (mExTime > -3 * SCALE_TIME) {
             mCcSph.SetC(current.pos);
             dComIfG_Ccsp()->Set(&mCcSph);
             dComIfG_Ccsp()->SetMass(&mCcSph, 1);
@@ -1114,7 +1114,7 @@ BOOL daNbomb_c::procBoomerangMoveInit(dCcD_GObjInf* unused) {
     speedF = 0.0f;
 
     mBoomerangMove.initOffset(&current.pos);
-    mExTime = daAlink_getAlinkActorClass()->getBombExplodeTime() * 1.5f;
+    mExTime = daAlink_getAlinkActorClass()->getBombExplodeTime() * (1.5f * SCALE_TIME);
     return true;
 }
 
@@ -1150,7 +1150,7 @@ BOOL daNbomb_c::procBoomerangMove() {
         procWaitInit();
     } else {
         if (mExTime < player->getBombExplodeTime()) {
-            mExTime = player->getBombExplodeTime() * 1.5f;
+            mExTime = player->getBombExplodeTime() * (1.5f * SCALE_TIME);
         }
     }
 
@@ -1180,7 +1180,7 @@ BOOL daNbomb_c::procInsectMoveInit() {
 
     speedF = 20.0f;
     old.pos = current.pos;
-    mNoHitPlayerTimer = 5;
+    mNoHitPlayerTimer = 5 * SCALE_TIME;
     return true;
 }
 

@@ -24,7 +24,7 @@ public:
     /* 0x572 */ u8 mSwBit;
     /* 0x574 */ J3DModel* mModel;
     /* 0x578 */ Z2Creature mSound;
-    /* 0x608 */ s16 field_0x608;
+    /* 0x608 */ s16 frameCounter;
     /* 0x60A */ s16 mAction;
     /* 0x60C */ s16 mActionMode;
     /* 0x60E */ s16 mTimers[2];

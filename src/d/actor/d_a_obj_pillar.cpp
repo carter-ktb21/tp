@@ -50,10 +50,10 @@ const static dCcD_SrcCyl l_cyl_src = {
 #define SHAKE_DATA_CRASH       3
 
 static const daPillar_c::sdata_t l_shake_data[] = {
-    /* CRASH FIRST */ {5, 0, 800, 20, 7000, 400, 65},
-    /* STRONG      */ {255, 0, 600, 20, 6000, 300, 40},
-    /* WEAK        */ {255, 0, 400, 20, 5000, 200, 30},
-    /* CRASH       */ {5, 0, 800, 120, 7000, 30, 15},
+    /* CRASH FIRST */ {5, 0, 800, 20 * SCALE_TIME, 7000 * DELTA_TIME, 400, 65},
+    /* STRONG      */ {255, 0, 600, 20 * SCALE_TIME, 6000 * DELTA_TIME, 300, 40},
+    /* WEAK        */ {255, 0, 400, 20 * SCALE_TIME, 5000 * DELTA_TIME, 200, 30},
+    /* CRASH       */ {5, 0, 800, 120 * SCALE_TIME, 7000 * DELTA_TIME, 30, 15},
 };
 
 static char* l_arcName[] = {
@@ -80,7 +80,7 @@ static void rideCallBack(dBgW* i_bgw, fopAc_ac_c* i_this, fopAc_ac_c* i_rideActo
         }
 
         i_rideActor->current.angle.y = player->current.angle.y + 0x7FFF + var_r28;
-        i_rideActor->speedF = 30.0f;
+        i_rideActor->speedF = 30.0f * DELTA_TIME;
         i_rideActor->speed.y = 1.0f;
         ((daObjCarry_c*)i_rideActor)->setDrop();
     }
@@ -152,7 +152,7 @@ int daPillar_c::Create() {
 
     u16 timer = getTimer();
     if (timer == 0 || timer == 255) {
-        mTimer = 4;
+        mTimer = 4 * SCALE_TIME;
     } else {
         mTimer = timer;
     }
@@ -411,7 +411,7 @@ int daPillar_c::Execute(Mtx** param_0) {
         }
     case SHAKE_MODE_QUAKE:
         mQuakeTimer++;
-        if (mQuakeTimer > 110) {
+        if (mQuakeTimer > 110 * DELTA_TIME) {
             dComIfGp_getVibration().StopQuake(31);
             mShakeMode = SHAKE_MODE_END;
         }

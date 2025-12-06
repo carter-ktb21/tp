@@ -112,12 +112,12 @@ static void damage_check(e_hb_class* i_this) {
         i_this->ccStts.Move();
 
         if (i_this->atSph.ChkAtShieldHit()) {
-            i_this->invulnerabilityTimer = 6;
+            i_this->invulnerabilityTimer = 6 * SCALE_TIME;
             i_this->action = ACTION_S_DAMAGE;
             i_this->mode = 0;
 
-            i_this->timers[0] = 10;
-            i_this->timers[1] = 100;
+            i_this->timers[0] = 10 * SCALE_TIME;
+            i_this->timers[1] = 100 * SCALE_TIME;
 
             i_this->field_0x680 = player->shape_angle.y;
             i_this->field_0x1230 = 10;
@@ -129,7 +129,7 @@ static void damage_check(e_hb_class* i_this) {
 
         for (int i = 0; i < 4; i++) {
             if (i_this->kukiSph[i].ChkTgHit()) {
-                i_this->invulnerabilityTimer = 10;
+                i_this->invulnerabilityTimer = 10 * SCALE_TIME;
                 i_this->atInfo.mpCollider = i_this->kukiSph[i].GetTgHitObj();
 
                 if (i_this->atInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
@@ -144,8 +144,8 @@ static void damage_check(e_hb_class* i_this) {
                 } else {
                     i_this->action = ACTION_S_DAMAGE;
                     i_this->mode = 0;
-                    i_this->timers[0] = 10;
-                    i_this->timers[1] = 100;
+                    i_this->timers[0] = 10 * SCALE_TIME;
+                    i_this->timers[1] = 100 * SCALE_TIME;
                     i_this->field_0x680 = player->shape_angle.y;
                     def_se_set(&i_this->sound, i_this->atInfo.mpCollider, 0x2D, NULL);
                     i_this->field_0x1230 = 10;
@@ -163,11 +163,11 @@ static void damage_check(e_hb_class* i_this) {
             }
 
             if (i_this->field_0x850 == 0) {
-                i_this->invulnerabilityTimer = 6;
+                i_this->invulnerabilityTimer = 6 * SCALE_TIME;
                 i_this->action = ACTION_S_DAMAGE;
                 i_this->mode = 0;
-                i_this->timers[0] = 10;
-                i_this->timers[1] = 100;
+                i_this->timers[0] = 10 * SCALE_TIME;
+                i_this->timers[1] = 100 * SCALE_TIME;
                 i_this->field_0x680 = player->shape_angle.y;
                 i_this->field_0x1230 = 10;
                 def_se_set(&i_this->sound, i_this->atInfo.mpCollider, 0x2D, NULL);
@@ -221,7 +221,7 @@ static void e_hb_stay(e_hb_class* i_this) {
     fopAc_ac_c* actor = &i_this->enemy;
 
     cXyz sp14;
-    i_this->invulnerabilityTimer = 15;
+    i_this->invulnerabilityTimer = 15 * SCALE_TIME;
 
     switch (i_this->mode) {
     case 0:
@@ -232,7 +232,7 @@ static void e_hb_stay(e_hb_class* i_this) {
         if (leaf_anm_init(i_this, 0x14, 10.0f, 2, 0.0f)) {
             i_this->mode = 5;
             i_this->field_0x690 = 0.0f;
-            i_this->timers[0] = 50;
+            i_this->timers[0] = 50 * SCALE_TIME;
         }
         break;
     case 2:
@@ -339,7 +339,7 @@ static void e_hb_appear_v(e_hb_class* i_this) {
         anm_init(i_this, 5, 5.0f, 0, 1.0f);
         leaf_anm_init(i_this, 0x13, 5.0f, 2, 1.0f);
         i_this->mode = 1;
-        i_this->timers[0] = JREG_S(6) + 30;
+        i_this->timers[0] = (JREG_S(6) + 30) * SCALE_TIME;
         i_this->field_0x690 = 0.0f;
         i_this->modelMorf->setFrame(15.0f);
         /* fallthrough */
@@ -397,16 +397,16 @@ static void e_hb_wait(e_hb_class* i_this) {
         i_this->mode = 1;
 
         if (i_this->arg1 == 1) {
-            i_this->timers[1] = 30.0f + cM_rndF(20.0f);
+            i_this->timers[1] = (30.0f + cM_rndF(20.0f)) * SCALE_TIME;
         } else {
-            i_this->timers[1] = l_HIO.attack_freq + cM_rndF(l_HIO.attack_freq);
+            i_this->timers[1] = (l_HIO.attack_freq + cM_rndF(l_HIO.attack_freq)) * SCALE_TIME;
         }
 
         i_this->timers[0] = 0;
         break;
     case 1:
         if (i_this->timers[0] == 0) {
-            i_this->timers[0] = 10.0f + cM_rndF(30.0f);
+            i_this->timers[0] = (10.0f + cM_rndF(30.0f)) * SCALE_TIME;
             i_this->field_0x674.x = actor->home.pos.x + cM_rndFX(100.0f);
             i_this->field_0x674.z = actor->home.pos.z + cM_rndFX(100.0f);
 
@@ -468,7 +468,7 @@ static void e_hb_attack(e_hb_class* i_this) {
     switch (i_this->mode) {
     case 0:
         i_this->mode = 1;
-        i_this->timers[0] = 17;
+        i_this->timers[0] = 17 * SCALE_TIME;
         i_this->field_0x690 = 0.0f;
         i_this->field_0xb0d = 0;
 
@@ -502,7 +502,7 @@ static void e_hb_attack(e_hb_class* i_this) {
 
         if (i_this->timers[0] == 0) {
             i_this->mode = 2;
-            i_this->timers[1] = 10;
+            i_this->timers[1] = 10 * SCALE_TIME;
 
             if (i_this->field_0x851 != 0) {
                 cMtx_YrotS(*calc_mtx, (actor->shape_angle.y + 0x8000));
@@ -560,7 +560,7 @@ static void e_hb_attack(e_hb_class* i_this) {
             i_this->mode = 5;
             i_this->field_0x690 = 20.0f;
             anm_init(i_this, 7, 2.0f, 2, 1.0f);
-            i_this->timers[0] = 120;
+            i_this->timers[0] = 120 * SCALE_TIME;
 
             daPy_getPlayerActorClass()->setDkCaught(actor);
             dComIfGp_getVibration().StartShock(6, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
@@ -582,7 +582,7 @@ static void e_hb_attack(e_hb_class* i_this) {
         spA = 0;
 
         if (daPy_getPlayerActorClass()->getDkCaught()) {
-            if (i_this->timers[0] == 30) {
+            if (i_this->timers[0] == 30 * SCALE_TIME) {
                 dComIfGp_setItemLifeCount(-1.0f, 0);
             }
 
@@ -663,7 +663,7 @@ static void e_hb_chance(e_hb_class* i_this) {
 
         leaf_anm_init(i_this, 0x14, 5.0f, 2, 1.0f);
         i_this->mode = 1;
-        i_this->timers[0] = 60;
+        i_this->timers[0] = 60 * SCALE_TIME;
         i_this->field_0x690 = 0.0f;
         /* fallthrough */
     case 1:
@@ -681,7 +681,7 @@ static void e_hb_chance(e_hb_class* i_this) {
 
         cLib_addCalc2(&i_this->field_0x690, 1.0f, 1.0f, 0.1f);
 
-        if (i_this->timers[0] <= 50 && i_this->timers[0] >= 10) {
+        if (i_this->timers[0] <= 50 * SCALE_TIME && i_this->timers[0] >= 10 * SCALE_TIME) {
             i_this->sound.startCreatureSoundLevel(0x70088, 0, -1);
         }
 

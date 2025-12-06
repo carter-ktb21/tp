@@ -23,7 +23,7 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
 
         if (jnt_no == swpr_p->mKaitenJntID) {
             cMtx_copy(model_p->getAnmMtx(jnt_no), mDoMtx_stack_c::get());
-            mDoMtx_stack_c::YrotM(swpr_p->field_0x82c);
+            mDoMtx_stack_c::YrotM(swpr_p->field_0x82c * DELTA_TIME);
             model_p->setAnmMtx(jnt_no, mDoMtx_stack_c::get());
             mDoMtx_copy(mDoMtx_stack_c::get(), J3DSys::mCurrentMtx);
         }
@@ -198,7 +198,7 @@ void daObjSwPr_c::execute_type_boomerang() {
         if (strcmp(dComIfGp_getStartStageName(), "D_MN05") == 0 && fopAcM_GetRoomNo(this) == 0) {
             mSwDelayTimer = 0;
         } else {
-            mSwDelayTimer = 8;
+            mSwDelayTimer = 8 * SCALE_TIME;
         }
     }
 
@@ -250,7 +250,7 @@ void daObjSwPr_c::execute_type_wind() {
                 mRotateSpeed = 7000;
                 mRotateInitSpeed = mRotateSpeed;
                 fopAcM_onSwitch(this, sw);
-                mSwOffDelayTimer = 10;
+                mSwOffDelayTimer = 10 * SCALE_TIME;
 
                 if (getSwbit2() != 0xFF) {
                     fopAcM_onSwitch(this, getSwbit2());

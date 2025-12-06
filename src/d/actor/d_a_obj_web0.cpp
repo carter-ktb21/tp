@@ -34,10 +34,10 @@ static void damage_check(obj_web0_class* i_this) {
     }
 
     if (i_this->mSphCc.ChkTgHit()) {
-        i_this->mHitTimer = 6;
+        i_this->mHitTimer = 6 * SCALE_TIME;
 
         if (i_this->mSphCc.GetTgHitObj()->ChkAtType(AT_TYPE_IRON_BALL)) {
-            i_this->mDeleteTimer = 41;
+            i_this->mDeleteTimer = 41 * SCALE_TIME;
             return;
         }
 
@@ -48,21 +48,21 @@ static void damage_check(obj_web0_class* i_this) {
 
         if (i_this->mSphCc.GetTgHitObj()->ChkAtType(AT_TYPE_BOMB) ||
             i_this->mSphCc.GetTgHitGObj()->GetAtMtrl() == dCcD_MTRL_FIRE) {
-            i_this->mDeleteTimer = 1;
+            i_this->mDeleteTimer = 1 * SCALE_TIME;
             return;
         }
 
-        i_this->mReboundTimer = 20;
+        i_this->mReboundTimer = 20 * SCALE_TIME;
         fopAcM_seStart(i_this, Z2SE_OBJ_WEB_BOUND_L, 0);
     }
 
     if (i_this->mSphCc.ChkCoHit()) {
-        i_this->mReboundTimer = 10;
+        i_this->mReboundTimer = 10 * SCALE_TIME;
     }
 
     if (daPy_getPlayerActorClass()->checkFrontRollCrash() &&
         fopAcM_searchPlayerDistanceXZ(i_this) < i_this->scale.x * 260.0f) {
-        i_this->mReboundTimer = 20;
+        i_this->mReboundTimer = 20 * SCALE_TIME;
         fopAcM_seStart(i_this, Z2SE_OBJ_WEB_BOUND_L, 0);
     }
 }
@@ -84,19 +84,19 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
     }
 
     if (i_this->mDeleteTimer != 0) {
-        if (i_this->mDeleteTimer == 1) {
+        if (i_this->mDeleteTimer == 1 * SCALE_TIME) {
             cXyz sp20(base_p->scale);
             sp20.z = 1.0f;
 
             dComIfGp_particle_set(0x840C, &base_p->current.pos, &base_p->shape_angle, &sp20);
             i_this->mpBrk->setPlaySpeed(1.0f);
-        } else if (i_this->mDeleteTimer == 41) {
+        } else if (i_this->mDeleteTimer == 41 * SCALE_TIME) {
             i_this->mpBrk->setPlaySpeed(1.0f);
         }
 
         fopAcM_seStartLevel(base_p, Z2SE_OBJ_WEB_BURN, 0);
 
-        if (i_this->mDeleteTimer == 40 || i_this->mDeleteTimer == 80) {
+        if (i_this->mDeleteTimer == 40 * SCALE_TIME || i_this->mDeleteTimer == 80 * SCALE_TIME) {
             u32 sp0C = (fopAcM_GetParam(base_p) & 0xff000000) >> 24;
             dComIfGs_onSwitch(sp0C, fopAcM_GetRoomNo(base_p));
             fopAcM_delete(base_p);
@@ -120,7 +120,7 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
     }
 
     base_p->scale.z =
-        i_this->mReboundTimer * cM_ssin(i_this->mReboundTimer * 0x1900) * (0.075f + TREG_F(0));
+        (i_this->mReboundTimer * DELTA_TIME) * cM_ssin((i_this->mReboundTimer * DELTA_TIME) * 0x1900) * (0.075f + TREG_F(0));
 
     s16 var_r28 = fopAcM_searchPlayerAngleY(base_p);
     s16 sp08 = (var_r28 + 0x4000) - base_p->shape_angle.y;

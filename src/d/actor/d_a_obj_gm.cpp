@@ -379,7 +379,7 @@ static void swing(obj_gm_class* i_this) {
             }
 
             i_this->field_0x720 = cM_atan2s(a_this->speed.x, a_this->speed.z);
-            a_this->speedF = JMAFastSqrt(a_this->speed.x * a_this->speed.x + a_this->speed.z * a_this->speed.z);
+            a_this->speedF = JMAFastSqrt(a_this->speed.x * a_this->speed.x + a_this->speed.z * a_this->speed.z) * DELTA_TIME;
             i_this->field_0x728 = 1.0f;
         }
     }
@@ -392,7 +392,7 @@ static void drop(obj_gm_class* i_this) {
     cMtx_YrotS(*calc_mtx, i_this->field_0x720);
     sp38.x = 0.0f;
     sp38.y = 0.0f;
-    sp38.z = a_this->speedF * i_this->field_0x728;
+    sp38.z = (a_this->speedF * SCALE_TIME) * i_this->field_0x728;
     MtxPosition(&sp38, &sp44);
     a_this->current.pos.x += sp44.x;
     a_this->current.pos.z += sp44.z;
@@ -434,20 +434,20 @@ static void drop(obj_gm_class* i_this) {
     }
 
     if (i_this->mTimers[0] == 0 && i_this->mBgc.ChkWallHit()) {
-        i_this->mTimers[0] = 10;
+        i_this->mTimers[0] = 10 * SCALE_TIME;
         s16 wallAngle = wall_angle_get(i_this);
-        if (a_this->speedF > 5.0f && wallAngle != 35) {
+        if (a_this->speedF > 5.0f * DELTA_TIME && wallAngle != 35) {
             i_this->field_0x720 += (s16)(0x8000 - ((s16)(i_this->field_0x720 - wallAngle) << 1));
             i_this->field_0x722 *= -1;
-            i_this->mTimers[0] = 10;
-            a_this->speedF *= AREG_F(4) + 0.35f;
+            i_this->mTimers[0] = 10 * SCALE_TIME;
+            a_this->speedF *= (AREG_F(4) + 0.35f) * DELTA_TIME;
         } else {
-            a_this->speedF *= AREG_F(5) + 0.9f;
+            a_this->speedF *= (AREG_F(5) + 0.9f) * DELTA_TIME;
         }
     }
 
     if (i_this->field_0x726 != 0) {
-        i_this->field_0x722 += (int)(a_this->speedF * i_this->field_0x728 * spin_sp[i_this->mType]);
+        i_this->field_0x722 += (int)((a_this->speedF * SCALE_TIME) * i_this->field_0x728 * spin_sp[i_this->mType]);
     }
 
     MtxTrans(a_this->current.pos.x, a_this->current.pos.y, a_this->current.pos.z, 0);
@@ -495,7 +495,7 @@ static void action(obj_gm_class* i_this) {
     }
 
     if (bVar1) {
-        s16 target = i_this->field_0x648 * cM_ssin(i_this->field_0x608 * neg[i_this->mType]);
+        s16 target = i_this->field_0x648 * cM_ssin(i_this->frameCounter * neg[i_this->mType]);
         cLib_addCalc2(&i_this->field_0x648, NREG_F(8) + 2000.0f, 0.05f, TREG_F(5) + 10.0f);
         cLib_addCalcAngleS2(&i_this->field_0x64c[0], target, 16, 200);
     }
@@ -548,7 +548,7 @@ static int daObj_Gm_Execute(obj_gm_class* i_this) {
         }
     }
 
-    i_this->field_0x608++;
+    i_this->frameCounter++;
 
     if (i_this->field_0x948 != 0) {
         i_this->field_0x948--;
@@ -700,7 +700,7 @@ static cPhs__Step daObj_Gm_Create(fopAc_ac_c* a_this) {
         i_this->mBgc.Set(fopAcM_GetPosition_p(a_this), fopAcM_GetOldPosition_p(a_this), a_this, 1, &i_this->mAcchCir, fopAcM_GetSpeed_p(a_this), NULL, NULL);
         i_this->mAcchCir.SetWall(50.0f, obj_size[i_this->mType]);
         
-        i_this->field_0x608 = cM_rndF(65536.0f);
+        i_this->frameCounter = cM_rndF(65536.0f);
 
         daObj_Gm_Execute(i_this);
 

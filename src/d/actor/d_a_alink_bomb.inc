@@ -6,15 +6,15 @@
 #include "d/actor/d_a_alink.h"
 
 s16 daAlink_c::getBombExplodeTime() const {
-    return mpHIO->mItem.mBomb.m.mExplodeTime;
+    return mpHIO->mItem.mBomb.m.mExplodeTime * SCALE_TIME;
 }
 
 f32 daAlink_c::getBombGravity() const {
-    return mpHIO->mItem.mBomb.m.mGravity;
+    return mpHIO->mItem.mBomb.m.mGravity * DELTA_TIME;
 }
 
 f32 daAlink_c::getBombMaxFallSpeed() const {
-    return mpHIO->mItem.mBomb.m.mMaxFallSpeed;
+    return mpHIO->mItem.mBomb.m.mMaxFallSpeed * SCALE_TIME;
 }
 
 f32 daAlink_c::getBombBoundRate() const {
@@ -42,7 +42,7 @@ s16 daAlink_c::getEnemyBombColorR() const {
 }
 
 f32 daAlink_c::getBombWaterGravity() const {
-    return mpHIO->mItem.mBomb.m.mWaterGravity;
+    return mpHIO->mItem.mBomb.m.mWaterGravity * DELTA_TIME;
 }
 
 f32 daAlink_c::getBombWaterMaxFallSpeed() const {

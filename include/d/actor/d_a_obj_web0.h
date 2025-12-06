@@ -10,7 +10,8 @@
  *
  * @details
  *
- */
+*/
+
 class obj_web0_class : public fopAc_ac_c {
 public:
     /* 0x568 */ request_of_phase_process_class mPhase;

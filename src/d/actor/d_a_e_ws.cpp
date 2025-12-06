@@ -63,7 +63,7 @@ daE_WS_HIO_c::daE_WS_HIO_c() {
     dist_to_ground = 270.0f;
     debug_ON = false;
     search_angle = 18200;
-    attack_speed = 10.0f;
+    attack_speed = 10.0f * DELTA_TIME;
 }
 
 int daE_WS_c::draw() {
@@ -240,7 +240,7 @@ void daE_WS_c::executeWait() {
 
     switch (mMode) {
     case 0:
-        mMoveWaitTimer = 50.0f + cM_rndF(50.0f);
+        mMoveWaitTimer = (50.0f + cM_rndF(50.0f)) * SCALE_TIME;
         setBck(9, 2, 3.0f, 1.0f);
         mMode = 1;
         /* fallthrough */
@@ -273,7 +273,7 @@ void daE_WS_c::executeWait() {
 
         if (cLib_chaseAngleS(&shape_angle.y, mTargetAngle, mTargetStep)) {
             mMode = 4;
-            mMoveWaitTimer = 10;
+            mMoveWaitTimer = 10 * SCALE_TIME;
             setBck(9, 2, 3.0f, 1.0f);
         }
         break;
@@ -284,8 +284,8 @@ void daE_WS_c::executeWait() {
         break;
     case 5:
         mMode = 6;
-        speedF = 3.0f;
-        mMoveWaitTimer = 20.0f + cM_rndF(10.0f);
+        speedF = 3.0f * DELTA_TIME;
+        mMoveWaitTimer = (20.0f + cM_rndF(10.0f)) * SCALE_TIME;
         setBck(7, 2, 3.0f, 1.0f);
         /* fallthrough */
     case 6:
@@ -333,12 +333,12 @@ void daE_WS_c::executeAttack() {
             mMode = 2;
             setBck(10, 2, 3.0f, 1.0f);
             mSound.startCreatureVoice(Z2SE_EN_WS_V_YOKOKU, -1);
-            mMoveWaitTimer = 10;
+            mMoveWaitTimer = 10 * SCALE_TIME;
         }
         break;
     case 2:
         if (mMoveWaitTimer == 0) {
-            speedF = l_HIO.attack_speed * mBodyScale;
+            speedF = l_HIO.attack_speed * (mBodyScale * DELTA_TIME);
             setBck(7, 2, 3.0f, 3.0f);
             mMode = 3;
         }
@@ -392,7 +392,7 @@ void daE_WS_c::executeAttack() {
 }
 
 void daE_WS_c::executeDown() {
-    mInvulnerabilityTimer = 10;
+    mInvulnerabilityTimer = 10 * SCALE_TIME;
 
     switch (mMode) {
     case 0:
@@ -413,7 +413,7 @@ void daE_WS_c::executeDown() {
             current.angle.y = field_0x668.y;
             setBck(6, 0, 3.0f, 0.0f);
             mSound.startCreatureVoice(Z2SE_EN_WS_V_DEATH, -1);
-            speedF = 5.0f;
+            speedF = 5.0f * DELTA_TIME;
             gravity = -3.0f;
             mAcch.SetGroundUpY(25.0f * mBodyScale);
             mMode = 2;
@@ -430,10 +430,10 @@ void daE_WS_c::executeDown() {
         }
 
         if (mAcch.ChkGroundHit()) {
-            speedF = 3.0f + cM_rndF(2.0f);
+            speedF = (3.0f + cM_rndF(2.0f)) * DELTA_TIME;
             speed.y = 12.0f;
             mMode = 3;
-            mMoveWaitTimer = 30;
+            mMoveWaitTimer = 30 * SCALE_TIME;
             setBck(6, 0, 5.0f, 1.0f);
             mSound.startCreatureSound(Z2SE_CM_BODYFALL_S, 0, -1);
         }
@@ -468,7 +468,7 @@ void daE_WS_c::executeDown() {
         cLib_addCalc2(&mDownColor, -20.0f, 1.0f, 0.4f);
 
         if (mpModelMorf->isStop()) {
-            mMoveWaitTimer = 15;
+            mMoveWaitTimer = 15 * SCALE_TIME;
             mMode = 5;
             return;
         }
@@ -489,7 +489,7 @@ void daE_WS_c::executeDown() {
 }
 
 void daE_WS_c::executeWindDown() {
-    mInvulnerabilityTimer = 10;
+    mInvulnerabilityTimer = 10 * SCALE_TIME;
 
     switch (mMode) {
     case 0:
@@ -502,11 +502,11 @@ void daE_WS_c::executeWindDown() {
         setBck(7, 2, 3.0f, 1.0f);
     
         mSound.startCreatureVoice(Z2SE_EN_WS_V_DAMAGE, -1);
-        mMoveWaitTimer = 5;
+        mMoveWaitTimer = 5 * SCALE_TIME;
         mAcch.SetGroundUpY(20.0f);
         attention_info.flags = 0;
         speed.y = 0.0f;
-        speedF = 5.0f;
+        speedF = 5.0f * DELTA_TIME;
         current.angle.y = field_0x668.y;
         mTargetStep = -0x800;
         break;
@@ -531,10 +531,10 @@ void daE_WS_c::executeWindDown() {
         cLib_chaseAngleS(&shape_angle.z, 0, 0x400);
 
         if (mAcch.ChkGroundHit()) {
-            speedF = 3.0f + cM_rndF(2.0f);
+            speedF = (3.0f + cM_rndF(2.0f)) * DELTA_TIME;
             speed.y = 12.0f;
             mMode = 3;
-            mMoveWaitTimer = 30;
+            mMoveWaitTimer = 30 * SCALE_TIME;
             setBck(6, 0, 5.0f, 1.0f);
             mSound.startCreatureVoice(Z2SE_EN_WS_V_DEATH, -1);
             mSound.startCreatureSound(Z2SE_CM_BODYFALL_S, 0, -1);
@@ -561,7 +561,7 @@ void daE_WS_c::executeWindDown() {
         shape_angle.y += mTargetStep;
 
         if (mpModelMorf->isStop()) {
-            mMoveWaitTimer = 15;
+            mMoveWaitTimer = 15 * SCALE_TIME;
             mMode = 5;
         }
         break;
@@ -611,13 +611,13 @@ void daE_WS_c::damage_check() {
             cc_at_check(this, &mAtInfo);
 
             if (mAtInfo.mpCollider->ChkAtType(AT_TYPE_WOLF_ATTACK | AT_TYPE_WOLF_CUT_TURN | AT_TYPE_10000000 | AT_TYPE_MIDNA_LOCK)) {
-                mInvulnerabilityTimer = 20;
+                mInvulnerabilityTimer = 20 * SCALE_TIME;
             } else {
-                mInvulnerabilityTimer = 10;
+                mInvulnerabilityTimer = 10 * SCALE_TIME;
             }
 
             if (mAtInfo.mAttackPower <= 1) {
-                mInvulnerabilityTimer = KREG_S(8) + 10;
+                mInvulnerabilityTimer = (KREG_S(8) + 10) * SCALE_TIME;
             }
 
             if (mAtInfo.mpCollider->ChkAtType(AT_TYPE_BOOMERANG)) {
@@ -658,7 +658,7 @@ void daE_WS_c::action() {
         mDoMtx_stack_c::XrotM(field_0x668.x);
         mDoMtx_stack_c::YrotM(current.angle.y);
 
-        cXyz sp8(0.0f, 0.0f, speedF);
+        cXyz sp8(0.0f, 0.0f, speedF * SCALE_TIME);
         mDoMtx_stack_c::multVec(&sp8, &sp14);
         speed = sp14;
         current.pos += speed;

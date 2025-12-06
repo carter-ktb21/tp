@@ -242,8 +242,8 @@ int daObjStair_c::modeWaitUpper() {
 }
 
 int daObjStair_c::modeUpperInit() {
-    mMoveStartShakeTimer = 30;
-    mMoveEndShakeTimer = 15;
+    mMoveStartShakeTimer = 30 * SCALE_TIME;
+    mMoveEndShakeTimer = 15 * SCALE_TIME;
     mMoveStartShakeAmount = 3.0f;
     mMoveMode = 0;
     mMoveAccel = 0.0f;
@@ -266,7 +266,7 @@ int daObjStair_c::modeUpper() {
             }
             setParticle();
             mMoveMode = 1;
-        } else if (mMoveStartShakeTimer == 2 && getMdlType() != 1) {
+        } else if (mMoveStartShakeTimer == 2 * SCALE_TIME && getMdlType() != 1) {
             mDoAud_seStart(Z2SE_OBJ_STEP_MOVESTART, &mSoundPos, 0, 0);
         }
 
@@ -305,7 +305,7 @@ int daObjStair_c::modeUpper() {
     case 2:
         dComIfGp_getVibration().StartShock(4, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
         mMoveMode = 3;
-        mMoveStartShakeTimer = 15;
+        mMoveStartShakeTimer = 15 * SCALE_TIME;
         break;
     case 3:
         mMoveStartShakeTimer--;
@@ -317,7 +317,7 @@ int daObjStair_c::modeUpper() {
         break;
     }
 
-    mModelPos.y += mMoveStartShakeAmount * cM_scos(mMoveStartShakeTimer * shake_speed);
+    mModelPos.y += mMoveStartShakeAmount * cM_scos((mMoveStartShakeTimer * DELTA_TIME) * shake_speed);
     cLib_addCalc0(&mMoveStartShakeAmount, 0.5f + KREG_F(1), 0.5f + KREG_F(3));
     return 1;
 }
@@ -344,7 +344,7 @@ int daObjStair_c::modeLowerInit() {
     mMoveAccel = 0.0f;
     mMoveStep = 0.0f;
     mMoveMode = 0;
-    mMoveStartShakeTimer = 30;
+    mMoveStartShakeTimer = 30 * SCALE_TIME;
     mMode = MODE_LOWER_e;
     return 1;
 }
@@ -387,20 +387,20 @@ int daObjStair_c::modeLower() {
                     effpos.y += 600.0f;
                     mSmokeEmitter = dComIfGp_particle_set(0x833E, &effpos, &home.angle, NULL, 0xFF, NULL, -1, NULL, NULL, NULL);
                 }
-            } else if (mMoveStartShakeTimer == 2 && getMdlType() != 1) {
+            } else if (mMoveStartShakeTimer == 2 * SCALE_TIME && getMdlType() != 1) {
                 mDoAud_seStart(Z2SE_OBJ_STEP_MOVESTART, &mSoundPos, 0, 0);
             }
         }
     } else {
         if (mMoveStartShakeTimer == 0 && mMoveMode == 1) {
-            mMoveStartShakeTimer = 15;
+            mMoveStartShakeTimer = 15 * SCALE_TIME;
             mMoveMode = 2;
             dComIfGp_getVibration().StartShock(4, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
         }
 
         mMoveStartShakeTimer--;
         mModelPos = current.pos;
-        mModelPos.y += shake_amount * cM_scos(mMoveStartShakeTimer * shake_speed);
+        mModelPos.y += shake_amount * cM_scos((mMoveStartShakeTimer * DELTA_TIME) * shake_speed);
 
         if (mMoveStartShakeTimer == 0) {
             modeWaitUpperInit();

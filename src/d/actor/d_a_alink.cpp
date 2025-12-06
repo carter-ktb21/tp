@@ -13535,7 +13535,7 @@ BOOL daAlink_c::setItemActor() {
 
     if (checkBombItem(mEquipItem)) {
         if (checkHorseRide()) {
-            if (!dComIfGp_getHorseActor()->checkNoBombProc() &&
+            if (dComIfGp_getHorseActor()->checkNoBombProc() &&
                 (mProcID != PROC_HORSE_TURN || !checkModeFlg(MODE_DISABLE_ITEMS)))
             {
                 mEquipItem = fpcNm_ITEM_NONE;

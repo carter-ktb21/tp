@@ -260,7 +260,7 @@ cflags_base = [
 ]
 
 if config.version == "ShieldD":
-    cflags_base.extend(["-O0", "-inline off", "-RTTI on", "-str reuse", "-enc SJIS", "-DDEBUG=1", "-DWIDESCREEN_SUPPORT=1", '-pragma "nosyminline on"'])
+    cflags_base.extend(["-O0", "-inline off", "-RTTI on", "-str reuse", "-enc SJIS", "-DDEBUG=1", "-DWIDESCREEN_SUPPORT=1"])
 elif config.version == "RZDE01_00" or config.version == "RZDE01_02" or config.version == "Shield":
     cflags_base.extend(["-O4,p", "-inline auto", "-ipa file", "-RTTI on", "-str reuse", "-enc SJIS", "-DWIDESCREEN_SUPPORT=1"])
 else:
@@ -734,7 +734,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_bg_w_base.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_bg_w_kcol.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_bg_w_sv.cpp"),
-            Object(Equivalent, "d/d_cc_d.cpp"), # weak func order
+            Object(Equivalent, "d/d_cc_d.cpp"), # weak func order (cCcD_ShapeAttr::GetCoCP)
             Object(MatchingFor(ALL_GCN), "d/d_cc_mass_s.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_cc_s.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_cc_uty.cpp"),
@@ -965,7 +965,7 @@ config.libs = [
         [
             Object(MatchingFor(ALL_GCN), "JSystem/JStudio/JStudio/ctb.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield", "ShieldD"), "JSystem/JStudio/JStudio/ctb-data.cpp"),
-            Object(Equivalent, "JSystem/JStudio/JStudio/functionvalue.cpp"), # weak func order
+            Object(MatchingFor(ALL_GCN), "JSystem/JStudio/JStudio/functionvalue.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JStudio/JStudio/fvb.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "JSystem/JStudio/JStudio/fvb-data.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "JSystem/JStudio/JStudio/fvb-data-parse.cpp"),
@@ -1287,7 +1287,7 @@ config.libs = [
         [
             Object(MatchingFor("ShieldD"), "JSystem/JHostIO/JHIComm.cpp"),
             Object(MatchingFor("ShieldD"), "JSystem/JHostIO/JHICommonMem.cpp"),
-            Object(Equivalent, "JSystem/JHostIO/JORServer.cpp"), # weak func order
+            Object(Equivalent, "JSystem/JHostIO/JORServer.cpp"), # debug weak func order
             Object(MatchingFor("ShieldD"), "JSystem/JHostIO/JOREntry.cpp", extra_cflags=["-sym off"]), # debug weak func order
             Object(MatchingFor("ShieldD"), "JSystem/JHostIO/JORFile.cpp", extra_cflags=["-sym off"]),
             Object(MatchingFor("ShieldD"), "JSystem/JHostIO/JORMessageBox.cpp"),
@@ -1721,7 +1721,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_tag_msg"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tag_push"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tag_telop"),
-    ActorRel(Equivalent, "d_a_tbox"), # weak func order
+    ActorRel(MatchingFor(ALL_GCN), "d_a_tbox"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tbox2"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_vrbox"),
     ActorRel(NonMatching, "d_a_vrbox2"),
@@ -1730,7 +1730,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_crod"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_demo00"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_disappear"),
-    ActorRel(Equivalent, "d_a_mg_rod"), # regalloc; weak func order; inlining issues
+    ActorRel(Equivalent, "d_a_mg_rod"), # weak func order
     ActorRel(MatchingFor(ALL_GCN), "d_a_midna"),
     ActorRel(Equivalent, "d_a_nbomb"), # weak func order
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_life_container"),
@@ -1942,8 +1942,8 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_zs"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_formation_mng"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_guard_mng"),
-    ActorRel(Modded, "d_a_horse"),  # Boofener: Modified for DELTA_TIME scaling
-    ActorRel(Equivalent, "d_a_hozelda"), # weak func order
+    ActorRel(Modded, "d_a_horse"), # weak func order (J3DMtxCalcNoAnm)
+    ActorRel(Equivalent, "d_a_hozelda"), # weak func order (J3DMtxCalcNoAnm)
     ActorRel(MatchingFor(ALL_GCN), "d_a_izumi_gate"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_kago"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_kytag01"),
@@ -2010,7 +2010,7 @@ config.libs = [
     ActorRel(NonMatching, "d_a_npc_kn"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_knj"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kolinb"),
-    ActorRel(Equivalent, "d_a_npc_ks"), # weak func order
+    ActorRel(MatchingFor(ALL_GCN), "d_a_npc_ks"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kyury"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_len"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_lf"),

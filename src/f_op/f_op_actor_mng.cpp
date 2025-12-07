@@ -19,6 +19,7 @@
 #include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_scene_mng.h"
 #include "m_Do/m_Do_lib.h"
+#include "global.h"
 
 #define MAKE_ITEM_PARAMS(itemNo, itemBitNo, param_2, param_3)                                      \
     ((itemNo & 0xFF) << 0 | (itemBitNo & 0xFF) << 0x8 | param_2 << 0x10 | (param_3 & 0xF) << 0x18)
@@ -536,7 +537,7 @@ bool fopAcM_addAngleY(fopAc_ac_c* i_actor, s16 i_target, s16 i_step) {
 }
 
 void fopAcM_calcSpeed(fopAc_ac_c* i_actor) {
-    f32 speedF = fopAcM_GetSpeedF(i_actor);
+    f32 speedF = fopAcM_GetSpeedF(i_actor) * DELTA_TIME;
     f32 gravity = fopAcM_GetGravity(i_actor);
     cXyz* speed = fopAcM_GetSpeed_p(i_actor);
 

@@ -2556,7 +2556,7 @@ int daAlink_c::procWolfDashInit() {
     mProcVar3.field_0x300e = 0;
 
     if (checkWolfSlowDash()) {
-        mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow;
+        mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow * SCALE_TIME;
         field_0x594 = mpHIO->mWolf.mWlMove.m.mADashMaxSpeedSlow;
 
         if (mNormalSpeed < mpHIO->mWolf.mWlMove.m.mADashInitSpeedSlow) {
@@ -2570,7 +2570,7 @@ int daAlink_c::procWolfDashInit() {
             mNormalSpeed = mpHIO->mWolf.mWlMove.m.mADashInitSpeedSlow2;
         }
     } else {
-        mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDuration;
+        mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDuration * SCALE_TIME;
         field_0x594 = mpHIO->mWolf.mWlMove.m.mADashMaxSpeed;
 
         if (mNormalSpeed < mpHIO->mWolf.mWlMove.m.mADashInitSpeed) {
@@ -2619,11 +2619,11 @@ int daAlink_c::procWolfDash() {
         }
 
         if (checkWolfSlowDash()) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow * SCALE_TIME;
         } else if (field_0x2fc7 == 2) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2 * SCALE_TIME;
         } else {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime * SCALE_TIME;
         }
 
         return checkNextActionWolf(0);
@@ -2633,11 +2633,11 @@ int daAlink_c::procWolfDash() {
         }
 
         if (checkWolfSlowDash()) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow * SCALE_TIME;
         } else if (field_0x2fc7 == 2) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2 * SCALE_TIME;
         } else {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime * SCALE_TIME;
         }
 
         checkNextActionWolf(1);
@@ -6472,11 +6472,11 @@ int daAlink_c::decideDoStatusSwimWolf() {
             onNoResetFlg1(FLG1_DASH_MODE);
 
             if (field_0x2fc7 == 1 || field_0x2fc7 == 3) {
-                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow;
+                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow * SCALE_TIME;
             } else if (field_0x2fc7 == 2) {
-                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow2;
+                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDurationSlow2 * SCALE_TIME;
             } else {
-                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDuration;
+                mWolfDashDistTimer = mpHIO->mWolf.mWlMove.m.mADashDuration * SCALE_TIME;
             }
 
             setSingleAnimeWolfParam(WANM_SWIM_DASH, &mpHIO->mWolf.mWlSwim.m.mDashAnm);
@@ -6625,11 +6625,11 @@ int daAlink_c::procWolfSwimMove() {
                                     mpHIO->mWolf.mWlSwim.m.mMoveInterp);
 
         if (field_0x2fc7 == 1 || field_0x2fc7 == 3) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow * SCALE_TIME;
         } else if (field_0x2fc7 == 2) {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTimeSlow2 * SCALE_TIME;
         } else {
-            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime;
+            mWolfDashTimer = mpHIO->mWolf.mWlMove.m.mADashCooldownTime * SCALE_TIME;
         }
     }
 

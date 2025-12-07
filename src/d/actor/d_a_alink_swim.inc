@@ -1115,7 +1115,7 @@ int daAlink_c::procSwimMove() {
         procSwimDiveInit();
     } else if (dComIfGp_getDoStatus() == 9 && doTrigger()) {
         onNoResetFlg1(FLG1_DASH_MODE);
-        mWolfDashDistTimer = mpHIO->mSwim.m.field_0x5c;
+        mWolfDashDistTimer = mpHIO->mSwim.m.field_0x5c * SCALE_TIME;
         setSingleAnimeParam(ANM_SWIM_DASH, &mpHIO->mSwim.m.mDashAnm);
         field_0x3198 = ANM_SWIM_DASH;
     } else if (!checkZoraSwimMove() && (!checkUpSwimButtonAccept() || !doButton()) &&

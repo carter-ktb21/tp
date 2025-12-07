@@ -1,5 +1,6 @@
 #include "d/dolzel.h" // IWYU pragma: keep
 
+#include "global.h"
 #include "d/d_msg_class.h"
 #include <stdio.h>
 #include "d/d_meter2_info.h"
@@ -1784,7 +1785,7 @@ jmessage_tSequenceProcessor::jmessage_tSequenceProcessor(jmessage_tReference con
     : JMessage::TSequenceProcessor(pReference, pControl),
       mMeasureProcessor(pReference)
 {
-    field_0xa8 = 1;
+    field_0xa8 = 1 * SCALE_TIME;
     field_0xa4 = field_0xa8;
     field_0xa6 = 0;
     field_0xad = 0;
@@ -1807,9 +1808,9 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     mpText = pszText;
 
     if (((JMSMesgEntry_c*)pEntry)->fuki_kind == 8) {
-        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeedSpirit;
+        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeedSpirit * SCALE_TIME;
     } else {
-        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeed;
+        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeed * SCALE_TIME;
     }
 
     field_0xa4 = field_0xa8;
@@ -2240,11 +2241,11 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
             pReference->setSendFlag(4);
             return true;
         case MSGTAG_UNK_6:
-            field_0xa8 = *(u16*)i_data;
+            field_0xa8 = (*(u16*)i_data) * SCALE_TIME;
             field_0xa4 = field_0xa8;
             return true;
         case MSGTAG_PAUSE:
-            field_0xa4 = *(u16*)i_data;
+            field_0xa4 = (*(u16*)i_data) * SCALE_TIME;
             mMouthCheck = 0;
             return true;
         case MSGTAG_SELECT_2WAY:

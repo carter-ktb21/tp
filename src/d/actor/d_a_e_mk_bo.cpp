@@ -117,7 +117,7 @@ static s8 e_mk_bo_shot(e_mk_bo_class* i_this) {
         sp3C = i_this->field_0x5e0 - actor->current.pos;
         if (sp3C.abs() < 300.0f + TREG_F(18)) {
             i_this->mode = 2;
-            i_this->timers[0] = 30;
+            i_this->timers[0] = 30 * SCALE_TIME;
         }
         break;
     case 2:
@@ -148,13 +148,13 @@ static s8 e_mk_bo_shot(e_mk_bo_class* i_this) {
             i_this->action = 1;
             i_this->mode = 0;
             dComIfGp_setHitMark(3, actor, &actor->current.pos, &actor->shape_angle, NULL, 0);
-            actor->speed.y = 30.0f;
-            i_this->timers[0] = 40;
+            actor->speed.y = 30.0f * DELTA_TIME;
+            i_this->timers[0] = 40 * SCALE_TIME;
             return rt;
         }
     }
 
-    actor->speedF = 40.0f + NREG_F(0);
+    actor->speedF = (40.0f + NREG_F(0)) * DELTA_TIME;
     cMtx_YrotS(*calc_mtx, actor->current.angle.y);
     cMtx_XrotM(*calc_mtx, actor->current.angle.x);
     sp3C.x = 0.0f;
@@ -209,7 +209,7 @@ static s8 e_mk_bo_start(e_mk_bo_class* i_this) {
         sp38 = i_this->field_0x5e0 - actor->current.pos;
         if (sp38.abs() < 200.0f + TREG_F(18)) {
             i_this->mode = 2;
-            i_this->timers[0] = 30;
+            i_this->timers[0] = 30 * SCALE_TIME;
         }
         break;
     case 2:
@@ -239,7 +239,7 @@ static s8 e_mk_bo_start(e_mk_bo_class* i_this) {
         break;
     }
 
-    actor->speedF = 40.0f + NREG_F(0);
+    actor->speedF = (40.0f + NREG_F(0)) * DELTA_TIME;
     cMtx_YrotS(*calc_mtx, actor->current.angle.y);
     cMtx_XrotM(*calc_mtx, actor->current.angle.x);
     sp38.x = 0.0f;
@@ -274,8 +274,8 @@ static s8 e_mk_bo_r04(e_mk_bo_class* i_this) {
 
         actor->current.angle.y = a_parent->shape_angle.y + (VREG_S(7) - 0x3000);
         i_this->field_0x5fa = actor->current.angle.y;
-        i_this->timers[0] = JREG_S(7) + 65;
-        i_this->timers[1] = 30;
+        i_this->timers[0] = (JREG_S(7) + 65) * SCALE_TIME;
+        i_this->timers[1] = 30 * SCALE_TIME;
         break;
     case 1:
         if (i_this->timers[0] != 0) {
@@ -303,7 +303,7 @@ static s8 e_mk_bo_r04(e_mk_bo_class* i_this) {
         break;
     }
 
-    actor->speedF = 40.0f + NREG_F(0);
+    actor->speedF = (40.0f + NREG_F(0)) * DELTA_TIME;
     cMtx_YrotS(*calc_mtx, actor->current.angle.y);
     cMtx_XrotM(*calc_mtx, actor->current.angle.x);
     sp1C.x = 0.0f;
@@ -352,25 +352,25 @@ static void e_mk_bo_hasira(e_mk_bo_class* i_this) {
             cLib_addCalc2(&actor->current.pos.x, spC.x + sp18.x, 1.0f, 50.0f);
             cLib_addCalc2(&actor->current.pos.z, spC.z + sp18.z, 1.0f, 50.0f);
             actor->current.pos.y += actor->speed.y;
-            actor->speed.y -= 5.0f;
+            actor->speed.y -= 5.0f * DELTA_TIME;
 
             if (actor->current.pos.y <= 7.0f + spC.y) {
                 actor->current.pos.y = 7.0f + spC.y;
                 if (i_this->mode <= 3) {
-                    actor->speed.y *= -0.4f;
+                    actor->speed.y *= -0.4f * DELTA_TIME;
                 } else {
                     actor->speed.y = 0.0f;
                 }
 
                 if (i_this->mode <= 1) {
-                    i_this->timers[0] = 20;
+                    i_this->timers[0] = 20 * SCALE_TIME;
                 }
 
                 i_this->mode++;
             }
 
             if (pillar->checkRollAttack()) {
-                i_this->timers[0] = 20;
+                i_this->timers[0] = 20 * SCALE_TIME;
             }
         }
 
@@ -378,7 +378,7 @@ static void e_mk_bo_hasira(e_mk_bo_class* i_this) {
             i_this->field_0x5fc += 0.1f + AREG_F(19);
         }
 
-        actor->shape_angle.x = (200.0f + KREG_F(2)) * (i_this->timers[0] * cM_ssin(i_this->timers[0] * 12000));
+        actor->shape_angle.x = (200.0f + KREG_F(2)) * ((i_this->timers[0] * DELTA_TIME) * cM_ssin((i_this->timers[0] * DELTA_TIME) * 12000));
         actor->shape_angle.z = 0;
         cLib_addCalc2(&i_this->field_0x5f0, 10.0f + BREG_F(3), 1.0f, 5.0f);
     }
@@ -413,12 +413,12 @@ static void e_mk_bo_demo_spin(e_mk_bo_class* i_this) {
         actor->speed.y = 0.0f;
         i_this->mode = 1;
         actor->home.pos = actor->current.pos;
-        i_this->timers[0] = 20;
+        i_this->timers[0] = 20 * SCALE_TIME;
         actor->speedF = 0.0f;
         /* fallthrough */
     case 1:
         i_this->sound.startLevelSound(Z2SE_BOOM_GET_DEMO_LOOP1, 0, -1);
-        if (i_this->timers[0] == 1) {
+        if (i_this->timers[0] == 1 * SCALE_TIME) {
             Z2GetAudioMgr()->seStart(Z2SE_OBJ_PEEL_OFF_LEAVES, &actor->current.pos, 0, dComIfGp_getReverb(fopAcM_GetRoomNo(actor)), 1.0f, 1.0f, -1.0f, -1.0f, 0);
         }
 
@@ -426,7 +426,7 @@ static void e_mk_bo_demo_spin(e_mk_bo_class* i_this) {
             actor->field_0x560 = 1;
         }
 
-        if (i_this->timers[0] <= 10 && (i_this->counter & 15) == 0) {
+        if (i_this->timers[0] <= 10 * SCALE_TIME && (i_this->counter & 15) == 0) {
             f32 temp_f30 = 1.0f;
             static cXyz sc(temp_f30, temp_f30, temp_f30);
             dComIfGp_particle_set(dPa_RM(ID_ZI_S_OTIBA_A), &actor->home.pos, &actor->tevStr, &actor->shape_angle, &sc);
@@ -442,14 +442,14 @@ static void e_mk_bo_demo_spin(e_mk_bo_class* i_this) {
             actor->speedF = 0.0f;
             actor->current.angle.y = fopAcM_searchPlayerAngleY(actor) + 0x8000;
             i_this->field_0x5ec = 0;
-            i_this->timers[0] = 40;
+            i_this->timers[0] = 40 * SCALE_TIME;
             i_this->mode = 2;
         }
         break;
     case 2: 
         i_this->sound.startLevelSound(Z2SE_BOOM_GET_DEMO_LOOP2, 0, -1);
 
-        var_f31 = 40.0f;
+        var_f31 = 40.0f * DELTA_TIME;
         actor->shape_angle.y += i_this->field_0x602;
 
         if (i_this->timers[0] == 0) {
@@ -467,7 +467,7 @@ static void e_mk_bo_demo_spin(e_mk_bo_class* i_this) {
     case 3:
         i_this->sound.startLevelSound(Z2SE_BOOM_GET_DEMO_LOOP2, 0, -1);
 
-        var_f31 = 40.0f;
+        var_f31 = 40.0f * DELTA_TIME;
         actor->shape_angle.y += i_this->field_0x602;
 
         cLib_addCalcAngleS2(&actor->current.angle.y, fopAcM_searchPlayerAngleY(actor), 1, 0x400);

@@ -438,7 +438,7 @@ static void e_mk_wait(e_mk_class* i_this) {
 
     switch (i_this->mode) {
         case 0:
-            i_this->timer[0] = cM_rndF(40.0f) + 40.0f;
+            i_this->timer[0] = (cM_rndF(40.0f) + 40.0f) * SCALE_TIME;
             if (cM_rndF(1.0f) < 0.5f) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_PROVOCATION_02_e, 10.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mode = 1;
@@ -608,9 +608,9 @@ static void e_mk_shoot(e_mk_class* i_this) {
             i_this->action = e_mk_class::ACT_YORO;
             i_this->mode = 0;
             if (i_this->boomerangStatus != 0) {
-                i_this->timer[0] = 40;
+                i_this->timer[0] = 40 * SCALE_TIME;
             } else {
-                i_this->timer[0] = 250;
+                i_this->timer[0] = 250 * SCALE_TIME;
             }
         }
     }
@@ -655,8 +655,8 @@ static void e_mk_yoro(e_mk_class* i_this) {
         i_this->sound.startCreatureVoice(Z2SE_EN_MK_V_HIT_BOOM, -1);
         i_this->sound.startCollisionSE(Z2SE_HIT_WOOD_WEAPON, 31);
 
-        i_this->invulnerabilityTimer = 5;
-        i_this->tubaTimer = 5;
+        i_this->invulnerabilityTimer = 5 * SCALE_TIME;
+        i_this->tubaTimer = 5 * SCALE_TIME;
         if (lbl_210_bss_130 == 0) {
             lbl_210_bss_130 = 1;
             i_this->demoMode = e_mk_class::DEMO_MODE_BOHIT;
@@ -679,7 +679,7 @@ static void e_mk_drop(e_mk_class* i_this) {
             work.y = KREG_F(8) + 30.0f;
             work.z = KREG_F(9) + -10.0f;
             MtxPosition(&work, &actor->speed);
-            i_this->invulnerabilityTimer = 50;
+            i_this->invulnerabilityTimer = 50 * SCALE_TIME;
             break;
 
         case 1:
@@ -690,7 +690,7 @@ static void e_mk_drop(e_mk_class* i_this) {
             break;
 
         case 2:
-            i_this->invulnerabilityTimer = 5;
+            i_this->invulnerabilityTimer = 5 * SCALE_TIME;
             if (i_this->acch.ChkGroundHit()) {
                 i_this->anmP->setPlaySpeed(1.0f);
                 i_this->mode = 3;
@@ -717,7 +717,7 @@ static void e_mk_drop(e_mk_class* i_this) {
             if (i_this->anmP->isStop()) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_CHANCE_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mode = 4;
-                i_this->timer[0] = 150;
+                i_this->timer[0] = 150 * SCALE_TIME;
             }
             break;
         
@@ -761,7 +761,7 @@ static void e_mk_damage(e_mk_class* i_this) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_SPRING_e, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 i_this->action = e_mk_class::ACT_DROP;
                 i_this->mode = 5;
-                i_this->invulnerabilityTimer = 60;
+                i_this->invulnerabilityTimer = 60 * SCALE_TIME;
             } else {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_DAMAGE_e, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 i_this->mode = 1;
@@ -791,9 +791,9 @@ static void damage_check(e_mk_class* i_this) {
                 i_this->atInfo.mpCollider = i_this->tgSph.GetTgHitObj();
                 cc_at_check(actor, &i_this->atInfo);
                 if (i_this->atInfo.mpCollider->ChkAtType(AT_TYPE_UNK) != 0) {
-                    i_this->invulnerabilityTimer = 20;
+                    i_this->invulnerabilityTimer = 20 * SCALE_TIME;
                 } else {
-                    i_this->invulnerabilityTimer = 10;
+                    i_this->invulnerabilityTimer = 10 * SCALE_TIME;
                 }
 
                 if (actor->health <= 0) {
@@ -801,7 +801,7 @@ static void damage_check(e_mk_class* i_this) {
                     i_this->action = 30;
                     i_this->mode = 0;
                     i_this->sound.startCreatureVoice(Z2SE_EN_MK_V_DEAD, -1);
-                    i_this->invulnerabilityTimer = 20000;
+                    i_this->invulnerabilityTimer = 20000 * SCALE_TIME;
                     Z2GetAudioMgr()->subBgmStop();
                     
                     #if !DEBUG
@@ -811,7 +811,7 @@ static void damage_check(e_mk_class* i_this) {
                     i_this->action = 10;
                     i_this->mode = 0;
                     if (player->getCutType() == daPy_py_c::CUT_TYPE_JUMP && player->checkCutJumpCancelTurn()) {
-                        i_this->invulnerabilityTimer = 3;
+                        i_this->invulnerabilityTimer = 3 * SCALE_TIME;
                     }
                 }
             }
@@ -827,7 +827,7 @@ static void damage_check(e_mk_class* i_this) {
 static void e_mk_s_demo(e_mk_class* i_this) {
     fopEn_enemy_c* actor = (fopEn_enemy_c*)&i_this->actor;
     int frame = i_this->anmP->getFrame();
-    i_this->invulnerabilityTimer = 5;
+    i_this->invulnerabilityTimer = 5 * SCALE_TIME;
 
     switch (i_this->mode) {
         case 0:
@@ -898,7 +898,7 @@ static void e_mk_s_demo(e_mk_class* i_this) {
         case 7:
             if (i_this->anmP->isStop()) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_DEMO_GLAD_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
-                i_this->timer[0] = 30;
+                i_this->timer[0] = 30 * SCALE_TIME;
                 i_this->mode = 8;
             }
             break;
@@ -972,7 +972,7 @@ static s8 e_mk_e_demo(e_mk_class* i_this) {
     
             if (frame == AREG_S(1) + 1 || frame == AREG_S(2) + 18) {
                 actor->speed.y = AREG_F(14) + 50.0f;
-                actor->speedF = AREG_F(13) + 30.0f;
+                actor->speedF = (AREG_F(13) + 30.0f) * DELTA_TIME;
                 i_this->sound.startCreatureSound(Z2SE_EN_MK_JUMP_START, 0, -1);
             }
     
@@ -986,7 +986,7 @@ static s8 e_mk_e_demo(e_mk_class* i_this) {
                     actor->speedF = 0.0f;
                     actor->gravity = 0.0f;
                     actor->speed.y = 0.0f;
-                    i_this->timer[0] = 40;
+                    i_this->timer[0] = 40 * SCALE_TIME;
                     unk_flag = 60;
                     target_info_count = 0;
                     fpcM_Search(s_h_sub, i_this);
@@ -998,8 +998,8 @@ static s8 e_mk_e_demo(e_mk_class* i_this) {
         case 3:
             rv = 2;
             i_this->field_0x5d4 = 0;
-            if (i_this->timer[0] < 12) {
-              i_this->btpFrame = i_this->timer[0] << 1;
+            if (i_this->timer[0] < 12 * SCALE_TIME) {
+              i_this->btpFrame = (i_this->timer[0] * (int)DELTA_TIME) << 1;
               if (i_this->btpFrame >= 12.0f) {
                 i_this->btpFrame = i_this->btpFrame - 12.0f;
               }
@@ -1110,7 +1110,7 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
     cXyz work, offset;
     int frame = i_this->anmP->getFrame();
     f32 target_speedF = 0.0f;
-    i_this->invulnerabilityTimer = 5;
+    i_this->invulnerabilityTimer = 5 * SCALE_TIME;
 
     switch(i_this->mode) {
         case 0:
@@ -1126,7 +1126,7 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
             break;
 
         case 3:
-            target_speedF = KREG_F(8) + 30.0f;
+            target_speedF = (KREG_F(8) + 30.0f) * DELTA_TIME;
             if (actor->current.pos.z > -600.0f) {
                 i_this->mode = 4;
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_WAIT_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
@@ -1146,7 +1146,7 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
             if (i_this->anmP->isStop()) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_DEMO_THROW_WAIT_e, 2.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mode = 6;
-                i_this->timer[0] = VREG_S(7) + 95;
+                i_this->timer[0] = (VREG_S(7) + 95) * SCALE_TIME;
             }
             break;
 
@@ -1194,7 +1194,7 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
         case 9:
             if (i_this->anmP->isStop()) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_DEMO_GLAD_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
-                i_this->timer[0] = 30;
+                i_this->timer[0] = 30 * SCALE_TIME;
                 i_this->mode = 10;
             }
             break;
@@ -1210,13 +1210,13 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
             if (i_this->anmP->isStop()) {
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_RUN_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mode = 12;
-                i_this->timer[0] = 10;
+                i_this->timer[0] = 10 * SCALE_TIME;
             }
             break;
 
         case 12:
             if (i_this->timer[0] == 0) {
-                target_speedF = KREG_F(8) + 30.0f;
+                target_speedF = (KREG_F(8) + 30.0f) * DELTA_TIME;
             }
 
             cLib_addCalcAngleS2(&actor->current.angle.y, actor->home.angle.y + (u16)-0x8000, 2, 0x1000);
@@ -1224,11 +1224,11 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
     }
 
     cLib_addCalc2(&actor->speedF, target_speedF, 1.0f, 5.0f);
-    actor->gravity = AREG_F(15) + -10.0f;
+    actor->gravity = (AREG_F(15) + -10.0f) * DELTA_TIME;
     cMtx_YrotS(*calc_mtx, actor->current.angle.y);
     work.x = 0.0f;
     work.y = 0.0f;
-    work.z = actor->speedF;
+    work.z = actor->speedF * SCALE_TIME;
     MtxPosition(&work, &offset);
     actor->speed.x = offset.x;
     actor->speed.z = offset.z;
@@ -2016,7 +2016,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             dComIfGp_getEvent().startCheckSkipEdge(i_this);
             // fallthrough
         case 2:
-            if (i_this->demoCamCounter > 60) {
+            if (i_this->demoCamCounter > 60 * SCALE_TIME) {
                 cLib_addCalc2(&i_this->camCenter.x, i_this->camCenterTarget.x, 0.05f, i_this->distToCamCenterTarget.x * i_this->camStepScale1);
                 cLib_addCalc2(&i_this->camCenter.y, i_this->camCenterTarget.y, 0.05f, i_this->distToCamCenterTarget.y * i_this->camStepScale1);
                 cLib_addCalc2(&i_this->camCenter.z, i_this->camCenterTarget.z, 0.05f, i_this->distToCamCenterTarget.z * i_this->camStepScale1);
@@ -2025,14 +2025,14 @@ static void demo_camera_r04(e_mk_class* i_this) {
                 cLib_addCalc2(&i_this->camEye.z, i_this->camEyeTarget.z, 0.05f, i_this->distToCamEyeTarget.z * i_this->camStepScale1);
                 cLib_addCalc2(&i_this->camStepScale1, 1.0f, 1.0f, NREG_F(4) + 0.01f);
 
-                if (i_this->demoCamCounter == ZREG_S(1) + 258) {
+                if (i_this->demoCamCounter == (ZREG_S(1) + 258) * SCALE_TIME) {
                     monkey_p->mMode = 2;
                     pos.set(110.0f, 3300.0f, 4326.0f);
                     player->setPlayerPosAndAngle(&pos, (s16)0xFFFF8000, 0);
                     player->changeDemoMode(1, 1, 0, 0);
                 }
 
-                if (i_this->demoCamCounter == ZREG_S(1) + 260) {
+                if (i_this->demoCamCounter == (ZREG_S(1) + 260) * SCALE_TIME) {
                     cMtx_YrotS(*calc_mtx, monkey_p->actor.shape_angle.y);
                     work.x = ZREG_F(0) + 200.0f;
                     work.y = ZREG_F(1) + 300.0f;
@@ -2054,7 +2054,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             cLib_addCalc2(&i_this->camCenter.z, monkey_p->actor.current.pos.z, 0.2f, 50.0f);
             cLib_addCalc2(&i_this->camCenter.y, monkey_p->actor.current.pos.y + 130.0f + ZREG_F(3) + (KREG_F(18) + 30.0f) * cM_ssin(i_this->demoCamCounter * 0xA00), 0.2f, 50.0f);
 
-            if (i_this->demoCamCounter != 93) {
+            if (i_this->demoCamCounter != 93 * SCALE_TIME) {
                 return;
             }
 
@@ -2077,7 +2077,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             cLib_addCalc2(&i_this->camCenter.z, actor->current.pos.z, 0.2f, 50.0f);
             cLib_addCalc2(&i_this->camCenter.y, actor->current.pos.y + 220.0f + ZREG_F(7), 0.2f, 50.0f);
 
-            if (i_this->demoCamCounter != 74) {
+            if (i_this->demoCamCounter != 74 * SCALE_TIME) {
                 return;
             }
 
@@ -2098,11 +2098,11 @@ static void demo_camera_r04(e_mk_class* i_this) {
             cLib_addCalc2(&i_this->camCenter.z, monkey_p->actor.current.pos.z, 0.2f, 50.0f);
             cLib_addCalc2(&i_this->camCenter.y, monkey_p->actor.current.pos.y + 90.0f + ZREG_F(8) + (KREG_F(18) + 30.0f) * cM_ssin(i_this->demoCamCounter * 0xA00), 0.2f, 50.0f);
 
-            if (i_this->demoCamCounter == 10) {
+            if (i_this->demoCamCounter == 10 * SCALE_TIME) {
                 monkey_p->actor.field_0x567 = 1;
             }
 
-            if (i_this->demoCamCounter != NREG_S(7) + 55) {
+            if (i_this->demoCamCounter != (NREG_S(7) + 55) * SCALE_TIME) {
                 return;
             }
 
@@ -2119,7 +2119,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             i_this->camCenter = actor->current.pos;
             i_this->camCenter.y += ZREG_F(17) + 220.0f;
 
-            if (i_this->demoCamCounter < ZREG_S(9) + 45) {
+            if (i_this->demoCamCounter < (ZREG_S(9) + 45) * SCALE_TIME) {
                 return;
             }
 
@@ -2134,12 +2134,12 @@ static void demo_camera_r04(e_mk_class* i_this) {
             i_this->camCenter = boomerang_p->current.pos;
             i_this->camEye.set(ZREG_F(8) + -477.0f, ZREG_F(9) + 3119.0f, ZREG_F(10) + 1643.0f);
 
-            if (i_this->demoCamCounter == 30) {
+            if (i_this->demoCamCounter == 30 * SCALE_TIME) {
                 monkey_p->actor.current.pos.z = ZREG_F(15) + 1600.0f;
                 monkey_p->actor.current.pos.y = ZREG_F(17) + 3200.0f;
             }
 
-            if (i_this->demoCamCounter != ZREG_S(4) + 69) {
+            if (i_this->demoCamCounter != (ZREG_S(4) + 69) * SCALE_TIME) {
                 return;
             }
 
@@ -2148,11 +2148,11 @@ static void demo_camera_r04(e_mk_class* i_this) {
             return;
 
         case 6:
-            if (i_this->demoCamCounter == ZREG_S(6) + 3) {
+            if (i_this->demoCamCounter == (ZREG_S(6) + 3) * SCALE_TIME) {
                 monkey_p->mMode = 4;
             }
 
-            if (i_this->demoCamCounter != ZREG_S(5) + 25) {
+            if (i_this->demoCamCounter != (ZREG_S(5) + 25) * SCALE_TIME) {
                 return;
             }
 
@@ -2172,7 +2172,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             monkey_p->actor.speed.y = 0.0f;
             monkey_p->actor.current.pos.set(0.0f, 2500.0f, 3373.0f);
 
-            if (i_this->demoCamCounter != 250) {
+            if (i_this->demoCamCounter != 250 * SCALE_TIME) {
                 return;
             }
 
@@ -2187,7 +2187,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             cLib_addCalc2(&i_this->camCenter.y, monkey_p->actor.current.pos.y + ZREG_F(19), 0.2f, 50.0f);
             fpcM_Search(s_brg_sub, i_this);
 
-            if (i_this->demoCamCounter == (s16)(XREG_S(0) + 65)) {
+            if (i_this->demoCamCounter == (s16)(XREG_S(0) + 65) * SCALE_TIME) {
                 monkey_p->actor.current.pos.set(0.0f, 3310.0f, 3427.0f);
                 monkey_p->mMode++;
                 i_this->demoSubMode = 9;
@@ -2200,7 +2200,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             return;
 
         case 9:
-            if (i_this->demoCamCounter != 138) {
+            if (i_this->demoCamCounter != 138 * SCALE_TIME) {
                 return;
             }
 
@@ -2215,7 +2215,7 @@ static void demo_camera_r04(e_mk_class* i_this) {
             cLib_addCalcAngleS2(&i_this->prevPlShapeAngle, monkey_p->field_0x5c8 + (u16)-0x8000, 4, 0x800);
             player->setPlayerPosAndAngle(&player->current.pos, i_this->prevPlShapeAngle, 0);
 
-            if (i_this->demoCamCounter != 60) {
+            if (i_this->demoCamCounter != 60 * SCALE_TIME) {
                 return;
             }
 
@@ -2278,13 +2278,13 @@ static void demo_camera_bohit(e_mk_class* i_this) {
             cLib_addCalc2(&i_this->camCenter.y, actor->current.pos.y + 100.0f + KREG_F(7), 0.5f, 50.0f);
             cLib_addCalc2(&i_this->camCenter.z, actor->current.pos.z, 0.5f, 50.0f);
 
-            if (i_this->demoCamCounter == 25) {
+            if (i_this->demoCamCounter == 25 * SCALE_TIME) {
                 i_this->field_0xc98 = 30.0f;
             }
 
-            if (i_this->demoCamCounter == 80) {
+            if (i_this->demoCamCounter == 80 * SCALE_TIME) {
                 i_this->demoMode = e_mk_class::DEMO_MODE_FINISH;
-                i_this->timer[0] = 150;
+                i_this->timer[0] = 150 * SCALE_TIME;
             }
             break;
 
@@ -2367,8 +2367,8 @@ static void demo_camera(e_mk_class* i_this) {
         cLib_addCalc0(&i_this->field_0xc98, 1.0f, TREG_F(16) + 3.0f);
         i_this->demoCamCounter++;
 
-        if (i_this->demoCamCounter > 10000) {
-            i_this->demoCamCounter = 10000;
+        if (i_this->demoCamCounter > 10000 * SCALE_TIME) {
+            i_this->demoCamCounter = 10000 * SCALE_TIME;
         }
     }
 }

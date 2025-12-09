@@ -613,7 +613,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN, "Shield", "ShieldD"), "f_op/f_op_actor_iter.cpp"),
             Object(MatchingFor(ALL_GCN), "f_op/f_op_actor_tag.cpp"),
             Object(MatchingFor(ALL_GCN), "f_op/f_op_camera.cpp"),
-            Object(MatchingFor(ALL_GCN), "f_op/f_op_actor_mng.cpp"),
+            Object(Modded, "f_op/f_op_actor_mng.cpp"),  # Modified for DELTA_TIME scaling in fopAcM_calcSpeed
             Object(MatchingFor(ALL_GCN), "f_op/f_op_camera_mng.cpp"),
             Object(MatchingFor(ALL_GCN), "f_op/f_op_overlap.cpp"),
             Object(MatchingFor(ALL_GCN), "f_op/f_op_overlap_mng.cpp"),

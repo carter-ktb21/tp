@@ -11540,7 +11540,7 @@ BOOL daAlink_c::checkNextActionFromButton() {
                 !checkModeFlg(MODE_PLAYER_FLY) &&
                 !checkMagneBootsOn()) {
                 return procCoMetamorphoseInit();
-            }
+                }
         }
     }
 
@@ -17237,11 +17237,11 @@ int daAlink_c::execute() {
     }
 
     if (mWolfDashTimer != 0) {
-        mWolfDashTimer -= (s16)DELTA_TIME; // Boofener: scaled wolf link dash increment timer
+        mWolfDashTimer--;
     }
 
     if (mWolfDashDistTimer != 0) {
-        mWolfDashDistTimer -= (s16)DELTA_TIME; // Boofener: scaled wolf link dash distance timer
+        mWolfDashDistTimer--;
     } else {
         offNoResetFlg1(FLG1_DASH_MODE);
     }

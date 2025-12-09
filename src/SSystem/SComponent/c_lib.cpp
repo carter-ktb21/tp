@@ -239,7 +239,7 @@ void cLib_addCalcPosXZ2(cXyz* ppos, const cXyz& target, f32 scale, f32 maxStep) 
 s16 cLib_addCalcAngleS(s16* pvalue, s16 target, const s16 scale, s16 maxStep, s16 minStep) {
     s16 diff = target - *pvalue;
     if (*pvalue != target) {
-        s16 step = (diff) / (scale * DELTA_TIME);
+        s16 step = diff / scale;
         if (step > minStep || step < -minStep) {
             if (step > maxStep) {
                 step = maxStep;
@@ -247,16 +247,16 @@ s16 cLib_addCalcAngleS(s16* pvalue, s16 target, const s16 scale, s16 maxStep, s1
             if (step < -maxStep) {
                 step = -maxStep;
             }
-            *pvalue += step;
+            *pvalue += step * DELTA_TIME;
         } else {
             if (0 <= diff) {
-                *pvalue += minStep;
+                *pvalue += minStep * DELTA_TIME;
                 diff = target - *pvalue;
                 if (0 >= diff) {
                     *pvalue = target;
                 }
             } else {
-                *pvalue -= minStep;
+                *pvalue -= minStep * DELTA_TIME;
                 diff = target - *pvalue;
                 if (0 <= diff) {
                     *pvalue = target;

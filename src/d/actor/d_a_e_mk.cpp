@@ -1126,7 +1126,7 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
             break;
 
         case 3:
-            target_speedF = (KREG_F(8) + 30.0f) * DELTA_TIME;
+            target_speedF = KREG_F(8) + 30.0f;
             if (actor->current.pos.z > -600.0f) {
                 i_this->mode = 4;
                 anm_init(i_this, dRes_INDEX_E_MK_BCK_MK_WAIT_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
@@ -1216,19 +1216,19 @@ static void e_mk_r04_demo(e_mk_class* i_this) {
 
         case 12:
             if (i_this->timer[0] == 0) {
-                target_speedF = (KREG_F(8) + 30.0f) * DELTA_TIME;
+                target_speedF = KREG_F(8) + 30.0f;
             }
 
             cLib_addCalcAngleS2(&actor->current.angle.y, actor->home.angle.y + (u16)-0x8000, 2, 0x1000);
             break;
     }
 
-    cLib_addCalc2(&actor->speedF, target_speedF, 1.0f, 5.0f);
+    cLib_addCalc2(&actor->speedF, target_speedF * DELTA_TIME, 1.0f, 5.0f);
     actor->gravity = (AREG_F(15) + -10.0f) * DELTA_TIME;
     cMtx_YrotS(*calc_mtx, actor->current.angle.y);
     work.x = 0.0f;
     work.y = 0.0f;
-    work.z = actor->speedF * SCALE_TIME;
+    work.z = actor->speedF;
     MtxPosition(&work, &offset);
     actor->speed.x = offset.x;
     actor->speed.z = offset.z;

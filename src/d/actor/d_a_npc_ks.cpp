@@ -567,7 +567,7 @@ static void npc_ks_pole_ori(npc_ks_class* i_this) {
             monkeycage_p = (obj_so_class*)fpcM_Search(s_ori_sub, i_this);
             if (monkeycage_p != NULL) {
                 a_this->parentActorID = fopAcM_GetID(monkeycage_p);
-                anm_init(i_this, 20, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HELP_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mMode++;
                 i_this->mMode = 1;
             } else {
@@ -631,7 +631,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
     int rv = 0;
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 21, 10.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HELP_B_e, 10.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             i_this->mMode = 1;
             i_this->mTimers[0] = (cM_rndF(200.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -644,7 +644,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
 
             if (i_this->mTimers[0] == 0 && i_this->mpModelMorf->checkFrame(99.0f)) {
                 i_this->mMode = 2;
-                anm_init(i_this, 7, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 i_this->mTimers[0] = (cM_rndF(60.0f) + 40.0f) * SCALE_TIME;
             }
             break;
@@ -654,7 +654,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
                 if (i_this->mTimers[0] == 0) {
                     i_this->mMode = 0;
                 } else {
-                    anm_init(i_this, 7, 5.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 }
             }
             break;
@@ -669,7 +669,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
 
             if (i_this->mTimers[1] == 1 * SCALE_TIME) {
                 a_this->speedF = 0.0f;
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             }
 
             if (i_this->mTimers[0] == 0) {
@@ -692,11 +692,11 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 50 * SCALE_TIME) {
-                anm_init(i_this, 11, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CLAP_WAIT_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             }
 
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mTimers[0] = 15 * SCALE_TIME;
                 i_this->mMode++;
             }
@@ -705,7 +705,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
         case 12:
             rv = 1;
             if (i_this->mTimers[0] == 1) {
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 if (fopAcM_GetRoomNo(a_this) == 11) {
                     a_this->current.angle.y += NPC_KS_36DEG_ROT;
                 }
@@ -716,7 +716,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
             }
 
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 a_this->speed.y = 35.0f;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
@@ -744,7 +744,7 @@ static int npc_ks_ori(npc_ks_class* i_this) {
                 if (i_this->field_0x5b6 >= 5) {
                     i_this->mMode = 11;
                     i_this->mTimers[0] = 80 * SCALE_TIME;
-                    anm_init(i_this, 51 ,5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e , 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                     if (fopAcM_GetRoomNo(a_this) == 11) {
                         i_this->mTimers[1] = 10 * SCALE_TIME;
                     }
@@ -795,7 +795,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
         cage_p = (obj_so_class*)fpcM_Search(s_ori_sub, i_this);
         if (cage_p != NULL) {
             a_this->parentActorID = fopAcM_GetID(cage_p);
-            anm_init(i_this, 20, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HELP_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             i_this->mMode = 1;
             a_this->home.angle.y = cage_p->actor.shape_angle.y;
             i_this->field_0xbde = i_this->field_0x5c8 - a_this->home.angle.y;
@@ -849,7 +849,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
                 if (daPy_getPlayerActorClass()->getCutAtFlg() == 0 && fpcM_Search(shot_bo_sub, i_this) == NULL) break;
             }
 
-            anm_init(i_this, 41, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_B_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = (cM_rndF(20.0f) + 40.0f) * SCALE_TIME;
             break;
@@ -858,9 +858,9 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             sVar1 += NPC_KS_NEG_180DEG_ROT;
             if (i_this->mTimers[0] == 0) {
                 if (cage_p->partBreak()) {
-                    anm_init(i_this, 22, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HELP_C_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 } else {
-                    anm_init(i_this, 20, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HELP_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 }
 
                 i_this->mMode = 1;
@@ -876,7 +876,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
         case 3:
             fVar1 = -20.0f;
             if (i_this->mTimers[0] == 50 * SCALE_TIME) {
-                anm_init(i_this, 51, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             }
 
             if (i_this->mTimers[0] < 50 * SCALE_TIME) {
@@ -894,7 +894,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 30, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 i_this->mMode = 4;
                 i_this->mTimers[0] = 60 * SCALE_TIME;
                 i_this->field_0x93c = 0;
@@ -920,7 +920,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
         case 5:
             i_this->field_0x5fc = 0;
             fVar1 = -20.0f;
-            anm_init(i_this, 32, 2.0f, 0, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             i_this->mMode++;
             break;
 
@@ -929,7 +929,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             fVar1 = -20.0f;
             sVar1 += NPC_KS_45DEG_ROT;
             if (i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 a_this->speed.y = 35.0f;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
@@ -947,7 +947,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
             break;
 
         case 10:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
             i_this->mMode = 11;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -960,7 +960,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
                 i_this->field_0x910 = a_this->current.pos;
                 i_this->field_0x91c = i_this->field_0x8f0;
                 i_this->mMode = 12;
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 a_this->speedF = 0.0f;
             } else {
                 i_this->field_0x8f0.x = guide_path_04[i_this->field_0x904].field_0x4;
@@ -968,7 +968,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
                 i_this->mMode = 15;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
                 }
             }
             break;
@@ -976,7 +976,7 @@ static int npc_ks_ori2(npc_ks_class* i_this) {
         case 12:
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
                 a_this->speedF = (40.0f + TREG_F(9)) * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -1033,9 +1033,9 @@ static void npc_ks_home(npc_ks_class* i_this) {
     switch (i_this->mMode) {
         case 0:
             if (cM_rndF(1.0f) < 0.5f) {
-                anm_init(i_this, 30, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             } else {
-                anm_init(i_this, 5, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_BAKUCHU_e, 3.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             }
 
             i_this->mMode = 1;
@@ -1142,7 +1142,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
     switch (i_this->mMode) {
         int _;
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             // fallthrough
@@ -1164,7 +1164,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
                     i_this->mMode = 1;
                 } else {
                     i_this->mMode = 10;
-                    anm_init(i_this, 25, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_INDICATE_e, 5.0f, 2, 1.0f);
                     i_this->mTimers[0] = 35 * SCALE_TIME;
                 }
             }
@@ -1174,7 +1174,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             cLib_addCalcAngleS2(&a_this->current.angle.y, cage_p->actor.shape_angle.y + 0x8000, 2, 0x1000);
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 11;
-                anm_init(i_this, 26, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 5.0f, 2, 1.0f);
             }
             break;
 
@@ -1193,7 +1193,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp3c.z = sp48.z - a_this->current.pos.z;
             sp3c.y = JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z);
             if (sp3c.y < 55.0f && i_this->field_0x5d0 != 12) {
-                anm_init(i_this, 12, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CLIMB_e, 3.0f, 2, 1.0f);
             }
 
             if (sp3c.y < 1.0f + NREG_F(0)) {
@@ -1218,7 +1218,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp3c = sp48 - a_this->current.pos;
             if (sp3c.abs() < 1.0f + NREG_F(0)) {
                 i_this->mMode = 13;
-                anm_init(i_this, 23, 2.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HOLDING_e, 2.0f, 2, 1.0f);
                 i_this->mTimers[0] = 60 * SCALE_TIME;
             }
             break;
@@ -1243,7 +1243,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
 
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 14;
-                anm_init(i_this, 15, 2.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_GODOWN_e, 2.0f, 2, 1.0f);
             }
             break;
 
@@ -1261,7 +1261,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             cLib_addCalc2(&a_this->current.pos.y, i_this->mObjAcch.GetGroundH(), 1.0f, l_HIO.demo_speed * SCALE_TIME);
             
             if (NPC_KS_FABSF(a_this->current.pos.y - i_this->mObjAcch.GetGroundH()) < 1.0f) {
-                anm_init(i_this, 26, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 5.0f, 2, 1.0f);
                 a_this->speedF = 0.0f;
                 i_this->mTimers[0] = 20 * SCALE_TIME;
                 i_this->mMode = 15;
@@ -1273,7 +1273,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             cLib_addCalcAngleS2(&a_this->current.angle.y, s16(cage_p->actor.shape_angle.y), 2, 0x2000);
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 16;
-                anm_init(i_this, 25, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_INDICATE_e, 5.0f, 2, 1.0f);
             }
             break;
 
@@ -1282,10 +1282,10 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (i_this->mTimers[0] == 0) {
                 if (i_this->field_0x5d0 != 25) {
-                    anm_init(i_this, 25, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_INDICATE_e, 5.0f, 2, 1.0f);
                     i_this->mTimers[0] = 25 * SCALE_TIME;
                 } else {
-                    anm_init(i_this, 50, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAITSTAND_e, 5.0f, 2, 1.0f);
                     i_this->mTimers[0] = (cM_rndF(30.0f) + 30.0f) * SCALE_TIME;
                 }
             }
@@ -1307,7 +1307,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             if (a_this == attention_p->LockonTarget(0) && i_this->mTimers[2] == 0 
                 && mDoCPd_c::getTrigA(PAD_1) != 0) {
                 i_this->mMode = 17;
-                anm_init(i_this, 25, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_INDICATE_e, 2.0f, 0, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 a_this->speedF = 0.0f;
                 leader->field_0xb42 = 60;
@@ -1319,14 +1319,14 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             rv = 0;
             if (i_this->field_0x5d0 == 25) {
                 if (i_this->mpModelMorf->isStop()) {
-                    anm_init(i_this, 49, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_TO_ROTATE_e, 3.0f, 0, 1.0f);
                 }
             } else {
                 fVar1 = 30.0f * DELTA_TIME;
             }
 
             if (i_this->field_0x5d0 == 49 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 38, 1.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_ROTATE_e, 1.0f, 2, 1.0f);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_ROLL, 0, -1);
             }
 
@@ -1342,7 +1342,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             sp3c.z = a_pill_p->current.pos.z - a_this->current.pos.z;
             if (JMAFastSqrt(sp3c.x * sp3c.x + sp3c.z * sp3c.z) < 90.0f + NREG_F(7)) {
                 pillar_p->setShake(daPillar_c::SHAKE_STRONG);
-                anm_init(i_this, 6, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_BIKKURI_e, 5.0f, 0, 1.0f);
                 i_this->mMode = 18;
                 a_this->speedF = (-20.0f + NREG_F(4)) * DELTA_TIME;
                 a_this->speed.y = (30.0f + NREG_F(5));
@@ -1366,7 +1366,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
                 fopAcM_effSmokeSet1(&i_this->field_0x858, &i_this->field_0x85c, &a_this->eyePos, NULL, 1.7f + TREG_F(18), &a_this->tevStr, 1);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_CRUSHED, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_FALL_GROUND, 0, -1);
-                anm_init(i_this, 13, 2.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_FALL_e, 2.0f, 2, 1.0f);
             }
             break;
 
@@ -1378,7 +1378,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 35, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_LAND_e, 3.0f, 0, 1.0f);
                 i_this->mMode = 20;
             }
             break;
@@ -1387,7 +1387,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
             cLib_addCalcAngleS2(&a_this->current.angle.x, 0, 1, 0x800);
             if (i_this->mpModelMorf->isStop()) {
                 i_this->mMode = 16;
-                anm_init(i_this, 25, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_INDICATE_e, 5.0f, 2, 1.0f);
                 if (leader->field_0xb42 != 0) {
                     leader->field_0xb42 = 100;
                 }
@@ -1401,7 +1401,7 @@ static int npc_ks_demo_02(npc_ks_class* i_this) {
         i_this->mActionID = 100;
         i_this->mMode = 0;
     } else if (iVar1 != 0 && cage_p->actor.shape_angle.x > 0x200) {
-        anm_init(i_this, 6, 5.0f, 0, 1.0f);
+        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_BIKKURI_e, 5.0f, 0, 1.0f);
         i_this->mMode = 18;
         a_this->speedF = (-8.0f + NREG_F(4)) * DELTA_TIME;
         a_this->speed.y = (10.0f + NREG_F(5));
@@ -1429,7 +1429,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
 
     switch(i_this->mMode) {
         case 0:
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->mTimers[0] = 100 * SCALE_TIME;
             // fallthrough
@@ -1437,21 +1437,21 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 20;
-                anm_init(i_this, 30, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 3.0f, 2, 1.0f);
                 i_this->mTimers[0] = 90 * SCALE_TIME;
                 fpcM_Search(s_resq_sub, i_this);
             }
             break;
 
         case 10:
-            anm_init(i_this, 13, 2.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_FALL_e, 2.0f, 2, 1.0f);
             i_this->mTimers[0] = 30 * SCALE_TIME;
             i_this->mMode = 11;
             a_this->current.angle.x = ZREG_S(7) - 0x3830;
             // fallthrough
         case 11:
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 35, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_LAND_e, 3.0f, 0, 1.0f);
                 i_this->mMode = 12;
                 mDoAud_seStart(12, 0, 0, 0);
                 Z2GetAudioMgr()->muteSceneBgm(120, 0.0f);
@@ -1463,7 +1463,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             cLib_addCalcAngleS2(&a_this->current.angle.x, 0, 1, 0x800);
             if (i_this->mpModelMorf->isStop()) {
                 i_this->mMode = 20;
-                anm_init(i_this, 30, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 3.0f, 2, 1.0f);
                 i_this->mTimers[0] = 90 * SCALE_TIME;
                 fpcM_Search(s_resq_sub, i_this);
             }
@@ -1476,7 +1476,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             break;
 
         case 21:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 22;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             i_this->field_0xaec = 1;
@@ -1489,7 +1489,7 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
             }
 
             if ((i_this->mTimers[0] == 0) && (i_this->field_0x5d0 == 39)) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43) {
@@ -1509,10 +1509,10 @@ static int npc_ks_demo_022(npc_ks_class* i_this) {
         case 23:
             if (i_this->mTimers[0] == 0) {
                 if (i_this->field_0x5b6 == 0) {
-                    anm_init(i_this, 56, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_YOROKOBI_e, 3.0f, 2, 1.0f);
                 }
                 else {
-                    anm_init(i_this, 11, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CLAP_WAIT_e, 3.0f, 2, 1.0f);
                 }
                 i_this->mTimers[0] = (cM_rndF(25.0f) + 70.0f) * SCALE_TIME;
                 i_this->mMode = 24;
@@ -1538,14 +1538,14 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
     f32 fVar2 = 10.0f;
     switch(i_this->mMode) {
         case 0:
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mMode = 1;
             break;
 
         case 2:
             a_this->current.pos.set(0.0f, 3300.0f, 4393.0f);
             a_this->current.angle.y = -0x8000;
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 3;
             break;
 
@@ -1553,7 +1553,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             fVar1 = l_HIO.demo_speed;
             if (a_this->field_0x567 != 0) {
                 a_this->field_0x567 = 0;
-                anm_init(i_this, 45, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_STOPCALL_e, 3.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 45) {
@@ -1564,7 +1564,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
                 fVar1 = 0.0f;
                 fVar2 = 4.0f;
                 if (i_this->mpModelMorf->getFrame() >= 37.0f + AREG_F(17)) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
 
@@ -1572,30 +1572,30 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
 
         case 4:
             i_this->mMode = 5;
-            anm_init(i_this, 33, 5.0f, 0, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 5.0f, 0, 1.0f);
             mDoAud_seStart(0x5001a, 0, 0, 0);
             a_this->speed.y = 0.0f;
             break;
 
         case 5:
             fVar1 = l_HIO.demo_speed;
-            a_this->gravity = -2.0f + KREG_F(7);
+            a_this->gravity = (-2.0f + KREG_F(7)) * DELTA_TIME;
             break;
 
         case 6:
-            anm_init(i_this, 12, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CLIMB_e, 3.0f, 2, 1.0f);
             i_this->mMode = 7;
             // fallthrough
         case 7:
             a_this->gravity = 0.0f;
-            a_this->speed.y = 10.0f;
+            a_this->speed.y = 10.0f * DELTA_TIME;
             if ((i_this->frameCounter & 31) == 0) {
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_WAIT, -1);
             }
             break;
 
         case 8:
-            anm_init(i_this, 26, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 5.0f, 2, 1.0f);
             i_this->mTimers[0] = 35 * SCALE_TIME;
             i_this->mMode = 9;
             break;
@@ -1604,7 +1604,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             fVar1 = l_HIO.demo_speed;
             fVar2 = 4.0f;
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 37, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_RELIEF_e, 3.0f, 0, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_RELEIEF, -1);
                 i_this->field_0x5e4 = 1;
                 i_this->mMode = 10;
@@ -1615,7 +1615,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (i_this->mpModelMorf->isStop()) {
                 i_this->field_0x5e4 = 0;
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 11;
                 i_this->mTimers[0] = (25 + KREG_S(7)) * SCALE_TIME;
             }
@@ -1625,7 +1625,7 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             fVar1 = l_HIO.demo_speed;
             fVar2 = 4.0f;
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 i_this->mTimers[0] = 120 * SCALE_TIME;
                 i_this->mMode = 12;
             }
@@ -1640,20 +1640,20 @@ static void npc_ks_demo_04(npc_ks_class* i_this) {
             break;
 
         case 20:
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mMode = 21;
             // fallthrough
         case 21:
             if (a_this->field_0x567 != 0) {
                 a_this->field_0x567 = 0;
                 i_this->mMode = 22;
-                anm_init(i_this, 45, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_STOPCALL_e, 3.0f, 0, 1.0f);
             }
             break;
 
         case 22:
             if (i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 26) {
@@ -1678,7 +1678,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
             i_this->field_0x8f0 = sp3c;
             i_this->field_0x910 = a_this->current.pos;
             i_this->field_0x91c = i_this->field_0x8f0;
-            anm_init(i_this, 32, 2.0f, 0, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
             a_this->speedF = 0.0f;
             i_this->mMode++;
             break;
@@ -1688,7 +1688,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
             if (i_this->field_0x5d0 == 32) {
                 a_this->speedF = 0.0f;
                 if (i_this->mpModelMorf->isStop()) {
-                    anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                     a_this->speedF = 40.0f * DELTA_TIME;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -1714,7 +1714,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
 
                     a_this->current.pos = i_this->field_0x8f0;
                     i_this->field_0x910 = a_this->current.pos;
-                    anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_END, 0, -1);
                 }
             }
@@ -1734,7 +1734,7 @@ static void npc_ks_to_hang(npc_ks_class* i_this) {
             if (i_this->field_0x5d0 == 32) {
                 a_this->speedF = 0.0f;
                 if (i_this->mpModelMorf->isStop()) {
-                    anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                     a_this->speedF = 30.0f * DELTA_TIME;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                     i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -2023,7 +2023,7 @@ static void npc_ks_hang(npc_ks_class* i_this) {
             i_this->mMode = 6;
             i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
             player->changeDemoMode(24, 0, 0, 0);
-            anm_init(i_this, 24, 1.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 1.0f, 2, 1.0f);
             // fallthrough
         case 6:
             if (i_this->mTimers[0] == 8 * SCALE_TIME) {
@@ -2098,18 +2098,18 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
 
         case 1:
             if (i_this->field_0x5d0 != 16 && i_this->field_0x5c4 < 550.0f + YREG_F(9)) {
-                anm_init(i_this, 16, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGCALL_e, 5.0f, 2, 1.0f);
                 i_this->mTimers[0] = (cM_rndF(50.0f) + 200.0f) * SCALE_TIME;
             }
 
             if (i_this->mTimers[0] == 0) {
                 i_this->mTimers[0] = (cM_rndF(30.0f) + 50.0f) * SCALE_TIME;
                 if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 17, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_A_e, 5.0f, 2, 1.0f);
                 } else if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 18, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_B_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 19, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_C_e, 5.0f, 2, 1.0f);
                 }
             }
 
@@ -2131,7 +2131,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
                 i_this->mTimers[1] = (25 + WREG_S(9)) * SCALE_TIME;
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
-                anm_init(i_this, 24, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 3.0f, 2, 1.0f);
             }
 
             sVar1 = i_this->field_0x5c8 - sw_p->actor.current.angle.y;
@@ -2149,7 +2149,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == (s16(8 + BREG_S(5))) * SCALE_TIME) {
-                anm_init(i_this, 48, 2.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SWINGPOSE_e, 2.0f, 2, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_CATCH, -1);
                 i_this->mSound.startCreatureSound(Z2SE_FN_ROPE_CREAK, 0, -1);
                 sw_p->field_0x8fc = 20.0f + XREG_F(0);
@@ -2164,7 +2164,7 @@ static void npc_ks_hang_s(npc_ks_class* i_this) {
                     i_this->mMode = 5;
                     i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_THROW, -1);
                     player->changeDemoMode(24, 0, 0, 0);
-                    anm_init(i_this, 24, 1.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 1.0f, 2, 1.0f);
                     leader->field_0xb42 = 3;
                 } else {
                     leader->field_0xb42 = 100;
@@ -2220,14 +2220,14 @@ static void npc_ks_e_hang(npc_ks_class* i_this) {
             i_this->field_0x60c = 4000.0f;
 
             if (i_this->field_0x5b6 == 0) {
-                anm_init(i_this, 24, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 3.0f, 2, 1.0f);
                 i_this->mTimers[0] = 10000 * SCALE_TIME;
                 i_this->mTimers[1] = 15 * SCALE_TIME;
             }
             break;
 
         case 2:
-            anm_init(i_this, 48, 2.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SWINGPOSE_e, 2.0f, 2, 1.0f);
             i_this->mSound.startCreatureSound(Z2SE_FN_ROPE_CREAK, 0, -1);
             sw_p->field_0x8fc = 20.0f + XREG_F(0);
             sw_p->field_0xd10[i_this->field_0x630] = 10;
@@ -2247,11 +2247,11 @@ static void npc_ks_e_hang(npc_ks_class* i_this) {
         case 20:
             if (i_this->mTimers[0] == 0) {
                 if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 17, 10.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_A_e, 10.0f, 2, 1.0f);
                 } else if (cM_rndF(1.0f) < 0.3f) {
-                    anm_init(i_this, 18, 10.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_B_e, 10.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 19, 10.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HANGWAIT_C_e, 10.0f, 2, 1.0f);
                 }
 
                 i_this->mTimers[0] = 10000 * SCALE_TIME;
@@ -2259,7 +2259,7 @@ static void npc_ks_e_hang(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[1] == 1 * SCALE_TIME) {
-                anm_init(i_this, 24, 7.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 7.0f, 2, 1.0f);
             } else if (i_this->mTimers[1] == 0) {
                 i_this->field_0x5fa = 0x4000;
                 i_this->field_0x60c = 8000.0f;
@@ -2315,11 +2315,11 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         case 0:
         i_this->field_0xaec = 1;
         if (i_this->field_0x5c4 > l_HIO.pull_distance) {
-            anm_init(i_this, 28, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 5.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->mTimers[0] = 20 * SCALE_TIME;
         } else {
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mMode = 5;
             a_this->speedF = 0.0f;
         }
@@ -2339,7 +2339,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x5c8, 1, 0x2000);
         rv = 1;
         if (i_this->mTimers[0] == 0 || i_this->field_0x5c4 < l_HIO.pull_distance - 20.0f) {
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mMode = 5;
             a_this->speedF = 0.0f;
         }
@@ -2352,7 +2352,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         cLib_addCalcAngleS2(&a_this->current.angle.y, i_this->field_0x8fc.y, 1, 0x2000);
 
         if (go_jump_check(i_this->field_0x5b6) != 0) {
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mTimers[0] = 10 * SCALE_TIME;
             i_this->mMode = 6;
             i_this->field_0xaec = 0;
@@ -2364,7 +2364,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         a_this->speedF = 20.0f * DELTA_TIME;
         rv = 1;
         if (i_this->mTimers[0] == 0) {
-            anm_init(i_this, 32, 2.0f, 0, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
             i_this->mMode = 7;
         }
         break;
@@ -2375,7 +2375,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         if (i_this->field_0x5d0 == 32) {
             a_this->speedF = 0.0f;
             if (i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -2401,7 +2401,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 10;
-            anm_init(i_this, 48, 2.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SWINGPOSE_e, 2.0f, 2, 1.0f);
             ks_p->mMode = 2;
         }
         break;
@@ -2429,7 +2429,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
             i_this->field_0x930 = saru_p[ks_p->field_0x5b6 + 1];
         }
 
-        anm_init(i_this, 33, 1.0f, 0, 1.0f);
+        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
         i_this->field_0xbe0 = 1;
         // fallthrough
     case 11:
@@ -2446,7 +2446,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 12;
-            anm_init(i_this, 24, 2.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_HUNGING_e, 2.0f, 2, 1.0f);
             i_this->mSound.startCreatureSound(Z2SE_FN_ROPE_CREAK, 0, -1);
             sw_p2->field_0x8fc = 20.0f + XREG_F(0);
             sw_p2->field_0xd10[i_this->field_0x630] = 10;
@@ -2478,7 +2478,7 @@ static int npc_ks_e_jump(npc_ks_class* i_this) {
         if (sp28.abs() <= a_this->speedF * (1.2f * DELTA_TIME)) {
             a_this->speedF = 0.0f;
             i_this->mMode = 10;
-            anm_init(i_this, 48, 2.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SWINGPOSE_e, 2.0f, 2, 1.0f);
             ks_p->mMode = 2;
         }
     }
@@ -3169,7 +3169,7 @@ static void demo_camera(npc_ks_class* i_this) {
                 a_this->current.pos = player->current.pos + sp50;
                 a_this->current.angle.y = s16(player->shape_angle.y);
                 i_this->field_0x8fc.y = player->shape_angle.y;
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 230;
                 i_this->mTimers[0] = (65 + JREG_S(7)) * SCALE_TIME;
             }
@@ -3257,7 +3257,7 @@ static void demo_camera(npc_ks_class* i_this) {
                 i_this->field_0xb44 = 0;
                 i_this->field_0xb60.set(-30844.0f, 298.0f, -17007.0f);
                 i_this->field_0xb48.set(-30653.0f, 357.0f, -17289.0f);
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 i_this->field_0xc17 = 3;
                 mDoAud_seStart(0x600AC, &i_this->field_0xc04, 0, 0);
             }
@@ -3278,7 +3278,7 @@ static void demo_camera(npc_ks_class* i_this) {
 
         case 303:
             if (i_this->field_0xb44 == 10) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 301;
                 a_this->speedF = l_HIO.demo_speed_2;
             }
@@ -3286,7 +3286,7 @@ static void demo_camera(npc_ks_class* i_this) {
             if (i_this->field_0xb44 == 0x50) {
                 i_this->field_0xb42 = 100;
                 i_this->mMode = 302;
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 /* dSv_event_flag_c::F_0225 - Faron Woods - Lanter guide monkey doesn't come out a second time */
                 dComIfGs_onEventBit(u16(dSv_event_flag_c::saveBitLabels[0xE1]));
                 dComIfGs_offSwitch(61, fopAcM_GetRoomNo(a_this));
@@ -3394,7 +3394,7 @@ static void demo_camera(npc_ks_class* i_this) {
             i_this->field_0xb84.y = NPC_KS_FABSF(i_this->field_0xb6c.y - i_this->field_0xb60.y);
             i_this->field_0xb84.z = NPC_KS_FABSF(i_this->field_0xb6c.z - i_this->field_0xb60.z);
             i_this->field_0xbc4 = 0.0f;
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = 30 * SCALE_TIME;
             // fallthrough
@@ -3752,7 +3752,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
     switch (i_this->mMode) {
         case 0:
             i_this->mMode = 1;
-            anm_init(i_this, 51, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             i_this->mTimers[0] = (cM_rndF(100.0f) + 100.0f) * SCALE_TIME;
             fopAcM_setStageLayer(a_this);
             a_this->health = 0;
@@ -3761,12 +3761,12 @@ static int npc_ks_option(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 if (cM_rndF(1.0f) < 0.5f) {
                     if (i_this->field_0x5d0 != 51) {
-                        anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                         i_this->mTimers[0] = (cM_rndF(100.0f) + 80.0f) * SCALE_TIME;
                         i_soundID = Z2SE_KOSARU_V_WAIT;
                     }
                 } else if (i_this->field_0x5d0 != 53) {
-                    anm_init(i_this, 53, 8.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_B_e, 8.0f, 2, 1.0f);
                     i_this->mTimers[0] = (cM_rndF(30.0f) + 40.0f) * SCALE_TIME;
                     i_soundID = Z2SE_KOSARU_V_WAIT;
                 }
@@ -3774,7 +3774,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[1] == 0 && i_this->field_0x5c4 > (dbg_f30 + 20.0f)) {
-                anm_init(i_this, 28, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 5.0f, 2, 1.0f);
                 i_this->mMode = 2;
                 i_soundID = Z2SE_KOSARU_V_JUMP;
             }
@@ -3785,7 +3785,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             if (i_this->field_0x5c4 < (dbg_f30 - 20.0f)) {
                 i_this->mMode = 0;
             } else if (i_this->field_0x5c4 > dbg_f30 + 200.0f) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 3;
                 i_soundID = Z2SE_KOSARU_V_WALK;
             }
@@ -3802,7 +3802,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             }
 
             if (i_this->field_0x5c4 < (dbg_f30 + 130.0f)) {
-                anm_init(i_this, 28, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 2;
             }
 
@@ -3819,7 +3819,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             break;
 
         case 7:
-            anm_init(i_this, 47, 3.0f, 2, i_this->field_0x5d4);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SWIM_e, 3.0f, 2, i_this->field_0x5d4);
             i_this->mMode = 8;
             // fallthrough
         case 8:
@@ -3860,9 +3860,9 @@ static int npc_ks_option(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (i_this->mTimers[0] == 0) {
                 if (cM_rndF(1.0f) < 0.5f) {
-                    anm_init(i_this, 30, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 3.0f, 0, 1.0f);
                 } else {
-                    anm_init(i_this, 5, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_BAKUCHU_e, 3.0f, 0, 1.0f);
                 }
 
                 i_this->mMode = 12;
@@ -3873,9 +3873,9 @@ static int npc_ks_option(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (i_this->mpModelMorf->isStop()) {
                 if (cM_rndF(1.0f) < 0.5f) {
-                    anm_init(i_this, 30, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_ATTN_e, 3.0f, 0, 1.0f);
                 } else {
-                    anm_init(i_this, 5, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_BAKUCHU_e, 3.0f, 0, 1.0f);
                 }
 
                 i_this->mMode = 13;
@@ -3903,7 +3903,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             i_this->field_0x8fc.y += NPC_KS_180DEG_ROT;
             if (fVar2 > 400.0f) {
                 i_this->mMode = 31;
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             }
             break;
 
@@ -3913,12 +3913,12 @@ static int npc_ks_option(npc_ks_class* i_this) {
             i_this->field_0x5fc = 1;
             if (fVar2 < 350.0f) {
                 i_this->mMode = 30;
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             }
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             // ditto.
@@ -3932,7 +3932,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43) {
@@ -3965,7 +3965,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
                         i_this->field_0x8f0 = sp14c;
                         i_this->field_0x910 = a_this->current.pos;
                         i_this->field_0x91c = i_this->field_0x8f0;
-                        anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                         break;
                     }
                 }
@@ -3981,7 +3981,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
         case 51:
             retval = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = 40.0f + TREG_F(9);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -4016,7 +4016,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
         } else {
             s16 sVar2 = a_this->current.angle.y - i_this->field_0x5c8;
             if ((sVar2 > 0x3000 || sVar2 < -0x3000) && i_this->mMode < 5) {
-                anm_init(i_this, 28, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 3.0f, 0, 1.0f);
                 i_this->mMode = 5;
                 i_soundID = Z2SE_KOSARU_V_WALK;
             }
@@ -4050,7 +4050,7 @@ static int npc_ks_option(npc_ks_class* i_this) {
 
         if ((i_this->frameCounter & 15) == 0 && bomb_view_check(i_this) != NULL) {
             i_this->mMode = 30;
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             return retval;
         }
 
@@ -4099,9 +4099,9 @@ static int npc_ks_option(npc_ks_class* i_this) {
     }
 
     if (i_this->field_0x94c != 0 && (i_this->field_0x5d0 == 26 || i_this->field_0x5d0 == 28)) {
-        anm_init(i_this, 55, 3.0f, 2, 1.0f);
+        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WALKCLAP_e, 3.0f, 2, 1.0f);
     } else if (i_this->field_0x94c == 0 && i_this->field_0x5d0 == 55) {
-        anm_init(i_this, 26, 3.0f, 2, 1.0f);
+        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
     }
 
     if (iVar1 != 0) {
@@ -4161,7 +4161,7 @@ static void npc_ks_awaydoor(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->mTimers[0] = 30 * SCALE_TIME;
             break;
@@ -4242,7 +4242,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -4250,9 +4250,9 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5c4 > 700.0f || guide_path_00[i_this->field_0x904].field_0x0 < 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4264,7 +4264,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
                 i_this->mMode = 5;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4290,7 +4290,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
                 i_this->mMode = 1;
             } else {
                 if (i_this->field_0x5c4 < 150.0f && i_this->field_0x5d0 != 51) {
-                    anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 }
 
                 if (i_this->field_0x5d0 == 51) {
@@ -4322,7 +4322,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -4333,7 +4333,7 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43) {
@@ -4346,9 +4346,9 @@ static int npc_ks_guide_00(npc_ks_class* i_this) {
         case 42:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4397,7 +4397,7 @@ static int npc_ks_guide_00_2(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -4405,9 +4405,9 @@ static int npc_ks_guide_00_2(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5c4 > 900.0f || guide_path_00_2[i_this->field_0x904].field_0x0 < 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4419,7 +4419,7 @@ static int npc_ks_guide_00_2(npc_ks_class* i_this) {
                 i_this->mMode = 5;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4475,7 +4475,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -4483,9 +4483,9 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5c4 > 500.0f || guide_path_00_3[i_this->field_0x904].field_0x0 < 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4497,7 +4497,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
                 i_this->mMode = 5;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4523,7 +4523,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
                 i_this->mMode = 1;
             } else {
                 if (i_this->field_0x5c4 < 150.0f && i_this->field_0x5d0 != 51) {
-                    anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 }
 
                 if (i_this->field_0x5d0 == 51) {
@@ -4533,7 +4533,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -4544,7 +4544,7 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43) {
@@ -4557,9 +4557,9 @@ static int npc_ks_guide_00_3(npc_ks_class* i_this) {
         case 42:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4611,7 +4611,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -4620,9 +4620,9 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         case 101:
             if (i_this->mMode == 1 && (i_this->field_0x5c4 > 900.0f || guide_path_01[i_this->field_0x904].field_0x0 < 0)) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4635,7 +4635,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
                 i_this->field_0x910 = a_this->current.pos;
                 i_this->field_0x91c = i_this->field_0x8f0;
                 i_this->mMode = 2;
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                 a_this->speedF = 0.0f;
             } else {
                 i_this->field_0x8f0.x = guide_path_01[i_this->field_0x904].field_0x4;
@@ -4643,7 +4643,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
                 i_this->mMode = 5;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4651,7 +4651,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         case 2:
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -4709,7 +4709,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -4720,7 +4720,7 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43 && i_this->mpModelMorf->isStop()) {
@@ -4731,9 +4731,9 @@ static int npc_ks_guide_01(npc_ks_class* i_this) {
         case 42:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4818,7 +4818,7 @@ static int npc_ks_guide_02(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             if (i_this->field_0x5b6 == 0) {
                 i_this->field_0x904 = 0;
@@ -4832,9 +4832,9 @@ static int npc_ks_guide_02(npc_ks_class* i_this) {
             if (i_this->mTimers[2] == 0 && (((player->current.pos.y - a_this->current.pos.y) < 10.0f && i_this->field_0x5c4 > fVar1) || 
                 guide_path_02[i_this->field_0x904].field_0x0 < 0)) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -4846,7 +4846,7 @@ static int npc_ks_guide_02(npc_ks_class* i_this) {
                 i_this->mMode = 5;
                 a_this->speedF = l_HIO.demo_speed_2;
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4945,7 +4945,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -4953,16 +4953,16 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5c4 > 500.0f || guide_path_22[i_this->field_0x904].field_0x0 < 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
                 i_this->mMode = 10;
                 a_this->speedF = 0.0f;
             } else if (guide_path_22[i_this->field_0x904].field_0x0 != 0) {
-                anm_init(i_this, 12, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CLIMB_e, 3.0f, 2, 1.0f);
                 i_this->field_0x8f0.x = guide_path_22[i_this->field_0x904].field_0x4;
                 i_this->field_0x8f0.y = guide_path_22[i_this->field_0x904].field_0x8;
                 i_this->field_0x8f0.z = guide_path_22[i_this->field_0x904].field_0xc;
@@ -4975,7 +4975,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
                 a_this->speedF = l_HIO.demo_speed_2;
                 
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -4989,7 +4989,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
             cLib_addCalc2(&a_this->current.pos.y, i_this->field_0x8f0.y, 1.0f, 15.0f);
 
             if (a_this->current.pos.y >= (i_this->field_0x8f0.y - 110.0f) && i_this->field_0x5d0 != 26) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             }
 
             if (a_this->current.pos.y >= (i_this->field_0x8f0.y - 50.0f)) {
@@ -5027,7 +5027,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
             }
 
             if (i_this->field_0x5c4 < 150.0f && i_this->field_0x5d0 != 51) {
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 51) {
@@ -5036,7 +5036,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -5047,7 +5047,7 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43 && i_this->mpModelMorf->isStop()) {
@@ -5058,9 +5058,9 @@ static int npc_ks_guide_22(npc_ks_class* i_this) {
         case 42:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -5126,7 +5126,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -5134,9 +5134,9 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         case 1:
             if (i_this->field_0x5c4 > 900.0f || guide_path_09[i_this->field_0x904].field_0x0 < 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -5149,7 +5149,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
                 i_this->field_0x910 = a_this->current.pos;
                 i_this->field_0x91c = i_this->field_0x8f0;
                 i_this->mMode = 2;
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                 a_this->speedF = 0.0f;
             } else {
                 i_this->field_0x8f0.x = guide_path_09[i_this->field_0x904].field_0x4;
@@ -5158,7 +5158,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
                 a_this->speedF = l_HIO.demo_speed_2;
                 
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -5166,7 +5166,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         case 2:
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -5208,7 +5208,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
                 }
             } else {
                 if (i_this->field_0x5c4 < 150.0f && i_this->field_0x5d0 != 51) {
-                    anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 }
                 
                 if (i_this->field_0x5d0 == 51) {
@@ -5218,7 +5218,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -5229,7 +5229,7 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43 && i_this->mpModelMorf->isStop()) {
@@ -5240,9 +5240,9 @@ static int npc_ks_guide_09(npc_ks_class* i_this) {
         case 42:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -5304,7 +5304,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
     switch (i_this->mMode) {
         case 0:
             if (i_this->field_0xb42 >= 79) {
-                anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 i_this->mMode = 1;
                 i_this->field_0x904 = 0;
             }
@@ -5320,7 +5320,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
                 i_this->field_0x910 = a_this->current.pos;
                 i_this->field_0x91c = i_this->field_0x8f0;
                 i_this->mMode = 2;
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                 a_this->speedF = 0.0f;
             } else {
                 i_this->field_0x8f0.x = guide_path_12[i_this->field_0x904].field_0x4;
@@ -5329,7 +5329,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
                 a_this->speedF = l_HIO.demo_speed_2;
 
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -5337,7 +5337,7 @@ static int npc_ks_demo_12(npc_ks_class* i_this) {
         case 2:
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = 40.0f * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -5406,7 +5406,7 @@ static int npc_ks_guide_0409(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 26, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             i_this->field_0x904 = 0;
             a_this->speedF = 0.0f;
@@ -5414,9 +5414,9 @@ static int npc_ks_guide_0409(npc_ks_class* i_this) {
         case 1:
             if (player->current.pos.z > a_this->current.pos.z && (i_this->field_0x5c4 > 700.0f || guide_path_0409[i_this->field_0x904].field_0x0 < 0)) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -5429,7 +5429,7 @@ static int npc_ks_guide_0409(npc_ks_class* i_this) {
                 a_this->speedF = l_HIO.demo_speed_2;
 
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -5457,7 +5457,7 @@ static int npc_ks_guide_0409(npc_ks_class* i_this) {
                 i_this->mMode = 1;
             } else {
                 if (i_this->field_0x5c4 < 150.0f && i_this->field_0x5d0 != 51) {
-                    anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 }
 
                 if (i_this->field_0x5d0 == 51) {
@@ -5563,7 +5563,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             if (daPy_getPlayerActorClass()->checkKandelaarSwing(1) || (daPy_getPlayerActorClass()->getKandelaarFlamePos() != NULL && 
                 daPy_getPlayerActorClass()->checkUseKandelaar(0))) {
                 i_this->field_0xb42 = 200;
-                anm_init(i_this, 44, 0.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SHAKE_K_e, 0.0f, 2, 1.0f);
             } else {
                 i_this->mMode = 0;
             }
@@ -5586,14 +5586,14 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             if (i_this->mTimers[0] == 0) {
                 i_this->mMode = 231;
                 a_this->speedF = 0.0f;
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 i_this->mTimers[0] = 30 * SCALE_TIME;
             }
             break;
 
         case 231:
             if (i_this->mTimers[0] == 0) {
-                anm_init(i_this, 44, 3.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SHAKE_K_e, 3.0f, 2, 1.0f);
                 i_this->mTimers[0] = 110 * SCALE_TIME;
                 i_this->mMode = 232;
             }
@@ -5601,7 +5601,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
 
         case 232:
             if (i_this->mTimers[0] == 40 * SCALE_TIME) {
-                anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
             }
 
             if (i_this->mTimers[0] == 0) {
@@ -5612,7 +5612,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
 
         case 3:
             if (path_search(i_this) != 0) {
-                anm_init(i_this, 28, 6.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 6.0f, 2, 1.0f);
                 i_this->mMode = 4;
                 i_this->field_0x904 = 1;
                 a_this->speedF = 0.0f;
@@ -5622,15 +5622,15 @@ static int npc_ks_mori(npc_ks_class* i_this) {
 
         case 4:
             if (i_this->field_0x904 >= i_this->field_0xc18->m_num) {
-                anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 i_this->mMode = 11;
                 a_this->speedF = 0.0f;
             } else {
                 if (i_this->field_0x5c4 > (fVar1 + 150.0f)) {
                     if ((call_pt & 1) != 0) {
-                        anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                     } else {
-                        anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                     }
 
                     call_pt++;
@@ -5646,7 +5646,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
                     a_this->speedF = l_HIO.guided_movement_speed * fVar2;
                     
                     if (i_this->field_0x5d0 != 28) {
-                        anm_init(i_this, 28, 6.0f, 2, 1.0f);
+                        anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 6.0f, 2, 1.0f);
                     }
                 }
             }
@@ -5704,7 +5704,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -5715,7 +5715,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43 && i_this->mpModelMorf->isStop()) {
@@ -5724,7 +5724,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             break;
 
         case 50:
-            anm_init(i_this, 46, 3.0f, 0, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SURPRISE_K_e, 3.0f, 0, 1.0f);
             i_this->mMode = 51;
             break;
 
@@ -5737,9 +5737,9 @@ static int npc_ks_mori(npc_ks_class* i_this) {
         case 53:
             if (i_this->mTimers[0] == 0) {
                 if ((call_pt & 1) != 0) {
-                    anm_init(i_this, 8, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALLBACK_e, 5.0f, 2, 1.0f);
                 } else {
-                    anm_init(i_this, 7, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_CALL_e, 5.0f, 2, 1.0f);
                 }
 
                 call_pt++;
@@ -5749,7 +5749,7 @@ static int npc_ks_mori(npc_ks_class* i_this) {
             break;
 
         case 100:
-            anm_init(i_this, 44, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SHAKE_K_e, 3.0f, 2, 1.0f);
             i_this->mMode = 101;
             i_this->mTimers[0] = 80 * SCALE_TIME;
             break;
@@ -5829,7 +5829,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
                 if (player->current.pos.z < -21000.0f) {
                     i_this->mMode = 1;
                     a_this->current.pos.set(-39906.0f, 1962.0f, -24243.0f);
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                     i_this->field_0x904 = 0;
                     a_this->speedF = 0.0f;
                     i_this->field_0xb42 = 350;
@@ -5846,7 +5846,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
                 i_this->field_0x910 = a_this->current.pos;
                 i_this->field_0x91c = i_this->field_0x8f0;
                 i_this->mMode = 2;
-                anm_init(i_this, 32, 2.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_S_e, 2.0f, 0, 1.0f);
                 a_this->speedF = 0.0f;
             } else {
                 i_this->field_0x8f0.x = guide_path_fs[i_this->field_0x904].field_0x4;
@@ -5855,7 +5855,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
                 a_this->speedF = l_HIO.demo_speed_2;
 
                 if (i_this->field_0x5d0 != 26) {
-                    anm_init(i_this, 26, 3.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPRUN_e, 3.0f, 2, 1.0f);
                 }
             }
             break;
@@ -5863,7 +5863,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
         case 2:
             rv = 2;
             if (i_this->field_0x5d0 == 32 && i_this->mpModelMorf->isStop()) {
-                anm_init(i_this, 33, 1.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMP_T_e, 1.0f, 0, 1.0f);
                 a_this->speedF = (40.0f + TREG_F(9)) * DELTA_TIME;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP, -1);
                 i_this->mSound.startCreatureSound(Z2SE_KOSARU_JUMP_START, 0, -1);
@@ -5879,7 +5879,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
                 a_this->current.pos = i_this->field_0x8f0;
 
                 if (i_this->field_0x904 == 0) {
-                    anm_init(i_this, 45, 3.0f, 0, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_STOPCALL_e, 3.0f, 0, 1.0f);
                     i_this->mMode = 3;
                     i_this->field_0x8fc.y += 0x8000;
                     a_this->speedF = 0.0f;
@@ -5911,7 +5911,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
                 if (guide_path_fs[i_this->field_0x904].field_0x0 < 0) {
                     i_this->mMode = 10;
                     a_this->speedF = 0.0f;
-                    anm_init(i_this, 51, 5.0f, 2, 1.0f);
+                    anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 5.0f, 2, 1.0f);
                 }
             }
             break;
@@ -5922,7 +5922,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
 
         case 20:
             i_this->mMode = 21;
-            anm_init(i_this, 51, 10.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_WAIT_A_e, 10.0f, 2, 1.0f);
             // fallthrough
         case 21: {
             i_this->field_0x8fc.y = i_this->field_0x5c8;
@@ -5939,7 +5939,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             iVar1 = 1;
             sVar2 = a_this->current.angle.y - i_this->field_0x5c8;
             if ((sVar2 > 0x3000 || sVar2 < -0x3000) && i_this->mMode < 22) {
-                anm_init(i_this, 28, 3.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_JUMPWALK_e, 3.0f, 0, 1.0f);
                 i_this->mMode = 22;
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_WALK, -1);
             }
@@ -5957,7 +5957,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             break;
 
         case 40:
-            anm_init(i_this, 39, 5.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
             i_this->mMode = 41;
             i_this->mTimers[0] = (cM_rndF(80.0f) + 100.0f) * SCALE_TIME;
             break;
@@ -5968,7 +5968,7 @@ static int npc_ks_fsdemo(npc_ks_class* i_this) {
             }
 
             if (i_this->mTimers[0] == 0 && i_this->field_0x5d0 == 39) {
-                anm_init(i_this, 43, 5.0f, 0, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_LOOK_e, 5.0f, 0, 1.0f);
             }
 
             if (i_this->field_0x5d0 == 43) {
@@ -6034,7 +6034,7 @@ static void npc_ks_kago(npc_ks_class* i_this) {
 
     switch (i_this->mMode) {
         case 0:
-            anm_init(i_this, 34, 3.0f, 2, 1.0f);
+            anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_KAGO_JUMP_e, 3.0f, 2, 1.0f);
             i_this->mMode = 1;
             // fallthrough
         case 1:
@@ -6763,7 +6763,7 @@ static int daNpc_Ks_Execute(npc_ks_class* i_this) {
             
             basket_p->setMtx(mDoMtx_stack_c::get());
             if (fopAcM_checkHawkCarryNow(basket_p) != 0) {
-                anm_init(i_this, 39, 5.0f, 2, 1.0f);
+                anm_init(i_this, dRes_ID_NPC_KS_BCK_SARU_SCARED_e, 5.0f, 2, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_KOSARU_V_JUMP_SURPRISE, -1);
             }
         }

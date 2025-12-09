@@ -279,7 +279,7 @@ static s8 e_mk_bo_r04(e_mk_bo_class* i_this) {
         break;
     case 1:
         if (i_this->timers[0] != 0) {
-            actor->current.angle.y += i_this->field_0x5ee;
+            actor->current.angle.y += i_this->field_0x5ee * DELTA_TIME;
             i_this->field_0x5ee = JREG_S(9) + 350;
             actor->current.angle.x = JREG_S(2) + 1700;
         } else {

@@ -28,7 +28,7 @@ void jstudio_tAdaptor_message::adaptor_do_MESSAGE(JStudio::data::TEOperationData
         break;
     }
     default:
-#ifdef DEBUG
+#if DEBUG
         JGadget_outMessage msg(JGadget_outMessage::warning, __FILE__, 124);
         msg << "unknown data-type : " << iType << "\n  demo-object : " << adaptor_getID_string();
         int x = 0;
@@ -96,7 +96,7 @@ dDemo_actor_c::~dDemo_actor_c() {
     mBtkId = -1;
     mBrkId = -1;
 
-    #ifdef DEBUG
+    #if DEBUG
     if(dComIfGp_event_getMode() == 0) {
         g_dComIfG_gameInfo.play.getEvent().setDebugStb(0);
     }
@@ -857,7 +857,7 @@ void dDemo_c::create() {
     m_object = new dDemo_object_c();
     JUT_ASSERT(0, m_object != NULL);
 
-    m_control->setSecondPerFrame(1.0f / 30.0f);
+    m_control->setSecondPerFrame((1.0f / 30.0f) * DELTA_TIME);
     m_control->setFactory(m_factory);
     m_factory->appendCreateObject(m_stage);
     m_factory->appendCreateObject(m_audio);
@@ -999,30 +999,21 @@ int dDemo_c::update() {
         }
     }
 
-    // Boofener: Accumulate frames for proper 30fps cutscene speed at 60fps
-    static f32 s_frameAccum = 0.0f;
-    s_frameAccum += DELTA_TIME;
+    if (m_control->forward(1) != 0) {
+        m_frame++;
 
-    if (s_frameAccum >= 1.0f) {
-        s_frameAccum -= 1.0f;
-
-        if (m_control->forward(1) != 0) {
-            m_frame++;
-
-            if (m_control->getSuspend() <= 0) {
-                m_frameNoMsg++;
-            }
-        } else {
-            m_mode = 2;
+        if (m_control->getSuspend() <= 0) {
+            m_frameNoMsg++;
         }
+    } else {
+        m_mode = 2;
     }
 
     if (m_branchData != NULL) {
         branch();
     }
 
-    // Boofener: Only process staff roll timer on frames we actually advanced
-    if (s_frameAccum < DELTA_TIME && dComIfGs_staffroll_next_go_check() != 0) {
+    if (dComIfGs_staffroll_next_go_check() != 0) {
         dScnKy_env_light_c* env_light = &g_env_light;
 
         if (dComIfGs_staffroll_next_go_check() > 10) {

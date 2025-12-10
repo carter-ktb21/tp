@@ -690,7 +690,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_a_item_static.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_a_shop_item_static.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_a_horse_static.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_demo.cpp"),
+            Object(Modded, "d/d_demo.cpp"),
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_door_param2.cpp"), # debug weak func order
             Object(NonMatching, "d/d_resorce.cpp"),
             Object(Modded, "d/d_map_path.cpp"),

@@ -98,6 +98,9 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 <p>Run build_iso.bat</p>
 <pre>select your iso and let it run until it crashes</pre>
 
+<p>Open CMD</p>
+<pre>cd /path to repo/</pre>
+
 <p>Configure the project:</p>
 <pre>python3 configure.py --version=GZ2E01</pre>
 

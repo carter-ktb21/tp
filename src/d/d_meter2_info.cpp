@@ -1641,3 +1641,26 @@ int dMeter2Info_recieveLetter() {
 void dMeter2Info_set2DVibration() {}
 
 void dMeter2Info_set2DVibrationM() {}
+
+#if WIDESCREEN_SUPPORT
+static f32 s_wide2DScale = 1.0f;
+
+void dMeter2Info_onWide2D() {
+    // Scale HUD positions to move elements closer to screen edges
+    // 1.15 means elements at 304 (center) stay put, but elements at edges move 15% further out
+    s_wide2DScale = 1.15f;
+}
+
+void dMeter2Info_offWide2D() {
+    s_wide2DScale = 1.0f;
+}
+
+f32 dMeter2Info_getWide2DPosX(f32* pPosX) {
+    if (s_wide2DScale != 1.0f && pPosX != NULL) {
+        // Scale position from center (304 = 608/2)
+        f32 offset = *pPosX - 304.0f;
+        *pPosX = 304.0f + (offset * s_wide2DScale);
+    }
+    return s_wide2DScale;
+}
+#endif

@@ -205,15 +205,15 @@ int daSpinner_c::posMove() {
     }
 
     if (mpPathMove == NULL) {
-        speed.y += gravity;
+        speed.y += gravity * DELTA_TIME;
         if (speed.y < maxFallSpeed) {
             speed.y = maxFallSpeed;
         }
     }
 
-    current.pos.x += move_speed * cM_ssin(current.angle.y);
-    current.pos.y += speed.y - (speedF * cM_ssin(current.angle.x));
-    current.pos.z += move_speed * cM_scos(current.angle.y);
+    current.pos.x += move_speed * cM_ssin(current.angle.y) * DELTA_TIME;
+    current.pos.y += (speed.y - speedF * cM_ssin(current.angle.x)) * DELTA_TIME;
+    current.pos.z += move_speed * cM_scos(current.angle.y) * DELTA_TIME;
 
     if (mpPathMove != NULL) {
         f32 var_f31 = speedF;
@@ -230,7 +230,7 @@ int daSpinner_c::posMove() {
             int spC;
             s16 spA = sp3C.atan2sX_Z();
             sp3C.normalizeZP();
-            sp3C *= 58.0f;
+            sp3C *= 58.0f * DELTA_TIME;
 
             sp3C.x += curr_path_pos->x;
             sp3C.y += curr_path_pos->y;
@@ -293,8 +293,8 @@ int daSpinner_c::posMove() {
                             current.pos.set(curr_path_pos->x, -20.0f + curr_path_pos->y, curr_path_pos->z);
                         }
 
-                        current.pos.x += 29.0f * cM_ssin(spA);
-                        current.pos.z += 29.0f * cM_scos(spA);
+                        current.pos.x += 29.0f * cM_ssin(spA) * DELTA_TIME;
+                        current.pos.z += 29.0f * cM_scos(spA) * DELTA_TIME;
                         old.pos = current.pos;
                     }
                 }
@@ -590,7 +590,7 @@ int daSpinner_c::checkPathMove() {
         mAcchCir[0].SetWallR(58.0f);
         mCyl.SetR(58.0f);
 
-        mRideMoveTime = daAlink_getAlinkActorClass()->getSpinnerRideMoveTime();
+        mRideMoveTime = daAlink_getAlinkActorClass()->getSpinnerRideMoveTime() * SCALE_TIME;
 
         if (mpPathMove->field_0x7 == 0xFF) {
             speedF = daAlink_getAlinkActorClass()->getSpinnerRideSpeedF();
@@ -651,7 +651,7 @@ int daSpinner_c::execute() {
 
     daAlink_c* player = daAlink_getAlinkActorClass();
     if (!player->checkGameOverWindow() && field_0xa78 != 0) {
-        field_0xa78--;
+        field_0xa78 -= SCALE_TIME;
     }
 
     f32 pad_stick_value;
@@ -693,17 +693,18 @@ int daSpinner_c::execute() {
     }
 
     bool sp10 = player->checkSpinnerRideOwn(this);
-    mRotY += field_0xa82 * field_0xa76;
+    mRotY += (s16)(field_0xa82 * field_0xa76 * DELTA_TIME);
     if (reflectAccept()) {
-        mRotY += field_0xa76 * 2000;
+        mRotY += (s16)(field_0xa76 * 2000 * DELTA_TIME);
     }
+
 
     mBck.play();
 
     mSound.framework(0, mReverb);
 
     if (fopAcM_GetParam(this) == 0) {
-        field_0xa7c += (int)(2330.0f * (0.85f + cM_rndF(0.3f)));
+        field_0xa7c += (int)(2330.0f * (0.85f + cM_rndF(0.3f)) * DELTA_TIME);
         field_0xa84 = 5.0f * cM_ssin(field_0xa7c);
         field_0xa98 = current.pos;
 
@@ -731,14 +732,14 @@ int daSpinner_c::execute() {
                 current.pos.y = temp_f30;
             }
         } else if (mSpinnerTag == 2) {
-            speed.y += gravity;
+            speed.y += gravity * DELTA_TIME;
             if (speed.y < maxFallSpeed) {
                 speed.y = maxFallSpeed;
             }
 
             if (cLib_chaseF(&current.pos.y, field_0xaa4.y, fabsf(speed.y))) {
                 mSpinnerTag = TAG_INTO;
-                field_0xa82 = 0x800;
+                field_0xa82 = 0x800 * DELTA_TIME;
 
                 dComIfGp_particle_setPolyColor(0xE7, mAcch.m_gnd, &player->current.pos, &tevStr, NULL, NULL, 0, NULL, -1, NULL);
                 dComIfGp_getVibration().StartShock(VIBMODE_S_POWER4, 1, cXyz(0.0f, 1.0f, 0.0f));
@@ -746,28 +747,30 @@ int daSpinner_c::execute() {
         } else {
             current.pos = field_0xaa4;
 
-            if (mSpinnerTag != TAG_END) {
-                if (!dComIfGp_event_runCheck() && mTrigJump) {
-                    field_0xa82 += 0x200;
-                    if (field_0xa82 > 5000) {
-                        field_0xa82 = 5000;
-                    }
-                    mSpinnerTag = TAG_INTO_INC_ROT;
-                } else {
-                    field_0xa82 -= 0x40;
-                    if (field_0xa82 < 0) {
-                        field_0xa82 = 0;
-                    }
-                    mSpinnerTag = TAG_INTO;
+        if (mSpinnerTag != TAG_END) {
+            if (!dComIfGp_event_runCheck() && mTrigJump) {
+                field_0xa82 += (s16)(0x200 * DELTA_TIME);
+                if (field_0xa82 > 5000) {
+                    field_0xa82 = 5000;
                 }
+                mSpinnerTag = TAG_INTO_INC_ROT;
+            } else {
+                field_0xa82 -= (s16)(0x40 * DELTA_TIME);
+                if (field_0xa82 < 0) {
+                    field_0xa82 = 0;
+                }
+                mSpinnerTag = TAG_INTO;
             }
         }
+    }
     } else {
         field_0xa82 = 0x82F;
         cLib_chaseF(&field_0xa84, 0.0f, 0.5f);
 
         if (mRideMoveTime == 0) {
-            if (cLib_addCalc(&speedF, 0.0f, player->getSpinnerRideDecSpeedRate(), player->getSpinnerRideDecSpeedMax(), player->getSpinnerRideDecSpeedMin()) < 0.1f) {
+            if (cLib_addCalc(&speedF, 0.0f, player->getSpinnerRideDecSpeedRate(),
+                             player->getSpinnerRideDecSpeedMax(),
+                             player->getSpinnerRideDecSpeedMin()) < 0.1f) {
                 mDeleteFlg = true;
                 return 1;
             }
@@ -844,7 +847,7 @@ int daSpinner_c::execute() {
         }
 
         if (!dComIfGp_event_runCheck() && speedF > 3.0f && field_0xa98.abs2XZ(current.pos) < 9.0f) {
-            field_0xa79++;
+            field_0xa79 += SCALE_TIME;
             if (field_0xa79 > 30) {
                 mDeleteFlg = true;
             }

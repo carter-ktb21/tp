@@ -2,7 +2,7 @@
 
 <hr>
 
-<h2><b>🚫 IMPORTANT LEGAL NOTICE — READ BEFORE CONTINUING</b></h2>
+<h2><b>🚫 IMPORTANT LEGAL NOTvICE — READ BEFORE CONTINUING</b></h2>
 <p>
   <b>We do NOT distribute game assets or ISO files.</b><br>
   <b>We will NEVER provide, upload, or link to copyrighted ROMs, ISOs, or extracted game data.</b><br>

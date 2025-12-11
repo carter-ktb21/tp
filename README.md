@@ -2,7 +2,7 @@
 
 <hr>
 
-<h2><b>🚫 IMPORTANT LEGAL NOTvICE — READ BEFORE CONTINUING</b></h2>
+<h2><b>🚫 IMPORTANT LEGAL NOTICE — READ BEFORE CONTINUING 🚫</b></h2>
 <p>
   <b>We do NOT distribute game assets or ISO files.</b><br>
   <b>We will NEVER provide, upload, or link to copyrighted ROMs, ISOs, or extracted game data.</b><br>
@@ -55,6 +55,10 @@
 <h3>Windows</h3>
 <ol>
   <li>
+  <b>Install Winget From Microsoft Store</b><br>
+  <a href="https://apps.microsoft.com/detail/9nblggh4nns1?hl=en-US&gl=US">Winget Install</a><br>
+  </li>
+  <li>
     <b>Install Python 3.14.0 (64-bit)</b><br>
     Download: <a href="https://www.python.org/ftp/python/3.14.0/python-3.14.0-amd64.exe">Python 3.14.0</a><br>
     Verify:
@@ -63,9 +67,7 @@ pip --version</pre>
   </li>
   <li>
     <b>Install Git</b><br>
-    <pre>Using winget tool: winget install --id Git.Git -e --source winget</pre>
-    or
-    <pre>https://git-scm.com/install/windows (BE SURE TO ADD TO %PATH%</pre>
+    <pre>winget install --id Git.Git -e --source winget</pre>
   </li>
   <li>
     <b>Install Ninja</b><br>
@@ -127,7 +129,7 @@ cd Twilight-Princess-Ultimate-Edition</pre>
   <li>Output a Dolphin-ready image</li>
 </ul>
 
-<h2><b>🐍 Linux ISO Build</b></h2>
+<h2><b>Linux ISO Build</b></h2>
 <p>Run the included script:</p>
 <pre>python3 build_iso_linux.py</pre>
 
@@ -140,7 +142,7 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 
 <hr>
 
-<h2><b>⚡ 60FPS Engine Overview</b></h2>
+<h2><b>60FPS Engine Overview</b></h2>
 <ul>
   <li>Frame-rate–independent delta-time physics</li>
   <li>Proper 60FPS animations & movement</li>
@@ -151,7 +153,7 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 
 <hr>
 
-<h2><b>📘 Modding & Contributions</b></h2>
+<h2><b>Modding & Contributions</b></h2>
 <p>Before modifying RELs or engine code:</p>
 <p>→ Please read <b>Modding Guide.pdf</b>.</p>
 <p>It covers:</p>
@@ -164,13 +166,13 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 
 <hr>
 
-<h2><b>🙏 Credits</b></h2>
+<h2><b>Credits</b></h2>
 
-<h3>🏹 Zelda Reverse Engineering Team</h3>
+<h3>Zelda Reverse Engineering Team</h3>
 <p>For fully decompiling the GameCube USA (GZ2E01) version of Twilight Princess.<br>
 This project exists thanks to their foundational work.</p>
 
-<h3>🔧 Carco</h3>
+<h3>Carco</h3>
 <p>For essential research and documentation regarding:</p>
 <ul>
   <li>REL internals</li>

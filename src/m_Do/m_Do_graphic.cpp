@@ -326,6 +326,8 @@ void mDoGph_gInf_c::create() {
     } else {
         onWide();
     }
+    #elif WIDESCREEN_SUPPORT
+    onWide();
     #endif
 
     VISetBlack(TRUE);

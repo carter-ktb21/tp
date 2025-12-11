@@ -264,7 +264,7 @@ if config.version == "ShieldD":
 elif config.version == "RZDE01_00" or config.version == "RZDE01_02" or config.version == "Shield":
     cflags_base.extend(["-O4,p", "-inline auto", "-ipa file", "-RTTI on", "-str reuse", "-enc SJIS", "-DWIDESCREEN_SUPPORT=1"])
 else:
-    cflags_base.extend(["-O4,p", "-inline auto", "-RTTI off", "-str reuse", "-multibyte"])
+    cflags_base.extend(["-O4,p", "-inline auto", "-RTTI off", "-str reuse", "-multibyte", "-DWIDESCREEN_SUPPORT=1"])
 
 USE_REVOLUTION_SDK_VERSIONS = [
     "RZDE01_00", # Wii USA Rev 0
@@ -1735,7 +1735,7 @@ config.libs = [
     ActorRel(Modded, "d_a_nbomb"), # weak func order
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_life_container"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_yousei"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_spinner"),
+    ActorRel(Modded, "d_a_spinner"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_suspend"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tag_attention"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_alldie"),

@@ -1,7 +1,4 @@
 <h1 align="center"><b>Twilight Princess Ultimate Edition (GCN USA)</b></h1>
-<p align="center">
-  <img src="https://github.com/TP-Ultimate-Edition/.github/raw/main/banner.png" width="720" alt="Twilight Princess Ultimate Edition Banner">
-</p>
 
 <hr>
 
@@ -32,7 +29,7 @@
 
 <hr>
 
-<h2><b>⭐ Features</b></h2>
+<h2><b>Features</b></h2>
 <ul>
   <li>True 60FPS engine via delta-time physics</li>
   <li>Correct animation & gameplay timing at 60FPS</li>
@@ -44,7 +41,7 @@
 
 <hr>
 
-<h2><b>🚨 IMPORTANT BUILD PREREQUISITE</b></h2>
+<h2><b>IMPORTANT BUILD PREREQUISITE</b></h2>
 <p>
   Before using any ISO build script:<br>
   <b>You must successfully complete a normal decomp build using the USA (GZ2E01) ISO.</b><br>
@@ -53,9 +50,9 @@
 
 <hr>
 
-<h2><b>🔧 Dependencies</b></h2>
+<h2><b>Dependencies</b></h2>
 
-<h3>🪟 Windows</h3>
+<h3>Windows</h3>
 <ol>
   <li>
     <b>Install Python 3.14.0 (64-bit)</b><br>
@@ -63,6 +60,12 @@
     Verify:
     <pre>python --version
 pip --version</pre>
+  </li>
+  <li>
+    <b>Install Git</b><br>
+    <pre>Using winget tool: winget install --id Git.Git -e --source winget</pre>
+    or
+    <pre>https://git-scm.com/install/windows (BE SURE TO ADD TO %PATH%</pre>
   </li>
   <li>
     <b>Install Ninja</b><br>
@@ -76,7 +79,7 @@ pip --version</pre>
   </li>
 </ol>
 
-<h3>🐧 Linux</h3>
+<h3>Linux</h3>
 <p>Install Python + Ninja:</p>
 <pre>sudo apt install python3 python3-pip ninja-build</pre>
 <p>(or your distro equivalent)</p>
@@ -85,13 +88,13 @@ pip --version</pre>
 
 <hr>
 
-<h2><b>🏗️ Standard Decomp Build (Required First)</b></h2>
+<h2><b>Standard Decomp Build (Required First)</b></h2>
 <p>Clone the repo:</p>
 <pre>git clone https://github.com/TP-Ultimate-Edition/Twilight-Princess-Ultimate-Edition.git
 cd Twilight-Princess-Ultimate-Edition</pre>
 
-<p>Place your own legally dumped USA ISO at:</p>
-<pre>orig/GZ2E01/baserom.iso</pre>
+<p>Run build_iso.bat</p>
+<pre>select your iso and let it run until it crashes</pre>
 
 <p>Configure the project:</p>
 <pre>python3 configure.py --version=GZ2E01</pre>
@@ -107,7 +110,7 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 
 <hr>
 
-<h2><b>💿 Windows ISO Build</b></h2>
+<h2><b>Windows ISO Build</b></h2>
 <p>Run:</p>
 <pre>build_iso.bat</pre>
 

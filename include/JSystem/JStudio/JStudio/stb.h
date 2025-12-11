@@ -5,6 +5,7 @@
 #include "JSystem/JStudio/JStudio/object-id.h"
 #include "JSystem/JStudio/JStudio/stb-data-parse.h"
 #include "dolphin/os.h"
+#include "global.h"
 
 namespace JStudio {
 class TObject;
@@ -78,7 +79,7 @@ public:
     const void* getSequence_next() const { return pSequence_next; }
     void setSequence_next(const void* seq) { pSequence_next = seq; }
     u32 getWait() const { return u32Wait_; }
-    void setWait(u32 wait) { u32Wait_ = wait; }
+    void setWait(u32 wait) { u32Wait_ = wait * SCALE_TIME; }  // Boofener: Scale waits for 60fps (forward called 2x as often)
     TEStatus getStatus() const { return mStatus; }
     void setStatus_(TEStatus status) { mStatus = status; }
     u32 toInt32FromUInt24_(u32 val) {

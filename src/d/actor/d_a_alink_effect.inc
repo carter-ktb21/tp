@@ -2064,7 +2064,7 @@ void daAlink_lockCursor_c::update() {
         mLockCursorAngle = 21.0f;
     }
 
-    mLockCursorAngle += 0.9f;
+    mLockCursorAngle += 0.9f * DELTA_TIME;
 
     if (mLockCursorAngle >= 50.0f) {
         mLockCursorAngle += -29.0f;

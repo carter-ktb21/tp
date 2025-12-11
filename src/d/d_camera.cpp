@@ -9607,7 +9607,8 @@ void dCamera_c::SetBlureActor(fopAc_ac_c* i_actor) {
 }
 
 int dCamera_c::blureCamera() {
-    if (mBlure.field_0x4 > 0) {
+    return 0;
+    /*if (mBlure.field_0x4 > 0) {
         if (mBlure.mpActor != NULL) {
             dDlst_window_c* window = get_window(field_0x0);
             scissor_class* scissor = window->getScissor();
@@ -9643,7 +9644,7 @@ int dCamera_c::blureCamera() {
         mBlure.field_0x4 = 0;
     }
 
-    return mBlure.field_0x4;
+    return mBlure.field_0x4; */
 }
 
 void dCamera_c::onHorseDush() {

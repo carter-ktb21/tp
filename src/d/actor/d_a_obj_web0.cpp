@@ -37,7 +37,7 @@ static void damage_check(obj_web0_class* i_this) {
         i_this->mHitTimer = 6 * SCALE_TIME;
 
         if (i_this->mSphCc.GetTgHitObj()->ChkAtType(AT_TYPE_IRON_BALL)) {
-            i_this->mDeleteTimer = 41 * SCALE_TIME;
+            i_this->mDeleteTimer = 41;
             return;
         }
 
@@ -48,7 +48,7 @@ static void damage_check(obj_web0_class* i_this) {
 
         if (i_this->mSphCc.GetTgHitObj()->ChkAtType(AT_TYPE_BOMB) ||
             i_this->mSphCc.GetTgHitGObj()->GetAtMtrl() == dCcD_MTRL_FIRE) {
-            i_this->mDeleteTimer = 1 * SCALE_TIME;
+            i_this->mDeleteTimer = 1;
             return;
         }
 
@@ -84,19 +84,19 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
     }
 
     if (i_this->mDeleteTimer != 0) {
-        if (i_this->mDeleteTimer == 1 * SCALE_TIME) {
+        if (i_this->mDeleteTimer == 1) {
             cXyz sp20(base_p->scale);
             sp20.z = 1.0f;
 
             dComIfGp_particle_set(0x840C, &base_p->current.pos, &base_p->shape_angle, &sp20);
             i_this->mpBrk->setPlaySpeed(1.0f);
-        } else if (i_this->mDeleteTimer == 41 * SCALE_TIME) {
+        } else if (i_this->mDeleteTimer == 41) {
             i_this->mpBrk->setPlaySpeed(1.0f);
         }
 
         fopAcM_seStartLevel(base_p, Z2SE_OBJ_WEB_BURN, 0);
 
-        if (i_this->mDeleteTimer == 40 * SCALE_TIME || i_this->mDeleteTimer == 80 * SCALE_TIME) {
+        if (i_this->mDeleteTimer == 40 || i_this->mDeleteTimer == 80) {
             u32 sp0C = (fopAcM_GetParam(base_p) & 0xff000000) >> 24;
             dComIfGs_onSwitch(sp0C, fopAcM_GetRoomNo(base_p));
             fopAcM_delete(base_p);

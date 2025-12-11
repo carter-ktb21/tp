@@ -626,7 +626,7 @@ static void move_calc(e_st_class* i_this) {
     cMtx_YrotM(*calc_mtx, a_this->current.angle.y);
     sp1c.x = 0.0f;
     sp1c.y = TREG_F(8);
-    sp1c.z = a_this->speedF * SCALE_TIME;
+    sp1c.z = a_this->speedF;
     MtxPosition(&sp1c, &sp28);
     a_this->old.pos = i_this->mBgPos;
     i_this->mBgPos += sp28;
@@ -2517,7 +2517,7 @@ static void action(e_st_class* i_this) {
     if (unk_flag_5) {
         dBgS_LinChk lin_chk;
         cMtx_YrotS(*calc_mtx, a_this->current.angle.y);
-        sp9c.z = a_this->speedF * SCALE_TIME;
+        sp9c.z = a_this->speedF;
         sp9c.x = 0.0f;
         sp9c.y = 0.0f;
         MtxPosition(&sp9c, &spa8);
@@ -2543,7 +2543,7 @@ static void action(e_st_class* i_this) {
         if (dComIfG_Bgsp().LineCross(&lin_chk)) {
             sp9c.x = 0.0f;
             sp9c.y = 0.0f;
-            sp9c.z = TREG_F(11) + fabsf(a_this->speedF * SCALE_TIME) + 30.0f;
+            sp9c.z = TREG_F(11) + fabsf(a_this->speedF) + 30.0f;
             MtxPosition(&sp9c, &spa8);
             a_this->current.pos += spa8;
         }

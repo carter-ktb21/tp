@@ -63,7 +63,7 @@ public:
     /* 0x8E8 */ cXyz field_0x8e8;
     /* 0x8F4 */ f32 mDemoCamFovy;
     /* 0x8F8 */ u8 field_0x8f8[0x8fc - 0x8f8];
-    /* 0x8FC */ f32 field_0x8fc;
+    /* 0x8FC */ f32 field_0x8fc; // Handles the position the piece of rope a monkey is holding moves to when swinging from monkey
     /* 0x900 */ f32 field_0x900;
     /* 0x904 */ cXyz field_0x904[2];
     /* 0x91C */ int field_0x91c;

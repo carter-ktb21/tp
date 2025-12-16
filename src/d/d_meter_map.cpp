@@ -314,7 +314,7 @@ void dMeterMap_c::draw() {
         f32 tmp3 = field_0x1c;
 
         mMapJ2DPicture->setAlpha(mMapAlpha);
-        mMapJ2DPicture->draw(tmp2, tmp3, sizeX, sizeY, false, false, false);
+        mMapJ2DPicture->draw(ScaleHUDXLeft(tmp2), tmp3, sizeX, sizeY, false, false, false);
         mMapJ2DPicture->calcMtx();
     }
 }

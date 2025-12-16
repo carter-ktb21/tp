@@ -799,7 +799,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_meter_button.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter_haihai.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter_hakusha.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_meter_map.cpp"),
+            Object(Modded, "d/d_meter_map.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter_string.cpp"),
             Object(Modded, "d/d_meter2_draw.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter2_info.cpp"),

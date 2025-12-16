@@ -10,7 +10,7 @@ s16 daAlink_c::getBombExplodeTime() const {
 }
 
 f32 daAlink_c::getBombGravity() const {
-    return mpHIO->mItem.mBomb.m.mGravity * DELTA_TIME;
+    return mpHIO->mItem.mBomb.m.mGravity;
 }
 
 f32 daAlink_c::getBombMaxFallSpeed() const {
@@ -42,7 +42,7 @@ s16 daAlink_c::getEnemyBombColorR() const {
 }
 
 f32 daAlink_c::getBombWaterGravity() const {
-    return mpHIO->mItem.mBomb.m.mWaterGravity * DELTA_TIME;
+    return mpHIO->mItem.mBomb.m.mWaterGravity;
 }
 
 f32 daAlink_c::getBombWaterMaxFallSpeed() const {

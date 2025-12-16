@@ -31,7 +31,6 @@ if exist "%DECOMP_PATH%\.env" (
 REM Set defaults if not provided in .env
 if not defined VANILLA_ISO set VANILLA_ISO=%DECOMP_PATH%\orig\GZ2E01\baserom.iso
 if not defined OUTPUT_ISO set OUTPUT_ISO=
-if not defined DOLPHIN_PATH set DOLPHIN_PATH=C:\Program Files\Dolphin-x64\Dolphin.exe
 if not defined LAUNCH set LAUNCH=true
 if not defined DUAL_BOOT set DUAL_BOOT=false
 
@@ -55,6 +54,8 @@ if not exist "%VANILLA_ISO%" (
 
     if "!SELECTED_ISO!"=="" (
         echo ERROR: No ISO file selected. Exiting.
+        echo.
+        pause
         exit /b 1
     )
 
@@ -69,6 +70,8 @@ if not exist "%VANILLA_ISO%" (
     copy "!SELECTED_ISO!" "%VANILLA_ISO%"
     if errorlevel 1 (
         echo ERROR: Failed to copy ISO
+        echo.
+        pause
         exit /b 1
     )
 
@@ -76,6 +79,62 @@ if not exist "%VANILLA_ISO%" (
     echo.
 ) else (
     echo Using existing vanilla ISO: %VANILLA_ISO%
+    echo.
+)
+
+REM Check if Dolphin path is defined and exists
+if not defined DOLPHIN_PATH (
+    echo Dolphin path not configured.
+    echo.
+    echo Please select your Dolphin.exe location...
+    echo.
+
+    REM Use PowerShell to show file dialog for Dolphin.exe
+    for /f "delims=" %%I in ('powershell -Command "Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.OpenFileDialog; $dialog.Filter = 'Dolphin Emulator (Dolphin.exe)|Dolphin.exe|All Files (*.*)|*.*'; $dialog.Title = 'Select Dolphin.exe'; if ($dialog.ShowDialog() -eq 'OK') { $dialog.FileName }"') do set SELECTED_DOLPHIN=%%I
+
+    if "!SELECTED_DOLPHIN!"=="" (
+        echo WARNING: No Dolphin.exe selected. Launch features will be disabled.
+        set LAUNCH=false
+    ) else (
+        set DOLPHIN_PATH=!SELECTED_DOLPHIN!
+        echo Selected: !DOLPHIN_PATH!
+        
+        REM Save to .env file for future runs
+        echo.
+        echo Saving Dolphin path to .env file...
+        if not exist "%DECOMP_PATH%\.env" (
+            echo # Twilight Princess Build Configuration > "%DECOMP_PATH%\.env"
+        )
+        echo DOLPHIN_PATH=!DOLPHIN_PATH! >> "%DECOMP_PATH%\.env"
+        echo Dolphin path saved!
+    )
+    echo.
+) else if not exist "%DOLPHIN_PATH%" (
+    echo Dolphin not found at: %DOLPHIN_PATH%
+    echo.
+    echo Please select your Dolphin.exe location...
+    echo.
+
+    REM Use PowerShell to show file dialog for Dolphin.exe
+    for /f "delims=" %%I in ('powershell -Command "Add-Type -AssemblyName System.Windows.Forms; $dialog = New-Object System.Windows.Forms.OpenFileDialog; $dialog.Filter = 'Dolphin Emulator (Dolphin.exe)|Dolphin.exe|All Files (*.*)|*.*'; $dialog.Title = 'Select Dolphin.exe'; if ($dialog.ShowDialog() -eq 'OK') { $dialog.FileName }"') do set SELECTED_DOLPHIN=%%I
+
+    if "!SELECTED_DOLPHIN!"=="" (
+        echo WARNING: No Dolphin.exe selected. Launch features will be disabled.
+        set LAUNCH=false
+    ) else (
+        set DOLPHIN_PATH=!SELECTED_DOLPHIN!
+        echo Selected: !DOLPHIN_PATH!
+        
+        REM Save to .env file for future runs
+        echo.
+        echo Updating Dolphin path in .env file...
+        REM Update existing DOLPHIN_PATH line
+        powershell -Command "(Get-Content '%DECOMP_PATH%\.env') -replace '^DOLPHIN_PATH=.*', 'DOLPHIN_PATH=!DOLPHIN_PATH!' | Set-Content '%DECOMP_PATH%\.env'"
+        echo Dolphin path updated!
+    )
+    echo.
+) else (
+    echo Using Dolphin at: %DOLPHIN_PATH%
     echo.
 )
 
@@ -91,7 +150,8 @@ echo Checking for running Dolphin emulator...
 taskkill /F /IM Dolphin.exe >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
     echo Dolphin closed successfully.
-    timeout /t 2 /nobreak >NUL
+    echo Waiting 30 seconds for process to fully terminate...
+    timeout /t 30 /nobreak >NUL
 ) else (
     echo No Dolphin instances running.
 )
@@ -101,6 +161,8 @@ echo [1/3] Configuring build...
 python configure.py --non-matching --map
 if errorlevel 1 (
     echo ERROR: Configure failed
+    echo.
+    pause
     exit /b 1
 )
 
@@ -116,12 +178,16 @@ if errorlevel 1 (
     python configure.py --non-matching --map
     if errorlevel 1 (
         echo ERROR: Reconfigure failed
+        echo.
+        pause
         exit /b 1
     )
     echo Rebuilding...
     ninja
     if errorlevel 1 (
         echo ERROR: Build failed after clean
+        echo.
+        pause
         exit /b 1
     )
 )
@@ -131,6 +197,8 @@ echo [3/3] Building ISO...
 python tools\rebuild-decomp-tp.py "%VANILLA_ISO%" "%OUTPUT_ISO%" "%DECOMP_PATH%"
 if errorlevel 1 (
     echo ERROR: ISO build failed
+    echo.
+    pause
     exit /b 1
 )
 
@@ -176,4 +244,7 @@ if /i "%LAUNCH%"=="true" (
     echo Skipping Dolphin launch (LAUNCH=false in .env)
 )
 
+echo.
+echo Press any key to close...
+pause >nul
 endlocal

@@ -83,17 +83,21 @@ void dOvlpFd2_dlst_c::draw() {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_CLR_RGB, GX_RGBA4, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_CLR_RGBA, GX_RGB8, 0);
 
+    // DEV: Use the actual render target size so the transition quad covers widescreen (prevents a
+    // one-frame 4:3 flash during fades/room transitions).
+    s16 w = (s16)mDoGph_gInf_c::getWidth();
+    s16 h = (s16)mDoGph_gInf_c::getHeight();
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition2s16(-mDoGph_gInf_c::getWidth() / 2, mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(-w / 2, h / 2);
     GXTexCoord2s8(0, 0);
 
-    GXPosition2s16(mDoGph_gInf_c::getWidth() / 2, mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(w / 2, h / 2);
     GXTexCoord2s8(1, 0);
 
-    GXPosition2s16(mDoGph_gInf_c::getWidth() / 2, -mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(w / 2, -h / 2);
     GXTexCoord2s8(1, 1);
 
-    GXPosition2s16(-mDoGph_gInf_c::getWidth() / 2, -mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(-w / 2, -h / 2);
     GXTexCoord2s8(0, 1);
     GXEnd();
 

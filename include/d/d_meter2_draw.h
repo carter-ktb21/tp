@@ -7,6 +7,8 @@ class CPaneMgr;
 class CPaneMgrAlpha;
 class J2DAnmColorKey;
 class J2DAnmTransformKey;
+class J2DGrafContext;
+class J2DPicture;
 class JKRExpHeap;
 class JKRHeap;
 
@@ -243,9 +245,13 @@ public:
     void setAlphaButtonBAnimeMin();
     void setAlphaButtonBAnimeMax();
     void setButtonIconAAlpha(u8, u32, bool);
-    void setButtonIconBAlpha(u8, u32, bool);
-    void setButtonIconMidonaAlpha(u32);
-    void setButtonIconAlpha(int, u8, u32, bool);
+	    void setButtonIconBAlpha(u8, u32, bool);
+	    void setButtonIconMidonaAlpha(u32);
+	    void setButtonIconAlpha(int, u8, u32, bool);
+	    // DEV: Lazily initializes the D-pad-down transform hint icon textures when map UI archives load.
+	    void updateTransformHintIcons();
+	    // DEV: Draws the D-pad-down transform hint icon (opposite form icon as a hint).
+	    void drawTransformHintIcon(J2DGrafContext*);
     ResTIMG* getNumberTexture(int);
     char* getActionString(u8, u8, u8*);
     void changeTextureItemB(u8);
@@ -286,7 +292,12 @@ public:
     void setEmphasisB(u8 param_0) { field_0x762 = param_0; }
     u8 getInsideObjCheck() { return field_0x772; }
 
-private:
+	private:
+	    // DEV: Loads Link/Wolf map icon textures used by the transform hint icon.
+	    void initTransformHintIcons();
+	    // DEV: Deletes cached J2DPicture wrappers for the transform hint icon.
+	    void clearTransformHintIcons();
+
     /* 0x004 */ item_params mItemParams[4];
     /* 0x074 */ JKRExpHeap* heap;
     /* 0x078 */ J2DScreen* mpScreen;
@@ -496,6 +507,8 @@ private:
     /* 0x858 */ GXColor mButtonZTextColor;
     /* 0x85C */ GXColor mButtonXYTextColor;
     /* 0x860 */ u8 field_0x860[2];
+    /* 0x864 */ ResTIMG* mTransformIconTex[2];       // cache icons for dpad down transform detection        
+    /* 0x86C */ J2DPicture* mpDpadDownIcon[2][2];    // J2D heap allocation cache  
 };
 
 #endif /* D_METER_D_METER2_DRAW_H */

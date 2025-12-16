@@ -88,7 +88,7 @@ extern float g_deltaTime;
 extern int g_scaleTime;
 extern float g_targetFrameTime;
 extern float g_targetFramerate;
-extern int g_shouldUpdateLogic;  // Skip logic updates on render-only frames (0=false, 1=true)
+extern int g_shouldUpdateLogic;  // Always 1 (legacy; kept for compatibility)
 #define DELTA_TIME g_deltaTime
 #define SCALE_TIME g_scaleTime
 void updateDeltaTime();

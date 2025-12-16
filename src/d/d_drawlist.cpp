@@ -1883,7 +1883,7 @@ void dDlst_list_c::wipeIn(f32 i_wipeSpeed, GXColor& i_wipeColor) {
     ResTIMG* texture = (ResTIMG*)JKRArchive::getGlbResource('TIMG', "wipe_00.bti", main2d);
 
     mWipeDlst.init(texture, mDoGph_gInf_c::getMinX(), mDoGph_gInf_c::getMinY(),
-                   mDoGph_gInf_c::getWidth(), mDoGph_gInf_c::getHeight(), 0, 1, 1, 2.0f, 2.436f);
+                   mDoGph_gInf_c::getWidthF(), mDoGph_gInf_c::getHeightF(), 0, 1, 1, 2.0f, 2.436f);
 }
 
 

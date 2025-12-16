@@ -535,14 +535,14 @@ void daAlink_c::onWolfEyeUp() {
     if (mWolfEyeUp == 0) {
         mZ2Link.setWolfEyeOpen(true);
         mWolfEyeUp = mpHIO->mWolf.m.mSensesLingerTime;
-        field_0x2fd2 = 20;
+        field_0x2fd2 = (u8)(20 * SCALE_TIME);
     }
 }
 
 void daAlink_c::offWolfEyeUp() {
     if (mWolfEyeUp != 0) {
         mWolfEyeUp = 0;
-        field_0x2fd2 = 20;
+        field_0x2fd2 = (u8)(20 * SCALE_TIME);
         mZ2Link.setWolfEyeOpen(false);
     }
 }
@@ -2912,7 +2912,7 @@ int daAlink_c::procWolfSideStepLandInit(s16 param_0) {
     if (field_0x2f98 == 1) {
         setSingleAnimeWolfParam(WANM_BACK_JUMP_END, &mpHIO->mWolf.mWlSideStep.m.mBackLandAnm);
         field_0x3478 = mpHIO->mWolf.mWlSideStep.m.mBackLandAnm.mCancelFrame;
-        field_0x2fcc = 10;
+        field_0x2fcc = (u8)(10 * SCALE_TIME);
     } else {
         field_0x2fcc = 0;
         setSingleAnimeWolfParam(
@@ -2938,7 +2938,7 @@ int daAlink_c::procWolfSideStepLand() {
     daPy_frameCtrl_c* frameCtrl = mUnderFrameCtrl;
 
     if (field_0x2fcc != 0) {
-        field_0x2fcc = 10;
+        field_0x2fcc = (u8)(10 * SCALE_TIME);
     }
 
     setWolfAtnMoveDirection();
@@ -3028,7 +3028,7 @@ int daAlink_c::procWolfBackJumpLandInit(s16 param_0, s16 param_1) {
     mNormalSpeed = 0.0f;
     field_0x2f9d = 4;
     setFootEffectProcType(2);
-    field_0x2fcc = 10;
+    field_0x2fcc = (u8)(10 * SCALE_TIME);
     mProcVar5.field_0x3012 = param_0;
     mProcVar4.field_0x3010 = param_1;
     setStepLandVibration();
@@ -3040,7 +3040,7 @@ int daAlink_c::procWolfBackJumpLand() {
     daPy_frameCtrl_c* frameCtrl = mUnderFrameCtrl;
 
     if (field_0x2fcc != 0) {
-        field_0x2fcc = 10;
+        field_0x2fcc = (u8)(10 * SCALE_TIME);
     }
 
     setWolfAtnMoveDirection();
@@ -6447,6 +6447,8 @@ f32 daAlink_c::getWolfSwimMoveAnmSpeed() {
             anm_speed * (mpHIO->mWolf.mWlSwim.m.mMoveMaxAnmSpeedWeak - mpHIO->mWolf.mWlSwim.m.mMoveMinAnmSpeedWeak);
     }
 
+    // Returned in "frames per 30fps tick" units; callers that directly update frameCtrl rates
+    // should use setWaterInAnmRate() (which applies `DELTA_TIME`).
     return anm_speed;
 }
 
@@ -6571,9 +6573,9 @@ int daAlink_c::procWolfSwimWait() {
     setSwimUpDownOffset();
 
     if (checkWolfDashMode()) {
-        mUnderFrameCtrl[0].setRate(mpHIO->mWolf.mWlSwim.m.mIdleAnmSpeed);
+        setWaterInAnmRate(&mUnderFrameCtrl[0], mpHIO->mWolf.mWlSwim.m.mIdleAnmSpeed);
     } else {
-        mUnderFrameCtrl[0].setRate(mpHIO->mWolf.mWlSwim.m.mIdleAnmSpeedWeak);
+        setWaterInAnmRate(&mUnderFrameCtrl[0], mpHIO->mWolf.mWlSwim.m.mIdleAnmSpeedWeak);
     }
 
     if (checkSwimUpAction()) {
@@ -6609,7 +6611,7 @@ int daAlink_c::procWolfSwimMove() {
     setSpeedAndAngleSwimWolf();
 
     if (!checkWolfSwimDashAnime()) {
-        mUnderFrameCtrl[0].setRate(getWolfSwimMoveAnmSpeed());
+        setWaterInAnmRate(&mUnderFrameCtrl[0], getWolfSwimMoveAnmSpeed());
     }
 
     if (checkSwimUpAction()) {
@@ -7033,8 +7035,11 @@ int daAlink_c::procWolfRollAttackMoveInit() {
         onModeFlg(1);
     }
 
-    mProcVar0.field_0x3008 = mpHIO->mWolf.mWlAttack.m.mChargeTime;
-    mProcVar1.field_0x300a = mpHIO->mWolf.mWlAttack.mWlAtLock.m.mAutoActivationTime;
+    // Scale charge timers to real time at higher FPS
+    mProcVar0.field_0x3008 =
+        (s16)(mpHIO->mWolf.mWlAttack.m.mChargeTime * (1.0f / DELTA_TIME) + 0.5f);
+    mProcVar1.field_0x300a =
+        (s16)(mpHIO->mWolf.mWlAttack.mWlAtLock.m.mAutoActivationTime * (1.0f / DELTA_TIME) + 0.5f);
     mProcVar5.field_0x3012 = 30;
     field_0x3198 = 0;
     field_0x2fe4 = shape_angle.y;

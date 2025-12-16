@@ -121,17 +121,17 @@ private:
     /* 0xA73 */ s8 mPathDirection;
     /* 0xA74 */ u8 field_0xa74;
     /* 0xA75 */ u8 mTrigJump;
-    /* 0xA76 */ s8 field_0xa76;
-    /* 0xA77 */ u8 mPathForceRemove;
-    /* 0xA78 */ u8 field_0xa78;
-    /* 0xA79 */ u8 field_0xa79;
-    /* 0xA7A */ s16 mRideMoveTime;
-    /* 0xA7C */ s16 field_0xa7c;
-    /* 0xA7E */ s16 mRotY;
-    /* 0xA80 */ s16 field_0xa80;
-    /* 0xA82 */ s16 field_0xa82;
-    /* 0xA84 */ f32 field_0xa84;
-    /* 0xA88 */ f32 field_0xa88;
+	    /* 0xA76 */ s8 field_0xa76;
+	    /* 0xA77 */ u8 mPathForceRemove;
+	    /* 0xA78 */ u8 field_0xa78;  // estimated: wall-hit cooldown timer (ticks); decremented once per update
+	    /* 0xA79 */ u8 field_0xa79;  // estimated: "stuck" / low-movement timer (ticks) before auto-delete
+	    /* 0xA7A */ s16 mRideMoveTime;  // spinner ride duration in logic ticks (set via `frames / DELTA_TIME`, decremented by 1 per update)
+	    /* 0xA7C */ s16 field_0xa7c;
+	    /* 0xA7E */ s16 mRotY;
+	    /* 0xA80 */ s16 field_0xa80;
+	    /* 0xA82 */ s16 field_0xa82;  // estimated: spin strength/velocity used to advance `mRotY` (ramps during tag-entry/jump)
+	    /* 0xA84 */ f32 field_0xa84;
+	    /* 0xA88 */ f32 field_0xa88;  // currently unused (kept for original struct layout)
     /* 0xA8C */ u32 mSpreadEmitterIDs[2];
     /* 0xA94 */ u32 field_0xa94;
     /* 0xA98 */ cXyz field_0xa98;

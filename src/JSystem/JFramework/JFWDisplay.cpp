@@ -355,31 +355,58 @@ static void waitForTick(u32 p1, u16 p2) {
         nextTick = time + p1;
     }
     else {
-        static OSTime lastFrameTime = 0;
+        // Boofener: Frame limiter for unlocked render loop.
+        //
+        // What this replaces:
+        // - A simple "measure last frame in milliseconds and spin-wait until >= targetFrameTimeMS".
+        //   That version used `OSTicksToMilliseconds(...)` (integer truncation), which quantizes time
+        //   to whole milliseconds and can create periodic cadence hiccups (especially when target
+        //   frametimes are not an integer number of milliseconds).
+        //
+        // Current approach:
+        // - Keep a target `nextFrameTime` in OS ticks and spin until `OSGetTime()` reaches it.
+        // - Advance `nextFrameTime` by a fixed `ticksPerFrame` each frame and carry remainder forward.
+        //   This avoids drift and reduces periodic spikes.
+        // - Use integer math (no `double`) because Metrowerks can otherwise emit helper calls like
+        //   `__cvt_sll_dbl` that aren't linked in this project.
+        static OSTime nextFrameTime = 0;
+        static OSTime lastFrameTicks = 0;
 
-        float targetFPS = getTargetFramerate();
-        OSTime currentTime = OSGetTime();
-
-        // Boofener: Use time-based frame limiting for all framerates
-        // This works regardless of VBI/vsync settings
-        if (targetFPS > 0.0f) {
-            float targetFrameTimeMS = 1000.0f / targetFPS;  // ms per frame
-
-            if (lastFrameTime != 0) {
-                // Calculate how long this frame took
-                OSTime deltaTicks = currentTime - lastFrameTime;
-                float deltaMS = (float)OSTicksToMilliseconds(deltaTicks);
-
-                // Spin-wait until we hit target frametime (more accurate than sleep)
-                while (deltaMS < targetFrameTimeMS) {
-                    currentTime = OSGetTime();
-                    deltaTicks = currentTime - lastFrameTime;
-                    deltaMS = (float)OSTicksToMilliseconds(deltaTicks);
-                }
-            }
-
-            lastFrameTime = currentTime;
+        const float targetFPS = getTargetFramerate();
+        if (targetFPS <= 0.0f) {
+            nextFrameTime = 0;
+            lastFrameTicks = 0;
+            return;
         }
+
+        const u32 ticksPerSecond = (u32)OSSecondsToTicks(1);
+        const u32 fpsMilli = (u32)(targetFPS * 1000.0f + 0.5f);
+        const u64 numerator = (u64)ticksPerSecond * 1000ull;
+        const OSTime ticksPerFrame = (fpsMilli != 0) ? (OSTime)((numerator + (fpsMilli / 2)) / fpsMilli) : 0;
+        const OSTime now = OSGetTime();
+
+        if (ticksPerFrame <= 0) {
+            nextFrameTime = 0;
+            lastFrameTicks = 0;
+            return;
+        }
+
+        if (nextFrameTime == 0 || lastFrameTicks != ticksPerFrame) {
+            nextFrameTime = now + ticksPerFrame;
+            lastFrameTicks = ticksPerFrame;
+            return;
+        }
+
+        // Spin-wait until we hit the target time (tick-accurate; avoids millisecond truncation jitter).
+        OSTime currentTime = now;
+        while (currentTime < nextFrameTime) {
+            currentTime = OSGetTime();
+        }
+
+        // Carry remainder forward to avoid drift and periodic spikes.
+        do {
+            nextFrameTime += ticksPerFrame;
+        } while (nextFrameTime <= currentTime);
     }
 }
 

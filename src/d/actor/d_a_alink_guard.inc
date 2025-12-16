@@ -75,12 +75,12 @@ void daAlink_c::setArrowShieldActor(fopAc_ac_c* i_actor, int param_1) {
 
     int arrow_num = 0;
     for (; arrow_num < 16; arrow_num++) {
-        if (mShieldArrowIDs[arrow_num] == fpcM_ERROR_PROCESS_ID_e) {
-            mShieldArrowIDs[arrow_num] = new_arrow_id;
-            field_0x2f7c[arrow_num] = 10;
-            break;
+            if (mShieldArrowIDs[arrow_num] == fpcM_ERROR_PROCESS_ID_e) {
+                mShieldArrowIDs[arrow_num] = new_arrow_id;
+                field_0x2f7c[arrow_num] = (u8)(10 * SCALE_TIME);
+                break;
+            }
         }
-    }
 
     if (arrow_num == 16) {
         fopAc_ac_c* first_arrow = fopAcM_SearchByID(mShieldArrowIDs[0]);
@@ -95,14 +95,14 @@ void daAlink_c::setArrowShieldActor(fopAc_ac_c* i_actor, int param_1) {
         }
 
         mShieldArrowIDs[i] = new_arrow_id;
-        field_0x2f7c[i] = 10;
+        field_0x2f7c[i] = (u8)(10 * SCALE_TIME);
 
         dComIfGp_setItemArrowNumCount(1);
         fopAcM_createItemForSimpleDemo(&current.pos, fpcNm_ITEM_ARROW_10, -1, NULL, NULL, 0.0f, 0.0f);
     }
 
     if (param_1 && field_0x2fcb == 0 && !checkMagicArmorNoDamage()) {
-        field_0x2fcb = 120;
+        field_0x2fcb = (u8)(120 * SCALE_TIME);
     }
 }
 
@@ -239,7 +239,7 @@ int daAlink_c::procGuardSlipInit(int param_0, dCcD_GObjInf* param_1) {
     }
 
     commonProcInit(PROC_GUARD_SLIP);
-    field_0x2fd4 = 3;
+    field_0x2fd4 = (u8)(3 * SCALE_TIME);
     
     cXyz* temp_r3 = getDamageVec(param_1);
     current.angle.y = temp_r3->atan2sX_Z();

@@ -111,6 +111,9 @@ void daAlink_c::setWaterInAnmRate(daPy_frameCtrl_c* i_frameCtrl, f32 i_rate) {
         }
     }
 
+    // daPy_frameCtrl_c::updateFrame() advances by `rate` each game tick.
+    // Scale here so any direct per-frame rate updates remain real-time consistent at 30/60fps.
+    i_rate *= DELTA_TIME;
     i_frameCtrl->setRate(i_rate);
 }
 
@@ -319,7 +322,7 @@ void daAlink_c::setSpeedAndAngleSwim() {
 
 int daAlink_c::checkNextActionSwim() {
     if (checkSwimButtonMove() && getZoraSwim()) {
-        field_0x3000 = 30;
+        field_0x3000 = 30 * SCALE_TIME;
     }
 
     if ((checkZoraWearAbility() && !checkHeavyStateOn(1, 1)) || checkNoResetFlg0(FLG0_SWIM_UP)) {
@@ -343,7 +346,7 @@ int daAlink_c::checkNextActionSwim() {
             return procSwimDiveInit();
         }
 
-        field_0x3000 = 30;
+        field_0x3000 = 30 * SCALE_TIME;
         return procSwimMoveInit();
     }
 
@@ -451,7 +454,7 @@ int daAlink_c::checkSwimAction(int param_0) {
                     seStartOnlyReverb(Z2SE_AL_JUMP_DIVE_WATER);
 
                     if (checkZoraWearAbility()) {
-                        field_0x3000 = 30;
+                        field_0x3000 = 30 * SCALE_TIME;
                     }
                     return procSwimMoveInit();
                 }
@@ -912,7 +915,7 @@ int daAlink_c::procSwimUpInit() {
 
     seStartMapInfo(Z2SE_AL_OUTOF_WATER);
     swimDeleteItem();
-    field_0x2fcd = 15;
+    field_0x2fcd = (u8)(15 * SCALE_TIME);
     return 1;
 }
 
@@ -1037,7 +1040,7 @@ int daAlink_c::procSwimWait() {
                (checkUpSwimButtonAccept() && doButton()))
     {
         if (checkUpSwimButtonAccept() && doButton()) {
-            field_0x3000 = 30;
+            field_0x3000 = 30 * SCALE_TIME;
         }
 
         procSwimMoveInit();
@@ -1093,7 +1096,7 @@ int daAlink_c::procSwimMove() {
     setSpeedAndAngleSwim();
 
     if (checkUpSwimButtonAccept() && doButton()) {
-        field_0x3000 = 30;
+        field_0x3000 = 30 * SCALE_TIME;
     }
 
     setSwimMoveAnime();
@@ -1147,7 +1150,7 @@ int daAlink_c::procSwimDiveInit() {
     mProcVar4.field_0x3010 = 0;
 
     dComIfGp_setPlayerStatus0(0, 0x100000);
-    field_0x3000 = 30;
+    field_0x3000 = 30 * SCALE_TIME;
     field_0x3478 = 0.0f;
     field_0x347c = 1.0f / mpHIO->mSwim.m.mUnderwaterDiveAnm.mEndFrame;
     return 1;
@@ -1165,7 +1168,7 @@ int daAlink_c::procSwimDive() {
     }
 
     field_0x2f99 = 7;
-    field_0x3000 = 30;
+    field_0x3000 = 30 * SCALE_TIME;
     setNormalSpeedF(0.0f, mpHIO->mSwim.m.mDeceleration);
 
     field_0x3478 = field_0x347c * frame_ctrl->getFrame();
@@ -1333,7 +1336,7 @@ int daAlink_c::procSwimHookshotMove() {
     }
 
     if (checkUpSwimButtonAccept() && doTrigger()) {
-        field_0x3000 = 30;
+        field_0x3000 = 30 * SCALE_TIME;
         return procSwimMoveInit();
     }
 

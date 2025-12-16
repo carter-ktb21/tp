@@ -7851,7 +7851,7 @@ public:
     /* 0x02FB1 */ u8 mWolfLockNum;
     /* 0x02FB2 */ u8 mMidnaTalkDelayTimer;
     /* 0x02FB3 */ u8 field_0x2fb3;
-    /* 0x02FB4 */ u8 field_0x2fb4;
+    /* 0x02FB4 */ u8 field_0x2fb4;  // estimated: horse ride enemy-search cooldown (prevents immediate re-targeting)
     /* 0x02FB5 */ u8 mDamageColorTime;
     /* 0x02FB6 */ u8 field_0x2fb6;
     /* 0x02FB7 */ u8 field_0x2fb7;
@@ -7862,30 +7862,30 @@ public:
     /* 0x02FBC */ u8 field_0x2fbc;
     /* 0x02FBD */ u8 field_0x2fbd;
     /* 0x02FBE */ u8 field_0x2fbe;
-    /* 0x02FBF */ u8 mClothesChangeWaitTimer;
+    /* 0x02FBF */ u8 mClothesChangeWaitTimer;  // estimated: async model swap step timer (clothes/wolf)
     /* 0x02FC0 */ u8 field_0x2fc0;
     /* 0x02FC1 */ u8 field_0x2fc1;
     /* 0x02FC2 */ u8 field_0x2fc2;
-    /* 0x02FC3 */ u8 field_0x2fc3;
-    /* 0x02FC4 */ u8 field_0x2fc4;
+    /* 0x02FC3 */ u8 field_0x2fc3;  // estimated: magic armor rupee drain interval
+    /* 0x02FC4 */ u8 field_0x2fc4;  // estimated: short visual/effect timer (u8-limited, time-gated at 60fps)
     /* 0x02FC5 */ u8 field_0x2fc5;
     /* 0x02FC6 */ u8 field_0x2fc6;
     /* 0x02FC7 */ u8 field_0x2fc7;
     /* 0x02FC8 */ u8 field_0x2fc8;
     /* 0x02FC9 */ u8 field_0x2fc9;
     /* 0x02FCA */ u8 field_0x2fca;
-    /* 0x02FCB */ u8 field_0x2fcb;
-    /* 0x02FCC */ u8 field_0x2fcc;
-    /* 0x02FCD */ u8 field_0x2fcd;
-    /* 0x02FCE */ u8 field_0x2fce;
+    /* 0x02FCB */ u8 field_0x2fcb;  // estimated: wood shield burn timer (counts down to 0)
+    /* 0x02FCC */ u8 field_0x2fcc;  // estimated: short post-land/guard lockout timer (movement/guard gating)
+    /* 0x02FCD */ u8 field_0x2fcd;  // estimated: swimming/underwater sub-timer (general cooldown)
+    /* 0x02FCE */ u8 field_0x2fce;  // estimated: short generic cooldown (various actions)
     /* 0x02FCF */ u8 field_0x2fcf;
     /* 0x02FD0 */ u8 field_0x2fd0;
-    /* 0x02FD1 */ u8 mShieldChangeWaitTimer;
-    /* 0x02FD2 */ u8 field_0x2fd2;
-    /* 0x02FD3 */ u8 field_0x2fd3;
-    /* 0x02FD4 */ u8 field_0x2fd4;
+    /* 0x02FD1 */ u8 mShieldChangeWaitTimer;  // estimated: async shield model swap step timer
+    /* 0x02FD2 */ u8 field_0x2fd2;  // estimated: wolf-only cooldown (metamorph/event gating)
+    /* 0x02FD3 */ u8 field_0x2fd3;  // estimated: bottle/bee child short timer
+    /* 0x02FD4 */ u8 field_0x2fd4;  // estimated: guard-slip short cooldown (clears field_0x2fd5 when done)
     /* 0x02FD5 */ u8 field_0x2fd5;
-    /* 0x02FD6 */ u8 mSwordChangeWaitTimer;
+    /* 0x02FD6 */ u8 mSwordChangeWaitTimer;  // estimated: async sword model swap step timer
     /* 0x02FD7 */ u8 field_0x2fd7;
     /* 0x02FD8 */ u8 field_0x2fd8;
     /* 0x02FD9 */ u8 field_0x2fd9[3];
@@ -7986,8 +7986,8 @@ public:
     /* 0x0309A */ s16 field_0x309a[3];
     /* 0x030A0 */ s16 field_0x30a0;
     /* 0x030A2 */ s16 field_0x30a2;
-    /* 0x030A4 */ s16 field_0x30a4;
-    /* 0x030A6 */ s16 field_0x30a6;
+    /* 0x030A4 */ s16 field_0x30a4;  // estimated: bomb-arrow hold window timer
+    /* 0x030A6 */ s16 field_0x30a6;  // estimated: horse whip cooldown timer
     /* 0x030A8 */ u16 field_0x30a8;
     /* 0x030AA */ u16 field_0x30aa;
     /* 0x030AC */ s16 mWolfEyeUp;
@@ -8005,7 +8005,7 @@ public:
     /* 0x030C4 */ u16 field_0x30c4;
     /* 0x030C6 */ u16 field_0x30c6;
     /* 0x030C8 */ s16 field_0x30c8;
-    /* 0x030CA */ s16 field_0x30ca;
+    /* 0x030CA */ s16 field_0x30ca;  // estimated: service wait timer (NPC/service interactions)
     /* 0x030CC */ s16 field_0x30cc;
     /* 0x030CE */ u16 mKeepItem;
     /* 0x030D0 */ s16 mWolfDashDistTimer;
@@ -8013,17 +8013,17 @@ public:
     /* 0x030D4 */ s16 field_0x30d4;
     /* 0x030D6 */ s16 field_0x30d6;
     /* 0x030D8 */ u8 field_0x30d8[0x14];
-    /* 0x030EC */ s16 field_0x30ec;
+    /* 0x030EC */ s16 field_0x30ec;  // estimated: horse sword-up interpolation duration
     /* 0x030EE */ s16 field_0x30ee;
     /* 0x030F0 */ u16 field_0x30f0;
     /* 0x030F2 */ u8 field_0x30f2[2];
     /* 0x030F4 */ s16 mSwordFlourishTimer;
-    /* 0x030F6 */ s16 field_0x30f6;
-    /* 0x030F8 */ s16 field_0x30f8;
+    /* 0x030F6 */ s16 field_0x30f6;  // estimated: DK/caught state timer
+    /* 0x030F8 */ s16 field_0x30f8;  // estimated: enemy-aim assist cooldown/hold timer
     /* 0x030FA */ s16 field_0x30fa;
     /* 0x030FC */ u16 field_0x30fc;
     /* 0x030FE */ u16 field_0x30fe;
-    /* 0x03100 */ s16 field_0x3100;
+    /* 0x03100 */ s16 field_0x3100;  // estimated: short action/effect timer (s16)
     /* 0x03102 */ s16 field_0x3102;
     /* 0x03104 */ s16 field_0x3104;
     /* 0x03106 */ u16 field_0x3106;

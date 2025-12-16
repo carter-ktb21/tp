@@ -122,8 +122,21 @@ def main() -> None:
     parser.add_argument("--tag", help="GitHub tag", required=True)
     args = parser.parse_args()
 
-    url = TOOLS[args.tool](args.tag)
     output = Path(args.output)
+    if output.exists():
+        try:
+            if output.is_dir():
+                if any(output.iterdir()):
+                    os.utime(output, None)
+                    return
+            else:
+                if output.stat().st_size > 0:
+                    os.utime(output, None)
+                    return
+        except OSError:
+            pass
+
+    url = TOOLS[args.tool](args.tag)
 
     print(f"Downloading {url} to {output}")
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})

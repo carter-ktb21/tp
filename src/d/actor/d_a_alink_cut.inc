@@ -1726,7 +1726,8 @@ int daAlink_c::procCutTurnChargeInit() {
     setSingleAnimeParam(ANM_CUT_TURN_CHARGE_START, &mpHIO->mCut.mCutTurn.m.mChargeAnm);
     mNormalSpeed = 0.0f;
     current.angle.y = shape_angle.y;
-    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration;
+    // Scaled so the charge voice timing matches 30fps behavior at higher FPS.
+    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration * SCALE_TIME;
     return 1;
 }
 
@@ -2221,7 +2222,8 @@ int daAlink_c::procCutLargeJumpChargeInit() {
     setSingleAnimeParam(ANM_CUT_JUMP_LARGE_CHARGE, &mpHIO->mCut.mCutLargeJump.m.mChargeAnm);
     mNormalSpeed = 0.0f;
     current.angle.y = shape_angle.y;
-    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration;
+    // Scaled so the charge voice timing matches 30fps behavior at higher FPS.
+    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration * SCALE_TIME;
     return 1;
 }
 

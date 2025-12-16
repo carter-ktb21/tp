@@ -55,16 +55,18 @@ static int unknownHeapErrors;
 
 static u32 heapErrors;
 
+// The values listed below were changed accoringly to brute force 16:9 in gc builds. Will list original values
+
 #if VERSION == VERSION_GCN_USA || VERSION == VERSION_GCN_JPN
 GXRenderModeObj g_ntscZeldaIntDf = {
     VI_TVMODE_NTSC_INT,
-    608,
-    448,
-    448,
-    27,
-    16,
-    666,
-    448,
+    640,        // 608
+    456,      // 448  
+    456,      // 448
+    25,       // 27
+    12,       // 16
+    670,        // 666
+    456,       // 448
     VI_XFBMODE_DF,
     0,
     0,
@@ -83,15 +85,16 @@ GXRenderModeObj g_ntscZeldaIntDf = {
     {8, 8, 10, 12, 10, 8, 8},
 };
 
+// forces 16:9 in gc 480p
 GXRenderModeObj g_ntscZeldaProg = {
     VI_TVMODE_NTSC_PROG,
-    608,
-    448,
-    448,
-    27,
-    16,
-    666,
-    448,
+    640,        // 608
+    456,      // 448
+    456,      // 448
+    25,       // 27
+    12,       // 16
+    670,        // 666
+    456,       // 448
     VI_XFBMODE_SF,
     0,
     0,
@@ -109,11 +112,13 @@ GXRenderModeObj g_ntscZeldaProg = {
      {6, 6}},
     {0, 0, 21, 22, 21, 0, 0},
 };
+
+// forces 16:9 for the offbrand build
 #elif VERSION == VERSION_GCN_PAL
 GXRenderModeObj g_ntscZeldaIntDf = {
     VI_TVMODE_PAL_INT,
-    608,
-    448,
+    640,            // 608
+    456,            // 448
     538,
     25,
     18,
@@ -136,16 +141,16 @@ GXRenderModeObj g_ntscZeldaIntDf = {
      {6, 6}},
     {8, 8, 10, 12, 10, 8, 8},
 };
-
+// more pal scale
 GXRenderModeObj g_ntscZeldaProg = {
     VI_TVMODE_EURGB60_INT,
-    608,
-    448,
-    448,
-    27,
-    16,
-    666,
-    448,
+    640,            // 608 THESE VALUES ARE CONSISTENT ACROSS THE SOURCE
+    456,            // 448
+    456,            // 448
+    25,             // 27
+    12,             // 16
+    670,            // 666
+    456,            // 448
     VI_XFBMODE_DF,
     0,
     0,

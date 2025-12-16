@@ -187,7 +187,8 @@ int daAlink_c::setDamagePoint(int i_dmgAmount, int i_checkZoraMag, int i_setDmgT
     mSwordUpTimer = 0;
 
     if (i_setDmgTimer) {
-        mDamageTimer = mpHIO->mDamage.m.mInvincibleTime;
+        // Scale i-frames to real time at higher FPS
+        mDamageTimer = (s16)(mpHIO->mDamage.m.mInvincibleTime * (1.0f / DELTA_TIME) + 0.5f);
         setDamageColorTime();
     }
 
@@ -417,7 +418,7 @@ BOOL daAlink_c::checkDamageAction() {
         if ((!checkModeFlg(0x70C52)) && (!checkWolf()) && (!checkDkCaught2Anime())) {
             setUpperAnimeBase(getMainBckData(ANM_HORSE_WAIT_D_B)->m_underID);
             setFacePriAnime(ANM_HORSE_WAIT_D_B);
-            field_0x30f6 = mpHIO->mDamage.mDamCaught.m.mGrabDuration;
+            field_0x30f6 = mpHIO->mDamage.mDamCaught.m.mGrabDuration * SCALE_TIME;
             field_0x2f96 = 1;
             field_0x2f97 = 6;
             onNoResetFlg1(FLG1_UNK_100000);
@@ -498,7 +499,8 @@ BOOL daAlink_c::checkDamageAction() {
         setDamagePoint(1, sp2C & 0x80, TRUE, 0);
 
         if (checkWolf()) {
-            mDamageTimer = mpHIO->mDamage.m.mWolfFloorInvincibleTime;
+            // Scale wolf floor i-frames to real time at higher FPS
+            mDamageTimer = (s16)(mpHIO->mDamage.m.mWolfFloorInvincibleTime * (1.0f / DELTA_TIME) + 0.5f);
             setDamageColorTime();
         }
 
@@ -600,7 +602,7 @@ BOOL daAlink_c::checkDamageAction() {
             }
     
             if (!armor_no_dmg && at_mtrl == dCcD_MTRL_FIRE && checkWoodShieldEquip() && field_0x2fcb == 0 && !field_0x2e44.checkPassNum(15)) {
-                field_0x2fcb = 120;
+                field_0x2fcb = (u8)(120 * SCALE_TIME);
                 seStartOnlyReverb(Z2SE_AL_BURN_START);
             }
 

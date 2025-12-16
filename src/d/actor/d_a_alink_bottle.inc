@@ -175,7 +175,7 @@ int daAlink_c::commonBottleDrink(int param_0) {
                 } else if (mEquipItem == fpcNm_ITEM_LV3_SOUP) {
                     dComIfGp_setItemLifeCount(32, 0);
                 } else if (mEquipItem == fpcNm_ITEM_BEE_CHILD) {
-                    field_0x2fd3 = 3;
+                    field_0x2fd3 = (u8)(3 * SCALE_TIME);
                     dComIfGp_setItemLifeCount(dComIfGp_getSelectItemNum(mSelectItemId), 0);
                 } else if (mEquipItem == fpcNm_ITEM_RED_BOTTLE || mEquipItem == fpcNm_ITEM_CHUCHU_RED ||
                            mEquipItem == fpcNm_ITEM_RED_BOTTLE_2)

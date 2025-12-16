@@ -1590,7 +1590,7 @@ const daAlinkHIO_boom_c1 daAlinkHIO_boom_c0::m = {
 	},
     40,
     0,
-    1.0f,
+    1.0f * DELTA_TIME,
     3.0f,
     60.0f,
     60.0f,

@@ -51,7 +51,7 @@ void daAlink_c::setOriginalHeap(JKRExpHeap** i_ppheap, u32 i_size) {
 
 void daAlink_c::setClothesChange(int param_0) {
     if (!checkWolf()) {
-        mClothesChangeWaitTimer = 4;
+        mClothesChangeWaitTimer = (u8)(4 * SCALE_TIME);
 
         if (param_0 != 0) {
             onNoResetFlg2(FLG2_UNK_200000);
@@ -60,14 +60,14 @@ void daAlink_c::setClothesChange(int param_0) {
 }
 
 void daAlink_c::setShieldChange() {
-    mShieldChangeWaitTimer = 4;
+    mShieldChangeWaitTimer = (u8)(4 * SCALE_TIME);
 }
 
 int daAlink_c::loadModelDVD() {
     if (mClothesChangeWaitTimer != 0) {
         mClothesChangeWaitTimer--;
 
-        if (mClothesChangeWaitTimer == 2) {
+        if (mClothesChangeWaitTimer == (u8)(2 * SCALE_TIME)) {
             mEyeHL1.remove();
             mEyeHL2.remove();
             mpWlMidnaModel = NULL;
@@ -86,7 +86,7 @@ int daAlink_c::loadModelDVD() {
                     setArcName(checkWolf());
                 }
             }
-        } else if (mClothesChangeWaitTimer == 1) {
+        } else if (mClothesChangeWaitTimer == (u8)(1 * SCALE_TIME)) {
             if (checkNoResetFlg2(FLG2_UNK_280000)) {
                 mClothesChangeWaitTimer = 0;
                 changeLink(1);
@@ -106,7 +106,7 @@ int daAlink_c::loadModelDVD() {
 
                     return 1;
                 }
-                mClothesChangeWaitTimer = 2;
+                mClothesChangeWaitTimer = (u8)(2 * SCALE_TIME);
             }
         }
     } else {
@@ -127,19 +127,19 @@ int daAlink_c::loadShieldModelDVD() {
     if (mShieldChangeWaitTimer != 0) {
         mShieldChangeWaitTimer--;
 
-        if (mShieldChangeWaitTimer == 2) {
+        if (mShieldChangeWaitTimer == (u8)(2 * SCALE_TIME)) {
             mShieldModel = NULL;
             dComIfG_resDelete(&mShieldPhaseReq, mShieldArcName);
             cPhs_Reset(&mShieldPhaseReq);
             mpShieldArcHeap->freeAll();
             setShieldArcName();
-        } else if (mShieldChangeWaitTimer == 1) {
+        } else if (mShieldChangeWaitTimer == (u8)(1 * SCALE_TIME)) {
             if (dComIfG_resLoad(&mShieldPhaseReq, mShieldArcName, mpShieldArcHeap) == cPhs_COMPLEATE_e)
             {
                 mShieldChangeWaitTimer = 0;
                 setShieldModel();
             } else {
-                mShieldChangeWaitTimer = 2;
+                mShieldChangeWaitTimer = (u8)(2 * SCALE_TIME);
             }
         }
     } else {

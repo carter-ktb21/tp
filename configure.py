@@ -264,7 +264,7 @@ if config.version == "ShieldD":
 elif config.version == "RZDE01_00" or config.version == "RZDE01_02" or config.version == "Shield":
     cflags_base.extend(["-O4,p", "-inline auto", "-ipa file", "-RTTI on", "-str reuse", "-enc SJIS", "-DWIDESCREEN_SUPPORT=1"])
 else:
-    cflags_base.extend(["-O4,p", "-inline auto", "-RTTI off", "-str reuse", "-multibyte"])
+    cflags_base.extend(["-O4,p", "-inline auto", "-RTTI off", "-str reuse", "-multibyte", "-DWIDESCREEN_SUPPORT=1"])
 
 USE_REVOLUTION_SDK_VERSIONS = [
     "RZDE01_00", # Wii USA Rev 0
@@ -573,7 +573,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_audio.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_controller_pad.cpp"),
             Object(NonMatching, "m_Do/m_Re_controller_pad.cpp"),
-            Object(MatchingFor(ALL_GCN), "m_Do/m_Do_graphic.cpp"),
+            Object(Modded, "m_Do/m_Do_graphic.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_machine.cpp"),
             Object(MatchingFor(ALL_GCN), "m_Do/m_Do_mtx.cpp"),
             Object(Modded, "m_Do/m_Do_ext.cpp"), # weak func order
@@ -706,7 +706,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN, "Shield"), "d/d_particle_name.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_particle_copoly.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_path.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_drawlist.cpp"),
+            Object(Modded, "d/d_drawlist.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_kankyo_data.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_kankyo_wether.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_kankyo_rain.cpp"),
@@ -801,7 +801,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_meter_hakusha.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter_map.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter_string.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_meter2_draw.cpp"),
+            Object(Modded, "d/d_meter2_draw.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter2_info.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_meter2.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_out_font.cpp"),
@@ -828,8 +828,8 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_name.cpp"),
             Object(NonMatching, "d/d_npc_lib.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_ovlp_fade.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_ovlp_fade2.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_ovlp_fade3.cpp"),
+            Object(Modded, "d/d_ovlp_fade2.cpp"),
+            Object(Modded, "d/d_ovlp_fade3.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_pane_class.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_pane_class_alpha.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_pane_class_ex.cpp"),
@@ -1735,7 +1735,7 @@ config.libs = [
     ActorRel(Modded, "d_a_nbomb"), # weak func order
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_life_container"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_yousei"),
-    ActorRel(MatchingFor(ALL_GCN), "d_a_spinner"),
+    ActorRel(Modded, "d_a_spinner"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_suspend"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tag_attention"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_alldie"),

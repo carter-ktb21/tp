@@ -35,14 +35,16 @@ f32 daAlink_c::getSpinnerRideSpeedF() {
 }
 
 f32 daAlink_c::getSpinnerRideDecSpeedMax() const {
-    return mpHIO->mItem.mSpinner.m.mDecelSpeedMax;
+    // Clamp per-frame decel to keep real-time pacing consistent across framerates.
+    return mpHIO->mItem.mSpinner.m.mDecelSpeedMax * DELTA_TIME;
 }
 
 f32 daAlink_c::getSpinnerRideDecSpeedMin() const {
-    return mpHIO->mItem.mSpinner.m.mDecelSpeedMin;
+    return mpHIO->mItem.mSpinner.m.mDecelSpeedMin * DELTA_TIME;
 }
 
 f32 daAlink_c::getSpinnerRideDecSpeedRate() const {
+    // cLib_addCalc applies DELTA_TIME internally; keep rate unscaled to avoid double scaling.
     return mpHIO->mItem.mSpinner.m.mDecelRate;
 }
 
@@ -197,7 +199,8 @@ int daAlink_c::procSpinnerWait() {
         if (!itemButton()) {
             mProcVar2.field_0x300c = 1;
             mNormalSpeed = getSpinnerRideSpeedF();
-            spinner->setMove(mNormalSpeed, getSpinnerRideMoveTime());
+            s16 ride_ticks = (s16)(getSpinnerRideMoveTime() / DELTA_TIME + 0.5f);
+            spinner->setMove(mNormalSpeed, ride_ticks);
         } else if (checkInputOnR()) {
             int direction = getDirectionFromAngle(mStickAngle);
             s16 angle = field_0x33ac * 384.0f * field_0x33ac;

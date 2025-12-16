@@ -370,7 +370,7 @@ int daAlink_c::checkDemoAction() {
 
             field_0x2f98 = mDemo.getParam0();
             if (field_0x2f98 == 1) {
-                field_0x2fcc = 1;
+                field_0x2fcc = (u8)(1 * SCALE_TIME);
             }
 
             return procWolfSideStepInit(0);

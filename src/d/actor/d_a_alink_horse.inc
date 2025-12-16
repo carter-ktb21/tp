@@ -697,7 +697,7 @@ int daAlink_c::setSyncHorse(int param_0) {
                 if (doTrigger()) {
                     onResetFlg0(RFLG0_COW_GAME_LEASH);
                     voiceStart(Z2SE_AL_V_RUSH_HORSE);
-                    field_0x30a6 = mpHIO->mHorse.m.mWhipWaitTime;
+                    field_0x30a6 = (s16)(mpHIO->mHorse.m.mWhipWaitTime * SCALE_TIME);
                     setHorseSwordUpAnime();
                     field_0x3002 = -mpHIO->mHorse.m.mWhipWaitTime;
                 }
@@ -727,7 +727,7 @@ int daAlink_c::setSyncHorse(int param_0) {
                     onNoResetFlg1(FLG1_UNK_800);
                 }
 
-                field_0x30a6 = mpHIO->mHorse.m.mWhipWaitTime;
+                field_0x30a6 = (s16)(mpHIO->mHorse.m.mWhipWaitTime * SCALE_TIME);
             }
         }
     }
@@ -759,12 +759,12 @@ int daAlink_c::setSyncHorse(int param_0) {
                 field_0x3002 = 0;
             }
         } else {
-            field_0x30ec = mpHIO->mHorse.m.mSwordUpInterpolation;
+            field_0x30ec = (s16)(mpHIO->mHorse.m.mSwordUpInterpolation * SCALE_TIME);
             field_0x3002++;
 
             if (field_0x3002 == 0) {
                 resetUpperAnime(UPPER_2, mpHIO->mHorse.m.mSwordUpInterpolation);
-                field_0x30ec = mpHIO->mHorse.m.mSwordUpInterpolation;
+                field_0x30ec = (s16)(mpHIO->mHorse.m.mSwordUpInterpolation * SCALE_TIME);
             }
         }
     }
@@ -1466,15 +1466,15 @@ int daAlink_c::procHorseRide() {
                 onNoResetFlg1(FLG1_UNK_1000);
                 voiceStart(Z2SE_AL_V_RUSH_HORSE);
 
-                field_0x30a6 = mpHIO->mHorse.m.mWhipWaitTime;
-                field_0x3004 = mpHIO->mHorse.m.mWalkOutProhibitionTime;
+                field_0x30a6 = (s16)(mpHIO->mHorse.m.mWhipWaitTime * SCALE_TIME);
+                field_0x3004 = (s16)(mpHIO->mHorse.m.mWalkOutProhibitionTime * SCALE_TIME);
                 var_r26->onPlayerBackRideLash();
             }
         } else if (mProcVar2.field_0x300c == 0 && checkHorseRide()) {
             setSingleAnime(ANM_HORSE_WAIT_A, 1.0f, 9.0f, -1, 4.0f);
         }
     
-        field_0x2fb4 = 30;
+        field_0x2fb4 = (u8)(30 * SCALE_TIME);
 
         if (mProcVar3.field_0x300e != 0) {
             swordEquip(0);
@@ -2078,7 +2078,8 @@ int daAlink_c::procHorseCutChargeReadyInit() {
         resetUnderAnime(UNDER_2, -1.0f);
     }
 
-    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration;
+    // Scaled so the charge voice timing matches 30fps behavior at higher FPS.
+    mProcVar2.field_0x300c = mpHIO->mCut.m.mNormalSwingDuration * SCALE_TIME;
     field_0x3004 = 0;
     onNoResetFlg1(FLG1_UNK_10000000);
     return 1;

@@ -103,6 +103,19 @@ fi
 echo ""
 echo "[3/3] Creating ISO..."
 
+# ==========================================================
+# Patch DOL to enable full debug mode (revision byte = 0x91)
+# ==========================================================
+DOL_PATH="build/GZ2E01/sys/main.dol"
+
+if [ -f "$DOL_PATH" ]; then
+    echo "Patching DOL: enabling debug mode (0x91)..."
+    printf "\x91" | dd of="$DOL_PATH" bs=1 seek=4 count=1 conv=notrunc 2>/dev/null
+else
+    echo "⚠️ WARNING: main.dol not found, cannot apply debug patch"
+fi
+
+
 # Check if ISO needs rebuilding
 NEEDS_REBUILD=0
 if [ ! -f "$OUTPUT_ISO" ]; then
@@ -144,9 +157,9 @@ echo ""
 if [ -e "$DOLPHIN_PATH" ]; then
     echo "Launching Dolphin..."
     open -a "$DOLPHIN_PATH" "$OUTPUT_ISO"
+
+    # Close this terminal window after launching Dolphin
+    osascript -e 'tell application "Terminal" to close first window' &
 fi
 
-echo ""
-echo "Done! Press any key to close..."
-read -n 1 -s
 exit 0

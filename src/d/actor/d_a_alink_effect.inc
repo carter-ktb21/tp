@@ -1329,7 +1329,7 @@ void daAlink_c::setWolfBarrierHitEffect(dBgS_LinChk& param_0) {
     }
 
     mDoAud_seStart(Z2SE_OBJ_BARRIER_COLLISION, param_0.GetCrossP(), 0, 0);
-    field_0x3100 = 3;
+    field_0x3100 = (s16)(3 * SCALE_TIME);
 }
 
 void daAlink_c::setCutWaterDropEffect() {

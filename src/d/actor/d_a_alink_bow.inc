@@ -335,7 +335,7 @@ BOOL daAlink_c::checkUpperItemActionBow() {
                     dComIfGp_setItemArrowNumCount(-1);
                     mItemAcKeep.clearData();
                     onResetFlg0(RFLG0_UNK_20000000);
-                    field_0x30a4 = mpHIO->mItem.mBow.m.mBombArrowHoldTime;
+                    field_0x30a4 = (s16)(mpHIO->mItem.mBow.m.mBombArrowHoldTime * SCALE_TIME);
                 } else {
                     seStartOnlyReverb(Z2SE_AL_ARROW_EMPTY);
                 }

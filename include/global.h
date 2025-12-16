@@ -91,6 +91,26 @@ extern float g_targetFramerate;
 extern int g_shouldUpdateLogic;  // Always 1 (legacy; kept for compatibility)
 #define DELTA_TIME g_deltaTime
 #define SCALE_TIME g_scaleTime
+
+inline f32 ScaleHUDXRight(f32 baseX) {
+    #if WIDESCREEN_SUPPORT
+    const f32 screenCenter = 304.0f;
+    const f32 scale = 1.3f;
+    return -((baseX - screenCenter) * scale + screenCenter);
+    #else
+    return 1.0f;
+    #endif
+}
+inline f32 ScaleHUDXLeft(f32 baseX) {
+    #if WIDESCREEN_SUPPORT
+    const f32 screenCenter = 304.0f;
+    const f32 scale = 1.3f;
+    return (baseX - screenCenter) * scale + screenCenter;
+    #else
+    return 1.0f;
+    #endif
+}
+
 void updateDeltaTime();
 void setTargetFramerate(float fps);
 float getTargetFramerate();

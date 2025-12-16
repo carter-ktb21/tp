@@ -575,7 +575,7 @@ void dMeter2Draw_c::exec(u32 i_status) {
         {
             mButtonsPosX = g_drawHIO.mMainHUDButtonsPosX;
             mButtonsPosY = g_drawHIO.mMainHUDButtonsPosY;
-            mpButtonParent->paneTrans(g_drawHIO.mMainHUDButtonsPosX, g_drawHIO.mMainHUDButtonsPosY);
+            mpButtonParent->paneTrans(ScaleHUDXRight(g_drawHIO.mMainHUDButtonsPosX), g_drawHIO.mMainHUDButtonsPosY);
         }
 
         if (mButtonsScale != g_drawHIO.mMainHUDButtonsScale) {
@@ -1501,7 +1501,7 @@ void dMeter2Draw_c::drawLife(s16 i_maxLife, s16 i_life, f32 i_posX, f32 i_posY) 
         mpBigHeart->scale(g_drawHIO.mBigHeartScale, g_drawHIO.mBigHeartScale);
     }
 
-    mpLifeParent->paneTrans(i_posX, i_posY);
+    mpLifeParent->paneTrans(ScaleHUDXLeft(i_posX), i_posY);
 }
 
 void dMeter2Draw_c::setAlphaLifeChange(bool param_0) {
@@ -2029,7 +2029,7 @@ void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
     mpRupeeKeyParent->paneTrans(g_drawHIO.mRupeeKeyPosX, g_drawHIO.mRupeeKeyPosY);
 
     mpRupeeParent[0]->scale(g_drawHIO.mRupeeScale, g_drawHIO.mRupeeScale);
-    mpRupeeParent[0]->paneTrans(g_drawHIO.mRupeePosX, g_drawHIO.mRupeePosY);
+    mpRupeeParent[0]->paneTrans(ScaleHUDXRight(g_drawHIO.mRupeePosX), g_drawHIO.mRupeePosY);
 
     mpRupeeParent[1]->scale(g_drawHIO.mRupeeFramePosY, g_drawHIO.mRupeeFramePosY);
     mpRupeeParent[1]->paneTrans(g_drawHIO.mRupeeFrameScale, g_drawHIO.mRupeeFramePosX);
@@ -2607,7 +2607,7 @@ void dMeter2Draw_c::drawButtonCross(f32 i_posX, f32 i_posY) {
     mpButtonCrossParent->scale(g_drawHIO.mButtonCrossScale, g_drawHIO.mButtonCrossScale);
     mpTextI->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
     mpTextM->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
-    mpButtonCrossParent->paneTrans(i_posX, i_posY);
+    mpButtonCrossParent->paneTrans(ScaleHUDXLeft(i_posX), i_posY);
 }
 
 void dMeter2Draw_c::setAlphaButtonCrossAnimeMin() {

@@ -391,7 +391,7 @@ dDlst_GameOverScrnDraw_c::dDlst_GameOverScrnDraw_c(JKRArchive* i_archive) {
     gold_tbox->setFont(mDoExt_getSubFont());
 
     char string[64];
-    dMeter2Info_getString(0x381, string, NULL);
+    dMeter2Info_getString(0x381, string, NULL); // GAME OVER
     gold_tbox->setString(string);
 
     mpLight = new dMsgScrnLight_c(6, 0xFF);

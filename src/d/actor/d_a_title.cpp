@@ -192,7 +192,7 @@ void daTitle_c::loadWait_proc() {
         for (int i = 0; i < 7; i++) {
             text[i]->setFont(mpFont);
             text[i]->setString(0x80, "");
-            fopMsgM_messageGet(text[i]->getStringPtr(), 100);
+            fopMsgM_messageGet(text[i]->getStringPtr(), 100); // PRESS START
         }
 
         field_0x600 = new CPaneMgrAlpha(mTitle.Scr, 'n_all', 2, NULL);

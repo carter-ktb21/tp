@@ -2252,7 +2252,7 @@ bool daNpcWrestler_c::sumouReady(void* param_1) {
 
                 case 4:
                     if (field_0xe80++ > field_0xbd8->ready_appearance_time) {
-                        dMeter2Info_setMeterString(0x515);
+                        dMeter2Info_setMeterString(0x515); // READY?
                         Z2GetAudioMgr()->seStart(Z2SE_SY_SUMO_READY, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
                         field_0xe80 = 0;
                         field_0xe84++;
@@ -2261,7 +2261,7 @@ bool daNpcWrestler_c::sumouReady(void* param_1) {
 
                 case 5:
                     if (field_0xe80++ > field_0xbd8->fight_appearance_time) {
-                        dMeter2Info_setMeterString(0x516);
+                        dMeter2Info_setMeterString(0x516); // FIGHT!
                         Z2GetAudioMgr()->seStart(Z2SE_SY_SUMO_START, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
                         Z2GetAudioMgr()->changeSubBgmStatus(1);
                         dComIfGp_setDoStatus(21, 0);

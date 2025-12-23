@@ -1120,6 +1120,8 @@ static void demo_camera(b_gm_class* i_this) {
                 cLib_addCalc2(&i_this->field_0x1cdc, 1.0f, 1.0f, 0.05f);
 
                 if (i_this->mDemoModeTimer == 280) {
+                    /* {Tag - 7 bytes | Group FF | Name: size - pct = 82}Twilit Arachnid
+                       {Tag - 7 bytes | Group FF | Name: size - pct = 100}\nARMOGOHMA{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 90} */
                     fopMsgM_messageSetDemo(0x484);
                 }
 

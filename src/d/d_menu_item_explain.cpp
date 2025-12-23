@@ -469,15 +469,15 @@ void dMenu_ItemExplain_c::move_select_init() {
     cStack78[1] = 0;
 
     if (getWarpMarkFlag() == 0) {
-        field_0xc8 = 0x517;
+        field_0xc8 = 0x517; // Mark this room and exit?
         field_0xe2 = 0;
-        dMeter2Info_getString(0x518, local_88, NULL);
-        dMeter2Info_getString(0x519, local_80, NULL);
+        dMeter2Info_getString(0x518, local_88, NULL); // YES
+        dMeter2Info_getString(0x519, local_80, NULL); // NO
     } else {
-        field_0xc8 = 0x51A;
+        field_0xc8 = 0x51A; // Return to the marked room?
         field_0xe2 = 0;
-        dMeter2Info_getString(0x51B, local_88, NULL);
-        dMeter2Info_getString(0x51C, local_80, NULL);
+        dMeter2Info_getString(0x51B, local_88, NULL); // YES
+        dMeter2Info_getString(0x51C, local_80, NULL); // NO
     }
 
     f32 stringLength1 = dMeter2Info_getStringLength(mDoExt_getMesgFont(), mpSelect_c->getFontSize(),
@@ -564,7 +564,7 @@ void dMenu_ItemExplain_c::move_select_proc() {
 }
 
 void dMenu_ItemExplain_c::move_next_init() {
-    field_0xc8 = 0x51d;
+    field_0xc8 = 0x51d; // You cannot warp now.
     if (mpArrow != NULL) {
         mpArrow->arwAnimeInit();
     }
@@ -645,15 +645,15 @@ u8 dMenu_ItemExplain_c::openExplainDmap(u8 param_0, u8 param_1, u8 param_2, bool
         field_0xe1 = param_0;
         field_0xcc = itemNo + 0x165;
         if (dStage_stagInfo_GetSaveTbl(dComIfGp_getStageStagInfo()) == 0x14 && itemNo == 0x23) {
-            field_0xcc = 0x5bf;
+            field_0xcc = 0x5bf; // Mansion Map
         }
         if (itemNo == 0x25 && dComIfGs_isDungeonItemWarp(0x16)) {
-            field_0xcc = 0x251;
+            field_0xcc = 0x251; // Ooccoo
         }
         field_0xc8 = itemNo + 0x265;
         if (dMeter2Info_getRentalBombBag() != 0xff) {
             if (param_4 == dMeter2Info_getRentalBombBag() + 0xf) {
-                field_0xcc = 0x16d;
+                field_0xcc = 0x16d; // Lent Bomb Bag
                 if (dComIfGs_getBombNum(dMeter2Info_getRentalBombBag()) != 0) {
                     field_0xc8 = 0x26d;
                 } else {

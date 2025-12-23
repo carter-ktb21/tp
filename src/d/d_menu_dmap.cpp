@@ -518,8 +518,8 @@ void dMenu_DmapBg_c::setFloorMessage() {
     J2DTextBox* floor_textbox_2[8];
     J2DTextBox* floor_textbox_3[8];
     s16 floor_msg_no[13] = {
-        0,      0,      0x03DB, 0x03DA, 0x036B, 0x036C, 0x036D,
-        0x036E, 0x036F, 0x03DC, 0x03DD, 0x03D9, 0x03D8,
+        0,      0,      0x03DB /* 8F */, 0x03DA /* B2 */, 0x036B /* B1 */, 0x036C /* 1F */, 0x036D /* 2F */,
+        0x036E /* 3F */, 0x036F /* 4F */, 0x03DC /* 5F */, 0x03DD /* 6F */, 0x03D9 /* 7F */, 0x03D8 /* 8F */,
     };
 
     #if VERSION == VERSION_GCN_JPN
@@ -1659,12 +1659,12 @@ void dMenu_Dmap_c::_create() {
             mpDrawBg->setBButtonString(0x522);
         }
 
-        mCMessageNum = 0x37B;
-        mJMessageNum = 0x569;
+        mCMessageNum = 0x37B; // Move
+        mJMessageNum = 0x569; // Map Control
     } else {
         if (POINTER_OPT == 0) {
-            mpDrawBg->setAButtonString(0x527);
-            mpDrawBg->setBButtonString(0x3F9);
+            mpDrawBg->setAButtonString(0x527); // Zoom in
+            mpDrawBg->setBButtonString(0x3F9); // Back
         }
 
         mCMessageNum = 0;
@@ -2236,12 +2236,12 @@ void dMenu_Dmap_c::itemInfoCloseAnm() {
         m_itemSubProcess = 0;
 
         if (POINTER_OPT == 0) {
-            mpDrawBg->setBButtonString(0x3F9);
+            mpDrawBg->setBButtonString(0x3F9); // Back
         }
 
         if (mZoomState) {
-            mCMessageNum = 0x37B;
-            mJMessageNum = 0x569;
+            mCMessageNum = 0x37B; // Move
+            mJMessageNum = 0x569; // Map Control
         } else {
             mCMessageNum = 0;
             mJMessageNum = 0;
@@ -2520,9 +2520,9 @@ void dMenu_Dmap_c::zoomIn_proc() {
     if (temp_r30 == true && temp_r29 == true && temp_r28 == true) {
         mZoomState = 1;
         mpDrawBg->setAButtonString(0);
-        mpDrawBg->setBButtonString(0x522);
-        mCMessageNum = 0x37B;
-        mJMessageNum = 0x569;
+        mpDrawBg->setBButtonString(0x522); // Zoom out
+        mCMessageNum = 0x37B; // Move
+        mJMessageNum = 0x569; // Map Control
         field_0x17e = 0;
     }
 }
@@ -2548,8 +2548,8 @@ void dMenu_Dmap_c::zoomOut_proc() {
 
     if (temp_r30 == true && temp_r29 == true && temp_r28 == true) {
         mZoomState = 0;
-        mpDrawBg->setAButtonString(0x527);
-        mpDrawBg->setBButtonString(0x3F9);
+        mpDrawBg->setAButtonString(0x527); // Zoom in
+        mpDrawBg->setBButtonString(0x3F9); // Back
         mCMessageNum = 0;
         mJMessageNum = 0;
         field_0x17e = 0;

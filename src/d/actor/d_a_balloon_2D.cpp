@@ -210,8 +210,8 @@ int daBalloon2D_c::createHeap() {
     for (int i = 0; i < 2; i++) {
         combos[i]->setString(32, "");
         scores[i]->setString(32, "");
-        dMeter2Info_getStringKanji(0x53f, combos[i]->getStringPtr(), 0);
-        dMeter2Info_getStringKanji(0x53e, scores[i]->getStringPtr(), 0);
+        dMeter2Info_getStringKanji(0x53f, combos[i]->getStringPtr(), 0); // COMBO
+        dMeter2Info_getStringKanji(0x53e, scores[i]->getStringPtr(), 0); // SCORE
         combos[i]->setFont(mDoExt_getMesgFont());
         scores[i]->setFont(mDoExt_getMesgFont());
     }

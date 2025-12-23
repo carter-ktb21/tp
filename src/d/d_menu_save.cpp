@@ -171,8 +171,8 @@ void dMenu_save_c::screenSet() {
     static u64 l_tagName20[2] = {'er_for0', 'er_for1'};
 #endif
     static u64 l_tagName13[3] = {'w_dat_i0', 'w_dat_i1', 'w_dat_i2'};
-    static u8 l_msgNum0[2] = {0x08, 0x07};
-    static u8 l_msgNum[2] = {0x54, 0x55};
+    static u8 l_msgNum0[2] = {0x08 /* No */, 0x07 /* Yes */};
+    static u8 l_msgNum[2] = {0x54 /* Back */, 0x55 /* Confirm */};
 
     mSaveSel.Scr = new J2DScreen();
     mSaveSel.Scr->setPriority("zelda_file_select2.blo", 0x1100000, mpArchive);

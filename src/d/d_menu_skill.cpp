@@ -253,8 +253,8 @@ int dMenu_Skill_c::_close() {
 }
 
 void dMenu_Skill_c::wait_init() {
-    setAButtonString(0x40C);
-    setBButtonString(0x3f9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3f9); // Back
 }
 
 void dMenu_Skill_c::wait_move() {
@@ -320,7 +320,7 @@ void dMenu_Skill_c::read_open_move() {
 
 void dMenu_Skill_c::read_move_init() {
     setAButtonString(0);
-    setBButtonString(0x3f9);
+    setBButtonString(0x3f9); // Back
 }
 
 void dMenu_Skill_c::read_move_move() {

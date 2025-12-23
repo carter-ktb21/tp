@@ -1872,7 +1872,7 @@ dMeter_drawHIO_c::dMeter_drawHIO_c() {
 
     mButtonBaseAlpha = 0.55f;
 
-    mButtonATextActionID = 1001;
+    mButtonATextActionID = 1001; // "Let go"
     field_0x2cc = 1001;
     mButtonATextDebug = false;
 

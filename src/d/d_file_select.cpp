@@ -707,7 +707,7 @@ void dFile_select_c::dataSelectIn() {
             mSelFilePanes[i]->reinit();
         }
 
-        headerTxtSet(0x43, 1, 0);
+        headerTxtSet(0x43, 1, 0); // Choose a Quest Log
         mLastSelectNum = mSelectNum;
         mSelFilePanes[mSelectNum]->getPanePtr()->setAnimation((J2DAnmTransform*)mBaseMoveAnm);
         field_0x00e0[mSelectNum] = SelStartFrameTbl[mSelectNum];
@@ -792,15 +792,16 @@ static s32 YnSelEndFrameTbl[2] = {
 };
 
 static u16 msgTbl[3] = {
-    0x0040,
-    0x0041,
-    0x0042,
+    0x0040, // Quest Log 1
+    0x0041, // Quest Log 2
+    0x0042, // Quest Log 3
 };
 
 void dFile_select_c::dataSelectStart() {
     mSelIcon->setAlphaRate(0.0f);
 
     if (mIsNoData[mSelectNum]) {
+        // This Quest Log is corrupted. \nDo you want to erase its data? {Tag - 7 bytes | Group 00 | Name: boxatleast - frame_count = 30}
         headerTxtSet(0x52, 0, 0);
         selectDataMoveAnmInitSet(SelOpenStartFrameTbl[mSelectNum], SelOpenEndFrameTbl[mSelectNum]);
         yesnoMenuMoveAnmInitSet(0x473, 0x47d);
@@ -825,7 +826,7 @@ void dFile_select_c::dataSelectStart() {
 
         dComIfGs_setDataNum(mSelectNum);
         mDoAud_seStart(Z2SE_SY_NEW_FILE, NULL, 0, 0);
-        headerTxtSet(0x385, 1, 0);
+        headerTxtSet(0x385, 1, 0); // Enter name
         fileRecScaleAnmInitSet2(1.0f, 0.0f);
         nameMoveAnmInitSet(3359, 3369);
 
@@ -1198,13 +1199,13 @@ void dFile_select_c::menuSelectStart() {
     } else if (mSelectMenuNum == 0) {
         mSelIcon->setAlphaRate(0.0f);
         yesnoMenuMoveAnmInitSet(0x473, 0x47d);
-        headerTxtSet(0x49, 0, 0);
+        headerTxtSet(0x49, 0, 0); // Erase this Quest Log?
         mCommand = 1;
         mDataSelProc = DATASELPROC_TO_ERASE_PANE_MOVE;
     } else if (mSelectMenuNum == 2) {
         mCpDataNum = mSelectNum;
         menuMoveAnmInitSet(0x329, 799);
-        headerTxtSet(0x44, 0, 0);
+        headerTxtSet(0x44, 0, 0); // Copy to where?
         mSelIcon->setAlphaRate(0.0f);
         selectDataMoveAnmInitSet(SelOpenEndFrameTbl[mSelectNum], SelOpenStartFrameTbl[mSelectNum]);
         selectWakuAlpahAnmInit(mSelectNum, 0, 255, g_fsHIO.select_box_appear_frames);
@@ -1219,7 +1220,7 @@ void dFile_select_c::menuSelectCansel() {
     selectDataMoveAnmInitSet(SelOpenEndFrameTbl[mSelectNum], SelOpenStartFrameTbl[mSelectNum]);
     menuMoveAnmInitSet(0x329, 799);
     modoruTxtDispAnmInit(0);
-    headerTxtSet(0x43, 1, 0);
+    headerTxtSet(0x43, 1, 0); // Choose a Quest Log
     mSelIcon->setAlphaRate(0.0f);
     mDataSelProc = DATASELPROC_BACK_SELECT_MOVE;
 }
@@ -1416,7 +1417,7 @@ void dFile_select_c::nameInput() {
             mDataSelProc = DATASELPROC_MEMCARD_CHECK_MAIN;
             mCardCheckProc = MEMCARDCHECKPROC_STAT_CHECK;
         } else {
-            headerTxtSet(0x43, 1, 0);
+            headerTxtSet(0x43, 1, 0); // Choose a Quest Log
             fileRecScaleAnmInitSet2(0.0f, 1.0f);
             nameMoveAnmInitSet(0xd29, 0xd1f);
             modoruTxtDispAnmInit(0);
@@ -1466,7 +1467,7 @@ void dFile_select_c::nameInputFade() {
 
     if (mFadeTimer == 0) {
         char name[32];
-        headerTxtSet(900, 1, 1);
+        headerTxtSet(900, 1, 1); // Enter horse name
         dMeter2Info_getString(899, name, NULL);
         dComIfGs_setHorseName(name);
         mpName->setNextNameStr(dComIfGs_getHorseName());
@@ -1537,7 +1538,7 @@ void dFile_select_c::backNameInputMove0() {
     #endif
 
     if (mFadeTimer == 0) {
-        headerTxtSet(901, 1, 1);
+        headerTxtSet(901, 1, 1); // Enter name
         mpName->setNextNameStr(dComIfGs_getPlayerName());
         mpName->initial();
         modoruTxtChange(1);
@@ -1719,7 +1720,7 @@ void dFile_select_c::copyDataToSelectStart() {
     mSelIcon2->setAlphaRate(0.0f);
 
     if (mIsDataNew[mCpDataToNum] != 0) {
-        headerTxtSet(70, 0, 0);
+        headerTxtSet(70, 0, 0); // Copying...
         mpFileWarning->openInit();
         mCopyEfPane[mSelectNum]->getPanePtr()->scale(1.0f, 1.0f);
         mCopyEfPane[mSelectNum]->alphaAnimeStart(0);
@@ -1741,7 +1742,7 @@ void dFile_select_c::copyDataToSelectStart() {
         mDataSelProc = DATASELPROC_CMD_EXEC_PANE_MOVE0;
     } else {
         yesnoMenuMoveAnmInitSet(1139, 1149);
-        headerTxtSet(69, 0, 0);
+        headerTxtSet(69, 0, 0); // Overwrite with this Quest Log?
         mDataSelProc = DATASELPROC_COPY_TO_SEL_PANE_MOVE;
     }
 }
@@ -2125,7 +2126,7 @@ void dFile_select_c::yesNoSelectStart() {
 
         switch (mCommand) {
         case 1:
-            headerTxtSet(74, 0, 0);
+            headerTxtSet(74, 0, 0); // Erasing...
             mpFileWarning->openInit();
             mDeleteEfPane[mSelectNum]->getPanePtr()->scale(1.0f, 1.0f);
             mDeleteEfPane[mSelectNum]->alphaAnimeStart(0);
@@ -2138,7 +2139,7 @@ void dFile_select_c::yesNoSelectStart() {
             field_0x0208 = 1;
             break;
         case 2:
-            headerTxtSet(0x4a, 0, 0);
+            headerTxtSet(0x4a, 0, 0); // Erasing...
             mpFileWarning->openInit();
             mDeleteEfPane[mSelectNum]->getPanePtr()->scale(1.0f, 1.0f);
             mDeleteEfPane[mSelectNum]->alphaAnimeStart(0);
@@ -2150,7 +2151,7 @@ void dFile_select_c::yesNoSelectStart() {
             field_0x0208 = 1;
             break;
         case 0:
-            headerTxtSet(0x46, 0, 0);
+            headerTxtSet(0x46, 0, 0); // Copying...
             mpFileWarning->openInit();
             mCopyEfPane[mSelectNum]->getPanePtr()->scale(1.0f, 1.0f);
             mCopyEfPane[mSelectNum]->alphaAnimeStart(0);
@@ -2204,11 +2205,11 @@ void dFile_select_c::yesnoCancelAnmSet() {
         headerTxtSet(msgTbl[mSelectNum], 1, 0);
         break;
     case 2:
-        headerTxtSet(67, 1, 0);
+        headerTxtSet(67, 1, 0); // Choose a Quest Log
         selectDataMoveAnmInitSet(SelOpenEndFrameTbl[mSelectNum], SelOpenStartFrameTbl[mSelectNum]);
         break;
     case 0:
-        headerTxtSet(68, 0, 0);
+        headerTxtSet(68, 0, 0); // Copy to where?
         break;
     }
 
@@ -2380,6 +2381,7 @@ void dFile_select_c::DataEraseWait2() {
         mWaitTimer--;
     } else if (field_0x03b4 == 2) {
         mDoAud_seStart(Z2SE_SY_FILE_ERROR, NULL, 0, 0);
+        // An error might have occurred while\nerasing... {Tag - 7 bytes | Group 00 | Name: boxatleast - frame_count = 30}
         headerTxtSet(76, 0, 0);
         mpFileWarning->closeInit();
         modoruTxtDispAnmInit(1);
@@ -2410,6 +2412,7 @@ void dFile_select_c::ErasePaneMoveOk() {
         field_0x0208 = 0;
         setSaveData();
         makeRecInfo(mSelectNum);
+        // Erased. {Tag - 7 bytes | Group 00 | Name: boxatleast - frame_count = 30}
         headerTxtSet(0x4b, 0, 0);
         mpFileWarning->closeInit();
         mFileInfoNoDatBasePane[mSelectNum]->alphaAnimeStart(0);
@@ -2436,7 +2439,7 @@ void dFile_select_c::eraseEndBackSelectWait() {
         mWaitTimer--;
     } else if (mWaitTimer == 0) {
         selectDataMoveAnmInitSet(SelOpenEndFrameTbl[mSelectNum], SelOpenStartFrameTbl[mSelectNum]);
-        headerTxtSet(67, 1, 0);
+        headerTxtSet(67, 1, 0); // Choose a Quest Log
         ketteiTxtDispAnmInit(1);
         mDataSelProc = DATASELPROC_ERASE_END_BACK_SELECT;
     }
@@ -2484,6 +2487,7 @@ void dFile_select_c::DataCopyWait2() {
     } else {
         if (field_0x03b4 == 2) {
             mDoAud_seStart(Z2SE_SY_FILE_ERROR, NULL, 0, 0);
+            // An error might have occurred while\ncopying... {Tag - 7 bytes | Group 00 | Name: boxatleast - frame_count = 30}
             headerTxtSet(0x48, 0, 0);
             mpFileWarning->closeInit();
             modoruTxtDispAnmInit(1);
@@ -2514,6 +2518,7 @@ void dFile_select_c::copyPaneMoveOk() {
 
     if (iVar1 == true && iVar2 == true && iVar3 == true) {
         field_0x0209 = 0;
+        // Copy complete. {Tag - 7 bytes | Group 00 | Name: boxatleast - frame_count = 30}
         headerTxtSet(71, 0, 0);
         mpFileWarning->closeInit();
         setSaveData();
@@ -2971,11 +2976,11 @@ void dFile_select_c::screenSet() {
     ((J2DTextBox*)mModoruTxtPane->getPanePtr())->setString(32, "");
 
     mModoruStringPtr = ((J2DTextBox*)mModoruTxtPane->getPanePtr())->getStringPtr();
-    fopMsgM_messageGet(mModoruStringPtr, 0x54);
+    fopMsgM_messageGet(mModoruStringPtr, 0x54); // Back
     field_0x024c = 0;
 
     char ketteiTxtBuf[32];
-    fopMsgM_messageGet(ketteiTxtBuf, 0x55);
+    fopMsgM_messageGet(ketteiTxtBuf, 0x55); // Confirm
     ((J2DTextBox*)mKetteiTxtPane->getPanePtr())->setString(ketteiTxtBuf);
 
     void* bpk = JKRGetNameResource("zelda_file_select.bpk", mpArchive);
@@ -3279,7 +3284,7 @@ void dFile_select_c::screenSetYesNo() {
         'w_yes_g',
     };
     static u64 l_tagName11[2] = {'w_no_gr', 'w_yes_gr'};
-    static u8 l_msgNum2[2] = {0x08, 0x07};
+    static u8 l_msgNum2[2] = {0x08 /* No */, 0x07 /* Yes */};
 
     mYnSel.ScrYn = new J2DScreen();
     JUT_ASSERT(5435, mYnSel.ScrYn != NULL);
@@ -3342,7 +3347,7 @@ void dFile_select_c::screenSet3Menu() {
     static u64 l_tagName1[3] = {'w_sta_n', 'w_del_n', 'w_cop_n'};
     static u64 l_tagName011[3] = {'w_sta', 'w_del', 'w_cop_t'};
     static u64 l_tagName011U[3] = {'f_sta', 'f_del', 'f_cop_t'};
-    static u8 l_msgNum[3] = {0x57, 0x58, 0x56};
+    static u8 l_msgNum[3] = {0x57 /* Erase */, 0x58 /* Start */, 0x56 /* Copy */};
 
     m3mSel.Scr3m = new J2DScreen();
     JUT_ASSERT(5530, m3mSel.Scr3m != NULL);
@@ -3540,10 +3545,10 @@ bool dFile_select_c::headerTxtChangeAnm() {
 
 void dFile_select_c::modoruTxtChange(u8 param_1) {
     if (param_1 != 0) {
-        fopMsgM_messageGet(mModoruStringPtr, 981);
+        fopMsgM_messageGet(mModoruStringPtr, 981); // Clear
         field_0x024c = 1;
     } else {
-        fopMsgM_messageGet(mModoruStringPtr, 84);
+        fopMsgM_messageGet(mModoruStringPtr, 84); // Back
         field_0x024c = 0;
     }
 }
@@ -3861,7 +3866,7 @@ void dFile_select_c::errDispInitSet(int param_1, int param_2) {
         headerTxtSet(0xffff, 0, 0);
     } else {
         #if PLATFORM_GCN
-        headerTxtSet(1, 0, 0);
+        headerTxtSet(1, 0, 0); // Checking Memory Card in Slot A...
         #else
         headerTxtSet(1, 1, 0);
         #endif
@@ -4544,7 +4549,7 @@ void dFile_select_c::MemCardErrMsgWaitNoSaveSel() {
             mIsDataNew[i] = true;
         }
 
-        headerTxtSet(901, 1, 0);
+        headerTxtSet(901, 1, 0); // Enter name
         mSelIcon->setAlphaRate(1.0f);
     
         char namebuf[32];

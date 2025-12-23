@@ -3237,7 +3237,9 @@ static void demo_camera(b_gnd_class* i_this) {
         }
 
         if (i_this->mDemoCamTimer == 320) {
-            fopMsgM_messageSetDemo(1159);  // Dark Lord GANONDORF
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 82}Dark Lord
+               {Tag - 7 bytes | Group FF | Name: size - pct = 100}\nGANONDORF{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 90} */
+            fopMsgM_messageSetDemo(0x487);
         }
 
         if (i_this->mAnmID == B_GND_BCK_EGND_KAMAE && i_this->mpModelMorf->isStop()) {

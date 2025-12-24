@@ -390,7 +390,7 @@ int dMsgObject_c::_create(msg_class* param_1) {
     field_0x196 = 0;
     mMsgSendControl = 0;
     field_0x197 = 0;
-    mMessageID = 1000;
+    mMessageID = 1000; // Item Selection
     field_0x158 = mMessageID;
     field_0x15c = 0;
     field_0x172 = 0;
@@ -748,7 +748,7 @@ void dMsgObject_c::waitProc() {
                         mDoAud_seStart(Z2SE_SY_TALK_WIN_OPEN, 0, 0, 0);
                     }
                 } else {
-                    if (mMessageID >= 0x47f && mMessageID <= 0x487) {
+                    if (mMessageID >= 0x47f && mMessageID <= 0x487) { // If one of the boss name messages
                         setMessageIndexDemo(mMessageID, true);
                     } else {
                         setMessageIndex(mMessageID, field_0x15c, true);
@@ -1762,9 +1762,16 @@ bool dMsgObject_c::isHowlMessage() {
 }
 
 bool dMsgObject_c::isMidonaMessage() {
-    if (mFukiKind == 13 && (mpRefer->getMsgID() == 0x7d3 || mpRefer->getMsgID() == 0x7f6 ||
-                            mpRefer->getMsgID() == 0x7fa))
-    {
+    if (mFukiKind == 13 &&
+        (
+            /* What is it, {Tag - 5 bytes | Group 00 | Name: link}?{Tag - 5 bytes | Group 00 | Name: softnl} */
+            mpRefer->getMsgID() == 0x7d3 ||
+            /* Huh? What is it?{Tag - 5 bytes | Group 00 | Name: softnl} */
+            mpRefer->getMsgID() == 0x7f6 ||
+            /* What is it, {Tag - 5 bytes | Group 00 | Name: link}?{Tag - 5 bytes | Group 00 | Name: softnl} */
+            mpRefer->getMsgID() == 0x7fa
+        )
+    ) {
         return 1;
     }
     return 0;

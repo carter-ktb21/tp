@@ -1138,11 +1138,14 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         }
         if (i_this->field_0x754 >= 160) {
             if (i_this->field_0x754 == 160) {
-                i_this->mMsgFlow.init(actor, 0x321, 0, NULL);
+                i_this->mMsgFlow.init(actor, 0x321, 0, NULL); // Event Node | Args: 0x290
                 unkXyz_6c.set(-67.0f, 0.0f, 105.0f);
                 daPy_getPlayerActorClass()->setPlayerPosAndAngle(&unkXyz_6c, 0xffffe1c5, 0);
             }
             i_this->mMsgFlow.doFlow(actor, NULL, 0);
+            /* Hey! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}
+               You... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 20}
+               You've never been here\nbefore, have you? */
             if (i_this->mMsgFlow.getNowMsgNo() == 0x1f42) {
                 i_this->cam_mode = 11;
                 i_this->field_0x754 = -20;
@@ -1181,8 +1184,11 @@ static void demo_camera_shop(npc_henna_class* i_this) {
             if (i_this->field_0x5be == 1) {
                 i_this->field_0x5be = 2;
                 if (i_this->field_0x7b7 >= 4) {
+                    /* You...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 20} You caught ANOTHER Hylian\nloach?! */
                     i_this->mMsgFlow.init(actor, 0x354, 0, NULL);
                 } else {
+                    /* {Tag - 5 bytes | Group 00 | Name: instant}{Tag - 7 bytes | Group FF | Name: size - pct = 150}DEARIE ME!
+                       {Tag - 5 bytes | Group 00 | Name: type} */
                     i_this->mMsgFlow.init(actor, 0x353, 0, NULL);
                 }
                 anm_init(i_this, 18, -10.0f, 2, 1.0f);
@@ -1197,20 +1203,24 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                 /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d1])) {
                     if (i_this->field_0x709 != 0) {
-                        i_this->mMsgFlow.init(actor, 0x327, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x327, 0, NULL); // Event Node | Args: 0x1E
                         i_this->field_0x6ba = 90;
                     } else {
+                        /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n
+                           {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                         i_this->mMsgFlow.init(actor, 0x325, 0, NULL);
                     }
                     i_this->cam_mode = 20;
                     i_this->field_0x754 = 0;
                 } else {
                     if (i_this->field_0x709 != 0) {
-                        i_this->mMsgFlow.init(actor, 0x326, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x326, 0, NULL); // Branch Node
                         i_this->field_0x6ba = 90;
                     } else if (i_this->field_0x5bc == 0) {
-                        i_this->mMsgFlow.init(actor, 0x323, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x323, 0, NULL); // Event Node | Args: 0x0
                     } else {
+                        /* Ooh... It's about {Tag - 5 bytes | Group 05 | Name: thin-up-arrow}.\nSo um, wh-what do you wanna do?
+                           {Tag - 5 bytes | Group 00 | Name: softnl} */
                         i_this->mMsgFlow.init(actor, 0x324, 0, NULL);
                     }
                 }
@@ -1251,23 +1261,27 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     if (dComIfGs_getRupee() >= 20) {
                         /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d1])) {
-                            i_this->mMsgFlow.init(actor, 0x32e, 0, NULL);
+                            /* Oh, wow! That's a Hyrule bass!\nSizewise I'd say it's about\n
+                               {Tag - 5 bytes | Group 05 | Name: fish-length}, or so. */
+                            i_this->mMsgFlow.init(actor, 0x32E, 0, NULL);
                             /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d1]);
                             /* dSv_event_flag_c::F_0464 - Fishing Pond - Reserved for fishing */
                             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d0]);
                             data_80450CA0 = 1;
                         } else {
-                            i_this->mMsgFlow.init(actor, 0x32f, 0, NULL);
+                            i_this->mMsgFlow.init(actor, 0x32F, 0, NULL); // Event Node | Args: 0x0
                         }
                         dComIfGp_setItemRupeeCount(0xffffffec);
                         /* dSv_event_flag_c::F_0463 - Fishing Pond - Reserved for fishing */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1cf]);
                         i_this->field_0x5b6 = 1;
                     } else {
-                        i_this->mMsgFlow.init(actor, 0x332, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x332, 0, NULL); // Branch Node
                     }
                 } else {
+                    /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n
+                       {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                     i_this->mMsgFlow.init(actor, 0x331, 0, NULL);
                 }
             }
@@ -1310,6 +1324,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
                 if (dComIfGs_getRupee() >= 100) {
+                    /* This one's a record breaker, so\nyou can keep it if you like. What do\nyou say?
+                       {Tag - 5 bytes | Group 00 | Name: softnl} */
                     i_this->mMsgFlow.init(actor, 0x330, 0, NULL);
                     dComIfGp_setItemRupeeCount(-100);
                     /* dSv_event_flag_c::F_0463 - Fishing Pond - Reserved for fishing */
@@ -1319,7 +1335,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     data_80450CA0 = 1;
                     i_this->field_0x5b6 = 1;
                 } else {
-                    i_this->mMsgFlow.init(actor, 0x332, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x332, 0, NULL); // Branch Node
                 }
             }
             if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
@@ -1351,12 +1367,17 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 5) {
             if (i_this->field_0x754 == 5) {
                 if (i_this->field_0x7b5 > 25) {
-                    i_this->mMsgFlow.init(actor, 0x352, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x352, 0, NULL); // Event Node | Args: 0xF
                 } else {
                     if (i_this->field_0x7b5 > 5) {
+                        /* That size looks to be...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 30}
+                           {Tag - 5 bytes | Group 05 | Name: fish-length}...\n
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}Oh, too bad!
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} That's smaller than\nthe last one!
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} It's a waste, but you'll\nhave to let the little guy go... */
                         i_this->mMsgFlow.init(actor, 0x351, 0, NULL);
                     } else {
-                        i_this->mMsgFlow.init(actor, 0x350, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x350, 0, NULL); // Event Node | Args: 0xF
                     }
                 }
                 i_this->field_0x7b5 = 0;
@@ -1384,6 +1405,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         unkBool1 = TRUE;
         if (i_this->field_0x754 >= 5) {
             if (i_this->field_0x754 == 5) {
+                /* {Tag - 5 bytes | Group 00 | Name: instant}{Tag - 7 bytes | Group FF | Name: size - pct = 150}
+                   DEARIE ME!{Tag - 5 bytes | Group 00 | Name: type} */
                 i_this->mMsgFlow.init(actor, 0x322, 0, NULL);
             }
             if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
@@ -1461,93 +1484,112 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     }
 
                     if (unkInt1 == 0) {
+                        /* Ooh, that's a Hylian pike! Looks\nlike it's about {Tag - 5 bytes | Group 05 | Name: fish-length}. */
                         i_this->mMsgFlow.init(actor, 0x333, 0, NULL);
                     } else if (unkInt1 >= 4) {
+                        /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n
+                           {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                         i_this->mMsgFlow.init(actor, 0x336, 0, NULL);
+                    } else if (dComIfGs_getEventReg(check_kind[1]) >= 10) {
+                        /* This one's a record breaker, so\nyou can keep it if you like. What do\nyou say?
+                           {Tag - 5 bytes | Group 00 | Name: softnl} */
+                        i_this->mMsgFlow.init(actor, 0x335, 0, NULL);
                     } else {
-                        if (dComIfGs_getEventReg(check_kind[1]) >= 10) {
-                            i_this->mMsgFlow.init(actor, 0x335, 0, NULL);
-                        } else {
-                            i_this->mMsgFlow.init(actor, 0x334, 0, NULL);
-                        }
+                        i_this->mMsgFlow.init(actor, 0x334, 0, NULL); // Event Node | Args: 0x0
                     }
                     break;
                 case 2:
                     /* dSv_event_flag_c::F_0469 - Fishing Pond - Reserved for fishing */
                     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d5])) {
+                        /* Whoa! An Ordon catfish! And it's\n{Tag - 5 bytes | Group 05 | Name: fish-length}! */
                         i_this->mMsgFlow.init(actor, 0x338, 0, NULL);
                     } else {
-                        i_this->mMsgFlow.init(actor, 0x337, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x337, 0, NULL); // Branch Node
                     }
                     break;
                 case 3:
-                    i_this->mMsgFlow.init(actor, 0x339, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x339, 0, NULL); // Event Node | Args: 0x0
                     break;
                 case 4:
+                    /* This one's a record breaker, so\nyou can keep it if you like. What do\nyou say?{Tag - 5 bytes | Group 00 | Name: softnl} */
                     i_this->mMsgFlow.init(actor, 0x33a, 0, NULL);
                     break;
                 case 5:
+                    /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n{Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                     i_this->mMsgFlow.init(actor, 0x33b, 0, NULL);
                     data_80450C9D |= 0x80;
                     break;
                 case 6:
+                    /* And I saw the very moment you\nlanded it with my own eyes!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}\nIncredible! */
                     i_this->mMsgFlow.init(actor, 0x33d, 0, NULL);
                     break;
                 case 7:
-                    i_this->mMsgFlow.init(actor, 0x33e, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x33e, 0, NULL); // Event Node | Args: 0x0
                     break;
                 case 8: {
                     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
                     if (kankyo->raincnt == 0) {
                         hour = kankyo->daytime / 15.0f;
                         if (hour < 8 || hour > 16) {
-                            i_this->mMsgFlow.init(actor, 0x371, 0, NULL);
+                            i_this->mMsgFlow.init(actor, 0x371, 0, NULL); // Branch Node
                         } else {
-                            i_this->mMsgFlow.init(actor, 0x346, 0, NULL);
+                            i_this->mMsgFlow.init(actor, 0x346, 0, NULL); // Event Node | Args: 0x291
                         }
                     } else {
-                        i_this->mMsgFlow.init(actor, 0x347, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x347, 0, NULL); // Event Node | Args: 0xF
                     }
                     break;
                 }
                 case 0xb:
-                    i_this->mMsgFlow.init(actor, 0x35f, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x35f, 0, NULL); // Branch Node
                     break;
                 case 0xc:
+                    /* You...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 20} You caught ANOTHER Hylian\nloach?! */
                     i_this->mMsgFlow.init(actor, 0x344, 0, NULL);
                     break;
                 case 0xd:
-                    i_this->mMsgFlow.init(actor, 0x342, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x342, 0, NULL); // Event Node | Args: 0xF
                     break;
                 case 0xe:
+                    /* {Tag - 5 bytes | Group 00 | Name: instant}{Tag - 7 bytes | Group FF | Name: size - pct = 150}DEARIE ME!
+                       {Tag - 5 bytes | Group 00 | Name: type} */
                     i_this->mMsgFlow.init(actor, 0x343, 0, NULL);
                     break;
                 case 0xf:
-                    i_this->mMsgFlow.init(actor, 0x341, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x341, 0, NULL); // Branch Node
                     break;
                 case 0x10:
+                    /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n{Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                     i_this->mMsgFlow.init(actor, 0x340, 0, NULL);
                     break;
                 case 0x11:
+                    /* Sizewise it looks to be about...
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 30}\n{Tag - 5 bytes | Group 05 | Name: fish-length}!
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15} Hey!
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} That's bigger than\nmine! You'll keep it, right?
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}\nWon't you?!{Tag - 5 bytes | Group 00 | Name: softnl} */
                     i_this->mMsgFlow.init(actor, 0x33f, 0, NULL);
                     break;
                 case 0x12:
-                    i_this->mMsgFlow.init(actor, 0x33c, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x33c, 0, NULL); // Branch Node
                     break;
                 case 0x13:
                     /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll
                      * goal game cleared */
                     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x335])) {
-                        i_this->mMsgFlow.init(actor, 0x366, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x366, 0, NULL); // Event Node | Args: 0x290
                     } else {
                         dComIfGp_event_offHindFlag(0x80);
                         dComIfGp_setMessageCountNumber(
                             (s16)((s16)((lbl_82_bss_91 & 7) + (lbl_82_bss_91 >> 3) * 10) + 11));
                         if (lbl_82_bss_91 == 0) {
+                            /* Wh-{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}What are you doing...? */
                             i_this->mMsgFlow.init(actor, 0x348, 0, NULL);
                         } else if (lbl_82_bss_91 == 0x3f) {
+                            /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n{Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                             i_this->mMsgFlow.init(actor, 0x370, 0, NULL);
                         } else {
+                            /* Oh! A Hylian pike! */
                             i_this->mMsgFlow.init(actor, 0x34b, 0, NULL);
                         }
                     }
@@ -1594,7 +1636,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     }
     case 42: {
         if (i_this->field_0x754 == 1) {
-            i_this->mMsgFlow.init(actor, 0x349, 0, NULL);
+            i_this->mMsgFlow.init(actor, 0x349, 0, NULL); // Oh! A Hyrule bass!
         }
         if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
             i_this->cam_mode = 0x4b;
@@ -1604,6 +1646,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     }
     case 43: {
         if (i_this->field_0x754 == 1) {
+            /* I guess it's about {Tag - 5 bytes | Group 05 | Name: fish-length}...\nIt's a little on the small side, so\nyou ought to release it. */
             i_this->mMsgFlow.init(actor, 0x34a, 0, NULL);
             i_this->cam_mode = 42;
         }
@@ -1646,16 +1689,24 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 15) {
             if (i_this->field_0x754 == 15) {
                 if (data_80450C9A == 0) {
+                    /* Th-That... That's a legendary\n{Tag - 6 bytes | Group FF | Name: color - hue = 2}Hylian loach
+                       {Tag - 6 bytes | Group FF | Name: color - hue = 0}! */
                     i_this->mMsgFlow.init(actor, 0x328, 0, NULL);
                 } else if (data_80450C9B == 2) {
+                    /* You can't catch one just like that!\n{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}
+                       {Tag - 7 bytes | Group FF | Name: size - pct = 80}It... It's just not right... */
                     i_this->mMsgFlow.init(actor, 0x329, 0, NULL);
                 } else if (data_80450C9B == 3) {
+                    /* Amazing... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}
+                       From now on, I'm calling\nyou {Tag - 5 bytes | Group 00 | Name: link}, Fish Master! */
                     i_this->mMsgFlow.init(actor, 0x32a, 0, NULL);
                 } else if (data_80450C9B == 4) {
-                    i_this->mMsgFlow.init(actor, 0x32b, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x32b, 0, NULL); // Event Node | Args:0xF
                 } else if (data_80450C9B == 1) {
-                    i_this->mMsgFlow.init(actor, 0x32d, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x32d, 0, NULL); // Event Node | Args: 0x291
                 } else {
+                    /* Oh... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}Right... 
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}I got so excited,\nI forgot to measure your fish. */
                     i_this->mMsgFlow.init(actor, 0x32c, 0, NULL);
                 }
             }
@@ -1728,7 +1779,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         cLib_addCalc2(&i_this->field_0x7bc, 55.0f, 0.5f, 5.0f);
 
         if (i_this->field_0x754 == 0) {
-            i_this->mMsgFlow.init(actor, 0x355, 0, NULL);
+            i_this->mMsgFlow.init(actor, 0x355, 0, NULL); // Branch Node
             anm_init(i_this, 18, -10.0f, 2, 1.0f);
             i_this->field_0x688 = 2;
         }
@@ -1742,7 +1793,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     case 62: {
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
-                i_this->mMsgFlow.init(actor, 0x356, 0, NULL);
+                i_this->mMsgFlow.init(actor, 0x356, 0, NULL); // Event Node | Args: 0x291
             }
 
             if (i_this->field_0x754 == 5) {
@@ -1792,6 +1843,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 == 0x14) {
             mDoGph_gInf_c::fadeIn(0.1f, g_blackColor);
 
+            /* Aw, but it looks like it's only about\n{Tag - 5 bytes | Group 05 | Name: fish-length}... 
+               It's a little too small\nto keep now, so you ought to\nrelease it. */
             i_this->mMsgFlow.init(actor, 0x34c, 0, NULL);
 
             i_this->cam_mode = 71;
@@ -1879,12 +1932,15 @@ static void demo_camera_shop(npc_henna_class* i_this) {
             }
             if (i_this->field_0x754 == 10) {
                 if (actor->health == 0) {
+                    /* Ah!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Is that an Ordon catfish? */
                     i_this->mMsgFlow.init(actor, 0x34d, 0, NULL);
                 } else if (actor->health == 1) {
+                    /* {Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 1}Keep\n{Tag - 6 bytes | Group 00 | Name: oneof2 - choice = 2}Release */
                     i_this->mMsgFlow.init(actor, 0x364, 0, NULL);
                 } else if (actor->health == 2) {
-                    i_this->mMsgFlow.init(actor, 0x360, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x360, 0, NULL); // Event Node | Args: 0x290
                 } else {
+                    /* Are you going to keep this fish?{Tag - 5 bytes | Group 00 | Name: softnl} */
                     i_this->mMsgFlow.init(actor, 0x363, 0, NULL);
                 }
                 i_this->cam_mode = 74;
@@ -1950,23 +2006,32 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 == 10) {
              /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll goal game cleared */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x335])) {
+                /* Are you going to keep this fish?{Tag - 5 bytes | Group 00 | Name: softnl} */
                 i_this->mMsgFlow.init(actor, 0x36f, 0, NULL);
             } else {
                 if ((lbl_82_bss_91 & 7) == 0x7) {
                     if (lbl_82_bss_91 == 0x3f) {
-                        i_this->mMsgFlow.init(actor, 0x365, 0, NULL);
+                        i_this->mMsgFlow.init(actor, 0x365, 0, NULL); // Branch Node
                         /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll goal game cleared */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x335]);
                         dComIfGp_setItemRupeeCount(1000);
                     } else if ((lbl_82_bss_91 & 0x38) == 0) {
+                        /* And I saw the very moment you\nlanded it with my own eyes!
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}\nIncredible! */
                         i_this->mMsgFlow.init(actor, 0x34f, 0, NULL);
                         /* dSv_event_flag_c::F_0469 - Fishing Pond - Reserved for fishing */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d5]);
                     } else {
+                        /* And I saw the very moment you\nlanded it with my own eyes!
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}\nIncredible! */
                         i_this->mMsgFlow.init(actor, 0x34f, 0, NULL);
                         dComIfGp_setItemRupeeCount(10);
                     }
                 } else {
+                    /* It's roughly {Tag - 5 bytes | Group 05 | Name: fish-length}, huh?
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} That's\ntoo small.
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Release it!
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Release! */
                     i_this->mMsgFlow.init(actor, 0x34e, 0, NULL);
                     dComIfGp_setItemRupeeCount(10);
                 }
@@ -2083,6 +2148,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         i_this->field_0x7b9 = 0;
         if (i_this->field_0x754 >= 2) {
             if (i_this->field_0x754 == 2) {
+                /* Aw, but it looks like it's only about\n{Tag - 5 bytes | Group 05 | Name: fish-length}... 
+                   It's a little too small\nto keep now, so you ought to\nrelease it. */
                 i_this->mMsgFlow.init(actor, 0x34c, 0, NULL);
                 __memcpy(unkIntArr2, unkLimitsMs2, sizeof(unkLimitsMs2));
                 dTimer_createTimer(6, unkIntArr2[0], 1, 0, 210.0f, 410.0f, 32.0f, 419.0f);
@@ -2127,7 +2194,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         cLib_addCalc2(&i_this->field_0x7bc, 25.0f + TREG_F(12), 0.1f, 0.2f);
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
-                i_this->mMsgFlow.init(actor, 0x362, 0, NULL);
+                i_this->mMsgFlow.init(actor, 0x362, 0, NULL); // Event Node | Args: 0x0
             }
             if (i_this->field_0x754 == 15) {
                 i_this->field_0x688 = 2;
@@ -2214,21 +2281,26 @@ static void message_guide(npc_henna_class* i_this) {
                 if (i_this->field_0x7d5 != 0 &&
                     (i_this->field_0x7d6 == 0 || (i_this->field_0x5bc & 0x3) == 0))
                 {
-                    i_this->mMsgFlow.init(actor, 0x3c3, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x3c3, 0, NULL); // Branch Node
                     i_this->field_0x7d5 = 0x0;
                     i_this->field_0x7d6 = 0x1;
                 } else if (i_this->demo_timer != 0) {
                     i_this->demo_timer = 0;
+                    /* Some people just don't know their\nmanners... */
                     i_this->mMsgFlow.init(actor, 0x3cc, 0, NULL);
                 } else if (i_this->field_0x7cc == 0) {
                     if (i_this->field_0x5bc < 4) {
+                        /* There's so much trash out here,\nsometimes folks reel it in when\nthey're trying to fish! */
                         i_this->mMsgFlow.init(actor, 0x3cd, 0, NULL);
                     } else if ((i_this->field_0x5bc & 1) != 0) {
+                        /* There's so much trash out here,\nsometimes folks reel it in when\nthey're trying to fish! */
                         i_this->mMsgFlow.init(actor, 0x3cd, 0, NULL);
                     } else {
+                        /* People who can't be nice to Mother\nNature will never make good\nfishermen, y'know... */
                         i_this->mMsgFlow.init(actor, 0x3ce, 0, NULL);
                     }
                 } else {
+                    /* People who can't be nice to Mother\nNature will never make good\nfishermen, y'know... */
                     i_this->mMsgFlow.init(actor, 0x3ce, 0, NULL);
                 }
             }

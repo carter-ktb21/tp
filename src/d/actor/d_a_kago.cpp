@@ -2384,7 +2384,7 @@ void daKago_c::initFirstDemo() {
     }
     case 2: {
         field_0x728 = 60;
-        mMsgFlow.init(this, 0x7d3, 0, NULL);
+        mMsgFlow.init(this, 0x7d3, 0, NULL); // b'\x00Hey! Stop it!'
 
         break;
     }
@@ -2580,12 +2580,14 @@ bool daKago_c::executeFirstDemo() {
                 setBck(0xf, 0x02, 20.0f, 1.0f);
             }
 
+            /* I'm your new master now!\nSettle down! */
             if (mMsgFlow.getNowMsgNo() == 0x1774) {
                 setBck(0xf, 0x02, 20.0f, 1.0f);
                 field_0x728 = 0;
             }
         }
 
+        /* Hey!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Why don't we use this guy to\nget us all the way to the lake's\nwater source? */
         if (mMsgFlow.getNowMsgNo() == 0x1775) {
             field_0x748 = 3;
 

@@ -11,6 +11,7 @@ from gclib.rarc import RARC
 from io import BytesIO
 from typing import List, Union
 from pathlib import Path
+import xml.etree.ElementTree as ET
 # import shutil
 
 
@@ -447,8 +448,9 @@ def string_cleanup(data: bytes) -> str:
         b = data[i]
 
         if b == 0x00:
-            b = data[i + 1]
-            i += 1
+            if i + 1 < len(data):
+                b = data[i + 1]
+                i += 1
 
         if b == 0x1A:
             out.append("{Tag - ")
@@ -569,10 +571,20 @@ def string_cleanup(data: bytes) -> str:
                             i += 4
                             continue
 
+                        case 0x2C:
+                            out.append("warp-point}")
+                            i += 2
+                            continue
+
                         case 0x36:
                             out.append("boxatleast - frame_count = ")
                             i += 2
                             out.append(f"{(data[i] << 8) | data[i + 1]}" + "}")
+                            i += 2
+                            continue
+
+                        case 0x3B:
+                            out.append("returned-bug")
                             i += 2
                             continue
 
@@ -617,6 +629,10 @@ def string_cleanup(data: bytes) -> str:
     return "".join(out)
 
 
+def bytes_to_int(data: bytes) -> int:
+    return int.from_bytes(data, byteorder='big')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("vanilla_iso_path", nargs="?", default="orig/GZ2E01/baserom.iso", help="Path to a vanilla Twilight Princess ISO to use as a base.")
@@ -626,7 +642,7 @@ def main():
 
     args = parser.parse_args()
     # decomp_build_path = args.decomp_repo_path / "build/GZ2E01"
-    output_path = args.output_path
+    # output_path = args.output_path
 
     gcm = GCM(args.vanilla_iso_path)
     gcm.read_entire_disc()
@@ -653,34 +669,113 @@ def main():
     for entry in bmg_files:
         bmgs.append(parse_bmg(entry.data, entry.name))
 
-    # data = bmgs[1].to_bytes()
-    # for i, byte in enumerate(data):
-    #     print(f"{byte:02X} ", end="")
-    #     if (i + 1) % 16 == 0:
-    #         print()
-    while True:
-        print("--------------------\n" +
-              "1) Search by message ID\n" +
-              "2) Search by phrase\n" +
-              "3) Rebuild bmg files\n" +
-              "4) Cancel\n" +
-              "--------------------\n")
-        choice = int(input("Enter menu choice: "))
-        match choice:
-            case 1:
-                msg_id_target = int(input("Enter msgId (hex): "), 16)
-                for bmg in bmgs:
-                    for dat1_entry in bmg.dat1_section.entries:
-                        if dat1_entry.msgId == msg_id_target:
-                            print(f"\n{bmg.name}")
-                            print(f"{string_cleanup(dat1_entry.message)}\n")
+    # Search Tool
+    # while True:
+    #     print("--------------------\n" +
+    #           "1) Search by message ID\n" +
+    #           "2) Search by Flow ID\n" +
+    #           "3) Rebuild bmg files\n" +
+    #           "4) Cancel\n" +
+    #           "--------------------\n")
+    #     choice = int(input("Enter menu choice: "))
+    #     match choice:
+    #         case 1:
+    #             msg_id_target = int(input("Enter msgId (hex): "), 16)
+    #             for bmg in bmgs:
+    #                 for dat1_entry in bmg.dat1_section.entries:
+    #                     if dat1_entry.msgId == msg_id_target:
+    #                         print(f"\n{bmg.name}")
+    #                         print(f"{string_cleanup(dat1_entry.message)}\n")
 
-            case 3:
-                for bmg in bmgs:
-                    bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
+    #         case 2:
+    #             flow_id_target = int(input("Enter flow ID (hex): "), 16)
+    #             for bmg in bmgs:
+    #                 for fli1_entry in bmg.fli1_section.entries:
+    #                     if bytes_to_int(fli1_entry.id) == flow_id_target:
+    #                         flw1_idx = bytes_to_int(fli1_entry.flw1_idx)
+    #                         if flw1_idx < len(bmg.flw1_section.flow_nodes):
+    #                             node = bmg.flw1_section.flow_nodes[flw1_idx]
+    #                             type = bytes_to_int(node.type)
+    #                             match type:
+    #                                 case 1:
+    #                                     inf1_idx = bytes_to_int(node.inf1_index)
+    #                                     dat1_offset = bmg.inf1_section.entries[inf1_idx].dat1_offset
+    #                                     for dat1_entry in bmg.dat1_section.entries:
+    #                                         if dat1_entry.offset == dat1_offset:
+    #                                             print(f"{bmg.name}\n{string_cleanup(dat1_entry.message)}\n")
 
-            case 4:
-                break
+    #                                 case 2:
+    #                                     query_param = node.parameter
+    #                                     indirection_offset = node.indirection_tbl_offset
+    #                                     print(f"{bmg.name}\nBranch Node | Query Func Idx - 0x{node.query_func_idx.hex()} | Query Func Param - 0x{query_param.hex()} | Indirection Table Offset - 0x{indirection_offset.hex()}\n")
+
+    #                                 case 3:
+    #                                     event_func_params = node.arguments
+    #                                     indirection_idx = node.indirection_tbl_idx
+    #                                     print(f"{bmg.name}\nEvent Node | Event Func Idx - 0x{node.event_func_idx.hex()} | Event Func Params - 0x{event_func_params.hex()} | Indirection Table Idx - 0x{indirection_idx.hex()}\n")
+
+    #         case 3:
+                # for bmg in bmgs:
+                #     bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
+
+    # Editor
+    class BMG_Entry:
+        def __init__(self):
+            self.bmg_name = ""
+            self.edit_msg_flag = False
+            self.msgId = int()
+            self.message = bytes(0)
+
+    BASE_DIR = Path(__file__).resolve().parent
+    xml_path = BASE_DIR / "custom_text.xml"
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    bmg_entries: List[BMG_Entry] = []
+
+    # Parse XML for bmg entries
+    i = 0
+    for msg in root.findall("message"):
+        entry = BMG_Entry()
+        entry.bmg_name = msg.findtext("bmg_file")
+        entry.edit_msg_flag = msg.find("edit_message") == "true"
+        text = msg.findtext("msgId")
+        if text:
+            entry.msgId = (int(text, 16)).to_bytes(2, 'big')
+        entry.message = b'\x00'
+        text = msg.findtext("new_message")
+        if text:
+            entry.message += bytes(msg.findtext("new_message").encode('utf-8'))
+        bmg_entries.insert(i, entry)
+        i += 1
+
+    for bmg in bmgs:
+        for new_entry in bmg_entries:
+            if new_entry.bmg_name == bmg.name:
+                # Edit the message with the msgId denoted in custom_text.xml
+                # Additionally, edit that message entries' offset, along with every other offset after that entry. And edit the total bmg file size value
+                message_changed_flag = False
+                for i in range(bytes_to_int(bmg.inf1_section.num_entries)):
+                    if message_changed_flag is False:
+                        if bmg.inf1_section.entries[i].msg_id == new_entry.msgId:
+                            bmg.inf1_section.entries[i + 1].dat1_offset = bytes(bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(new_entry.message))
+                            for dat1_entry in bmg.dat1_section.entries:
+                                if dat1_entry.offset == bmg.inf1_section.entries[i].dat1_offset:
+                                    file_size = bytes_to_int(bmg.file_size)
+                                    file_size -= len(dat1_entry.message)
+                                    dat1_entry.message = new_entry.message
+                                    dat1_entry.message_length = len(new_entry.message)
+                                    file_size += len(dat1_entry.message)
+                                    bmg.file_size = bytes(file_size)
+                            message_changed_flag = True
+                    else:
+                        message = bytes(0)
+                        for dat1_entries in bmg.dat1_section.entries:
+                            if dat1_entries.offset == bmg.inf1_section.entries[i].dat1_offset:
+                                message = dat1_entries.message
+                        bmg.inf1_section.entries[i + 1].dat1_offset = bytes(bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(message))
+
+    for bmg in bmgs:
+        bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
 
 
 if __name__ == "__main__":

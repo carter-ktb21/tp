@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<messages>
+    <message>
+        <edit_message>true</edit_message>
+        <msgId>0x381</msgId>
+        <bmg_file>zel_00.bmg</bmg_file>
+        <new_message>YOU SUCK</new_message>
+    </message>
+    <message>
+        <edit_message>true</edit_message>
+        <bmg_file>zel_00.bmg</bmg_file>
+        <string>Hello World2</string>
+    </message>
+    <message>
+        <edit_message>true</edit_message>
+        <bmg_file>zel_00.bmg</bmg_file>
+        <string>Hello World3</string>
+    </message>
+    <message>
+        <edit_message>true</edit_message>
+        <bmg_file>zel_00.bmg</bmg_file>
+        <string>Hello World4</string>
+    </message>
+</messages>

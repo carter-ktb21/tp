@@ -754,10 +754,11 @@ def main():
                 # Edit the message with the msgId denoted in custom_text.xml
                 # Additionally, edit that message entries' offset, along with every other offset after that entry. And edit the total bmg file size value
                 message_changed_flag = False
-                for i in range(bytes_to_int(bmg.inf1_section.num_entries)):
+                for i in range(bytes_to_int(bmg.inf1_section.num_entries) - 1):
                     if message_changed_flag is False:
                         if bmg.inf1_section.entries[i].msg_id == new_entry.msgId:
-                            bmg.inf1_section.entries[i + 1].dat1_offset = bytes(bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(new_entry.message))
+                            new_offset = bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(new_entry.message)
+                            bmg.inf1_section.entries[i + 1].dat1_offset = new_offset.to_bytes(4, 'big')
                             for dat1_entry in bmg.dat1_section.entries:
                                 if dat1_entry.offset == bmg.inf1_section.entries[i].dat1_offset:
                                     file_size = bytes_to_int(bmg.file_size)
@@ -765,17 +766,20 @@ def main():
                                     dat1_entry.message = new_entry.message
                                     dat1_entry.message_length = len(new_entry.message)
                                     file_size += len(dat1_entry.message)
-                                    bmg.file_size = bytes(file_size)
+                                    bmg.file_size = file_size.to_bytes(4, 'big')
                             message_changed_flag = True
                     else:
-                        message = bytes(0)
                         for dat1_entries in bmg.dat1_section.entries:
-                            if dat1_entries.offset == bmg.inf1_section.entries[i].dat1_offset:
+                            if i == bytes_to_int(bmg.inf1_section.num_entries) - 1:
+                                break
+                            if bytes_to_int(dat1_entries.offset) > new_offset:
                                 message = dat1_entries.message
-                        bmg.inf1_section.entries[i + 1].dat1_offset = bytes(bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(message))
+                                new_offset = bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(message)
+                                bmg.inf1_section.entries[i + 1].dat1_offset = new_offset.to_bytes(4, 'big')
+                                i += 1
 
     for bmg in bmgs:
-        bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
+        bmg.rebuild_bmg(Path(f"C:/Users/Carter/Twilight_Princess/BMG_Test/{bmg.name}"))
 
 
 if __name__ == "__main__":

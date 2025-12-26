@@ -122,8 +122,7 @@ cPhs__Step daNpcAshB_c::Create() {
 
     /* dSv_event_flag_c::F_0361 - Arbiter's Grounds - Spun the spinning pillars */
     if (!daNpcF_chkEvtBit(0x169)
-        /* dSv_event_flag_c::F_0335 - Snowpeak mountain - Obtained scribble from Ashei at mountain
-           pass */
+        /* dSv_event_flag_c::F_0335 - Snowpeak mountain - Obtained scribble from Ashei at mountain pass */
         || daNpcF_chkEvtBit(0x14F))
     {
         return cPhs_ERROR_e;
@@ -760,6 +759,7 @@ bool daNpcAshB_c::wait(void* param_0) {
                     } else {
                         u8 preitemno = dComIfGp_event_getPreItemNo();
                         if (preitemno == fpcNm_ITEM_ASHS_SCRIBBLING) {
+                            /* The sketch turned out pretty good,\nthough, yeah? Tell you what... You can\nhave it. */
                             mFlowID = 504;
                             setAction(&daNpcAshB_c::talk);
                         } else {

@@ -116,7 +116,7 @@ private:
     /* 0x1A68 */ int field_0x1a68;
     /* 0x1A6C */ int field_0x1a6c;
     /* 0x1A70 */ int field_0x1a70;
-    /* 0x1A74 */ int mMsgNo;
+    /* 0x1A74 */ int mMsgFlowNo;
     /* 0x1A78 */ s16 mLookMode;
     /* 0x1A7A */ u16 mMode;
     /* 0x1A7C */ u8 mType;

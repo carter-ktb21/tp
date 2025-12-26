@@ -159,7 +159,7 @@ public:
     /* 0x916 */ s16 field_0x916;
     /* 0x918 */ s16 field_0x918;
     /* 0x91A */ s16 field_0x91A;
-    /* 0x91C */ u16 field_0x91C;
+    /* 0x91C */ u16 mFlowNodeNo;
     /* 0x91E */ u16 field_0x91E;
     /* 0x920 */ s16 field_0x920;
     /* 0x922 */ s16 field_0x922;

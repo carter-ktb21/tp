@@ -2113,10 +2113,13 @@ void daNPC_TK_c::executeWolfPerch() {
                 dComIfGp_roomControl_getStayNo() == 0 && dComIfG_play_c::getLayerNo(0) == 1)
             {
                 field_0x6eb = 1;
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02ec | Indirection Table Offset - 0x00d8 */
                 mMsgFlow.init(this, 0xbcc, 0, NULL);
             } else if (field_0x6eb == 0) {
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02ec | Indirection Table Offset - 0x00de */
                 mMsgFlow.init(this, 0xbce, 0, NULL);
             } else {
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02ec | Indirection Table Offset - 0x00db */
                 mMsgFlow.init(this, 0xbcd, 0, NULL);
             }
 

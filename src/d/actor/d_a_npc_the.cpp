@@ -808,15 +808,18 @@ BOOL daNpcThe_c::talk(void* param_0) {
         }
 
         if (bvar1) {
-            int local_24[2] = {-1, -1};
+            int msgID[2] = {-1, -1};
+            /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x00c4 */
             if (mFlowID == 0x430) {
-                local_24[0] = 0x13ef;
+                /* Well, there's no accounting for the\nfoolishness of a man. And at least I\nunderstand Ilia's situation now. */
+                msgID[0] = 0x13EF;
             }
-            if (talkProc(local_24, 1, NULL)) {
+            if (talkProc(msgID, 1, NULL)) {
                 if (!mFlow.checkEndFlow()) {
                     daPy_getPlayerActorClass()->changeOriginalDemo();
                     daPy_getPlayerActorClass()->changeDemoMode(6, 0, 1, 0);
                 } else {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x00c4 */
                     if (mFlowID == 0x430) {
                         daPy_getPlayerActorClass()->cancelOriginalDemo();
                     }
@@ -839,6 +842,7 @@ BOOL daNpcThe_c::talk(void* param_0) {
 
         if (ret) {
             mMode = 3;
+            /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x00c4 */
             if (mFlowID == 0x430) {
                 if (!field_0xe1d) {
                     field_0xe1d = true;
@@ -1204,6 +1208,7 @@ BOOL daNpcThe_c::doEvent() {
                 }
                 u8 item_no = dComIfGp_event_getPreItemNo();
                 if (item_no == 0x80) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x00c4 */
                     mFlowID = 0x430;
                     if (chkAction(&daNpcThe_c::talk)) {
                         (this->*mpActionFn)(NULL);
@@ -1211,6 +1216,7 @@ BOOL daNpcThe_c::doEvent() {
                         setAction(&daNpcThe_c::talk);
                     }
                 } else if (item_no == 0x81) {
+                    /* You go ahead and show this to the\nmedical professor, OK, honey?\nThen you'll see its magical effect! */
                     mFlowID = 0x431;
                     if (chkAction(&daNpcThe_c::talk)) {
                         (this->*mpActionFn)(NULL);

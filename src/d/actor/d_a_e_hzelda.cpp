@@ -932,6 +932,8 @@ static int daE_HZELDA_Execute(e_hzelda_class* i_this) {
     if (i_this->mMsgSetTimer != 0) {
         i_this->mMsgSetTimer--;
         if (i_this->mMsgSetTimer == 0) {
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 82}Ganon's Puppet{Tag - 7 bytes | Group FF | Name: size - pct = 100}\nZELDA
+               {Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 90} */
             fopMsgM_messageSetDemo(0x490);
         }
     }

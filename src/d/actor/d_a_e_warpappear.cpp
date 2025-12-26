@@ -529,6 +529,7 @@ static void demo_camera(e_warpappear_class* i_this) {
         if (strcmp(dComIfGp_getStartStageName(), "F_SP104") == 0) {
             if (i_this->field_0x5a0 >= 40) {
                 if (i_this->field_0x5a0 == 40) {
+                    /* {Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60}Beware... A shadow being...\nIt approaches... */
                     i_this->mMsgFlow.init(i_this, 0xbba, 0, NULL);
                 }
 

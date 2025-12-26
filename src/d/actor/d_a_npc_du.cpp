@@ -645,8 +645,10 @@ static cPhs__Step daNpc_Du_Create(fopAc_ac_c* a_this) {
         a_this->current.angle.x = a_this->shape_angle.x = 0;
 
         if (i_this->arg0 == 1) {
+            /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02de | Indirection Table Offset - 0x01eb */
             i_this->mMsgFNo = 0x2EF;
         } else {
+            /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02df | Indirection Table Offset - 0x01ee */
             i_this->mMsgFNo = 0x2F0;
         }
 

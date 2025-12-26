@@ -1289,7 +1289,8 @@ void dMenu_Fmap_c::portal_demo1_init() {
     mpDraw2DTop->set3DStickString(0);
     mpDraw2DTop->setCrossLRString(0);
     dMsgObject_setTalkHeap(mpTalkHeap);
-    mMsgFlow.init(NULL, 3005, 0, NULL);
+    /* Event Node | Event Func Idx - 0x00 | Event Func Params - 0x00360000 | Indirection Table Idx - 0x002a */
+    mMsgFlow.init(NULL, 0xBBD, 0, NULL);
     mZoomLevel = 10;
 }
 
@@ -1297,7 +1298,11 @@ void dMenu_Fmap_c::portal_demo1_move() {
     talkButton();
     mMsgFlow.doFlow(NULL, NULL, 0);
 
-    if (dMsgObject_getMessageID() >= 2008 || mZoomLevel < 10) {
+    /* Whenever you destroy those\ncreatures from the darkness, a\nportal opens that looks like this\non the map: 
+       {Tag - 5 bytes | Group 00 | Name: warp-point}.\nYou hear me? It's called a {Tag - 6 bytes | Group FF | Name: color - hue = 1}portal
+       {Tag - 6 bytes | Group FF | Name: color - hue = 0}.\nYou'd better remember that! */
+    if (dMsgObject_getMessageID() >= 2008 ||
+        mZoomLevel < 10) {
         if (mZoomLevel == 10) {
             Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_ZOOMOUT, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
         }
@@ -1323,6 +1328,7 @@ void dMenu_Fmap_c::portal_demo2_move() {
     talkButton();
     mMsgFlow.doFlow(NULL, NULL, 0);
 
+    /* And...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}in those woods we came\nthrough... */
     if (dMsgObject_getMessageID() >= 2009) {
         mpDraw2DBack->setRegionCursor(1);
         setProcess(PROC_PORTAL_DEMO3);
@@ -1342,7 +1348,9 @@ void dMenu_Fmap_c::portal_demo3_move() {
     talkButton();
     mMsgFlow.doFlow(NULL, NULL, 0);
 
-    if (dMsgObject_getMessageID() >= 2010 || mZoomLevel > 0) {
+    /* Yes! It's got to be around there... */
+    if (dMsgObject_getMessageID() >= 2010 ||
+        mZoomLevel > 0) {
         if (mZoomLevel == 0) {
             readWorldData(mpDraw2DBack->getRegionCursor() + 1);
             Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_ZOOMIN, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
@@ -1440,14 +1448,16 @@ void dMenu_Fmap_c::yamiboss_demo1_init() {
     mpDraw2DTop->set3DStickString(0);
     mpDraw2DTop->setCrossLRString(0);
     dMsgObject_setTalkHeap(mpTalkHeap);
-    mMsgFlow.init(NULL, 3012, 0, NULL);
+    /* There should be one more... Where\ncould the last {Tag - 6 bytes | Group FF | Name: color - hue = 1}tear{Tag - 6 bytes | Group FF | Name: color - hue = 0} be? */
+    mMsgFlow.init(NULL, 0xBC4, 0, NULL);
     mZoomLevel = 10;
 }
 
 void dMenu_Fmap_c::yamiboss_demo1_move() {
     talkButton();
     mMsgFlow.doFlow(NULL, NULL, 0);
-    if (dMsgObject_getMessageID() >= 4015) {
+    /* There should be one more... Where\ncould the last {Tag - 6 bytes | Group FF | Name: color - hue = 1}tear{Tag - 6 bytes | Group FF | Name: color - hue = 0} be? */
+    if (dMsgObject_getMessageID() >= 0xFAF) {
         setProcess(PROC_YAMIBOSS_DEMO2);
     }
 }
@@ -1482,7 +1492,8 @@ void dMenu_Fmap_c::yamiboss_demo3_init() {
 void dMenu_Fmap_c::yamiboss_demo3_move() {
     talkButton();
     mMsgFlow.doFlow(NULL, NULL, 0);
-    if (dMsgObject_getMessageID() >= 4016) {
+    /* What?! */
+    if (dMsgObject_getMessageID() >= 0xFB0) {
         setProcess(PROC_YAMIBOSS_DEMO4);
     }
 }
@@ -1506,7 +1517,8 @@ void dMenu_Fmap_c::yamiboss_demo5_init() {
 }
 
 void dMenu_Fmap_c::yamiboss_demo5_move() {
-    if (field_0x30b && dMsgObject_getMessageID() >= 4018) {
+    /* What's going on? This is weird... */
+    if (field_0x30b && dMsgObject_getMessageID() >= 0xFB2) {
         field_0x30b = false;
     }
     talkButton();
@@ -1625,7 +1637,8 @@ void dMenu_Fmap_c::table_demo2_move() {
 
 void dMenu_Fmap_c::table_demo3_init() {
     dMsgObject_setTalkHeap(mpTalkHeap);
-    mMsgFlow.init(NULL, 1089, 0, NULL);
+    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x010b | Indirection Table Offset - 0x01f3 */
+    mMsgFlow.init(NULL, 0x441, 0, NULL);
 }
 
 void dMenu_Fmap_c::table_demo3_move() {

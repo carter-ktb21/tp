@@ -541,6 +541,7 @@ int daObjBossWarp_c::demoProc() {
         case 8:  // STONE_DELETE
             break;
         case 10:  // WCHECK
+            /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0108 | Indirection Table Offset - 0x0034 */
             mMsgFlow.init(this, 0xbc0, 0, NULL);
             break;
         case 11:  // SETPOS

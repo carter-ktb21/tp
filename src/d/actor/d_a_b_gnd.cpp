@@ -3119,7 +3119,8 @@ static void demo_camera(b_gnd_class* i_this) {
         
         if (i_this->mDemoCamTimer >= 10) {
             if (i_this->mDemoCamTimer == 10) {
-                i_this->mMsgFlow.init(a_this, 3018, 0, NULL);
+                /* An impressive-looking blade...{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 60} */
+                i_this->mMsgFlow.init(a_this, 0xBCA, 0, NULL);
             }
             i_this->mMsgFlow.doFlow(a_this, NULL, 0);  
         }

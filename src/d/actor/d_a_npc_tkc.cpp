@@ -593,9 +593,10 @@ void daNpcTkc_c::reset() {
     mMode = 0;
     mUnkID = fpcM_ERROR_PROCESS_ID_e;
 
-    mMsgNo = getMessageNo();
-    if (mMsgNo == 0 || mMsgNo == 0xFF) {
-        mMsgNo = 0xBC6;
+    mMsgFlowNo = getMessageNo();
+    if (mMsgFlowNo == 0 || mMsgFlowNo == 0xFF) {
+        /* Event Node | Event Func Idx - 0x0d | Event Func Params - 0x00000002 | Indirection Table Idx - 0x0040 */
+        mMsgFlowNo = 0xBC6;
     }
 
     setAngle(current.angle.y);
@@ -947,7 +948,7 @@ inline void daNpcTkc_c::setExpressionTalkAfter() {
 void daNpcTkc_c::normalTalk() {
     switch (mMode) {
         case 0:
-            initTalk(mMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             setLookMode(LOOK_PLAYER);
             mActorMngr[0].entry(daPy_getPlayerActorClass());
@@ -1014,7 +1015,7 @@ void daNpcTkc_c::warpTalk() {
             mDoMtx_stack_c::YrotM(fopAcM_GetShapeAngle_p(player)->y);
             mDoMtx_stack_c::transM(0.0f, 0.0f, mpHIO->m.conversation_dist);
             mDoMtx_stack_c::multVecZero(&field_0xd44);
-            initTalk(mMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             setLookMode(LOOK_PLAYER);
             mActorMngr[0].entry(daPy_getPlayerActorClass());

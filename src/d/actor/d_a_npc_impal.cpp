@@ -139,7 +139,7 @@ int daNpcImpal_c::Create() {
         }
 
         mFlowID = getMessageNo();
-        field_de2 = mFlowID;
+        mInitialFlowID = mFlowID;
 
         J3DModelData* model_data = mAnm_p->getModel()->getModelData();
         fopAcM_SetMtx(this, mAnm_p->getModel()->getBaseTRMtx());
@@ -842,7 +842,7 @@ bool daNpcImpal_c::talk(void* param_0) {
         }
         break;
     case 3:
-        mFlowID = field_de2;
+        mFlowID = mInitialFlowID;
         setExpression(EXPR_7, -1.0f);
         if (!field_0x9ec) {
             dComIfGp_event_reset();

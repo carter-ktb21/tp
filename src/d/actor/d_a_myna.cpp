@@ -523,7 +523,7 @@ void daMyna_c::attack_wait_move() {
 }
 
 void daMyna_c::attack_before_talk_init() {
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
     setAnimeType(10, 0.0f);
 }
 
@@ -577,14 +577,14 @@ void daMyna_c::attack_move() {
 }
 
 void daMyna_c::attack_after_talk_init() {
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::attack_after_talk_move() {
     if (eventInfo.checkCommandTalk() && mMsgFlow.doFlow(this, NULL, 0) != 0) {
         dComIfGp_event_reset();
         onEventFlag(2);
-        field_0x91C = 0x139;
+        mFlowNodeNo = 0x139;
         field_0x92C = 5;
     }
 }
@@ -642,18 +642,18 @@ void daMyna_c::greet_talk_init() {
 
     switch (field_0x932) {
     case 0:
-        field_0x91C = getFlowNodeNum();
+        mFlowNodeNo = getFlowNodeNum();
         break;
     case 1:
-        field_0x91C = getFlowNodeNum() + 1;
+        mFlowNodeNo = getFlowNodeNum() + 1;
         break;
     case 2:
-        field_0x91C = getFlowNodeNum() + 2;
+        mFlowNodeNo = getFlowNodeNum() + 2;
         break;
     }
 
     setAnimeType(9, 0.0f);
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::greet_talk_move() {
@@ -775,8 +775,8 @@ void daMyna_c::shopping_wait_move() {
 
 void daMyna_c::shopping_talk_init() {
     field_0x828 = fopAcM_SearchByID(mShopItems[field_0x931].mTargetActorID);
-    field_0x91C = mShopItems[field_0x931].mFlowNodeNum;
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mFlowNodeNo = mShopItems[field_0x931].mFlowNodeNum;
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::shopping_talk_move() {
@@ -791,13 +791,13 @@ void daMyna_c::thanks_talk_init() {
     s16 nowTotalPayment = dMsgObject_getMsgObjectClass()->getNowTotalPayment();
     s16 nowTotalPrice = dMsgObject_getMsgObjectClass()->getNowTotalPrice();
     if (nowTotalPayment == nowTotalPrice) {
-        field_0x91C = getFlowNodeNum() + 6;
+        mFlowNodeNo = getFlowNodeNum() + 6;
     } else if (nowTotalPayment > nowTotalPrice) {
-        field_0x91C = getFlowNodeNum() + 7;
+        mFlowNodeNo = getFlowNodeNum() + 7;
     } else {
-        field_0x91C = getFlowNodeNum() + 8;
+        mFlowNodeNo = getFlowNodeNum() + 8;
     }
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::thanks_talk_move() {
@@ -820,13 +820,13 @@ void daMyna_c::byebye_talk_init() {
 
     switch (field_0x932) {
     case 0:
-        field_0x91C = getFlowNodeNum() + 3;
+        mFlowNodeNo = getFlowNodeNum() + 3;
         break;
     case 1:
-        field_0x91C = getFlowNodeNum() + 4;
+        mFlowNodeNo = getFlowNodeNum() + 4;
         break;
     case 2:
-        field_0x91C = getFlowNodeNum() + 5;
+        mFlowNodeNo = getFlowNodeNum() + 5;
         break;
     }
 
@@ -840,7 +840,7 @@ void daMyna_c::byebye_talk_init() {
         offEventFlag(0);
     }
 
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::byebye_talk_move() {
@@ -980,6 +980,7 @@ void daMyna_c::turn_on_end3_move() {
 }
 
 void daMyna_c::wolf_talk_init() {
+    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x02f5 | Indirection Table Offset - 0x016c */
     mMsgFlow.init(this, 0xC9, 0, NULL);
 }
 
@@ -1036,7 +1037,7 @@ void daMyna_c::attack_wait2_move() {
 
 
 void daMyna_c::attack_before_talk2_init() {
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
     setAnimeType(10, 0.0f);
 }
 
@@ -1111,8 +1112,9 @@ void daMyna_c::attack2_move() {
 }
 
 void daMyna_c::attack2_talk_init() {
-    field_0x91C = 214;
-    mMsgFlow.init(this, field_0x91C, 0, NULL);
+    /* Don't steal anything! */
+    mFlowNodeNo = 0xD6;
+    mMsgFlow.init(this, mFlowNodeNo, 0, NULL);
 }
 
 void daMyna_c::attack2_talk_move() {
@@ -1312,10 +1314,11 @@ void daMyna_c::initiate() {
         mShopItems[i].mItemType = 0xF;
     }
     if (dComIfGs_isSaveSwitch(0x3C)) {
-        field_0x91C = 0x139;
+        mFlowNodeNo = 0x139;
         field_0x92C = 5;
     } else {
-        field_0x91C = 200;
+        /* Branch Node | Query Func Idx - 0x000c | Query Func Param - 0x003c | Indirection Table Offset - 0x0167 */
+        mFlowNodeNo = 0xC8;
         field_0x92C = 0;
     }
     field_0x92D = field_0x92C;

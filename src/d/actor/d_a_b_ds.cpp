@@ -1362,6 +1362,7 @@ void daB_DS_c::executeOpeningDemo() {
             }
 
             if (mModeTimer == 1) {
+                /* You still live... How astonishing.\nNo wonder some call you "hero."{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
                 setYoMessage(0x1F41);
             }
         } else if (doYoMessage()) {
@@ -1369,6 +1370,7 @@ void daB_DS_c::executeOpeningDemo() {
         }
         break;
     case 16:
+        /* But this is truly a bittersweet\nreunion... Truly!{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
         setYoMessage(0x1F42);
         mMode++;
         break;
@@ -1385,6 +1387,7 @@ void daB_DS_c::executeOpeningDemo() {
     case 18:
         if (cLib_calcTimer(&mModeTimer) != 0) {
             if (mModeTimer == 1) {
+                /* For I fear this is the last time I will\nsee you alive!{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
                 setYoMessage(0x1F43);
             }
         } else {

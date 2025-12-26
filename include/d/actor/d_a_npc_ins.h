@@ -30,7 +30,7 @@ public:
 
 struct insect_param_data {
     int evt_bit_no;
-    s16 msg_no;
+    s16 msg_flow_no;
     u8 field_0x6;
     u8 field_0x7;
 };
@@ -103,7 +103,7 @@ public:
 
         return rv;
     }
-    s16 getInsectMessageNo(int type) { return getInsectParamData(type).msg_no; }
+    s16 getInsectMessageNo(int type) { return getInsectParamData(type).msg_flow_no; }
     u32 getInsectEvtBitNo(int type) { return getInsectParamData(type).evt_bit_no; }
     inline void setExpressionTalkAfter();
     inline void playExpression();
@@ -130,9 +130,9 @@ private:
     /* 0xE08 */ int mPntIndex;
     /* 0xE0C */ f32 field_0xe0c;
     /* 0xE10 */ f32 mCurrentPosY;
-    /* 0xE14 */ s16 field_0xe14;
-    /* 0xE16 */ s16 field_0xe16;
-    /* 0xE18 */ s16 mInsectMsgNo;
+    /* 0xE14 */ s16 mPlayerAngleY;
+    /* 0xE16 */ s16 mInitialMsgFlowNo;
+    /* 0xE18 */ s16 mMsgFlowNo;
     /* 0xE1A */ s16 mLookMode;
     /* 0xE1C */ u16 mGoHomeTime;
     /* 0xE1E */ u16 mMode;

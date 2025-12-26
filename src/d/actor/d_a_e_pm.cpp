@@ -1943,8 +1943,11 @@ void daE_PM_c::BossDeathAction() {
 
         if (mTimer[2] == 0) {
             if (dComIfG_play_c::getLayerNo(0) == 2) {
+                /* Hee hee hee... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}That was fun!\n
+                   {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}I'll tell you what: I'll let you\ninto a secret place! */
                 mMsgFlow.init(this, 0x6E, 0, NULL);
             } else {
+                /* Hee hee hee! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}...'Bye! */
                 mMsgFlow.init(this, 0x6F, 0, NULL);
             }
             mMode++;

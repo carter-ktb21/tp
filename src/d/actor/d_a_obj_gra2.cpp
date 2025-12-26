@@ -276,7 +276,7 @@ cPhs__Step daObj_GrA_c::create() {
         }
     }
 
-    field_0x848 = ((int)home.angle.x == 0xFFFF) ? -1 : home.angle.x;
+    mMsgFlowNo = ((int)home.angle.x == 0xFFFF) ? -1 : home.angle.x;
 
     field_0x1fe8 = (fopAcM_GetParam(this) & 0xC0000000) >> 30;
     field_0xa7f = home.angle.z & 0xFF;
@@ -1442,7 +1442,7 @@ int daObj_GrA_c::talk(void* param_1) {
     int iVar1, iVar2;
     int rv = 0;
     int iVar3;
-    int iVar4 = field_0x848;
+    int iVar4 = mMsgFlowNo;
     s16 sVar1;
     switch (field_0xa7c) {
         case 0:
@@ -2020,7 +2020,7 @@ int daObj_GrA_c::face999(int param_1) {
 }
 
 int daObj_GrA_c::evtcutTalk(int param_1, int param_2) {
-    s32 sVar1 = field_0x848;
+    s32 sVar1 = mMsgFlowNo;
     if (param_2 != 0) {
         mMsgFlow.init(this, sVar1, 0, NULL);
         field_0xaa0 = 0;

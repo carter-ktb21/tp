@@ -142,7 +142,7 @@ private:
     /* 0x1374 */ int field_0x1374;
     /* 0x1378 */ int mPlayerArea;
     /* 0x137C */ u32 field_0x137c[2];
-    /* 0x1384 */ s16 mMessageNo;
+    /* 0x1384 */ s16 mMsgFlowNo;
     /* 0x1386 */ s16 mLookMode;
     /* 0x1388 */ u16 mMode;
     /* 0x138A */ bool field_0x138a;

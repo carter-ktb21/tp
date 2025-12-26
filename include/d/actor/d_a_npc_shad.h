@@ -252,8 +252,8 @@ private:
     /* 0xE08 */ fpc_ProcID mItemPartnerId;
     /* 0xE0C */ int field_0xe0c;
     /* 0xE10 */ int field_0xe10;
-    /* 0xE14 */ s16 field_0xe14;
-    /* 0xE16 */ s16 field_0xe16;
+    /* 0xE14 */ s16 mMsgFlowNo;
+    /* 0xE16 */ s16 mInitialMsgFlowNo;
     /* 0xE18 */ s16 mLookMode;
     /* 0xE1A */ u16 field_0xe1a;
     /* 0xE1C */ s16 field_0xe1c;

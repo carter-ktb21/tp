@@ -3243,6 +3243,7 @@ int daMidna_c::execute() {
                     }
                 }
                 onStateFlg0(FLG0_UNK_8000);
+                /* Branch Node | Query Func Idx - 0x0033 | Query Func Param - 0x0000 | Indirection Table Offset - 0x0024 */
                 mMsgFlow.init(this, 0xbb9, 0, NULL);
             } else if (mMsgFlow.doFlow(this, NULL, 0)) {
                 int item_id;

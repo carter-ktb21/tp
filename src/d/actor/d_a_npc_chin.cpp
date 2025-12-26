@@ -266,7 +266,7 @@ int daNpcChin_c::Create() {
                     return cPhs_ERROR_e;
                 }
 
-        field_0xe00 = getMessageNo();
+        mMsgFlowNo = getMessageNo();
 
         J3DModelData* modelData = mAnm_p->getModel()->getModelData();
 
@@ -1250,7 +1250,7 @@ bool daNpcChin_c::talk(void* param_0) {
 
     switch (mActionMode) {
     case 0:
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         dMeter2Info_setMsgTimeMs(dComIfGs_getHookGameTime());
         mTurnMode = 0;
         mMsgTimer = 0;
@@ -1458,7 +1458,8 @@ void daNpcChin_c::Event_DT() {
 
         break;
     case EVT_GAME_SUCCEED:
-        field_0xe00 = 0x439;
+        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x004e004f | Indirection Table Idx - 0x0166 */
+        mMsgFlowNo = 0x439;
         Event_DT_Base();
         ForcibleTalk_Off();
         setAction(&daNpcChin_c::wait);
@@ -1473,7 +1474,8 @@ void daNpcChin_c::Event_DT() {
             break;
         }
 
-        field_0xe00 = 0x439;
+        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x004e004f | Indirection Table Idx - 0x0166 */
+        mMsgFlowNo = 0x439;
         Event_DT_Base();
         ForcibleTalk_Off();
         setAction(&daNpcChin_c::wait);
@@ -1496,7 +1498,8 @@ void daNpcChin_c::Event_DT() {
 
         break;
     case EVT_GAME_GIVEUP:
-        field_0xe00 = 0x439;
+        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x004e004f | Indirection Table Idx - 0x0166 */
+        mMsgFlowNo = 0x439;
         Event_DT_Base();
         ForcibleTalk_Off();
         setAction(&daNpcChin_c::wait);
@@ -1685,13 +1688,14 @@ int daNpcChin_c::_Evt_GameFailed_CutInit(const int& param_0) {
 
         break;
     case 20:
-        field_0xe00 = 0x43a;
+        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0122 | Indirection Table Offset - 0x019a */
+        mMsgFlowNo = 0x43a;
         mMsgTimer = 0;
 
         dComIfGp_event_offHindFlag(0x80);
         daNpcF_offTmpBit(11);
 
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         ForcibleTalk_Off();
 
         setExpression(0, -1.0f);
@@ -1745,7 +1749,8 @@ int daNpcChin_c::_Evt_GameSucceed_CutInit(const int& param_0) {
     case 10:
         break;
     case 20:
-        field_0xe00 = 0x43a;
+        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0122 | Indirection Table Offset - 0x019a */
+        mMsgFlowNo = 0x43a;
         mMsgTimer = 0;
 
         if (field_0xe07 == 0) {
@@ -1755,7 +1760,7 @@ int daNpcChin_c::_Evt_GameSucceed_CutInit(const int& param_0) {
         }
 
         daNpcF_offTmpBit(11);
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         ForcibleTalk_Off();
         setExpression(0, -1.0f);
         setLookMode(3);
@@ -1764,7 +1769,8 @@ int daNpcChin_c::_Evt_GameSucceed_CutInit(const int& param_0) {
     case 30:
         break;
     case 40:
-        field_0xe00 = 0x43a;
+        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0122 | Indirection Table Offset - 0x019a */
+        mMsgFlowNo = 0x43a;
         mMsgTimer = 0;
 
         if (field_0xe07 == 0) {
@@ -1773,7 +1779,7 @@ int daNpcChin_c::_Evt_GameSucceed_CutInit(const int& param_0) {
             daNpcF_onTmpBit(0x4f);
         }
 
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         ForcibleTalk_Off();
         setLookMode(3);
 
@@ -1862,8 +1868,9 @@ int daNpcChin_c::_Evt_SelectGiveUp_CutInit(const int& param_0) {
     case 20:
         daNpcF_offTmpBit(11);
         setExpression(0, -1.0f);
-        field_0xe00 = 0x43e;
-        initTalk(field_0xe00, NULL);
+        /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x01ce */
+        mMsgFlowNo = 0x43e;
+        initTalk(mMsgFlowNo, NULL);
 
         break;
     }
@@ -1923,10 +1930,11 @@ int daNpcChin_c::_Evt_GameGiveUp_CutInit(const int& param_0) {
 
         break;
     case 20:
-        field_0xe00 = 0x43e;
+        /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x01ce */
+        mMsgFlowNo = 0x43e;
         mMsgTimer = 0;
 
-        initTalk(field_0xe00,NULL);
+        initTalk(mMsgFlowNo,NULL);
         ForcibleTalk_Off();
         setExpression(0, -1.0f);
         setLookMode(3);
@@ -1986,7 +1994,7 @@ int daNpcChin_c::_Evt_Appear_CutInit(const int& param_0) {
     case 20:
         mMsgTimer = 0;
         daNpcF_offTmpBit(11);
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         ForcibleTalk_Off();
         setExpression(0, -1.0f);
         setLookMode(3);
@@ -1995,7 +2003,7 @@ int daNpcChin_c::_Evt_Appear_CutInit(const int& param_0) {
     case 30:
         mMsgTimer = 0;
         Z2GetAudioMgr()->bgmStart(Z2BGM_MINIGAME_ROOM, 0, 0);
-        initTalk(field_0xe00, NULL);
+        initTalk(mMsgFlowNo, NULL);
         ForcibleTalk_Off();
         setExpression(0, -1.0f);
         setLookMode(3);

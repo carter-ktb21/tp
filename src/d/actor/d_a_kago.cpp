@@ -233,6 +233,7 @@ int daKago_c::executeBalloonMenu() {
             break;
         }
 
+        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x004a0000 | Indirection Table Idx - 0x0284 */
         mMsgFlow.init(this, 0x457, 0, NULL);
 
         camera->Stop();
@@ -2384,7 +2385,7 @@ void daKago_c::initFirstDemo() {
     }
     case 2: {
         field_0x728 = 60;
-        mMsgFlow.init(this, 0x7d3, 0, NULL); // b'\x00Hey! Stop it!'
+        mMsgFlow.init(this, 0x7d3, 0, NULL); // Hey! Stop it!
 
         break;
     }

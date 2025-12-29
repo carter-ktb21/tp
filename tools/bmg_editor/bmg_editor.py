@@ -1,18 +1,12 @@
-# from pathlib import Path
-# import sys
+import os
 import argparse
-
-# DTK_PATH = Path("build/tools/dtk.exe")
-
 from gclib.gcm import GCM
 from gclib.rarc import RARC
-# from gclib.yaz0_yay0 import Yaz0
-# from gclib.gclib_file import GCLibFile
+from gclib.yaz0_yay0 import Yaz0
 from io import BytesIO
 from typing import List, Union
 from pathlib import Path
 import xml.etree.ElementTree as ET
-# import shutil
 
 
 class INF1_Entry:
@@ -52,7 +46,7 @@ class DAT1_Entry:
         self.message = bytes(0)
         self.message_length = 0
         self.msgId = 0
-        self.tags = []
+        self.tags: List[DAT1_Tag] = []
 
 
 class DAT1_Section:
@@ -157,6 +151,7 @@ class BMG:
         self.flw1_section = FLW1_Section()
         self.padding_before_fli1 = bytes(0)
         self.fli1_section = FLI1_Section()
+        self.end_padding = bytes(0)
 
     def to_bytes(self) -> bytes:
         out = bytearray()
@@ -240,6 +235,9 @@ class BMG:
             out += entry.flw1_idx
             out += entry.end_padding
 
+        if self.name == "zel_unit.bmg":
+            out += self.end_padding
+
         return bytes(out)
 
     def rebuild_bmg(self, path: str):
@@ -302,7 +300,6 @@ def parse_bmg(bmg_bytes: BytesIO, name):
         byte = bmg_bytes.read(9)
         new_bmg.inf1_section.end_padding += byte
 
-    # print(bmg_bytes.read(40))
     # DAT1 Section
     new_bmg.dat1_section.magic = bmg_bytes.read(4)
     new_bmg.dat1_section.padded_size = bmg_bytes.read(4)
@@ -436,7 +433,9 @@ def parse_bmg(bmg_bytes: BytesIO, name):
         entry.end_padding = bmg_bytes.read(2)
         new_bmg.fli1_section.entries.insert(index, entry)
 
-    # print(bmg_bytes.read(40))
+    if new_bmg.name == "zel_unit.bmg":
+        new_bmg.end_padding = bytes(3)
+
     return new_bmg
 
 
@@ -636,13 +635,7 @@ def bytes_to_int(data: bytes) -> int:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("vanilla_iso_path", nargs="?", default="orig/GZ2E01/baserom.iso", help="Path to a vanilla Twilight Princess ISO to use as a base.")
-    parser.add_argument("output_path", nargs="?", help="Path to put the modified ISO.")
-    parser.add_argument("decomp_repo_path", nargs="?", default="", help="Path to the root of the git repository containing the tp decompilation.")
-    parser.add_argument("--map", help="Folder to place the symbol map for the modified ISO.")
-
     args = parser.parse_args()
-    # decomp_build_path = args.decomp_repo_path / "build/GZ2E01"
-    # output_path = args.output_path
 
     gcm = GCM(args.vanilla_iso_path)
     gcm.read_entire_disc()
@@ -665,9 +658,10 @@ def main():
                 print(f"  [failed to read ARC: {e}]")
                 continue
 
-    bmgs = [BMG(None)]
-    for entry in bmg_files:
-        bmgs.append(parse_bmg(entry.data, entry.name))
+    print("Parsing BMG files")
+    bmgs: List[BMG] = []
+    for i, entry in enumerate(bmg_files):
+        bmgs.insert(i, parse_bmg(entry.data, entry.name))
 
     # Search Tool
     # while True:
@@ -715,8 +709,8 @@ def main():
     #                                     print(f"{bmg.name}\nEvent Node | Event Func Idx - 0x{node.event_func_idx.hex()} | Event Func Params - 0x{event_func_params.hex()} | Indirection Table Idx - 0x{indirection_idx.hex()}\n")
 
     #         case 3:
-                # for bmg in bmgs:
-                #     bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
+    #             for bmg in bmgs:
+    #                 bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
 
     # Editor
     class BMG_Entry:
@@ -748,6 +742,7 @@ def main():
         bmg_entries.insert(i, entry)
         i += 1
 
+    print("Editing BMG files")
     for bmg in bmgs:
         for new_entry in bmg_entries:
             if new_entry.bmg_name == bmg.name:
@@ -777,9 +772,39 @@ def main():
                                 new_offset = bytes_to_int(bmg.inf1_section.entries[i].dat1_offset) + len(message)
                                 bmg.inf1_section.entries[i + 1].dat1_offset = new_offset.to_bytes(4, 'big')
                                 i += 1
-
     for bmg in bmgs:
-        bmg.rebuild_bmg(Path(f"C:/Users/Carter/Twilight_Princess/BMG_Test/{bmg.name}"))
+        bmg.rebuild_bmg(BASE_DIR / f"output/{bmg.name}")
+    print("Finished editing BMG files")
+
+    # Rebuild iso with new bmg files
+    bmg_arcs: list[tuple[str, RARC]] = []
+    for entry in gcm.file_entries:
+        if entry.name.lower().startswith("bmgres") and entry.name.lower().endswith(".arc"):
+            arc = RARC(gcm.read_file_data(entry.file_path))
+            arc.read()
+            bmg_arcs.append((entry.file_path, arc))
+
+    for arc_path, arc in bmg_arcs:
+        for bmg_file in os.listdir(BASE_DIR / "output"):
+            out_path = BASE_DIR / "output" / bmg_file
+            with open(out_path, "rb") as f:
+                raw = f.read()
+
+            fe = arc.get_file_entry(bmg_file)
+            if not fe:
+                continue
+
+            fe.data = BytesIO(raw)
+            fe.data_size = len(raw)
+
+    for arc_path, arc in bmg_arcs:
+        arc.save_changes()
+        gcm.changed_files[arc_path] = Yaz0.compress(arc.data)
+
+    print("Building new iso")
+    for _ in gcm.export_disc_to_iso_with_changed_files(BASE_DIR / "output/rebuilt_bmgs.iso"):
+        pass
+    print("Done")
 
 
 if __name__ == "__main__":

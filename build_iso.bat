@@ -33,6 +33,7 @@ if not defined VANILLA_ISO set VANILLA_ISO=%DECOMP_PATH%\orig\GZ2E01\baserom.iso
 if not defined OUTPUT_ISO set OUTPUT_ISO=
 if not defined LAUNCH set LAUNCH=true
 if not defined DUAL_BOOT set DUAL_BOOT=false
+if not defined DEVELOPMENT_MODE set DEVELOPMENT_MODE=true
 
 REM Command line argument overrides .env OUTPUT_ISO
 if not "%~1"=="" set OUTPUT_ISO=%~1

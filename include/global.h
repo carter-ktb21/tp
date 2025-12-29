@@ -103,7 +103,7 @@ extern int g_shouldUpdateLogic;  // Always 1 (legacy; kept for compatibility)
 
 inline f32 ScaleHUDXRight(f32 baseX) {
     #if WIDESCREEN_SUPPORT
-    const f32 screenCenter = 304.0f;
+    const f32 screenCenter = 320.0f;
     const f32 scale = 1.3f;
     return -((baseX - screenCenter) * scale + screenCenter);
     #else
@@ -112,7 +112,7 @@ inline f32 ScaleHUDXRight(f32 baseX) {
 }
 inline f32 ScaleHUDXLeft(f32 baseX) {
     #if WIDESCREEN_SUPPORT
-    const f32 screenCenter = 304.0f;
+    const f32 screenCenter = 320.0f;
     const f32 scale = 1.3f;
     return (baseX - screenCenter) * scale + screenCenter;
     #else
@@ -123,6 +123,10 @@ inline f32 ScaleHUDXLeft(f32 baseX) {
 void updateDeltaTime();
 void setTargetFramerate(float fps);
 float getTargetFramerate();
+void setSelectedFramerate(float fps);
+float getSelectedFramerate();
+void setStaleMode(int enabled);
+int getStaleMode();
 int shouldUpdateGameLogic();
 
 // hack to make strings with no references compile properly

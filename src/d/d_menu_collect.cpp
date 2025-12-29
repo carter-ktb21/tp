@@ -1593,23 +1593,31 @@ void dMenu_Collect2D_c::wait_proc() {
 
     // Boofener: Handle framerate menu input
     if (mFramerateMenuOpen) {
+        static const float framerateValues[] = {30.0f, 60.0f, 1000.0f, 0.0f};
+        static const int framerateCount = sizeof(framerateValues) / sizeof(framerateValues[0]);
+
         mpStick->checkTrigger();
         if (mpStick->checkUpTrigger() && mFramerateSelection > 0) {
             mFramerateSelection--;
             Z2GetAudioMgr()->seStart(Z2SE_SY_MENU_CURSOR_COMMON, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-        } else if (mpStick->checkDownTrigger() && mFramerateSelection < 1) {
+        } else if (mpStick->checkDownTrigger() && mFramerateSelection < framerateCount - 1) {
             mFramerateSelection++;
             Z2GetAudioMgr()->seStart(Z2SE_SY_MENU_CURSOR_COMMON, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
         }
 
         // Boofener: Apply framerate when A button is pressed
         if (mDoCPd_c::getTrigA(PAD_1)) {
-            float newFramerate = 60.0f;
-            switch (mFramerateSelection) {
-                case 0: newFramerate = 30.0f; break;
-                case 1: newFramerate = 60.0f; break;
+            float selectedFPS = framerateValues[mFramerateSelection];
+            if (selectedFPS <= 0.0f) {
+                // Stale mode: freeze animations but keep rendering at 60fps
+                setStaleMode(1);
+                setTargetFramerate(60.0f);
+                setSelectedFramerate(0.0f);  // Mark as stale for toggle logic
+            } else {
+                setStaleMode(0);
+                setTargetFramerate(selectedFPS);
+                setSelectedFramerate(selectedFPS);
             }
-            setTargetFramerate(newFramerate);
             Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OK, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
             mFramerateMenuOpen = 0;
         }
@@ -2110,13 +2118,15 @@ void dMenu_Collect2D_c::_draw() {
 
     // Boofener: Draw framerate selector menu
     if (mFramerateMenuOpen) {
-        const char* framerateOptions[] = {"30 FPS", "60 FPS"};
+        static const char* framerateOptions[] = {"30 FPS", "60 FPS", "Unlimited FPS", "Stale Mode"};
+        static const float framerateValues[] = {30.0f, 60.0f, 1000.0f, 0.0f};
+        static const int optionCount = sizeof(framerateOptions) / sizeof(framerateOptions[0]);
 
         // Draw semi-transparent background box
         f32 menuX = 250.0f;
         f32 menuY = 150.0f;
         f32 menuWidth = 140.0f;
-        f32 menuHeight = 80.0f;
+        f32 menuHeight = 50.0f + (optionCount * 22.0f);
 
         JGeometry::TBox2<f32> menuBox(menuX, menuY, menuX + menuWidth, menuY + menuHeight);
         grafPort->setColor(JUtility::TColor(0, 0, 0, 180));
@@ -2132,13 +2142,21 @@ void dMenu_Collect2D_c::_draw() {
             font->drawString_scale(menuX + 20.0f, menuY + 20.0f, 12.0f, 12.0f, "FRAMERATE", true);
 
             // Get current active framerate for display
-            float currentFPS = getTargetFramerate();
             int activeFPSIndex = 1; // Default to 60fps
-            if (currentFPS <= 30.0f) activeFPSIndex = 0;
-            else activeFPSIndex = 1;
+            if (getStaleMode()) {
+                activeFPSIndex = optionCount - 1; // Stale mode is the last option
+            } else {
+                float currentFPS = getTargetFramerate();
+                for (int i = 0; i < optionCount; i++) {
+                    if (currentFPS == framerateValues[i]) {
+                        activeFPSIndex = i;
+                        break;
+                    }
+                }
+            }
 
             // Draw each option
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < optionCount; i++) {
                 f32 optionY = menuY + 50.0f + (i * 22.0f);
 
                 // Draw cursor for selected option

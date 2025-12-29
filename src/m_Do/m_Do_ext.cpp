@@ -88,9 +88,9 @@ int mDoExt_baseAnm::initPlay(s16 i_frameMax, int i_attribute, f32 i_rate, s16 i_
     }
 
     mFrameCtrl.setAttribute(i_attribute);
-    mFrameCtrl.setRate(i_rate * DELTA_TIME);
+    mFrameCtrl.setRate(i_rate);
 
-    if (i_rate * DELTA_TIME >= 0.0f) {
+    if (i_rate >= 0.0f) {
         mFrameCtrl.setFrame(i_startF);
     } else {
         mFrameCtrl.setFrame(mFrameCtrl.getEnd());

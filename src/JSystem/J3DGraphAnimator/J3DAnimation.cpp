@@ -3,6 +3,7 @@
 #include "JSystem/J3DGraphAnimator/J3DAnimation.h"
 #include "JSystem/J3DGraphBase/J3DStruct.h"
 #include "JSystem/JMath/JMath.h"
+#include "global.h"
 
 void J3DFrameCtrl::init(s16 endFrame) {
     mAttribute = EMode_LOOP;
@@ -15,7 +16,9 @@ void J3DFrameCtrl::init(s16 endFrame) {
 }
 
 int J3DFrameCtrl::checkPass(f32 passFrame) {
-    f32 next_frame = mFrame + mRate;
+    // 60fps: Multiply rate by DELTA_TIME to account for frame-rate independent animation timing
+    // OLD: f32 next_frame = mFrame + mRate; (30fps - frame advancement wasn't scaled)
+    f32 next_frame = mFrame + mRate * DELTA_TIME;
 
     switch (mAttribute) {
     case 0:
@@ -134,7 +137,9 @@ int J3DFrameCtrl::checkPass(f32 passFrame) {
 
 void J3DFrameCtrl::update() {
     mState = 0;
-    mFrame += mRate;
+    // 60fps: Multiply rate by DELTA_TIME to maintain consistent animation speed at higher framerate
+    // OLD: mFrame += mRate; (30fps - direct frame increment without scaling)
+    mFrame += mRate * DELTA_TIME;
 
     switch (mAttribute) {
     case EMode_NONE:
@@ -236,69 +241,209 @@ void J3DAnmTransformFull::getTransform(u16 jointNo, J3DTransformInfo* pTransform
         pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset];
     } else {
         u32 frame_max;
-        u32 frame = (int)(mFrame + 0.5f);
+        // 60fps: Support fractional frames by using truncation instead of rounding, then interpolating
+        // between keyframes when mFrame has a fractional component. This prevents jitter on baked
+        // "Full" animations at 60fps.
+        // OLD: u32 frame = (int)(mFrame + 0.5f); (rounded to nearest frame, no interpolation)
+        int frame = (int)mFrame;
 
-        frame_max = entryX->mScaleMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mScale.x = mScaleData[entryX->mScaleOffset + (frame_max - 1)];
-        } else {
-            pTransform->mScale.x = mScaleData[entryX->mScaleOffset + frame];
-        }
+        // When mFrame is exactly on a keyframe (no fractional part), use the keyframe data directly
+        if (frame == mFrame) {
+            frame_max = entryX->mScaleMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mScale.x = mScaleData[entryX->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.x = mScaleData[entryX->mScaleOffset + frame];
+            }
 
-        frame_max = entryX->mRotationMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mRotation.x = mRotData[entryX->mRotationOffset + (frame_max - 1)];
-        } else {
-            pTransform->mRotation.x = mRotData[entryX->mRotationOffset + frame];
-        }
+            frame_max = entryX->mRotationMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mRotation.x = mRotData[entryX->mRotationOffset + (frame_max - 1)];
+            } else {
+                pTransform->mRotation.x = mRotData[entryX->mRotationOffset + frame];
+            }
 
-        frame_max = entryX->mTranslateMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + (frame_max - 1)];
-        } else {
-            pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + frame];
-        }
+            frame_max = entryX->mTranslateMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + frame];
+            }
 
-        frame_max = entryY->mScaleMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mScale.y = mScaleData[entryY->mScaleOffset + (frame_max - 1)];
-        } else {
-            pTransform->mScale.y = mScaleData[entryY->mScaleOffset + frame];
-        }
+            frame_max = entryY->mScaleMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mScale.y = mScaleData[entryY->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.y = mScaleData[entryY->mScaleOffset + frame];
+            }
 
-        frame_max = entryY->mRotationMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mRotation.y = mRotData[entryY->mRotationOffset + (frame_max - 1)];
-        } else {
-            pTransform->mRotation.y = mRotData[entryY->mRotationOffset + frame];
-        }
+            frame_max = entryY->mRotationMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mRotation.y = mRotData[entryY->mRotationOffset + (frame_max - 1)];
+            } else {
+                pTransform->mRotation.y = mRotData[entryY->mRotationOffset + frame];
+            }
 
-        frame_max = entryY->mTranslateMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + (frame_max - 1)];
-        } else {
-            pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + frame];
-        }
+            frame_max = entryY->mTranslateMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + frame];
+            }
 
-        frame_max = entryZ->mScaleMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + (frame_max - 1)];
-        } else {
-            pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + frame];
-        }
+            frame_max = entryZ->mScaleMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + frame];
+            }
 
-        frame_max = entryZ->mRotationMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + (frame_max - 1)];
-        } else {
-            pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + frame];
-        }
+            frame_max = entryZ->mRotationMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + (frame_max - 1)];
+            } else {
+                pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + frame];
+            }
 
-        frame_max = entryZ->mTranslateMaxFrame;
-        if (frame >= frame_max) {
-            pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + (frame_max - 1)];
+            frame_max = entryZ->mTranslateMaxFrame;
+            if (frame >= (int)frame_max) {
+                pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + frame];
+            }
         } else {
-            pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + frame];
+            // When mFrame has a fractional part, interpolate between current and next keyframe.
+            // 'rate' represents how far between the two keyframes we are (0.0 to 1.0).
+            // This entire else block is NEW for 60fps support - the old code had no interpolation.
+            //
+            // For each axis (X, Y, Z) and each component (Scale, Rotation, Translation):
+            // - Scale/Translation use simple linear interpolation: current + rate * (next - current)
+            // - Rotation uses interpolation with wrap-around handling to take the shortest path
+            //   when crossing the 0°/360° boundary (values are 16-bit: 0x0000-0xFFFF = 0°-360°)
+            f32 rate = mFrame - frame;
+            u32 next_frame = (u32)frame + 1;
+
+            // Scale X: Linear interpolation between keyframes
+            // OLD: pTransform->mScale.x = mScaleData[entryX->mScaleOffset + frame];
+            frame_max = entryX->mScaleMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mScale.x = mScaleData[entryX->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.x = mScaleData[entryX->mScaleOffset + frame]
+                    + rate * (mScaleData[entryX->mScaleOffset + next_frame]
+                            - mScaleData[entryX->mScaleOffset + frame]);
+            }
+
+            // Rotation X: Interpolate with wrap-around handling for 16-bit rotation values
+            // Handles shortest-path rotation by detecting when delta crosses 180° threshold
+            // OLD: pTransform->mRotation.x = mRotData[entryX->mRotationOffset + frame];
+            frame_max = entryX->mRotationMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mRotation.x = mRotData[entryX->mRotationOffset + (frame_max - 1)];
+            } else {
+                u32 rot1 = (u16)mRotData[entryX->mRotationOffset + frame];
+                u32 rot2 = (u16)mRotData[entryX->mRotationOffset + next_frame];
+                int delta = rot2 - rot1;
+                // If delta > 180°, rotate the other way (add 360° to rot1, subtract 360° from delta)
+                if (delta > 0x8000) {
+                    rot1 += 0x10000;
+                    delta -= 0x10000;
+                } else if (-delta > 0x8000) {  // If delta < -180°, rotate the other way
+                    delta += 0x10000;
+                }
+                pTransform->mRotation.x = (u32)((f32)rot1 + rate * (f32)delta);
+            }
+
+            // Translation X: Linear interpolation between keyframes
+            // OLD: pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + frame];
+            frame_max = entryX->mTranslateMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.x = mTransData[entryX->mTranslateOffset + frame]
+                    + rate * (mTransData[entryX->mTranslateOffset + next_frame]
+                            - mTransData[entryX->mTranslateOffset + frame]);
+            }
+
+            // Scale Y: Linear interpolation between keyframes
+            // OLD: pTransform->mScale.y = mScaleData[entryY->mScaleOffset + frame];
+            frame_max = entryY->mScaleMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mScale.y = mScaleData[entryY->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.y = mScaleData[entryY->mScaleOffset + frame]
+                    + rate * (mScaleData[entryY->mScaleOffset + next_frame]
+                            - mScaleData[entryY->mScaleOffset + frame]);
+            }
+
+            // Rotation Y: Interpolate with wrap-around handling for 16-bit rotation values
+            // OLD: pTransform->mRotation.y = mRotData[entryY->mRotationOffset + frame];
+            frame_max = entryY->mRotationMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mRotation.y = mRotData[entryY->mRotationOffset + (frame_max - 1)];
+            } else {
+                u32 rot1 = (u16)mRotData[entryY->mRotationOffset + frame];
+                u32 rot2 = (u16)mRotData[entryY->mRotationOffset + next_frame];
+                int delta = rot2 - rot1;
+                if (delta > 0x8000) {
+                    rot1 += 0x10000;
+                    delta -= 0x10000;
+                } else if (-delta > 0x8000) {
+                    delta += 0x10000;
+                }
+                pTransform->mRotation.y = (u32)((f32)rot1 + rate * (f32)delta);
+            }
+
+            // Translation Y: Linear interpolation between keyframes
+            // OLD: pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + frame];
+            frame_max = entryY->mTranslateMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.y = mTransData[entryY->mTranslateOffset + frame]
+                    + rate * (mTransData[entryY->mTranslateOffset + next_frame]
+                            - mTransData[entryY->mTranslateOffset + frame]);
+            }
+
+            // Scale Z: Linear interpolation between keyframes
+            // OLD: pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + frame];
+            frame_max = entryZ->mScaleMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + (frame_max - 1)];
+            } else {
+                pTransform->mScale.z = mScaleData[entryZ->mScaleOffset + frame]
+                    + rate * (mScaleData[entryZ->mScaleOffset + next_frame]
+                            - mScaleData[entryZ->mScaleOffset + frame]);
+            }
+
+            // Rotation Z: Interpolate with wrap-around handling for 16-bit rotation values
+            // OLD: pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + frame];
+            frame_max = entryZ->mRotationMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mRotation.z = mRotData[entryZ->mRotationOffset + (frame_max - 1)];
+            } else {
+                u32 rot1 = (u16)mRotData[entryZ->mRotationOffset + frame];
+                u32 rot2 = (u16)mRotData[entryZ->mRotationOffset + next_frame];
+                int delta = rot2 - rot1;
+                if (delta > 0x8000) {
+                    rot1 += 0x10000;
+                    delta -= 0x10000;
+                } else if (-delta > 0x8000) {
+                    delta += 0x10000;
+                }
+                pTransform->mRotation.z = (u32)((f32)rot1 + rate * (f32)delta);
+            }
+
+            // Translation Z: Linear interpolation between keyframes
+            // OLD: pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + frame];
+            frame_max = entryZ->mTranslateMaxFrame;
+            if (next_frame >= frame_max) {
+                pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + (frame_max - 1)];
+            } else {
+                pTransform->mTranslate.z = mTransData[entryZ->mTranslateOffset + frame]
+                    + rate * (mTransData[entryZ->mTranslateOffset + next_frame]
+                            - mTransData[entryZ->mTranslateOffset + frame]);
+            }
         }
     }
 }

@@ -588,11 +588,24 @@ void dMeterMap_c::meter_map_move(u32 param_0) {
     } else if (dMw_RIGHT_TRIGGER() && !isEventRunCheck() &&*/
 
 void dMeterMap_c::keyCheck() {
-    // Dpad left: Toggle framerate between 30fps and 60fps
+    // Dpad left: Toggle framerate between 30fps and selected fps (or stale mode)
     if (dMw_LEFT_TRIGGER() && !isEventRunCheck()) {
-        float currentFPS = getTargetFramerate();
-        float newFPS = (currentFPS <= 30.0f) ? 60.0f : 30.0f;
-        setTargetFramerate(newFPS);
+        float selectedFPS = getSelectedFramerate();
+        if (selectedFPS <= 0.0f) {
+            // Stale mode toggle
+            if (getStaleMode()) {
+                setStaleMode(0);
+                setTargetFramerate(30.0f);
+            } else {
+                setStaleMode(1);
+                setTargetFramerate(60.0f);
+            }
+        } else {
+            // Normal FPS toggle
+            float currentFPS = getTargetFramerate();
+            float newFPS = (currentFPS <= 30.0f) ? selectedFPS : 30.0f;
+            setTargetFramerate(newFPS);
+        }
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OK, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     }
 

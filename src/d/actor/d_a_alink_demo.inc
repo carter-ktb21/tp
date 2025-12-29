@@ -2164,7 +2164,8 @@ int daAlink_c::procCoGetItem() {
         }
     }
 
-    field_0x3478 += 1.0f;
+    // FIX: Scale door sound timer with DELTA_TIME for 60fps
+    field_0x3478 += 1.0f * DELTA_TIME;
     if (field_0x3478 > 100.0f) {
         field_0x3478 = 100.0f;
     }

@@ -25,6 +25,7 @@
 #include "d/d_msg_class.h"
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
+#include "JSystem/JUtility/JUTFont.h"
 #include "cstring.h"
 
 dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
@@ -724,6 +725,32 @@ void dMeter2Draw_c::draw() {
                    g_drawHIO.mMidnaIconPikariBackOuter, g_drawHIO.mMidnaIconPikariBackInner,
                    g_drawHIO.mMidnaIconPikariAnimSpeed, 3);
     }
+
+    // Draw FPS mode indicator
+    JUTFont* font = mDoExt_getMesgFont();
+    if (font) {
+        font->setGX();
+
+        const char* fpsLabel;
+        if (getStaleMode()) {
+            fpsLabel = "STALE";
+            font->setCharColor(JUtility::TColor(128, 128, 128, 255));
+        } else {
+            float currentFPS = getTargetFramerate();
+            if (currentFPS <= 30.0f) {
+                fpsLabel = "30";
+                font->setCharColor(JUtility::TColor(255, 255, 255, 255));
+            } else if (currentFPS <= 60.0f) {
+                fpsLabel = "60";
+                font->setCharColor(JUtility::TColor(100, 200, 255, 255));
+            } else {
+                fpsLabel = "MAX";
+                font->setCharColor(JUtility::TColor(255, 200, 100, 255));
+            }
+        }
+
+        font->drawString_scale(580.0f, 20.0f, 10.0f, 10.0f, fpsLabel, true);
+    }
 }
 
 void dMeter2Draw_c::initLife() {
@@ -1357,7 +1384,8 @@ void dMeter2Draw_c::drawPikari(f32 i_posX, f32 i_posY, f32* i_framep, f32 i_scal
     if (param_9 != 3 && param_9 != 4 && param_9 != 5 && dMsgObject_isTalkNowCheck()) {
         *i_framep = 0.0f;
     } else {
-        *i_framep += param_8;
+        // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+        *i_framep += param_8 * DELTA_TIME;
         if (*i_framep > var_f31) {
             if (param_9 == 1 || param_9 == 2 || param_9 == 3) {
                 *i_framep = 18.0f;

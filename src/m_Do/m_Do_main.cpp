@@ -62,6 +62,8 @@ float g_deltaTime = 0.5f;
 int g_scaleTime = 2;
 float g_targetFrameTime = 1.0f / 30.0f;
 float g_targetFramerate = 60.0f;
+float g_selectedFramerate = 60.0f;
+int g_staleMode = 0;
 static OSTime s_lastFrameTime = 0;
 static int s_initialized = 0;
 
@@ -77,6 +79,22 @@ void setTargetFramerate(float fps) {
 
 float getTargetFramerate() {
     return g_targetFramerate;
+}
+
+void setSelectedFramerate(float fps) {
+    g_selectedFramerate = fps;
+}
+
+float getSelectedFramerate() {
+    return g_selectedFramerate;
+}
+
+void setStaleMode(int enabled) {
+    g_staleMode = enabled;
+}
+
+int getStaleMode() {
+    return g_staleMode;
 }
 
 int shouldUpdateGameLogic() {
@@ -124,6 +142,11 @@ void updateDeltaTime() {
     }
 
     g_deltaTime = deltaTime30fps;
+
+    // Stale mode: freeze all delta-time based animations
+    if (g_staleMode) {
+        g_deltaTime = 0.0f;
+    }
 
     // Keep SCALE_TIME aligned with the *selected* mode to preserve existing timer scaling behavior.
     // In 60fps mode, timers are typically initialized with `frames * SCALE_TIME` and decremented by 1
@@ -269,7 +292,7 @@ void HeapCheck::heapDisplay() const {
 int mDoMain::argument = -1;
 #endif
 
-s8 mDoMain::developmentMode = true;
+s8 mDoMain::developmentMode = DEVELOPMENT_MODE;
 
 #if DEBUG
 u32 mDoMain::gameHeapSize = 0xFFFFFFFF;

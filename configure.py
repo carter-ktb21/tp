@@ -14,6 +14,7 @@
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -293,6 +294,10 @@ if args.debug:
     cflags_base.extend(["-sym on", "-DDEBUG=1", "-DDEBUG_DEFINED=1", "-DNDEBUG_DEFINED=0"])
 else:
     cflags_base.extend(["-DNDEBUG=1", "-DNDEBUG_DEFINED=1", "-DDEBUG_DEFINED=0"])
+
+# Development mode flag (read from .env via environment)
+dev_mode = os.environ.get("DEVELOPMENT_MODE", "true").lower() == "true"
+cflags_base.append(f"-DDEVELOPMENT_MODE={1 if dev_mode else 0}")
 
 # Warning flags
 if args.warn == "all":

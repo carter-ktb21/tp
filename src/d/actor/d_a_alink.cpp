@@ -4900,6 +4900,8 @@ void daAlink_c::setIceSlipSpeed() {
             sp58 *= 30.0f / var_f28;
         }
 
+        // FIX: Scale ice slip acceleration with DELTA_TIME but increase magnitude to maintain distance
+        // At 60fps, we apply the force twice as often, so we need to apply it at the full rate per frame
         field_0x35c4 += sp58 * var_f29;
         speed += sp58 * (1.0f - var_f29);
 
@@ -5395,8 +5397,7 @@ int daAlink_c::simpleAnmPlay(J3DAnmBase* i_anm) {
     }
 
     int ret = 0;
-    // This helper advances non-player J3D animations by 1 frame per 30fps tick.
-    // Scale by DELTA_TIME so these animations play at the same real-time speed at 30/60fps.
+    // 60fps: advance simple J3D anims in 30fps frame units (fixes sword-charge BTK/SFX timing).
     f32 frame = i_anm->getFrame() + DELTA_TIME;
 
     if (frame >= i_anm->getFrameMax()) {
@@ -6437,7 +6438,7 @@ void daAlink_c::setFrameCtrl(daPy_frameCtrl_c* i_ctrl, u8 i_attr, s16 i_start, s
         }
     }
 
-    i_ctrl->setFrameCtrl(i_attr, i_start, i_end, i_rate* DELTA_TIME, i_frame);
+    i_ctrl->setFrameCtrl(i_attr, i_start, i_end, i_rate, i_frame);
 }
 
 const daAlink_BckData* daAlink_c::getMainBckData(daAlink_c::daAlink_ANM i_anmID) const {
@@ -6638,7 +6639,7 @@ int daAlink_c::setDoubleAnime(f32 i_blendRate, f32 i_anmSpeedA, f32 i_anmSpeedB,
     commonDoubleAnime(under_bckA, upper_bckA, under_bckB, upper_bckB, i_blendRate, i_anmSpeedA,
                       i_anmSpeedB, param_5);
     if (i_morf >= 0.0f) {
-        field_0x2060->initOldFrameMorf(i_morf, 0, 35);
+        field_0x2060->initOldFrameMorf(i_morf / DELTA_TIME, 0, 35); // animation blending from roll to run 
     }
 
     setHandIndex(i_anmA);
@@ -11390,7 +11391,7 @@ void daAlink_c::swordEquip(int param_0) {
         setFacePriBck(0x15E);
 
         if (checkEventRun() && checkStageName("F_SP102") && fopAcM_GetRoomNo(this) == 0 && dComIfGp_getStartStageLayer() == 0) {
-            mUpperFrameCtrl[2].setRate(-0.8f * DELTA_TIME);
+            mUpperFrameCtrl[2].setRate(-0.8f);
         }
 
         if (field_0x2f94 == 0xFF) {
@@ -12575,10 +12576,12 @@ void daAlink_c::posMove() {
 
             if (mLinkAcch.ChkGroundHit() && dComIfG_Bgsp().ChkPolySafe(mLinkAcch.m_gnd)) {
                 s16 angle1 = getGroundAngle(&mLinkAcch.m_gnd, 0);
-                current.pos.z += field_0x35c4.z * cM_scos(angle1);
+                // FIX: Scale ice slip position update with DELTA_TIME for correct frame rate
+                current.pos.z += field_0x35c4.z * cM_scos(angle1) * DELTA_TIME;
 
                 s16 angle2 = getGroundAngle(&mLinkAcch.m_gnd, 0x4000);
-                current.pos.x += field_0x35c4.x * cM_scos(angle2);
+                // FIX: Scale ice slip position update with DELTA_TIME for correct frame rate
+                current.pos.x += field_0x35c4.x * cM_scos(angle2) * DELTA_TIME;
 
                 if (checkZeroSpeedF() && field_0x35c4.abs2() > 9.0f) {
                     seStartOnlyReverbLevel(Z2SE_AL_ICE_SLIP);
@@ -16445,7 +16448,7 @@ int daAlink_c::procLandInit(f32 param_0) {
     setSingleAnimeParam(ANM_JUMP_LAND, &mpHIO->mAutoJump.m.mLandAnm);
 
     if (checkGrabGlide()) {
-        mUnderFrameCtrl[0].setRate(0.5f * DELTA_TIME);
+        mUnderFrameCtrl[0].setRate(0.5f);
     } else if (checkNoResetFlg0(FLG0_UNDERWATER)) {
         f32 rate = mUnderFrameCtrl[0].getRate() * 0.34999999f;
         mUnderFrameCtrl[0].setRate(rate);

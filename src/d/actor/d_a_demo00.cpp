@@ -1165,7 +1165,7 @@ inline int daDemo00_c::execute() {
 
         action(actor);
 
-        #if WIDESCREEN_SUPPORT
+        #if !PLATFORM_GCN
         if (field_0x6b1 != 0) {
             mDoGph_gInf_c::onWideZoom();
         }

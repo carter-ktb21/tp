@@ -234,7 +234,7 @@ int daAlink_c::procGrassWhistleWait() {
 
             if (mProcVar2.field_0x300c == 0) {
                 voiceStart(Z2SE_PLAY_REED_TOBIKUSA);
-                mProcVar0.field_0x3008 = 100;
+                mProcVar0.field_0x3008 = (s16)(100 / DELTA_TIME + 0.5f);
 
                 if (dComIfGs_isEventBit(dSv_event_flag_c::F_0700) &&
                     dComIfGs_isEventBit(dSv_event_flag_c::F_0037))
@@ -243,7 +243,7 @@ int daAlink_c::procGrassWhistleWait() {
                 }
             } else {
                 voiceStart(Z2SE_PLAY_REED_UMAKUSA);
-                mProcVar0.field_0x3008 = 140;
+                mProcVar0.field_0x3008 = (s16)(140 / DELTA_TIME + 0.5f);
 
                 if (mProcVar2.field_0x300c == 1) {
                     dComIfGs_onEventBit(dSv_event_flag_c::F_0580);
@@ -267,11 +267,11 @@ int daAlink_c::procCoHorseCallWaitInit(int param_0) {
     commonProcInit(PROC_HORSE_CALL_WAIT);
 
     if (param_0 == 4) {
-        mProcVar4.field_0x3010 = 2;
+        mProcVar4.field_0x3010 = (s16)(2 / DELTA_TIME + 0.5f);
     } else if (param_0 == 1) {
-        mProcVar4.field_0x3010 = 0x3D;
+        mProcVar4.field_0x3010 = (s16)(0x3D / DELTA_TIME + 0.5f);
     } else {
-        mProcVar4.field_0x3010 = 0x10;
+        mProcVar4.field_0x3010 = (s16)(0x10 / DELTA_TIME + 0.5f);
     }
 
     if (checkWolf()) {
@@ -289,14 +289,19 @@ int daAlink_c::procCoHorseCallWait() {
     setGrassCancelStatus(0);
 
     mProcVar4.field_0x3010--;
-    if (mProcVar4.field_0x3010 > 2 && dComIfGp_getHorseActor() != NULL) {
-        cLib_addCalcAngleS(&shape_angle.y, fopAcM_searchActorAngleY(this, dComIfGp_getHorseActor()), 2, 0x2000, 0x800);
+
+    s16 scaledThreshold2 = (s16)(2 / DELTA_TIME + 0.5f);
+    if (mProcVar4.field_0x3010 > scaledThreshold2 && dComIfGp_getHorseActor() != NULL) {
+        cLib_addCalcAngleS(&shape_angle.y, fopAcM_searchActorAngleY(this, dComIfGp_getHorseActor()), 2, 0x2000 * DELTA_TIME, 0x800);
         current.angle.y = shape_angle.y;
     }
 
-    if (mProcVar4.field_0x3010 == 60) {
+    s16 cameraEvent2Frame = (s16)(60 / DELTA_TIME + 0.5f);
+    s16 cameraEvent3Frame = (s16)(15 / DELTA_TIME + 0.5f);
+
+    if (mProcVar4.field_0x3010 == cameraEvent2Frame) {
         dCam_getBody()->EventFlag(2);
-    } else if (mProcVar4.field_0x3010 == 15) {
+    } else if (mProcVar4.field_0x3010 == cameraEvent3Frame) {
         dCam_getBody()->EventFlag(3);
     } else if (mProcVar4.field_0x3010 == 0) {
         resetSpecialEvent();

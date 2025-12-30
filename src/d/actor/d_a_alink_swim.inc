@@ -111,9 +111,6 @@ void daAlink_c::setWaterInAnmRate(daPy_frameCtrl_c* i_frameCtrl, f32 i_rate) {
         }
     }
 
-    // daPy_frameCtrl_c::updateFrame() advances by `rate` each game tick.
-    // Scale here so any direct per-frame rate updates remain real-time consistent at 30/60fps.
-    i_rate *= DELTA_TIME;
     i_frameCtrl->setRate(i_rate);
 }
 
@@ -796,9 +793,9 @@ void daAlink_c::setSwimMoveAnime() {
     if (var_r29 != ANM_SWIM_WAIT && var_r29 != ANM_SWIM_DASH) {
         f32 temp_f30 = var_f31 * fabsf(mNormalSpeed);
         if (temp_f30 > 1.0f && field_0x2f98 == 4) {
-            temp_r28->setRate((mpHIO->mSwim.m.mUnderwaterMaxAnmSpeed + ((temp_f30 - 1.0f) * mpHIO->mSwim.m.mUnderwaterAdditionalAnmSpeed)) * DELTA_TIME);
+            temp_r28->setRate(mpHIO->mSwim.m.mUnderwaterMaxAnmSpeed + ((temp_f30 - 1.0f) * mpHIO->mSwim.m.mUnderwaterAdditionalAnmSpeed));
         } else {
-            temp_r28->setRate((field_0x3478 + (field_0x347c * temp_f30)) * DELTA_TIME);
+            temp_r28->setRate(field_0x3478 + (field_0x347c * temp_f30));
         }
     }
 

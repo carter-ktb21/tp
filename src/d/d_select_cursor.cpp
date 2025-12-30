@@ -270,9 +270,11 @@ void dSelect_cursor_c::update() {
         if (field_0x30) {
             if (chkPlayAnime(0)) {
                 if (mNameIdx == 1) {
-                    field_0x44 += mpCursorHIO->field_0x8 * fVar1;
+                    // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                    field_0x44 += mpCursorHIO->field_0x8 * fVar1 * DELTA_TIME;
                 } else {
-                    field_0x44 += fVar1;
+                    // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                    field_0x44 += fVar1 * DELTA_TIME;
                 }
 
                 if (field_0x44 >= field_0x30->getFrameMax()) {
@@ -294,9 +296,11 @@ void dSelect_cursor_c::update() {
             if (field_0x34[i]) {
                 if ((i == 0 && chkPlayAnime(2)) || (i == 1 && chkPlayAnime(3))) {
                     if (mNameIdx == 1) {
-                        field_0x48[i] += mpCursorHIO->field_0x8 * fVar1;
+                        // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                        field_0x48[i] += mpCursorHIO->field_0x8 * fVar1 * DELTA_TIME;
                     } else {
-                        field_0x48[i] += fVar1;
+                        // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                        field_0x48[i] += fVar1 * DELTA_TIME;
                     }
                     if (field_0x48[i] >= field_0x34[i]->getFrameMax()) {
                         field_0x48[i] -= field_0x34[i]->getFrameMax();
@@ -310,9 +314,11 @@ void dSelect_cursor_c::update() {
 
         if (field_0x2C && chkPlayAnime(1)) {
             if (mNameIdx == 1) {
-                    field_0x40 += mpCursorHIO->field_0x8 * fVar1;
+                    // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                    field_0x40 += mpCursorHIO->field_0x8 * fVar1 * DELTA_TIME;
                 } else {
-                    field_0x40 += fVar1;
+                    // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+                    field_0x40 += fVar1 * DELTA_TIME;
                 }
                 if (field_0x40 >= field_0x2C->getFrameMax()) {
                     field_0x40 -= field_0x2C->getFrameMax();
@@ -508,7 +514,8 @@ void dSelect_cursor_c::setCursorAnimation() {
         fVar1 = 0.5f;
     }
 
-    field_0x40 += fVar1;
+    // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+    field_0x40 += fVar1 * DELTA_TIME;
     if (field_0x40 >= 20.0f) {
         field_0x40 -= 20.0f;
     }

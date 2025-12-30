@@ -310,7 +310,7 @@ public:
     f32 getLoopFrame() { return mFrameCtrl.getLoop(); }
     void setLoopFrame(f32 frame) { mFrameCtrl.setLoop(frame); }
     f32 getPlaySpeed() { return mFrameCtrl.getRate(); }
-    void setPlaySpeed(f32 speed) { mFrameCtrl.setRate(speed * DELTA_TIME); }
+    void setPlaySpeed(f32 speed) { mFrameCtrl.setRate(speed); }
     f32 getFrame() { return mFrameCtrl.getFrame(); }
     void setFrame(f32 frame) { mFrameCtrl.setFrame((s16)frame); }
     void setFrameF(f32 frame) { mFrameCtrl.setFrame(frame); }

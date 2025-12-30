@@ -173,13 +173,16 @@ cXyz daNPC_TK_c::chaseTargetPos(cXyz param_0, f32 param_1, f32 param_2, s16 para
                        unkInt1);
     current.angle.y = shape_angle.y;
     f32 dVar3 = setAddCalcSpeedXZ(current.pos, param_0, 8.0f, param_1, 1.0f);
+    f32 origDVar3 = dVar3;
     if (dVar3 > param_2) {
         dVar3 = param_2;
     }
     if (dVar3 < -param_2) {
         dVar3 = -param_2;
     }
-    cLib_chaseF(&speed.y, dVar3, 3.0f);
+
+    f32 scaledTarget = dVar3 * DELTA_TIME;
+    cLib_chaseF(&speed.y, scaledTarget, 3.0f * DELTA_TIME);
     return param_0 - current.pos;
 }
 
@@ -457,7 +460,7 @@ void daNPC_TK_c::initPerchDemo(int param_0) {
 
         setBck(8, 2, 3.0f, 1.0f);
 
-        speed.y = -32.0f;
+        speed.y = -32.0f * DELTA_TIME;
         speedF = 20.0f;
 
         commonXyz1.set(100.0f, 150.0f, 0.0f);
@@ -507,12 +510,12 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
             targetPos = chaseTargetPos(field_0x604, field_0x678, 20.0f, 0x80);
 
             if ((field_0x698 & 0x10) != 0) {
-                cLib_chaseF(&field_0x67c, 5.0f, 1.0f);
+                cLib_chaseF(&field_0x67c, 5.0f, 1.0f * DELTA_TIME);
             } else {
-                cLib_chaseF(&field_0x67c, -5.0f, 1.0f);
+                cLib_chaseF(&field_0x67c, -5.0f, 1.0f * DELTA_TIME);
             }
 
-            current.pos.y = current.pos.y + field_0x67c;
+            current.pos.y = current.pos.y + field_0x67c * DELTA_TIME;
 
             if (abs(cLib_targetAngleY(&current.pos, &field_0x604) - shape_angle.y) <= 0x800) {
                 if (field_0x6c2 == 0) {
@@ -530,12 +533,12 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
             }
         } else if (field_0x694 == 0) {
             if ((field_0x698 & 0x20) != 0) {
-                cLib_chaseF(&field_0x67c, 3.0f, 0.3f);
+                cLib_chaseF(&field_0x67c, 3.0f, 0.3f * DELTA_TIME);
             } else {
-                cLib_chaseF(&field_0x67c, -3.0f, 0.3f);
+                cLib_chaseF(&field_0x67c, -3.0f, 0.3f * DELTA_TIME);
             }
 
-            current.pos.y = current.pos.y + field_0x67c;
+            current.pos.y = current.pos.y + field_0x67c * DELTA_TIME;
 
             pathPos = dPath_GetPnt(mpPath1, mPathStep2)->m_position;
             cLib_addCalcAngleS(&current.angle.y, cLib_targetAngleY(&current.pos, &pathPos), 0x20,
@@ -572,7 +575,7 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
             cLib_addCalcAngleS(&shape_angle.x, cLib_targetAngleX(&current.pos, &masterPos), 4,
                                0x200, 0x40);
             targetPos = chaseTargetPos(masterPos, field_0x678, field_0x678, 0x800);
-            cLib_chaseF(&field_0x678, 60.0f, 1.0f);
+            cLib_chaseF(&field_0x678, 60.0f, 1.0f * DELTA_TIME);
             if (targetPos.abs() < 700.0f) {
                 return true;
             }
@@ -580,7 +583,7 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
 
         break;
     case 2:
-        cLib_chaseF(&speed.y, 0.0f, 1.0f);
+        cLib_chaseF(&speed.y, 0.0f, 1.0f * DELTA_TIME);
 
         if (current.pos.absXZ(field_0x604) < 150.0f) {
             shape_angle.y = current.angle.y = cLib_targetAngleY(&current.pos, &field_0x604);
@@ -592,16 +595,17 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
         setMasterShoulder(&field_0x604);
         cLib_addCalcAngleS(&shape_angle.y, getMasterPointer()->shape_angle.y - 0x2800, 8, 0x800,
                            0x100);
+
         switch (field_0x694) {
         case 0:
-            cLib_chaseF(&speedF, 0.0f, 1.3f);
-            if (cLib_chaseF(&speed.y, 6.0f, 1.0f) != 0) {
+            cLib_chaseF(&speedF, 0.0f, 1.3f * DELTA_TIME);
+            if (cLib_chaseF(&speed.y, 6.0f * DELTA_TIME, 1.0f * DELTA_TIME) != 0) {
                 field_0x694 = 1;
             }
             break;
         case 1:
-            cLib_chaseF(&speedF, 0.0f, 1.3f);
-            if (cLib_chaseF(&speed.y, 0.0f, 1.0f) != 0) {
+            cLib_chaseF(&speedF, 0.0f, 1.3f * DELTA_TIME);
+            if (cLib_chaseF(&speed.y, 0.0f, 1.0f * DELTA_TIME) != 0) {
                 field_0x694 = 2;
                 setBck(9, 0, 5.0f, 1.0f);
                 field_0x678 = 0.0f;
@@ -611,7 +615,8 @@ bool daNPC_TK_c::executePerchDemo(int param_0) {
             setMasterShoulder(&field_0x604);
             cLib_addCalcAngleS(&shape_angle.y, getMasterPointer()->shape_angle.y - 0x2800, 8, 0x800,
                                0x100);
-            cLib_chaseF(&field_0x678, 4.0f, 1.0f);
+            cLib_chaseF(&speedF, 0.0f, 1.3f * DELTA_TIME);
+            cLib_chaseF(&field_0x678, 4.0f * DELTA_TIME, 1.0f * DELTA_TIME);
 
             if (cLib_chasePos(&current.pos, field_0x604, field_0x678) != 0) {
                 field_0x694 = 3;

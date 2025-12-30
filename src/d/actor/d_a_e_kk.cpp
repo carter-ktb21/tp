@@ -944,7 +944,9 @@ void daE_KK_c::executeWeaponMove() {
         field_0x674 = fopAcM_searchPlayerAngleX(this) - 0x2EE0;
         shape_angle.z = -0x389A;
 
-        mTimer = 200;
+        // FIX: Scale spear lifetime with SCALE_TIME so it flies the same distance at 60fps
+        // (position updates use DELTA_TIME via global actor system, timer needs to last 2x longer)
+        mTimer = 200 * SCALE_TIME;
         speedF = 120.0f;
 
         mMovingRange = 20.0f - (fopAcM_searchPlayerDistance(this) - l_HIO.direct_attack_range) / 7.0f;

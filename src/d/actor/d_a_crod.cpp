@@ -24,7 +24,7 @@ enum daCrod_ANM {
     /* 18 */ ANM_WAIT_C,
 };
 
-// not sure what this is
+// not sure what this is    looks like a state machine
 static u8 const lit_3759[12] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
@@ -155,7 +155,7 @@ void daCrod_c::posMove() {
         speedF * cM_ssin(current.angle.x),
         speedF * cM_scos(current.angle.y) * cM_scos(current.angle.x)
     );
-    current.pos += speed;
+    current.pos += speed * DELTA_TIME; // ball velocity
 }
 
 void daCrod_c::setBckAnm(u16 i_anmResID) {

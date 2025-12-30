@@ -148,7 +148,7 @@ void daAlink_c::setBoomerangReadyAnime() {
         var_f31 = 0.0f;
     }
 
-    setUpperAnimeBaseSpeed(0x54, var_f31, 3.0f * DELTA_TIME);
+    setUpperAnimeBaseSpeed(0x54, var_f31, 3.0f);
     setBoomerangReadyQuake();
 }
 

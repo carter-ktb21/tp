@@ -701,7 +701,8 @@ bool dMenu_Ring_c::isClose() {
     if (field_0x674[0] != 0 || field_0x674[1] != 0 || field_0x674[2] != 0 || field_0x674[3] != 0) {
         return 0;
     }
-    mOpenCloseFrames--;
+    // FIX: Scale close animation timer with DELTA_TIME for correct frame rate
+    mOpenCloseFrames -= DELTA_TIME;
     mAlphaRate = (f32)mOpenCloseFrames / (f32)g_ringHIO.mCloseFrames;
     if (mOpenCloseFrames <= 0) {
         for (int i = 0; i < 4; i++) {
@@ -1377,7 +1378,8 @@ void dMenu_Ring_c::stick_wait_proc() {
         Z2GetAudioMgr()->seStart(Z2SE_SYS_ERROR, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     }
     if (mWaitFrames > 0) {
-        mWaitFrames--;
+        // FIX: Scale wait timer with DELTA_TIME for correct frame rate
+        mWaitFrames -= DELTA_TIME;
     } else if (getStickInfo(mpStick) != 0) {
         setStatus(STATUS_MOVE);
         field_0x6b2 = 0;
@@ -1423,7 +1425,7 @@ void dMenu_Ring_c::stick_move_proc() {
     } else {
         if (field_0x6d3 == 0xff) {
             cLib_addCalcAngleS(&field_0x66e, field_0x670, 4, 0x7FFF, mCursorSpeed);
-        } else {
+        } else{
             if (field_0x6d3 == 0) {
                 field_0x66e = -0x2007;
             } else {
@@ -1849,9 +1851,11 @@ u8 dMenu_Ring_c::getItem(int i_slot_no, u8 i_slot_no2) {
 void dMenu_Ring_c::setDoStatus(u8 i_doStatus) {
     if (i_doStatus == 0 && mDoStatus == 0x24) {
         if (field_0x68e > 0) {
-            field_0x68e--;
-            if (field_0x68e == 0) {
+            // FIX: Scale status timer with DELTA_TIME for correct frame rate
+            field_0x68e -= DELTA_TIME;
+            if (field_0x68e <= 0) {
                 mDoStatus = 0;
+                field_0x68e = 0;
             }
         } else {
             field_0x68e = 10;

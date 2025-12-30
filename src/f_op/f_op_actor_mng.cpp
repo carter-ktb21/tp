@@ -537,12 +537,15 @@ bool fopAcM_addAngleY(fopAc_ac_c* i_actor, s16 i_target, s16 i_step) {
 }
 
 void fopAcM_calcSpeed(fopAc_ac_c* i_actor) {
-    f32 speedF = fopAcM_GetSpeedF(i_actor) * DELTA_TIME;
+    // FIX: Don't scale speedF here - position update in fopAcM_posMove already applies DELTA_TIME
+    // (This function converts speedF + angle into speed.x/y/z components)
+    f32 speedF = fopAcM_GetSpeedF(i_actor);
     f32 gravity = fopAcM_GetGravity(i_actor);
     cXyz* speed = fopAcM_GetSpeed_p(i_actor);
 
     f32 xSpeed = speedF * cM_ssin(i_actor->current.angle.y);
-    f32 ySpeed = speed->y + gravity;
+    // FIX: Scale gravity with DELTA_TIME since it's an acceleration applied per frame
+    f32 ySpeed = speed->y + gravity * DELTA_TIME;
     f32 zSpeed = speedF * cM_scos(i_actor->current.angle.y);
 
     if (ySpeed < fopAcM_GetMaxFallSpeed(i_actor)) {
@@ -554,14 +557,16 @@ void fopAcM_calcSpeed(fopAc_ac_c* i_actor) {
 void fopAcM_posMove(fopAc_ac_c* i_actor, const cXyz* i_movePos) {
     cXyz* pos = fopAcM_GetPosition_p(i_actor);
     cXyz* speed = fopAcM_GetSpeed_p(i_actor);
-    pos->x += speed->x;
-    pos->y += speed->y;
-    pos->z += speed->z;
+    // FIX: Scale position updates with DELTA_TIME for correct frame rate
+    pos->x += speed->x * DELTA_TIME;
+    pos->y += speed->y * DELTA_TIME;
+    pos->z += speed->z * DELTA_TIME;
 
     if (i_movePos != NULL) {
-        pos->x += i_movePos->x;
-        pos->y += i_movePos->y;
-        pos->z += i_movePos->z;
+        // FIX: Scale additional movement with DELTA_TIME for correct frame rate
+        pos->x += i_movePos->x * DELTA_TIME;
+        pos->y += i_movePos->y * DELTA_TIME;
+        pos->z += i_movePos->z * DELTA_TIME;
     }
 }
 

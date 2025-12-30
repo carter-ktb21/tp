@@ -834,9 +834,6 @@ void daHorse_c::resetBasAnime() {
 
 int daHorse_c::setDoubleAnime(f32 i_ratio, f32 i_anmSpeedA, f32 i_anmSpeedB, u16 i_anmIdxA, u16 i_anmIdxB,
                               f32 i_morf) {
-    // Boofener: Scale animation speeds for 60fps
-    i_anmSpeedA *= DELTA_TIME;
-    i_anmSpeedB *= DELTA_TIME;
 
     J3DAnmTransform* temp_r26 = m_anmRatio[0].getAnmTransform();
     if (i_morf < 0.0f && (m_anmIdx[0] != ANM_HS_RUN_DASH || i_anmIdxA != ANM_HS_RUN_SLOW) && (m_anmIdx[0] != i_anmIdxA || m_anmIdx[1] != i_anmIdxB)) {
@@ -885,7 +882,7 @@ int daHorse_c::setDoubleAnime(f32 i_ratio, f32 i_anmSpeedA, f32 i_anmSpeedB, u16
     m_anmRatio[1].setAnmTransform(bckB);
 
     if (i_morf >= 0.0f) {
-        m_oldFrame->initOldFrameMorf(i_morf, 0, 38);
+        m_oldFrame->initOldFrameMorf(i_morf / DELTA_TIME, 0, 38);
         m_morf_frame = i_morf;
     }
 
@@ -900,10 +897,6 @@ int daHorse_c::setDoubleAnime(f32 i_ratio, f32 i_anmSpeedA, f32 i_anmSpeedB, u16
 
 int daHorse_c::setSingleAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_endF, f32 i_morf,
                               BOOL i_isDemoAnm) {
-    // Boofener: Scale animation speed for 60fps (but NOT for demo anims - they're frame-controlled by demo system)
-    if (!i_isDemoAnm) {
-        i_speed *= DELTA_TIME;
-    }
 
     J3DAnmTransform* bck;
     if (i_isDemoAnm) {
@@ -947,7 +940,7 @@ int daHorse_c::setSingleAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_end
     bck->setFrame(frame);
 
     if (i_morf >= 0.0f) {
-        m_oldFrame->initOldFrameMorf(i_morf, 0, 38);
+        m_oldFrame->initOldFrameMorf(i_morf / DELTA_TIME, 0, 38);
         m_morf_frame = i_morf;
     }
 
@@ -3171,8 +3164,6 @@ void daHorse_c::setNeckAnimeMorf() {
 }
 
 void daHorse_c::setNeckAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_endF) {
-    // Boofener: Scale animation speed for 60fps
-    i_speed *= DELTA_TIME;
 
     J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, i_anmIdx);
 

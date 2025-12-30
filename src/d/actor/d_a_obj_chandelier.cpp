@@ -182,8 +182,9 @@ void daObjChandelier_c::setModelMtx() {
 
 void daObjChandelier_c::moveSwing(f32 param_0, f32 param_1, f32 param_2, f32 param_3) {
     f32 f1 = -param_1 + param_0 * field_0x5fc;
-    shape_angle.z += (s16)(field_0x608 * (f1 * field_0x5ec));
-    shape_angle.y += (s16)(field_0x608 * field_0x604 * field_0x5ec);
+    // FIX: Scale swing angle updates with DELTA_TIME for correct swing speed at 60fps
+    shape_angle.z += (s16)(field_0x608 * (f1 * field_0x5ec) * DELTA_TIME);
+    shape_angle.y += (s16)(field_0x608 * field_0x604 * field_0x5ec * DELTA_TIME);
     if (f1 > param_1) {
         field_0x5fc = 0;
         field_0x608 *= -1;
@@ -192,7 +193,8 @@ void daObjChandelier_c::moveSwing(f32 param_0, f32 param_1, f32 param_2, f32 par
             field_0x5f0 = param_3 + cM_rndF(param_3);
         }
     }
-    field_0x606 += field_0x608 * 0x200;
+    // FIX: Scale rotation update with DELTA_TIME for correct oscillation speed at 60fps
+    field_0x606 += field_0x608 * 0x200 * DELTA_TIME;
     current.pos.x = home.pos.x + cM_ssin(field_0x606) * 3.0f;
     current.pos.z = home.pos.z + cM_scos(field_0x606) * 3.0f;
     u32 u1 = field_0x5f8 * field_0x5ec * 127.0f * 0.1f;

@@ -212,8 +212,8 @@ void dGameover_c::playerAnmWait_proc() {
 }
 
 void dGameover_c::dispFadeOut_init() {
-    mTimer = 30;
-    mDoGph_gInf_c::startFadeOut(15);
+    mTimer = 30 * SCALE_TIME;
+    mDoGph_gInf_c::startFadeOut(15); // fade out timer
 }
 
 void dGameover_c::dispFadeOut_proc() {
@@ -225,7 +225,7 @@ void dGameover_c::dispFadeOut_proc() {
 }
 
 void dGameover_c::dispWait_init() {
-    mTimer = 90;
+    mTimer = 90 * SCALE_TIME; // fade in timer
     mDoGph_gInf_c::startFadeIn(30);
 }
 
@@ -245,13 +245,13 @@ void dGameover_c::demoFadeIn_proc() {
     mTimer++;
     dgo_screen_c->setBackAlpha(1.0f);
 
-    if (mTimer >= 30) {
+    if (mTimer >= 30 * SCALE_TIME) {
         mProc = PROC_SAVE_OPEN;
     }
 }
 
 void dGameover_c::demoFadeOut_init() {
-    mTimer = 30;
+    mTimer = 30 * SCALE_TIME;
 }
 
 void dGameover_c::demoFadeOut_proc() {

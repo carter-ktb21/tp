@@ -361,13 +361,14 @@ void dName_c::playNameSet(int nameLength) {
 }
 
 void dName_c::cursorAnm() {
-    mCurColAnmF += 2;
+    // FIX: Scale J2D cursor blink animation frame increments with DELTA_TIME for correct speed at 60fps
+    mCurColAnmF += 2 * DELTA_TIME;
     if (mCurColAnmF >= mCursorColorKey->getFrameMax()) {
         mCurColAnmF -= mCursorColorKey->getFrameMax();
     }
     mCursorColorKey->setFrame(mCurColAnmF);
 
-    mCurTexAnmF += 2;
+    mCurTexAnmF += 2 * DELTA_TIME;
     if (mCurTexAnmF >= mCursorTexKey->getFrameMax()) {
         mCurTexAnmF -= mCursorTexKey->getFrameMax();
     }

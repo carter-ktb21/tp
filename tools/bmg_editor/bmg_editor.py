@@ -664,53 +664,51 @@ def main():
         bmgs.insert(i, parse_bmg(entry.data, entry.name))
 
     # Search Tool
-    # while True:
-    #     print("--------------------\n" +
-    #           "1) Search by message ID\n" +
-    #           "2) Search by Flow ID\n" +
-    #           "3) Rebuild bmg files\n" +
-    #           "4) Cancel\n" +
-    #           "--------------------\n")
-    #     choice = int(input("Enter menu choice: "))
-    #     match choice:
-    #         case 1:
-    #             msg_id_target = int(input("Enter msgId (hex): "), 16)
-    #             for bmg in bmgs:
-    #                 for dat1_entry in bmg.dat1_section.entries:
-    #                     if dat1_entry.msgId == msg_id_target:
-    #                         print(f"\n{bmg.name}")
-    #                         print(f"{string_cleanup(dat1_entry.message)}\n")
+    while True:
+        print("--------------------\n" +
+              "1) Search by message ID\n" +
+              "2) Search by Flow ID\n" +
+              "3) Rebuild iso with custom bmgs\n" +
+              "--------------------\n")
+        choice = int(input("Enter menu choice: "))
+        match choice:
+            case 1:
+                msg_id_target = int(input("Enter msgId (hex): "), 16)
+                for bmg in bmgs:
+                    for dat1_entry in bmg.dat1_section.entries:
+                        if dat1_entry.msgId == msg_id_target:
+                            print(f"\n{bmg.name}")
+                            print(f"{string_cleanup(dat1_entry.message)}\n")
 
-    #         case 2:
-    #             flow_id_target = int(input("Enter flow ID (hex): "), 16)
-    #             for bmg in bmgs:
-    #                 for fli1_entry in bmg.fli1_section.entries:
-    #                     if bytes_to_int(fli1_entry.id) == flow_id_target:
-    #                         flw1_idx = bytes_to_int(fli1_entry.flw1_idx)
-    #                         if flw1_idx < len(bmg.flw1_section.flow_nodes):
-    #                             node = bmg.flw1_section.flow_nodes[flw1_idx]
-    #                             type = bytes_to_int(node.type)
-    #                             match type:
-    #                                 case 1:
-    #                                     inf1_idx = bytes_to_int(node.inf1_index)
-    #                                     dat1_offset = bmg.inf1_section.entries[inf1_idx].dat1_offset
-    #                                     for dat1_entry in bmg.dat1_section.entries:
-    #                                         if dat1_entry.offset == dat1_offset:
-    #                                             print(f"{bmg.name}\n{string_cleanup(dat1_entry.message)}\n")
+            case 2:
+                flow_id_target = int(input("Enter flow ID (hex): "), 16)
+                for bmg in bmgs:
+                    for fli1_entry in bmg.fli1_section.entries:
+                        if bytes_to_int(fli1_entry.id) == flow_id_target:
+                            flw1_idx = bytes_to_int(fli1_entry.flw1_idx)
+                            if flw1_idx < len(bmg.flw1_section.flow_nodes):
+                                node = bmg.flw1_section.flow_nodes[flw1_idx]
+                                type = bytes_to_int(node.type)
+                                match type:
+                                    case 1:
+                                        inf1_idx = bytes_to_int(node.inf1_index)
+                                        dat1_offset = bmg.inf1_section.entries[inf1_idx].dat1_offset
+                                        for dat1_entry in bmg.dat1_section.entries:
+                                            if dat1_entry.offset == dat1_offset:
+                                                print(f"{bmg.name}\n{string_cleanup(dat1_entry.message)}\n")
 
-    #                                 case 2:
-    #                                     query_param = node.parameter
-    #                                     indirection_offset = node.indirection_tbl_offset
-    #                                     print(f"{bmg.name}\nBranch Node | Query Func Idx - 0x{node.query_func_idx.hex()} | Query Func Param - 0x{query_param.hex()} | Indirection Table Offset - 0x{indirection_offset.hex()}\n")
+                                    case 2:
+                                        query_param = node.parameter
+                                        indirection_offset = node.indirection_tbl_offset
+                                        print(f"{bmg.name}\nBranch Node | Query Func Idx - 0x{node.query_func_idx.hex()} | Query Func Param - 0x{query_param.hex()} | Indirection Table Offset - 0x{indirection_offset.hex()}\n")
 
-    #                                 case 3:
-    #                                     event_func_params = node.arguments
-    #                                     indirection_idx = node.indirection_tbl_idx
-    #                                     print(f"{bmg.name}\nEvent Node | Event Func Idx - 0x{node.event_func_idx.hex()} | Event Func Params - 0x{event_func_params.hex()} | Indirection Table Idx - 0x{indirection_idx.hex()}\n")
+                                    case 3:
+                                        event_func_params = node.arguments
+                                        indirection_idx = node.indirection_tbl_idx
+                                        print(f"{bmg.name}\nEvent Node | Event Func Idx - 0x{node.event_func_idx.hex()} | Event Func Params - 0x{event_func_params.hex()} | Indirection Table Idx - 0x{indirection_idx.hex()}\n")
 
-    #         case 3:
-    #             for bmg in bmgs:
-    #                 bmg.rebuild_bmg(Path(f"C:/BMG_Test/{bmg.name}"))
+            case 3:
+                break
 
     # Editor
     class BMG_Entry:

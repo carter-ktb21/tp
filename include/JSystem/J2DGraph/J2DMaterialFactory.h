@@ -9,33 +9,33 @@
  * 
  */
 struct J2DMaterialBlock {
-    u32 field_0x0;
-    u32 field_0x4;
-    u16 field_0x8;
-    u16 field_0xa;
-    u32 field_0xc;
-    u32 field_0x10;
-    u32 field_0x14;
-    u32 field_0x18;
-    u32 field_0x1c;
-    u32 field_0x20;
-    u32 field_0x24;
-    u32 field_0x28;
-    u32 field_0x2c;
-    u32 field_0x30;
-    u32 field_0x34;
-    u32 field_0x38;
-    u32 field_0x3c;
-    u32 field_0x40;
-    u32 field_0x44;
-    u32 field_0x48;
-    u32 field_0x4c;
-    u32 field_0x50;
-    u32 field_0x54;
-    u32 field_0x58;
-    u32 field_0x5c;
-    u32 field_0x60;
-    u32 field_0x64;
+    /* 0x00 */ u32 magic;
+    /* 0x04 */ u32 mat1_section_size;
+    /* 0x08 */ u16 material_num;
+    /* 0x0A */ u16 padding;
+    /* 0x0C */ u32 mat_init_data_offset;
+    /* 0x10 */ u32 offset_2;
+    /* 0x14 */ u32 offset_3;
+    /* 0x18 */ u32 ind_init_data_offset;
+    /* 0x1C */ u32 cull_modes_offset;
+    /* 0x20 */ u32 offset_6;
+    /* 0x24 */ u32 offset_7;
+    /* 0x28 */ u32 offset_8;
+    /* 0x2C */ u32 offset_9;
+    /* 0x30 */ u32 offset_10;
+    /* 0x34 */ u32 offset_11;
+    /* 0x38 */ u32 offset_12;
+    /* 0x3C */ u32 offset_13;
+    /* 0x40 */ u32 offset_14;
+    /* 0x44 */ u32 offset_15;
+    /* 0x48 */ u32 offset_16;
+    /* 0x4C */ u32 offset_17;
+    /* 0x50 */ u32 offset_18;
+    /* 0x54 */ u32 offset_19;
+    /* 0x58 */ u32 offset_20;
+    /* 0x5C */ u32 offset_21;
+    /* 0x60 */ u32 offset_22;
+    /* 0x64 */ u32 offset_23;
 };
 
 typedef struct _GXColor GXColor;
@@ -134,19 +134,19 @@ public:
     u8 newDither(int) const;
 
     u32 getMaterialMode(int idx) const {
-        return field_0x4[field_0x8[idx]].field_0x0;
+        return mMatInitData[field_0x8[idx]].field_0x0;
     }
 
     u8 getMaterialAlphaCalc(int idx) const {
-        return field_0x4[field_0x8[idx]].field_0x6;
+        return mMatInitData[field_0x8[idx]].field_0x6;
     }
 
 private:
-    /* 0x00 */ u16 field_0x0;
+    /* 0x00 */ u16 mMaterialNum;
     /* 0x02 */ u16 field_0x2;
-    /* 0x04 */ J2DMaterialInitData* field_0x4;
+    /* 0x04 */ J2DMaterialInitData* mMatInitData;
     /* 0x08 */ u16* field_0x8;
-    /* 0x0C */ J2DIndInitData* field_0xc;
+    /* 0x0C */ J2DIndInitData* mIndInitData;
     /* 0x10 */ GXColor* field_0x10;
     /* 0x14 */ u8* field_0x14;
     /* 0x18 */ J2DColorChanInfo* field_0x18;
@@ -155,7 +155,7 @@ private:
     /* 0x24 */ J2DTexMtxInfo* field_0x24;
     /* 0x28 */ u16* field_0x28;
     /* 0x2C */ u16* field_0x2c;
-    /* 0x30 */ _GXCullMode* field_0x30;
+    /* 0x30 */ _GXCullMode* mCullModes;
     /* 0x34 */ J2DTevOrderInfo* field_0x34;
     /* 0x38 */ _GXColorS10* field_0x38;
     /* 0x3C */ GXColor* field_0x3c;

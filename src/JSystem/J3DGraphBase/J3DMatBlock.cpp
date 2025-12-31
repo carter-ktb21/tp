@@ -295,8 +295,6 @@ static u32 SizeOfLoadAmbColors = 13;
 
 static u32 SizeOfLoadColorChans = 21;
 
-static u8 sdata_padding[4] = {};
-
 static u32 SizeOfJ3DColorBlockLightOffLoad = SizeOfLoadMatColors + SizeOfLoadColorChans;
 
 void J3DColorBlockLightOff::load() {
@@ -2019,13 +2017,3 @@ void J3DTexGenBlockPatched::calcPostTexMtxWithoutViewMtx(f32 const (*param_0)[4]
         }
     }
 }
-
-void J3DTevBlock::diffTevReg() {}
-
-void J3DTevBlock::diffTevStageIndirect() {}
-
-void J3DTevBlock::diffTevStage() {}
-
-void J3DTevBlock::diffTexCoordScale() {}
-
-void J3DTevBlock::diffTexNo() {}

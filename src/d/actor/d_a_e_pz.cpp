@@ -182,8 +182,8 @@ void daE_PZ_c::mEntrySUB(bool param_0) {
     }
 }
 
-/* 80761DFD 0003+00 l_initHIO None */
-static u8 l_initHIO;
+/* 80761DFD 0003+00 hio_set None */
+static u8 hio_set;
 
 /* 80761E0C 001C+01 data_80761E0C l_HIO */
 static daE_PZ_HIO_c l_HIO;
@@ -1766,8 +1766,8 @@ static const struct {
 };
 
 static const s16 mDBaBa_birthAngle_dt[] = {
-    0x0000, 0x2AAA, 0x5554, 0x7FFE, 0xAAA8, 0xD552,
-    0x1000, 0x3AAA, 0x6554, 0x8FFE, 0xBAA8, 0xE552,
+    0x0000, 0x2AAA, 0x5554, 0x7FFE, -0x5558, -0x2AAE,
+    0x1000, 0x3AAA, 0x6554, -0x7002, -0x4558, -0x1AAE,
 };
 
 static const f32 mDBaBa_birthHani_dt[] = {
@@ -2363,7 +2363,7 @@ int daE_PZ_c::_delete() {
     }
 
     if (mInitHIO != 0) {
-        l_initHIO = 0;
+        hio_set = 0;
         mDoHIO_DELETE_CHILD(l_HIO.no);
     }
 
@@ -2521,8 +2521,8 @@ int daE_PZ_c::create() {
                 }
             }
 
-            if (!l_initHIO) {
-                l_initHIO = true;
+            if (!hio_set) {
+                hio_set = true;
                 mInitHIO = true;
                 l_HIO.no = mDoHIO_CREATE_CHILD("ファントムザント", &l_HIO);
             }

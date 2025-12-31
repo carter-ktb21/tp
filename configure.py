@@ -48,7 +48,6 @@ VERSIONS = [
 
 # Versions to disable until properly configured
 DISABLED_VERSIONS = [
-    5,  # Wii PAL
     7,  # Wii KOR
     8,  # Wii USA Kiosk Demo
     9,  # Wii PAL Kiosk Demo
@@ -192,7 +191,7 @@ if not config.non_matching:
 config.binutils_tag = "2.42-1"
 config.compilers_tag = "20251118"
 config.dtk_tag = "v1.7.1"
-config.objdiff_tag = "v3.4.4"
+config.objdiff_tag = "v3.5.0"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.0-beta.5"
 
@@ -264,7 +263,7 @@ cflags_base = [
 
 if config.version == "ShieldD":
     cflags_base.extend(["-O0", "-inline off", "-RTTI on", "-str reuse", "-enc SJIS", "-DDEBUG=1", "-DWIDESCREEN_SUPPORT=1"])
-elif config.version in ["RZDE01_00", "RZDE01_02", "RZDJ01", "Shield"]:
+elif config.version in ["RZDE01_00", "RZDE01_02", "RZDP01", "RZDJ01", "Shield"]:
     cflags_base.extend(["-O4,p", "-inline auto", "-ipa file", "-RTTI on", "-str reuse", "-enc SJIS", "-DWIDESCREEN_SUPPORT=1"])
 else:
     cflags_base.extend(["-O4,p", "-inline auto", "-RTTI off", "-str reuse", "-multibyte", "-DWIDESCREEN_SUPPORT=1"])
@@ -426,11 +425,14 @@ cflags_framework = [
 ]
 
 if config.version != "ShieldD":
-    if config.version in ["RZDE01_00", "RZDE01_02", "RZDJ01", "Shield"]:
+    if config.version in ["RZDE01_00", "RZDE01_02", "RZDP01", "RZDJ01", "Shield"]:
         # TODO: whats the correct inlining flag? deferred looks better in some places, others not. something else wrong?
         cflags_framework.extend(["-inline noauto", "-O4,s", "-sym on"])
     else:
         cflags_framework.extend(["-inline noauto", "-O3,s", "-sym on", "-str reuse,pool,readonly"])
+
+if config.version in ["RZDE01_00", "RZDE01_02", "RZDP01", "RZDJ01"]:
+    cflags_framework.extend(["-DSDK_SEP2006"])
 
 # REL flags
 cflags_rel = [
@@ -455,7 +457,7 @@ def MWVersion(cfg_version: str | None) -> str:
             return "GC/2.7"
         case "GZ2J01":
             return "GC/2.7"
-        case "RZDE01_00" | "RZDE01_02" | "RZDJ01":
+        case "RZDE01_00" | "RZDE01_02" | "RZDP01" | "RZDJ01":
             # NOTE: we use a modified version of GC/3.0a3 to be able to handle multi-char constants.
             # This was probably a change made in some compiler version in the early days of transitioning GC to Wii development,
             # but we don't have that version. GC/3.0a3 appears to have the best overall codegen of any available GC/Wii compiler
@@ -468,7 +470,7 @@ def MWVersion(cfg_version: str | None) -> str:
         case _:
             return "GC/2.7"
 
-if config.version in ["RZDE01_00", "RZDE01_02", "RZDJ01"]:
+if config.version in ["RZDE01_00", "RZDE01_02", "RZDP01", "RZDJ01"]:
     config.linker_version = "GC/3.0a5"
 else:
     config.linker_version = MWVersion(config.version)
@@ -776,7 +778,7 @@ config.libs = [
             Object(Modded, "d/actor/d_a_alink.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_itembase.cpp"),
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_no_chg_room.cpp"),
-            Object(NonMatching, "d/actor/d_a_npc.cpp"),
+            Object(Equivalent, "d/actor/d_a_npc.cpp"), # weak func order (daNpcF_MoveBgActor_c::Delete)
             Object(MatchingFor(ALL_GCN), "d/actor/d_a_npc_cd.cpp"),
             Object(NonMatching, "d/actor/d_a_npc_cd2.cpp"), # stripped vtable order
             Object(Modded, "d/actor/d_a_obj_item.cpp"),
@@ -831,7 +833,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_msg_out_font.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_class.cpp"),
             Object(Equivalent, "d/d_msg_object.cpp"), # weak func order
-            Object(MatchingFor("GZ2P01", "GZ2J01"), "d/d_msg_unit.cpp"),
+            Object(MatchingFor(ALL_GCN), "d/d_msg_unit.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_scrn_3select.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_scrn_arrow.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_scrn_base.cpp"),
@@ -850,7 +852,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_msg_string.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_msg_flow.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_name.cpp"),
-            Object(NonMatching, "d/d_npc_lib.cpp"),
+            Object(MatchingFor(ALL_GCN), "d/d_npc_lib.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_ovlp_fade.cpp"),
             Object(Modded, "d/d_ovlp_fade2.cpp"),
             Object(Modded, "d/d_ovlp_fade3.cpp"),
@@ -941,7 +943,7 @@ config.libs = [
     JSystemLib(
         "JFramework",
         [
-            Object(MatchingFor("ShieldD"), "JSystem/JFramework/JFWSystem.cpp"), # retail-only regalloc
+            Object(MatchingFor(ALL_GCN, "ShieldD"), "JSystem/JFramework/JFWSystem.cpp"),
             Object(Modded, "JSystem/JFramework/JFWDisplay.cpp"),
         ],
     ),
@@ -1061,7 +1063,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASChannel.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASLfo.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASOscillator.cpp"),
-            Object(NonMatching, "JSystem/JAudio2/JASAiCtrl.cpp"),
+            Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASAiCtrl.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASAudioThread.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASAudioReseter.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JASDSPChannel.cpp"),
@@ -1094,13 +1096,32 @@ config.libs = [
             Object(MatchingFor(ALL_GCN, "ShieldD"), "JSystem/JAudio2/JAUBankTable.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUClusterSound.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUInitializer.cpp"),
-            Object(Equivalent, "JSystem/JAudio2/JAUSectionHeap.cpp"), # weak func order
+            Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUSectionHeap.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUSeqCollection.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUSeqDataBlockMgr.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUSoundAnimator.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUSoundTable.cpp"),
             Object(MatchingFor(ALL_GCN), "JSystem/JAudio2/JAUStreamFileTable.cpp"),
         ],
+    ),
+    JSystemLib(
+        "JAWExtSystem",
+        [
+            Object(Matching, "JSystem/JAWExtSystem/JAWSystem.cpp"),
+            Object(NonMatching, "JSystem/JAWExtSystem/JAWWindow.cpp"),
+            Object(Matching, "JSystem/JAWExtSystem/JAWWindow3D.cpp"),
+            Object(NonMatching, "JSystem/JAWExtSystem/JAWGraphContext.cpp"),
+            Object(NonMatching, "JSystem/JAWExtSystem/JAWExtSystem.cpp"),
+        ],
+    ),
+    JSystemLib(
+        "JAHostIO",
+        [
+            Object(Matching, "JSystem/JAHostIO/JAHioMessage.cpp"),
+            Object(NonMatching, "JSystem/JAHostIO/JAHioMgr.cpp"),
+            Object(NonMatching, "JSystem/JAHostIO/JAHioNode.cpp"),
+            Object(NonMatching, "JSystem/JAHostIO/JAHioUtil.cpp"),
+        ]
     ),
     JSystemLib(
         "JMessage",
@@ -1140,6 +1161,8 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "Z2AudioLib/Z2WolfHowlMgr.cpp"),
             Object(MatchingFor(ALL_GCN), "Z2AudioLib/Z2SpeechMgr2.cpp"),
             Object(Equivalent, "Z2AudioLib/Z2AudioMgr.cpp"), # weak func order
+            Object(NonMatching, "Z2AudioLib/Z2DebugSys.cpp"),
+            Object(NonMatching, "Z2AudioLib/Z2SoundPlayer.cpp"),
         ],
     },
     {
@@ -1507,6 +1530,7 @@ config.libs = [
     RevolutionLib(
         "os",
         [
+            Object(NonMatching, "revolution/os/__start.c"),
             Object(MatchingFor("ShieldD"), "revolution/os/OS.c"),
             Object(MatchingFor("ShieldD"), "revolution/os/OSAddress.c"),
             Object(MatchingFor("ShieldD"), "revolution/os/OSAlarm.c"),
@@ -1540,7 +1564,7 @@ config.libs = [
             Object(MatchingFor("ShieldD"), "revolution/os/OSNandbootInfo.c"),
             Object(MatchingFor("ShieldD"), "revolution/os/OSPlayTime.c"),
             Object(MatchingFor("ShieldD"), "revolution/os/OSLaunch.c"),
-            Object(MatchingFor("ShieldD"), "revolution/os/__ppc_eabi_init.cpp"),
+            Object(NonMatching, "revolution/os/__ppc_eabi_init.cpp"),
         ],
     ),
     RevolutionLib(
@@ -1997,7 +2021,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_tbox"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_tbox2"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_vrbox"),
-    ActorRel(NonMatching, "d_a_vrbox2"),
+    ActorRel(MatchingFor(ALL_GCN), "d_a_vrbox2"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_arrow"),
     ActorRel(Modded, "d_a_boomerang"),  # Boofener: Modified for DELTA_TIME scaling
     ActorRel(MatchingFor(ALL_GCN), "d_a_crod"),
@@ -2141,7 +2165,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_df"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_dk"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_dt"),
-    ActorRel(NonMatching, "d_a_e_fb"),
+    ActorRel(MatchingFor(ALL_GCN), "d_a_e_fb"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_fk"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_fs"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_e_fz"),
@@ -2280,7 +2304,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kasi_kyu"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kasi_mich"),
     ActorRel(MatchingFor(ALL_GCN, "Shield"), "d_a_npc_kdk"),
-    ActorRel(NonMatching, "d_a_npc_kn"),
+    ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kn"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_knj"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_npc_kolinb"),
     ActorRel(Modded, "d_a_npc_ks"),
@@ -2433,7 +2457,7 @@ config.libs = [
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_hfuta"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_hsTarget"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_ice_l"),
-    ActorRel(NonMatching, "d_a_obj_ice_s"),
+    ActorRel(MatchingFor(ALL_GCN), "d_a_obj_ice_s"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_iceblock"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_iceleaf"),
     ActorRel(MatchingFor(ALL_GCN), "d_a_obj_ihasi"),

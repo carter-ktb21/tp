@@ -12,7 +12,7 @@ J2DMaterial::J2DMaterial() {
     mTevBlock = NULL;
     mIndBlock = NULL;
     mAnmPointer = NULL;
-    field_0x8 = 1;
+    mMatMode = 1;
     mVisible = true;
 }
 

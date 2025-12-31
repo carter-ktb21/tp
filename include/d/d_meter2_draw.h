@@ -267,7 +267,7 @@ public:
     void setItemParamZ(u8);
     void setItemParamB(u8);
     bool getFishingType();
-    bool getCanoeFishing();
+    u8 getCanoeFishing();
     bool getCameraSubject();
     bool getItemSubject();
     bool getPlayerSubject();

@@ -299,7 +299,9 @@ static int specialType[42];
 
 static int Stage;
 
+#if WIDESCREEN_SUPPORT
 static f32 WideTurnSaving = 0.86f + OREG_F(1);
+#endif
 
 inline static u32 check_owner_action(u32 param_0, u32 param_1) {
     return dComIfGp_checkPlayerStatus0(param_0, param_1);
@@ -7455,8 +7457,8 @@ bool dCamera_c::railCamera(s32 param_0) {
     cSGlobe eyeFromCenter = bestEyePos - mViewCache.mCenter;
     cSAngle unkAngle1 = eyeFromCenter.U() - mViewCache.mDirection.U();
 
-    static cSAngle yawSnapThreshold = 120.0f;
-    if (unkAngle1.Abs() > yawSnapThreshold) {
+    static cSAngle _120 = 120.0f;
+    if (unkAngle1.Abs() > _120) {
         setUSOAngle();
     }
 
@@ -7686,8 +7688,8 @@ bool dCamera_c::paraRailCamera(s32 param_0) {
     cSGlobe cStack_260 = paraRail->field_0x10 - mViewCache.mCenter;
     cSAngle acStack_2cc = cStack_260.U() - mViewCache.mDirection.U();
 
-    static cSAngle paraRailCamera = 120.0f;
-    if (acStack_2cc.Abs() > paraRailCamera) {
+    static cSAngle _120 = 120.0f;
+    if (acStack_2cc.Abs() > _120) {
         setUSOAngle();
     }
 
@@ -9042,7 +9044,7 @@ bool dCamera_c::eventCamera(s32 param_0) {
              mEventData.field_0xc == specialType[20] || mEventData.field_0xc == specialType[21] ||
              mEventData.field_0xc == specialType[22] || mEventData.field_0xc == specialType[23] ||
              mEventData.field_0xc == specialType[24] || mEventData.field_0xc == specialType[18]) &&
-             *(int*)((int)&mEventData + 0xc) != -1) // fakematch to force additional load
+             *(int*)((intptr_t)&mEventData + 0xc) != -1) // fakematch to force additional load
         {
             var_r29 = 28;
         } else if (mEventData.field_0xc == specialType[14] && var_r29 != 2) {
@@ -9432,7 +9434,6 @@ int dCamera_c::Reset() {
     return 1;
 }
 
-// NONMATCHING - minor regalloc
 f32 dCamera_c::shakeCamera() {
     static f32 const wave[] = {0.4f, 0.9f, 2.1f, 3.2f};
 

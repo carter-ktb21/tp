@@ -1,6 +1,8 @@
 #include <dolphin/dolphin.h>
 #include "__ppc_eabi_linker.h"
 
+static u8 Debug_BBA;
+
 extern void InitMetroTRK();
 extern void exit(int);
 extern int main(int argc, char* argv[]);
@@ -17,7 +19,7 @@ __declspec(section ".init") extern void __init_data(void);
 __declspec(section ".init") extern void __init_hardware(void);
 __declspec(section ".init") extern void __flush_cache(void* addr, u32 size);
 
-extern u8 Debug_BBA_804516D0;
+extern u8 Debug_BBA;
 
 __declspec(section ".init") void __check_pad3(void) {
     if ((*(u16*)0x800030E4 & 0xEEF) == 0xEEF) {
@@ -26,11 +28,11 @@ __declspec(section ".init") void __check_pad3(void) {
 }
 
 void __set_debug_bba(void) {
-    Debug_BBA_804516D0 = 1;
+    Debug_BBA = 1;
 }
 
 __declspec(section ".init") u8 __get_debug_bba(void) {
-    return Debug_BBA_804516D0;
+    return Debug_BBA;
 }
 
 __declspec(section ".init") asm void __start(void) {

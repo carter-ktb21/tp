@@ -128,8 +128,8 @@ struct TLinkList : TNodeLinkList {
 
         iterator& operator=(const iterator& rhs) {
             //TODO: Probably fakematch? Not sure what's going on here exactly
-            (TIterator<std::bidirectional_iterator_tag, T, long, T*, T&>&)*this =
-                (const TIterator<std::bidirectional_iterator_tag, T, long, T*, T&>&)rhs;
+            (TIterator<std::bidirectional_iterator_tag, T, s32, T*, T&>&)*this =
+                (const TIterator<std::bidirectional_iterator_tag, T, s32, T*, T&>&)rhs;
             this->node = rhs.node;
             return *this;
         }
@@ -262,7 +262,7 @@ struct TLinkList_factory : public TLinkList<T, I> {
     }
 
     typename TLinkList<T, I>::iterator Erase_destroy(T* param_0) {
-        typename TLinkList<T, I>::iterator spC(Erase(param_0));
+        typename TLinkList<T, I>::iterator spC(this->Erase(param_0));
         Do_destroy(param_0);
         return spC;
     }

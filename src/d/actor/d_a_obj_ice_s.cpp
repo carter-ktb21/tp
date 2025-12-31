@@ -17,7 +17,7 @@
 class daOBJ_ICE_S_HIO_c : public JORReflexible {
 public:
     daOBJ_ICE_S_HIO_c();
-    virtual ~daOBJ_ICE_S_HIO_c();
+    virtual ~daOBJ_ICE_S_HIO_c() {}
 
     void genMessage(JORMContext*);
 
@@ -27,8 +27,6 @@ public:
 };
 
 static char* l_arcName = "V_Ice_s";
-
-daOBJ_ICE_S_HIO_c::~daOBJ_ICE_S_HIO_c() {}
 
 daOBJ_ICE_S_HIO_c::daOBJ_ICE_S_HIO_c() {
     mId = -1;
@@ -54,7 +52,7 @@ void daObjIce_s_c::RideOn_Angle(s16& param_1, f32 param_2, s16 param_3, f32 para
     cLib_addCalcAngleS(&param_1, param_3 * (param_2 / param_4), 5, 0x100, 1);
 }
 
-static u8 l_HIOInit;
+static u8 hio_set;
 
 static daOBJ_ICE_S_HIO_c l_HIO;
 
@@ -119,7 +117,6 @@ void daObjIce_s_c::setBaseMtx() {
     cMtx_copy(mDoMtx_stack_c::get(), mBgMtx);
 }
 
-// NONMATCHING - regalloc, equivalent
 static void rideCallBack(dBgW* param_1, fopAc_ac_c* param_2, fopAc_ac_c* param_3) {
     (void)param_1;
     daObjIce_s_c* ice = (daObjIce_s_c*)param_2;
@@ -137,8 +134,10 @@ static void rideCallBack(dBgW* param_1, fopAc_ac_c* param_2, fopAc_ac_c* param_3
         ice->Check_LinkRideOn(*playerPos);
     }
 
-    cXyz* icePos = (cXyz*)&fopAcM_GetPosition(param_2);
-    if (pBallCenter != NULL && icePos != NULL && icePos->absXZ(*pBallCenter) < ice->field_0x5c8.x * 600.0f) {
+    cXyz* icePos = &fopAcM_GetPosition(param_2);
+    if (pBallCenter != NULL && icePos != NULL &&
+        icePos->absXZ(*pBallCenter) < ice->field_0x5c8.x * 600.0f)
+    {
         ice->field_0x5d8 = 0x300;
         ice->field_0x5a4 = -11.0f;
         ice->field_0x5ac = 0x1000;
@@ -150,9 +149,7 @@ static void rideCallBack(dBgW* param_1, fopAc_ac_c* param_2, fopAc_ac_c* param_3
         ice->field_0x5ac = 0x1000;
         ice->Check_RideOn(*playerPos);
     }
-    if (ice->field_0x5c5 == 0xff &&
-        fopAcM_GetName(param_3) == PROC_ALINK)
-    {
+    if (ice->field_0x5c5 == 0xff && fopAcM_GetName(param_3) == PROC_ALINK) {
         ice->field_0x5d8 = 0x300;
         ice->field_0x5a4 = -11.0f;
         ice->field_0x5ac = 0x1000;
@@ -183,7 +180,7 @@ static int daObjIce_s_Create(fopAc_ac_c* i_this) {
     return a_this->create();
 }
 
-inline int daObjIce_s_c::create() {
+int daObjIce_s_c::create() {
     fopAcM_ct(this, daObjIce_s_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
@@ -195,8 +192,8 @@ inline int daObjIce_s_c::create() {
             return rv;
         }
     }
-    if (!l_HIOInit) {
-        l_HIOInit = TRUE;
+    if (!hio_set) {
+        hio_set = TRUE;
         field_0x640 = 1;
         l_HIO.mId = mDoHIO_CREATE_CHILD("氷の足場小", &l_HIO);
     }
@@ -230,7 +227,7 @@ inline int daObjIce_s_c::create() {
     return rv;
 }
 
-inline int daObjIce_s_c::CreateHeap() {
+int daObjIce_s_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "Ice_s.bmd");
     JUT_ASSERT(157, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -289,7 +286,7 @@ int daObjIce_s_c::Draw() {
 int daObjIce_s_c::Delete() {
     dComIfG_resDelete(&mPhase, l_arcName);
     if (field_0x640 != 0) {
-        l_HIOInit = FALSE;
+        hio_set = FALSE;
         mDoHIO_DELETE_CHILD(l_HIO.mId);
     }
     return 1;

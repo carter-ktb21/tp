@@ -12,8 +12,6 @@
 
 static daBarDesk_HIO_c l_HIO;
 
-static u8 data_80BA9D2C[4];
-
 dCcD_SrcGObjInf const daBarDesk_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0xD8FAFDBF, 0x11}, {0}}},
     {1, 0, 0, 0, 0},
@@ -76,7 +74,7 @@ int daBarDesk_c::Execute(Mtx** i_mtxP) {
 
 void daBarDesk_c::windowProc() {
     typedef void (daBarDesk_c::*daBarDesk_modeFunc)();
-    static daBarDesk_modeFunc mode_proc[2] = {
+    static const daBarDesk_modeFunc mode_proc[2] = {
         &daBarDesk_c::modeWait,
         &daBarDesk_c::modeBreak,
     };

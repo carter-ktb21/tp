@@ -9,6 +9,7 @@
 #include "JSystem/JAudio2/JASProbe.h"
 #include "JSystem/JKernel/JKRSolidHeap.h"
 #include "dolphin/dsp.h"
+#include "stdint.h"
 
 JASAudioThread::JASAudioThread(int stackSize, int msgCount, u32 threadPriority)
     : 
@@ -19,7 +20,7 @@ JASAudioThread::JASAudioThread(int stackSize, int msgCount, u32 threadPriority)
     OSInitThreadQueue(&sThreadQueue);
 }
 
-void JASAudioThread::create(long threadPriority) {
+void JASAudioThread::create(s32 threadPriority) {
 	JASAudioThread* sAudioThread = new (JASDram, 0) JASAudioThread(threadPriority, 0x10, 0x1400);
     sAudioThread->setCurrentHeap(JKRGetSystemHeap());
 	sAudioThread->resume();
@@ -60,7 +61,7 @@ void* JASAudioThread::run() {
 
     while (true) {
         OSMessage msg = waitMessageBlock();
-        switch ((int)msg) {
+        switch ((intptr_t)msg) {
         case AUDIOMSG_DMA:
             if (sbPauseFlag) {
                 JASDriver::stopDMA();

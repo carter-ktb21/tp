@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kanban2.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -87,8 +89,6 @@ enum daObj_Kanban2_DamageType {
 };
 
 namespace {
-/* 8058586C-805858B8 -00001 004C+00 1/1 0/0 0/0 .data
- * l_kn2_bmdidx__29@unnamed@d_a_obj_kanban2_cpp@                */
 static char* l_kn2_bmdidx[] = {
     "J_kanban00.bmd",
     "J_kanban00_01.bmd",
@@ -111,21 +111,17 @@ static char* l_kn2_bmdidx[] = {
     "J_kanban00_18.bmd",
 };
 
-/* 805858B8-805858C8 00004C 0010+00 1/1 0/0 0/0 .data
- * dKn2_CarryOffset__29@unnamed@d_a_obj_kanban2_cpp@            */
 static s16 dKn2_CarryOffset[] = {
-    0xD07D,
-    0xBA21,
-    0xBA21,
-    0xE37E,
+    -0x2f83,
+    -0x45df,
+    -0x45df,
+    -0x1c82,
     0x1D9F,
-    0xB36C,
-    0xC9C8,
-    0xC66D,
+    -0x4c94,
+    -0x3638,
+    -0x3993,
 };
 
-/* 805858C8-80585958 00005C 0090+00 1/1 0/0 0/0 .data
- * dKb2_BAN_SPEED__29@unnamed@d_a_obj_kanban2_cpp@              */
 static struct {
     f32 speed_y;
     f32 speed_f;
@@ -150,8 +146,6 @@ static struct {
     { 0.0f, 30.0f },
 };
 
-/* 80585958-8058597C 0000EC 0024+00 1/1 0/0 0/0 .data
- * dKb2_BAN_ANGLE__29@unnamed@d_a_obj_kanban2_cpp@              */
 static u16 dKb2_BAN_ANGLE[] = {
     0x6800,
     0x7800,
@@ -173,8 +167,6 @@ static u16 dKb2_BAN_ANGLE[] = {
     0x9000,
 };
 
-/* 8058597C-805859C4 000110 0048+00 2/2 0/0 0/0 .data
- * dKb2_BAN_PARTS__29@unnamed@d_a_obj_kanban2_cpp@              */
 static u32 dKb2_BAN_PARTS[] = {
     PART_TOP_LEFT_UNDER,
     PART_SPINE_LEFT_UPPER | PART_TOP_LEFT_UPPER,
@@ -196,8 +188,6 @@ static u32 dKb2_BAN_PARTS[] = {
     0,
 };
 
-/* 805859C4-80585A04 000158 0040+00 1/1 0/0 0/0 .data cc_kn2_src__29@unnamed@d_a_obj_kanban2_cpp@
- */
 static dCcD_SrcSph cc_kn2_src = {
     {
         {0x0, {{AT_TYPE_1000, 0x2, 0x13}, {0xD8FBFDFF, 0x11}, 0x79}}, // mObj
@@ -210,8 +200,6 @@ static dCcD_SrcSph cc_kn2_src = {
     } // mSphAttr
 };
 
-/* 80585A04-80585A94 000198 0090+00 1/1 0/0 0/0 .data
- * d_KANBAN_OFFSET__29@unnamed@d_a_obj_kanban2_cpp@             */
 static struct {
     f32 x;
     f32 y;
@@ -237,13 +225,11 @@ static struct {
 };
 }
 
-/* 8058176C-80581790 0000EC 0024+00 1/1 0/0 0/0 .text            __ct__19daObj_Kanban2_HIO_cFv */
 daObj_Kanban2_HIO_c::daObj_Kanban2_HIO_c() {
     id = -1;
     base_size = 1.0f;
 }
 
-/* 80581790-805818DC 000110 014C+00 1/1 0/0 0/0 .text            draw__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::draw() {
     cXyz sp8;
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
@@ -267,12 +253,10 @@ int daObj_Kanban2_c::draw() {
     return 1;
 }
 
-/* 80581918-80581938 000298 0020+00 1/0 0/0 0/0 .text daObj_Kanban2_Draw__FP15daObj_Kanban2_c */
 static int daObj_Kanban2_Draw(daObj_Kanban2_c* i_this) {
     return i_this->draw();
 }
 
-/* 80581938-805819BC 0002B8 0084+00 1/1 0/0 0/0 .text            setKanbanSE__15daObj_Kanban2_cFi */
 void daObj_Kanban2_c::setKanbanSE(int i_se) {
     u32 var_r31;
     if (field_0x620 <= 1) {
@@ -286,13 +270,10 @@ void daObj_Kanban2_c::setKanbanSE(int i_se) {
     Z2GetAudioMgr()->seStart(i_se, &current.pos, var_r31, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
 }
 
-/* 805819BC-805819FC 00033C 0040+00 3/3 0/0 0/0 .text createBreakParts__15daObj_Kanban2_cFUl5csXyz
- */
 void daObj_Kanban2_c::createBreakParts(u32 i_parameters, csXyz i_rot) {
     fopAcM_create(PROC_OBJ_KANBAN2, i_parameters, &current.pos, fopAcM_GetRoomNo(this), &i_rot, NULL, -1);
 }
 
-/* 805819FC-80581B5C 00037C 0160+00 1/1 0/0 0/0 .text createWallHitBreak__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::createWallHitBreak() {
     BOOL play_se = FALSE;
     csXyz rotation(shape_angle);
@@ -334,7 +315,6 @@ void daObj_Kanban2_c::createWallHitBreak() {
     setCenterPos();
 }
 
-/* 80581B5C-80581C48 0004DC 00EC+00 2/1 0/0 0/0 .text getKanbanCutType__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::getKanbanCutType() {
     s16 angle_to_player = cLib_distanceAngleS(shape_angle.y, fopAcM_searchPlayerAngleY(this));
 
@@ -385,7 +365,6 @@ int daObj_Kanban2_c::getKanbanCutType() {
     }
 }
 
-/* 80581C48-80581D04 0005C8 00BC+00 1/1 0/0 0/0 .text getKanbanWolfCutType__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::getKanbanWolfCutType() {
     s16 angle_to_player = cLib_distanceAngleS(shape_angle.y, fopAcM_searchPlayerAngleY(this));
 
@@ -413,8 +392,6 @@ int daObj_Kanban2_c::getKanbanWolfCutType() {
     return DAMAGE_HORIZONTAL_SPLIT;
 }
 
-/* 80581D04-8058221C 000684 0518+00 2/1 0/0 0/0 .text            damage_check__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::damage_check() {
     int sp24 = 0;
     u8 mode = 0;
@@ -568,7 +545,6 @@ static f32 dummyFloat() {
     return rt;
 }
 
-/* 8058221C-805822F0 000B9C 00D4+00 1/1 0/0 0/0 .text float_damage_check__15daObj_Kanban2_cFv */
 bool daObj_Kanban2_c::float_damage_check() {
     if (mInvulnerabilityTimer != 0) {
         return false;
@@ -589,7 +565,6 @@ bool daObj_Kanban2_c::float_damage_check() {
     return false;
 }
 
-/* 805822F0-805825A4 000C70 02B4+00 2/2 0/0 0/0 .text            deletePart__15daObj_Kanban2_cFv */
 bool daObj_Kanban2_c::deletePart() {
     if (field_0x620 <= 1) {
         if (fopAcM_CheckCondition(this, 4)) {
@@ -610,8 +585,6 @@ bool daObj_Kanban2_c::deletePart() {
     return false;
 }
 
-/* 805825A4-805826D4 000F24 0130+00 1/1 0/0 0/0 .text            getWallAngle__15daObj_Kanban2_cFv
- */
 s16 daObj_Kanban2_c::getWallAngle() {
     cXyz line_start;
     cXyz line_end;
@@ -637,8 +610,6 @@ s16 daObj_Kanban2_c::getWallAngle() {
     return angle;
 }
 
-/* 8058271C-80582894 00109C 0178+00 2/2 0/0 0/0 .text            setGroundAngle__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::setGroundAngle() {
     Vec gnd_pos;
     cXyz sp8;
@@ -653,7 +624,7 @@ void daObj_Kanban2_c::setGroundAngle() {
     gnd_chk.SetPos(&gnd_pos);
     gnd_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-    if (-1000000000.0f != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
+    if (-G_CM3D_F_INF != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
         field_0x5ee.x = -cM_atan2s(gnd_pos.y - sp8.y, gnd_pos.z - sp8.z);
     }
 
@@ -663,12 +634,11 @@ void daObj_Kanban2_c::setGroundAngle() {
     gnd_chk.SetPos(&gnd_pos);
     gnd_pos.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
 
-    if (-1000000000.0f != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
+    if (-G_CM3D_F_INF != gnd_pos.y && std::abs(gnd_pos.y - sp8.y) < 50.0f) {
         field_0x5ee.z = cM_atan2s(gnd_pos.y - sp8.y, gnd_pos.x - sp8.x);
     }
 }
 
-/* 80582894-80582944 001214 00B0+00 2/2 0/0 0/0 .text checkWaterSurface__15daObj_Kanban2_cFv */
 bool daObj_Kanban2_c::checkWaterSurface() {
     dBgS_ObjGndChk_Spl gnd_chk;
     Vec sp8;
@@ -684,7 +654,6 @@ bool daObj_Kanban2_c::checkWaterSurface() {
     return false;
 }
 
-/* 80582944-80582A68 0012C4 0124+00 1/1 0/0 0/0 .text checkPataGround__15daObj_Kanban2_cFss */
 bool daObj_Kanban2_c::checkPataGround(s16 param_0, s16 param_1) {
     cXyz sp18;
     cXyz spC;
@@ -702,14 +671,13 @@ bool daObj_Kanban2_c::checkPataGround(s16 param_0, s16 param_1) {
     sp24.SetPos(&spC);
 
     f32 ground_y = dComIfG_Bgsp().GroundCross(&sp24);
-    if (ground_y != -1000000000.0f && sp18.y < ground_y) {
+    if (ground_y != -G_CM3D_F_INF && sp18.y < ground_y) {
         return true;
     }
 
     return false;
 }
 
-/* 80582A68-80582AAC 0013E8 0044+00 3/3 0/0 0/0 .text            setCullMtx__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::setCullMtx() {
     for (int i = 0; i < 18; i++) {
         if (mPartFlags & (1 << i)) {
@@ -719,22 +687,15 @@ void daObj_Kanban2_c::setCullMtx() {
     }
 }
 
-/* 80582AAC-80582AFC 00142C 0050+00 1/1 0/0 0/0 .text setSmokeEffect__15daObj_Kanban2_cF4cXyz */
 void daObj_Kanban2_c::setSmokeEffect(cXyz i_pos) {
     fopAcM_effSmokeSet1(&field_0x9e0, &field_0x9e4, &i_pos, NULL, 0.02 * field_0x600, &tevStr, 1);
 }
 
-UNK_REL_BSS
+/* 80585CB5 0003+00 hio_set None */
+static u8 hio_set;
 
-/* 80585CB4-80585CB8 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 80585CB5 0003+00 l_initHIO None */
-static u8 l_initHIO;
-
-/* 80585CC4-80585CD0 000054 000C+00 3/3 0/0 0/0 .bss             l_HIO */
 static daObj_Kanban2_HIO_c l_HIO;
 
-/* 80582AFC-80582C40 00147C 0144+00 2/2 0/0 0/0 .text            setWaterEffect__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::setWaterEffect() {
     cXyz eff_pos(current.pos.x, field_0x604, current.pos.z);
     static cXyz sc(0.5f, 0.5f, 0.5f);
@@ -747,8 +708,6 @@ void daObj_Kanban2_c::setWaterEffect() {
     mSound.startSound(Z2SE_CM_BODYFALL_WATER_S, 0, -1);
 }
 
-/* 80582C40-80582E68 0015C0 0228+00 3/3 0/0 0/0 .text            setCenterPos__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::setCenterPos() {
     cXyz sp14(0.0f, 0.0f, 0.0f);
     cXyz sp8;
@@ -809,10 +768,8 @@ void daObj_Kanban2_c::setCenterPos() {
     }
 }
 
-/* 80582E68-80582EF0 0017E8 0088+00 2/2 0/0 0/0 .text            checkCarryOn__15daObj_Kanban2_cFv
- */
 BOOL daObj_Kanban2_c::checkCarryOn() {
-    cLib_onBit<u32>(attention_info.flags, 0x10);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     if (fopAcM_checkCarryNow(this)) {
         setActionMode(ACTION_CARRY_e, 0);
 
@@ -830,8 +787,6 @@ BOOL daObj_Kanban2_c::checkCarryOn() {
     return FALSE;
 }
 
-/* 80582EF0-80582F40 001870 0050+00 6/6 0/0 0/0 .text            setActionMode__15daObj_Kanban2_cFii
- */
 void daObj_Kanban2_c::setActionMode(int i_action, int i_mode) {
     if (mAction != i_action) {
         mPrevAction = mAction;
@@ -848,7 +803,6 @@ void daObj_Kanban2_c::setActionMode(int i_action, int i_mode) {
     }
 }
 
-/* 80582F40-80583364 0018C0 0424+00 1/1 0/0 0/0 .text calcNormalSwing__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::calcNormalSwing() {
     u8 sp8 = 0;
     s16 var_r29 = 0;
@@ -956,8 +910,6 @@ void daObj_Kanban2_c::calcNormalSwing() {
     field_0x626 = sp8;
 }
 
-/* 80583364-80583598 001CE4 0234+00 1/1 0/0 0/0 .text            executeNormal__15daObj_Kanban2_cFv
- */
 // NONMATCHING - gameinfo mEvent load, equivalent
 void daObj_Kanban2_c::executeNormal() {
     calcNormalSwing();
@@ -986,12 +938,12 @@ void daObj_Kanban2_c::executeNormal() {
     switch (field_0x9fe) {
     case 0:
         if (mFlowID != -1 && cLib_distanceAngleS(shape_angle.y, fopAcM_searchPlayerAngleY(this)) < 0x3000) {
-            cLib_onBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
             attention_info.distances[fopAc_attn_TALK_e] = 21;
             attention_info.distances[fopAc_attn_SPEAK_e] = 21;
             eventInfo.onCondition(1);
         } else {
-            cLib_offBit<u32>(attention_info.flags, 0x4000000A);
+            cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_TALKREAD_e | fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         }
 
         if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk()) {
@@ -1002,9 +954,20 @@ void daObj_Kanban2_c::executeNormal() {
         break;
     case 1:
         mInvulnerabilityTimer = 3;
-        if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk()) {
+#if VERSION != VERSION_SHIELD_DEBUG
+        // TODO: gameInfo fake match to force reuse of pointer
+        dComIfG_play_c* play = &g_dComIfG_gameInfo.play;
+        if (play->getEvent().runCheck() && eventInfo.checkCommandTalk())
+#else
+        if (dComIfGp_event_runCheck() && eventInfo.checkCommandTalk())
+#endif
+        {
             if (mMsgFlow.doFlow(this, NULL, 0)) {
+#if VERSION != VERSION_SHIELD_DEBUG
+                play->getEvent().reset();
+#else
                 dComIfGp_event_reset();
+#endif
                 field_0x9fe = 0;
             }
         } else {
@@ -1014,7 +977,6 @@ void daObj_Kanban2_c::executeNormal() {
     }
 }
 
-/* 80583598-80583A2C 001F18 0494+00 2/1 0/0 0/0 .text            initPart__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::initPart() {
     daPy_py_c* player = daPy_getPlayerActorClass();
 
@@ -1130,7 +1092,6 @@ void daObj_Kanban2_c::initPart() {
     mMode = 9;
 }
 
-/* 80583A2C-8058437C 0023AC 0950+00 2/1 0/0 0/0 .text            executePart__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::executePart() {
     cXyz sp4C;
     attention_info.position = eyePos = current.pos;
@@ -1387,12 +1348,10 @@ void daObj_Kanban2_c::executePart() {
     }
 }
 
-/* 8058437C-80584884 002CFC 0508+00 1/1 0/0 0/0 .text            executeFloat__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::executeFloat() {
     checkWaterSurface();
 
-    if (-1000000000.0f == field_0x604) {
+    if (-G_CM3D_F_INF == field_0x604) {
         setActionMode(ACTION_PART_e, 7);
         return;
     }
@@ -1514,8 +1473,6 @@ void daObj_Kanban2_c::executeFloat() {
     }
 }
 
-/* 80584884-805849CC 003204 0148+00 1/1 0/0 0/0 .text            executeCarry__15daObj_Kanban2_cFv
- */
 void daObj_Kanban2_c::executeCarry() {
     attention_info.position = eyePos = current.pos;
     fopAcM_SetFoodStatus(this, fopAcM_FOOD_2);
@@ -1553,7 +1510,6 @@ void daObj_Kanban2_c::executeCarry() {
     }
 }
 
-/* 805849CC-80584AD8 00334C 010C+00 1/1 0/0 0/0 .text            action__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::action() {
     mAcch.SetGroundUpY(0.0f);
 
@@ -1584,7 +1540,6 @@ void daObj_Kanban2_c::action() {
     }
 }
 
-/* 80584AD8-80584CFC 003458 0224+00 1/1 0/0 0/0 .text            mtx_set__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::mtx_set() {
     if (field_0x62e != 0) {
         csXyz sp8(0, 0, 0);
@@ -1643,7 +1598,6 @@ void daObj_Kanban2_c::mtx_set() {
     }
 }
 
-/* 80584CFC-80584DF0 00367C 00F4+00 1/1 0/0 0/0 .text            cc_set__15daObj_Kanban2_cFv */
 void daObj_Kanban2_c::cc_set() {
     cXyz sph_center(current.pos);
 
@@ -1668,7 +1622,6 @@ void daObj_Kanban2_c::cc_set() {
     dComIfG_Ccsp()->Set(&mCcSph);
 }
 
-/* 80584DF0-80584EB0 003770 00C0+00 1/1 0/0 0/0 .text            execute__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::execute() {
     if (mPartFlags == 0) {
         fopAcM_delete(this);
@@ -1695,24 +1648,19 @@ int daObj_Kanban2_c::execute() {
     return 1;
 }
 
-/* 80584EB0-80584ED0 003830 0020+00 2/1 0/0 0/0 .text daObj_Kanban2_Execute__FP15daObj_Kanban2_c
- */
 static int daObj_Kanban2_Execute(daObj_Kanban2_c* i_this) {
     return i_this->execute();
 }
 
-/* 80584ED0-80584ED8 003850 0008+00 1/0 0/0 0/0 .text daObj_Kanban2_IsDelete__FP15daObj_Kanban2_c
- */
 static int daObj_Kanban2_IsDelete(daObj_Kanban2_c* i_this) {
     return 1;
 }
 
-/* 80584ED8-80584F44 003858 006C+00 1/1 0/0 0/0 .text            _delete__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::_delete() {
     dComIfG_resDelete(&mPhase, "Obj_kn2");
 
     if (mInitHIO) {
-        l_initHIO = false;
+        hio_set = false;
         mDoHIO_DELETE_CHILD(l_HIO.id);
     }
 
@@ -1723,20 +1671,18 @@ int daObj_Kanban2_c::_delete() {
     return 1;
 }
 
-/* 80584F44-80584F64 0038C4 0020+00 1/0 0/0 0/0 .text daObj_Kanban2_Delete__FP15daObj_Kanban2_c */
 static int daObj_Kanban2_Delete(daObj_Kanban2_c* i_this) {
     fpc_ProcID id = fopAcM_GetID(i_this);
     return i_this->_delete();
 }
 
-/* 80584F64-805850C8 0038E4 0164+00 1/1 0/0 0/0 .text            CreateHeap__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::CreateHeap() {
     void* modelData;
     u32 part_flags = fopAcM_GetParam(this) & 0x3FFFF;
 
     if (part_flags == PARTS_ALL) {
         modelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[0]);
-        JUT_ASSERT(2214, modelData != 0);
+        JUT_ASSERT(2214, modelData != NULL);
 
         mpModel = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
         if (mpModel == NULL) {
@@ -1747,7 +1693,7 @@ int daObj_Kanban2_c::CreateHeap() {
     for (int i = 0; i < 18; i++) {
         if (part_flags & (1 << i)) {
             modelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[i + 1]);
-            JUT_ASSERT(2228, modelData != 0);
+            JUT_ASSERT(2228, modelData != NULL);
             void* shareModelData = dComIfG_getObjectRes("Obj_kn2", l_kn2_bmdidx[0]);
             mDoExt_setupShareTexture((J3DModelData*)modelData, (J3DModelData*)shareModelData);
             mpPartModel[i] = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
@@ -1760,15 +1706,13 @@ int daObj_Kanban2_c::CreateHeap() {
     return 1;
 }
 
-/* 805850C8-805850E8 003A48 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     daObj_Kanban2_c* a_this = (daObj_Kanban2_c*)i_this;
     return a_this->CreateHeap();
 }
 
-/* 805850E8-80585458 003A68 0370+00 1/1 0/0 0/0 .text            create__15daObj_Kanban2_cFv */
 int daObj_Kanban2_c::create() {
-    fopAcM_SetupActor(this, daObj_Kanban2_c);
+    fopAcM_ct(this, daObj_Kanban2_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, "Obj_kn2");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -1777,8 +1721,8 @@ int daObj_Kanban2_c::create() {
             return cPhs_ERROR_e;
         }
 
-        if (!l_initHIO) {
-            l_initHIO = true;
+        if (!hio_set) {
+            hio_set = true;
             mInitHIO = true;
             l_HIO.id = mDoHIO_CREATE_CHILD("細切れ看板", &l_HIO);
         }
@@ -1835,12 +1779,10 @@ int daObj_Kanban2_c::create() {
     return phase_state;
 }
 
-/* 80585558-80585578 003ED8 0020+00 1/0 0/0 0/0 .text daObj_Kanban2_Create__FP15daObj_Kanban2_c */
 static int daObj_Kanban2_Create(daObj_Kanban2_c* i_this) {
     return i_this->create();
 }
 
-/* 80585BCC-80585BEC -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Kanban2_Method */
 static actor_method_class l_daObj_Kanban2_Method = {
     (process_method_func)daObj_Kanban2_Create,
     (process_method_func)daObj_Kanban2_Delete,
@@ -1849,7 +1791,6 @@ static actor_method_class l_daObj_Kanban2_Method = {
     (process_method_func)daObj_Kanban2_Draw,
 };
 
-/* 80585BEC-80585C1C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_KANBAN2 */
 extern actor_process_profile_definition g_profile_OBJ_KANBAN2 = {
   fpcLy_CURRENT_e,         // mLayerID
   7,                       // mListID

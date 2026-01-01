@@ -1,0 +1,286 @@
+================================================================================
+                    DELTA_TIME vs SCALE_TIME Guide
+                    For 60fps Port of Twilight Princess
+================================================================================
+
+OVERVIEW
+--------
+The game was originally designed to run at 30fps. To make it work correctly at
+60fps, we need to adjust timing in two different ways depending on what we're
+scaling:
+
+1. SCALE_TIME - For timers and counters
+2. DELTA_TIME - For movement and smooth changes
+
+Implementation notes (current codebase):
+  - `DELTA_TIME` is a real, measured 30fps-normalized timestep:
+      - 30fps frame time => 1.0
+      - 60fps frame time => 0.5
+      - If the game misses frames (e.g. runs at ~30 while in 60 mode), `DELTA_TIME`
+        rises toward 1.0 so movement stays real-time consistent (no slow-motion).
+  - `SCALE_TIME` is still the legacy integer multiplier (selected mode):
+      - 30fps mode => 1
+      - 60fps mode => 2
+
+
+================================================================================
+SCALE_TIME - For Timers/Counters
+================================================================================
+
+VALUES:
+  30fps: SCALE_TIME = 1
+  60fps: SCALE_TIME = 2
+
+PURPOSE:
+  Make timers last the same real-world duration regardless of framerate
+
+WHEN TO USE:
+  - Initializing countdown timers
+  - Setting animation durations (in frames)
+  - Any counter that gets decremented by 1 each frame
+
+PATTERN:
+  Multiply by SCALE_TIME when initializing, then decrement with -- operator
+
+EXAMPLE:
+  // Timer should last 1 second (30 frames at 30fps, 60 frames at 60fps)
+  mDashTimer = 30 * SCALE_TIME;
+
+  // Each frame in the game loop:
+  if (mDashTimer != 0) {
+      mDashTimer--;  // Just subtract 1, no DELTA_TIME needed!
+  }
+
+WHY IT WORKS:
+  At 60fps, timer starts at 60 instead of 30
+  But we're running twice as many frames, so it still takes 1 second
+
+NOTE (for >60fps targets):
+  If logic is being skipped (`g_shouldUpdateLogic`), relying on `SCALE_TIME` as
+  “fps/30” can be misleading because logic may still be effectively 60fps-paced.
+  In those cases, prefer converting timers using `frames / DELTA_TIME` (see below),
+  because `DELTA_TIME` is forced to 0.5 for >60fps targets.
+
+
+================================================================================
+DELTA_TIME - For Movement/Smooth Changes
+================================================================================
+
+VALUES:
+  30fps: DELTA_TIME = 1.0
+  60fps: DELTA_TIME = 0.5
+
+PURPOSE:
+  Make per-frame changes smaller at higher framerates so total movement over
+  time stays consistent
+
+WHEN TO USE:
+  - Movement speed calculations
+  - Rotation/angle changes
+  - Any gradual change that happens every frame
+  - Inside utility functions like cLib_addCalcAngleS, cLib_chaseF, etc.
+
+PATTERN:
+  Calculate the change, then multiply by DELTA_TIME when applying it
+
+EXAMPLE:
+  // Movement - should move 10 units per 30fps frame
+  void fopAcM_calcSpeed(fopAc_ac_c* i_actor) {
+      f32 speedF = fopAcM_GetSpeedF(i_actor) * DELTA_TIME;
+      // speedF will be half at 60fps, but applied twice as often
+  }
+
+  // Rotation - should smoothly rotate toward target
+  s16 cLib_addCalcAngleS(...) {
+      s16 step = diff / scale;           // Calculate step normally
+      *pvalue += step * DELTA_TIME;      // Apply half the step at 60fps
+  }
+
+WHY IT WORKS:
+  At 60fps, each step is 0.5x smaller
+  But we're running twice as many frames, so total movement is the same
+
+
+================================================================================
+CRITICAL RULE: Scale INSIDE Functions, NOT at Call Sites
+================================================================================
+
+WRONG - Scaling at call sites:
+  // DON'T DO THIS!
+  cLib_addCalcAngleS(&angle, target, 4 * DELTA_TIME, 0x1000, 0x100);
+
+  Problem: If cLib_addCalcAngleS also uses DELTA_TIME internally,
+           this causes DOUBLE SCALING and makes movement too slow!
+
+RIGHT - Scaling inside the function:
+  // Caller just passes normal values
+  cLib_addCalcAngleS(&angle, target, 4, 0x1000, 0x100);
+
+  // Function handles DELTA_TIME internally
+  s16 cLib_addCalcAngleS(s16* pvalue, s16 target, const s16 scale, ...) {
+      s16 step = diff / scale;
+      *pvalue += step * DELTA_TIME;  // DELTA_TIME applied here
+  }
+
+WHY THIS MATTERS:
+  - Consistency: All callers automatically get correct behavior
+  - No double scaling: DELTA_TIME only applied once
+  - Easier to maintain: Fix it once in the function, works everywhere
+
+
+================================================================================
+DIVIDING BY DELTA_TIME: When It’s Correct (and When It’s Not)
+================================================================================
+
+There are two very different operations that people describe as “divide by DELTA_TIME”:
+
+1) WRONG: dividing a *movement step* (units-per-tick) by `DELTA_TIME`
+   This makes per-tick motion larger at higher FPS and will over-speed.
+
+   Example (wrong):
+     step = diff / (scale * DELTA_TIME);
+
+2) RIGHT: converting a 30fps “frame count” into *logic ticks*
+   If a timer is specified in “30fps frames”, and you’re incrementing/decrementing
+   it by 1 per logic tick, the correct conversion is:
+
+     ticks = frames / DELTA_TIME
+
+   Because:
+     30fps: DELTA_TIME = 1.0  => 30 / 1.0  = 30 ticks
+     60fps: DELTA_TIME = 0.5  => 30 / 0.5  = 60 ticks
+     120fps render w/ 60fps logic: DELTA_TIME is forced to 0.5 => still 60 ticks
+
+   Recommended pattern:
+     s16 ticks = (s16)(frames / DELTA_TIME + 0.5f);  // rounded
+
+
+================================================================================
+Quick Reference Table
+================================================================================
+
+What are you doing?              | Use this:        | How:
+---------------------------------|------------------|------------------------
+Setting a timer                  | SCALE_TIME       | timer = frames * SCALE_TIME
+Decrementing a timer             | Just use --      | if (timer) timer--;
+Movement speed                   | DELTA_TIME       | speed * DELTA_TIME
+Angle changes                    | DELTA_TIME       | angle += step * DELTA_TIME
+Gradual value changes            | DELTA_TIME       | value += change * DELTA_TIME
+Animation frame advances         | Nothing          | Frame++ (already frame-based)
+
+
+================================================================================
+Common Functions Already Handling DELTA_TIME Internally
+================================================================================
+
+Be precise here: some helpers apply `DELTA_TIME` to the *applied delta*, but may
+not apply it to all parameters (notably clamp parameters).
+
+These functions apply `DELTA_TIME` internally to the applied delta, so DO NOT
+scale their “scale”/“step” inputs at call sites:
+
+- cLib_addCalcAngleS()   - clamps then applies `step * DELTA_TIME`
+- cLib_addCalcAngleS2()  - applies `maxStep * DELTA_TIME` in clamped path
+- fopAcM_calcSpeed()     - multiplies speed by `DELTA_TIME`
+
+Special case: `cLib_addCalc(f32* ...)`
+  `cLib_addCalc` includes `DELTA_TIME` in its “scale * (target - value)” term, but
+  its `maxStep`/`minStep` clamps are in raw units. If the clamp path is frequently
+  hit, you may need to time-scale the clamp values at the call site:
+    maxStep_scaled = maxStep * DELTA_TIME
+    minStep_scaled = minStep * DELTA_TIME
+
+Bottom line: never “blindly scale everything”; check the helper’s implementation.
+
+
+================================================================================
+Examples from the Codebase
+================================================================================
+
+TIMERS (use SCALE_TIME):
+  // src/d/actor/d_a_alink_swim.inc:1118
+  mWolfDashDistTimer = mpHIO->mSwim.m.field_0x5c * SCALE_TIME;
+
+  // src/d/actor/d_a_alink.cpp:17240
+  if (mWolfDashTimer != 0) {
+      mWolfDashTimer--;  // No DELTA_TIME needed!
+  }
+
+MOVEMENT (use DELTA_TIME):
+  // src/f_op/f_op_actor_mng.cpp:540
+  void fopAcM_calcSpeed(fopAc_ac_c* i_actor) {
+      f32 speedF = fopAcM_GetSpeedF(i_actor) * DELTA_TIME;
+      // ... calculate movement with scaled speed
+  }
+
+ANGLES (use DELTA_TIME):
+  // src/SSystem/SComponent/c_lib.cpp:242
+  s16 cLib_addCalcAngleS(s16* pvalue, s16 target, const s16 scale, ...) {
+      s16 step = diff / scale;
+      *pvalue += step * DELTA_TIME;  // Scaled inside the function
+  }
+
+
+================================================================================
+Spinner (d_a_spinner / d_a_alink_spinner.inc / d_a_spinner.h)
+================================================================================
+Goal: keep spinner ride distance, wall-hit cooldowns, and slowdown timing identical in real time at 30/60.
+
+What’s scaled and why:
+  - Ride timer: `mRideMoveTime` remains `s16` (struct layout preserved) and stores logic ticks,
+    not raw “30fps frames”.
+      ticks = frames / DELTA_TIME
+    The code sets `mRideMoveTime` using that conversion and then decrements it by 1 per update.
+    This keeps the same real-time ride duration at 30fps and 60fps without needing a float copy.
+    (`field_0xa88` exists in the struct but is currently unused.)
+
+  - Wall-hit cooldown (`field_0xa78`) and “stuck” self-destruct threshold (`field_0xa79` check):
+      ticks = frames / DELTA_TIME
+    so they represent the same real duration at 30fps and 60fps.
+    Note: `frames / DELTA_TIME` is equivalent to `frames * (1.0f / DELTA_TIME)`; division is just clearer.
+
+  - Decel clamps (`getSpinnerRideDecSpeedMax/Min` in `d_a_alink_spinner.inc`):
+    these are per-tick maximum deltas passed into `cLib_addCalc`. Because `cLib_addCalc`
+    does not time-scale its clamp parameters internally, the clamps are multiplied by
+    `DELTA_TIME` to preserve the same per-second deceleration envelope.
+
+  - Decel rate (`getSpinnerRideDecSpeedRate`):
+    keep this unscaled if it is used as the `scale` parameter to `cLib_addCalc`,
+    because `cLib_addCalc` already includes `DELTA_TIME` in its “scale” term.
+
+What is NOT scaled explicitly:
+  - Movement/rotation/gravity in `d_a_spinner.cpp` already apply `DELTA_TIME` at integration sites; inputs stay in native units.
+
+Key code touch points:
+  - `include/d/actor/d_a_spinner.h`: `mRideMoveTime` is `s16` logic ticks; `field_0xa88` is currently unused.
+  - `src/d/actor/d_a_alink_spinner.inc`: converts ride frames -> ticks before calling `spinner->setMove(...)`.
+  - `src/d/actor/d_a_spinner.cpp`: converts ride frames -> ticks when entering tag/path states and decrements `mRideMoveTime--`.
+    Wall/stuck timers use `frames / DELTA_TIME` thresholds.
+
+
+================================================================================
+Troubleshooting
+================================================================================
+
+Movement too fast?
+  - Check if you're dividing by DELTA_TIME (should multiply instead)
+  - Check for double scaling (DELTA_TIME at call site AND inside function)
+
+Movement too slow?
+  - Might be missing DELTA_TIME scaling in the movement function
+  - Check if the function already handles it internally
+
+Jittery/stuttery movement?
+  - Usually caused by DELTA_TIME being applied at call sites when the
+    function already handles it internally
+  - Remove DELTA_TIME from the function parameters
+
+Timers too short?
+  - Should use SCALE_TIME when initializing: timer = value * SCALE_TIME
+
+Timers too long?
+  - Check you're not using both SCALE_TIME and DELTA_TIME on timers
+  - Timers should only use SCALE_TIME at initialization
+
+
+================================================================================

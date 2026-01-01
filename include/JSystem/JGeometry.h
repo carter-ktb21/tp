@@ -34,12 +34,26 @@ struct TUtil<f32> {
     static inline f32 epsilon() { return 32.0f * FLT_EPSILON; }
     static inline f32 PI() { return 3.1415927f; }
     static inline f32 inv_sqrt(f32 x) {
+        #ifdef __MWERKS__
         if (x <= 0.0f) {
             return x;
         }
         f32 root = __frsqrte(x);
         root = 0.5f * root * (3.0f - x * (root * root));
         return root;
+        #endif
+    }
+
+    static inline f32 sqrt(f32 x) {
+        #ifdef __MWERKS__
+        if (x <= 0.0f) {
+            return x;
+        }
+
+        f32 root = __frsqrte(x);
+        root = 0.5f * root * (3.0f - x * (root * root));
+        return x * root;
+        #endif
     }
 };
 
@@ -112,13 +126,13 @@ struct TVec3<s16> {
 };
 
 inline void setTVec3f(const f32* vec_a, f32* vec_b) {
-    const register f32* v_a = vec_a;
-    register f32* v_b = vec_b;
-
-    register f32 a_x;
-    register f32 b_x;
-
 #ifdef __MWERKS__
+    const __REGISTER f32* v_a = vec_a;
+    __REGISTER f32* v_b = vec_b;
+
+    __REGISTER f32 a_x;
+    __REGISTER f32 b_x;
+
     asm {
         psq_l a_x, 0(v_a), 0, 0
         lfs b_x, 8(v_a)
@@ -134,18 +148,21 @@ inline void setTVec3f(const Vec& vec_a, Vec& vec_b) {
 }
 
 inline float fsqrt_step(float mag) {
+    #ifdef __MWERKS__
     f32 root = __frsqrte(mag);
     return 0.5f * root * (3.0f - mag * (root * root));
+    #endif
 }
 
-inline void mulInternal(register const f32* a, register const f32* b, register float* dst) {
-    register f32 a_x_y;
-    register f32 b_x_y;
-    register f32 x_y;
-    register f32 za;
-    register f32 zb;
-    register f32 z;
+inline void mulInternal(__REGISTER const f32* a, __REGISTER const f32* b, __REGISTER float* dst) {
 #ifdef __MWERKS__
+    __REGISTER f32 a_x_y;
+    __REGISTER f32 b_x_y;
+    __REGISTER f32 x_y;
+    __REGISTER f32 za;
+    __REGISTER f32 zb;
+    __REGISTER f32 z;
+
     asm {
         psq_l  a_x_y, 0(a), 0, 0
         psq_l  b_x_y, 0(b), 0, 0
@@ -216,7 +233,7 @@ struct TVec3<f32> : public Vec {
     }
 
     inline TVec3<f32>& operator=(const TVec3<f32>& b) {
-        set(b.x, b.y, b.z);
+        setTVec3f(&b.x, &this->x);
         return *this;
     }    
 
@@ -251,31 +268,28 @@ struct TVec3<f32> : public Vec {
         return inv_norm * sq; 
     }
 
-    void normalize(const TVec3<f32>& other) {
+    f32 normalize(const TVec3<f32>& other) {
         f32 sq = other.squared();
         if (sq <= TUtil<f32>::epsilon()) {
             zero();
-            return;
+            return 0.0f;
         }
-        f32 norm;
-        if (sq <= 0.0f) {
-            norm = sq;
-        } else {
-            norm = fsqrt_step(sq);
-        }
+        f32 norm = TUtil<f32>::inv_sqrt(sq);
         scale(norm, other);
+        return norm * sq;
     }
 
     f32 length() const {
         return VECMag((Vec*)this);
     }
 
-    void scale(register f32 sc) {
-        register f32 z;
-        register f32 x_y;
-        register f32* dst = &x;
-        register f32 zres;
+    void scale(__REGISTER f32 sc) {
 #ifdef __MWERKS__
+        __REGISTER f32 z;
+        __REGISTER f32 x_y;
+        __REGISTER f32* dst = &x;
+        __REGISTER f32 zres;
+
         asm {
             psq_l    x_y, 0(dst),  0, 0
             psq_l    z,   8(dst),  1, 0
@@ -287,13 +301,14 @@ struct TVec3<f32> : public Vec {
 #endif
     }
 
-    void scale(register f32 sc, const TVec3<f32>& other) {
-        register const f32* src = &other.x;
-        register f32 z;
-        register f32 x_y;
-        register f32* dst = &x;
-        register f32 zres;
+    void scale(__REGISTER f32 sc, const TVec3<f32>& other) {
 #ifdef __MWERKS__
+        __REGISTER const f32* src = &other.x;
+        __REGISTER f32 z;
+        __REGISTER f32 x_y;
+        __REGISTER f32* dst = &x;
+        __REGISTER f32 zres;
+
         asm {
             psq_l    x_y, 0(src),  0, 0
             psq_l    z,   8(src),  1, 0
@@ -305,16 +320,17 @@ struct TVec3<f32> : public Vec {
 #endif
     }
 
-    void scaleAdd(register f32 sc, const TVec3<f32>& a, const TVec3<f32>& b) {
+    void scaleAdd(__REGISTER f32 sc, const TVec3<f32>& a, const TVec3<f32>& b) {
         JMAVECScaleAdd(&a, &b, this, sc);
     }
 
     void negateInternal(TVec3<f32>* dst) {
-        register f32* rdst = &dst->x;
-        const register f32* src = &x;
-        register f32 x_y;
-        register f32 z;
 #ifdef __MWERKS__
+        __REGISTER f32* rdst = &dst->x;
+        const __REGISTER f32* src = &x;
+        __REGISTER f32 x_y;
+        __REGISTER f32 z;
+
         asm {
             psq_l  x_y, 0(src), 0, 0
             ps_neg x_y, x_y
@@ -389,16 +405,20 @@ template <typename T>
 struct TVec2 {
     TVec2() {}
     TVec2(T v) { set(v); }
-    TVec2(T x, T y) { set(x, y); }
+
+    template <typename U>
+    TVec2(const U x, const U y) { set(x, y); }
 
     void set(T v) { y = x = v; }
 
-    void set(T x, T y) {
+    template <typename U>
+    void set(const U x, const U y) {
         this->x = x;
         this->y = y;
     }
 
-    void set(const TVec2& other) {
+    template <typename U>
+    void set(const TVec2<U>& other) {
         x = other.x;
         y = other.y;
     }
@@ -435,12 +455,7 @@ struct TVec2 {
     }
 
     f32 length() const {
-        f32 sqr = squared();
-        if (sqr <= 0.0f) {
-            return sqr;
-        }
-        sqr *= fsqrt_step(sqr);
-        return sqr;
+        return TUtil<f32>::sqrt(squared());
     }
 
     T x;
@@ -481,9 +496,12 @@ template<> struct TBox<TVec2<f32> > {
 };
 
 template <typename T>
-struct TBox2 : TBox<TVec2<T> > {
+struct TBox2 : public TBox<TVec2<T> > {
     TBox2() {}
-    TBox2(const TVec2<f32>& i, const TVec2<f32>& f) { set(i, f); }
+    TBox2(const TVec2<f32>& _i, const TVec2<f32>& _f) { 
+        TBox<TVec2<T> >::i.set(_i);
+        TBox<TVec2<T> >::f.set(_f);
+    }
     TBox2(f32 x0, f32 y0, f32 x1, f32 y1) { set(x0, y0, x1, y1); }
 
     void absolute() {
@@ -496,7 +514,7 @@ struct TBox2 : TBox<TVec2<T> > {
         }
     }
 
-    void set(const TBox2& other) { set(other.i, other.f); }
+    void set(const TBox<TVec2<T> >& other) { set(other.i, other.f); }
     void set(const TVec2<f32>& i, const TVec2<f32>& f) { this->i.set(i), this->f.set(f); }
     void set(f32 x0, f32 y0, f32 x1, f32 y1) { this->i.set(x0, y0); this->f.set(x1, y1); }
 };

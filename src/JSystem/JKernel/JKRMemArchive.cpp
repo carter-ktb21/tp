@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRMemArchive.h"
 #include "JSystem/JKernel/JKRDecomp.h"
 #include "JSystem/JKernel/JKRDvdRipper.h"
@@ -5,9 +7,8 @@
 #include "JSystem/JUtility/JUTException.h"
 #include "string.h"
 #include "global.h"
+#include <stdint.h>
 
-/* 802D69B8-802D6A6C 2D12F8 00B4+00 0/0 2/2 0/0 .text
- * __ct__13JKRMemArchiveFlQ210JKRArchive15EMountDirection       */
 JKRMemArchive::JKRMemArchive(s32 entryNum, JKRArchive::EMountDirection mountDirection)
     : JKRArchive(entryNum, MOUNT_MEM) {
     mIsMounted = false;
@@ -23,8 +24,6 @@ JKRMemArchive::JKRMemArchive(s32 entryNum, JKRArchive::EMountDirection mountDire
     mIsMounted = true;
 }
 
-/* 802D6A6C-802D6B24 2D13AC 00B8+00 0/0 2/2 0/0 .text __ct__13JKRMemArchiveFPvUl15JKRMemBreakFlag
- */
 JKRMemArchive::JKRMemArchive(void* buffer, u32 bufferSize, JKRMemBreakFlag param_3)
     : JKRArchive((s32)buffer, MOUNT_MEM) {
     mIsMounted = false;
@@ -39,7 +38,6 @@ JKRMemArchive::JKRMemArchive(void* buffer, u32 bufferSize, JKRMemBreakFlag param
     mIsMounted = true;
 }
 
-/* 802D6B24-802D6BCC 2D1464 00A8+00 1/0 0/0 0/0 .text            __dt__13JKRMemArchiveFv */
 JKRMemArchive::~JKRMemArchive() {
     if (mIsMounted == true) {
         if (mIsOpen) {
@@ -52,8 +50,6 @@ JKRMemArchive::~JKRMemArchive() {
     }
 }
 
-/* 802D6BCC-802D6D30 2D150C 0164+00 1/1 0/0 0/0 .text
- * open__13JKRMemArchiveFlQ210JKRArchive15EMountDirection       */
 bool JKRMemArchive::open(s32 entryNum, JKRArchive::EMountDirection mountDirection) {
     mArcHeader = NULL;
     mArcInfoBlock = NULL;
@@ -94,11 +90,11 @@ bool JKRMemArchive::open(s32 entryNum, JKRArchive::EMountDirection mountDirectio
         mStringTable = (char *)((u8 *)&mArcInfoBlock->num_nodes + mArcInfoBlock->string_table_offset);
 
         mArchiveData =
-            (u8 *)((u32)mArcHeader + mArcHeader->header_length + mArcHeader->file_data_offset);
+            (u8 *)((uintptr_t)mArcHeader + mArcHeader->header_length + mArcHeader->file_data_offset);
         mIsOpen = true;
     }
 
-#ifdef DEBUG
+#if DEBUG
     if (mMountMode == 0) {
         OSReport(":::Cannot alloc memory [%s][%d]\n", __FILE__, 460);
     }
@@ -107,8 +103,6 @@ bool JKRMemArchive::open(s32 entryNum, JKRArchive::EMountDirection mountDirectio
     return (mMountMode == UNKNOWN_MOUNT_MODE) ? false : true;
 }
 
-/* 802D6D30-802D6DDC 2D1670 00AC+00 1/1 0/0 0/0 .text open__13JKRMemArchiveFPvUl15JKRMemBreakFlag
- */
 bool JKRMemArchive::open(void* buffer, u32 bufferSize, JKRMemBreakFlag flag) {
     mArcHeader = (SArcHeader *)buffer;
     JUT_ASSERT(491, mArcHeader->signature =='RARC');
@@ -116,15 +110,13 @@ bool JKRMemArchive::open(void* buffer, u32 bufferSize, JKRMemBreakFlag flag) {
     mNodes = (SDIDirEntry *)((u8 *)&mArcInfoBlock->num_nodes + mArcInfoBlock->node_offset);
     mFiles = (SDIFileEntry *)((u8 *)&mArcInfoBlock->num_nodes + mArcInfoBlock->file_entry_offset);
     mStringTable = (char *)((u8 *)&mArcInfoBlock->num_nodes + mArcInfoBlock->string_table_offset);
-    mArchiveData = (u8 *)(((u32)mArcHeader + mArcHeader->header_length) + mArcHeader->file_data_offset);
+    mArchiveData = (u8 *)(((uintptr_t)mArcHeader + mArcHeader->header_length) + mArcHeader->file_data_offset);
     mIsOpen = (flag == JKRMEMBREAK_FLAG_UNKNOWN1) ? true : false; // mIsOpen might be u8
     mHeap = JKRHeap::findFromRoot(buffer);
     mCompression = COMPRESSION_NONE;
     return true;
 }
 
-/* 802D6DDC-802D6E10 2D171C 0034+00 1/0 0/0 0/0 .text
- * fetchResource__13JKRMemArchiveFPQ210JKRArchive12SDIFileEntryPUl */
 void* JKRMemArchive::fetchResource(SDIFileEntry* fileEntry, u32* resourceSize) {
     JUT_ASSERT(555, isMounted());
     if (!fileEntry->data) {
@@ -138,8 +130,6 @@ void* JKRMemArchive::fetchResource(SDIFileEntry* fileEntry, u32* resourceSize) {
     return fileEntry->data;
 }
 
-/* 802D6E10-802D6ED0 2D1750 00C0+00 1/0 0/0 0/0 .text
- * fetchResource__13JKRMemArchiveFPvUlPQ210JKRArchive12SDIFileEntryPUl */
 void* JKRMemArchive::fetchResource(void* buffer, u32 bufferSize, SDIFileEntry* fileEntry,
                                    u32* resourceSize) {
     JUT_ASSERT(595, isMounted());
@@ -164,7 +154,6 @@ void* JKRMemArchive::fetchResource(void* buffer, u32 bufferSize, SDIFileEntry* f
     return buffer;
 }
 
-/* 802D6ED0-802D6F20 2D1810 0050+00 1/0 0/0 0/0 .text removeResourceAll__13JKRMemArchiveFv */
 void JKRMemArchive::removeResourceAll(void) {
     JUT_ASSERT(642, isMounted());
 
@@ -183,8 +172,6 @@ void JKRMemArchive::removeResourceAll(void) {
     }
 }
 
-/* 802D6F20-802D6F5C 2D1860 003C+00 1/0 0/0 0/0 .text            removeResource__13JKRMemArchiveFPv
- */
 bool JKRMemArchive::removeResource(void* resource) {
     JUT_ASSERT(673, isMounted());
 
@@ -196,8 +183,6 @@ bool JKRMemArchive::removeResource(void* resource) {
     return true;
 }
 
-/* 802D6F5C-802D7030 2D189C 00D4+00 1/1 1/1 0/0 .text
- * fetchResource_subroutine__13JKRMemArchiveFPUcUlPUcUli        */
 u32 JKRMemArchive::fetchResource_subroutine(u8* src, u32 srcLength, u8* dst, u32 dstLength,
                                             JKRCompression compression) {
     switch (compression) {
@@ -210,15 +195,18 @@ u32 JKRMemArchive::fetchResource_subroutine(u8* src, u32 srcLength, u8* dst, u32
         return srcLength;
 
     case COMPRESSION_YAY0:
-    case COMPRESSION_YAZ0:
+    case COMPRESSION_YAZ0: {
         u32 expendedSize = JKRDecompExpandSize(src);
+        #if VERSION != VERSION_SHIELD_DEBUG
         srcLength = expendedSize;
+        #endif
         if (expendedSize > dstLength) {
             srcLength = dstLength;
         }
 
         JKRDecompress(src, dst, srcLength, 0);
         return srcLength;
+    }
 
     default: {
         JUTException::panic(__FILE__, 723, "??? bad sequence\n");
@@ -228,7 +216,6 @@ u32 JKRMemArchive::fetchResource_subroutine(u8* src, u32 srcLength, u8* dst, u32
     return 0;
 }
 
-/* 802D7030-802D70C0 2D1970 0090+00 1/0 0/0 0/0 .text getExpandedResSize__13JKRMemArchiveCFPCv */
 u32 JKRMemArchive::getExpandedResSize(const void* resource) const {
     SDIFileEntry* fileEntry = findPtrResource(resource);
     if (fileEntry == NULL)

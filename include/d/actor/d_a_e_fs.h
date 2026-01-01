@@ -15,8 +15,9 @@
  * @details 
  * 
  */
-class e_fs_class : public fopEn_enemy_c {
+class e_fs_class {
 public:
+    /* 0x000 */ fopEn_enemy_c mEnemy;
     /* 0x5AC */ request_of_phase_process_class mPhase;
     /* 0x5B4 */ u8 field_0x5b4;
     /* 0x5B5 */ u8 field_0x5b5;
@@ -60,20 +61,5 @@ public:
 };
 
 STATIC_ASSERT(sizeof(e_fs_class) == 0xB9C);
-
-class daE_Fs_HIO_c {
-public:
-    /* 806BBACC */ daE_Fs_HIO_c();
-    /* 806BDF94 */ virtual ~daE_Fs_HIO_c() {}
-
-    /* 0x04 */ s8 field_0x4;
-    /* 0x08 */ f32 mScale;
-    /* 0x0C */ f32 mAttackRange;
-    /* 0x10 */ f32 mAttackDistance;
-    /* 0x14 */ f32 mMoveSpeedRatio;
-    /* 0x18 */ f32 mDeleteRange;
-};
-
-STATIC_ASSERT(sizeof(daE_Fs_HIO_c) == 0x1C);
 
 #endif /* D_A_E_FS_H */

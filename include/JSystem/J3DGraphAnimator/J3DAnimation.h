@@ -476,10 +476,10 @@ public:
         mFrame = 0.0f;
     }
 
-    J3DAnmBase(s16 i_frameMax) {
+    J3DAnmBase(s16 frameMax) {
         mAttribute = 0;
         field_0x5 = 0;
-        mFrameMax = i_frameMax;
+        mFrameMax = frameMax;
         mFrame = 0.0f;
     }
 
@@ -503,10 +503,10 @@ public:
  */
 class J3DAnmTransform : public J3DAnmBase {
 public:
-    /* 80328E40 */ J3DAnmTransform(s16, f32*, s16*, f32*);
+    J3DAnmTransform(s16, f32*, s16*, f32*);
 
-    /* 8003B93C */ virtual ~J3DAnmTransform() {}
-    /* 8003C77C */ virtual s32 getKind() const { return 0; }
+    virtual ~J3DAnmTransform() {}
+    virtual s32 getKind() const { return 0; }
     virtual void getTransform(u16, J3DTransformInfo*) const = 0;
 
     /* 0x0C */ f32* mScaleData;
@@ -515,7 +515,7 @@ public:
     /* 0x18 */ s16 field_0x18;
     /* 0x1A */ s16 field_0x1a;
     /* 0x1C */ u16 field_0x1c;
-    /* 0x1E */ s16 field_0x1e;
+    /* 0x1E */ u16 field_0x1e;
 };  // Size: 0x20
 
 /**
@@ -529,12 +529,12 @@ public:
         mAnmTable = 0;
     }
 
-    /* 80329A34 */ void calcTransform(f32, u16, J3DTransformInfo*) const;
+    void calcTransform(f32, u16, J3DTransformInfo*) const;
 
-    /* 8003B8D0 */ virtual ~J3DAnmTransformKey() {}
-    /* 8003C800 */ virtual s32 getKind() const { return 8; }
-    /* 8003C808 */ virtual void getTransform(u16 param_0, J3DTransformInfo* param_1) const {
-        calcTransform(mFrame, param_0, param_1);
+    virtual ~J3DAnmTransformKey() {}
+    virtual s32 getKind() const { return 8; }
+    virtual void getTransform(u16 jointNo, J3DTransformInfo* pTransform) const {
+        calcTransform(mFrame, jointNo, pTransform);
     }
 
     /* 0x20 */ int mDecShift;
@@ -549,9 +549,9 @@ class J3DAnmTransformFull : public J3DAnmTransform {
 public:
     J3DAnmTransformFull() : J3DAnmTransform(0, NULL, NULL, NULL) { mAnmTable = NULL; }
 
-    /* 8032C2AC */ virtual ~J3DAnmTransformFull() {}
-    /* 8032C318 */ virtual s32 getKind() const { return 9; }
-    /* 80328E90 */ virtual void getTransform(u16, J3DTransformInfo*) const;
+    virtual ~J3DAnmTransformFull() {}
+    virtual s32 getKind() const { return 9; }
+    virtual void getTransform(u16, J3DTransformInfo*) const;
 
     /* 0x20 */ J3DAnmTransformFullTable* mAnmTable;
 };  // Size: 0x24
@@ -562,9 +562,9 @@ public:
  */
 class J3DAnmTransformFullWithLerp : public J3DAnmTransformFull {
 public:
-    /* 8032C228 */ virtual ~J3DAnmTransformFullWithLerp() {}
-    /* 8032C2A4 */ virtual s32 getKind() const { return 16; }
-    /* 803291F0 */ virtual void getTransform(u16, J3DTransformInfo*) const;
+    virtual ~J3DAnmTransformFullWithLerp() {}
+    virtual s32 getKind() const { return 16; }
+    virtual void getTransform(u16, J3DTransformInfo*) const;
 };  // Size: 0x24
 
 struct J3DTextureSRTInfo;
@@ -577,33 +577,33 @@ class J3DMaterialTable;
  */
 class J3DAnmTextureSRTKey : public J3DAnmBase {
 public:
-    /* 80329E5C */ J3DAnmTextureSRTKey();
-    /* 80329F14 */ void calcTransform(f32, u16, J3DTextureSRTInfo*) const;
-    /* 8032B0C0 */ void searchUpdateMaterialID(J3DMaterialTable*);
-    /* 8032B1D4 */ void searchUpdateMaterialID(J3DModelData*);
+    J3DAnmTextureSRTKey();
+    void calcTransform(f32, u16, J3DTextureSRTInfo*) const;
+    void searchUpdateMaterialID(J3DMaterialTable*);
+    void searchUpdateMaterialID(J3DModelData*);
 
-    /* 8032C198 */ virtual ~J3DAnmTextureSRTKey() {}
-    /* 8032C220 */ virtual s32 getKind() const { return 4; }
+    virtual ~J3DAnmTextureSRTKey() {}
+    virtual s32 getKind() const { return 4; }
 
-    void getTransform(u16 param_0, J3DTextureSRTInfo* pSRTInfo) const {
-        calcTransform(getFrame(), param_0, pSRTInfo);
+    void getTransform(u16 jointNo, J3DTextureSRTInfo* pSRTInfo) const {
+        calcTransform(getFrame(), jointNo, pSRTInfo);
     }
 
     u16 getUpdateMaterialID(u16 idx) const {
-        J3D_ASSERT(1029, idx < mTrackNum / 3, "Error : range over.");
+        J3D_ASSERT_RANGE(1029, idx < mTrackNum / 3);
         return mUpdateMaterialID[idx];
     }
     u16 getUpdateMaterialNum() const { return mTrackNum / 3; }
     u16 getPostUpdateMaterialNum() const { return field_0x4a / 3; }
 
     int getUpdateTexMtxID(u16 idx) const {
-        J3D_ASSERT(1017, idx < mTrackNum / 3, "Error : range over.");
+        J3D_ASSERT_RANGE(1017, idx < mTrackNum / 3);
         return mUpdateTexMtxID[idx];
     }
     bool isValidUpdateMaterialID(u16 idx) const { return mUpdateMaterialID[idx] != 0xffff; }
     u32 getTexMtxCalcType() { return mTexMtxCalcType; }
     Vec* getSRTCenter(u16 idx) {
-        J3D_ASSERT(1047, idx < mTrackNum / 3, "Error : range over.");
+        J3D_ASSERT_RANGE(1047, idx < mTrackNum / 3);
         return &mSRTCenter[idx];
     }
 
@@ -641,16 +641,16 @@ public:
  */
 class J3DAnmTexPattern : public J3DAnmBase {
 public:
-    /* 8032AED8 */ J3DAnmTexPattern();
-    /* 8032AF50 */ void getTexNo(u16, u16*) const;
-    /* 8032B004 */ void searchUpdateMaterialID(J3DMaterialTable*);
-    /* 8032B09C */ void searchUpdateMaterialID(J3DModelData*);
+    J3DAnmTexPattern();
+    void getTexNo(u16, u16*) const;
+    void searchUpdateMaterialID(J3DMaterialTable*);
+    void searchUpdateMaterialID(J3DModelData*);
 
-    /* 8032BD20 */ virtual ~J3DAnmTexPattern() {}
-    /* 8032BD94 */ virtual s32 getKind() const { return 2; }
+    virtual ~J3DAnmTexPattern() {}
+    virtual s32 getKind() const { return 2; }
 
     u16 getUpdateMaterialID(u16 idx) const {
-        J3D_ASSERT(2288, idx < mUpdateMaterialNum, "Error : range over.");
+        J3D_ASSERT_RANGE(2288, idx < mUpdateMaterialNum);
         return mUpdateMaterialID[idx];
     }
     u16 getUpdateMaterialNum() const { return mUpdateMaterialNum; }
@@ -671,32 +671,32 @@ public:
  */
 class J3DAnmTevRegKey : public J3DAnmBase {
 public:
-    /* 8032AE18 */ J3DAnmTevRegKey();
-    /* 8032B1F8 */ void getTevColorReg(u16, _GXColorS10*) const;
-    /* 8032B4BC */ void getTevKonstReg(u16, _GXColor*) const;
-    /* 8032B780 */ void searchUpdateMaterialID(J3DMaterialTable*);
-    /* 8032B87C */ void searchUpdateMaterialID(J3DModelData*);
+    J3DAnmTevRegKey();
+    void getTevColorReg(u16, _GXColorS10*) const;
+    void getTevKonstReg(u16, _GXColor*) const;
+    void searchUpdateMaterialID(J3DMaterialTable*);
+    void searchUpdateMaterialID(J3DModelData*);
 
-    /* 8032BD9C */ virtual ~J3DAnmTevRegKey() {}
-    /* 8032BE24 */ virtual s32 getKind() const { return 5; }
+    virtual ~J3DAnmTevRegKey() {}
+    virtual s32 getKind() const { return 5; }
 
     u16 getCRegUpdateMaterialNum() const { return mCRegUpdateMaterialNum; }
     u16 getKRegUpdateMaterialNum() const { return mKRegUpdateMaterialNum; }
 
     u16 getCRegUpdateMaterialID(u16 idx) const {
-        J3D_ASSERT(2100, idx < mCRegUpdateMaterialNum, "Error : range over.");
+        J3D_ASSERT_RANGE(2100, idx < mCRegUpdateMaterialNum);
         return mCRegUpdateMaterialID[idx];
     }
     u16 getKRegUpdateMaterialID(u16 idx) const {
-        J3D_ASSERT(2140, idx < mKRegUpdateMaterialNum, "Error : range over.");
+        J3D_ASSERT_RANGE(2140, idx < mKRegUpdateMaterialNum);
         return mKRegUpdateMaterialID[idx];
     }
 
-    const J3DAnmCRegKeyTable* getAnmCRegKeyTable() const { return mAnmCRegKeyTable; }
-    const J3DAnmKRegKeyTable* getAnmKRegKeyTable() const { return mAnmKRegKeyTable; }
+    const J3DAnmCRegKeyTable* getAnmCRegKeyTable() { return mAnmCRegKeyTable; }
+    const J3DAnmKRegKeyTable* getAnmKRegKeyTable() { return mAnmKRegKeyTable; }
 
-    bool isValidCRegUpdateMaterialID(u16 idx) { return mCRegUpdateMaterialID[idx] != 0xffff; }
-    bool isValidKRegUpdateMaterialID(u16 idx) { return mKRegUpdateMaterialID[idx] != 0xffff; }
+    bool isValidCRegUpdateMaterialID(u16 idx) const { return mCRegUpdateMaterialID[idx] != 0xffff; }
+    bool isValidKRegUpdateMaterialID(u16 idx) const { return mKRegUpdateMaterialID[idx] != 0xffff; }
 
     /* 0x0C */ u16 mCRegUpdateMaterialNum;
     /* 0x0E */ u16 mKRegUpdateMaterialNum;
@@ -730,17 +730,17 @@ public:
  */
 class J3DAnmColor : public J3DAnmBase {
 public:
-    /* 8032A828 */ J3DAnmColor();
-    /* 8032A8A4 */ void searchUpdateMaterialID(J3DMaterialTable*);
+    J3DAnmColor();
+    void searchUpdateMaterialID(J3DMaterialTable*);
 
-    /* 8032BCAC */ virtual ~J3DAnmColor() {}
-    /* 8032BF44 */ virtual s32 getKind() const { return 1; }
-    /* 8032BF4C */ virtual void getColor(u16, GXColor*) const {}
+    virtual ~J3DAnmColor() {}
+    virtual s32 getKind() const { return 1; }
+    virtual void getColor(u16, GXColor*) const {}
 
     u16 getUpdateMaterialNum() const { return mUpdateMaterialNum; }
     bool isValidUpdateMaterialID(u16 id) const { return mUpdateMaterialID[id] != 0xFFFF; }
     u16 getUpdateMaterialID(u16 idx) const { 
-        J3D_ASSERT(1578, idx < mUpdateMaterialNum, "Error : range over.");
+        J3D_ASSERT_RANGE(1578, idx < mUpdateMaterialNum);
         return mUpdateMaterialID[idx];
     }
 
@@ -759,11 +759,11 @@ public:
  */
 class J3DAnmColorKey : public J3DAnmColor {
 public:
-    /* 8032AB00 */ J3DAnmColorKey();
+    J3DAnmColorKey();
 
-    /* 8032BE2C */ virtual ~J3DAnmColorKey() {}
-    /* 8032BEB0 */ virtual s32 getKind() const { return 11; }
-    /* 8032AB54 */ virtual void getColor(u16, GXColor*) const;
+    virtual ~J3DAnmColorKey() {}
+    virtual s32 getKind() const { return 11; }
+    virtual void getColor(u16, GXColor*) const;
 
     /* 0x2C */ s16* mColorR;
     /* 0x30 */ s16* mColorG;
@@ -778,11 +778,11 @@ public:
  */
 class J3DAnmColorFull : public J3DAnmColor {
 public:
-    /* 8032AB00 */ J3DAnmColorFull();
+    J3DAnmColorFull();
 
-    /* 8032BE2C */ virtual ~J3DAnmColorFull() {}
-    /* 8032BEB0 */ virtual s32 getKind() const { return 10; }
-    /* 8032AB54 */ virtual void getColor(u16, GXColor*) const;
+    virtual ~J3DAnmColorFull() {}
+    virtual s32 getKind() const { return 10; }
+    virtual void getColor(u16, GXColor*) const;
 
     /* 0x2C */ u8* mColorR;
     /* 0x30 */ u8* mColorG;
@@ -813,11 +813,11 @@ public:
  */
 class J3DAnmVtxColorKey : public J3DAnmVtxColor {
 public:
-    /* 8032A4E0 */ J3DAnmVtxColorKey();
+    J3DAnmVtxColorKey();
 
-    /* 8032BF50 */ virtual ~J3DAnmVtxColorKey() {}
-    /* 8032BFBC */ virtual s32 getKind() const { return 15; }
-    /* 8032A53C */ virtual void getColor(u8, u16, GXColor*) const;
+    virtual ~J3DAnmVtxColorKey() {}
+    virtual s32 getKind() const { return 15; }
+    virtual void getColor(u8, u16, GXColor*) const;
 
     /* 0x18 */ J3DAnmColorKeyTable* mpTable[2];
     /* 0x20 */ s16* mColorR;
@@ -832,11 +832,11 @@ public:
  */
 class J3DAnmVtxColorFull : public J3DAnmVtxColor {
 public:
-    /* 8032A30C */ J3DAnmVtxColorFull();
+    J3DAnmVtxColorFull();
 
-    /* 8032BFC4 */ virtual ~J3DAnmVtxColorFull() {}
-    /* 8032C030 */ virtual s32 getKind() const { return 14; }
-    /* 8032A368 */ virtual void getColor(u8, u16, GXColor*) const;
+    virtual ~J3DAnmVtxColorFull() {}
+    virtual s32 getKind() const { return 14; }
+    virtual void getColor(u8, u16, GXColor*) const;
 
     /* 0x18 */ J3DAnmColorFullTable* mpTable[2];
     /* 0x20 */ u8* mColorR;
@@ -851,11 +851,11 @@ public:
  */
 class J3DAnmCluster : public J3DAnmBase {
 public:
-    J3DAnmCluster(s16 param_1, f32* param_2) : J3DAnmBase(param_1) { mWeight = param_2; }
+    J3DAnmCluster(s16 frameMax, f32* pWeight) : J3DAnmBase(frameMax) { mWeight = pWeight; }
 
-    /* 8032BCAC */ virtual ~J3DAnmCluster() {}
-    /* 8032BF44 */ virtual s32 getKind() const { return 3; }
-    /* 8032BF4C */ virtual f32 getWeight(u16) const { return 1.0f; }
+    virtual ~J3DAnmCluster() {}
+    virtual s32 getKind() const { return 3; }
+    virtual f32 getWeight(u16) const { return 1.0f; }
 
     /* 0x0C */ f32* mWeight;
 };  // Size: 0x10
@@ -866,11 +866,11 @@ public:
  */
 class J3DAnmClusterFull : public J3DAnmCluster {
 public:
-    J3DAnmClusterFull() : J3DAnmCluster(0, 0) { mAnmTable = NULL; }
+    J3DAnmClusterFull() : J3DAnmCluster(0, NULL) { mAnmTable = NULL; }
 
-    /* 8032BCAC */ virtual ~J3DAnmClusterFull() {}
-    /* 8032BF44 */ virtual s32 getKind() const { return 12; }
-    /* 8032BF4C */ virtual f32 getWeight(u16) const;
+    virtual ~J3DAnmClusterFull() {}
+    virtual s32 getKind() const { return 12; }
+    virtual f32 getWeight(u16) const;
 
     /* 0x10 */ J3DAnmClusterFullTable* mAnmTable;
 };
@@ -883,9 +883,9 @@ class J3DAnmClusterKey : public J3DAnmCluster {
 public:
     J3DAnmClusterKey() : J3DAnmCluster(0, NULL) { mAnmTable = NULL; }
 
-    /* 8032C044 */ virtual ~J3DAnmClusterKey() {}
-    /* 8032C0B0 */ virtual s32 getKind() const { return 13; }
-    /* 8032A218 */ virtual f32 getWeight(u16) const;
+    virtual ~J3DAnmClusterKey() {}
+    virtual s32 getKind() const { return 13; }
+    virtual f32 getWeight(u16) const;
 
     /* 0x10 */ J3DAnmClusterKeyTable* mAnmTable;
 };
@@ -903,8 +903,8 @@ public:
         mVisibility = NULL;
     }
 
-    /* 8033979C */ virtual ~J3DAnmVisibilityFull() {}
-    /* 803397F8 */ virtual s32 getKind() const { return 6; }
+    virtual ~J3DAnmVisibilityFull() {}
+    virtual s32 getKind() const { return 6; }
 
     /* 0x0C */ u16 mUpdateMaterialNum;
     /* 0x0E */ u16 field_0xe;
@@ -919,15 +919,17 @@ public:
 class J3DFrameCtrl {
 public:
     enum Attribute_e {
-        EMode_NONE,
-        EMode_RESET,
-        EMode_LOOP,
-        EMode_REVERSE,
-        EMode_LOOP_REVERSE,
+        /*  -1 */ EMode_NULL = -1,
+        /* 0x0 */ EMode_NONE,
+        /* 0x1 */ EMode_RESET,
+        /* 0x2 */ EMode_LOOP,
+        /* 0x3 */ EMode_REVERSE,
+        /* 0x4 */ EMode_LOOP_REVERSE,
     };
 
     J3DFrameCtrl() { this->init(0); }
     void init(s16);
+    void init(int endFrame) { init((s16)endFrame); }
     BOOL checkPass(f32);
     void update();
     virtual ~J3DFrameCtrl() {}
@@ -943,7 +945,7 @@ public:
     }
     s16 getEnd() const { return mEnd; }
     void setEnd(s16 end) { mEnd = end; }
-    s32 getLoop() { return mLoop; }
+    s16 getLoop() const { return mLoop; }
     void setLoop(s16 loop) { mLoop = loop; }
     f32 getRate() const { return mRate; }
     void setRate(f32 rate) { mRate = rate; }
@@ -965,10 +967,10 @@ public:
 };  // Size: 0x14
 
 struct J3DMtxCalcAnmBase: public J3DMtxCalc {
-    J3DMtxCalcAnmBase(J3DAnmTransform* param_0) { mAnmTransform = param_0; }
-    /* 8000D8EC */ ~J3DMtxCalcAnmBase() {}
-    /* 80014FB8 */ J3DAnmTransform* getAnmTransform() { return mAnmTransform; }
-    /* 80014FC0 */ void setAnmTransform(J3DAnmTransform* param_0) { mAnmTransform = param_0; }
+    J3DMtxCalcAnmBase(J3DAnmTransform* pAnmTransform) { mAnmTransform = pAnmTransform; }
+    ~J3DMtxCalcAnmBase() {}
+    J3DAnmTransform* getAnmTransform() { return mAnmTransform; }
+    void setAnmTransform(J3DAnmTransform* pAnmTransform) { mAnmTransform = pAnmTransform; }
 
     J3DAnmTransform* mAnmTransform;
 };
@@ -980,29 +982,32 @@ struct J3DMtxCalcAnimationAdaptorBase {
 
 template <typename A0>
 struct J3DMtxCalcAnimationAdaptorDefault : public J3DMtxCalcAnimationAdaptorBase {
-    J3DMtxCalcAnimationAdaptorDefault(J3DAnmTransform* param_0) {}
-    void calc(J3DMtxCalcAnmBase* param_0) {
+    J3DMtxCalcAnimationAdaptorDefault(J3DAnmTransform* pAnmTransform) {}
+
+    void calc(J3DMtxCalcAnmBase* pMtxCalc) {
         J3DTransformInfo transform;
         J3DTransformInfo* transform_p;
-        if (param_0->getAnmTransform() != NULL) {
-            u16 jnt_no = J3DMtxCalc::getJoint()->getJntNo();
-            param_0->getAnmTransform()->getTransform(jnt_no, &transform);
+        if (pMtxCalc->getAnmTransform() != NULL) {
+            pMtxCalc->getAnmTransform()->getTransform(J3DMtxCalc::getJoint()->getJntNo(), &transform);
             transform_p = &transform;
         } else {
             transform_p = &J3DMtxCalc::getJoint()->getTransformInfo();
         }
+
         A0::calcTransform(*transform_p);
     }
 };
 
 template <typename A0, typename B0>
 struct J3DMtxCalcAnimation : public J3DMtxCalcAnmBase {
-    J3DMtxCalcAnimation(J3DAnmTransform* param_0) : J3DMtxCalcAnmBase(param_0), field_0x8(param_0) {}
+    J3DMtxCalcAnimation(J3DAnmTransform* pAnmTransform) : J3DMtxCalcAnmBase(pAnmTransform), field_0x8(pAnmTransform) {}
     ~J3DMtxCalcAnimation() {}
-    void setAnmTransform(J3DAnmTransform* param_0) {
-        mAnmTransform = param_0;
-        field_0x8.change(param_0);
+
+    void setAnmTransform(J3DAnmTransform* pAnmTransform) {
+        mAnmTransform = pAnmTransform;
+        field_0x8.change(pAnmTransform);
     }
+
     void init(const Vec& param_0, const Mtx& param_1) { B0::init(param_0, param_1); }
     void calc() { field_0x8.calc(this); }
 

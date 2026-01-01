@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_explain.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "d/d_lib.h"
@@ -11,12 +13,11 @@
 #include "m_Do/m_Do_controller_pad.h"
 #include "stdio.h"
 
-extern dMsgObject_HIO_c g_MsgObject_HIO_c;
-
-/* 803C0E40-803C0E4C 01DF60 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
+#if VERSION == VERSION_GCN_JPN
+#define STR_BUF_LEN 528
+#else
+#define STR_BUF_LEN 512
+#endif
 
 static dMsgScrnExplain_c::ProcFunc init_process[] = {
     &dMsgScrnExplain_c::wait_init,        &dMsgScrnExplain_c::open_request_init,
@@ -30,8 +31,6 @@ static dMsgScrnExplain_c::ProcFunc move_process[] = {
     &dMsgScrnExplain_c::move_select_proc, &dMsgScrnExplain_c::close_proc,
 };
 
-/* 8023CC88-8023D538 2375C8 08B0+00 0/0 2/2 0/0 .text __ct__17dMsgScrnExplain_cFP9STControlUcbUc
- */
 dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_2, u8 param_3) {
     mpStick = i_stick;
     field_0x54 = 0;
@@ -75,7 +74,11 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         mpTxScreen->search('n_3fline')->hide();
         mpTxScreen->search('n_e4line')->hide();
 
+#if VERSION == VERSION_GCN_JPN
+        field_0x50 = 0.0f;
+#else
         field_0x50 = -10.0f;
+#endif
         field_0x4c = 0.0f;
     } else {
         mpTxScreen->setPriority("zelda_message_window_text.blo", 0x20000,
@@ -84,6 +87,31 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
 
         mpScreen->search('n_all')->scale(g_MsgObject_HIO_c.mBoxTalkScaleX,
                                          g_MsgObject_HIO_c.mBoxTalkScaleY);
+#if VERSION == VERSION_GCN_JPN
+        field_0x50 = 0.0f;
+
+        if (dComIfGs_getOptUnk0() == 0) {
+            mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3flin', 0, NULL);
+            mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3f_s', 0, NULL);
+
+            field_0x10[0] = new CPaneMgr(mpTxScreen, 'mg_3f', 0, NULL);
+            field_0x10[1] = new CPaneMgr(mpTxScreen, 'mg_3f_s', 0, NULL);
+
+            mpTxScreen->search('n_3line')->hide();
+            mpTxScreen->search('n_3fline')->show();
+            mpTxScreen->search('n_e4line')->hide();
+        } else {
+            mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3line', 0, NULL);
+            mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3_s', 0, NULL);
+
+            field_0x10[0] = NULL;
+            field_0x10[1] = NULL;
+
+            mpTxScreen->search('n_3line')->show();
+            mpTxScreen->search('n_3fline')->hide();
+            mpTxScreen->search('n_e4line')->hide();
+        }
+#else
         field_0x50 = -10.0f;
 
         mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_e4lin', 0, NULL);
@@ -95,6 +123,7 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         mpTxScreen->search('n_3line')->hide();
         mpTxScreen->search('n_3fline')->hide();
         mpTxScreen->search('n_e4line')->show();
+#endif
 
         if (param_1 == 2 || param_1 == 4) {
             field_0x4c = 0.0f;
@@ -106,12 +135,20 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
     f32 lineSpace = ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getLineSpace();
     for (int i = 0; i < 2; i++) {
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+#if VERSION == VERSION_GCN_JPN
+        ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x210, "");
+#else
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x200, "");
+#endif
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setLineSpace(lineSpace);
 
         if (field_0x10[i] != NULL) {
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+#if VERSION == VERSION_GCN_JPN
+            ((J2DTextBox*)field_0x10[i]->getPanePtr())->setString(0x210, "");
+#else
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setString(0x200, "");
+#endif
             ((J2DTextBox*)field_0x10[i]->getPanePtr())->setLineSpace(lineSpace);
         }
     }
@@ -130,8 +167,8 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
         ResTIMG* texResource =
             (ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG', "tt_block8x8.bti");
         mpBackTex = new J2DPicture(texResource);
-        mpBackTex->setBlackWhite(JUtility::TColor::TColor(0, 0, 0, 0),
-                                 JUtility::TColor::TColor(0, 0, 0, 0xff));
+        mpBackTex->setBlackWhite(JUtility::TColor(0, 0, 0, 0),
+                                 JUtility::TColor(0, 0, 0, 0xff));
         mpBackTex->setAlpha(0);
     } else {
         mpBackTex = NULL;
@@ -152,7 +189,6 @@ dMsgScrnExplain_c::dMsgScrnExplain_c(STControl* i_stick, u8 param_1, bool param_
     mpMg_c[1]->translate(vtxCenter2.x + field_0x50, vtxCenter2.y);
 }
 
-/* 8023D538-8023D7D8 237E78 02A0+00 1/0 0/0 0/0 .text            __dt__17dMsgScrnExplain_cFv */
 dMsgScrnExplain_c::~dMsgScrnExplain_c() {
     delete mpString_c;
     mpString_c = NULL;
@@ -205,7 +241,6 @@ dMsgScrnExplain_c::~dMsgScrnExplain_c() {
     dComIfGp_getMsgCommonArchive()->removeResourceAll();
 }
 
-/* 8023D7D8-8023D918 238118 0140+00 0/0 4/4 0/0 .text            move__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::move() {
     u8 currentStatus = mStatus;
 
@@ -229,8 +264,6 @@ void dMsgScrnExplain_c::move() {
                                      g_MsgObject_HIO_c.mBoxTalkScaleY);
 }
 
-/* 8023D918-8023DAD0 238258 01B8+00 0/0 3/3 0/0 .text draw__17dMsgScrnExplain_cFP13J2DOrthoGraph
- */
 void dMsgScrnExplain_c::draw(J2DOrthoGraph* i_graf) {
     if (mStatus == 0 || mStatus == 1) {
         return;
@@ -244,11 +277,15 @@ void dMsgScrnExplain_c::draw(J2DOrthoGraph* i_graf) {
         mpScreen->draw(0.0f, 0.0f, (J2DGrafContext*)i_graf);
     }
 
-    char string_buf[512];
+    char string_buf[STR_BUF_LEN];
     strcpy(string_buf, ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getStringPtr());
 
     mpTxScreen->draw(0.0f, 0.0f, (J2DGrafContext*)i_graf);
+#if VERSION == VERSION_GCN_JPN
+    mpString_c->getString(field_0x54, (J2DTextBox*)mpTm_c[0]->getPanePtr(), NULL, NULL, NULL, 12);
+#else
     mpString_c->getString(field_0x54, (J2DTextBox*)mpTm_c[0]->getPanePtr(), NULL, NULL, NULL, 8);
+#endif
     mpString_c->drawOutFont((J2DTextBox*)mpTm_c[0]->getPanePtr(), -1.0f);
 
     strcpy(((J2DTextBox*)mpTm_c[0]->getPanePtr())->getStringPtr(), string_buf);
@@ -269,16 +306,12 @@ void dMsgScrnExplain_c::draw(J2DOrthoGraph* i_graf) {
     }
 }
 
-/* 8023DAD0-8023DAD4 238410 0004+00 1/0 0/0 0/0 .text            wait_init__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::wait_init() {}
 
-/* 8023DAD4-8023DAD8 238414 0004+00 1/0 0/0 0/0 .text            wait_proc__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::wait_proc() {}
 
-/* 8023DAD8-8023DADC 238418 0004+00 2/1 0/0 0/0 .text open_request_init__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::open_request_init() {}
 
-/* 8023DADC-8023DBE4 23841C 0108+00 1/0 0/0 0/0 .text open_request_proc__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::open_request_proc() {
     J2DTextBox* uVar1;
     J2DTextBox* uVar6 = NULL;
@@ -288,9 +321,9 @@ void dMsgScrnExplain_c::open_request_proc() {
         uVar6 = (J2DTextBox*)field_0x10[0]->getPanePtr();
     }
 
-    char acStack_220[512];
-    char acStack_420[512];
-    char acStack_620[512];
+    char acStack_220[STR_BUF_LEN];
+    char acStack_420[STR_BUF_LEN];
+    char acStack_620[STR_BUF_LEN];
 
     if (dMsgObject_getString(field_0x54, uVar1, uVar6, mDoExt_getMesgFont(), mpOutFont, acStack_220,
                              acStack_420, acStack_620, &field_0x5c) != 0)
@@ -311,7 +344,6 @@ void dMsgScrnExplain_c::open_request_proc() {
     }
 }
 
-/* 8023DBE4-8023DC7C 238524 0098+00 1/0 0/0 0/0 .text            open_init__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::open_init() {
     field_0x5a = 0;
     field_0x48 = 608.0f;
@@ -321,7 +353,6 @@ void dMsgScrnExplain_c::open_init() {
     mDoAud_seStart(Z2SE_SY_EXP_WIN_OPEN, 0, 0, 0);
 }
 
-/* 8023DC7C-8023DD90 2385BC 0114+00 1/0 0/0 0/0 .text            open_proc__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::open_proc() {
     field_0x5a++;
     if (field_0x5a >= 5) {
@@ -343,12 +374,10 @@ void dMsgScrnExplain_c::open_proc() {
     }
 }
 
-/* 8023DD90-8023DDB4 2386D0 0024+00 1/0 0/0 0/0 .text            move_init__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::move_init() {
     mpArrow_c->arwAnimeInit();
 }
 
-/* 8023DDB4-8023DE8C 2386F4 00D8+00 1/0 0/0 0/0 .text            move_proc__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::move_proc() {
     if (mKeyWaitTimer > 0) {
         mKeyWaitTimer--;
@@ -367,7 +396,6 @@ void dMsgScrnExplain_c::move_proc() {
     }
 }
 
-/* 8023DE8C-8023E0F4 2387CC 0268+00 1/0 0/0 0/0 .text move_select_init__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::move_select_init() {
     char msg_buf_yes[8];
     char msg_buf_no[8];
@@ -420,7 +448,6 @@ void dMsgScrnExplain_c::move_select_init() {
     mpArrow_c->arwAnimeInit();
 }
 
-/* 8023E0F4-8023E43C 238A34 0348+00 1/0 0/0 0/0 .text move_select_proc__17dMsgScrnExplain_cFv */
 void dMsgScrnExplain_c::move_select_proc() {
     if (mKeyWaitTimer > 0) {
         mKeyWaitTimer--;
@@ -477,14 +504,10 @@ void dMsgScrnExplain_c::move_select_proc() {
     }
 }
 
-/* 8023E43C-8023E448 238D7C 000C+00 1/0 0/0 0/0 .text            close_init__17dMsgScrnExplain_cFv
- */
 void dMsgScrnExplain_c::close_init() {
     field_0x5a = 5;
 }
 
-/* 8023E448-8023E558 238D88 0110+00 1/0 0/0 0/0 .text            close_proc__17dMsgScrnExplain_cFv
- */
 void dMsgScrnExplain_c::close_proc() {
     bool iVar1;
     if (mpSelect_c != NULL) {
@@ -511,8 +534,6 @@ void dMsgScrnExplain_c::close_proc() {
     }
 }
 
-/* 8023E558-8023E5CC 238E98 0074+00 0/0 7/7 0/0 .text openExplain__17dMsgScrnExplain_cFUlUcUcUcb
- */
 bool dMsgScrnExplain_c::openExplain(u32 param_0, u8 param_1, u8 param_2, u8 param_3, bool param_4) {
     bool rv = false;
 
@@ -535,7 +556,6 @@ bool dMsgScrnExplain_c::openExplain(u32 param_0, u8 param_1, u8 param_2, u8 para
     return rv;
 }
 
-/* 8023E5CC-8023E640 238F0C 0074+00 2/2 0/0 0/0 .text getAlphaRatio__17dMsgScrnExplain_cFv */
 f32 dMsgScrnExplain_c::getAlphaRatio() {
     switch (mStatus) {
     case 2:
@@ -548,12 +568,10 @@ f32 dMsgScrnExplain_c::getAlphaRatio() {
     }
 }
 
-/* 8023E640-8023E654 238F80 0014+00 1/1 0/0 0/0 .text checkTriggerA__17dMsgScrnExplain_cFv */
 bool dMsgScrnExplain_c::checkTriggerA() {
     return mDoCPd_c::getTrigA(PAD_1);
 }
 
-/* 8023E654-8023E668 238F94 0014+00 1/1 0/0 0/0 .text checkTriggerB__17dMsgScrnExplain_cFv */
 bool dMsgScrnExplain_c::checkTriggerB() {
     return mDoCPd_c::getTrigB(PAD_1);
 }

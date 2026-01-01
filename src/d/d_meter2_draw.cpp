@@ -3,13 +3,20 @@
  * Main HUD drawing
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_meter2_draw.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
+#include "JSystem/J2DGraph/J2DPicture.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "JSystem/J2DGraph/J2DTextBox.h"
+#include "JSystem/JUtility/JUTTexture.h"
+#include "JSystem/JKernel/JKRAramArchive.h"
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "d/actor/d_a_alink.h"
+#include "d/actor/d_a_midna.h"
+#include "d/actor/d_a_player.h"
 #include "d/d_item.h"
 #include "d/d_item_data.h"
 #include "d/d_kantera_icon_meter.h"
@@ -18,10 +25,9 @@
 #include "d/d_msg_class.h"
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
+#include "JSystem/JUtility/JUTFont.h"
 #include "cstring.h"
 
-/* 8020FAB4-802102F8 20A3F4 0844+00 0/0 1/1 0/0 .text            __ct__13dMeter2Draw_cFP10JKRExpHeap
- */
 dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     OS_REPORT("enter dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap *mp_heap)\n");
 
@@ -45,7 +51,7 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     mDoExt_setCurrentHeap(heap);
 
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
     bool fg = mpScreen->setPriority("zelda_game_image.blo", 0x20000, dComIfGp_getMain2DArchive());
     JUT_ASSERT(0, fg != false);
     dPaneClass_showNullPane(mpScreen);
@@ -55,24 +61,28 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
 
     for (int i = 0; i < 2; i++) {
         mpKanteraMeter[i] = new dKantera_icon_c();
-        JUT_ASSERT(0, mpKanteraMeter[i] != 0);
+        JUT_ASSERT(0, mpKanteraMeter[i] != NULL);
+        mTransformIconTex[i] = NULL;
+        for (int j = 0; j < 2; j++) {
+            mpDpadDownIcon[i][j] = NULL;
+        }
     }
 
     mpKanteraScreen = new J2DScreen();
-    JUT_ASSERT(0, mpKanteraScreen != 0);
+    JUT_ASSERT(0, mpKanteraScreen != NULL);
     fg = mpKanteraScreen->setPriority("zelda_game_image_kantera.blo", 0x20000,
                                       dComIfGp_getMain2DArchive());
     JUT_ASSERT(0, fg != false);
     dPaneClass_showNullPane(mpKanteraScreen);
 
     mpPikariScreen = new J2DScreen();
-    JUT_ASSERT(0, mpPikariScreen != 0);
+    JUT_ASSERT(0, mpPikariScreen != NULL);
     fg = mpPikariScreen->setPriority("zelda_icon_pikari.blo", 0x20000, dComIfGp_getMain2DArchive());
     JUT_ASSERT(0, fg != false);
     dPaneClass_showNullPane(mpPikariScreen);
 
     mpPikariParent = new CPaneMgr(mpPikariScreen, 'pika_n', 0, NULL);
-    JUT_ASSERT(0, mpPikariParent != 0);
+    JUT_ASSERT(0, mpPikariParent != NULL);
     mPikariBlack = static_cast<J2DPicture*>(mpPikariScreen->search('pika00'))->getBlack();
     mPikariWhite = static_cast<J2DPicture*>(mpPikariScreen->search('pika00'))->getWhite();
 
@@ -87,7 +97,7 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     playPikariBpkAnimation(1.0f);
 
     mpParent = new CPaneMgr(mpScreen, 'n_all', 2, NULL);
-    JUT_ASSERT(0, mpParent != 0);
+    JUT_ASSERT(0, mpParent != NULL);
 
     static u64 const a_tag[] = {'cont_at1', 'cont_at2', 'cont_at3', 'cont_at4', 'cont_at'};
     static u64 const b_tag[] = {'cont_bt1', 'cont_bt2', 'cont_bt3', 'cont_bt4', 'cont_bt'};
@@ -97,34 +107,35 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
 
     for (int i = 0; i < 5; i++) {
         mpAText[i] = new CPaneMgr(mpScreen, a_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpAText[i] != 0);
+        JUT_ASSERT(0, mpAText[i] != NULL);
         static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->setString(64, "");
         static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
         static_cast<J2DTextBox*>(mpAText[i]->getPanePtr())
             ->setCharSpace(g_drawHIO.mButtonATextSpacing);
 
         mpBText[i] = new CPaneMgr(mpScreen, b_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpBText[i] != 0);
+        JUT_ASSERT(0, mpBText[i] != NULL);
         static_cast<J2DTextBox*>(mpBText[i]->getPanePtr())->setString(64, "");
         static_cast<J2DTextBox*>(mpBText[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
 
         mpXYText[i][2] = new CPaneMgr(mpScreen, z_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpXYText[i][2] != 0);
+        JUT_ASSERT(0, mpXYText[i][2] != NULL);
         static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->setString(64, "");
         static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->setFont(mDoExt_getMesgFont());
 
         mpXYText[i][0] = new CPaneMgr(mpScreen, x_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpXYText[i][0] != 0);
+        JUT_ASSERT(0, mpXYText[i][0] != NULL);
         static_cast<J2DTextBox*>(mpXYText[i][0]->getPanePtr())->setString(64, "");
         static_cast<J2DTextBox*>(mpXYText[i][0]->getPanePtr())->setFont(mDoExt_getMesgFont());
 
         mpXYText[i][1] = new CPaneMgr(mpScreen, y_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpXYText[i][1] != 0);
+        JUT_ASSERT(0, mpXYText[i][1] != NULL);
         static_cast<J2DTextBox*>(mpXYText[i][1]->getPanePtr())->setString(64, "");
         static_cast<J2DTextBox*>(mpXYText[i][1]->getPanePtr())->setFont(mDoExt_getMesgFont());
     }
 
     J2DTextBox::TFontSize font_size;
+#if VERSION != VERSION_GCN_JPN
     font_size.mSizeX = 17.0f;
     font_size.mSizeY = 20.0f;
     for (int i = 0; i < 5; i++) {
@@ -134,6 +145,7 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
         static_cast<J2DTextBox*>(mpXYText[i][1]->getPanePtr())->setFontSize(font_size);
         static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->setFontSize(font_size);
     }
+#endif
 
     init();
     field_0xa8 = 0;
@@ -144,11 +156,12 @@ dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap* mp_heap) {
     OS_REPORT("exit dMeter2Draw_c::dMeter2Draw_c(JKRExpHeap *mp_heap)\n");
 }
 
-/* 802102F8-80210FB0 20AC38 0CB8+00 1/0 0/0 0/0 .text            __dt__13dMeter2Draw_cFv */
 dMeter2Draw_c::~dMeter2Draw_c() {
     dComIfGp_getMsgDtArchive(0)->removeResource(dMeter2Info_getMsgResource());
     dComIfGp_getMsgDtArchive(0)->removeResource(dMeter2Info_getMsgUnitResource());
     dComIfGp_getItemIconArchive()->removeResourceAll();
+
+    clearTransformHintIcons(); // new function call for cleanup
 
     delete mpScreen;
     mpScreen = NULL;
@@ -401,7 +414,6 @@ dMeter2Draw_c::~dMeter2Draw_c() {
     }
 }
 
-/* 80210FB0-8021135C 20B8F0 03AC+00 1/1 0/0 0/0 .text            init__13dMeter2Draw_cFv */
 void dMeter2Draw_c::init() {
     field_0x608 = 0.0f;
     field_0x60c = 0.0f;
@@ -534,7 +546,6 @@ void dMeter2Draw_c::init() {
     field_0x772 = 0;
 }
 
-/* 8021135C-8021151C 20BC9C 01C0+00 0/0 1/1 0/0 .text            exec__13dMeter2Draw_cFUl */
 void dMeter2Draw_c::exec(u32 i_status) {
     if (mParentScale != g_drawHIO.mParentScale) {
         mParentScale = g_drawHIO.mParentScale;
@@ -565,7 +576,7 @@ void dMeter2Draw_c::exec(u32 i_status) {
         {
             mButtonsPosX = g_drawHIO.mMainHUDButtonsPosX;
             mButtonsPosY = g_drawHIO.mMainHUDButtonsPosY;
-            mpButtonParent->paneTrans(g_drawHIO.mMainHUDButtonsPosX, g_drawHIO.mMainHUDButtonsPosY);
+            mpButtonParent->paneTrans(ScaleHUDXRight(g_drawHIO.mMainHUDButtonsPosX), g_drawHIO.mMainHUDButtonsPosY);
         }
 
         if (mButtonsScale != g_drawHIO.mMainHUDButtonsScale) {
@@ -573,14 +584,16 @@ void dMeter2Draw_c::exec(u32 i_status) {
             mpButtonParent->scale(g_drawHIO.mMainHUDButtonsScale, g_drawHIO.mMainHUDButtonsScale);
         }
     }
+
+    updateTransformHintIcons(); // new function call for form check
 }
 
-/* 8021151C-80211BEC 20BE5C 06D0+00 1/0 0/0 0/0 .text            draw__13dMeter2Draw_cFv */
 void dMeter2Draw_c::draw() {
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
     graf_ctx->setup2D();
 
     mpScreen->draw(0.0f, 0.0f, graf_ctx);
+    drawTransformHintIcon(graf_ctx); // new function call for drawing
     drawKanteraScreen(1);
     drawKanteraScreen(2);
 
@@ -712,9 +725,34 @@ void dMeter2Draw_c::draw() {
                    g_drawHIO.mMidnaIconPikariBackOuter, g_drawHIO.mMidnaIconPikariBackInner,
                    g_drawHIO.mMidnaIconPikariAnimSpeed, 3);
     }
+
+    // Draw FPS mode indicator
+    JUTFont* font = mDoExt_getMesgFont();
+    if (font) {
+        font->setGX();
+
+        const char* fpsLabel;
+        if (getStaleMode()) {
+            fpsLabel = "STALE";
+            font->setCharColor(JUtility::TColor(128, 128, 128, 255));
+        } else {
+            float currentFPS = getTargetFramerate();
+            if (currentFPS <= 30.0f) {
+                fpsLabel = "30";
+                font->setCharColor(JUtility::TColor(255, 255, 255, 255));
+            } else if (currentFPS <= 60.0f) {
+                fpsLabel = "60";
+                font->setCharColor(JUtility::TColor(100, 200, 255, 255));
+            } else {
+                fpsLabel = "MAX";
+                font->setCharColor(JUtility::TColor(255, 200, 100, 255));
+            }
+        }
+
+        font->drawString_scale(580.0f, 20.0f, 10.0f, 10.0f, fpsLabel, true);
+    }
 }
 
-/* 80211BEC-80211E64 20C52C 0278+00 1/1 0/0 0/0 .text            initLife__13dMeter2Draw_cFv */
 void dMeter2Draw_c::initLife() {
     if (dComIfGs_getLife() > dComIfGs_getMaxLifeGauge()) {
         // "●●●●●●Heart Count adjust======>%d, %d\n"
@@ -754,27 +792,27 @@ void dMeter2Draw_c::initLife() {
     };
 
     mpLifeParent = new CPaneMgr(mpScreen, 'heart_n', 2, NULL);
-    JUT_ASSERT(0, mpLifeParent != 0);
+    JUT_ASSERT(0, mpLifeParent != NULL);
 
     for (int i = 0; i < 20; i++) {
         mpLifeParts[i] = new CPaneMgr(mpScreen, life_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpLifeParts[i] != 0);
+        JUT_ASSERT(0, mpLifeParts[i] != NULL);
 
         mpHeartMark[i] = new CPaneMgr(mpScreen, mark_tag[i], 2, NULL);
-        JUT_ASSERT(0, mpHeartMark[i] != 0);
+        JUT_ASSERT(0, mpHeartMark[i] != NULL);
 
         mpHeartBase[i] = new CPaneMgrAlpha(mpScreen, base_tag[i], 2, NULL);
-        JUT_ASSERT(0, mpHeartBase[i] != 0);
+        JUT_ASSERT(0, mpHeartBase[i] != NULL);
 
         mpLifeTexture[i][0] = new CPaneMgrAlpha(mpScreen, lifet1_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpLifeTexture[i][0] != 0);
+        JUT_ASSERT(0, mpLifeTexture[i][0] != NULL);
 
         mpLifeTexture[i][1] = new CPaneMgrAlpha(mpScreen, lifet2_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpLifeTexture[i][1] != 0);
+        JUT_ASSERT(0, mpLifeTexture[i][1] != NULL);
     }
 
     mpBigHeart = new CPaneMgr(mpScreen, 'bigh_n', 2, NULL);
-    JUT_ASSERT(0, mpBigHeart != 0);
+    JUT_ASSERT(0, mpBigHeart != NULL);
 
     mpLifeParent->setAlphaRate(0.0f);
 
@@ -790,26 +828,25 @@ void dMeter2Draw_c::initLife() {
     setAlphaLifeChange(true);
 }
 
-/* 80211E64-80212190 20C7A4 032C+00 1/1 0/0 0/0 .text            initMagic__13dMeter2Draw_cFv */
 void dMeter2Draw_c::initMagic() {
     field_0x550 = 0.0f;
     field_0x554 = 0.0f;
 
     mpMagicParent = new CPaneMgr(mpKanteraScreen, 'magic_n', 2, NULL);
-    JUT_ASSERT(0, mpMagicParent != 0);
+    JUT_ASSERT(0, mpMagicParent != NULL);
 
     mpMagicBase = new CPaneMgr(mpKanteraScreen, 'mm_base', 0, NULL);
-    JUT_ASSERT(0, mpMagicBase != 0);
+    JUT_ASSERT(0, mpMagicBase != NULL);
 
     mpMagicFrameL = new CPaneMgr(mpKanteraScreen, 'm_w_l_n', 2, NULL);
-    JUT_ASSERT(0, mpMagicFrameL != 0);
+    JUT_ASSERT(0, mpMagicFrameL != NULL);
 
     mpMagicFrameR =
         new CPaneMgr(mpKanteraScreen, 'm_w_r_n', 2, NULL);
-    JUT_ASSERT(0, mpMagicFrameR != 0);
+    JUT_ASSERT(0, mpMagicFrameR != NULL);
 
     mpMagicMeter = new CPaneMgr(mpKanteraScreen, 'mm_00', 0, NULL);
-    JUT_ASSERT(0, mpMagicMeter != 0);
+    JUT_ASSERT(0, mpMagicMeter != NULL);
 
     OSInitFastCast();
 
@@ -854,10 +891,9 @@ void dMeter2Draw_c::initMagic() {
     setAlphaKanteraChange(true);
 }
 
-/* 80212190-80212404 20CAD0 0274+00 1/1 0/0 0/0 .text            initLightDrop__13dMeter2Draw_cFv */
 void dMeter2Draw_c::initLightDrop() {
     mpLightDropParent = new CPaneMgr(mpScreen, 's_tuta_n', 2, NULL);
-    JUT_ASSERT(0, mpLightDropParent != 0);
+    JUT_ASSERT(0, mpLightDropParent != NULL);
 
     static u64 const tuta_0[] = {
         's_00', 's_01', 's_02', 's_03', 's_04', 's_05', 's_06', 's_07',
@@ -876,20 +912,20 @@ void dMeter2Draw_c::initLightDrop() {
 
     for (int i = 0; i < 16; i++) {
         mpSIParts[i][0] = new CPaneMgr(mpScreen, tuta_0[i], 0, NULL);
-        JUT_ASSERT(0, mpSIParts[i][0] != 0);
+        JUT_ASSERT(0, mpSIParts[i][0] != NULL);
 
         mpSIParts[i][1] = new CPaneMgr(mpScreen, tuta_1[i], 0, NULL);
-        JUT_ASSERT(0, mpSIParts[i][1] != 0);
+        JUT_ASSERT(0, mpSIParts[i][1] != NULL);
 
         mpSIParts[i][2] = new CPaneMgr(mpScreen, tuta_2[i], 0, NULL);
-        JUT_ASSERT(0, mpSIParts[i][2] != 0);
+        JUT_ASSERT(0, mpSIParts[i][2] != NULL);
     }
 
     mpSIParent[0] = new CPaneMgr(mpScreen, 'tuta_n', 2, NULL);
-    JUT_ASSERT(0, mpSIParent[0] != 0);
+    JUT_ASSERT(0, mpSIParent[0] != NULL);
 
     mpSIParent[1] = new CPaneMgr(mpScreen, 's_null', 2, NULL);
-    JUT_ASSERT(0, mpSIParent[1] != 0);
+    JUT_ASSERT(0, mpSIParent[1] != NULL);
 
     mpLightDropParent->setAlphaRate(0.0f);
     field_0x6fc = 0.0f;
@@ -911,10 +947,9 @@ void dMeter2Draw_c::initLightDrop() {
     setAlphaLightDropChange(true);
 }
 
-/* 80212404-802126E4 20CD44 02E0+00 1/1 0/0 0/0 .text            initRupeeKey__13dMeter2Draw_cFv */
 void dMeter2Draw_c::initRupeeKey() {
     mpRupeeKeyParent = new CPaneMgr(mpScreen, 'r_k_n', 2, NULL);
-    JUT_ASSERT(0, mpRupeeKeyParent != 0);
+    JUT_ASSERT(0, mpRupeeKeyParent != NULL);
     field_0x718 = 1.0f;
 
     static u64 const rupeet1_tag[] = {'r_n_1_s', 'r_n_2_s', 'r_n_3_s', 'r_n_4_s'};
@@ -922,22 +957,22 @@ void dMeter2Draw_c::initRupeeKey() {
 
     for (int i = 0; i < 4; i++) {
         mpRupeeTexture[i][0] = new CPaneMgr(mpScreen, rupeet1_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpRupeeTexture[i][0] != 0);
+        JUT_ASSERT(0, mpRupeeTexture[i][0] != NULL);
         mpRupeeTexture[i][0]->getPanePtr()->setBasePosition(J2DBasePosition_4);
 
         mpRupeeTexture[i][1] = new CPaneMgr(mpScreen, rupeet2_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpRupeeTexture[i][1] != 0);
+        JUT_ASSERT(0, mpRupeeTexture[i][1] != NULL);
         mpRupeeTexture[i][1]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     }
 
     mpRupeeParent[0] = new CPaneMgr(mpScreen, 'rupi_n', 2, NULL);
-    JUT_ASSERT(0, mpRupeeParent[0] != 0);
+    JUT_ASSERT(0, mpRupeeParent[0] != NULL);
 
     mpRupeeParent[1] = new CPaneMgr(mpScreen, 'moyou_rn', 2, NULL);
-    JUT_ASSERT(0, mpRupeeParent[1] != 0);
+    JUT_ASSERT(0, mpRupeeParent[1] != NULL);
 
     mpRupeeParent[2] = new CPaneMgr(mpScreen, 'moyou_ln', 2, NULL);
-    JUT_ASSERT(0, mpRupeeParent[2] != 0);
+    JUT_ASSERT(0, mpRupeeParent[2] != NULL);
 
     mpRupeeParent[0]->setAlphaRate(0.0f);
     mpRupeeParent[1]->setAlphaRate(0.0f);
@@ -947,13 +982,13 @@ void dMeter2Draw_c::initRupeeKey() {
 
     for (int i = 0; i < 5; i++) {
         mpKeyTexture[i] = new CPaneMgr(mpScreen, key_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpKeyTexture[i] != 0);
+        JUT_ASSERT(0, mpKeyTexture[i] != NULL);
         mpKeyTexture[i]->getPanePtr()->setBasePosition(J2DBasePosition_4);
         mpKeyTexture[i]->hide();
     }
 
     mpKeyParent = new CPaneMgr(mpScreen, 'key_n', 2, NULL);
-    JUT_ASSERT(0, mpKeyParent != 0);
+    JUT_ASSERT(0, mpKeyParent != NULL);
     mpKeyParent->setAlphaRate(0.0f);
 
     drawRupee(dComIfGs_getRupee());
@@ -962,7 +997,6 @@ void dMeter2Draw_c::initRupeeKey() {
     setAlphaKeyChange(true);
 }
 
-/* 802126E4-8021350C 20D024 0E28+00 1/1 0/0 0/0 .text            initButton__13dMeter2Draw_cFv */
 void dMeter2Draw_c::initButton() {
     field_0x761 = 1;
     field_0x762 = 1;
@@ -979,7 +1013,7 @@ void dMeter2Draw_c::initButton() {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
             mpItemBTex[i][j] = (ResTIMG*)heap->alloc(0xC00, 0x20);
-            JUT_ASSERT(0, mpItemBTex[i][j] != 0);
+            JUT_ASSERT(0, mpItemBTex[i][j] != NULL);
         }
     }
 
@@ -990,13 +1024,13 @@ void dMeter2Draw_c::initButton() {
         for (int j = 0; j < 2; j++) {
             for (int k = 0; k < 2; k++) {
                 mpItemXYTex[i][j][k] = (ResTIMG*)heap->alloc(0xC00, 0x20);
-                JUT_ASSERT(0, mpItemXYTex[i][j][k] != 0);
+                JUT_ASSERT(0, mpItemXYTex[i][j][k] != NULL);
             }
         }
     }
 
     mpItemB = new CPaneMgr(mpScreen, 'b_itm_p', 0, NULL);
-    JUT_ASSERT(0, mpItemB != 0);
+    JUT_ASSERT(0, mpItemB != NULL);
     mpItemB->getPanePtr()->setBasePosition(J2DBasePosition_4);
     mpItemB->show();
 
@@ -1013,17 +1047,17 @@ void dMeter2Draw_c::initButton() {
         'b_itm_pp',
         JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemB->getInitSizeX(), mpItemB->getInitSizeY()),
         static_cast<J2DPicture*>(mpItemB->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
-    JUT_ASSERT(0, mpItemBPane != 0);
+    JUT_ASSERT(0, mpItemBPane != NULL);
     mpItemBPane->setBasePosition(J2DBasePosition_4);
     mpItemB->getPanePtr()->appendChild(mpItemBPane);
 
     mpItemXY[0] = new CPaneMgr(mpScreen, 'x_itm_p', 0, NULL);
-    JUT_ASSERT(0, mpItemXY[0] != 0);
+    JUT_ASSERT(0, mpItemXY[0] != NULL);
     mpItemXY[0]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     dMeter2Info_setMeterItemPanePtr(0, mpItemXY[0]);
 
     mpItemXY[1] = new CPaneMgr(mpScreen, 'y_itm_p', 0, NULL);
-    JUT_ASSERT(0, mpItemXY[1] != 0);
+    JUT_ASSERT(0, mpItemXY[1] != NULL);
     mpItemXY[1]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     dMeter2Info_setMeterItemPanePtr(1, mpItemXY[1]);
 
@@ -1034,7 +1068,7 @@ void dMeter2Draw_c::initButton() {
         'x_itm_pp',
         JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY[0]->getInitSizeX(), mpItemXY[0]->getInitSizeY()),
         static_cast<J2DPicture*>(mpItemXY[0]->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
-    JUT_ASSERT(0, mpItemXYPane[0] != 0);
+    JUT_ASSERT(0, mpItemXYPane[0] != NULL);
     mpItemXYPane[0]->setBasePosition(J2DBasePosition_4);
     mpItemXY[0]->getPanePtr()->appendChild(mpItemXYPane[0]);
 
@@ -1042,12 +1076,12 @@ void dMeter2Draw_c::initButton() {
         'y_itm_pp',
         JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemXY[1]->getInitSizeX(), mpItemXY[1]->getInitSizeY()),
         static_cast<J2DPicture*>(mpItemXY[1]->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
-    JUT_ASSERT(0, mpItemXYPane[1] != 0);
+    JUT_ASSERT(0, mpItemXYPane[1] != NULL);
     mpItemXYPane[1]->setBasePosition(J2DBasePosition_4);
     mpItemXY[1]->getPanePtr()->appendChild(mpItemXYPane[1]);
 
     mpItemR = new CPaneMgr(mpScreen, 'r_itm_p', 0, NULL);
-    JUT_ASSERT(0, mpItemR != 0);
+    JUT_ASSERT(0, mpItemR != NULL);
     mpItemR->getPanePtr()->setBasePosition(J2DBasePosition_4);
     dMeter2Info_setMeterItemPanePtr(2, mpItemR);
 
@@ -1055,65 +1089,65 @@ void dMeter2Draw_c::initButton() {
         'r_itm_pp',
         JGeometry::TBox2<f32>(0.0f, 0.0f, mpItemR->getInitSizeX(), mpItemR->getInitSizeY()),
         static_cast<J2DPicture*>(mpItemR->getPanePtr())->getTexture(0)->getTexInfo(), NULL);
-    JUT_ASSERT(0, mpItemXYPane[2] != 0);
+    JUT_ASSERT(0, mpItemXYPane[2] != NULL);
     mpItemXYPane[2]->setBasePosition(J2DBasePosition_4);
     mpItemR->getPanePtr()->appendChild(mpItemXYPane[2]);
 
     mpLightB = new CPaneMgr(mpScreen, 'b_light', 0, NULL);
-    JUT_ASSERT(0, mpLightB != 0);
+    JUT_ASSERT(0, mpLightB != NULL);
     mpLightB->getPanePtr()->setBasePosition(J2DBasePosition_4);
     field_0x72c = 1.0f;
     mpLightB->hide();
 
     mpLightXY[0] = new CPaneMgr(mpScreen, 'x_light', 0, NULL);
-    JUT_ASSERT(0, mpLightXY[0] != 0);
+    JUT_ASSERT(0, mpLightXY[0] != NULL);
     mpLightXY[0]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     mpLightXY[0]->hide();
 
     mpLightXY[1] = new CPaneMgr(mpScreen, 'y_light', 0, NULL);
-    JUT_ASSERT(0, mpLightXY[1] != 0);
+    JUT_ASSERT(0, mpLightXY[1] != NULL);
     mpLightXY[1]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     mpLightXY[1]->hide();
 
     mpLightXY[2] = new CPaneMgr(mpScreen, 'r_light', 0, NULL);
-    JUT_ASSERT(0, mpLightXY[2] != 0);
+    JUT_ASSERT(0, mpLightXY[2] != NULL);
     mpLightXY[2]->getPanePtr()->setBasePosition(J2DBasePosition_4);
     mpLightXY[2]->hide();
 
     mpBTextA = new CPaneMgr(mpScreen, 'b_text_a', 0, NULL);
-    JUT_ASSERT(0, mpBTextA != 0);
+    JUT_ASSERT(0, mpBTextA != NULL);
 
     mpBTextB = new CPaneMgr(mpScreen, 'b_text_b', 0, NULL);
-    JUT_ASSERT(0, mpBTextB != 0);
+    JUT_ASSERT(0, mpBTextB != NULL);
 
     mpBTextXY[0] = new CPaneMgr(mpScreen, 'b_text_x', 0, NULL);
-    JUT_ASSERT(0, mpBTextXY[0] != 0);
+    JUT_ASSERT(0, mpBTextXY[0] != NULL);
 
     mpBTextXY[1] = new CPaneMgr(mpScreen, 'b_text_y', 0, NULL);
-    JUT_ASSERT(0, mpBTextXY[1] != 0);
+    JUT_ASSERT(0, mpBTextXY[1] != NULL);
 
     mpBTextXY[2] = NULL;
 
     mpTextA = new CPaneMgr(mpScreen, 'a_text_n', 0, NULL);
-    JUT_ASSERT(0, mpTextA != 0);
+    JUT_ASSERT(0, mpTextA != NULL);
 
     mpTextB = new CPaneMgr(mpScreen, 'b_text_n', 0, NULL);
-    JUT_ASSERT(0, mpTextB != 0);
+    JUT_ASSERT(0, mpTextB != NULL);
 
     mpTextXY[2] = new CPaneMgr(mpScreen, 'z_text_n', 0, NULL);
-    JUT_ASSERT(0, mpTextXY[2] != 0);
+    JUT_ASSERT(0, mpTextXY[2] != NULL);
 
     mpTextXY[0] = new CPaneMgr(mpScreen, 'x_text_n', 0, NULL);
-    JUT_ASSERT(0, mpTextXY[0] != 0);
+    JUT_ASSERT(0, mpTextXY[0] != NULL);
 
     mpTextXY[1] = new CPaneMgr(mpScreen, 'y_text_n', 0, NULL);
-    JUT_ASSERT(0, mpTextXY[1] != 0);
+    JUT_ASSERT(0, mpTextXY[1] != NULL);
 
     mpTextI = new CPaneMgr(mpScreen, 'i_text_n', 2, NULL);
-    JUT_ASSERT(0, mpTextI != 0);
+    JUT_ASSERT(0, mpTextI != NULL);
 
     mpTextM = new CPaneMgr(mpScreen, 'm_text_n', 2, NULL);
-    JUT_ASSERT(0, mpTextM != 0);
+    JUT_ASSERT(0, mpTextM != NULL);
 
     static u64 const juji_i_tag[] = {'ju_ring4', 'yaji_00', 'yaji_01', 'ju_ring2', 'ju_ring4'};
     static u64 const juji_m_tag[] = {'ju_ring3', 'yaji_02', 'yaji_03', 'ju_ring3', 0};
@@ -1121,14 +1155,14 @@ void dMeter2Draw_c::initButton() {
     for (int i = 0; i < 5; i++) {
         if (juji_i_tag[i] != 0) {
             mpJujiI[i] = new CPaneMgr(mpScreen, juji_i_tag[i], 0, NULL);
-            JUT_ASSERT(0, mpJujiI[i] != 0);
+            JUT_ASSERT(0, mpJujiI[i] != NULL);
         } else {
             mpJujiI[i] = NULL;
         }
 
         if (juji_m_tag[i] != 0) {
             mpJujiM[i] = new CPaneMgr(mpScreen, juji_m_tag[i], 0, NULL);
-            JUT_ASSERT(0, mpJujiM[i] != 0);
+            JUT_ASSERT(0, mpJujiM[i] != NULL);
         } else {
             mpJujiM[i] = NULL;
         }
@@ -1138,40 +1172,40 @@ void dMeter2Draw_c::initButton() {
     mpTextXY[1]->hide();
 
     mpButtonParent = new CPaneMgr(mpScreen, 'cont_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonParent != 0);
+    JUT_ASSERT(0, mpButtonParent != NULL);
 
     mpButtonA = new CPaneMgr(mpScreen, 'abtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonA != 0);
+    JUT_ASSERT(0, mpButtonA != NULL);
 
     mpButtonB = new CPaneMgr(mpScreen, 'bbtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonB != 0);
+    JUT_ASSERT(0, mpButtonB != NULL);
     field_0x730 = 1.0f;
 
     mpButtonMidona = new CPaneMgr(mpScreen, 'midona_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonMidona != 0);
+    JUT_ASSERT(0, mpButtonMidona != NULL);
     mButtonZAlpha = 0.0f;
     field_0x724 = 0.0f;
     field_0x738 = 0.0f;
     field_0x740 = 0;
 
     mpButtonXY[0] = new CPaneMgr(mpScreen, 'xbtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonXY[0] != 0);
+    JUT_ASSERT(0, mpButtonXY[0] != NULL);
 
     mpButtonXY[1] = new CPaneMgr(mpScreen, 'ybtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonXY[1] != 0);
+    JUT_ASSERT(0, mpButtonXY[1] != NULL);
 
     mpButtonXY[2] = new CPaneMgr(mpScreen, 'zbtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonXY[2] != 0);
+    JUT_ASSERT(0, mpButtonXY[2] != NULL);
 
     mpUzu = new CPaneMgrAlpha(mpScreen, 'uzu_n', 2, NULL);
-    JUT_ASSERT(0, mpUzu != 0);
+    JUT_ASSERT(0, mpUzu != NULL);
 
     ResTIMG* timg = (ResTIMG*)dComIfGp_getMain2DArchive()->getResource(
         'TIMG', dMeter2Info_getNumberTextureName(0));
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
             mpItemNumTex[i][j] = new J2DPicture(timg);
-            JUT_ASSERT(0, mpItemNumTex[i][j] != 0);
+            JUT_ASSERT(0, mpItemNumTex[i][j] != NULL);
         }
     }
 
@@ -1214,11 +1248,9 @@ void dMeter2Draw_c::initButton() {
     mpButtonParent->setAlphaRate(0.0f);
 }
 
-/* 8021350C-80213CEC 20DE4C 07E0+00 1/1 0/0 0/0 .text            initButtonCross__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::initButtonCross() {
     mpButtonCrossParent = new CPaneMgr(mpScreen, 'juji_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonCrossParent != 0);
+    JUT_ASSERT(0, mpButtonCrossParent != NULL);
 
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju0'))->setFont(mDoExt_getMesgFont());
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju1'))->setFont(mDoExt_getMesgFont());
@@ -1268,9 +1300,10 @@ void dMeter2Draw_c::initButtonCross() {
 
     mpButtonCrossParent->setAlphaRate(0.0f);
     drawButtonCross(g_drawHIO.mButtonCrossOFFPosX, g_drawHIO.mButtonCrossOFFPosY);
+
+    initTransformHintIcons(); // new function call to init the icon on dpad
 }
 
-/* 80213CEC-80213D6C 20E62C 0080+00 3/3 0/0 0/0 .text playPikariBckAnimation__13dMeter2Draw_cFf */
 void dMeter2Draw_c::playPikariBckAnimation(f32 i_frame) {
     mpPikariParent->getPanePtr()->setAnimation(mPikariBck);
     mPikariBck->setFrame(i_frame);
@@ -1278,15 +1311,12 @@ void dMeter2Draw_c::playPikariBckAnimation(f32 i_frame) {
     mpPikariParent->getPanePtr()->setAnimation((J2DAnmTransformKey*)NULL);
 }
 
-/* 80213D6C-80213E3C 20E6AC 00D0+00 1/1 0/0 0/0 .text
- * setPikariBpkAnimation__13dMeter2Draw_cFP11J2DAnmColor        */
 void dMeter2Draw_c::setPikariBpkAnimation(J2DAnmColor* i_bpk) {
     mpPikariScreen->search('pika00')->setAnimation(i_bpk);
     mpPikariScreen->search('moya00')->setAnimation(i_bpk);
     mpPikariScreen->search('moyabs')->setAnimation(i_bpk);
 }
 
-/* 80213E3C-80213E94 20E77C 0058+00 3/3 0/0 0/0 .text playPikariBpkAnimation__13dMeter2Draw_cFf */
 void dMeter2Draw_c::playPikariBpkAnimation(f32 i_frame) {
     setPikariBpkAnimation(mPikariBpk);
     mPikariBpk->setFrame(i_frame);
@@ -1294,8 +1324,6 @@ void dMeter2Draw_c::playPikariBpkAnimation(f32 i_frame) {
     setPikariBpkAnimation(NULL);
 }
 
-/* 80213E94-80213FF0 20E7D4 015C+00 1/1 0/0 0/0 .text
- * playOxygenBpkAnimation__13dMeter2Draw_cFP11J2DAnmColor       */
 void dMeter2Draw_c::playOxygenBpkAnimation(J2DAnmColor* i_bpk) {
     if (i_bpk == NULL || mpMagicMeter->getAlpha() == 0) {
         mpKanteraScreen->search('mm_00')->setAnimation((J2DAnmColor*)NULL);
@@ -1356,7 +1384,8 @@ void dMeter2Draw_c::drawPikari(f32 i_posX, f32 i_posY, f32* i_framep, f32 i_scal
     if (param_9 != 3 && param_9 != 4 && param_9 != 5 && dMsgObject_isTalkNowCheck()) {
         *i_framep = 0.0f;
     } else {
-        *i_framep += param_8;
+        // FIX: Scale animation speed with DELTA_TIME for correct frame rate
+        *i_framep += param_8 * DELTA_TIME;
         if (*i_framep > var_f31) {
             if (param_9 == 1 || param_9 == 2 || param_9 == 3) {
                 *i_framep = 18.0f;
@@ -1422,7 +1451,6 @@ void dMeter2Draw_c::drawPikariHakusha(f32 i_posX, f32 i_posY, f32 i_frame, f32 i
     mpPikariScreen->draw(0.0f, 0.0f, dComIfGp_getCurrentGrafPort());
 }
 
-/* 802147CC-802149F4 20F10C 0228+00 1/1 0/0 0/0 .text changeTextureLife__13dMeter2Draw_cFibUc */
 void dMeter2Draw_c::changeTextureLife(int i_no, bool param_1, u8 i_quarterNum) {
     if (param_1) {
         if (i_quarterNum == 0xFF) {
@@ -1456,7 +1484,6 @@ void dMeter2Draw_c::changeTextureLife(int i_no, bool param_1, u8 i_quarterNum) {
     }
 }
 
-/* 802149F4-80214C20 20F334 022C+00 1/1 1/1 0/0 .text            drawLife__13dMeter2Draw_cFssff */
 void dMeter2Draw_c::drawLife(s16 i_maxLife, s16 i_life, f32 i_posX, f32 i_posY) {
     s16 max_heart_cnt = i_maxLife / 5;
     s16 heart_cnt = i_life / 4;
@@ -1502,10 +1529,9 @@ void dMeter2Draw_c::drawLife(s16 i_maxLife, s16 i_life, f32 i_posX, f32 i_posY) 
         mpBigHeart->scale(g_drawHIO.mBigHeartScale, g_drawHIO.mBigHeartScale);
     }
 
-    mpLifeParent->paneTrans(i_posX, i_posY);
+    mpLifeParent->paneTrans(ScaleHUDXLeft(i_posX), i_posY);
 }
 
-/* 80214C20-80214DF4 20F560 01D4+00 1/1 1/1 0/0 .text setAlphaLifeChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaLifeChange(bool param_0) {
     bool var_r31 = false;
     bool var_r30 = false;
@@ -1554,7 +1580,6 @@ void dMeter2Draw_c::setAlphaLifeChange(bool param_0) {
     }
 }
 
-/* 80214DF4-80214E54 20F734 0060+00 0/0 1/1 0/0 .text setAlphaLifeAnimeMin__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaLifeAnimeMin() {
     if (mpLifeParent->getAlphaRate() != 0.0f) {
         mpLifeParent->setAlphaRate(g_drawHIO.mParentAlpha);
@@ -1562,7 +1587,6 @@ void dMeter2Draw_c::setAlphaLifeAnimeMin() {
     }
 }
 
-/* 80214E54-80214EB4 20F794 0060+00 0/0 1/1 0/0 .text setAlphaLifeAnimeMax__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaLifeAnimeMax() {
     if (mpLifeParent->getAlphaRate() != g_drawHIO.mParentAlpha) {
         mpLifeParent->setAlphaRate(g_drawHIO.mParentAlpha);
@@ -1570,7 +1594,6 @@ void dMeter2Draw_c::setAlphaLifeAnimeMax() {
     }
 }
 
-/* 80214EB4-80215290 20F7F4 03DC+00 1/1 0/0 0/0 .text drawKanteraScreen__13dMeter2Draw_cFUc */
 void dMeter2Draw_c::drawKanteraScreen(u8 i_meterType) {
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
 
@@ -1623,7 +1646,6 @@ void dMeter2Draw_c::drawKanteraScreen(u8 i_meterType) {
     mpKanteraScreen->draw(0.0f, 0.0f, graf_ctx);
 }
 
-/* 80215290-80215380 20FBD0 00F0+00 1/1 0/0 0/0 .text            drawMagic__13dMeter2Draw_cFssff */
 void dMeter2Draw_c::drawMagic(s16 i_max, s16 i_magic, f32 i_posX, f32 i_posY) {
     f32 temp_f30 = mpMagicFrameL->getInitPosX();
     f32 temp_f31 = mpMagicFrameR->getInitPosX() - temp_f30;
@@ -1644,7 +1666,6 @@ void dMeter2Draw_c::drawMagic(s16 i_max, s16 i_magic, f32 i_posX, f32 i_posY) {
     field_0x5f0[0] = i_posY;
 }
 
-/* 80215380-802154A8 20FCC0 0128+00 2/2 0/0 0/0 .text setAlphaMagicChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaMagicChange(bool i_forceSet) {
     bool meter_parent_alpha_set = false;
     bool meter_alpha_set = false;
@@ -1680,8 +1701,6 @@ static f32 dummyLiteralOrder() {
     return 5.0f;
 }
 
-/* 802154A8-802155B8 20FDE8 0110+00 1/1 1/1 0/0 .text            drawKantera__13dMeter2Draw_cFllff
- */
 void dMeter2Draw_c::drawKantera(s32 i_max, s32 i_oil, f32 i_posX, f32 i_posY) {
     f32 var_f6 = mpMagicFrameR->getInitPosX() - mpMagicFrameL->getInitPosX();
     f32 var_f7 = 0.0f;
@@ -1704,7 +1723,6 @@ void dMeter2Draw_c::drawKantera(s32 i_max, s32 i_oil, f32 i_posX, f32 i_posY) {
     field_0x5f0[1] = i_posY;
 }
 
-/* 802155B8-802156E0 20FEF8 0128+00 2/2 1/1 0/0 .text setAlphaKanteraChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaKanteraChange(bool i_forceSet) {
     bool meter_parent_alpha_set = false;
     bool meter_alpha_set = false;
@@ -1735,8 +1753,6 @@ void dMeter2Draw_c::setAlphaKanteraChange(bool i_forceSet) {
     }
 }
 
-/* 802156E0-8021575C 210020 007C+00 0/0 1/1 0/0 .text setAlphaKanteraAnimeMin__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaKanteraAnimeMin() {
     if (field_0x742[1] <= 0) {
         mMeterAlphaRate[1] = 0.0f;
@@ -1750,8 +1766,6 @@ void dMeter2Draw_c::setAlphaKanteraAnimeMin() {
     }
 }
 
-/* 8021575C-802157E0 21009C 0084+00 0/0 1/1 0/0 .text setAlphaKanteraAnimeMax__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaKanteraAnimeMax() {
     if (field_0x742[1] >= 5) {
         mMeterAlphaRate[1] = g_drawHIO.mParentAlpha;
@@ -1765,7 +1779,6 @@ void dMeter2Draw_c::setAlphaKanteraAnimeMax() {
     }
 }
 
-/* 802157E0-802158F0 210120 0110+00 0/0 1/1 0/0 .text            drawOxygen__13dMeter2Draw_cFllff */
 void dMeter2Draw_c::drawOxygen(s32 i_max, s32 i_oxygen, f32 i_posX, f32 i_posY) {
     f32 var_f6 = mpMagicFrameR->getInitPosX() - mpMagicFrameL->getInitPosX();
     f32 var_f7 = 0.0f;
@@ -1788,7 +1801,6 @@ void dMeter2Draw_c::drawOxygen(s32 i_max, s32 i_oxygen, f32 i_posX, f32 i_posY) 
     field_0x5f0[2] = i_posY;
 }
 
-/* 802158F0-80215A18 210230 0128+00 1/1 1/1 0/0 .text setAlphaOxygenChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaOxygenChange(bool i_forceSet) {
     bool meter_parent_alpha_set = false;
     bool meter_alpha_set = false;
@@ -1819,7 +1831,6 @@ void dMeter2Draw_c::setAlphaOxygenChange(bool i_forceSet) {
     }
 }
 
-/* 80215A18-80215A94 210358 007C+00 0/0 1/1 0/0 .text setAlphaOxygenAnimeMin__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaOxygenAnimeMin() {
     if (field_0x742[2] <= 0) {
         mMeterAlphaRate[2] = 0.0f;
@@ -1833,7 +1844,6 @@ void dMeter2Draw_c::setAlphaOxygenAnimeMin() {
     }
 }
 
-/* 80215A94-80215B18 2103D4 0084+00 0/0 1/1 0/0 .text setAlphaOxygenAnimeMax__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaOxygenAnimeMax() {
     if (field_0x742[2] >= 5) {
         mMeterAlphaRate[2] = g_drawHIO.mParentAlpha;
@@ -1847,7 +1857,6 @@ void dMeter2Draw_c::setAlphaOxygenAnimeMax() {
     }
 }
 
-/* 80215B18-80215DA4 210458 028C+00 1/1 1/1 0/0 .text drawLightDrop__13dMeter2Draw_cFUcUcffffUc */
 void dMeter2Draw_c::drawLightDrop(u8 i_num, u8 i_needNum, f32 i_posX, f32 i_posY, f32 i_vesselScale,
                                   f32 param_5, u8 param_6) {
     for (int i = 0; i < 16; i++) {
@@ -1901,12 +1910,8 @@ void dMeter2Draw_c::drawLightDrop(u8 i_num, u8 i_needNum, f32 i_posX, f32 i_posY
     mpLightDropParent->paneTrans(i_posX, i_posY);
 }
 
-/* 80215DA4-80215DA8 2106E4 0004+00 1/1 1/1 0/0 .text setAlphaLightDropChange__13dMeter2Draw_cFb
- */
 void dMeter2Draw_c::setAlphaLightDropChange(bool unused) {}
 
-/* 80215DA8-80215E40 2106E8 0098+00 0/0 1/1 0/0 .text getNowLightDropRateCalc__13dMeter2Draw_cFv
- */
 f32 dMeter2Draw_c::getNowLightDropRateCalc() {
     f32 drop_num = dComIfGs_getLightDropNum(dComIfGp_getStartStageDarkArea());
     f32 need_drop_num = dComIfGp_getNeedLightDropNum();
@@ -1923,8 +1928,6 @@ f32 dMeter2Draw_c::getNowLightDropRateCalc() {
     return rate;
 }
 
-/* 80215E40-80215F88 210780 0148+00 0/0 1/1 0/0 .text setAlphaLightDropAnimeMin__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaLightDropAnimeMin() {
     if (mpLightDropParent->getAlphaRate() != 0.0f) {
         mpLightDropParent->setAlphaRate(g_drawHIO.mParentAlpha * field_0x6fc);
@@ -1947,8 +1950,6 @@ void dMeter2Draw_c::setAlphaLightDropAnimeMin() {
     }
 }
 
-/* 80215F88-8021632C 2108C8 03A4+00 0/0 1/1 0/0 .text setAlphaLightDropAnimeMax__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaLightDropAnimeMax() {
     f32 temp_f31 = g_drawHIO.mParentAlpha * field_0x6fc;
 
@@ -2014,7 +2015,6 @@ void dMeter2Draw_c::setAlphaLightDropAnimeMax() {
     }
 }
 
-/* 8021632C-80216684 210C6C 0358+00 1/1 1/1 0/0 .text            drawRupee__13dMeter2Draw_cFs */
 void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
     mpRupeeTexture[3][0]->hide();
     mpRupeeTexture[3][1]->hide();
@@ -2057,7 +2057,7 @@ void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
     mpRupeeKeyParent->paneTrans(g_drawHIO.mRupeeKeyPosX, g_drawHIO.mRupeeKeyPosY);
 
     mpRupeeParent[0]->scale(g_drawHIO.mRupeeScale, g_drawHIO.mRupeeScale);
-    mpRupeeParent[0]->paneTrans(g_drawHIO.mRupeePosX, g_drawHIO.mRupeePosY);
+    mpRupeeParent[0]->paneTrans(ScaleHUDXRight(g_drawHIO.mRupeePosX), g_drawHIO.mRupeePosY);
 
     mpRupeeParent[1]->scale(g_drawHIO.mRupeeFramePosY, g_drawHIO.mRupeeFramePosY);
     mpRupeeParent[1]->paneTrans(g_drawHIO.mRupeeFrameScale, g_drawHIO.mRupeeFramePosX);
@@ -2073,7 +2073,6 @@ void dMeter2Draw_c::drawRupee(s16 i_rupeeNum) {
     }
 }
 
-/* 80216684-802168D0 210FC4 024C+00 1/1 1/1 0/0 .text setAlphaRupeeChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaRupeeChange(bool param_0) {
     bool set_parent = false;
     bool set_rupeekey = false;
@@ -2129,7 +2128,6 @@ void dMeter2Draw_c::setAlphaRupeeChange(bool param_0) {
     }
 }
 
-/* 802168D0-80216990 211210 00C0+00 0/0 1/1 0/0 .text setAlphaRupeeAnimeMin__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaRupeeAnimeMin() {
     f32 alphas[3];
     alphas[0] = g_drawHIO.mRupeeAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mRupeeKeyAlpha);
@@ -2144,7 +2142,6 @@ void dMeter2Draw_c::setAlphaRupeeAnimeMin() {
     }
 }
 
-/* 80216990-80216A40 2112D0 00B0+00 0/0 1/1 0/0 .text setAlphaRupeeAnimeMax__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaRupeeAnimeMax() {
     f32 alphas[3];
     alphas[0] = g_drawHIO.mRupeeAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mRupeeKeyAlpha);
@@ -2159,7 +2156,6 @@ void dMeter2Draw_c::setAlphaRupeeAnimeMax() {
     }
 }
 
-/* 80216A40-80216B28 211380 00E8+00 1/1 1/1 0/0 .text            drawKey__13dMeter2Draw_cFs */
 void dMeter2Draw_c::drawKey(s16 i_keyNum) {
     if (i_keyNum > 5) {
         i_keyNum = 5;
@@ -2181,7 +2177,6 @@ void dMeter2Draw_c::drawKey(s16 i_keyNum) {
     mpKeyParent->paneTrans(g_drawHIO.mKeyPosX, g_drawHIO.mKeyPosY);
 }
 
-/* 80216B28-80216CA8 211468 0180+00 1/1 1/1 0/0 .text setAlphaKeyChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaKeyChange(bool param_0) {
     bool set_parent = false;
     bool set_rupeekey = false;
@@ -2219,7 +2214,6 @@ void dMeter2Draw_c::setAlphaKeyChange(bool param_0) {
     }
 }
 
-/* 80216CA8-80216D2C 2115E8 0084+00 0/0 1/1 0/0 .text setAlphaKeyAnimeMin__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaKeyAnimeMin() {
     f32 alpha = g_drawHIO.mKeyAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mRupeeKeyAlpha);
 
@@ -2229,7 +2223,6 @@ void dMeter2Draw_c::setAlphaKeyAnimeMin() {
     }
 }
 
-/* 80216D2C-80216DAC 21166C 0080+00 0/0 1/1 0/0 .text setAlphaKeyAnimeMax__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaKeyAnimeMax() {
     f32 alpha = g_drawHIO.mKeyAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mRupeeKeyAlpha);
 
@@ -2239,7 +2232,6 @@ void dMeter2Draw_c::setAlphaKeyAnimeMax() {
     }
 }
 
-/* 80216DAC-802170E4 2116EC 0338+00 1/1 1/1 0/0 .text drawButtonA__13dMeter2Draw_cFUcfffffbb */
 void dMeter2Draw_c::drawButtonA(u8 i_action, f32 i_posX, f32 i_posY, f32 i_textPosX, f32 i_textPosY,
                                 f32 i_scale, bool param_6, bool param_7) {
     char* mp_string = getActionString(i_action, 1, &field_0x761);
@@ -2282,7 +2274,7 @@ void dMeter2Draw_c::drawButtonA(u8 i_action, f32 i_posX, f32 i_posY, f32 i_textP
         mpTextA->hide();
     }
 
-    JUT_ASSERT(0, std::strlen (mp_string) < (64));
+    JUT_ASSERT(0, strlen(mp_string) < (64));
 
     if (daPy_getPlayerActorClass()->getSumouMode()) {
         mpTextA->show();
@@ -2304,7 +2296,6 @@ void dMeter2Draw_c::drawButtonA(u8 i_action, f32 i_posX, f32 i_posY, f32 i_textP
                        g_drawHIO.mButtonATextPosY + i_textPosY);
 }
 
-/* 802170E4-8021764C 211A24 0568+00 1/1 1/1 0/0 .text drawButtonB__13dMeter2Draw_cFUcbfffffb */
 void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_posY, f32 i_textPosX,
                                 f32 i_textPosY, f32 i_scale, bool param_7) {
     int var_r31 = 0;
@@ -2350,7 +2341,7 @@ void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_pos
         }
     }
 
-    JUT_ASSERT(0, std::strlen (mp_string) < (64));
+    JUT_ASSERT(0, strlen(mp_string) < (64));
 
     for (int i = 0; i < 5; i++) {
         strcpy(static_cast<J2DTextBox*>(mpBText[i]->getPanePtr())->getStringPtr(), mp_string);
@@ -2405,8 +2396,6 @@ void dMeter2Draw_c::drawButtonB(u8 i_action, bool param_1, f32 i_posX, f32 i_pos
                        g_drawHIO.mButtonBFontPosY + i_textPosY);
 }
 
-/* 8021764C-802176EC 211F8C 00A0+00 1/1 1/1 0/0 .text            drawButtonR__13dMeter2Draw_cFUcUcbb
- */
 void dMeter2Draw_c::drawButtonR(u8 unused0, u8 i_action, bool unused1, bool unused2) {
     mpScreen->search('item_r_n')->hide();
     mpTextXY[2]->show();
@@ -2417,7 +2406,6 @@ void dMeter2Draw_c::drawButtonR(u8 unused0, u8 i_action, bool unused1, bool unus
     }
 }
 
-/* 802176EC-80217904 21202C 0218+00 1/1 1/1 0/0 .text            drawButtonZ__13dMeter2Draw_cFUc */
 void dMeter2Draw_c::drawButtonZ(u8 i_action) {
     char* mp_string = getActionString(i_action, 1, &field_0x764);
 
@@ -2436,7 +2424,7 @@ void dMeter2Draw_c::drawButtonZ(u8 i_action) {
         mpButtonMidona->show();
     }
 
-    JUT_ASSERT(0, std::strlen (mp_string) < (64));
+    JUT_ASSERT(0, strlen(mp_string) < (64));
 
     for (int i = 0; i < 5; i++) {
         strcpy(static_cast<J2DTextBox*>(mpXYText[i][2]->getPanePtr())->getStringPtr(), mp_string);
@@ -2456,7 +2444,6 @@ void dMeter2Draw_c::drawButtonZ(u8 i_action) {
     mpTextXY[2]->paneTrans(g_drawHIO.mButtonZFontPosX, g_drawHIO.mButtonZFontPosY);
 }
 
-/* 80217904-80217954 212244 0050+00 1/1 1/1 0/0 .text            drawButton3D__13dMeter2Draw_cFUc */
 void dMeter2Draw_c::drawButton3D(u8 i_action) {
     getActionString(i_action, 1, &field_0x765);
     if (i_action != 0) {
@@ -2464,7 +2451,6 @@ void dMeter2Draw_c::drawButton3D(u8 i_action) {
     }
 }
 
-/* 80217954-802179C0 212294 006C+00 1/1 1/1 0/0 .text            drawButtonC__13dMeter2Draw_cFUcb */
 void dMeter2Draw_c::drawButtonC(u8 i_action, bool unused) {
     getActionString(i_action, 1, &field_0x766);
     if (i_action != 0 && (dComIfGp_isCStickSetFlag(2) & 1 || dComIfGp_isCStickSetFlag(4))) {
@@ -2472,7 +2458,6 @@ void dMeter2Draw_c::drawButtonC(u8 i_action, bool unused) {
     }
 }
 
-/* 802179C0-80217A10 212300 0050+00 1/1 1/1 0/0 .text            drawButtonS__13dMeter2Draw_cFUc */
 void dMeter2Draw_c::drawButtonS(u8 i_action) {
     getActionString(i_action, 1, &field_0x767);
     if (i_action != 0) {
@@ -2480,8 +2465,6 @@ void dMeter2Draw_c::drawButtonS(u8 i_action) {
     }
 }
 
-/* 80217A10-80217AB4 212350 00A4+00 0/0 1/1 0/0 .text            drawButtonBin__13dMeter2Draw_cFUc
- */
 void dMeter2Draw_c::drawButtonBin(u8 i_action) {
     int bottle_num = 0;
     for (int i = 0; i < 4; i++) {
@@ -2498,7 +2481,6 @@ void dMeter2Draw_c::drawButtonBin(u8 i_action) {
     }
 }
 
-/* 80217AB4-80218238 2123F4 0784+00 1/1 1/1 0/0 .text drawButtonXY__13dMeter2Draw_cFiUcUcbb */
 void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_3, bool param_4) {
     JUT_ASSERT(0, i_no < SELECT_MAX_e);
 
@@ -2541,7 +2523,7 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
             mpTextXY[i_no]->hide();
         }
 
-        JUT_ASSERT(0, std::strlen (mp_string) < (64));
+        JUT_ASSERT(0, strlen(mp_string) < (64));
 
         for (int i = 0; i < 5; i++) {
             strcpy(static_cast<J2DTextBox*>(mpXYText[i][i_no]->getPanePtr())->getStringPtr(),
@@ -2645,23 +2627,17 @@ void dMeter2Draw_c::drawButtonXY(int i_no, u8 i_itemNo, u8 i_action, bool param_
     }
 }
 
-/* 80218238-80218254 212B78 001C+00 0/0 1/1 0/0 .text
- * getButtonCrossParentInitTransY__13dMeter2Draw_cFv            */
 f32 dMeter2Draw_c::getButtonCrossParentInitTransY() {
     return mpButtonCrossParent->getInitCenterPosY();
 }
 
-/* 80218254-80218338 212B94 00E4+00 1/1 1/1 0/0 .text            drawButtonCross__13dMeter2Draw_cFff
- */
 void dMeter2Draw_c::drawButtonCross(f32 i_posX, f32 i_posY) {
     mpButtonCrossParent->scale(g_drawHIO.mButtonCrossScale, g_drawHIO.mButtonCrossScale);
     mpTextI->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
     mpTextM->scale(g_drawHIO.mButtonCrossTextScale, g_drawHIO.mButtonCrossTextScale);
-    mpButtonCrossParent->paneTrans(i_posX, i_posY);
+    mpButtonCrossParent->paneTrans(ScaleHUDXLeft(i_posX), i_posY);
 }
 
-/* 80218338-802183A8 212C78 0070+00 0/0 1/1 0/0 .text
- * setAlphaButtonCrossAnimeMin__13dMeter2Draw_cFv               */
 void dMeter2Draw_c::setAlphaButtonCrossAnimeMin() {
     if (mpButtonCrossParent->getAlphaRate() != 0.0f) {
         mpButtonCrossParent->setAlphaRate(g_drawHIO.mParentAlpha);
@@ -2672,8 +2648,6 @@ void dMeter2Draw_c::setAlphaButtonCrossAnimeMin() {
     setAlphaButtonCrossMapAnimeMin();
 }
 
-/* 802183A8-80218448 212CE8 00A0+00 0/0 1/1 0/0 .text
- * setAlphaButtonCrossAnimeMax__13dMeter2Draw_cFv               */
 void dMeter2Draw_c::setAlphaButtonCrossAnimeMax() {
     if (g_drawHIO.mParentAlpha != mpButtonCrossParent->getAlphaRate()) {
         mpButtonCrossParent->setAlphaRate(g_drawHIO.mParentAlpha);
@@ -2693,8 +2667,6 @@ void dMeter2Draw_c::setAlphaButtonCrossAnimeMax() {
     }
 }
 
-/* 80218448-80218524 212D88 00DC+00 2/2 0/0 0/0 .text
- * setAlphaButtonCrossItemAnimeMin__13dMeter2Draw_cFv           */
 void dMeter2Draw_c::setAlphaButtonCrossItemAnimeMin() {
     if (mpTextI->getAlphaRate() != 0.0f) {
         mpTextI->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossITEMAlpha);
@@ -2709,8 +2681,6 @@ void dMeter2Draw_c::setAlphaButtonCrossItemAnimeMin() {
     }
 }
 
-/* 80218524-802185E8 212E64 00C4+00 1/1 0/0 0/0 .text
- * setAlphaButtonCrossItemAnimeMax__13dMeter2Draw_cFv           */
 void dMeter2Draw_c::setAlphaButtonCrossItemAnimeMax() {
     if (g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossITEMAlpha != mpTextI->getAlphaRate()) {
         mpTextI->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossITEMAlpha);
@@ -2725,8 +2695,6 @@ void dMeter2Draw_c::setAlphaButtonCrossItemAnimeMax() {
     }
 }
 
-/* 802185E8-802186C4 212F28 00DC+00 2/2 0/0 0/0 .text
- * setAlphaButtonCrossMapAnimeMin__13dMeter2Draw_cFv            */
 void dMeter2Draw_c::setAlphaButtonCrossMapAnimeMin() {
     if (mpTextM->getAlphaRate() != 0.0f) {
         mpTextM->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossMAPAlpha);
@@ -2741,8 +2709,6 @@ void dMeter2Draw_c::setAlphaButtonCrossMapAnimeMin() {
     }
 }
 
-/* 802186C4-80218788 213004 00C4+00 1/1 0/0 0/0 .text
- * setAlphaButtonCrossMapAnimeMax__13dMeter2Draw_cFv            */
 void dMeter2Draw_c::setAlphaButtonCrossMapAnimeMax() {
     if (g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossMAPAlpha != mpTextM->getAlphaRate()) {
         mpTextM->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mButtonCrossMAPAlpha);
@@ -2757,7 +2723,6 @@ void dMeter2Draw_c::setAlphaButtonCrossMapAnimeMax() {
     }
 }
 
-/* 80218788-8021901C 2130C8 0894+00 1/1 1/1 0/0 .text setAlphaButtonChange__13dMeter2Draw_cFb */
 void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
     bool set_parent = false;
     bool set_buttonA = false;
@@ -2956,7 +2921,6 @@ void dMeter2Draw_c::setAlphaButtonChange(bool param_0) {
     }
 }
 
-/* 8021901C-802190A8 21395C 008C+00 0/0 1/1 0/0 .text setAlphaButtonAnimeMin__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaButtonAnimeMin() {
     if (mpButtonParent->getAlphaRate() != 0.0f) {
         mpButtonParent->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha);
@@ -2968,7 +2932,6 @@ void dMeter2Draw_c::setAlphaButtonAnimeMin() {
     }
 }
 
-/* 802190A8-80219174 2139E8 00CC+00 0/0 1/1 0/0 .text setAlphaButtonAnimeMax__13dMeter2Draw_cFv */
 void dMeter2Draw_c::setAlphaButtonAnimeMax() {
     if (g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha != mpButtonParent->getAlphaRate()) {
         mpButtonParent->setAlphaRate(g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha);
@@ -2986,8 +2949,6 @@ void dMeter2Draw_c::setAlphaButtonAnimeMax() {
     }
 }
 
-/* 80219174-80219258 213AB4 00E4+00 0/0 1/1 0/0 .text setAlphaButtonAAnimeMin__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaButtonAAnimeMin() {
     if (mpButtonA->getAlphaRate() != 0.0f) {
         mpButtonA->setAlphaRate(g_drawHIO.mButtonAAlpha *
@@ -3003,8 +2964,6 @@ void dMeter2Draw_c::setAlphaButtonAAnimeMin() {
     }
 }
 
-/* 80219258-80219324 213B98 00CC+00 0/0 1/1 0/0 .text setAlphaButtonAAnimeMax__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaButtonAAnimeMax() {
     if (g_drawHIO.mButtonAAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha) !=
         mpButtonA->getAlphaRate())
@@ -3022,8 +2981,6 @@ void dMeter2Draw_c::setAlphaButtonAAnimeMax() {
     }
 }
 
-/* 80219324-80219474 213C64 0150+00 0/0 1/1 0/0 .text setAlphaButtonBAnimeMin__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaButtonBAnimeMin() {
     if (mpButtonB->getAlphaRate() != 0.0f) {
         mpButtonB->setAlphaRate(g_drawHIO.mButtonBAlpha *
@@ -3048,8 +3005,6 @@ void dMeter2Draw_c::setAlphaButtonBAnimeMin() {
     }
 }
 
-/* 80219474-802195A4 213DB4 0130+00 0/0 1/1 0/0 .text setAlphaButtonBAnimeMax__13dMeter2Draw_cFv
- */
 void dMeter2Draw_c::setAlphaButtonBAnimeMax() {
     if (mpButtonB->getAlphaRate() !=
         g_drawHIO.mButtonBAlpha * (g_drawHIO.mParentAlpha * g_drawHIO.mMainHUDButtonsAlpha))
@@ -3076,8 +3031,6 @@ void dMeter2Draw_c::setAlphaButtonBAnimeMax() {
     }
 }
 
-/* 802195A4-80219788 213EE4 01E4+00 0/0 1/1 0/0 .text setButtonIconAAlpha__13dMeter2Draw_cFUcUlb
- */
 void dMeter2Draw_c::setButtonIconAAlpha(u8 unused0, u32 unused1, bool unused2) {
     if (mpButtonA->isVisible()) {
         u8 alpha = g_drawHIO.mButtonAAlpha *
@@ -3102,8 +3055,6 @@ void dMeter2Draw_c::setButtonIconAAlpha(u8 unused0, u32 unused1, bool unused2) {
     }
 }
 
-/* 80219788-80219A84 2140C8 02FC+00 0/0 1/1 0/0 .text setButtonIconBAlpha__13dMeter2Draw_cFUcUlb
- */
 void dMeter2Draw_c::setButtonIconBAlpha(u8 unused0, u32 unused1, bool param_2) {
     if (mpItemB->isVisible() || mpLightB->isVisible() || mpButtonB->isVisible()) {
         f32 temp_f30 =
@@ -3146,8 +3097,6 @@ void dMeter2Draw_c::setButtonIconBAlpha(u8 unused0, u32 unused1, bool param_2) {
     }
 }
 
-/* 80219A84-80219E98 2143C4 0414+00 0/0 1/1 0/0 .text setButtonIconMidonaAlpha__13dMeter2Draw_cFUl
- */
 void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
     mpButtonMidona->scale(g_drawHIO.mMidnaIconScale, g_drawHIO.mMidnaIconScale);
     mpButtonMidona->paneTrans(g_drawHIO.mMidnaIconPosX, g_drawHIO.mMidnaIconPosY);
@@ -3160,8 +3109,13 @@ void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
         bool var_r31 = 1;
 
         if (getCanoeFishing() ||
+              /*dSv_event_flag_c::M_009 - Cutscene - [cutscene: 6B] Prison escape - Midna rides on back */
             (!dComIfGs_isEventBit(0x0540) && !dMeter2Info_isUseButton(0x800)) ||
-            !dComIfGs_isEventBit(0x0C10) || dComIfGs_isEventBit(0x6140))
+             /* dSv_event_flag_c::M_067 - Main Event - Midna riding / not riding (ON == riding) */
+            !dComIfGs_isEventBit(0x0C10) ||
+            /* dSv_event_flag_c::F_0800 - Cutscene - After returning to Ordon Woods, until Midna comes out of the shadows 
+                                                     (If 800 is ON, Midna can't be called) */
+            dComIfGs_isEventBit(0x6140))
         {
             var_f29 = 0.0f;
         } else if (dComIfGp_isPauseFlag()) {
@@ -3223,8 +3177,6 @@ void dMeter2Draw_c::setButtonIconMidonaAlpha(u32 param_0) {
     mpButtonXY[2]->setAlpha(255.0f * field_0x724 * temp_f30_2);
 }
 
-/* 80219E98-8021A29C 2147D8 0404+00 0/0 1/1 0/0 .text setButtonIconAlpha__13dMeter2Draw_cFiUcUlb
- */
 void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool unused2) {
     JUT_ASSERT(0, i_no < SELECT_MAX_e);
 
@@ -3307,14 +3259,11 @@ void dMeter2Draw_c::setButtonIconAlpha(int i_no, u8 unused0, u32 unused1, bool u
     }
 }
 
-/* 8021A29C-8021A2F4 214BDC 0058+00 1/1 0/0 0/0 .text            getNumberTexture__13dMeter2Draw_cFi
- */
 ResTIMG* dMeter2Draw_c::getNumberTexture(int i) {
     return (ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG',
                                                               dMeter2Info_getNumberTextureName(i));
 }
 
-/* 8021A2F4-8021A468 214C34 0174+00 9/9 1/1 0/0 .text getActionString__13dMeter2Draw_cFUcUcPUc */
 char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
     static u32 i_action_num[] = {
         0,    1001, 1002, 1003, 1004, 1005, 1006, 1007, 1387, 1009, 1010, 1011, 1012, 1013, 1014,
@@ -3374,7 +3323,6 @@ char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
     return i_text_buf;
 }
 
-/* 8021A468-8021A71C 214DA8 02B4+00 2/2 0/0 0/0 .text changeTextureItemB__13dMeter2Draw_cFUc */
 void dMeter2Draw_c::changeTextureItemB(u8 i_itemNo) {
     int var_r31 = 0;
     if (i_itemNo == fpcNm_ITEM_LURE_ROD) {
@@ -3419,7 +3367,6 @@ void dMeter2Draw_c::changeTextureItemB(u8 i_itemNo) {
     mpItemBPane->resize(field_0x6e4, field_0x6e8);
 }
 
-/* 8021A71C-8021A9C8 21505C 02AC+00 1/1 0/0 0/0 .text changeTextureItemXY__13dMeter2Draw_cFiUc */
 void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     JUT_ASSERT(0, i_no < SELECT_MAX_e);
 
@@ -3472,8 +3419,6 @@ void dMeter2Draw_c::changeTextureItemXY(int i_no, u8 i_itemNo) {
     mpItemXYPane[i_no]->resize(field_0x6c4[i_no], field_0x6d0[i_no]);
 }
 
-/* 8021A9C8-8021AAA4 215308 00DC+00 10/10 2/2 0/0 .text
- * setAlphaAnimeMin__13dMeter2Draw_cFP13CPaneMgrAlphas          */
 void dMeter2Draw_c::setAlphaAnimeMin(CPaneMgrAlpha* i_pane, s16 i_min) {
     f32 alpha_rate = i_pane->getAlphaRate();
     s16 alpha_timer = i_pane->getAlphaTimer();
@@ -3496,8 +3441,6 @@ void dMeter2Draw_c::setAlphaAnimeMin(CPaneMgrAlpha* i_pane, s16 i_min) {
     }
 }
 
-/* 8021AAA4-8021AB84 2153E4 00E0+00 10/10 23/23 0/0 .text
- * setAlphaAnimeMax__13dMeter2Draw_cFP13CPaneMgrAlphas          */
 void dMeter2Draw_c::setAlphaAnimeMax(CPaneMgrAlpha* i_pane, s16 i_max) {
     f32 alpha_rate = i_pane->getAlphaRate();
     s16 alpha_timer = i_pane->getAlphaTimer();
@@ -3517,8 +3460,6 @@ void dMeter2Draw_c::setAlphaAnimeMax(CPaneMgrAlpha* i_pane, s16 i_max) {
     }
 }
 
-/* 8021AB84-8021AEC8 2154C4 0344+00 0/0 6/6 0/0 .text            setItemNum__13dMeter2Draw_cFUcUcUc
- */
 void dMeter2Draw_c::setItemNum(u8 i_button, u8 i_num, u8 i_max) {
     JUT_ASSERT(0, i_button < SELECT_MAX_e);
 
@@ -3573,7 +3514,6 @@ void dMeter2Draw_c::setItemNum(u8 i_button, u8 i_num, u8 i_max) {
     }
 }
 
-/* 8021AEC8-8021AF78 215808 00B0+00 0/0 1/1 0/0 .text            drawItemNum__13dMeter2Draw_cFUcf */
 void dMeter2Draw_c::drawItemNum(u8 i_button, f32 i_alpha) {
     JUT_ASSERT(0, i_button < SELECT_MAX_e);
 
@@ -3586,7 +3526,6 @@ void dMeter2Draw_c::drawItemNum(u8 i_button, f32 i_alpha) {
     }
 }
 
-/* 8021AF78-8021B0C8 2158B8 0150+00 0/0 1/1 0/0 .text drawKanteraMeter__13dMeter2Draw_cFUcf */
 void dMeter2Draw_c::drawKanteraMeter(u8 i_button, f32 i_alphaRate) {
     JUT_ASSERT(0, i_button < SELECT_MAX_e);
 
@@ -3608,14 +3547,10 @@ void dMeter2Draw_c::drawKanteraMeter(u8 i_button, f32 i_alphaRate) {
     mpKanteraMeter[i_button]->setAlphaRate(i_alphaRate);
 }
 
-/* 8021B0C8-8021B104 215A08 003C+00 0/0 3/3 0/0 .text            isButtonVisible__13dMeter2Draw_cFv
- */
 u8 dMeter2Draw_c::isButtonVisible() {
     return (mpButtonParent->getAlphaRate() == 0.0f) ^ 1;
 }
 
-/* 8021B104-8021B364 215A44 0260+00 3/2 0/0 0/0 .text            setItemParamX__13dMeter2Draw_cFUc
- */
 void dMeter2Draw_c::setItemParamX(u8 i_itemNo) {
     if (g_drawHIO.mButtonDebug[0]) {
         mItemParams[SELECT_X_e].pos_x = g_drawHIO.mButtonXItemPosX;
@@ -3695,8 +3630,6 @@ void dMeter2Draw_c::setItemParamX(u8 i_itemNo) {
     }
 }
 
-/* 8021B364-8021B5B0 215CA4 024C+00 3/2 0/0 0/0 .text            setItemParamY__13dMeter2Draw_cFUc
- */
 void dMeter2Draw_c::setItemParamY(u8 i_itemNo) {
     if (g_drawHIO.mButtonDebug[1]) {
         mItemParams[SELECT_Y_e].pos_x = g_drawHIO.mButtonYItemPosX;
@@ -3776,8 +3709,6 @@ void dMeter2Draw_c::setItemParamY(u8 i_itemNo) {
     }
 }
 
-/* 8021B5B0-8021B810 215EF0 0260+00 3/2 0/0 0/0 .text            setItemParamZ__13dMeter2Draw_cFUc
- */
 void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
     if (g_drawHIO.mButtonDebug[2]) {
         mItemParams[SELECT_Z_e].pos_x = g_drawHIO.field_0x1cc;
@@ -3857,8 +3788,6 @@ void dMeter2Draw_c::setItemParamZ(u8 i_itemNo) {
     }
 }
 
-/* 8021B810-8021BB6C 216150 035C+00 3/2 0/0 0/0 .text            setItemParamB__13dMeter2Draw_cFUc
- */
 void dMeter2Draw_c::setItemParamB(u8 i_itemNo) {
     if (g_drawHIO.mButtonDebug[3]) {
         mItemParams[3].pos_x = g_drawHIO.mButtonBItemPosX[0];
@@ -3989,8 +3918,6 @@ void dMeter2Draw_c::setItemParamB(u8 i_itemNo) {
     }
 }
 
-/* 8021BB6C-8021BBB4 2164AC 0048+00 1/1 0/0 0/0 .text            getFishingType__13dMeter2Draw_cFv
- */
 bool dMeter2Draw_c::getFishingType() {
     if (dMeter2Info_isGameStatus(1) && getCanoeFishing()) {
         return true;
@@ -4003,11 +3930,9 @@ bool dMeter2Draw_c::getFishingType() {
 static const char* tex_name[] = {"tt_heart_00.bti", "tt_heart_01.bti", "tt_heart_02.bti",
                                  "tt_heart_03.bti"};
 
-/* 8021BBB4-8021BC24 2164F4 0070+00 2/2 1/1 0/0 .text            getCanoeFishing__13dMeter2Draw_cFv
- */
-bool dMeter2Draw_c::getCanoeFishing() {
+u8 dMeter2Draw_c::getCanoeFishing() {
     if (!strcmp(dComIfGp_getStartStageName(), "F_SP127") &&
-        g_dComIfG_gameInfo.play.mPlayer[0]->checkCanoeRide())
+        ((daPy_py_c*)dComIfGp_getPlayer(0))->checkCanoeRide())
     {
         return TRUE;
     } else {
@@ -4015,14 +3940,10 @@ bool dMeter2Draw_c::getCanoeFishing() {
     }
 }
 
-/* 8021BC24-8021BC54 216564 0030+00 0/0 1/1 0/0 .text            getCameraSubject__13dMeter2Draw_cFv
- */
 bool dMeter2Draw_c::getCameraSubject() {
     return dCam_getBody()->Mode() == 4 ? TRUE : FALSE;
 }
 
-/* 8021BC54-8021BCAC 216594 0058+00 0/0 1/1 0/0 .text            getItemSubject__13dMeter2Draw_cFv
- */
 bool dMeter2Draw_c::getItemSubject() {
     if (dCam_getBody()->Mode() != 4 && (dCam_getBody()->Mode() == 7 || dCam_getBody()->Mode() == 8))
     {
@@ -4032,13 +3953,195 @@ bool dMeter2Draw_c::getItemSubject() {
     return false;
 }
 
-/* 8021BCAC-8021BCC0 2165EC 0014+00 0/0 1/1 0/0 .text            getPlayerSubject__13dMeter2Draw_cFv
- */
 bool dMeter2Draw_c::getPlayerSubject() {
     return dComIfGp_checkPlayerStatus0(0, 0x8000000);
 }
 
-/* 8021BCC0-8021BDD0 216600 0110+00 2/2 2/2 0/0 .text            isBButtonShow__13dMeter2Draw_cFb */
+// DEV: HUD transform hint (D-pad down).
+// Loads the same Link/Wolf map icon BTIs used on the dungeon map screen and displays the opposite
+// form icon as a hint (Human -> Wolf icon, Wolf -> Link icon).
+void dMeter2Draw_c::initTransformHintIcons() {
+    clearTransformHintIcons();
+
+    JKRArchive* iconArchive = dComIfGp_getDmapResArchive();
+    if (iconArchive == NULL) {
+        iconArchive = dComIfGp_getFmapResArchive();
+    }
+    if (iconArchive == NULL) {
+        iconArchive = dComIfGp_getFieldMapArchive2();
+    }
+    if (iconArchive == NULL) {
+        iconArchive = dComIfGp_getAllMapArchive();
+    }
+    if (iconArchive == NULL) {
+        iconArchive = dComIfGp_getMain2DArchive();
+    }
+
+    ResTIMG* wolfTex = NULL;
+    if (iconArchive != NULL) {
+        // Dungeon map uses dedicated Wolf/Link icons for this toggle.
+        wolfTex = (ResTIMG*)iconArchive->getResource(
+            'TIMG', "im_dungeon_map_icon_wolf_ci8_48x45_ind_06.bti");
+        if (wolfTex == NULL) {
+            wolfTex = (ResTIMG*)iconArchive->getResource('TIMG', "tt_map_icon_wolf_ci8_32_00.bti");
+        }
+        if (wolfTex == NULL) {
+            wolfTex =
+                (ResTIMG*)iconArchive->getResource('TIMG', "tt_map_icon_wolf_s_ci8_24_00.bti");
+        }
+        // Fallback: gold wolf icon (not Wolf Link), in case the Wolf Link icon isn't present.
+        if (wolfTex == NULL) {
+            wolfTex = (ResTIMG*)iconArchive->getResource('TIMG', "st_gold_wolf.bti");
+        }
+    }
+    if (wolfTex == NULL) {
+        if (iconArchive != NULL) {
+            wolfTex = (ResTIMG*)JKRGetNameResource("im_dungeon_map_icon_wolf_ci8_48x45_ind_06.bti",
+                                                   iconArchive);
+        }
+    }
+    if (wolfTex == NULL) {
+        if (iconArchive != NULL) {
+            wolfTex = (ResTIMG*)JKRGetNameResource("tt_map_icon_wolf_ci8_32_00.bti", iconArchive);
+        }
+    }
+    if (wolfTex == NULL) {
+        if (iconArchive != NULL) {
+            wolfTex = (ResTIMG*)JKRGetNameResource("tt_map_icon_wolf_s_ci8_24_00.bti", iconArchive);
+        }
+    }
+    if (wolfTex == NULL) {
+        if (iconArchive != NULL) {
+            wolfTex = (ResTIMG*)JKRGetNameResource("st_gold_wolf.bti", iconArchive);
+        }
+    }
+
+    ResTIMG* linkTex = NULL;
+    if (iconArchive != NULL) {
+        linkTex = (ResTIMG*)iconArchive->getResource(
+            'TIMG', "im_dungeon_map_icon_rink_ci8_44x45_04.bti");
+        if (linkTex == NULL) {
+            linkTex = (ResTIMG*)iconArchive->getResource('TIMG', "tt_map_icon_link_ci8_32_00.bti");
+        }
+        if (linkTex == NULL) {
+            linkTex =
+                (ResTIMG*)iconArchive->getResource('TIMG', "tt_map_icon_link_s_ci8_24_00.bti");
+        }
+    }
+    if (linkTex == NULL) {
+        if (iconArchive != NULL) {
+            linkTex = (ResTIMG*)JKRGetNameResource("im_dungeon_map_icon_rink_ci8_44x45_04.bti",
+                                                   iconArchive);
+        }
+    }
+    if (linkTex == NULL) {
+        if (iconArchive != NULL) {
+            linkTex = (ResTIMG*)JKRGetNameResource("tt_map_icon_link_ci8_32_00.bti", iconArchive);
+        }
+    }
+    if (linkTex == NULL) {
+        if (iconArchive != NULL) {
+            linkTex = (ResTIMG*)JKRGetNameResource("tt_map_icon_link_s_ci8_24_00.bti", iconArchive);
+        }
+    }
+
+    // Same assets as dMenuMapCommon_c::initiate(): use the map icon BTIs.
+    // Index 0: show wolf icon while human; index 1: show Link icon while wolf.
+    mTransformIconTex[0] = wolfTex;
+    mTransformIconTex[1] = linkTex;
+}
+
+// DEV: Releases any cached J2DPicture instances for the transform hint icon.
+void dMeter2Draw_c::clearTransformHintIcons() {
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            if (mpDpadDownIcon[i][j] != NULL) {
+                delete mpDpadDownIcon[i][j];
+                mpDpadDownIcon[i][j] = NULL;
+            }
+        }
+    }
+}
+
+// DEV: Lazily (re)initializes textures once the map UI archives are available.
+void dMeter2Draw_c::updateTransformHintIcons() {
+    if ((mTransformIconTex[0] == NULL || mTransformIconTex[1] == NULL) &&
+        (dComIfGp_getDmapResArchive() != NULL || dComIfGp_getFmapResArchive() != NULL ||
+         dComIfGp_getFieldMapArchive2() != NULL || dComIfGp_getAllMapArchive() != NULL))
+    {
+        initTransformHintIcons();
+    }
+}
+
+// DEV: Draws the transform hint icon anchored under the D-pad cross.
+void dMeter2Draw_c::drawTransformHintIcon(J2DGrafContext* graf_ctx) {
+    if (dComIfGp_isPauseFlag()) {
+        return;
+    }
+
+    if (mpButtonCrossParent == NULL || mpButtonCrossParent->getAlphaRate() == 0.0f) {
+        return;
+    }
+
+    // Only show icon if transformation is allowed
+    daAlink_c* linkPlayer = daAlink_getAlinkActorClass();
+    if (linkPlayer == NULL) {
+        return;
+    }
+
+    // Check transformation conditions (same as dpad down button check)
+    if (linkPlayer->checkEventRun() || linkPlayer->mProcID == daAlink_c::PROC_METAMORPHOSE) {
+        return;
+    }
+
+    daMidna_c* midna = (daMidna_c*)linkPlayer->getMidnaActor();
+    bool can_transform = midna != NULL && midna->checkMetamorphoseEnable();
+
+    if (!can_transform || !linkPlayer->mLinkAcch.ChkGroundHit() ||
+        linkPlayer->checkModeFlg(daAlink_c::MODE_PLAYER_FLY) || linkPlayer->checkMagneBootsOn()) {
+        return;
+    }
+
+    // Match dungeon-map behavior: show the opposite form icon as a hint.
+    // Human -> show wolf icon; Wolf -> show Link icon.
+    bool nowWolf = linkPlayer->checkWolf();
+    int iconIdx = nowWolf ? 1 : 0;
+    ResTIMG* tex = mTransformIconTex[iconIdx];
+    if (tex == NULL) {
+        return;
+    }
+
+    f32 scale = g_drawHIO.mDpadMAPScale;
+    if (scale <= 0.0f) { // scale and clamp icon size
+        scale = 0.6f;
+    }
+    scale *= 0.6f;
+
+    // Anchor to the D-pad cross itself so the icon doesn't shift with map/text state.
+    J2DPane* anchor = mpButtonCrossParent->getPanePtr();
+
+    Vec v0 = anchor->getGlbVtx(0);
+    Vec v3 = anchor->getGlbVtx(3);
+    f32 left = v0.x < v3.x ? v0.x : v3.x;
+    f32 right = v0.x > v3.x ? v0.x : v3.x;
+    f32 top = v0.y < v3.y ? v0.y : v3.y;
+    f32 bottom = v0.y > v3.y ? v0.y : v3.y;
+    f32 centerX = (left + right) * 0.498f;
+    f32 height = bottom - top;
+
+    J2DPicture pic(tex);
+    pic.setBasePosition(J2DBasePosition_4);
+    pic.setAlpha((u8)(mpButtonCrossParent->getAlphaRate() * 255.0f));
+    f32 drawW = tex->width * scale;
+    f32 drawH = tex->height * scale;
+    const f32 gapYScaleFromBottom = -0.2f;
+    f32 gapY = height * gapYScaleFromBottom;
+    const f32 centerOffsetX = -10.0f;
+    f32 posX = centerX - (drawW * 0.5f) + g_drawHIO.mDpadMAPPosX + centerOffsetX;
+    f32 posY = bottom + gapY + g_drawHIO.mDpadMAPPosY;
+    pic.draw(posX, posY, drawW, drawH, false, false, false);
+}
+
 bool dMeter2Draw_c::isBButtonShow(bool param_0) {
     if (dMsgObject_getMsgObjectClass() == NULL) {
         return false;
@@ -4055,13 +4158,10 @@ bool dMeter2Draw_c::isBButtonShow(bool param_0) {
     return false;
 }
 
-/* 8021BDD0-8021BDDC 216710 000C+00 0/0 1/1 0/0 .text            getButtonTimer__13dMeter2Draw_cFv
- */
 s16 dMeter2Draw_c::getButtonTimer() {
     return mpButtonParent->getAlphaTimer();
 }
 
-/* 803988B8-803988D0 024F18 0018+00 0/0 0/0 0/0 .rodata          tag$7759 */
 // unused
 static u64 const tag_7759[] = {
     'item_x_n',

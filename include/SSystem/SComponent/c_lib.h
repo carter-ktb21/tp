@@ -9,8 +9,8 @@ inline bool cLib_IsZero(f32 value) {
     return fabsf(value) < 8e-11f;
 }
 
-void cLib_memCpy(void* dst, const void* src, unsigned long size);
-void cLib_memSet(void* ptr, int value, unsigned long size);
+void cLib_memCpy(void* dst, const void* src, u32 size);
+void cLib_memSet(void* ptr, int value, u32 size);
 
 f32 cLib_addCalc(f32* o_value, f32 target, f32 scale, f32 maxStep, f32 minStep);
 void cLib_addCalc2(f32* o_value, f32 target, f32 scale, f32 maxStep);
@@ -72,6 +72,19 @@ inline T cLib_maxLimit(T val, T max) {
 }
 
 template <typename T>
+inline T cLib_minLimit(T val, T min) {
+    T ret;
+
+    if (val < min) {
+        ret = min;
+    } else {
+        ret = val;
+    }
+
+    return (T)ret;
+}
+
+template <typename T>
 T cLib_getRndValue(T min, T range) {
     return (T)(min + cM_rndF((f32)range));
 }
@@ -79,7 +92,7 @@ T cLib_getRndValue(T min, T range) {
 template <typename T>
 T cLib_calcTimer(T* value) {
     if (*(T*)value != 0) {
-        *value = *value - 1;
+        --*value;
     }
     return *value;
 }

@@ -11,66 +11,116 @@
  * @details
  *
  */
-class daNpc_Kkri_c : public fopAc_ac_c {
+class daNpc_Kkri_c : public daNpcT_c {
 public:
-    /* 8054F3AC */ ~daNpc_Kkri_c();
-    /* 8054F4F8 */ void create();
-    /* 8054F7D0 */ void CreateHeap();
-    /* 8054FC10 */ void Delete();
-    /* 8054FC44 */ void Execute();
-    /* 8054FC64 */ void Draw();
-    /* 8054FD00 */ void createHeapCallBack(fopAc_ac_c*);
-    /* 8054FD20 */ void ctrlJointCallBack(J3DJoint*, int);
-    /* 8054FD78 */ void srchYm(void*, void*);
-    /* 8054FE20 */ void getType();
-    /* 8054FE58 */ void isDelete();
-    /* 8054FE8C */ void reset();
-    /* 8054FFEC */ void checkChangeEvt();
-    /* 805500A0 */ void setParam();
-    /* 80550270 */ void setAfterTalkMotion();
-    /* 8055032C */ void srchActors();
-    /* 80550398 */ void evtTalk();
-    /* 80550438 */ void evtCutProc();
-    /* 80550500 */ void action();
-    /* 805505F8 */ void beforeMove();
-    /* 805506BC */ void setAttnPos();
-    /* 80550ADC */ void setCollision();
-    /* 80550CA0 */ bool drawDbgInfo();
-    /* 80550CA8 */ void selectAction();
-    /* 80550D44 */ void chkAction(int (daNpc_Kkri_c::*)(void*));
-    /* 80550D70 */ void setAction(int (daNpc_Kkri_c::*)(void*));
-    /* 80550E18 */ void cutConversationAboutSoup(int);
-    /* 80550F70 */ void cutYmLook(int);
-    /* 80551084 */ void sleep();
-    /* 805512E0 */ void wait(void*);
-    /* 80551538 */ void sitWait1(void*);
-    /* 80551A4C */ void fearWait(void*);
-    /* 80551DA4 */ void talk(void*);
-    /* 80553304 */ daNpc_Kkri_c(daNpcT_faceMotionAnmData_c const*, daNpcT_motionAnmData_c const*,
-                                daNpcT_MotionSeqMngr_c::sequenceStepData_c const*, int,
-                                daNpcT_MotionSeqMngr_c::sequenceStepData_c const*, int,
-                                daNpcT_evtData_c const*, char**);
-    /* 805533E4 */ s32 getEyeballMaterialNo();
-    /* 805533EC */ s32 getHeadJointNo();
-    /* 805533F4 */ s32 getNeckJointNo();
-    /* 805533FC */ bool getBackboneJointNo();
-    /* 80553404 */ void checkChangeJoint(int);
-    /* 80553414 */ void checkRemoveJoint(int);
+    typedef int (daNpc_Kkri_c::*ActionFunc)(void*);
+    
+    int create();
+    int CreateHeap();
+    int Delete();
+    int Execute();
+    int Draw();
+    static int createHeapCallBack(fopAc_ac_c*);
+    static int ctrlJointCallBack(J3DJoint*, int);
+    static void* srchYm(void*, void*);
+    int getType();
+    int isDelete();
+    void reset();
+    void srchActors();
+    int selectAction();
+    BOOL chkAction(ActionFunc);
+    BOOL setAction(ActionFunc);
+    int cutConversationAboutSoup(int);
+    int cutYmLook(int);
+    int sleep();
+    int wait(void*);
+    int sitWait1(void*);
+    int fearWait(void*);
+    int talk(void*);
 
-    static void* mCutNameList[3];
-    static u8 mCutList[36];
+    daNpc_Kkri_c(daNpcT_faceMotionAnmData_c const* i_faceMotionAnmData,
+                                   daNpcT_motionAnmData_c const* i_motionAnmData,
+                                   daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
+                                   int i_faceMotionStepNum,
+                                   daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_motionSequenceData, int i_motionStepNum,
+                                   daNpcT_evtData_c const* i_evtData, char** i_arcNames)
+                    : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
+                               i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
+                               i_arcNames)
+                    {
+                        OS_REPORT("|%06d:%x|daNpc_Kkri_c -> コンストラクト\n", g_Counter.mCounter0, this);
+                    }
+
+    virtual ~daNpc_Kkri_c();
+    virtual BOOL checkChangeJoint(int i_jointNo) { return i_jointNo == 6; }
+    virtual BOOL checkRemoveJoint(int i_jointNo) { return i_jointNo == 10; }
+    virtual s32 getBackboneJointNo() { return 1; }
+    virtual s32 getNeckJointNo() { return 3; }
+    virtual s32 getHeadJointNo() { return 4; }
+    virtual u16 getEyeballMaterialNo() { return 2; }
+    virtual void setParam();
+    virtual BOOL checkChangeEvt();
+    virtual BOOL evtTalk();
+    virtual BOOL evtCutProc();
+    virtual void setAfterTalkMotion();
+    virtual void action();
+    virtual void beforeMove();
+    virtual void setAttnPos();
+    virtual void setCollision();
+    virtual int drawDbgInfo();
+
+    int getFlowNodeNo() {
+        u16 prm = home.angle.x;
+        return prm == 0xFFFF ? -1 : prm;
+    }
+
+    u8 getPathID() { return (fopAcM_GetParam(this) & 0xFF00) >> 8; }
+    u8 getBitSW() { return (fopAcM_GetParam(this) & 0xFF0000) >> 16; }
+    u8 getBitSW2() { return (fopAcM_GetParam(this) & 0xFF000000) >> 24; }
+
+    MtxP getBd3Mtx() {
+        return mpMorf[0]->getModel()->getAnmMtx(0x11);
+    }
+
+    MtxP getBd2Mtx() {
+        return mpMorf[0]->getModel()->getAnmMtx(6);
+    }
+
+    MtxP getBd1Mtx() {
+        return mpMorf[0]->getModel()->getAnmMtx(5);
+    }
+
+    static char* mCutNameList[3];
+    static int (daNpc_Kkri_c::*mCutList[])(int);
 
 private:
-    /* 0x568 */ u8 field_0x568[0xfdc - 0x568];
+    /* 0xE40 */ u8 field_0xE40[0xE44 - 0xE40];
+    /* 0xE44 */ dCcD_Cyl mCcCyl;
+    /* 0xF80 */ u8 mType;
+    /* 0xF84 */ daNpcT_ActorMngr_c mActorMng[1];
+    /* 0xF8C */ ActionFunc mSelectAction;
+    /* 0xF98 */ ActionFunc mAction;
+    /* 0xFA4 */ daNpcT_Path_c mPath;
+    /* 0xFCC */ int field_0xfcc;
+    /* 0xFD0 */ int field_0xfd0;
+    /* 0xFD4 */ u8 field_0xfd4;
+    /* 0xFD5 */ u8 field_0xfd5;
+    /* 0xFD6 */ u8 field_0xfd6;
+    /* 0xFD7 */ u8 field_0xfd7;
+    /* 0xFD8 */ u8 field_0xfd8;
 };
 
 STATIC_ASSERT(sizeof(daNpc_Kkri_c) == 0xfdc);
 
+struct daNpc_Kkri_HIOParam {
+    /* 0x00 */ daNpcT_HIOParam common;
+};
+
 class daNpc_Kkri_Param_c {
 public:
-    /* 80553424 */ ~daNpc_Kkri_Param_c();
+    virtual ~daNpc_Kkri_Param_c() {}
 
-    static u8 const m[140];
+    static const daNpc_Kkri_HIOParam m;
 };
 
 

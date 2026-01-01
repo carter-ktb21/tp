@@ -2,6 +2,8 @@
 #define D_A_OBJ_SMALLKEY_H
 
 #include "f_op/f_op_actor_mng.h"
+#include "d/actor/d_a_itembase.h"
+#include "d/d_particle.h"
 
 /**
  * @ingroup actors-objects
@@ -11,52 +13,88 @@
  * @details
  *
  */
-class daKey_c : public fopAc_ac_c {
-public:
-    /* 80CD9F2C */ void initBaseMtx();
-    /* 80CD9F68 */ void setBaseMtx();
-    /* 80CD9FDC */ void Create();
-    /* 80CDA15C */ bool __CreateHeap();
-    /* 80CDA164 */ void create();
-    /* 80CDA680 */ void bg_check();
-    /* 80CDA7E8 */ void actionInitInit();
-    /* 80CDA81C */ void actionInit();
-    /* 80CDA8C8 */ void actionParentWaitInit();
-    /* 80CDA8FC */ void actionParentWait();
-    /* 80CDA9AC */ void actionWaitInit();
-    /* 80CDAA28 */ void actionWait();
-    /* 80CDAB74 */ void initActionOrderGetDemo();
-    /* 80CDAC18 */ void actionOrderGetDemo();
-    /* 80CDAC94 */ void actionGetDemo();
-    /* 80CDAD28 */ void actionInitSwOnWait();
-    /* 80CDADD4 */ void actionSwOnWait();
-    /* 80CDAE54 */ void actionInitBoomerangCarry();
-    /* 80CDAF40 */ void actionBoomerangCarry();
-    /* 80CDAFB4 */ void effectSet();
-    /* 80CDB0D8 */ void effectStop();
-    /* 80CDB128 */ void effectCtrl();
-    /* 80CDB2E0 */ void seStartTwinkle_private(u32);
-    /* 80CDB36C */ void actionInitE_GB();
-    /* 80CDB3D8 */ void actionE_GB();
-    /* 80CDB404 */ void execute();
-    /* 80CDB5D4 */ void draw();
-    /* 80CDB628 */ void _delete();
+class daKey_c : public daItemBase_c {
+private:
+    void seStartTwinkle_private(u32);
 
-    void setPos(cXyz pos) {
-        current.pos = pos;
+public:
+    enum daKey_Status_e {
+        STATUS_INIT_e,
+        STATUS_PARENT_WAIT_e,
+        STATUS_WAIT_e,
+        STATUS_ORDER_GET_DEMO_e,
+        STATUS_GET_DEMO_e,
+        STATUS_SW_ON_WAIT_e,
+        STATUS_BOOMERANG_CARRY_e,
+        STATUS_E_GB_e,
+    };
+
+    void initBaseMtx();
+    void setBaseMtx();
+    int Create();
+    int __CreateHeap();
+    int create();
+    void bg_check();
+    int actionInitInit();
+    int actionInit();
+    int actionParentWaitInit();
+    int actionParentWait();
+    int actionWaitInit();
+    int actionWait();
+    int initActionOrderGetDemo();
+    int actionOrderGetDemo();
+    int actionGetDemo();
+    int actionInitSwOnWait();
+    int actionSwOnWait();
+    int actionInitBoomerangCarry();
+    int actionBoomerangCarry();
+    void effectSet();
+    void effectStop();
+    void effectCtrl();
+    int actionInitE_GB();
+    int actionE_GB();
+    int execute();
+    int draw();
+    int _delete();
+
+    int getSwNo() { return fopAcM_GetParamBit(this, 16, 8); }
+    int getSaveBitNo() { return fopAcM_GetParamBit(this, 8, 8); }
+
+    u16 getSwOnWaitTimer() { return field_0x93a & 0x3F; }
+
+    void setStatus(u8 i_status) { mStatus = i_status; }
+    bool chkStatus(u8 i_status) { return mStatus == i_status; }
+
+    void setPos(cXyz i_pos) {
+        current.pos = i_pos;
     }
 
-    void startMove(f32 param_1, f32 param_2) {
-        speedF = param_1;
-        speed.y = param_2;
+    void startMove(f32 i_speedF, f32 i_speedY) {
+        speedF = i_speedF;
+        speed.y = i_speedY;
         gravity = -6.0f;
         actionWaitInit();
     }
 
-    /* 0x568 */ u8 field_0x568[0x978 - 0x568];
+    void seStartTwinkle(u32 i_soundId, cXyz* param_1) {
+        field_0x978 = *param_1;
+        mDoAud_seStartLevel(i_soundId, &field_0x978, 0, dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
+        field_0x984 = 1;
+    }
+
+    /* 0x92C */ fpc_ProcID mItemId;
+    /* 0x930 */ int field_0x930;
+    /* 0x934 */ u8 mStatus;
+    /* 0x935 */ u8 mSwOnTimer;
+    /* 0x936 */ u8 field_0x936;
+    /* 0x937 */ u8 mIsPrmInit;
+    /* 0x938 */ s16 field_0x938;
+    /* 0x93A */ u16 field_0x93a;
+    /* 0x93C */ dPa_followEcallBack mEffect[2];
+    /* 0x964 */ csXyz mEffRot;
+    /* 0x96C */ cXyz mPrevSpeed;
     /* 0x978 */ cXyz field_0x978;
     /* 0x984 */ u8 field_0x984;
-    /* 0x985 */ u8 field_0x985[0x988 - 0x985];
 };
 
 STATIC_ASSERT(sizeof(daKey_c) == 0x988);

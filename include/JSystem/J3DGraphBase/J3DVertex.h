@@ -14,7 +14,7 @@ class J3DVertexBuffer;
  * 
  */
 struct J3DVtxColorCalc {
-    /* 8032E180 */ void calc(J3DModel*);
+    void calc(J3DModel*);
     virtual void calc(J3DVertexBuffer*);
 
     /* 0x0 */ void* vtable;  // inlined vtable?
@@ -29,6 +29,7 @@ struct J3DVtxColorCalc {
 class J3DVertexData {
 public:
     J3DVertexData();
+    ~J3DVertexData() {}
 
     void* getVtxPosArray() const { return mVtxPosArray; }
     void* getVtxNrmArray() const { return mVtxNrmArray; }
@@ -38,10 +39,10 @@ public:
     u32 getNrmNum() const { return mNrmNum; }
     u32 getVtxNum() const { return mVtxNum; }
     GXVtxAttrFmtList* getVtxAttrFmtList() const { return mVtxAttrFmtList; }
-    u8 getVtxPosFrac() { return mVtxPosFrac; }
-    u8 getVtxNrmFrac() { return mVtxNrmFrac; }
-    int getVtxPosType() { return mVtxPosType; }
-    int getVtxNrmType() { return mVtxNrmType; }
+    u8 getVtxPosFrac() const { return mVtxPosFrac; }
+    u8 getVtxNrmFrac() const { return mVtxNrmFrac; }
+    int getVtxPosType() const { return mVtxPosType; }
+    int getVtxNrmType() const { return mVtxNrmType; }
 
     void setVtxPosFrac(u8 frac) { mVtxPosFrac = frac; }
     void setVtxPosType(GXCompType type) { mVtxPosType = type; }
@@ -76,15 +77,15 @@ class J3DVertexBuffer {
 public:
     J3DVertexBuffer() { init(); }
 
-    /* 80310F78 */ void setVertexData(J3DVertexData*);
-    /* 80310FD8 */ void init();
-    /* 80311030 */ ~J3DVertexBuffer();
-    /* 8031106C */ void setArray() const;
-    /* 80311090 */ s32 copyLocalVtxPosArray(u32);
-    /* 803111B0 */ s32 copyLocalVtxNrmArray(u32);
-    /* 803112D0 */ s32 copyLocalVtxArray(u32);
-    /* 80311478 */ s32 allocTransformedVtxPosArray();
-    /* 8031152C */ s32 allocTransformedVtxNrmArray();
+    void setVertexData(J3DVertexData*);
+    void init();
+    ~J3DVertexBuffer();
+    void setArray() const;
+    s32 copyLocalVtxPosArray(u32);
+    s32 copyLocalVtxNrmArray(u32);
+    s32 copyLocalVtxArray(u32);
+    s32 allocTransformedVtxPosArray();
+    s32 allocTransformedVtxNrmArray();
 
     void setCurrentVtxPos(void* pVtxPos) { mCurrentVtxPos = pVtxPos; }
     void* getCurrentVtxPos() { return mCurrentVtxPos; }
@@ -147,9 +148,5 @@ private:
     /* 0x30 */ void* mCurrentVtxNrm;
     /* 0x34 */ GXColor* mCurrentVtxCol;
 };  // Size: 0x38
-
-struct VertexNormal {
-    Vec data;
-};
 
 #endif /* J3DVERTEX_H */

@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_iceblock.cpp
+* @file d_a_obj_iceblock.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_iceblock.h"
 #include "SSystem/SComponent/c_math.h"
@@ -9,6 +11,7 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_camera.h"
 #include "d/actor/d_a_mirror.h"
+#include "f_op/f_op_camera_mng.h"
 
 enum PUSH_DIR {
     DIR_SOUTH,
@@ -22,8 +25,6 @@ enum WALK_TYPE {
     WALK_IRON_BALL_HIT,
 };
 
-/* 80C21CD8-80C21DAC 000078 00D4+00 1/1 0/0 0/0 .text
- * PPCallBack__13daObjIceBlk_cFP10fopAc_ac_cP10fopAc_ac_csQ29dBgW_Base13PushPullLabel */
 void daObjIceBlk_c::PPCallBack(fopAc_ac_c* i_bgActor, fopAc_ac_c* i_pushActor, s16 i_angle,
                                dBgW_Base::PushPullLabel i_label) {
     bool temp_r3 = cLib_checkBit<u8>(i_label, dBgW::PPLABEL_PUSH) != 0;
@@ -55,15 +56,12 @@ void daObjIceBlk_c::PPCallBack(fopAc_ac_c* i_bgActor, fopAc_ac_c* i_pushActor, s
     ((daObjIceBlk_c*)i_bgActor)->mPPLabel = i_label;
 }
 
-/* 80C21DAC-80C21DC4 00014C 0018+00 1/1 0/0 0/0 .text
- * rideCallBack__FP4dBgWP10fopAc_ac_cP10fopAc_ac_c              */
 static void rideCallBack(dBgW* i_bgw, fopAc_ac_c* i_bgActor, fopAc_ac_c* i_rideActor) {
     if (fopAcM_GetName(i_rideActor) == PROC_ALINK) {
         ((daObjIceBlk_c*)i_bgActor)->mIsPlayerRide = true;
     }
 }
 
-/* 80C21DC4-80C21E24 000164 0060+00 1/1 0/0 0/0 .text            initBaseMtx__13daObjIceBlk_cFv */
 void daObjIceBlk_c::initBaseMtx() {
     if (mpIceModel != NULL) {
         mpIceModel->setBaseScale(scale);
@@ -73,7 +71,6 @@ void daObjIceBlk_c::initBaseMtx() {
     setBaseMtx();
 }
 
-/* 80C21E24-80C21EA4 0001C4 0080+00 2/2 0/0 0/0 .text            setBaseMtx__13daObjIceBlk_cFv */
 void daObjIceBlk_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(shape_angle.y);
@@ -86,7 +83,6 @@ void daObjIceBlk_c::setBaseMtx() {
     MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
 }
 
-/* 80C21EA4-80C21F2C 000244 0088+00 1/1 0/0 0/0 .text            getPointNo__13daObjIceBlk_cFv */
 u16 daObjIceBlk_c::getPointNo() {
     u16 point_no = 0;
 
@@ -99,8 +95,6 @@ u16 daObjIceBlk_c::getPointNo() {
     return point_no;
 }
 
-/* 80C21F2C-80C21FC8 0002CC 009C+00 1/1 0/0 0/0 .text            loadCurrentPos__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::loadCurrentPos() {
     if (mpPath != NULL) {
         u16 point_no = getPointNo();
@@ -113,7 +107,6 @@ void daObjIceBlk_c::loadCurrentPos() {
     }
 }
 
-/* 80C242F4-80C24324 000000 0030+00 8/8 0/0 0/0 .rodata          l_dir_vec */
 static const Vec l_dir_vec[4] = {
     {0.0f, 0.0f, 1.0f},
     {1.0f, 0.0f, 0.0f},
@@ -121,10 +114,8 @@ static const Vec l_dir_vec[4] = {
     {-1.0f, 0.0f, 0.0f},
 };
 
-/* 80C24324-80C2432C 000030 0008+00 1/3 0/0 0/0 .rodata          l_dir_angle */
-static const s16 l_dir_angle[4] = {0x0000, 0x4000, 0x8000, 0xC000};
+static const s16 l_dir_angle[4] = {0x0000, 0x4000, -0x8000, -0x4000};
 
-/* 80C2432C-80C24370 000038 0044+00 0/1 0/0 0/0 .rodata          l_cyl_src */
 const static dCcD_SrcCyl l_cyl_src = {
     {
         {0x0, {{0x100, 0x1, 0x1d}, {0x400000, 0x11}, 0x0}},  // mObj
@@ -139,8 +130,6 @@ const static dCcD_SrcCyl l_cyl_src = {
     }  // mCyl
 };
 
-/* 80C21FC8-80C22200 000368 0238+00 2/2 0/0 0/0 .text            saveCurrentPos__13daObjIceBlk_cFv
- */
 int daObjIceBlk_c::saveCurrentPos() {
     int current_pos = -1;
 
@@ -153,7 +142,7 @@ int daObjIceBlk_c::saveCurrentPos() {
     int nearest_point_no = 0;
 
     for (int i = 0; i < mpPath->m_num; i++) {
-#ifdef DEBUG
+#if DEBUG
         f32 dist = current.pos.absXZ(point->m_position);
         if (dist < nearest_dist) {
             nearest_point_no = i;
@@ -195,44 +184,20 @@ int daObjIceBlk_c::saveCurrentPos() {
     return current_pos;
 }
 
-/* 80C22200-80C2224C 0005A0 004C+00 1/1 0/0 0/0 .text            enablePushPull__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::enablePushPull() {
     if (mpBgW != NULL && mpBgW->ChkUsed()) {
         mpBgW->OnPushPullOk();
     }
 }
 
-/* 80C2224C-80C22298 0005EC 004C+00 2/2 0/0 0/0 .text            disablePushPull__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::disablePushPull() {
     if (mpBgW != NULL && mpBgW->ChkUsed()) {
         mpBgW->OffPushPullOk();
     }
 }
 
-/* 80C244D0-80C244DC 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C244DC-80C244F0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 80C244F0-80C244F4 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Y_icecube";
 
-/* 80C22298-80C22618 000638 0380+00 1/0 0/0 0/0 .text            Create__13daObjIceBlk_cFv */
 int daObjIceBlk_c::Create() {
     mpPath = dPath_GetRoomPath(getPathId(), fopAcM_GetRoomNo(this));
     mSwbit = getSwbit();
@@ -314,7 +279,7 @@ int daObjIceBlk_c::Create() {
                 mColdEffEmitters[i] =
                     dComIfGp_particle_set(l_eff_id[i], &current.pos, &home.angle, &scale, 0xFF,
                                           NULL, -1, NULL, NULL, NULL);
-#ifdef DEBUG
+#if DEBUG
                 if (mColdEffEmitters[i] == NULL) {
                     // "Ice Block: Cold Effect set failed\n"
                     OS_REPORT("氷ブロック：冷気エフェクトセット失敗\n");
@@ -333,13 +298,12 @@ int daObjIceBlk_c::Create() {
     return 1;
 }
 
-/* 80C22618-80C227F4 0009B8 01DC+00 1/0 0/0 0/0 .text            CreateHeap__13daObjIceBlk_cFv */
 int daObjIceBlk_c::CreateHeap() {
     static const int l_bmd[] = {5, 8};
 
     if (getSwbit2() != 0xFF && !fopAcM_isSwitch(this, getSwbit2())) {
         J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[0]);
-        JUT_ASSERT(0, modelData != 0);
+        JUT_ASSERT(0, modelData != NULL);
 
         mpIceModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
         if (mpIceModel == NULL) {
@@ -360,10 +324,10 @@ int daObjIceBlk_c::CreateHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[1]);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     J3DModelData* shareModelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmd[0]);
-    JUT_ASSERT(0, shareModelData != 0);
+    JUT_ASSERT(0, shareModelData != NULL);
 
     mDoExt_setupShareTexture(modelData, shareModelData);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -376,7 +340,6 @@ int daObjIceBlk_c::CreateHeap() {
     return 1;
 }
 
-/* 80C227F4-80C228B4 000B94 00C0+00 1/1 0/0 0/0 .text            create1st__13daObjIceBlk_cFv */
 int daObjIceBlk_c::create1st() {
     int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
@@ -394,8 +357,6 @@ int daObjIceBlk_c::create1st() {
     return phase;
 }
 
-/* 80C228B4-80C2294C 000C54 0098+00 1/0 0/0 0/0 .text            Execute__13daObjIceBlk_cFPPA3_A4_f
- */
 int daObjIceBlk_c::Execute(Mtx** param_0) {
     mode_proc_call();
     event_proc_call();
@@ -412,7 +373,6 @@ int daObjIceBlk_c::Execute(Mtx** param_0) {
     return 1;
 }
 
-/* 80C2294C-80C22B04 000CEC 01B8+00 1/1 0/0 0/0 .text            checkWalk__13daObjIceBlk_cFv */
 int daObjIceBlk_c::checkWalk() {
     int push_dir = -1;
 
@@ -456,18 +416,15 @@ int daObjIceBlk_c::checkWalk() {
     return push_dir;
 }
 
-/* 80C22B04-80C22B28 000EA4 0024+00 3/3 0/0 0/0 .text            clrCounter__13daObjIceBlk_cFv */
 void daObjIceBlk_c::clrCounter() {
     for (int i = 0; i < 4; i++) {
         mCounter[i] = 0;
     }
 }
 
-/* 80C22B28-80C22EF8 000EC8 03D0+00 1/1 0/0 0/0 .text            mode_proc_call__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::mode_proc_call() {
     typedef void (daObjIceBlk_c::*modeProc)(void);
-    static modeProc l_func[] = {&mode_proc_wait, &mode_proc_walk};
+    static modeProc l_func[] = {&daObjIceBlk_c::mode_proc_wait, &daObjIceBlk_c::mode_proc_walk};
 
     if (getSwbit2() != 0xFF && !fopAcM_isSwitch(this, getSwbit2())) {
         mCcCyl.OnAtSPrmBit(1);
@@ -530,8 +487,6 @@ void daObjIceBlk_c::mode_proc_call() {
     }
 }
 
-/* 80C22EF8-80C22F74 001298 007C+00 2/2 0/0 0/0 .text            mode_init_wait__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::mode_init_wait() {
     int current_pos = saveCurrentPos();
     if (current_pos - 1 == getCorrectPointNo()) {
@@ -552,8 +507,6 @@ void daObjIceBlk_c::mode_init_wait() {
     mMode = MODE_PROC_WAIT_e;
 }
 
-/* 80C22F74-80C23058 001314 00E4+00 1/0 0/0 0/0 .text            mode_proc_wait__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::mode_proc_wait() {
     int push_dir = checkWalk();
     if (push_dir != -1) {
@@ -571,16 +524,12 @@ void daObjIceBlk_c::mode_proc_wait() {
     dComIfG_Ccsp()->Set(&mCcCyl);
 }
 
-/* 80C23058-80C23088 0013F8 0030+00 1/1 0/0 0/0 .text            mode_init_walk__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::mode_init_walk() {
     fopAcM_SetGravity(this, -6.0f);
     mWalkInitPos = current.pos;
     mMode = MODE_PROC_WALK_e;
 }
 
-/* 80C23088-80C23388 001428 0300+00 1/0 0/0 0/0 .text            mode_proc_walk__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::mode_proc_walk() {
     if (mWalkType == WALK_PUSH) {
         cLib_addCalc(&speedF, 21.0f, 0.05f, 1.0f, 0.01f);
@@ -622,7 +571,6 @@ void daObjIceBlk_c::mode_proc_walk() {
     clrCounter();
 }
 
-/* 80C23388-80C2350C 001728 0184+00 1/1 0/0 0/0 .text            setEffect__13daObjIceBlk_cFv */
 void daObjIceBlk_c::setEffect() {
     static const u16 l_eff_break_b[] = {0x8679, 0x867A};
     static const u16 l_eff_break_id[] = {0x8ADF, 0x8AE0};
@@ -645,7 +593,6 @@ void daObjIceBlk_c::setEffect() {
     }
 }
 
-/* 80C2350C-80C236C8 0018AC 01BC+00 2/2 0/0 0/0 .text            checkWallPre__13daObjIceBlk_cFs */
 int daObjIceBlk_c::checkWallPre(s16 i_angle) {
     dBgS_ObjLinChk linchk;
     cXyz start;
@@ -655,7 +602,7 @@ int daObjIceBlk_c::checkWallPre(s16 i_angle) {
 
     int var_r29 = -1;
 
-    linchk.SetActorPid(base.id);
+    linchk.SetActorPid(base.base.id);
 
     mDoMtx_stack_c::YrotS(i_angle);
     mDoMtx_stack_c::multVec(&cXyz::BaseZ, &spBC);
@@ -684,14 +631,13 @@ int daObjIceBlk_c::checkWallPre(s16 i_angle) {
     return var_r29;
 }
 
-/* 80C236C8-80C237B0 001A68 00E8+00 2/2 0/0 0/0 .text            checkBgHit__13daObjIceBlk_cFv */
 int daObjIceBlk_c::checkBgHit() {
     cXyz check_pos;
-    mGroundY = -1000000000.0f;
+    mGroundY = -G_CM3D_F_INF;
 
     int var_r29 = -1;
 
-    mGndChk.SetActorPid(base.id);
+    mGndChk.SetActorPid(base.base.id);
 
     for (int i = 0; i < 5; i++) {
         static const Vec l_check_offsetXZ[] = {
@@ -713,7 +659,6 @@ int daObjIceBlk_c::checkBgHit() {
     return var_r29;
 }
 
-/* 80C237B0-80C23860 001B50 00B0+00 1/1 0/0 0/0 .text            bgCheck__13daObjIceBlk_cFv */
 void daObjIceBlk_c::bgCheck() {
     State_e prev_state = mState;
     mState = STATE_0_e;
@@ -740,7 +685,6 @@ void daObjIceBlk_c::bgCheck() {
     }
 }
 
-/* 80C23860-80C238B0 001C00 0050+00 1/1 0/0 0/0 .text            init_bgCheck__13daObjIceBlk_cFv */
 void daObjIceBlk_c::init_bgCheck() {
     if (checkBgHit() >= 0) {
         current.pos.y = mGroundY;
@@ -752,13 +696,12 @@ void daObjIceBlk_c::init_bgCheck() {
     }
 }
 
-/* 80C238B0-80C23A08 001C50 0158+00 1/1 0/0 0/0 .text            checkFall__13daObjIceBlk_cFv */
 BOOL daObjIceBlk_c::checkFall() {
     cXyz start;
     cXyz end;
 
     dBgS_ObjLinChk linchk;
-    linchk.SetActorPid(base.id);
+    linchk.SetActorPid(base.base.id);
 
     for (int i = 0; i < 5; i++) {
         static const Vec l_check_offsetXZ[] = {
@@ -785,16 +728,13 @@ BOOL daObjIceBlk_c::checkFall() {
     return true;
 }
 
-/* 80C23A50-80C23B0C 001DF0 00BC+00 1/1 0/0 0/0 .text            event_proc_call__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::event_proc_call() {
     typedef void (daObjIceBlk_c::*actionFunc)(void);
-    static actionFunc l_func[] = {&actionWait, &actionOrderEvent, &actionEvent, &actionDead};
+    static actionFunc l_func[] = {&daObjIceBlk_c::actionWait, &daObjIceBlk_c::actionOrderEvent, &daObjIceBlk_c::actionEvent, &daObjIceBlk_c::actionDead};
 
     (this->*l_func[mAction])();
 }
 
-/* 80C23B0C-80C23B70 001EAC 0064+00 1/0 0/0 0/0 .text            actionWait__13daObjIceBlk_cFv */
 void daObjIceBlk_c::actionWait() {
     if (mMode == MODE_PROC_WALK_e && mWalkType == WALK_PUSH) {
         setAction(ACTION_ORDER_EVENT_e);
@@ -803,8 +743,6 @@ void daObjIceBlk_c::actionWait() {
     }
 }
 
-/* 80C23B70-80C23C1C 001F10 00AC+00 1/0 0/0 0/0 .text            actionOrderEvent__13daObjIceBlk_cFv
- */
 void daObjIceBlk_c::actionOrderEvent() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
 
@@ -820,7 +758,6 @@ void daObjIceBlk_c::actionOrderEvent() {
     }
 }
 
-/* 80C23C1C-80C23CA0 001FBC 0084+00 1/0 0/0 0/0 .text            actionEvent__13daObjIceBlk_cFv */
 void daObjIceBlk_c::actionEvent() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
 
@@ -832,10 +769,8 @@ void daObjIceBlk_c::actionEvent() {
     }
 }
 
-/* 80C23CA0-80C23CA4 002040 0004+00 1/0 0/0 0/0 .text            actionDead__13daObjIceBlk_cFv */
 void daObjIceBlk_c::actionDead() {}
 
-/* 80C23CA4-80C23DA8 002044 0104+00 1/0 0/0 0/0 .text            Draw__13daObjIceBlk_cFv */
 int daObjIceBlk_c::Draw() {
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
 
@@ -857,7 +792,6 @@ int daObjIceBlk_c::Draw() {
     return 1;
 }
 
-/* 80C23DA8-80C23E68 002148 00C0+00 1/0 0/0 0/0 .text            Delete__13daObjIceBlk_cFv */
 int daObjIceBlk_c::Delete() {
     for (int i = 0; i < 2; i++) {
         if (mColdEffEmitters[i] != NULL) {
@@ -876,37 +810,29 @@ int daObjIceBlk_c::Delete() {
     return 1;
 }
 
-/* 80C23E68-80C23FCC 002208 0164+00 1/0 0/0 0/0 .text daObjIceBlk_create1st__FP13daObjIceBlk_c */
 static int daObjIceBlk_create1st(daObjIceBlk_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjIceBlk_c);
+    fopAcM_ct(i_this, daObjIceBlk_c);
     return i_this->create1st();
 }
 
-/* 80C24210-80C24230 0025B0 0020+00 1/0 0/0 0/0 .text daObjIceBlk_MoveBGDelete__FP13daObjIceBlk_c
- */
 static int daObjIceBlk_MoveBGDelete(daObjIceBlk_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 80C24230-80C24250 0025D0 0020+00 1/0 0/0 0/0 .text daObjIceBlk_MoveBGExecute__FP13daObjIceBlk_c
- */
 static int daObjIceBlk_MoveBGExecute(daObjIceBlk_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 80C24250-80C2427C 0025F0 002C+00 1/0 0/0 0/0 .text daObjIceBlk_MoveBGDraw__FP13daObjIceBlk_c */
 static int daObjIceBlk_MoveBGDraw(daObjIceBlk_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 80C24584-80C245A4 -00001 0020+00 1/0 0/0 0/0 .data            daObjIceBlk_METHODS */
 static actor_method_class daObjIceBlk_METHODS = {
     (process_method_func)daObjIceBlk_create1st,     (process_method_func)daObjIceBlk_MoveBGDelete,
     (process_method_func)daObjIceBlk_MoveBGExecute, (process_method_func)NULL,
     (process_method_func)daObjIceBlk_MoveBGDraw,
 };
 
-/* 80C245A4-80C245D4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_IceBlock */
 extern actor_process_profile_definition g_profile_Obj_IceBlock = {
     fpcLy_CURRENT_e,         // mLayerID
     3,                       // mListID

@@ -20,7 +20,7 @@ class JUTConsole;
  * @ingroup jsystem-jkernel
  * 
  */
-class JKRThread : JKRDisposer {
+class JKRThread : public JKRDisposer {
 public:
     class TLoad {
     public:
@@ -80,7 +80,6 @@ public:
         mCurrentHeap = heap ? heap : JKRHeap::getCurrentHeap();
     }
 
-protected:
     void resume() { OSResumeThread(mThreadRecord); }
     BOOL sendMessage(OSMessage message) {
         return OSSendMessage(&mMessageQueue, message, OS_MESSAGE_NOBLOCK);

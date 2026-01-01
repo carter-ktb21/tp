@@ -87,7 +87,7 @@ m_Do/m_Do_lib.cpp:
 m_Do/m_Do_Reset.cpp:
 	.text       start:0x800155D8 end:0x800157FC
 	.rodata     start:0x80376638 end:0x80376648
-	.sbss       start:0x8044ADB8 end:0x8044ADD0
+	.sbss       start:0x8044ADB8 end:0x8044ADC0
 
 m_Do/m_Do_dvd_thread.cpp:
 	.text       start:0x800157FC end:0x8001659C
@@ -95,10 +95,12 @@ m_Do/m_Do_dvd_thread.cpp:
 	.rodata     start:0x80376648 end:0x80376898
 	.data       start:0x8039D608 end:0x8039D658
 	.bss        start:0x803D7A80 end:0x803D8E00
+	.sbss       start:0x8044ADC0 end:0x8044ADC8
 
 m_Do/m_Do_DVDError.cpp:
 	.text       start:0x8001659C end:0x8001672C
 	.bss        start:0x803D8E00 end:0x803D9D60
+	.sbss       start:0x8044ADC8 end:0x8044ADD0
 
 m_Do/m_Do_MemCard.cpp:
 	.text       start:0x8001672C end:0x80017498
@@ -278,7 +280,7 @@ f_pc/f_pc_layer.cpp:
 f_pc/f_pc_leaf.cpp:
 	.text       start:0x80021A00 end:0x80021B88
 	.data       start:0x8039DB48 end:0x8039DB60
-	.sbss       start:0x8044AE70 end:0x8044AE80
+	.sbss       start:0x8044AE70 end:0x8044AE78
 
 f_pc/f_pc_layer_iter.cpp:
 	.text       start:0x80021B88 end:0x80021CD4
@@ -298,6 +300,7 @@ f_pc/f_pc_load.cpp:
 f_pc/f_pc_manager.cpp:
 	.text       start:0x800220A0 end:0x80022428
 	.bss        start:0x803EEEF0 end:0x803EEF98
+	.sbss       start:0x8044AE78 end:0x8044AE80
 
 f_pc/f_pc_method.cpp:
 	.text       start:0x80022428 end:0x800224F0
@@ -439,7 +442,7 @@ d/d_demo.cpp:
 	.data       start:0x803A1A70 end:0x803A1D78
 	.bss        start:0x8041E788 end:0x8041E7B8
 	.sdata      start:0x8044A760 end:0x8044A768
-	.sbss       start:0x8044AF40 end:0x8044AF9C
+	.sbss       start:0x8044AF40 end:0x8044AF98
 	.sdata2     start:0x8044BEF0 end:0x8044BF30
 
 d/d_door_param2.cpp:
@@ -471,7 +474,7 @@ d/d_map_path_dmap.cpp:
 	.rodata     start:0x8037C100 end:0x8037C228
 	.data       start:0x803A1EE0 end:0x803A20D8
 	.sdata      start:0x8044A770 end:0x8044A780
-	.sbss       start:0x8044AF9C end:0x8044AFD0
+	.sbss       start:0x8044AF98 end:0x8044AFD0
 	.sdata2     start:0x8044BF68 end:0x8044C000
 
 d/d_event.cpp:
@@ -511,7 +514,7 @@ d/d_particle.cpp:
 	.rodata     start:0x8037C5B0 end:0x8037C620
 	.data       start:0x803A2468 end:0x803A2730
 	.bss        start:0x8041E850 end:0x8041EA10
-	.sbss       start:0x8044AFD0 end:0x8044B014
+	.sbss       start:0x8044AFD0 end:0x8044B010
 	.sdata2     start:0x8044C080 end:0x8044C138
 
 d/d_particle_name.cpp:
@@ -534,7 +537,7 @@ d/d_drawlist.cpp:
 	.data       start:0x803A2900 end:0x803A2FF8
 	.bss        start:0x8041EA10 end:0x8041EA78
 	.sdata      start:0x8044A788 end:0x8044A7A0
-	.sbss       start:0x8044B014 end:0x8044B020
+	.sbss       start:0x8044B010 end:0x8044B020
 	.sdata2     start:0x8044C148 end:0x8044C220
 	.sbss2      start:0x80450C88 end:0x80450C90
 
@@ -564,7 +567,7 @@ d/d_vib_pattern.cpp:
 
 d/d_vibration.cpp:
 	.text       start:0x8006F1A8 end:0x80070058
-	.sbss       start:0x8044B090 end:0x8044B0A0
+	.sbss       start:0x8044B090 end:0x8044B098
 	.sdata2     start:0x8044C760 end:0x8044C768
 
 d/d_attention.cpp:
@@ -574,6 +577,7 @@ d/d_attention.cpp:
 	.data       start:0x803A3D58 end:0x803A3DD0
 	.bss        start:0x8041EC40 end:0x8041EC60
 	.sdata      start:0x8044A7A0 end:0x8044A7C0
+	.sbss       start:0x8044B098 end:0x8044B0A0
 	.sdata2     start:0x8044C768 end:0x8044C7F8
 
 d/d_att_dist.cpp:
@@ -588,13 +592,14 @@ d/d_bg_plc.cpp:
 d/d_bg_s.cpp:
 	.text       start:0x80074134 end:0x80075EEC
 	.data       start:0x803A5768 end:0x803A57A0
-	.sbss       start:0x8044B0A0 end:0x8044B0B0
+	.sbss       start:0x8044B0A0 end:0x8044B0A8
 	.sdata2     start:0x8044C7F8 end:0x8044C800
 
 d/d_bg_s_acch.cpp:
 	.text       start:0x80075EEC end:0x800774DC
 	.data       start:0x803A57A0 end:0x803A57D0
 	.bss        start:0x8041EC60 end:0x8041ECC0
+	.sbss       start:0x8044B0A8 end:0x8044B0B0
 	.sdata2     start:0x8044C800 end:0x8044C828
 
 d/d_bg_s_chk.cpp:
@@ -765,7 +770,7 @@ d/actor/d_a_npc.cpp:
 	.rodata     start:0x8038C700 end:0x8038CA98
 	.data       start:0x803AD808 end:0x803ADCE0
 	.bss        start:0x8041F848 end:0x8041FAB8
-	.sbss       start:0x8044B118 end:0x8044B144
+	.sbss       start:0x8044B118 end:0x8044B138
 	.sdata2     start:0x8044D520 end:0x8044D600
 
 d/actor/d_a_npc_cd.cpp:
@@ -774,6 +779,7 @@ d/actor/d_a_npc_cd.cpp:
 	.rodata     start:0x8038CA98 end:0x8038D2D0
 	.data       start:0x803ADCE0 end:0x803B0320
 	.bss        start:0x8041FAB8 end:0x80422750
+	.sbss       start:0x8044B138 end:0x8044B140
 	.sdata2     start:0x8044D600 end:0x8044D628
 
 d/actor/d_a_npc_cd2.cpp:
@@ -782,7 +788,7 @@ d/actor/d_a_npc_cd2.cpp:
 	.rodata     start:0x8038D2D0 end:0x8038DE08
 	.data       start:0x803B0320 end:0x803B3F00
 	.bss        start:0x80422750 end:0x80426A38
-	.sbss       start:0x8044B144 end:0x8044B158
+	.sbss       start:0x8044B140 end:0x8044B150
 	.sdata2     start:0x8044D628 end:0x8044D698
 
 d/actor/d_a_obj_item.cpp:
@@ -791,6 +797,7 @@ d/actor/d_a_obj_item.cpp:
 	.rodata     start:0x8038DE08 end:0x8038DE18
 	.data       start:0x803B3F00 end:0x803B41D8
 	.sdata      start:0x8044A7E8 end:0x8044A7F0
+	.sbss       start:0x8044B150 end:0x8044B158
 	.sdata2     start:0x8044D698 end:0x8044D728
 
 d/d_insect.cpp:
@@ -873,7 +880,7 @@ d/d_select_icon.cpp:
 	.ctors      start:0x80375CE4 end:0x80375CE8
 	.data       start:0x803B5918 end:0x803B5928
 	.bss        start:0x80426B50 end:0x80426B60
-	.sbss       start:0x8044B190 end:0x8044B19C
+	.sbss       start:0x8044B190 end:0x8044B198
 	.sdata2     start:0x8044DBA8 end:0x8044DBC0
 
 d/d_shop_camera.cpp:
@@ -892,7 +899,7 @@ d/d_shop_system.cpp:
 	.rodata     start:0x8038EC90 end:0x8038ECA8
 	.data       start:0x803B59F8 end:0x803B5CB0
 	.sdata      start:0x8044A828 end:0x8044A840
-	.sbss       start:0x8044B19C end:0x8044B1A8
+	.sbss       start:0x8044B198 end:0x8044B1A8
 	.sdata2     start:0x8044DC38 end:0x8044DCB8
 
 d/d_gameover.cpp:
@@ -1160,7 +1167,7 @@ d/d_msg_unit.cpp:
 	.rodata     start:0x803937C8 end:0x803937E8
 	.data       start:0x803BAD30 end:0x803BAD40
 	.bss        start:0x8042A7F8 end:0x8042A808
-	.sbss       start:0x8044B210 end:0x8044B220
+	.sbss       start:0x8044B210 end:0x8044B218
 	.sdata2     start:0x8044EC68 end:0x8044EC80
 
 d/d_msg_scrn_3select.cpp:
@@ -1225,6 +1232,7 @@ d/d_msg_scrn_light.cpp:
 	.rodata     start:0x80393C18 end:0x80393C88
 	.data       start:0x803BB3D8 end:0x803BB3F0
 	.bss        start:0x8042A808 end:0x8042A868
+	.sbss       start:0x8044B218 end:0x8044B220
 	.sdata2     start:0x8044EE00 end:0x8044EE10
 
 d/d_msg_scrn_place.cpp:
@@ -1390,7 +1398,7 @@ SSystem/SComponent/c_API.cpp:
 
 SSystem/SComponent/c_malloc.cpp:
 	.text       start:0x80265650 end:0x802656BC
-	.sbss       start:0x8044B290 end:0x8044B2A0
+	.sbss       start:0x8044B290 end:0x8044B298
 
 SSystem/SComponent/c_API_controller_pad.cpp:
 	.text       start:0x802656BC end:0x802656F8
@@ -1410,6 +1418,7 @@ SSystem/SComponent/c_cc_s.cpp:
 	.text       start:0x80266E9C end:0x8026824C
 	.data       start:0x803BD888 end:0x803BD8B8
 	.bss        start:0x8042AE00 end:0x8042AE18
+	.sbss       start:0x8044B298 end:0x8044B2A0
 	.sdata2     start:0x8044F158 end:0x8044F190
 
 SSystem/SComponent/c_counter.cpp:
@@ -1818,7 +1827,7 @@ JSystem/JAudio2/JASProbe.cpp:
 JSystem/JAudio2/JASReport.cpp:
 	.text       start:0x80293394 end:0x80293490
 	.bss        start:0x8042B7A0 end:0x8042B7B8
-	.sbss       start:0x8044B360 end:0x8044B378
+	.sbss       start:0x8044B360 end:0x8044B370
 
 JSystem/JAudio2/JASCmdStack.cpp:
 	.text       start:0x80293490 end:0x80293658
@@ -1831,6 +1840,7 @@ JSystem/JAudio2/JASTrack.cpp:
 	.rodata     start:0x80395138 end:0x80395180
 	.data       start:0x803BFCA8 end:0x803BFCD0
 	.bss        start:0x8042B7E8 end:0x8042BC58
+	.sbss       start:0x8044B370 end:0x8044B378
 	.sdata2     start:0x8044F6C0 end:0x8044F6F8
 
 JSystem/JAudio2/JASTrackPort.cpp:
@@ -1989,7 +1999,7 @@ JSystem/JAudio2/dsptask.cpp:
 	.text       start:0x802A0B20 end:0x802A0E40
 	.data       start:0x803C1A60 end:0x803C3960
 	.bss        start:0x8042C0C0 end:0x8042E1A0
-	.sbss       start:0x8044B440 end:0x8044B44C
+	.sbss       start:0x8044B440 end:0x8044B448
 
 JSystem/JAudio2/osdsp.cpp:
 	.text       start:0x802A0E40 end:0x802A0F60
@@ -1998,7 +2008,7 @@ JSystem/JAudio2/osdsp.cpp:
 JSystem/JAudio2/osdsp_task.cpp:
 	.text       start:0x802A0F60 end:0x802A13EC
 	.bss        start:0x8042E1A0 end:0x8042E1B8
-	.sbss       start:0x8044B44C end:0x8044B474
+	.sbss       start:0x8044B448 end:0x8044B450
 
 JSystem/JAudio2/JAIAudible.cpp:
 	.text       start:0x802A13EC end:0x802A1434
@@ -2018,12 +2028,14 @@ JSystem/JAudio2/JAISeMgr.cpp:
 	.rodata     start:0x80395A58 end:0x80395A70
 	.data       start:0x803C39F0 end:0x803C3A18
 	.bss        start:0x8042E1B8 end:0x8042E1D8
+	.sbss       start:0x8044B450 end:0x8044B458
 	.sdata2     start:0x8044F8A8 end:0x8044F8B8
 
 JSystem/JAudio2/JAISeq.cpp:
 	.text       start:0x802A2EAC end:0x802A3BB4
 	.data       start:0x803C3A18 end:0x803C3A68
 	.bss        start:0x8042E1D8 end:0x8042E200
+	.sbss       start:0x8044B458 end:0x8044B460
 	.sdata2     start:0x8044F8B8 end:0x8044F8C8
 
 JSystem/JAudio2/JAISeqDataMgr.cpp:
@@ -2034,6 +2046,7 @@ JSystem/JAudio2/JAISeqMgr.cpp:
 	.text       start:0x802A3C44 end:0x802A45C4
 	.data       start:0x803C3A98 end:0x803C3AB0
 	.bss        start:0x8042E200 end:0x8042E220
+	.sbss       start:0x8044B460 end:0x8044B468
 	.sdata2     start:0x8044F8C8 end:0x8044F8D8
 
 JSystem/JAudio2/JAISound.cpp:
@@ -2074,6 +2087,7 @@ JSystem/JAudio2/JAIStreamDataMgr.cpp:
 JSystem/JAudio2/JAIStreamMgr.cpp:
 	.text       start:0x802A5FA8 end:0x802A6684
 	.bss        start:0x8042E230 end:0x8042E250
+	.sbss       start:0x8044B468 end:0x8044B470
 	.sdata2     start:0x8044F920 end:0x8044F930
 
 JSystem/JAudio2/JAUAudioArcInterpreter.cpp:
@@ -2141,12 +2155,12 @@ JSystem/JMessage/locale.cpp:
 
 Z2AudioLib/Z2Calc.cpp:
 	.text       start:0x802ABACC end:0x802ABE74
-	.sbss       start:0x8044B474 end:0x8044B478
+	.sbss       start:0x8044B470 end:0x8044B478
 	.sdata2     start:0x8044F940 end:0x8044F958
 
 Z2AudioLib/Z2Param.cpp:
 	.sdata      start:0x8044A918 end:0x8044A9B0
-	.sbss       start:0x8044B478 end:0x8044B490
+	.sbss       start:0x8044B478 end:0x8044B488
 
 Z2AudioLib/Z2AudioArcLoader.cpp:
 	.text       start:0x802ABE74 end:0x802AC008
@@ -2166,6 +2180,7 @@ Z2AudioLib/Z2SoundStarter.cpp:
 Z2AudioLib/Z2SoundHandles.cpp:
 	.text       start:0x802AD4BC end:0x802ADA8C
 	.bss        start:0x8042E2F8 end:0x8042E318
+	.sbss       start:0x8044B488 end:0x8044B490
 
 Z2AudioLib/Z2SeMgr.cpp:
 	.text       start:0x802ADA8C end:0x802B12E0
@@ -2207,7 +2222,7 @@ Z2AudioLib/Z2Audience.cpp:
 	.rodata     start:0x80396380 end:0x80396390
 	.data       start:0x803C4DD8 end:0x803C4E10
 	.bss        start:0x8042E318 end:0x8042E338
-	.sbss       start:0x8044B490 end:0x8044B4A0
+	.sbss       start:0x8044B490 end:0x8044B498
 	.sdata2     start:0x8044FBC0 end:0x8044FC58
 
 Z2AudioLib/Z2SoundObject.cpp:
@@ -2227,6 +2242,7 @@ Z2AudioLib/Z2Creature.cpp:
 	.text       start:0x802C2864 end:0x802C56B8
 	.ctors      start:0x80375DC4 end:0x80375DC8
 	.data       start:0x803C5370 end:0x803C5A30
+	.sbss       start:0x8044B498 end:0x8044B4A0
 	.sdata2     start:0x8044FCF8 end:0x8044FDB8
 
 Z2AudioLib/Z2LinkMgr.cpp:
@@ -2500,7 +2516,7 @@ JSystem/JUtility/JUTException.cpp:
 	.rodata     start:0x803975F0 end:0x80397B00
 	.data       start:0x803C6760 end:0x803C67F8
 	.bss        start:0x8042E6B8 end:0x8042E9B0
-	.sdata      start:0x8044AA30 end:0x8044AA40
+	.sdata      start:0x8044AA30 end:0x8044AA34
 	.sbss       start:0x8044B648 end:0x8044B668
 	.sdata2     start:0x80450170 end:0x80450180
 
@@ -2514,6 +2530,7 @@ JSystem/JUtility/JUTDirectPrint.cpp:
 JSystem/JUtility/JUTAssert.cpp:
 	.text       start:0x802E6DF8 end:0x802E70F0
 	.bss        start:0x8042E9B0 end:0x8042EAF0
+	.sdata      start:0x8044AA38 end:0x8044AA40
 	.sbss       start:0x8044B670 end:0x8044B678
 	.sdata2     start:0x804501D8 end:0x804501F0
 
@@ -2938,7 +2955,7 @@ dolphin/os/OSThread.c:
 	.data       start:0x803CA978 end:0x803CB188
 	.bss        start:0x80445CB8 end:0x804466B0
 	.sdata      start:0x8044AAF8 end:0x8044AB00
-	.sbss       start:0x8044B800 end:0x8044B818
+	.sbss       start:0x8044B800 end:0x8044B810
 
 dolphin/os/OSTime.c:
 	.text       start:0x80344B98 end:0x80345014
@@ -2946,6 +2963,10 @@ dolphin/os/OSTime.c:
 
 dolphin/os/__ppc_eabi_init.cpp:
 	.text       start:0x80345014 end:0x803450A8
+
+dolphin/os/__start.c:
+	.init       start:0x80003100 end:0x80003458
+	.sbss       start:0x8044B810 end:0x8044B818
 
 dolphin/exi/EXIBios.c:
 	.text       start:0x803450A8 end:0x80346A84
@@ -3514,9 +3535,6 @@ TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Portable/notify.c:
 TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Processor/ppc/Generic/flush_cache.c:
 	.text       start:0x803719E4 end:0x80371A1C
 
-dolphin/os/__start.c:
-	.init       start:0x80003100 end:0x80003458
-
 PowerPC_EABI_Support/Runtime/Src/__mem.c:
 	.init       start:0x80003458 end:0x80003590
 
@@ -3554,13 +3572,14 @@ TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Os/dolphin/dolphin_trk_glue.c:
 	.text       start:0x80374084 end:0x803745DC
 	.rodata     start:0x8039CD68 end:0x8039CE70
 	.data       start:0x803CD3E8 end:0x803CD410
-	.bss        start:0x80449960 end:0x80449970
+	.bss        start:0x80449960 end:0x80449968
 
 TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Os/dolphin/targcont.c:
 	.text       start:0x803745DC end:0x80374610
 
 TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Os/dolphin/target_options.c:
 	.text       start:0x80374610 end:0x8037462C
+	.bss        start:0x80449968 end:0x80449970
 
 TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Export/mslsupp.c:
 	.text       start:0x8037462C end:0x803747A4

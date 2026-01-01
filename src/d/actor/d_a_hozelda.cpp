@@ -2,26 +2,28 @@
 // Translation Unit: d_a_hozelda
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_hozelda.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_horse.h"
 #include "d/actor/d_a_b_gnd.h"
 #include "d/actor/d_a_arrow.h"
 
-struct daHoZelda_hio_c1 {
-    /* 0x0 */ s16 bow_search_y_angle;
-    /* 0x2 */ s16 bow_start_angle;
-    /* 0x4 */ s16 bow_end_angle;
-    /* 0x8 */ f32 bow_start_distance;
-    /* 0xC */ f32 bow_end_distance;
-};
+static const char l_arcName[] = "HoZelda";
 
-struct daHoZelda_hio_c0 {
-    static daHoZelda_hio_c1 const m;
-};
+#if DEBUG
+void daHoZelda_hio_c::genMessage(JORMContext* context) {
+    context->genSlider("弓サーチＹ角度", &m.bow_search_y_angle, 0, 0x7fff, 0, NULL, -1, -1, 0x200, 0x18);
+    context->genSlider("弓開始角度", &m.bow_start_angle, 0, 0x7fff, 0, NULL, -1, -1, 0x200, 0x18);
+    context->genSlider("弓開始距離", &m.bow_start_distance, 0.0f, 10000.0f, 0, NULL, -1, -1, 0x200, 0x18);
+    context->genSlider("弓終了角度", &m.bow_end_angle, 0, 0x7fff, 0, NULL, -1, -1, 0x200, 0x18);
+    context->genSlider("弓終了距離", &m.bow_end_distance, 0.0f, 10000.0f, 0, NULL, -1, -1, 0x200, 0x18);
+}
+#endif
 
-/* 80845E98-80845EAC 000078 0014+00 1/1 0/0 0/0 .text daHoZelda_searchGanon__FP10fopAc_ac_cPv */
 static void* daHoZelda_searchGanon(fopAc_ac_c* i_actor, void* i_data) {
+    (void)i_data;
     if (fopAcM_GetName(i_actor) == PROC_B_GND) {
         return i_actor;
     }
@@ -29,22 +31,18 @@ static void* daHoZelda_searchGanon(fopAc_ac_c* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 80848E3C-80848E44 000000 0008+00 15/15 0/0 0/0 .rodata          l_arcName */
-static char const l_arcName[8] = "HoZelda";
-
-/* 80848E44-80848E54 000008 0010+00 0/5 0/0 0/0 .rodata          m__16daHoZelda_hio_c0 */
 const daHoZelda_hio_c1 daHoZelda_hio_c0::m = {
     0x38E,
     0x2AAA,
     0x4000,
+    0,
     3500.0f,
     4000.0f,
 };
 
-bool daHoZelda_matAnm_c::mEyeMoveFlg;
+u8 daHoZelda_matAnm_c::mEyeMoveFlg;
 u8 daHoZelda_matAnm_c::mMorfFrame;
 
-/* 80845EAC-80845EDC 00008C 0030+00 2/2 0/0 0/0 .text            init__18daHoZelda_matAnm_cFv */
 void daHoZelda_matAnm_c::init() {
     field_0xf4 = 0.0f;
     field_0xf8 = 0.0f;
@@ -55,98 +53,90 @@ void daHoZelda_matAnm_c::init() {
     mMorfFrame = 0;
 }
 
-/* 80845EDC-80846000 0000BC 0124+00 1/0 0/0 0/0 .text calc__18daHoZelda_matAnm_cCFP11J3DMaterial
- */
 void daHoZelda_matAnm_c::calc(J3DMaterial* i_material) const {
     J3DMaterialAnm::calc(i_material);
 
     for (u32 i = 0; i < 8; i++) {
         if (getTexMtxAnm(i).getAnmFlag()) {
-            J3DTexMtxInfo& texmtx = i_material->getTexGenBlock()->getTexMtx(i)->getTexMtxInfo();
+            J3DTextureSRTInfo& texmtx = i_material->getTexGenBlock()->getTexMtx(i)->getTexMtxInfo().mSRT;
             
             if (mMorfFrame != 0) {
                 f32 var_f31 = 1.0f / (mMorfFrame + 1);
-                texmtx.mSRT.mTranslationX = field_0xf4 * (1.0f - var_f31) + texmtx.mSRT.mTranslationX * var_f31;
-                texmtx.mSRT.mTranslationY = field_0xf8 * (1.0f - var_f31) + texmtx.mSRT.mTranslationY * var_f31;
+                texmtx.mTranslationX = field_0xf4 * (1.0f - var_f31) + texmtx.mTranslationX * var_f31;
+                texmtx.mTranslationY = field_0xf8 * (1.0f - var_f31) + texmtx.mTranslationY * var_f31;
             } else if (mEyeMoveFlg) {
-                texmtx.mSRT.mTranslationX = mNowOffsetX;
-                texmtx.mSRT.mTranslationY = mNowOffsetY;
+                texmtx.mTranslationX = mNowOffsetX;
+                texmtx.mTranslationY = mNowOffsetY;
             }
 
-            const_cast<f32&>(field_0xf4) = texmtx.mSRT.mTranslationX;
-            const_cast<f32&>(field_0xf8) = texmtx.mSRT.mTranslationY;
+            const_cast<f32&>(field_0xf4) = texmtx.mTranslationX;
+            const_cast<f32&>(field_0xf8) = texmtx.mTranslationY;
         }
     }
 }
 
-/* 80846000-8084642C 0001E0 042C+00 1/1 0/0 0/0 .text            createHeap__11daHoZelda_cFv */
-// NONMATCHING
-int daHoZelda_c::createHeap() {
+BOOL daHoZelda_c::createHeap() {
     mpZeldaModel = mDoExt_J3DModel__create((J3DModelData*)dComIfG_getObjectRes(l_arcName, 0x23), 0, 0x11020284);
     if (mpZeldaModel == NULL) {
-        return 0;
+        return FALSE;
     }
 
     for (int i = 0; i < 2; i++) {
         mpMatAnm[i] = new daHoZelda_matAnm_c();
         if (mpMatAnm[i] == NULL) {
-            return 0;
+            return FALSE;
         }
     }
 
     J3DTransformInfo* transinfo_buf = new J3DTransformInfo[47];
     if (transinfo_buf == NULL) {
-        return 0;
+        return FALSE;
     }
 
     Quaternion* quat_buf = new Quaternion[47];
     if (quat_buf == NULL) {
-        return 0;
+        return FALSE;
     }
 
     field_0x5c4 = new mDoExt_MtxCalcOldFrame(transinfo_buf, quat_buf);
     if (field_0x5c4 == NULL) {
-        return 0;
+        return FALSE;
     }
 
     field_0x5a8 = new mDoExt_MtxCalcAnmBlendTblOld(field_0x5c4, 3, mAnmRatioPack);
     if (field_0x5a8 == NULL) {
-        return 0;
+        return FALSE;
     }
 
-    void* res = dComIfG_getObjectRes(l_arcName, 0x2F);
-    if (!mEyeBtp.init(mpZeldaModel->getModelData(), (J3DAnmTexPattern*)res, 1, 2, 1.0f, 0, -1)) {
-        return 0;
+    if (!mEyeBtp.init(mpZeldaModel->getModelData(), (J3DAnmTexPattern*)dComIfG_getObjectRes(l_arcName, 0x2F), 1, 2, 1.0f, 0, -1)) {
+        return FALSE;
     }
 
-    res = dComIfG_getObjectRes(l_arcName, 0x26);
-    if (!mEyeBtk.init(mpZeldaModel->getModelData(), (J3DAnmTextureSRTKey*)res, 1, 0, 1.0f, 0, -1)) {
-        return 0;
+    if (!mEyeBtk.init(mpZeldaModel->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(l_arcName, 0x26), 1, 0, 1.0f, 0, -1)) {
+        return FALSE;
     }
 
     mpBowModel = mDoExt_J3DModel__create((J3DModelData*)dComIfG_getObjectRes(l_arcName, 0x20), 0x80000, 0x11000084);
     if (mpBowModel == NULL) {
-        return 0;
+        return FALSE;
     }
 
     if (!mBowBck.init((J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, 0xC), 1, 0, 1.0f, 0, -1, false)) {
-        return 0;
+        return FALSE;
     }
 
-    mpHIO = new daHoZelda_hio_c();
+    mpHIO = new HOZELDA_HIO_CLASS();
     if (mpHIO == NULL) {
-        return 0;
+        return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
-/* 808466F8-80846718 0008D8 0020+00 1/1 0/0 0/0 .text daHoZelda_createHeap__FP10fopAc_ac_c */
 static int daHoZelda_createHeap(fopAc_ac_c* i_this) {
     return ((daHoZelda_c*)i_this)->createHeap();
 }
 
-/* 80846718-8084696C 0008F8 0254+00 1/1 0/0 0/0 .text            modelCallBack__11daHoZelda_cFUs */
 void daHoZelda_c::modelCallBack(u16 i_jntNo) {
     if (i_jntNo == 0) {
         J3DTransformInfo sp24 = *field_0x5c4->getOldFrameTransInfo(0);
@@ -193,8 +183,8 @@ void daHoZelda_c::modelCallBack(u16 i_jntNo) {
     }
 }
 
-/* 8084696C-808469B0 000B4C 0044+00 1/1 0/0 0/0 .text daHoZelda_modelCallBack__FP8J3DJointi */
-static int daHoZelda_modelCallBack(J3DJoint* i_joint, int param_1) {
+static int daHoZelda_modelCallBack(J3DJoint* i_joint2, int param_1) {
+    J3DJoint* i_joint = i_joint2;
     u16 jnt_no = i_joint->getJntNo();
     daHoZelda_c* hozelda = (daHoZelda_c*)j3dSys.getModel()->getUserArea();
     
@@ -205,9 +195,8 @@ static int daHoZelda_modelCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 808469B0-80846C4C 000B90 029C+00 1/1 0/0 0/0 .text            create__11daHoZelda_cFv */
 int daHoZelda_c::create() {
-    fopAcM_SetupActor(this, daHoZelda_c);
+    fopAcM_ct(this, daHoZelda_c);
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -224,7 +213,7 @@ int daHoZelda_c::create() {
         J3DModelData* modelData = mpZeldaModel->getModelData();
 
         modelData->getJointNodePointer(0)->setMtxCalc(field_0x5a8);
-        mpZeldaModel->setUserArea((u32)this);
+        mpZeldaModel->setUserArea((uintptr_t)this);
 
         modelData->getJointNodePointer(0)->setCallBack(daHoZelda_modelCallBack);
         modelData->getJointNodePointer(1)->setCallBack(daHoZelda_modelCallBack);
@@ -235,6 +224,10 @@ int daHoZelda_c::create() {
 
         mpMatAnm[0]->init();
         mpMatAnm[1]->init();
+
+#if DEBUG
+        mpHIO->mID = mDoHIO_createChild("馬上ゼルダ", mpHIO);
+#endif
 
         setSingleAnime(0x1C, 1.0f, 0.0f, -1, -1.0f);
         resetUpperAnime();
@@ -248,15 +241,18 @@ int daHoZelda_c::create() {
     return phase_state;
 }
 
-/* 80846D90-80846DB0 000F70 0020+00 1/0 0/0 0/0 .text            daHoZelda_Create__FP10fopAc_ac_c */
 static int daHoZelda_Create(fopAc_ac_c* i_this) {
     daHoZelda_c* a_this = (daHoZelda_c*)i_this;
     fpc_ProcID id = fopAcM_GetID(i_this);
     return a_this->create();
 }
 
-/* 80846DB0-80846F24 000F90 0174+00 1/1 0/0 0/0 .text            __dt__11daHoZelda_cFv */
 daHoZelda_c::~daHoZelda_c() {
+    #if DEBUG
+    if (mpHIO) {
+        mDoHIO_deleteChild(mpHIO->mID);
+    }
+#endif
     dComIfG_resDelete(&mPhase, l_arcName);
 
     daHorse_c* horse = dComIfGp_getHorseActor();
@@ -272,15 +268,12 @@ daHoZelda_c::~daHoZelda_c() {
     mSound.deleteObject();
 }
 
-/* 80846F24-80846F4C 001104 0028+00 1/0 0/0 0/0 .text            daHoZelda_Delete__FP11daHoZelda_c
- */
 static int daHoZelda_Delete(daHoZelda_c* i_this) {
     fpc_ProcID id = fopAcM_GetID(i_this);
     i_this->~daHoZelda_c();
     return 1;
 }
 
-/* 80846F4C-8084718C 00112C 0240+00 1/1 0/0 0/0 .text setDoubleAnime__11daHoZelda_cFfffUsUsf */
 int daHoZelda_c::setDoubleAnime(f32 i_ratio, f32 i_anmSpeedA, f32 i_anmSpeedB, u16 i_anmIdxA, u16 i_anmIdxB,
                                 f32 i_morf) {
     J3DAnmTransform* var_r27 = mAnmRatioPack[0].getAnmTransform();
@@ -321,7 +314,6 @@ int daHoZelda_c::setDoubleAnime(f32 i_ratio, f32 i_anmSpeedA, f32 i_anmSpeedB, u
     return 1;
 }
 
-/* 8084718C-80847234 00136C 00A8+00 1/1 0/0 0/0 .text            setUpperAnime__11daHoZelda_cFUs */
 int daHoZelda_c::setUpperAnime(u16 i_anmNo) {
     J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, i_anmNo);
     mUpperAnmID = i_anmNo;
@@ -333,7 +325,6 @@ int daHoZelda_c::setUpperAnime(u16 i_anmNo) {
     return 1;
 }
 
-/* 80847234-808472C0 001414 008C+00 3/3 0/0 0/0 .text            resetUpperAnime__11daHoZelda_cFv */
 void daHoZelda_c::resetUpperAnime() {
     if (mUpperAnmID != 0xFFFF) {
         mUpperAnmID = 0xFFFF;
@@ -350,7 +341,6 @@ void daHoZelda_c::resetUpperAnime() {
     }
 }
 
-/* 808472C0-80847430 0014A0 0170+00 2/2 0/0 0/0 .text setSingleAnime__11daHoZelda_cFUsffsf */
 int daHoZelda_c::setSingleAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_endF, f32 i_morf) {
     J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, i_anmIdx);
 
@@ -386,7 +376,6 @@ int daHoZelda_c::setSingleAnime(u16 i_anmIdx, f32 i_speed, f32 i_startF, s16 i_e
     return 1;
 }
 
-/* 80847430-80847574 001610 0144+00 1/1 0/0 0/0 .text            animePlay__11daHoZelda_cFv */
 void daHoZelda_c::animePlay() {
     mFrameCtrl[0].updateFrame();
     mAnmRatioPack[0].getAnmTransform()->setFrame(mFrameCtrl[0].getFrame());
@@ -419,26 +408,22 @@ void daHoZelda_c::animePlay() {
     mBowBck.play();
 }
 
-/* 80847574-808475F0 001754 007C+00 2/2 0/0 0/0 .text            setEyeBtp__11daHoZelda_cFUs */
 void daHoZelda_c::setEyeBtp(u16 i_resNo) {
-    void* btp = dComIfG_getObjectRes(l_arcName, i_resNo);
-    mEyeBtp.init(mpZeldaModel->getModelData(), (J3DAnmTexPattern*)btp, 1, -1, 1.0f, 0, -1);
+    mEyeBtp.init(mpZeldaModel->getModelData(),
+                 (J3DAnmTexPattern*)dComIfG_getObjectRes(l_arcName, i_resNo), 1, -1, 1.0f, 0, -1);
 }
 
-/* 808475F0-80847670 0017D0 0080+00 2/2 0/0 0/0 .text            setEyeBtk__11daHoZelda_cFUsUc */
 void daHoZelda_c::setEyeBtk(u16 i_resNo, u8 param_1) {
     field_0x6de = param_1;
     void* btk = dComIfG_getObjectRes(l_arcName, i_resNo);
     mEyeBtk.init(mpZeldaModel->getModelData(), (J3DAnmTextureSRTKey*)btk, 1, -1, 1.0f, 0, -1);
 }
 
-/* 80847670-808476B0 001850 0040+00 2/2 0/0 0/0 .text            setNormalFace__11daHoZelda_cFv */
 void daHoZelda_c::setNormalFace() {
     setEyeBtp(0x2F);
     setEyeBtk(0x26, 0);
 }
 
-/* 808476B0-80847E44 001890 0794+00 1/1 0/0 0/0 .text            setAnm__11daHoZelda_cFv */
 void daHoZelda_c::setAnm() {
     u16 anm_idx[3];
     daHorse_c* horse = (daHorse_c*)dComIfGp_getHorseActor();
@@ -488,7 +473,7 @@ void daHoZelda_c::setAnm() {
         }
 
         if (anm_idx[0] == 0xE && field_0x6da == 0 && !mDamageInit && field_0x6dd == 0 && player->checkHorseRide() && ganondorf != NULL && ganondorf->checkPiyo() != 1 &&
-            ((gnd_seen_angleY < daHoZelda_hio_c0::m.bow_start_angle && gnd_lockon) || (mBowMode != 0 && gnd_seen_angleY < daHoZelda_hio_c0::m.bow_end_angle && (gnd_lockon || mArrowAcKeep.getActor() != NULL))))
+            ((gnd_seen_angleY < mpHIO->m.bow_start_angle && gnd_lockon) || (mBowMode != 0 && gnd_seen_angleY < mpHIO->m.bow_end_angle && (gnd_lockon || mArrowAcKeep.getActor() != NULL))))
         {
             mBowMode = 1;
         } else {
@@ -632,7 +617,6 @@ void daHoZelda_c::setAnm() {
     }
 }
 
-/* 80847E44-80847F54 002024 0110+00 2/2 0/0 0/0 .text            setBowModel__11daHoZelda_cFv */
 void daHoZelda_c::setBowModel() {
     static const Vec localEyePos = {8.0f, -12.0f, 0.0f};
     static const Vec localHeadCenterPos = {8.0f, 0.0f, 0.0f};
@@ -650,7 +634,6 @@ void daHoZelda_c::setBowModel() {
     mpBowModel->calc();
 }
 
-/* 80847F54-80848058 002134 0104+00 2/2 0/0 0/0 .text            setMatrix__11daHoZelda_cFv */
 void daHoZelda_c::setMatrix() {
     static const Vec localHorseRidePos = {-5.894f, 52.61f, 4.079f};
     static const Vec localFrontHorseRidePos = {-75.893997f, 57.61f, 4.079f};
@@ -677,7 +660,6 @@ void daHoZelda_c::setMatrix() {
     mpZeldaModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80848058-80848090 002238 0038+00 1/1 0/0 0/0 .text            shootArrow__11daHoZelda_cFv */
 void daHoZelda_c::shootArrow() {
     daArrow_c* arrow = (daArrow_c*)mArrowAcKeep.getActor();
     if (arrow != NULL) {
@@ -686,7 +668,6 @@ void daHoZelda_c::shootArrow() {
     }
 }
 
-/* 80848090-80848118 002270 0088+00 1/1 0/0 0/0 .text            deleteArrow__11daHoZelda_cFv */
 void daHoZelda_c::deleteArrow() {
     daArrow_c* arrow = (daArrow_c*)mArrowAcKeep.getActor();
     if (arrow != NULL) {
@@ -703,13 +684,11 @@ void daHoZelda_c::deleteArrow() {
     }
 }
 
-/* 80848118-8084819C 0022F8 0084+00 2/2 0/0 0/0 .text            setBowBck__11daHoZelda_cFUs */
 void daHoZelda_c::setBowBck(u16 i_anmNo) {
     mBowBck.init((J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, i_anmNo), 1, -1, 1.0f, 0, -1, 1);
     mBowAnmID = i_anmNo;
 }
 
-/* 8084819C-80848204 00237C 0068+00 2/2 0/0 0/0 .text            setRideOffset__11daHoZelda_cFv */
 void daHoZelda_c::setRideOffset() {
     static const Vec baseRidePos = {0.1f, 236.7f, -63.554f};
     static const Vec frontRidePos = {0.1f, 241.7f, 6.445999f};
@@ -721,7 +700,6 @@ void daHoZelda_c::setRideOffset() {
     }
 }
 
-/* 80848204-80848254 0023E4 0050+00 2/2 0/0 0/0 .text            clearEyeMove__11daHoZelda_cFv */
 void daHoZelda_c::clearEyeMove() {
     mpMatAnm[0]->setNowOffsetX(0.0f);
     mpMatAnm[1]->setNowOffsetX(0.0f);
@@ -734,8 +712,6 @@ void daHoZelda_c::clearEyeMove() {
     }
 }
 
-/* 80848254-808484B8 002434 0264+00 1/1 0/0 0/0 .text            setEyeMove__11daHoZelda_cFPC4cXyzss
- */
 void daHoZelda_c::setEyeMove(cXyz const* param_0, s16 param_1, s16 param_2) {
     f32 var_f30;
     f32 var_f31;
@@ -800,7 +776,6 @@ void daHoZelda_c::setEyeMove(cXyz const* param_0, s16 param_1, s16 param_2) {
     }
 }
 
-/* 808484B8-80848774 002698 02BC+00 1/1 0/0 0/0 .text            setNeckAngle__11daHoZelda_cFv */
 void daHoZelda_c::setNeckAngle() {
     daPy_py_c* player = daPy_getLinkPlayerActorClass();
     cXyz* var_r28 = NULL;
@@ -850,8 +825,8 @@ void daHoZelda_c::setNeckAngle() {
         angle_x_target = var_r27;
         angle_y_target = var_r26;
 
-        var_r27 += (spA - spE);
-        var_r26 += (sp8 - spC);
+        var_r27 += (s16)(spA - spE);
+        var_r26 += (s16)(sp8 - spC);
     }
 
     daPy_addCalcShort(&mNeckAngle.x, angle_x_target, 3, 0x1000, 0x100);
@@ -864,8 +839,6 @@ void daHoZelda_c::setNeckAngle() {
     }
 }
 
-/* 80848774-808489CC 002954 0258+00 1/1 0/0 0/0 .text            searchBodyAngle__11daHoZelda_cFv */
-// NONMATCHING - load order with cLib_minMaxLimit
 void daHoZelda_c::searchBodyAngle() {
     fopAc_ac_c* gnd_actor = mGndAcKeep.getActor();
     s16 angle_x_target = 0;
@@ -880,7 +853,9 @@ void daHoZelda_c::searchBodyAngle() {
 
         if (sp8.abs() >= 1.0f) {
             angle_x_target = cLib_minMaxLimit<s16>(sp8.atan2sY_XZ(), -0x800, 0x2000);
-            angle_y_target = cLib_minMaxLimit<s16>((s16)(sp8.atan2sX_Z() - shape_angle.y), -daHoZelda_hio_c0::m.bow_search_y_angle, daHoZelda_hio_c0::m.bow_search_y_angle);
+            angle_y_target =
+                cLib_minMaxLimit<s16>(sp8.atan2sX_Z() - shape_angle.y, -mpHIO->m.bow_search_y_angle,
+                                      (s16)mpHIO->m.bow_search_y_angle);
         }
     }
 
@@ -888,7 +863,6 @@ void daHoZelda_c::searchBodyAngle() {
     cLib_addCalcAngleS(&mBodyAngle.y, angle_y_target, 4, 0xC00, 0x180);
 }
 
-/* 808489CC-80848B44 002BAC 0178+00 1/1 0/0 0/0 .text            execute__11daHoZelda_cFv */
 int daHoZelda_c::execute() {
     mReverb = dComIfGp_getReverb(fopAcM_GetRoomNo(this));
 
@@ -929,13 +903,10 @@ int daHoZelda_c::execute() {
     return 1;
 }
 
-/* 80848B44-80848B64 002D24 0020+00 1/0 0/0 0/0 .text            daHoZelda_Execute__FP11daHoZelda_c
- */
 static int daHoZelda_Execute(daHoZelda_c* i_this) {
     return i_this->execute();
 }
 
-/* 80848B64-80848C68 002D44 0104+00 1/1 0/0 0/0 .text            draw__11daHoZelda_cFv */
 int daHoZelda_c::draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpZeldaModel, &tevStr);
@@ -955,12 +926,10 @@ int daHoZelda_c::draw() {
     return 1;
 }
 
-/* 80848C68-80848C88 002E48 0020+00 1/0 0/0 0/0 .text            daHoZelda_Draw__FP11daHoZelda_c */
 static int daHoZelda_Draw(daHoZelda_c* i_this) {
     return i_this->draw();
 }
 
-/* 80848F04-80848F24 -00001 0020+00 1/0 0/0 0/0 .data            l_daHoZelda_Method */
 static actor_method_class l_daHoZelda_Method = {
     (process_method_func)daHoZelda_Create,
     (process_method_func)daHoZelda_Delete,
@@ -969,7 +938,6 @@ static actor_method_class l_daHoZelda_Method = {
     (process_method_func)daHoZelda_Draw,
 };
 
-/* 80848F24-80848F54 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_HOZELDA */
 extern actor_process_profile_definition g_profile_HOZELDA = {
     fpcLy_CURRENT_e,        // mLayerID
     7,                      // mListID

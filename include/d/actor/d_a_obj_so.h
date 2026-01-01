@@ -9,7 +9,7 @@
 /**
  * @ingroup actors-objects
  * @class obj_so_class
- * @brief Monkey Cage
+ * @brief Monkey Cage (Saru Ori)
  *
  * @details
  *
@@ -86,11 +86,14 @@ public:
     /* 0x1BC4 */ u8 field_0x1bc4[0x1bcc - 0x1bc4];
     /* 0x1BCC */ u8 field_0x1bcc;
 
-    u8 partBreak() {
+    bool partBreak() {
         for (int i = 0; i < 8; i++) {
-            if (field_0x1a98[i] == 2) return 1;
+            if (field_0x1a98[i] == 2) {
+                return true;
+            }
         }
-        return 0;
+
+        return false;
     }
 };
 
@@ -98,8 +101,8 @@ STATIC_ASSERT(sizeof(obj_so_class) == 0x1bd0);
 
 class daObj_So_HIO_c : public JORReflexible {
 public:
-    /* 80CE03CC */ daObj_So_HIO_c();
-    /* 80CE3928 */ virtual ~daObj_So_HIO_c() {}
+    daObj_So_HIO_c();
+    virtual ~daObj_So_HIO_c() {}
 
     void genMessage(JORMContext*);
 

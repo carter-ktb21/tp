@@ -34,7 +34,7 @@ struct JPAChildShapeData {
     /* 0x44 */ u8 mStep;
     /* 0x45 */ u8 mTexIdx;
     /* 0x46 */ s16 mRotSpeed;
-};
+};  // Size: 0x48
 
 /**
  * @ingroup jsystem-jparticle
@@ -42,7 +42,7 @@ struct JPAChildShapeData {
  */
 class JPAChildShape {
 public:
-    /* 8027B038 */ JPAChildShape(u8 const*);
+    JPAChildShape(u8 const*);
 
     f32 getPosRndm() const { return mpData->mPosRndm; }
     f32 getBaseVel() const { return mpData->mBaseVel; }

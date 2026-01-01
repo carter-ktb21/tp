@@ -3,6 +3,7 @@
 
 #include "JSystem/J3DGraphBase/J3DTransform.h"
 #include "JSystem/J3DGraphBase/J3DSys.h"
+#include "JSystem/J3DGraphBase/J3DMaterial.h"
 
 class J3DAnmTransform;
 class J3DJoint;
@@ -15,20 +16,38 @@ class J3DMtxBuffer;
  */
 class J3DMtxCalc {
 public:
-    /* 80325D1C */ static void setMtxBuffer(J3DMtxBuffer*);
+    static void setMtxBuffer(J3DMtxBuffer*);
 
-    /* 8000D948 */ virtual ~J3DMtxCalc() {}
-    /* 80014E90 */ virtual void setAnmTransform(J3DAnmTransform*) {}
-    /* 80014E9C */ virtual J3DAnmTransform* getAnmTransform() { return NULL; }
-    /* 80014E8C */ virtual void setAnmTransform(u8, J3DAnmTransform*) {}
-    /* 80014E94 */ virtual J3DAnmTransform* getAnmTransform(u8) { return NULL; }
-    /* 80014EA4 */ virtual void setWeight(u8, f32) {}
-    /* 80014EA8 */ virtual f32 getWeight(u8) const { return 0.0f; }
+    virtual ~J3DMtxCalc() {}
+    virtual void setAnmTransform(J3DAnmTransform*) {
+        JUT_ASSERT_MSG(127, FALSE, "You cannot use this method");
+    }
+    virtual J3DAnmTransform* getAnmTransform() {
+        JUT_ASSERT_MSG(131, FALSE, "You cannot use this method");
+        return NULL;
+    }
+    virtual void setAnmTransform(u8, J3DAnmTransform*) {
+        JUT_ASSERT_MSG(137, FALSE, "You cannot use this method");
+    }
+    virtual J3DAnmTransform* getAnmTransform(u8) {
+        JUT_ASSERT_MSG(141, FALSE, "You cannot use this method");
+        return NULL;
+    }
+    virtual void setWeight(u8, f32) {
+        JUT_ASSERT_MSG(147, FALSE, "You cannot use this method");
+    }
+    virtual f32 getWeight(u8) const {
+        JUT_ASSERT_MSG(152, FALSE, "You cannot use this method");
+        return 0.0f;
+    }
     virtual void init(const Vec& param_0, const Mtx&) = 0;
     virtual void calc() = 0;
 
     static J3DMtxBuffer* getMtxBuffer() { return mMtxBuffer; }
-    static J3DJoint* getJoint() { return mJoint; }
+    static J3DJoint* getJoint() {
+        J3D_ASSERT_NULLPTR(185, mJoint != NULL)
+        return mJoint;
+    }
     static void setJoint(J3DJoint* joint) { mJoint = joint; }
 
     static J3DMtxBuffer* mMtxBuffer;
@@ -43,19 +62,29 @@ typedef int (*J3DJointCallBack)(J3DJoint*, int);
  */
 class J3DJoint {
 public:
-    /* 8032F13C */ void appendChild(J3DJoint*);
-    /* 8032F170 */ J3DJoint();
-    /* 8032F254 */ void entryIn();
-    /* 8032F3F8 */ void recursiveCalc();
+    void appendChild(J3DJoint*);
+    J3DJoint();
+    void entryIn();
+    void recursiveCalc();
+
+    u32 getType() const { return 'NJNT'; }
 
     J3DMaterial* getMesh() { return mMesh; }
+    void addMesh(J3DMaterial* pMesh) {
+        if (mMesh != NULL) {
+            pMesh->setNext(mMesh);
+        }
+
+        mMesh = pMesh;
+    }
+
     u16 getJntNo() const { return mJntNo; }
     u8 getScaleCompensate() const { return mScaleCompensate; }
     J3DJoint* getYounger() { return mYounger; }
     void setYounger(J3DJoint* pYounger) { mYounger = pYounger; }
     void setCurrentMtxCalc(J3DMtxCalc* pMtxCalc) { mCurrentMtxCalc = pMtxCalc; }
     J3DTransformInfo& getTransformInfo() { return mTransformInfo; }
-    void setTransformInfo(J3DTransformInfo& i_info) { mTransformInfo = i_info; }
+    void setTransformInfo(const J3DTransformInfo& i_info) { mTransformInfo = i_info; }
     Vec* getMax() { return &mMax; }
     Vec* getMin() { return &mMin; }
     void setCallBack(J3DJointCallBack callback) { mCallBack = callback; }
@@ -64,11 +93,13 @@ public:
     J3DMtxCalc* getMtxCalc() { return mMtxCalc; }
     J3DMtxCalc* getCurrentMtxCalc() { return mCurrentMtxCalc; };
     J3DJoint* getChild() { return mChild; }
-    u8 getMtxType() { return (mKind & 0xf0) >> 4; }
+    u8 getMtxType() const { return (mKind & 0xf0) >> 4; }
     void setMtxType(u8 type) { mKind = (mKind & ~0xf0) | (type << 4); }
     f32 getRadius() const { return mBoundingSphereRadius; }
 
     static J3DMtxCalc* mCurrentMtxCalc;
+
+    u8 getKind() const { return mKind & 15; }
 
 private:
     friend struct J3DJointFactory;
@@ -96,7 +127,7 @@ private:
  */
 class J3DMtxCalcNoAnmBase : public J3DMtxCalc {
 public:
-    /* 8000FA8C */ virtual ~J3DMtxCalcNoAnmBase() {}
+    virtual ~J3DMtxCalcNoAnmBase() {}
 };
 
 /**
@@ -109,7 +140,10 @@ public:
     J3DMtxCalcNoAnm() {}
     virtual ~J3DMtxCalcNoAnm() {}
     virtual void init(const Vec& param_0, const Mtx& param_1) { B::init(param_0, param_1); }
-    virtual void calc() { A::calcTransform(mJoint->getTransformInfo()); }
+    virtual void calc() {
+        J3DTransformInfo& transInfo = getJoint()->getTransformInfo();
+        A::calcTransform(transInfo);
+    }
 };
 
 /**
@@ -117,7 +151,7 @@ public:
  * 
  */
 struct J3DMtxCalcJ3DSysInitSoftimage {
-    /* 8032ECAC */ static void init(const Vec& param_0, const Mtx& param_1) {
+    static void init(const Vec& param_0, const Mtx& param_1) {
         J3DSys::mCurrentS = param_0;
         MTXCopy(param_1, J3DSys::mCurrentMtx);
     }
@@ -128,7 +162,7 @@ struct J3DMtxCalcJ3DSysInitSoftimage {
  * 
  */
 struct J3DMtxCalcJ3DSysInitMaya {
-    /* 8032ECAC */ static void init(const Vec&, const Mtx& param_1);
+    static void init(const Vec&, const Mtx& param_1);
 };
 
 /**
@@ -136,7 +170,7 @@ struct J3DMtxCalcJ3DSysInitMaya {
  * 
  */
 struct J3DMtxCalcJ3DSysInitBasic {
-    /* 8032EC28 */ static void init(const Vec&, const Mtx& param_1);
+    static void init(const Vec&, const Mtx& param_1);
 };
 
 /**
@@ -144,7 +178,7 @@ struct J3DMtxCalcJ3DSysInitBasic {
  * 
  */
 struct J3DMtxCalcCalcTransformSoftimage {
-    /* 8032EE50 */ static void calcTransform(J3DTransformInfo const&);
+    static void calcTransform(J3DTransformInfo const&);
 };
 
 /**
@@ -152,7 +186,7 @@ struct J3DMtxCalcCalcTransformSoftimage {
  * 
  */
 struct J3DMtxCalcCalcTransformMaya {
-    /* 8032EFBC */ static void calcTransform(J3DTransformInfo const&);
+    static void calcTransform(J3DTransformInfo const&);
 };
 
 /**
@@ -160,7 +194,7 @@ struct J3DMtxCalcCalcTransformMaya {
  * 
  */
 struct J3DMtxCalcCalcTransformBasic {
-    /* 8032ED30 */ static void calcTransform(J3DTransformInfo const&);
+    static void calcTransform(J3DTransformInfo const&);
 };
 
 #endif /* J3DJOINT_H */

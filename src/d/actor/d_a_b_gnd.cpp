@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_gnd.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_alink.h"
@@ -14,6 +16,21 @@
 #include "d/actor/d_a_mg_rod.h"
 
 #include "Z2AudioLib/Z2Instances.h"
+
+class daB_GND_HIO_c : public JORReflexible {
+public:
+    daB_GND_HIO_c();
+    virtual ~daB_GND_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 field_0xc;
+    /* 0x10 */ f32 field_0x10;
+    /* 0x14 */ f32 field_0x14;
+    /* 0x18 */ f32 field_0x18;
+};
 
 enum B_GND_RES_FILE_ID { // IDs and indexes are synced
     /* BCK */
@@ -176,12 +193,8 @@ enum daB_GND_ACTION {
     ACTION_END = 22,
 };
 
-UNK_REL_DATA;
-UNK_REL_BSS;
+static u8 hio_set;
 
-static u8 l_initHIO;
-
-/* 805F4A4C-805F4A94 0000EC 0048+00 1/1 0/0 0/0 .text            __ct__13daB_GND_HIO_cFv */
 daB_GND_HIO_c::daB_GND_HIO_c() {
     no = -1;
     model_size = 1.0f;
@@ -191,7 +204,6 @@ daB_GND_HIO_c::daB_GND_HIO_c() {
     field_0x18 = 40.0f;
 }
 
-/* 805F4A94-805F4B48 000134 00B4+00 15/15 0/0 0/0 .text            anm_init__FP11b_gnd_classifUcf */
 static void anm_init(b_gnd_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, f32 i_speed) {
     i_this->mAnmID = i_anmID;
     if (i_anmID == B_GND_BCK_EGND_RRUN) {
@@ -200,7 +212,6 @@ static void anm_init(b_gnd_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, f3
     i_this->mpModelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("B_gnd", i_anmID), i_attr, i_morf, i_speed, 0.0f, -1.0f);
 }
 
-/* 805F4B48-805F4C00 0001E8 00B8+00 7/7 0/0 0/0 .text            h_anm_init__FP11b_gnd_classifUcf */
 static void h_anm_init(b_gnd_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, f32 i_speed) {
     i_this->mHorseAnmID = i_anmID;
     if (i_anmID == B_HG_BCK_HG_RUN) {
@@ -209,7 +220,6 @@ static void h_anm_init(b_gnd_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, 
     i_this->mpHorseMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("B_hg", i_anmID), i_attr, i_morf, i_speed, 0.0f, -1.0f);
 }
 
-/* 805F4C00-805F4DCC 0002A0 01CC+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_2) {
     if (param_2 == 0) {
         int jntNo = i_joint->getJntNo();
@@ -242,7 +252,6 @@ static int nodeCallBack(J3DJoint* i_joint, int param_2) {
     return 1;
 }
 
-/* 805F4DCC-805F4F38 00046C 016C+00 1/1 0/0 0/0 .text            h_nodeCallBack__FP8J3DJointi */
 static int h_nodeCallBack(J3DJoint* i_joint, int param_2) {
     if (param_2 == 0) {
         int jntNo = i_joint->getJntNo();
@@ -270,7 +279,6 @@ static int h_nodeCallBack(J3DJoint* i_joint, int param_2) {
     return 1;
 }
 
-/* 805F4F38-805F53A4 0005D8 046C+00 1/0 0/0 0/0 .text            daB_GND_Draw__FP11b_gnd_class */
 static int daB_GND_Draw(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     
@@ -363,7 +371,6 @@ static int daB_GND_Draw(b_gnd_class* i_this) {
     return 1;
 }
 
-/* 805F53E0-805F5574 000A80 0194+00 1/1 0/0 0/0 .text            shot_s_sub__FPvPv */
 static void* shot_s_sub(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_ARROW &&
         (fopAcM_GetParam(i_actor) == 1 || fopAcM_GetParam(i_actor) == 2))
@@ -377,10 +384,8 @@ static void* shot_s_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 80602FB4-80602FD0 000054 001C+00 3/5 0/0 0/0 .bss             l_HIO */
 static daB_GND_HIO_c l_HIO;
 
-/* 805F5574-805F5BE8 000C14 0674+00 1/1 0/0 0/0 .text            gake_check__FP11b_gnd_class */
 static u32 gake_check(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     dBgS_GndChk gnd_chk;
@@ -504,7 +509,6 @@ static u32 gake_check(b_gnd_class* i_this) {
     return 0;
 }
 
-/* 805F5BE8-805F5EF4 001288 030C+00 1/1 0/0 0/0 .text            saku_jump_check__FP11b_gnd_class */
 static BOOL saku_jump_check(b_gnd_class* i_this) {
     if (i_this->mGakeChkType >= 4) {
         return FALSE;
@@ -568,7 +572,6 @@ static BOOL saku_jump_check(b_gnd_class* i_this) {
     return FALSE;
 }
 
-/* 805F5F3C-805F6068 0015DC 012C+00 1/1 0/0 0/0 .text            b_gnd_h_wait__FP11b_gnd_class */
 static void b_gnd_h_wait(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     f32 player_distxz = i_this->mPlayerDistXZ;
@@ -599,7 +602,6 @@ static void b_gnd_h_wait(b_gnd_class* i_this) {
     cLib_addCalc0(&a_this->speedF, 1.0f, 2.0f);
 }
 
-/* 805F6068-805F6290 001708 0228+00 1/1 0/0 0/0 .text            b_gnd_h_wait2__FP11b_gnd_class */
 static void b_gnd_h_wait2(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -655,17 +657,14 @@ static void b_gnd_h_wait2(b_gnd_class* i_this) {
     cLib_addCalc0(&a_this->speedF, 1.0f, 1.0f);
 }
 
-/* 80602FF8-8060305C 000098 0060+04 2/4 0/0 0/0 .bss             b_path */
 static cXyz b_path[8];
 
-/* 805F6290-805F6FA4 001930 0D14+00 2/1 0/0 0/0 .text            b_gnd_h_run_a__FP11b_gnd_class */
-// NONMATCHING - regswap, equivalent
 static void b_gnd_h_run_a(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    cXyz sp8C;
-    cXyz sp80;
+    cXyz sp8C, sp80;
 
+    f32 var_f30;
     f32 player_distxz = i_this->mPlayerDistXZ;
     f32 speed_target = 0.0f;
     f32 speed_step = 1.0f;
@@ -686,8 +685,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
     s8 sp8 = false;
     s16 spE = 0x80;
-    cXyz sp74;
-    cXyz sp68;
+    cXyz sp74, sp68;
 
     switch (i_this->mMoveMode) {
     case 0:
@@ -836,7 +834,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
     if (i_this->mMoveMode < 20) {
         sp8C = b_path[i_this->field_0xc60] - a_this->current.pos;
 
-        f32 var_f30 = JMAFastSqrt(sp8C.x * sp8C.x + sp8C.z * sp8C.z);
+        var_f30 = JMAFastSqrt(sp8C.x * sp8C.x + sp8C.z * sp8C.z);
         if (var_f30 < 800.0f) {
             sp8C = b_path[(i_this->field_0xc60 + 1) & 7] - a_this->current.pos;
 
@@ -855,14 +853,11 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
         i_this->field_0x5cc = cM_atan2s(sp8C.x, sp8C.z);
         if (i_this->field_0x1e0a >= 1 && i_this->mMoveMode <= 2) {
-            speed_target = (var_f30 - 800.0f) * 2.0f;
-            var_f30 = 7000.0f;
-            if (speed_target > 7000.0f) {
-                speed_target = 7000.0f;
-            } else {
-                if (speed_target < 0.0f) {
-                    speed_target = 0.0f;
-                }
+            var_f30 = (var_f30 - 800.0f) * (AREG_F(8) + 2.0f);
+            if (var_f30 > 7000.0f) {
+                var_f30 = 7000.0f;
+            } else if (var_f30 < 0.0f) {
+                var_f30 = 0.0f;
             }
 
             i_this->field_0xc90 = i_this->field_0xc90 + i_this->field_0xc92;
@@ -870,7 +865,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
                 i_this->field_0xc92 = cM_rndF(600.0f) + 300.0f;
             }
 
-            i_this->field_0x5cc += (s16)(speed_target * cM_ssin(i_this->field_0xc90));
+            i_this->field_0x5cc += (s16)(var_f30 * cM_ssin(i_this->field_0xc90));
         }
 
         if (i_this->field_0xc72 != 0) {
@@ -900,7 +895,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
                 speed_target = l_HIO.field_0xc;
             }
 
-            if (fopAcM_searchPlayerDistanceXZ(a_this) < 2000.0f) {
+            if (fopAcM_searchPlayerDistanceXZ(a_this) < KREG_F(0) + 2000.0f) {
                 speed_target *= 1.2f;
             }
 
@@ -927,7 +922,7 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
 
     cLib_addCalc2(&a_this->speedF, speed_target, 1.0f, speed_step);
     if (speed_target > 10.0f) {
-        sp12 = (a_this->current.angle.y - sp12) * -8;
+        sp12 = (AREG_S(7) + -8) * (a_this->current.angle.y - sp12);
         if (sp12 > 2000) {
             sp12 = 2000;
         } else if (sp12 < -2000) {
@@ -938,8 +933,8 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
     }
 
     if (i_this->mAnmID == B_GND_BCK_EGND_RRUN) {
-        i_this->mpModelMorf->setPlaySpeed(i_this->mPlaySpeed);
-        i_this->mpHorseMorf->setPlaySpeed(i_this->mPlaySpeed);
+        i_this->mpModelMorf->setPlaySpeed(i_this->mPlaySpeed * (JREG_F(11) + 1.0f));
+        i_this->mpHorseMorf->setPlaySpeed(i_this->mPlaySpeed * (JREG_F(11) + 1.0f));
     }
 
     cLib_addCalc2(&i_this->mPlaySpeed, anm_speed_target, 1.0f, 0.1f);
@@ -959,7 +954,6 @@ static void b_gnd_h_run_a(b_gnd_class* i_this) {
     }
 }
 
-/* 805F6FA4-805F74F4 002644 0550+00 1/1 0/0 0/0 .text            b_gnd_h_run_p__FP11b_gnd_class */
 static void b_gnd_h_run_p(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -1128,7 +1122,6 @@ static void b_gnd_h_run_p(b_gnd_class* i_this) {
     cLib_addCalc2(&i_this->mPlaySpeed, anm_speed_target, 1.0f, 0.1f);
 }
 
-/* 805F74F4-805F76C4 002B94 01D0+00 1/1 0/0 0/0 .text            b_gnd_h_jump__FP11b_gnd_class */
 static void b_gnd_h_jump(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -1165,7 +1158,6 @@ static void b_gnd_h_jump(b_gnd_class* i_this) {
     }
 }
 
-/* 805F76C4-805F7A10 002D64 034C+00 1/1 0/0 0/0 .text            b_gnd_h_end__FP11b_gnd_class */
 static void b_gnd_h_end(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
@@ -1236,7 +1228,6 @@ static void b_gnd_h_end(b_gnd_class* i_this) {
     }
 }
 
-/* 805F7A10-805F7E88 0030B0 0478+00 2/1 0/0 0/0 .text            b_gnd_g_wait__FP11b_gnd_class */
 static void b_gnd_g_wait(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     f32 speed_target = 0.0f;
@@ -1246,7 +1237,7 @@ static void b_gnd_g_wait(b_gnd_class* i_this) {
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
     dmg_rod_class* mgrod_p = (dmg_rod_class*)fopAcM_SearchByName(PROC_MG_ROD);
 
-    if (mgrod_p != NULL && mgrod_p->field_0xf7e != 0) {
+    if (mgrod_p != NULL && mgrod_p->action != 0) {
         if (i_this->mMoveMode < 5 && i_this->mPlayerDistXZ < 600.0f) {
             i_this->mMoveMode = 5;
             i_this->field_0xc44[0] = 10;
@@ -1332,7 +1323,7 @@ static void b_gnd_g_wait(b_gnd_class* i_this) {
         }
 
         i_this->field_0xc7d = 2;
-        i_this->field_0xc80 = mgrod_p->mHookPosition;
+        i_this->field_0xc80 = mgrod_p->hook_pos;
         break;
     case 6:
         angle_step = 0;
@@ -1359,7 +1350,6 @@ static void b_gnd_g_wait(b_gnd_class* i_this) {
     }
 }
 
-/* 805F7E88-805F878C 003528 0904+00 2/1 0/0 0/0 .text            b_gnd_g_attack__FP11b_gnd_class */
 static BOOL b_gnd_g_attack(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -1661,7 +1651,6 @@ static BOOL b_gnd_g_attack(b_gnd_class* i_this) {
     return spC;
 }
 
-/* 805F878C-805F8C20 003E2C 0494+00 1/1 0/0 0/0 .text            b_gnd_g_defence__FP11b_gnd_class */
 static void b_gnd_g_defence(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     int anm_frame = i_this->mpModelMorf->getFrame();
@@ -1769,7 +1758,6 @@ static void b_gnd_g_defence(b_gnd_class* i_this) {
     }
 }
 
-/* 805F8C20-805F8F88 0042C0 0368+00 1/1 0/0 0/0 .text            b_gnd_g_jump__FP11b_gnd_class */
 static int b_gnd_g_jump(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     f32 var_f31 = 0.0f;
@@ -1857,7 +1845,6 @@ static int b_gnd_g_jump(b_gnd_class* i_this) {
     return sp10;
 }
 
-/* 805F8F88-805F9220 004628 0298+00 1/1 0/0 0/0 .text            b_gnd_g_side__FP11b_gnd_class */
 static void b_gnd_g_side(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
@@ -1921,7 +1908,6 @@ static void b_gnd_g_side(b_gnd_class* i_this) {
     }
 }
 
-/* 805F9220-805F92FC 0048C0 00DC+00 1/1 0/0 0/0 .text            b_gnd_g_tuba__FP11b_gnd_class */
 static void b_gnd_g_tuba(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
@@ -1941,7 +1927,6 @@ static void b_gnd_g_tuba(b_gnd_class* i_this) {
     }
 }
 
-/* 805F92FC-805F94A8 00499C 01AC+00 1/1 0/0 0/0 .text            b_gnd_g_damage__FP11b_gnd_class */
 static void b_gnd_g_damage(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -1978,7 +1963,6 @@ static void b_gnd_g_damage(b_gnd_class* i_this) {
     cLib_addCalc2(&a_this->speedF, 0.0f, 1.0f, 10.0f);
 }
 
-/* 805F94A8-805F98A0 004B48 03F8+00 1/1 0/0 0/0 .text            b_gnd_g_down__FP11b_gnd_class */
 static void b_gnd_g_down(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopEn_enemy_c* e_this = (fopEn_enemy_c*)a_this;
@@ -2090,7 +2074,6 @@ static void b_gnd_g_down(b_gnd_class* i_this) {
     }
 }
 
-/* 805F98A0-805F98F8 004F40 0058+00 1/1 0/0 0/0 .text            b_gnd_g_end__FP11b_gnd_class */
 static void b_gnd_g_end(b_gnd_class* i_this) {
     i_this->mDamageInvulnerabilityTimer = 10;
     mant_class* mant_p = (mant_class*)fopAcM_SearchByID(i_this->mMantChildID);
@@ -2101,7 +2084,6 @@ static void b_gnd_g_end(b_gnd_class* i_this) {
     }
 }
 
-/* 805F98F8-805F9BE4 004F98 02EC+00 1/1 0/0 0/0 .text            damage_check__FP11b_gnd_class */
 static void damage_check(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -2189,7 +2171,6 @@ static void damage_check(b_gnd_class* i_this) {
     }
 }
 
-/* 805F9BE4-805FA2FC 005284 0718+00 1/1 0/0 0/0 .text            eff_set_h__FP11b_gnd_class */
 static void eff_set_h(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp44;
@@ -2332,7 +2313,6 @@ static void eff_set_h(b_gnd_class* i_this) {
     }
 }
 
-/* 805FA2FC-805FA3E4 00599C 00E8+00 1/1 0/0 0/0 .text            eff_set__FP11b_gnd_class */
 static void eff_set(b_gnd_class* i_this) {
     if (i_this->field_0x2698 == 2) {
         if (i_this->mCounter & 1) {
@@ -2350,7 +2330,6 @@ static void eff_set(b_gnd_class* i_this) {
     i_this->field_0x2698 = 0;
 }
 
-/* 805FA3E4-805FA430 005A84 004C+00 2/2 0/0 0/0 .text            s_fkdel_sub__FPvPv */
 static void* s_fkdel_sub(void* i_actor, void* i_data) {
     if (fopAc_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_FK) {
         fopAcM_delete((fopAc_ac_c*)i_actor);
@@ -2359,7 +2338,6 @@ static void* s_fkdel_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805FA430-805FA47C 005AD0 004C+00 1/1 0/0 0/0 .text            s_objgbdel_sub__FPvPv */
 static void* s_objgbdel_sub(void* i_actor, void* i_data) {
     if (fopAc_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_OBJ_GB) {
         fopAcM_delete((fopAc_ac_c*)i_actor);
@@ -2368,7 +2346,6 @@ static void* s_objgbdel_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805FA47C-805FA758 005B1C 02DC+00 1/1 0/0 0/0 .text            h_damage_check__FP11b_gnd_class */
 static void h_damage_check(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -2466,7 +2443,6 @@ static void h_damage_check(b_gnd_class* i_this) {
     }
 }
 
-/* 805FA758-805FAFF0 005DF8 0898+00 2/1 0/0 0/0 .text            action__FP11b_gnd_class */
 static void action(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -2549,10 +2525,10 @@ static void action(b_gnd_class* i_this) {
         i_this->field_0xc7d = 0;
     }
 
-#ifdef DEBUG
+#if DEBUG
     if (mDoCPd_c::getTrigR(PAD_2)) {
         dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-        kankyo->field_0x12cc = 1;
+        kankyo->wether = 1;
 
         i_this->mActionMode = ACTION_WAIT;
         i_this->mMoveMode = 0;
@@ -2596,7 +2572,7 @@ static void action(b_gnd_class* i_this) {
 
     if (attn_on) {
         fopAcM_OnStatus(i_this, 0);
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(i_this, 0);
         i_this->attention_info.flags = 0;
@@ -2723,7 +2699,6 @@ static void action(b_gnd_class* i_this) {
     i_this->field_0x26c2 = 0;
 }
 
-/* 805FAFF0-805FB0F0 006690 0100+00 1/1 0/0 0/0 .text            ball_bg_check__FP11b_gnd_classi */
 static BOOL ball_bg_check(b_gnd_class* i_this, int i_no) {
     cXyz start;
     cXyz end;
@@ -2741,7 +2716,6 @@ static BOOL ball_bg_check(b_gnd_class* i_this, int i_no) {
     return FALSE;
 }
 
-/* 805FB0F0-805FB414 006790 0324+00 1/1 0/0 0/0 .text himo_control1__FP11b_gnd_classP4cXyziSc */
 static void himo_control1(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 param_4) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp60;
@@ -2821,7 +2795,6 @@ static void himo_control1(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 pa
     }
 }
 
-/* 805FB414-805FB620 006AB4 020C+00 1/1 0/0 0/0 .text himo_control2__FP11b_gnd_classP4cXyziSc */
 static void himo_control2(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 param_4) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp30;
@@ -2871,7 +2844,6 @@ static void himo_control2(b_gnd_class* i_this, cXyz* param_2, int param_3, s8 pa
     var_r29[param_3] = i_this->field_0x1ff0[param_3].field_0x0[15];
 }
 
-/* 805FB620-805FB704 006CC0 00E4+00 1/1 0/0 0/0 .text            cam_3d_morf__FP11b_gnd_classf */
 static void cam_3d_morf(b_gnd_class* i_this, f32 i_scale) {
     cLib_addCalc2(&i_this->mDemoCamCenter.x, i_this->mDemoCamCenterTarget.x, i_scale, i_this->mDemoCamCenterSpd.x * i_this->field_0x2710.y);
     cLib_addCalc2(&i_this->mDemoCamCenter.y, i_this->mDemoCamCenterTarget.y, i_scale, i_this->mDemoCamCenterSpd.y * i_this->field_0x2710.y);
@@ -2882,7 +2854,6 @@ static void cam_3d_morf(b_gnd_class* i_this, f32 i_scale) {
     cLib_addCalc2(&i_this->mDemoCamEye.z, i_this->mDemoCamEyeTarget.z, i_scale, i_this->mDemoCamEyeSpd.z * i_this->field_0x2710.y);
 }
 
-/* 805FB704-805FB7A4 006DA4 00A0+00 1/1 0/0 0/0 .text            cam_spd_set__FP11b_gnd_class */
 static void cam_spd_set(b_gnd_class* i_this) {
     i_this->mDemoCamEyeSpd.x = fabsf(i_this->mDemoCamEyeTarget.x - i_this->mDemoCamEye.x);
     i_this->mDemoCamEyeSpd.y = fabsf(i_this->mDemoCamEyeTarget.y - i_this->mDemoCamEye.y);
@@ -2895,7 +2866,6 @@ static void cam_spd_set(b_gnd_class* i_this) {
     i_this->field_0x2710.y = 0.0f;
 }
 
-/* 805FB7A4-805FDAE0 006E44 233C+00 2/1 0/0 0/0 .text            demo_camera__FP11b_gnd_class */
 static void demo_camera(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c *)dComIfGp_getPlayer(0);
@@ -3262,9 +3232,10 @@ static void demo_camera(b_gnd_class* i_this) {
         if (i_this->mDemoCamTimer == 290) {
             anm_init(i_this, B_GND_BCK_EGND_KAMAE, 3.0f, 0, 1.0f);
             i_this->mGndEyeBtkNo = 5;
+            // Z2GetAudioMgr()->bgmStart(Z2BGM_VS_GANON_04, 0, 0);
             Z2GetAudioMgr()->bgmStreamPrepare(0x2000014); // ZREO Gnd Reorch Replacement File
             Z2GetAudioMgr()->bgmStreamPlay();
-            kankyo->field_0x12cc = 3;
+            kankyo->wether = 3;
         }
 
         if (i_this->mDemoCamTimer == 320) {
@@ -3286,7 +3257,7 @@ static void demo_camera(b_gnd_class* i_this) {
             dComIfGs_onOneZoneSwitch(15, -1);
             dComIfGs_onSaveDunSwitch(1);
             Z2GetAudioMgr()->setDemoName("force_end");
-            kankyo->field_0x12cc = 1;
+            kankyo->wether = 1;
         }
         break;
     case 50:
@@ -3760,7 +3731,6 @@ static void demo_camera(b_gnd_class* i_this) {
     }
 }
 
-/* 805FDAE0-805FEC58 009180 1178+00 1/1 0/0 0/0 .text            anm_se_set__FP11b_gnd_class */
 static void anm_se_set(b_gnd_class* i_this) {
     if (i_this->mAnmID == B_GND_BCK_EGND_RSPUR && i_this->mpModelMorf->checkFrame(15.0f) ||
         i_this->mAnmID == B_GND_BCK_EGND_RRETURN && i_this->mpModelMorf->checkFrame(86.0f)) {
@@ -3906,7 +3876,6 @@ static void anm_se_set(b_gnd_class* i_this) {
     } 
 }
 
-/* 805FEC58-806009F8 00A2F8 1DA0+00 2/1 0/0 0/0 .text            daB_GND_Execute__FP11b_gnd_class */
 static int daB_GND_Execute(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -3922,7 +3891,7 @@ static int daB_GND_Execute(b_gnd_class* i_this) {
         i_this->mNoDrawTimer--;
         if (i_this->mNoDrawTimer == 0) {
             dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-            kankyo->field_0x12cc = 1;
+            kankyo->wether = 1;
 
             i_this->mActionMode = ACTION_WAIT;
             i_this->mMoveMode = 0;
@@ -4080,7 +4049,7 @@ static int daB_GND_Execute(b_gnd_class* i_this) {
         sp6C->setBaseTRMtx(mDoMtx_stack_c::get());
 
         u32 sp68;
-        if (i_this->mAcch.GetGroundH() != -1000000000.0f) {
+        if (i_this->mAcch.GetGroundH() != -G_CM3D_F_INF) {
             if (i_this->mAcch.ChkWaterHit() && i_this->mAcch.m_wtr.GetHeight() > a_this->current.pos.y) {
                 sp68 = dKy_pol_sound_get(&i_this->mAcch.m_wtr);
             } else if (i_this->mAcch.ChkGroundHit()) {
@@ -4594,12 +4563,10 @@ static int daB_GND_Execute(b_gnd_class* i_this) {
     return 1;
 }
 
-/* 80600A54-80600A5C 00C0F4 0008+00 1/0 0/0 0/0 .text            daB_GND_IsDelete__FP11b_gnd_class */
 static int daB_GND_IsDelete(b_gnd_class* i_this) {
     return 1;
 }
 
-/* 80600A5C-80600B14 00C0FC 00B8+00 1/0 0/0 0/0 .text            daB_GND_Delete__FP11b_gnd_class */
 static int daB_GND_Delete(b_gnd_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -4607,7 +4574,7 @@ static int daB_GND_Delete(b_gnd_class* i_this) {
     dComIfG_resDelete(&i_this->mHorsePhaseReq, "B_hg");
 
     if (i_this->mInitHIO) {
-        l_initHIO = false;
+        hio_set = false;
     }
 
     if (a_this->heap != NULL) {
@@ -4623,7 +4590,6 @@ static int daB_GND_Delete(b_gnd_class* i_this) {
     return 1;
 }
 
-/* 80600B14-80601468 00C1B4 0954+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* a_this) {
     b_gnd_class* i_this = (b_gnd_class*)a_this;
 
@@ -4639,7 +4605,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
-    model->setUserArea((u32)i_this);
+    model->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -4684,7 +4650,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
         
     J3DModelData* modelData;
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 0x62);
-    JUT_ASSERT(6612, modelData != 0);
+    JUT_ASSERT(6612, modelData != NULL);
     i_this->mpSwordModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpSwordModel == NULL) {
         return 0;
@@ -4694,7 +4660,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     i_this->mpSwordModel->setBaseTRMtx(mDoMtx_stack_c::get());
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 0x61);
-    JUT_ASSERT(6626, modelData != 0);
+    JUT_ASSERT(6626, modelData != NULL);
     i_this->mpSheathModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (i_this->mpSheathModel == NULL) {
         return 0;
@@ -4705,7 +4671,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
 
     for (int i = 0; i < 2; i++) {
         modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", blur_model[i]);
-        JUT_ASSERT(6647, modelData != 0);
+        JUT_ASSERT(6647, modelData != NULL);
         i_this->mpSwordBlurModel[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
         if (i_this->mpSwordBlurModel[i] == NULL) {
             return 0;
@@ -4716,7 +4682,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes("B_gnd", 99);
-    JUT_ASSERT(6670, modelData != 0);
+    JUT_ASSERT(6670, modelData != NULL);
 
     for (int i = 0; i < 36; i++) {
         i_this->mpMantShadowModel[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -4736,7 +4702,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
     
     model = i_this->mpHorseMorf->getModel();
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(h_nodeCallBack);
     }
@@ -4799,10 +4765,9 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     return 1;
 }
 
-/* 806014B0-80601960 00CB50 04B0+00 1/0 0/0 0/0 .text            daB_GND_Create__FP10fopAc_ac_c */
 static int daB_GND_Create(fopAc_ac_c* a_this) {
     b_gnd_class* i_this = (b_gnd_class*)a_this;
-    fopAcM_SetupActor(i_this, b_gnd_class);
+    fopAcM_ct(i_this, b_gnd_class);
 
     int phase_state = dComIfG_resLoad(&i_this->mPhaseReq, "B_gnd");
     int h_phase_state = dComIfG_resLoad(&i_this->mHorsePhaseReq, "B_hg");
@@ -4820,9 +4785,9 @@ static int daB_GND_Create(fopAc_ac_c* a_this) {
             return cPhs_ERROR_e;
         }
         
-        if (!l_initHIO) {
+        if (!hio_set) {
             i_this->mInitHIO = true;
-            l_initHIO = true;
+            hio_set = true;
             l_HIO.no = mDoHIO_CREATE_CHILD("ガノンドロフ", &l_HIO);
         }
 
@@ -4855,7 +4820,7 @@ static int daB_GND_Create(fopAc_ac_c* a_this) {
         a_this->health = 24; // Horseback Ganondorf Health
         i_this->field_0x560 = 24;
 
-        i_this->mGndCcStts.Init(254, 0, a_this);
+        i_this->mGndCcStts.Init(0xFE, 0, a_this);
         i_this->mHorseCcStts.Init(150, 0, a_this);
 
         static dCcD_SrcSph h_cc_sph_src = {
@@ -4983,10 +4948,8 @@ static int daB_GND_Create(fopAc_ac_c* a_this) {
     return phase_state;
 }
 
-/* 80601960-80601D24 00D000 03C4+00 1/1 0/0 0/0 .text            __ct__11b_gnd_classFv */
 b_gnd_class::b_gnd_class() {}
 
-/* 80602E6C-80602E8C -00001 0020+00 1/0 0/0 0/0 .data            l_daB_GND_Method */
 static actor_method_class l_daB_GND_Method = {
     (process_method_func)daB_GND_Create,
     (process_method_func)daB_GND_Delete,
@@ -4995,7 +4958,6 @@ static actor_method_class l_daB_GND_Method = {
     (process_method_func)daB_GND_Draw,
 };
 
-/* 80602E8C-80602EBC -00001 0030+00 0/0 0/0 1/0 .data            g_profile_B_GND */
 extern actor_process_profile_definition g_profile_B_GND = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -5012,5 +4974,7 @@ extern actor_process_profile_definition g_profile_B_GND = {
   fopAc_ENEMY_e,          // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
+
+static int unk_bss_0xF0;
 
 AUDIO_INSTANCES;

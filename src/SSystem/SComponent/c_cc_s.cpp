@@ -6,43 +6,37 @@
 #include "SSystem/SComponent/c_cc_s.h"
 #include "JSystem/JUtility/JUTAssert.h"
 
-#define CHECK_FLOAT_CLASS(line, x)                                                                 \
-    JUT_ASSERT(line, !(((sizeof(x) == sizeof(float)) ? __fpclassifyf((float)(x)) :                 \
-                                                       __fpclassifyd((double)(x))) == 1));
+#define CHECK_FLOAT_CLASS(line, x) JUT_ASSERT(line, !isnan(x));
 #define CHECK_FLOAT_RANGE(line, x) JUT_ASSERT(line, -1.0e32f < x && x < 1.0e32f);
 
-/* 80264A6C-80264A94 25F3AC 0028+00 0/0 1/1 0/0 .text            __ct__4cCcSFv */
 cCcS::cCcS() {}
 
-/* 80264A94-80264B60 25F3D4 00CC+00 1/1 1/1 0/0 .text            Ct__4cCcSFv */
 void cCcS::Ct() {
-    for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + ARRAY_SIZE(mpObjAt); ++obj) {
+    for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + ARRAY_SIZEU(mpObjAt); ++obj) {
         *obj = NULL;
     }
     mObjAtCount = 0;
 
-    for (cCcD_Obj** obj = mpObjTg; obj < mpObjTg + ARRAY_SIZE(mpObjTg); ++obj) {
+    for (cCcD_Obj** obj = mpObjTg; obj < mpObjTg + ARRAY_SIZEU(mpObjTg); ++obj) {
         *obj = NULL;
     }
     mObjTgCount = 0;
 
-    for (cCcD_Obj** obj = mpObjCo; obj < mpObjCo + ARRAY_SIZE(mpObjCo); ++obj) {
+    for (cCcD_Obj** obj = mpObjCo; obj < mpObjCo + ARRAY_SIZEU(mpObjCo); ++obj) {
         *obj = NULL;
     }
     mObjCoCount = 0;
 
-    for (cCcD_Obj** obj = mpObj; obj < mpObj + ARRAY_SIZE(mpObj); ++obj) {
+    for (cCcD_Obj** obj = mpObj; obj < mpObj + ARRAY_SIZEU(mpObj); ++obj) {
         *obj = NULL;
     }
     mObjCount = 0;
 }
 
-/* 80264B60-80264B80 25F4A0 0020+00 0/0 1/1 0/0 .text            Dt__4cCcSFv */
 void cCcS::Dt() {
     Ct();
 }
 
-/* 80264B80-80264BA8 25F4C0 0028+00 1/1 0/0 0/0 .text            GetWt__4cCcSCFUc */
 WeightType cCcS::GetWt(u8 param_0) const {
     if (param_0 == 0xFF) {
         return WeightType_0;
@@ -53,12 +47,11 @@ WeightType cCcS::GetWt(u8 param_0) const {
     return WeightType_2;
 }
 
-/* 80264BA8-80264C5C 25F4E8 00B4+00 0/0 7/7 454/454 .text            Set__4cCcSFP8cCcD_Obj */
 void cCcS::Set(cCcD_Obj* obj) {
     if (obj->ChkAtSet()) {
-        if (mObjAtCount >= ARRAY_SIZE(mpObjAt)) {
+        if (mObjAtCount >= ARRAY_SIZEU(mpObjAt)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set AT Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjAt));
+            OS_REPORT("cCcS::Set AT Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjAt));
             OS_REPORT("\x1b[m");
         } else {
             mpObjAt[mObjAtCount] = obj;
@@ -67,9 +60,9 @@ void cCcS::Set(cCcD_Obj* obj) {
     }
 
     if (obj->ChkTgSet()) {
-        if (mObjTgCount >= ARRAY_SIZE(mpObjTg)) {
+        if (mObjTgCount >= ARRAY_SIZEU(mpObjTg)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set TG Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjTg));
+            OS_REPORT("cCcS::Set TG Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjTg));
             OS_REPORT("\x1b[m");
         } else {
             mpObjTg[mObjTgCount] = obj;
@@ -78,9 +71,9 @@ void cCcS::Set(cCcD_Obj* obj) {
     }
 
     if (obj->ChkCoSet()) {
-        if (mObjCoCount >= ARRAY_SIZE(mpObjCo)) {
+        if (mObjCoCount >= ARRAY_SIZEU(mpObjCo)) {
             OS_REPORT("\x1b[43;30m");
-            OS_REPORT("cCcS::Set CO Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObjCo));
+            OS_REPORT("cCcS::Set CO Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObjCo));
             OS_REPORT("\x1b[m");
         } else {
             mpObjCo[mObjCoCount] = obj;
@@ -88,9 +81,9 @@ void cCcS::Set(cCcD_Obj* obj) {
         }
     }
 
-    if (mObjCount >= ARRAY_SIZE(mpObj)) {
+    if (mObjCount >= ARRAY_SIZEU(mpObj)) {
         OS_REPORT("\x1b[43;30m");
-        OS_REPORT("cCcS::Set SET Overflow.Now Max is %d.\n", ARRAY_SIZE(mpObj));
+        OS_REPORT("cCcS::Set SET Overflow.Now Max is %d.\n", ARRAY_SIZEU(mpObj));
         OS_REPORT("\x1b[m");
     } else {
         mpObj[mObjCount] = obj;
@@ -98,7 +91,6 @@ void cCcS::Set(cCcD_Obj* obj) {
     }
 }
 
-/* 80264C5C-80264CF0 25F59C 0094+00 1/1 0/0 0/0 .text            ClrCoHitInf__4cCcSFv */
 void cCcS::ClrCoHitInf() {
     for (cCcD_Obj** obj = mpObjCo; obj < mpObjCo + mObjCoCount; ++obj) {
         if (*obj != NULL) {
@@ -112,7 +104,6 @@ void cCcS::ClrCoHitInf() {
     }
 }
 
-/* 80264CF0-80264D90 25F630 00A0+00 1/1 0/0 0/0 .text            ClrTgHitInf__4cCcSFv */
 void cCcS::ClrTgHitInf() {
     for (cCcD_Obj** obj = mpObjTg; obj < mpObjTg + mObjTgCount; ++obj) {
         if (*obj != NULL) {
@@ -126,7 +117,6 @@ void cCcS::ClrTgHitInf() {
     }
 }
 
-/* 80264D90-80264E2C 25F6D0 009C+00 1/1 0/0 0/0 .text            ClrAtHitInf__4cCcSFv */
 void cCcS::ClrAtHitInf() {
     for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + mObjAtCount; ++obj) {
         if (*obj != NULL) {
@@ -140,7 +130,6 @@ void cCcS::ClrAtHitInf() {
     }
 }
 
-/* 80264E2C-80264F40 25F76C 0114+00 1/1 0/0 0/0 .text ChkNoHitAtTg__4cCcSFP8cCcD_ObjP8cCcD_Obj */
 bool cCcS::ChkNoHitAtTg(cCcD_Obj* pat_obj, cCcD_Obj* ptg_obj) {
     fopAc_ac_c* pat_ac = pat_obj->GetAc();
     fopAc_ac_c* ptg_ac = ptg_obj->GetAc();
@@ -155,7 +144,6 @@ bool cCcS::ChkNoHitAtTg(cCcD_Obj* pat_obj, cCcD_Obj* ptg_obj) {
     }
 }
 
-/* 80264F40-8026515C 25F880 021C+00 1/1 0/0 0/0 .text            ChkAtTg__4cCcSFv */
 void cCcS::ChkAtTg() {
     cCcD_Obj** objTgEnd = mpObjTg + mObjTgCount;
     ClrAtHitInf();
@@ -165,7 +153,7 @@ void cCcS::ChkAtTg() {
             continue;
 
         cCcD_ShapeAttr* pat_sa = (*pat_obj)->GetShapeAttr();
-        JUT_ASSERT(0, pat_sa != 0);
+        JUT_ASSERT(0, pat_sa != NULL);
 
         for (cCcD_Obj** ptg_obj = mpObjTg; ptg_obj < objTgEnd; ++ptg_obj) {
             if (*ptg_obj == NULL || !(*ptg_obj)->ChkTgSet())
@@ -176,7 +164,7 @@ void cCcS::ChkAtTg() {
                 continue;
 
             cCcD_ShapeAttr* ptg_sa = (*ptg_obj)->GetShapeAttr();
-            JUT_ASSERT(0, ptg_sa != 0);
+            JUT_ASSERT(0, ptg_sa != NULL);
 
             static cXyz cross;
             bool didCross = pat_sa->CrossAtTg(*ptg_sa, &cross);
@@ -197,7 +185,6 @@ void cCcS::ChkAtTg() {
     }
 }
 
-/* 8026515C-80265230 25FA9C 00D4+00 1/1 0/0 0/0 .text ChkNoHitCo__4cCcSFP8cCcD_ObjP8cCcD_Obj */
 bool cCcS::ChkNoHitCo(cCcD_Obj* pco1_obj, cCcD_Obj* pco2_obj) {
     fopAc_ac_c* ac1 = pco1_obj->GetAc();
     fopAc_ac_c* ac2 = pco2_obj->GetAc();
@@ -213,7 +200,6 @@ bool cCcS::ChkNoHitCo(cCcD_Obj* pco1_obj, cCcD_Obj* pco2_obj) {
     }
 }
 
-/* 80265230-802653A0 25FB70 0170+00 1/1 0/0 0/0 .text            ChkCo__4cCcSFv */
 void cCcS::ChkCo() {
     ClrCoHitInf();
     if (mObjCoCount <= 1)
@@ -225,7 +211,7 @@ void cCcS::ChkCo() {
             continue;
 
         cCcD_ShapeAttr* pco1_sa = (*pco1_obj)->GetShapeAttr();
-        JUT_ASSERT(0, pco1_sa != 0);
+        JUT_ASSERT(0, pco1_sa != NULL);
 
         for (cCcD_Obj** pco2_obj = pco1_obj + 1; pco2_obj < objCoEnd; ++pco2_obj) {
             if (*pco2_obj == NULL || !(*pco2_obj)->ChkCoSet())
@@ -236,7 +222,7 @@ void cCcS::ChkCo() {
                 continue;
 
             cCcD_ShapeAttr* pco2_sa = (*pco2_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pco2_sa != 0);
+            JUT_ASSERT(0, pco2_sa != NULL);
 
             f32 cross_len;
             if (pco1_sa->CrossCo(*pco2_sa, &cross_len)) {
@@ -248,15 +234,11 @@ void cCcS::ChkCo() {
     }
 }
 
-/* 802653A0-802653C8 25FCE0 0028+00 1/0 0/0 0/0 .text
- * CalcTgPlusDmg__4cCcSFP8cCcD_ObjP8cCcD_ObjP9cCcD_SttsP9cCcD_Stts */
 void cCcS::CalcTgPlusDmg(cCcD_Obj* pat_obj, cCcD_Obj* ptg_obj, cCcD_Stts* pat_stts,
                          cCcD_Stts* ptg_stts) {
     ptg_stts->PlusDmg(pat_obj->GetAtAtp());
 }
 
-/* 802653C8-802655E4 25FD08 021C+00 1/1 0/0 0/0 .text
- * SetAtTgCommonHitInf__4cCcSFP8cCcD_ObjP8cCcD_ObjP4cXyz        */
 void cCcS::SetAtTgCommonHitInf(cCcD_Obj* pat_obj, cCcD_Obj* ptg_obj, cXyz* pcross) {
     cCcD_Stts* pat_stts = pat_obj->GetStts();
     cCcD_Stts* ptg_stts = ptg_obj->GetStts();
@@ -281,8 +263,6 @@ void cCcS::SetAtTgCommonHitInf(cCcD_Obj* pat_obj, cCcD_Obj* ptg_obj, cXyz* pcros
     }
 }
 
-/* 802655E4-80265750 25FF24 016C+00 1/1 0/0 0/0 .text
- * SetCoCommonHitInf__4cCcSFP8cCcD_ObjP4cXyzP8cCcD_ObjP4cXyzf   */
 void cCcS::SetCoCommonHitInf(cCcD_Obj* pco1_obj, cXyz* ppos1, cCcD_Obj* pco2_obj, cXyz* ppos2,
                              f32 cross_len) {
     bool co2_inf_set = !pco2_obj->ChkCoNoCoHitInfSet();
@@ -305,8 +285,6 @@ void cCcS::SetCoCommonHitInf(cCcD_Obj* pco1_obj, cXyz* ppos1, cCcD_Obj* pco2_obj
                  pco1_stts, pco2_stts, pco1_stts->GetGStts(), pco2_stts->GetGStts());
 }
 
-/* 80265750-80265BB4 260090 0464+00 1/0 0/0 0/0 .text
- * SetPosCorrect__4cCcSFP8cCcD_ObjP4cXyzP8cCcD_ObjP4cXyzf       */
 void cCcS::SetPosCorrect(cCcD_Obj* pco1_obj, cXyz* ppos1, cCcD_Obj* pco2_obj, cXyz* ppos2,
                          f32 cross_len) {
     CHECK_FLOAT_CLASS(616, cross_len);
@@ -449,14 +427,13 @@ void cCcS::SetPosCorrect(cCcD_Obj* pco1_obj, cXyz* ppos1, cCcD_Obj* pco2_obj, cX
     }
 }
 
-/* 80265BB4-80265CCC 2604F4 0118+00 1/1 0/0 0/0 .text            CalcArea__4cCcSFv */
 void cCcS::CalcArea() {
     cM3dGAab aab;
     aab.ClearForMinMax();
     for (cCcD_Obj** pset_obj = mpObj; pset_obj < mpObj + mObjCount; ++pset_obj) {
         if (*pset_obj != NULL) {
             cCcD_ShapeAttr* pset_sa = (*pset_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pset_sa != 0);
+            JUT_ASSERT(0, pset_sa != NULL);
 
             pset_sa->CalcAabBox();
             aab.SetMinMax(pset_sa->GetWorkAab());
@@ -467,7 +444,7 @@ void cCcS::CalcArea() {
     for (cCcD_Obj** pset_obj = mpObj; pset_obj < mpObj + mObjCount; ++pset_obj) {
         if (*pset_obj != NULL) {
             const cCcD_ShapeAttr* pset_sa = (*pset_obj)->GetShapeAttr();
-            JUT_ASSERT(0, pset_sa != 0);
+            JUT_ASSERT(0, pset_sa != NULL);
 
             cCcD_DivideInfo* divideInfo = &(*pset_obj)->GetDivideInfo();
             mDivideArea.CalcDivideInfo(divideInfo, pset_sa->GetWorkAab(),
@@ -476,7 +453,6 @@ void cCcS::CalcArea() {
     }
 }
 
-/* 80265CCC-80265D30 26060C 0064+00 0/0 1/1 0/0 .text            Move__4cCcSFv */
 void cCcS::Move() {
     CalcArea();
     ChkAtTg();
@@ -488,7 +464,6 @@ void cCcS::Move() {
     mObjCount = 0;
 }
 
-/* 80265D30-80265DF4 260670 00C4+00 0/0 1/1 0/0 .text            DrawClear__4cCcSFv */
 void cCcS::DrawClear() {
     for (cCcD_Obj** obj = mpObjAt; obj < mpObjAt + mObjAtCount; ++obj) {
         *obj = NULL;
@@ -512,8 +487,6 @@ void cCcS::DrawClear() {
     mObjCount = 0;
 }
 
-/* 80265DF4-80265DF8 260734 0004+00 1/0 1/0 0/0 .text
- * SetCoGCorrectProc__4cCcSFP8cCcD_ObjP8cCcD_Obj                */
 void cCcS::SetCoGCorrectProc(cCcD_Obj* pco1_obj, cCcD_Obj* pco2_obj) {}
 
 /* 80265DF8-80265DFC 260738 0004+00 1/0 0/0 0/0 .text
@@ -531,8 +504,6 @@ void cCcS::SetAtTgGObjInf(bool param_0, bool param_1, cCcD_Obj* pat_obj, cCcD_Ob
                           cCcD_Stts* ptg_stts, cCcD_GStts* pat_gstts, cCcD_GStts* ptg_gstts,
                           cXyz* pcross) {}
 
-/* 80265E00-80265E08 260740 0008+00 1/0 0/0 0/0 .text
- * ChkNoHitGAtTg__4cCcSFPC12cCcD_GObjInfPC12cCcD_GObjInfP10cCcD_GSttsP10cCcD_GStts */
 bool cCcS::ChkNoHitGAtTg(const cCcD_GObjInf* pat_gobj, const cCcD_GObjInf* ptg_gobj,
                          cCcD_GStts* pat_gstts, cCcD_GStts* ptg_gstts) {
     return false;
@@ -547,10 +518,8 @@ bool cCcS::ChkAtTgHitAfterCross(bool param_0, bool param_1, const cCcD_GObjInf* 
     return false;
 }
 
-/* 80265E10-80265E18 260750 0008+00 1/0 0/0 0/0 .text ChkNoHitGCo__4cCcSFP8cCcD_ObjP8cCcD_Obj */
 bool cCcS::ChkNoHitGCo(cCcD_Obj* pco1_obj, cCcD_Obj* pco2_obj) {
     return false;
 }
 
-/* 80265E18-80265E1C 260758 0004+00 1/0 0/0 0/0 .text            MoveAfterCheck__4cCcSFv */
 void cCcS::MoveAfterCheck() {}

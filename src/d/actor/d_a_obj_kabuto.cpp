@@ -3,20 +3,20 @@
  * Object - Golden Beetle
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_kabuto.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
-/* 80C2E2F0-80C2E2F4 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 80C2E300-80C2E314 000018 0014+00 3/3 0/0 0/0 .bss             l_HIO */
 static daObj_KabHIO_c l_HIO;
 
-/* 80C2AE6C-80C2AEA4 0000EC 0038+00 1/1 0/0 0/0 .text            __ct__14daObj_KabHIO_cFv */
 daObj_KabHIO_c::daObj_KabHIO_c() {
     field_0x4 = -1;
     field_0xc = 1.5f;
@@ -24,7 +24,6 @@ daObj_KabHIO_c::daObj_KabHIO_c() {
     field_0x10 = -0.6f;
 }
 
-/* 80C2AEA4-80C2AF10 000124 006C+00 1/1 0/0 0/0 .text            InitCcSph__13daObjKABUTO_cFv */
 void daObjKABUTO_c::InitCcSph() {
     const static dCcD_SrcSph ccSphSrc = {
         {
@@ -45,19 +44,16 @@ void daObjKABUTO_c::InitCcSph() {
     mCcSph.OnTgNoHitMark();
 }
 
-/* 80C2AF10-80C2AF68 000190 0058+00 1/1 0/0 0/0 .text            SetCcSph__13daObjKABUTO_cFv */
 void daObjKABUTO_c::SetCcSph() {
     mCcSph.SetC(current.pos);
     mCcSph.SetR(20.0f);
     dComIfG_Ccsp()->Set(&mCcSph);
 }
 
-/* 80C2AF68-80C2AF88 0001E8 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     return static_cast<daObjKABUTO_c*>(i_this)->CreateHeap();
 }
 
-/* 80C2AF88-80C2B2E0 000208 0358+00 1/1 0/0 0/0 .text            CreateHeap__13daObjKABUTO_cFv */
 int daObjKABUTO_c::CreateHeap() {
     J3DModelData* model_data;
     if (mSex == SEX_FEMALE) {
@@ -110,29 +106,25 @@ int daObjKABUTO_c::CreateHeap() {
     return 1;
 }
 
-/* 80C2B328-80C2B348 0005A8 0020+00 1/0 0/0 0/0 .text            daObjKABUTO_Create__FP10fopAc_ac_c
- */
 static cPhs__Step daObjKABUTO_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjKABUTO_c*>(i_this)->create();
 }
 
-/* 80C2B348-80C2B36C 0005C8 0024+00 1/0 0/0 0/0 .text daObjKABUTO_Delete__FP13daObjKABUTO_c */
 static int daObjKABUTO_Delete(daObjKABUTO_c* i_this) {
     i_this->Delete();
     return 1;
 }
 
-/* 80C2B36C-80C2B4D4 0005EC 0168+00 1/1 0/0 0/0 .text            ShopWaitAction__13daObjKABUTO_cFv
- */
 void daObjKABUTO_c::ShopWaitAction() {
     switch (mMode) {
-    case 0:
+    case 0: {
         speedF = 0.0f;
         J3DAnmTransform* anm = static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("Kab_m", 7));
         mpMorf->setAnm(anm, 2, 5.0f, 0.0f, 0.0f, -1.0f);
         mMode++;
         mTimers[0] = cM_rndF(50.0f) + 50.0f;
         break;
+    }
 
     case 1:
         mTimers[0]--;
@@ -155,16 +147,16 @@ void daObjKABUTO_c::ShopWaitAction() {
     }
 }
 
-/* 80C2B4D4-80C2B618 000754 0144+00 1/1 0/0 0/0 .text            WaitAction__13daObjKABUTO_cFv */
 void daObjKABUTO_c::WaitAction() {
     switch (mMode) {
-    case 0:
+    case 0: {
         speedF = 0.0f;
         J3DAnmTransform* anm = static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("Kab_m", 7));
         mpMorf->setAnm(anm, 2, 5.0f, 0.0f, 0.0f, -1.0f);
         mMode++;
         mTimers[0] = cM_rndF(50.0f) + 50.0f;
         break;
+    }
 
     case 1:
         if (fopAcM_searchActorDistance(this, daPy_getPlayerActorClass()) < 1500.0f) {
@@ -181,7 +173,6 @@ void daObjKABUTO_c::WaitAction() {
     }
 }
 
-/* 80C2B618-80C2B844 000898 022C+00 1/1 0/0 0/0 .text            WallCheck__13daObjKABUTO_cFv */
 BOOL daObjKABUTO_c::WallCheck() {
     dBgS_LinChk lin_chk;
     lin_chk.SetObj();
@@ -201,7 +192,6 @@ BOOL daObjKABUTO_c::WallCheck() {
     return false;
 }
 
-/* 80C2B88C-80C2B998 000B0C 010C+00 1/1 0/0 0/0 .text            SpeedSet__13daObjKABUTO_cFv */
 void daObjKABUTO_c::SpeedSet() {
     speed.y += gravity;
     cXyz speed_base(0.0f, speed.y, speedF);
@@ -218,7 +208,6 @@ void daObjKABUTO_c::SpeedSet() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80C2B998-80C2BDE8 000C18 0450+00 1/1 0/0 0/0 .text            WallWalk__13daObjKABUTO_cFv */
 void daObjKABUTO_c::WallWalk() {
     cXyz vec1(0.0f, -100.0f, speedF * 3.0f);
     cXyz vec2(0.0f, 40.0f, 0.0f);
@@ -260,7 +249,6 @@ void daObjKABUTO_c::WallWalk() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80C2BDE8-80C2BFE8 001068 0200+00 2/2 0/0 0/0 .text            WalkAction__13daObjKABUTO_cFv */
 void daObjKABUTO_c::WalkAction() {
     for (int i = 0; i < 3; i++) {
         mTimers[i]--;
@@ -307,7 +295,6 @@ void daObjKABUTO_c::WalkAction() {
     WallWalk();
 }
 
-/* 80C2BFE8-80C2C7C8 001268 07E0+00 2/2 0/0 0/0 .text            MoveAction__13daObjKABUTO_cFv */
 void daObjKABUTO_c::MoveAction() {
     for (int i = 0; i < 3; i++) {
         mTimers[i]--;
@@ -441,7 +428,6 @@ void daObjKABUTO_c::MoveAction() {
     }
 }
 
-/* 80C2C7C8-80C2C944 001A48 017C+00 1/1 0/0 0/0 .text            Z_BufferChk__13daObjKABUTO_cFv */
 void daObjKABUTO_c::Z_BufferChk() {
     cXyz vec2, vec1;
     vec1 = current.pos;
@@ -454,7 +440,7 @@ void daObjKABUTO_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -468,7 +454,6 @@ void daObjKABUTO_c::Z_BufferChk() {
     mScreenZ = ((near + far * near / vec2.z) / (far - near) + 1.0f) * 0xffffff;
 }
 
-/* 80C2C944-80C2CA08 001BC4 00C4+00 1/1 0/0 0/0 .text            Action__13daObjKABUTO_cFv */
 void daObjKABUTO_c::Action() {
     switch (mAction) {
     case ACT_WAIT:
@@ -486,7 +471,6 @@ void daObjKABUTO_c::Action() {
     mCreatureSound.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
 }
 
-/* 80C2CA08-80C2CAC4 001C88 00BC+00 1/1 0/0 0/0 .text            ShopAction__13daObjKABUTO_cFv */
 void daObjKABUTO_c::ShopAction() {
     switch (mAction) {
     case ACT_WAIT:
@@ -503,16 +487,13 @@ void daObjKABUTO_c::ShopAction() {
     mCreatureSound.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
 }
 
-/* 80C2CAC4-80C2CADC 001D44 0018+00 1/0 0/0 0/0 .text            Insect_Release__13daObjKABUTO_cFv
- */
 void daObjKABUTO_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = ACT_MOVE;
     mMode = 0;
 }
 
-/* 80C2E1E0-80C2E1E4 0000D0 0002+02 1/2 0/0 0/0 .rodata          l_kab_itemno */
-static u8 const l_kab_itemno[2] = {0xC0, 0xC1};
+static u8 const l_kab_itemno[2] = {fpcNm_ITEM_M_BEETLE, fpcNm_ITEM_F_BEETLE};
 
 // Some unused function went here.
 // This fake function is here in its place to make the literals match
@@ -520,7 +501,6 @@ static f32 fake(f32 param_0) {
     return param_0 * -9.0f * -0.2f * 0.05f;
 }
 
-/* 80C2CADC-80C2CC18 001D5C 013C+00 1/1 0/0 0/0 .text            ParticleSet__13daObjKABUTO_cFv */
 void daObjKABUTO_c::ParticleSet() {
     if (mScreenZ > mBufferZ) {
         cLib_chaseF(&mParticleScale, 0.0f, 1.0f);
@@ -540,7 +520,6 @@ void daObjKABUTO_c::ParticleSet() {
     }
 }
 
-/* 80C2CC18-80C2D21C 001E98 0604+00 1/1 0/0 0/0 .text            Execute__13daObjKABUTO_cFv */
 int daObjKABUTO_c::Execute() {
     if (ChkGetDemo()) {
         mScreenZ = mBufferZ + 10000.0f;
@@ -634,7 +613,6 @@ int daObjKABUTO_c::Execute() {
     return 1;
 }
 
-/* 80C2D21C-80C2D3A4 00249C 0188+00 1/1 0/0 0/0 .text            ObjHit__13daObjKABUTO_cFv */
 void daObjKABUTO_c::ObjHit() {
     if (mCcSph.ChkTgHit()) {
         cCcD_Obj* hit_obj = mCcSph.GetTgHitObj();
@@ -661,11 +639,10 @@ void daObjKABUTO_c::ObjHit() {
     }
 }
 
-/* 80C2D3A4-80C2D40C 002624 0068+00 1/1 0/0 0/0 .text            Delete__13daObjKABUTO_cFv */
 int daObjKABUTO_c::Delete() {
     dComIfG_resDelete(&mPhaseReq, "Kab_m");
     if (mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
     if (heap != NULL) {
         mpMorf->stopZelAnime();
@@ -673,7 +650,6 @@ int daObjKABUTO_c::Delete() {
     return 1;
 }
 
-/* 80C2D40C-80C2D474 00268C 0068+00 1/1 0/0 0/0 .text            setBaseMtx__13daObjKABUTO_cFv */
 void daObjKABUTO_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(mWallAngle);
@@ -700,21 +676,19 @@ int daObjKABUTO_c::Draw() {
     return 1;
 }
 
-/* 80C2D474-80C2D558 0026F4 00E4+00 1/0 0/0 0/0 .text            daObjKABUTO_Draw__FP13daObjKABUTO_c
- */
 static int daObjKABUTO_Draw(daObjKABUTO_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80C2D558-80C2D578 0027D8 0020+00 2/1 0/0 0/0 .text daObjKABUTO_Execute__FP13daObjKABUTO_c */
 static int daObjKABUTO_Execute(daObjKABUTO_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80C2E200-80C2E204 0000F0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x0191, 0x0192};
+static u16 const l_musiya_num[2] = {
+    0x0191, /* dSv_event_flag_c::F_0401 - Misc. - Beetle (M) */
+    0x0192, /* dSv_event_flag_c::F_0402 - Misc. - Beetle (F) */
+};
 
-/* 80C2D578-80C2D724 0027F8 01AC+00 1/1 0/0 0/0 .text            CreateChk__13daObjKABUTO_cFv */
 bool daObjKABUTO_c::CreateChk() {
     u8 param = (fopAcM_GetParam(this) >> 8) & 0xf;
     if (param == 0xf) {
@@ -749,15 +723,14 @@ bool daObjKABUTO_c::CreateChk() {
     return true;
 }
 
-/* 80C2D724-80C2DF60 0029A4 083C+00 1/1 0/0 0/0 .text            create__13daObjKABUTO_cFv */
 cPhs__Step daObjKABUTO_c::create() {
-    fopAcM_SetupActor(this, daObjKABUTO_c);
+    fopAcM_ct(this, daObjKABUTO_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "Kab_m");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
         } else {
@@ -777,8 +750,8 @@ cPhs__Step daObjKABUTO_c::create() {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
-            hioInit = true;
+        if (!hio_set) {
+            hio_set = true;
             mHIOInit = true;
             l_HIO.field_0x4 = -1;
         }
@@ -877,12 +850,10 @@ cPhs__Step daObjKABUTO_c::create() {
     return step;
 }
 
-/* 80C2E060-80C2E068 0032E0 0008+00 1/0 0/0 0/0 .text daObjKABUTO_IsDelete__FP13daObjKABUTO_c */
 static int daObjKABUTO_IsDelete(daObjKABUTO_c* i_this) {
     return 1;
 }
 
-/* 80C2E228-80C2E248 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjKABUTO_Method */
 static actor_method_class l_daObjKABUTO_Method = {
     (process_method_func)daObjKABUTO_Create,
     (process_method_func)daObjKABUTO_Delete,
@@ -891,7 +862,6 @@ static actor_method_class l_daObjKABUTO_Method = {
     (process_method_func)daObjKABUTO_Draw,
 };
 
-/* 80C2E248-80C2E278 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Kabuto */
 extern actor_process_profile_definition g_profile_Obj_Kabuto = {
     fpcLy_CURRENT_e,
     7,

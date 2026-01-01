@@ -3,6 +3,8 @@
  * Tag - Midna Hint
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_mhint.h"
 #include "d/actor/d_a_midna.h"
 #include "d/d_com_inf_game.h"
@@ -10,9 +12,8 @@
 #include "d/d_procname.h"
 #include "d/d_meter2_info.h"
 
-/* 805A56B8-805A58C8 000078 0210+00 1/1 0/0 0/0 .text            create__12daTagMhint_cFv */
 int daTagMhint_c::create() {
-    fopAcM_SetupActor(this, daTagMhint_c);
+    fopAcM_ct(this, daTagMhint_c);
 
     field_0x574 = fopAcM_GetParam(this) & 0x3FF;
     field_0x57c = (fopAcM_GetParam(this) >> 10) & 0x3FF;
@@ -62,23 +63,17 @@ int daTagMhint_c::create() {
     return cPhs_COMPLEATE_e;
 }
 
-/* 805A58C8-805A58E8 000288 0020+00 1/0 0/0 0/0 .text            daTagMhint_Create__FP10fopAc_ac_c
- */
 static int daTagMhint_Create(fopAc_ac_c* i_this) {
     return static_cast<daTagMhint_c*>(i_this)->create();
 }
 
-/* 805A58E8-805A594C 0002A8 0064+00 1/1 0/0 0/0 .text            __dt__12daTagMhint_cFv */
 daTagMhint_c::~daTagMhint_c() {}
 
-/* 805A594C-805A5974 00030C 0028+00 1/0 0/0 0/0 .text            daTagMhint_Delete__FP12daTagMhint_c
- */
 static int daTagMhint_Delete(daTagMhint_c* i_this) {
     i_this->~daTagMhint_c();
     return 1;
 }
 
-/* 805A5974-805A5AE4 000334 0170+00 1/1 0/0 0/0 .text            eventOrder__12daTagMhint_cFv */
 void daTagMhint_c::eventOrder() {
     if (!dComIfGp_event_runCheck()) {
         eventInfo.onCondition(dEvtCnd_CANTALK_e);
@@ -110,7 +105,6 @@ void daTagMhint_c::eventOrder() {
     }
 }
 
-/* 805A5AE4-805A6004 0004A4 0520+00 1/1 0/0 0/0 .text            execute__12daTagMhint_cFv */
 int daTagMhint_c::execute() {
     daMidna_c* midna_p = daPy_py_c::getMidnaActor();
     if (midna_p == NULL) {
@@ -226,26 +220,20 @@ int daTagMhint_c::execute() {
     return 1;
 }
 
-/* 805A6004-805A6024 0009C4 0020+00 1/0 0/0 0/0 .text daTagMhint_Execute__FP12daTagMhint_c */
 static int daTagMhint_Execute(daTagMhint_c* i_this) {
     return i_this->execute();
 }
 
-/* 805A6024-805A602C 0009E4 0008+00 1/0 0/0 0/0 .text            daTagMhint_Draw__FP12daTagMhint_c
- */
 static int daTagMhint_Draw(daTagMhint_c* i_this) {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 805A6054-805A6074 -00001 0020+00 1/0 0/0 0/0 .data            l_daTagMhint_Method */
 static actor_method_class l_daTagMhint_Method = {
     (process_method_func)daTagMhint_Create,  (process_method_func)daTagMhint_Delete,
     (process_method_func)daTagMhint_Execute, (process_method_func)NULL,
     (process_method_func)daTagMhint_Draw,
 };
 
-/* 805A6074-805A60A4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Tag_Mhint */
 extern actor_process_profile_definition g_profile_Tag_Mhint = {
     fpcLy_CURRENT_e,
     7,

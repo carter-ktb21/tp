@@ -3,27 +3,26 @@
  * Object - Golden Butterfly
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_cho.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
-/* 80BCC750-80BCC754 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 80BCC760-80BCC770 000018 0010+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_ChoHIO_c l_HIO;
 
-/* 80BCA30C-80BCA334 0000EC 0028+00 1/1 0/0 0/0 .text            __ct__14daObj_ChoHIO_cFv */
 daObj_ChoHIO_c::daObj_ChoHIO_c() {
     field_0x4 = -1;
     mScaleMale = 0.8f;
     mScaleFemale = 0.8f;
 }
 
-/* 80BCA334-80BCA3A0 000114 006C+00 1/1 0/0 0/0 .text            InitCcSph__10daObjCHO_cFv */
 void daObjCHO_c::InitCcSph() {
     mCcStts.Init(1, 0, this);
     const static dCcD_SrcSph ccSphSrc = {
@@ -43,19 +42,16 @@ void daObjCHO_c::InitCcSph() {
     mCcSph.OnTgNoHitMark();
 }
 
-/* 80BCA3A0-80BCA3F8 000180 0058+00 1/1 0/0 0/0 .text            SetCcSph__10daObjCHO_cFv */
 void daObjCHO_c::SetCcSph() {
     mCcSph.SetC(current.pos);
     mCcSph.SetR(20.0f);
     dComIfG_Ccsp()->Set(&mCcSph);
 }
 
-/* 80BCA3F8-80BCA418 0001D8 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     return static_cast<daObjCHO_c*>(i_this)->CreateHeap();
 }
 
-/* 80BCA418-80BCA700 0001F8 02E8+00 1/1 0/0 0/0 .text            CreateHeap__10daObjCHO_cFv */
 int daObjCHO_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes("I_Cho", 10);
     mpMorf = new mDoExt_McaMorfSO(model_data, NULL, NULL,
@@ -101,18 +97,15 @@ int daObjCHO_c::CreateHeap() {
     return 1;
 }
 
-/* 80BCA748-80BCA768 000528 0020+00 1/0 0/0 0/0 .text            daObjCHO_Create__FP10fopAc_ac_c */
 static cPhs__Step daObjCHO_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjCHO_c*>(i_this)->create();
 }
 
-/* 80BCA768-80BCA78C 000548 0024+00 1/0 0/0 0/0 .text            daObjCHO_Delete__FP10daObjCHO_c */
 static int daObjCHO_Delete(daObjCHO_c* i_this) {
     i_this->Delete();
     return 1;
 }
 
-/* 80BCA78C-80BCA88C 00056C 0100+00 1/1 0/0 0/0 .text            SpeedSet__10daObjCHO_cFv */
 void daObjCHO_c::SpeedSet() {
     speed.y += gravity;
     current.pos.y += speed.y;
@@ -128,7 +121,6 @@ void daObjCHO_c::SpeedSet() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80BCA88C-80BCA924 00066C 0098+00 1/1 0/0 0/0 .text            WallCheck__10daObjCHO_cFv */
 void daObjCHO_c::WallCheck() {
     dBgS_LinChk lin_chk;
     lin_chk.SetObj();
@@ -139,7 +131,6 @@ void daObjCHO_c::WallCheck() {
     }
 }
 
-/* 80BCA924-80BCAB50 000704 022C+00 1/1 0/0 0/0 .text            SearchLink__10daObjCHO_cFv */
 void daObjCHO_c::SearchLink() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     if (current.pos.absXZ(player->current.pos) < 200.0f
@@ -156,7 +147,6 @@ void daObjCHO_c::SearchLink() {
     }
 }
 
-/* 80BCAB50-80BCAEDC 000930 038C+00 2/2 0/0 0/0 .text            WaitAction__10daObjCHO_cFv */
 void daObjCHO_c::WaitAction() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     cXyz vec1, target;
@@ -204,7 +194,6 @@ void daObjCHO_c::WaitAction() {
     mTargetPos = target;
 }
 
-/* 80BCAEDC-80BCB210 000CBC 0334+00 2/2 0/0 0/0 .text            MoveAction__10daObjCHO_cFv */
 void daObjCHO_c::MoveAction() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     SpeedSet();
@@ -253,7 +242,6 @@ void daObjCHO_c::MoveAction() {
     }
 }
 
-/* 80BCB210-80BCB268 000FF0 0058+00 1/1 0/0 0/0 .text            Action__10daObjCHO_cFv */
 void daObjCHO_c::Action() {
     switch (mAction) {
     case ACT_WAIT:
@@ -266,7 +254,6 @@ void daObjCHO_c::Action() {
     Insect_GetDemoMain();
 }
 
-/* 80BCB268-80BCB2AC 001048 0044+00 1/1 0/0 0/0 .text            ShopAction__10daObjCHO_cFv */
 void daObjCHO_c::ShopAction() {
     switch (mAction) {
     case ACT_WAIT:
@@ -278,21 +265,18 @@ void daObjCHO_c::ShopAction() {
     }
 }
 
-/* 80BCB2AC-80BCB310 00108C 0064+00 1/1 0/0 0/0 .text            checkGroundPos__10daObjCHO_cFv */
 void daObjCHO_c::checkGroundPos() {
     cXyz pos = current.pos;
     mGndChk.SetPos(&pos);
     mGroundPos = dComIfG_Bgsp().GroundCross(&mGndChk);
 }
 
-/* 80BCB310-80BCB320 0010F0 0010+00 1/0 0/0 0/0 .text            Insect_Release__10daObjCHO_cFv */
 void daObjCHO_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = ACT_MOVE;
 }
 
-/* 80BCC630-80BCC634 0000B8 0002+02 1/2 0/0 0/0 .rodata          l_cho_itemno */
-static u8 const l_cho_itemno[2] = {0xC2, 0xC3};
+static u8 const l_cho_itemno[2] = {fpcNm_ITEM_M_BUTTERFLY, fpcNm_ITEM_F_BUTTERFLY};
 
 // Some unused function went here.
 // This fake function is here in its place to make the literals match
@@ -300,7 +284,6 @@ static f32 fake(f32 param_0, s32 param_1) {
     return param_0 * -2.0f * 4000.0f * param_1;
 }
 
-/* 80BCB320-80BCB49C 001100 017C+00 1/1 0/0 0/0 .text            Z_BufferChk__10daObjCHO_cFv */
 void daObjCHO_c::Z_BufferChk() {
     cXyz vec2, vec1;
     vec1 = current.pos;
@@ -313,7 +296,7 @@ void daObjCHO_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -327,7 +310,6 @@ void daObjCHO_c::Z_BufferChk() {
     mScreenZ = ((near + far * near / vec2.z) / (far - near) + 1.0f) * 0xffffff;
 }
 
-/* 80BCB49C-80BCB5C0 00127C 0124+00 1/1 0/0 0/0 .text            ParticleSet__10daObjCHO_cFv */
 void daObjCHO_c::ParticleSet() {
     if (mScreenZ > mBufferZ) {
         cLib_addCalc2(&mParticleScale, 0.0f, 1.0f, 1.0f);
@@ -343,7 +325,6 @@ void daObjCHO_c::ParticleSet() {
     }
 }
 
-/* 80BCB5C0-80BCB834 0013A0 0274+00 1/1 0/0 0/0 .text            BoomChk__10daObjCHO_cFv */
 void daObjCHO_c::BoomChk() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     if (mBoomerangHit) {
@@ -385,7 +366,6 @@ void daObjCHO_c::BoomChk() {
     }
 }
 
-/* 80BCB87C-80BCBB40 00165C 02C4+00 1/1 0/0 0/0 .text            Execute__10daObjCHO_cFv */
 int daObjCHO_c::Execute() {
     if (ChkGetDemo()) {
         mScreenZ = mBufferZ + 10000.0f;
@@ -440,7 +420,6 @@ int daObjCHO_c::Execute() {
     return 1;
 }
 
-/* 80BCBB40-80BCBCA8 001920 0168+00 1/1 0/0 0/0 .text            ObjHit__10daObjCHO_cFv */
 void daObjCHO_c::ObjHit() {
     if (mCcSph.ChkTgHit()) {
         cCcD_Obj* hit_obj = mCcSph.GetTgHitObj();
@@ -466,11 +445,10 @@ void daObjCHO_c::ObjHit() {
     }
 }
 
-/* 80BCBCA8-80BCBD10 001A88 0068+00 1/1 0/0 0/0 .text            Delete__10daObjCHO_cFv */
 int daObjCHO_c::Delete() {
     dComIfG_resDelete(&mPhaseReq, "I_Cho");
     if (mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
     if (heap != NULL) {
         mpMorf->stopZelAnime();
@@ -478,7 +456,6 @@ int daObjCHO_c::Delete() {
     return 1;
 }
 
-/* 80BCBD10-80BCBD70 001AF0 0060+00 1/1 0/0 0/0 .text            setBaseMtx__10daObjCHO_cFv */
 void daObjCHO_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(shape_angle);
@@ -504,20 +481,19 @@ int daObjCHO_c::Draw() {
     return 1;
 }
 
-/* 80BCBD70-80BCBE50 001B50 00E0+00 1/0 0/0 0/0 .text            daObjCHO_Draw__FP10daObjCHO_c */
 static int daObjCHO_Draw(daObjCHO_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80BCBE50-80BCBE70 001C30 0020+00 2/1 0/0 0/0 .text            daObjCHO_Execute__FP10daObjCHO_c */
 static int daObjCHO_Execute(daObjCHO_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80BCC670-80BCC674 0000F8 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x0193, 0x0194};
+static u16 const l_musiya_num[2] = {
+    0x0193, /* dSv_event_flag_c::F_0403 - Misc. - Butterfly (M) */
+    0x0194, /* dSv_event_flag_c::F_0404 - Misc. - Butterfly (F) */
+};
 
-/* 80BCBE70-80BCC01C 001C50 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjCHO_cFv */
 bool daObjCHO_c::CreateChk() {
     u8 param = (fopAcM_GetParam(this) >> 8) & 0xf;
     if (param == 0xf) {
@@ -552,15 +528,14 @@ bool daObjCHO_c::CreateChk() {
     return true;
 }
 
-/* 80BCC01C-80BCC3C8 001DFC 03AC+00 1/1 0/0 0/0 .text            create__10daObjCHO_cFv */
 cPhs__Step daObjCHO_c::create() {
-    fopAcM_SetupActor(this, daObjCHO_c);
+    fopAcM_ct(this, daObjCHO_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, "I_Cho");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
             mTargetSpeedY = -2.0f;
@@ -590,8 +565,8 @@ cPhs__Step daObjCHO_c::create() {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
-            hioInit = true;
+        if (!hio_set) {
+            hio_set = true;
             mHIOInit = true;
             l_HIO.field_0x4 = -1;
         }
@@ -618,13 +593,10 @@ cPhs__Step daObjCHO_c::create() {
     return step;
 }
 
-/* 80BCC4C8-80BCC4D0 0022A8 0008+00 1/0 0/0 0/0 .text            daObjCHO_IsDelete__FP10daObjCHO_c
- */
 static int daObjCHO_IsDelete(daObjCHO_c* i_this) {
     return 1;
 }
 
-/* 80BCC688-80BCC6A8 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjCHO_Method */
 static actor_method_class l_daObjCHO_Method = {
     (process_method_func)daObjCHO_Create,
     (process_method_func)daObjCHO_Delete,
@@ -633,7 +605,6 @@ static actor_method_class l_daObjCHO_Method = {
     (process_method_func)daObjCHO_Draw,
 };
 
-/* 80BCC6A8-80BCC6D8 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Cho */
 extern actor_process_profile_definition g_profile_Obj_Cho = {
     fpcLy_CURRENT_e,
     7,

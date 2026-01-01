@@ -17,9 +17,6 @@ class daGraveStone_c : public dBgS_MoveBgActor {
 public:
     class daObj_GrvStn_prtclMngr_c {
     public:
-        /* 80C12EF0 */ ~daObj_GrvStn_prtclMngr_c() {}
-        /* 80C12F2C */ daObj_GrvStn_prtclMngr_c() {}
-
         /* 0x00 */ bool field_0x00;
         /* 0x04 */ cXyz mPos;
         /* 0x10 */ csXyz mAngle;
@@ -27,17 +24,17 @@ public:
         /* 0x24 */ dPaPo_c field_0x24;
     };  // Size: 0x5C
 
-    /* 80C125F8 */ void setBaseMtx();
-    /* 80C1266C */ void moveCalc();
-    /* 80C12918 */ int setPrtcl();
-    /* 80C12A38 */ void setEnvTevColor();
-    /* 80C12A94 */ void setRoomNo();
-    /* 80C12AD8 */ int Create();
-    /* 80C12CA4 */ int CreateHeap();
-    /* 80C12D1C */ cPhs__Step create();
-    /* 80C13030 */ int Execute(Mtx**);
-    /* 80C13078 */ int Draw();
-    /* 80C1311C */ int Delete();
+    void setBaseMtx();
+    void moveCalc();
+    int setPrtcl();
+    void setEnvTevColor();
+    void setRoomNo();
+    int Create();
+    int CreateHeap();
+    cPhs__Step create();
+    int Execute(Mtx**);
+    int Draw();
+    int Delete();
 
 private:
     friend class daNpc_zrZ_c;

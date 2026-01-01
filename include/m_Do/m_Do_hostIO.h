@@ -2,7 +2,6 @@
 #define M_DO_M_DO_HOSTIO_H
 
 #include "JSystem/JHostIO/JORReflexible.h"
-#include "JSystem/JHostIO/JORMContext.h"
 #include <string.h>
 
 class mDoHIO_child_c {
@@ -26,7 +25,7 @@ public:
 
 class mDoHIO_entry_c : public JORReflexible {
 public:
-#ifdef DEBUG
+#if DEBUG
     mDoHIO_entry_c();
     void entryHIO(const char* i_name);
     void removeHIO();
@@ -59,7 +58,9 @@ public:
     void update();
     void updateChild(s8);
     void deleteChild(s8);
-    int createChild(const char*, JORReflexible*);
+    s8 createChild(const char* i_name, JORReflexible* i_node) {
+        return mSub.createChild(i_name, i_node);
+    }
 
     virtual void genMessage(JORMContext*);
     virtual ~mDoHIO_root_c();
@@ -71,9 +72,11 @@ extern mDoHIO_root_c mDoHIO_root;
 
 void mDoHIO_updateChild(s8 i_no);
 void mDoHIO_deleteChild(s8 i_no);
-s8 mDoHIO_createChild(const char*, JORReflexible*);
+inline s8 mDoHIO_createChild(const char* i_name, JORReflexible* i_node) {
+    return mDoHIO_root.createChild(i_name, i_node);
+}
 
-#ifdef DEBUG
+#if DEBUG
 #define mDoHIO_CREATE_CHILD(i_name, i_node) mDoHIO_createChild(i_name, i_node)
 #define mDoHIO_DELETE_CHILD(i_no)           mDoHIO_deleteChild(i_no)
 #else

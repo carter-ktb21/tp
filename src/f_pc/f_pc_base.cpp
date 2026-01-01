@@ -13,12 +13,8 @@
 #include "f_pc/f_pc_pause.h"
 #include "f_pc/f_pc_profile.h"
 #include "f_pc/f_pc_debug_sv.h"
-
-#if VERSION == VERSION_SHIELD_DEBUG
 #include "Z2AudioLib/Z2AudioMgr.h"
-#endif
 
-/* 8002064C-8002065C 0010+00 s=0 e=14 z=0  None .text      fpcBs_Is_JustOfType__Fii */
 BOOL fpcBs_Is_JustOfType(int i_typeA, int i_typeB) {
     if (i_typeB == i_typeA) {
         return TRUE;
@@ -27,10 +23,8 @@ BOOL fpcBs_Is_JustOfType(int i_typeA, int i_typeB) {
     }
 }
 
-/* 80450D00-80450D04 0004+00 s=1 e=0 z=0  None .sbss      g_fpcBs_type */
 int g_fpcBs_type;
 
-/* 8002065C-8002069C 0040+00 s=1 e=5 z=0  None .text      fpcBs_MakeOfType__FPi */
 int fpcBs_MakeOfType(int* i_type) {
     static int t_type = 0x9130000;
     if (*i_type == 0) {
@@ -39,17 +33,15 @@ int fpcBs_MakeOfType(int* i_type) {
     return *i_type;
 }
 
-/* 8002069C-800206C4 0028+00 s=0 e=2 z=0  None .text      fpcBs_MakeOfId__Fv */
 int fpcBs_MakeOfId() {
     static int process_id = 1;
     return process_id++;
 }
 
-/* 800206C4-80020720 005C+00 s=0 e=1 z=0  None .text      fpcBs_Execute__FP18base_process_class */
 int fpcBs_Execute(base_process_class* i_proc) {
     int result = 1;
 
-#ifdef DEBUG
+#if DEBUG
     if (!fpcBs_Is_JustOfType(g_fpcBs_type, i_proc->type)) {
         if (g_fpcDbSv_service[10] != NULL) {
             g_fpcDbSv_service[10](i_proc);
@@ -71,8 +63,6 @@ int fpcBs_Execute(base_process_class* i_proc) {
     return result;
 }
 
-/* 80020720-80020760 0040+00 s=2 e=0 z=0  None .text      fpcBs_DeleteAppend__FP18base_process_class
- */
 void fpcBs_DeleteAppend(base_process_class* i_proc) {
     if (i_proc->append != NULL) {
         cMl::free(i_proc->append);
@@ -80,7 +70,6 @@ void fpcBs_DeleteAppend(base_process_class* i_proc) {
     }
 }
 
-/* 80020760-800207BC 005C+00 s=0 e=1 z=0  None .text      fpcBs_IsDelete__FP18base_process_class */
 int fpcBs_IsDelete(base_process_class* i_proc) {
     int result;
     layer_class* save_layer = fpcLy_CurrentLayer();
@@ -92,7 +81,6 @@ int fpcBs_IsDelete(base_process_class* i_proc) {
     return result;
 }
 
-/* 800207BC-80020820 0064+00 s=0 e=2 z=0  None .text      fpcBs_Delete__FP18base_process_class */
 int fpcBs_Delete(base_process_class* i_proc) {
     BOOL result = TRUE;
     if (result == TRUE) {
@@ -103,28 +91,27 @@ int fpcBs_Delete(base_process_class* i_proc) {
             i_proc->type = 0;
             cMl::free(i_proc);
 
-            #if VERSION == VERSION_SHIELD_DEBUG
-            // JSUList<Z2SoundObjBase>* allList = Z2GetAudioMgr()->getAllList();
-            
-            // for (JSUListIterator<Z2SoundObjBase> it(allList->getFirst()); it != allList->getEnd(); it++) {
-            //     static JSULink<Z2SoundObjBase>* DUMMY_FILL_IT = NULL;
-            //     static Z2SoundObjBase* DUMMY_FILL_P = NULL;
-            //     if (it == DUMMY_FILL_IT || it.getObject() == DUMMY_FILL_P) {
-            //         const char* stageName = dStage_getName2(profname, 0);
-            //         if (stageName == NULL) {
-            //             JUT_PANIC_F(341, "Sound Object Not Delete !! <%d>\n", profname);
-            //         } else {
-            //             JUT_PANIC_F(345, "Sound Object Not Delete !! <%s>\n", stageName);
-            //         }
-            //     }
-            // }
+            #if DEBUG
+            JSUList<Z2SoundObjBase>* allList = Z2GetAudioMgr()->getAllList();
+
+            for (JSUListIterator<Z2SoundObjBase> it(allList->getFirst()); it != allList->getEnd(); it++) {
+                static JSULink<Z2SoundObjBase>* DUMMY_FILL_IT = NULL;
+                static Z2SoundObjBase* DUMMY_FILL_P = NULL;
+                if (it == DUMMY_FILL_IT || it.getObject() == DUMMY_FILL_P) {
+                    const char* stageName = dStage_getName2(profname, 0);
+                    if (stageName == NULL) {
+                        JUT_PANIC_F(341, "Sound Object Not Delete !! <%d>\n", profname);
+                    } else {
+                        JUT_PANIC_F(345, "Sound Object Not Delete !! <%s>\n", stageName);
+                    }
+                }
+            }
             #endif
         }
     }
     return result;
 }
 
-/* 80020820-8002091C 00FC+00 s=0 e=2 z=0  None .text      fpcBs_Create__FsUiPv */
 base_process_class* fpcBs_Create(s16 i_profname, fpc_ProcID i_procID, void* i_append) {
     process_profile_definition* pprofile;
     base_process_class* pprocess;
@@ -145,7 +132,7 @@ base_process_class* fpcBs_Create(s16 i_profname, fpc_ProcID i_procID, void* i_ap
     fpcPi_Init(&pprocess->priority, pprocess, pprofile->layer_id, pprofile->list_id,
                 pprofile->list_priority);
 
-    pprocess->init_state = 0;
+    pprocess->state.init_state = 0;
     pprocess->unk_0xA = 0;
     pprocess->id = i_procID;
     pprocess->profname = i_profname;
@@ -164,19 +151,19 @@ int fpcBs_SubCreate(base_process_class* i_proc) {
     case cPhs_NEXT_e:
     case cPhs_COMPLEATE_e:
         fpcBs_DeleteAppend(i_proc);
-        i_proc->create_phase = cPhs_NEXT_e;
+        i_proc->state.create_phase = cPhs_NEXT_e;
         return cPhs_NEXT_e;
     case cPhs_INIT_e:
-    case cPhs_LOADING_e:
-        i_proc->init_state = 1;
-        i_proc->create_phase = cPhs_INIT_e;
+case cPhs_LOADING_e:
+        i_proc->state.init_state = 1;
+        i_proc->state.create_phase = cPhs_INIT_e;
         return cPhs_INIT_e;
     case cPhs_UNK3_e:
-        i_proc->create_phase = cPhs_UNK3_e;
+        i_proc->state.create_phase = cPhs_UNK3_e;
         return cPhs_UNK3_e;
     case cPhs_ERROR_e:
     default:
-        i_proc->create_phase = cPhs_ERROR_e;
+        i_proc->state.create_phase = cPhs_ERROR_e;
         return cPhs_ERROR_e;
     }
 }

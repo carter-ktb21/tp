@@ -3,6 +3,8 @@
  * UI Epona Dash Spurs
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_meter_hakusha.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
@@ -12,18 +14,15 @@
 #include "d/d_meter_HIO.h"
 #include "d/d_pane_class.h"
 
-/* 8020C320-8020C384 206C60 0064+00 0/0 1/1 0/0 .text            __ct__15dMeterHakusha_cFPv */
 dMeterHakusha_c::dMeterHakusha_c(void* i_screen) {
     field_0x004 = (J2DScreen*)i_screen;
     _create();
 }
 
-/* 8020C384-8020C400 206CC4 007C+00 1/0 0/0 0/0 .text            __dt__15dMeterHakusha_cFv */
 dMeterHakusha_c::~dMeterHakusha_c() {
     _delete();
 }
 
-/* 8020C400-8020C808 206D40 0408+00 1/0 0/0 0/0 .text            _create__15dMeterHakusha_cFv */
 int dMeterHakusha_c::_create() {
     static u64 haku_tag[] = {
         'haku_n00', 'haku_n01', 'haku_n02', 'haku_n03', 'haku_n04', 'haku_n05',
@@ -31,14 +30,14 @@ int dMeterHakusha_c::_create() {
 
     for (int i = 0; i < 6; i++) {
         mpHakushaPos[i] = new CPaneMgr(field_0x004, haku_tag[i], 0, NULL);
-        JUT_ASSERT(0, mpHakushaPos[i] != 0);
+        JUT_ASSERT(0, mpHakushaPos[i] != NULL);
     }
 
     mpHakushaParent = new CPaneMgr(field_0x004, 'hakunall', 0, NULL);
-    JUT_ASSERT(0, mpHakushaParent != 0);
+    JUT_ASSERT(0, mpHakushaParent != NULL);
 
     mpHakushaScreen = new J2DScreen();
-    JUT_ASSERT(0, mpHakushaScreen != 0);
+    JUT_ASSERT(0, mpHakushaScreen != NULL);
 
     bool fg = mpHakushaScreen->setPriority("zelda_game_image_hakusha_parts.blo", 0x20000,
                                            dComIfGp_getMain2DArchive());
@@ -46,10 +45,10 @@ int dMeterHakusha_c::_create() {
     dPaneClass_showNullPane(mpHakushaScreen);
 
     mpHakushaOn = new CPaneMgr(mpHakushaScreen, 'haku_n', 2, NULL);
-    JUT_ASSERT(0, mpHakushaOn != 0);
+    JUT_ASSERT(0, mpHakushaOn != NULL);
 
     mpHakushaOff = new CPaneMgr(mpHakushaScreen, 'haku_b_n', 2, NULL);
-    JUT_ASSERT(0, mpHakushaOff != 0);
+    JUT_ASSERT(0, mpHakushaOff != NULL);
 
     mpHakushaOn->setAlphaRate(0.0f);
     mpHakushaOff->setAlphaRate(0.0f);
@@ -67,7 +66,7 @@ int dMeterHakusha_c::_create() {
     mHakushaNum = dMeter2Info_getHorseLifeCount();
 
     mpButtonScreen = new J2DScreen();
-    JUT_ASSERT(0, mpButtonScreen != 0);
+    JUT_ASSERT(0, mpButtonScreen != NULL);
 
     fg = mpButtonScreen->setPriority("zelda_game_image_hakusha_a_btn.blo", 0x20000,
                                      dComIfGp_getMain2DArchive());
@@ -75,7 +74,7 @@ int dMeterHakusha_c::_create() {
     dPaneClass_showNullPane(mpButtonScreen);
 
     mpButtonA = new CPaneMgr(mpButtonScreen, 'abtn_n', 2, NULL);
-    JUT_ASSERT(0, mpButtonA != 0);
+    JUT_ASSERT(0, mpButtonA != NULL);
     mpButtonA->show();
     mpButtonA->setAlphaRate(0.0f);
 
@@ -101,14 +100,12 @@ int dMeterHakusha_c::_create() {
     return cPhs_COMPLEATE_e;
 }
 
-/* 8020C808-8020C850 207148 0048+00 1/0 0/0 0/0 .text            _execute__15dMeterHakusha_cFUl */
 int dMeterHakusha_c::_execute(u32 i_flags) {
     updateHakusha();
     alphaAnimeHakusha(i_flags);
     return 1;
 }
 
-/* 8020C850-8020CABC 207190 026C+00 1/0 0/0 0/0 .text            draw__15dMeterHakusha_cFv */
 void dMeterHakusha_c::draw() {
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
     graf_ctx->setup2D();
@@ -154,7 +151,6 @@ void dMeterHakusha_c::draw() {
     }
 }
 
-/* 8020CABC-8020CC58 2073FC 019C+00 1/0 0/0 0/0 .text            _delete__15dMeterHakusha_cFv */
 int dMeterHakusha_c::_delete() {
     for (int i = 0; i < 6; i++) {
         delete mpHakushaPos[i];
@@ -183,7 +179,6 @@ int dMeterHakusha_c::_delete() {
     return 1;
 }
 
-/* 8020CC58-8020CD6C 207598 0114+00 1/1 0/0 0/0 .text alphaAnimeHakusha__15dMeterHakusha_cFUl */
 void dMeterHakusha_c::alphaAnimeHakusha(u32 i_flags) {
     if ((i_flags & 0x4000) || (i_flags & 0x40) || (i_flags & 0x100000) || (i_flags & 0x1000) ||
         (i_flags & 8) || (i_flags & 0x10) || (i_flags & 0x20) || (i_flags & 0x04000000) ||
@@ -205,8 +200,6 @@ void dMeterHakusha_c::alphaAnimeHakusha(u32 i_flags) {
     }
 }
 
-/* 8020CD6C-8020D258 2076AC 04EC+00 1/1 0/0 0/0 .text            updateHakusha__15dMeterHakusha_cFv
- */
 void dMeterHakusha_c::updateHakusha() {
     Vec sp2C = mpHakushaPos[0]->getGlobalVtxCenter(false, 0);
     Vec sp20 = mpHakushaPos[5]->getGlobalVtxCenter(false, 0);
@@ -298,8 +291,6 @@ void dMeterHakusha_c::updateHakusha() {
     }
 }
 
-/* 8020D258-8020D308 207B98 00B0+00 1/1 0/0 0/0 .text setAlphaHakushaAnimeMin__15dMeterHakusha_cFv
- */
 void dMeterHakusha_c::setAlphaHakushaAnimeMin() {
     if (mpHakushaOn->getAlphaRate() != 0.0f) {
         mpHakushaOn->setAlphaRate(g_drawHIO.mSpurIconAlpha);
@@ -312,8 +303,6 @@ void dMeterHakusha_c::setAlphaHakushaAnimeMin() {
     }
 }
 
-/* 8020D308-8020D3B8 207C48 00B0+00 1/1 0/0 0/0 .text setAlphaHakushaAnimeMax__15dMeterHakusha_cFv
- */
 void dMeterHakusha_c::setAlphaHakushaAnimeMax() {
     if (mpHakushaOn->getAlphaRate() != g_drawHIO.mSpurIconAlpha) {
         mpHakushaOn->setAlphaRate(g_drawHIO.mSpurIconAlpha);
@@ -326,8 +315,6 @@ void dMeterHakusha_c::setAlphaHakushaAnimeMax() {
     }
 }
 
-/* 8020D3B8-8020D41C 207CF8 0064+00 1/1 0/0 0/0 .text setAlphaButtonAnimeMin__15dMeterHakusha_cFv
- */
 void dMeterHakusha_c::setAlphaButtonAnimeMin() {
     if (mpButtonA->getAlphaRate() != 0.0f) {
         mpButtonA->setAlphaRate(1.0f);
@@ -335,8 +322,6 @@ void dMeterHakusha_c::setAlphaButtonAnimeMin() {
     }
 }
 
-/* 8020D41C-8020D480 207D5C 0064+00 1/1 0/0 0/0 .text setAlphaButtonAnimeMax__15dMeterHakusha_cFv
- */
 void dMeterHakusha_c::setAlphaButtonAnimeMax() {
     if (mpButtonA->getAlphaRate() != 1.0f) {
         mpButtonA->setAlphaRate(1.0f);
@@ -344,8 +329,6 @@ void dMeterHakusha_c::setAlphaButtonAnimeMax() {
     }
 }
 
-/* 8020D480-8020D49C 207DC0 001C+00 2/2 0/0 0/0 .text            getHakushaNum__15dMeterHakusha_cFv
- */
 int dMeterHakusha_c::getHakushaNum() {
     int hakusha_num = g_drawHIO.mMaxSpurAmount;
     if (hakusha_num > 12) {

@@ -1,8 +1,7 @@
 #ifndef J3DCLUSTER_H
 #define J3DCLUSTER_H
 
-#include "JSystem/JUtility/JUTAssert.h"
-#include "dolphin/types.h"
+#include "JSystem/J3DAssert.h"
 
 class J3DDeformer;
 class J3DClusterKey;
@@ -74,20 +73,20 @@ public:
  */
 class J3DDeformData {
 public:
-    /* 8032E1F8 */ J3DDeformData();
-    /* 8032E230 */ void offAllFlag(u32);
-    /* 8032E298 */ void deform(J3DVertexBuffer*);
-    /* 8032E274 */ void deform(J3DModel*);
-    /* 8032E364 */ void setAnm(J3DAnmCluster*);
+    J3DDeformData();
+    void offAllFlag(u32);
+    void deform(J3DVertexBuffer*);
+    void deform(J3DModel*);
+    void setAnm(J3DAnmCluster*);
 
     J3DCluster* getClusterPointer(u16 index) {
-        J3D_ASSERT(186, (index < mClusterNum), "Error : range over.");
+        J3D_ASSERT_RANGE(186, (index < mClusterNum));
         return &mClusterPointer[index];
     }
     u16 getClusterNum() const { return mClusterNum; }
     u16 getClusterKeyNum() const { return mClusterKeyNum; }
     J3DClusterKey* getClusterKeyPointer(u16 i) {
-        J3D_ASSERT(199, (i < mClusterKeyNum), "Error : range over.");
+        J3D_ASSERT_RANGE(199, (i < mClusterKeyNum));
         return &mClusterKeyPointer[i];
     }
     f32* getVtxPos() { return mVtxPos; }

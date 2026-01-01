@@ -3,12 +3,11 @@
  *
  */
 
+#include "d/dolzel_rel.h"  // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_crvgate.h"
+#include "d/d_s_play.h"
 
-#include "d/actor/d_a_obj_eff.h"
-#include "d/actor/d_a_player.h"
-
-/* 80BD30C0-80BD3100 000000 0040+00 12/12 0/0 0/0 .rodata          ccCylSrc$3774 */
 const static dCcD_SrcSph ccSphSrc = {
     {
         {0x0, {{0x0, 0x0, 0x13}, {0x100000, 0x1F}, 0x75}},  // mObj
@@ -21,17 +20,12 @@ const static dCcD_SrcSph ccSphSrc = {
     }  // mSphAttr
 };
 
-/* 80BD31F4-80BD31F8 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "CrvGate";
 
-/* 80BD32B8-80BD32BC 000000 0002+02 1/1 0/0 0/0 .bss s_CoCount__29@unnamed@d_a_obj_crvgate_cpp@
- */
 namespace {
 static u16 s_CoCount = 0;
 }
 
-/* 80BD0398-80BD0500 000078 0168+00 1/1 0/0 0/0 .text            initCcCylinder__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::initCcCylinder() {
     mStts.Init(0xff, 0xff, this);
 
@@ -55,14 +49,12 @@ void daObjCRVGATE_c::initCcCylinder() {
     mSph[2].SetC(mXyzSph[2]);
 }
 
-/* 80BD0500-80BD0658 0001E0 0158+00 1/1 0/0 0/0 .text            setCcCylinder__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::setCcCylinder() {
     for (int i = 0; i < 3; i++) {
         mDoMtx_stack_c::transS(current.pos);
         mDoMtx_stack_c::YrotM(shape_angle.y);
         mDoMtx_stack_c::YrotM(mDoorAngle);
-        mDoMtx_stack_c::transM(i * 95.0f + 80.0f, 130.0f, 0);
+        mDoMtx_stack_c::transM(i * (nREG_F(8) + 95.0f) + 80.0f + nREG_F(9), nREG_F(10) + 130.0f, 0);
         mDoMtx_stack_c::multVecZero(&mXyzSph[i]);
     }
 
@@ -76,35 +68,37 @@ void daObjCRVGATE_c::setCcCylinder() {
     dComIfG_Ccsp()->Set(&mSph[2]);
 }
 
-/* 80BD0658-80BD0678 000338 0020+00 1/0 0/0 0/0 .text            daObjCRVGATE_Create__FP10fopAc_ac_c
- */
 static int daObjCRVGATE_Create(fopAc_ac_c* i_this) {
-    return static_cast<daObjCRVGATE_c*>(i_this)->create();
+    daObjCRVGATE_c* a_this = (daObjCRVGATE_c*)i_this;
+    fpc_ProcID _ = fopAcM_GetID(i_this);
+    return a_this->create();
 }
 
-/* 80BD0678-80BD069C 000358 0024+00 1/0 0/0 0/0 .text daObjCRVGATE_Delete__FP14daObjCRVGATE_c */
 static int daObjCRVGATE_Delete(daObjCRVGATE_c* i_this) {
+    fpc_ProcID _ = fopAcM_GetID(i_this);
     i_this->MoveBGDelete();
     return 1;
 }
 
-/* 80BD069C-80BD0844 00037C 01A8+00 1/1 0/0 0/0 .text            checkOpen__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::checkOpen() {
     if (dComIfGs_getKeyNum() == 0) {
         return 0;
     }
 
     daPy_py_c* player = daPy_getPlayerActorClass();
-    s16 height_diff = fopAcM_GetAngle_p(this)->y - fopAcM_GetAngle_p(player)->y;
+    s16 height_diff = current.angle.y - player->current.angle.y;
 
     if (abs(height_diff) < 0x5000) {
         return 0;
     }
 
-    return mPos.absXZ(fopAcM_GetPosition(player)) < 200.0f;
+    if (mPos.absXZ(player->current.pos) < 200.0f) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
-/* 80BD0880-80BD0978 000560 00F8+00 1/1 0/0 0/0 .text actionStartEvent__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::actionStartEvent() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     dCamera_c* camera_body = dCam_getBody();
@@ -126,8 +120,6 @@ void daObjCRVGATE_c::actionStartEvent() {
     }
 }
 
-/* 80BD0978-80BD0A64 000658 00EC+00 1/1 0/0 0/0 .text            actionWaitEvent__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::actionWaitEvent() {
     if (eventInfo.checkCommandDoor()) {
         daPy_py_c* player = daPy_getPlayerActorClass();
@@ -149,28 +141,23 @@ void daObjCRVGATE_c::actionWaitEvent() {
     }
 }
 
-/* 80BD0A64-80BD0B7C 000744 0118+00 1/1 0/0 0/0 .text            Demo_Set__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::Demo_Set() {
     daPy_py_c* player = daPy_getPlayerActorClass();
-    cXyz* player_pos = fopAcM_GetPosition_p(player);
+    cXyz* player_pos = &fopAcM_GetPosition(player);
 
     s16 target_angle = cLib_targetAngleY(&current.pos, player_pos);
 
-    cXyz* ac_pos = fopAcM_GetPosition_p(this);
-    ac_pos->absXZ(*player_pos);  // ?
+    f32 _ = current.pos.absXZ(*player_pos);  // ?
 
-    mCamEye.set(ac_pos->x + cM_scos(target_angle + 0x1000) * 300.0f, ac_pos->y + 500.0f,
-                ac_pos->z - cM_ssin(target_angle + 0x1000) * 300.0f);
-    mCamCenter.set(ac_pos->x, ac_pos->y + 200.0f, ac_pos->z);
+    mCamEye.set(current.pos.x + cM_scos(target_angle + 0x1000) * 300.0f, current.pos.y + 500.0f,
+                current.pos.z - cM_ssin(target_angle + 0x1000) * 300.0f);
+    mCamCenter.set(current.pos.x, current.pos.y + 200.0f, current.pos.z);
 }
 
-/* 80BD0B7C-80BD0B88 00085C 000C+00 2/2 0/0 0/0 .text            SetOpen__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::SetOpen() {
     mStatus = 0x0;
 }
 
-/* 80BD0B88-80BD0D28 000868 01A0+00 1/1 0/0 0/0 .text            actionDemoEvent__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::actionDemoEvent() {
     if (!mFlagDemoEventPlay) {
         mPosAccel.y += -5.0f;
@@ -184,7 +171,7 @@ void daObjCRVGATE_c::actionDemoEvent() {
     } else {
         cLib_chaseAngleS(&mDoorOpenAngle.x, 0x4000, mMoveAngle.z);
 
-        mMoveAngle.z += 0x300;
+        mMoveAngle.z += (s16)0x300;
         if (mDoorOpenAngle.x == 0x4000) {
             mEventID = 3;
             camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
@@ -201,8 +188,6 @@ void daObjCRVGATE_c::actionDemoEvent() {
     }
 }
 
-/* 80BD0D28-80BD0D90 000A08 0068+00 1/1 0/0 0/0 .text            event_proc_call__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::event_proc_call() {
     switch (mEventID) {
     case 0:
@@ -220,22 +205,26 @@ void daObjCRVGATE_c::event_proc_call() {
     }
 }
 
-/* 80BD0D90-80BD0E1C 000A70 008C+00 1/1 0/0 0/0 .text            CheckVec__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::CheckVec() {
-    cXyz player_pos = fopAcM_GetPosition(daPy_getPlayerActorClass());
+    daPy_py_c* player = daPy_getPlayerActorClass();
+    cXyz* player_pos = &fopAcM_GetPosition(player);
+    cXyz pos = *player_pos;
 
     Mtx inv_mtx;
     mDoMtx_inverse(mpModelGate->getBaseTRMtx(), inv_mtx);
 
     mDoMtx_stack_c::copy(inv_mtx);
-    mDoMtx_stack_c::multVec(&player_pos, &player_pos);
+    mDoMtx_stack_c::multVec(&pos, &pos);
 
-    return player_pos.z > 0;
+    if (pos.z > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
-/* 80BD0E1C-80BD0F9C 000AFC 0180+00 1/1 0/0 0/0 .text            KeyVib__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::KeyVib() {
-    mMoveAngle.x -= 0x21;
+    mMoveAngle.x -= (s16)0x21;
     mMoveAngle.z += mMoveAngle.x;
     cLib_chaseAngleS(&mMoveAngle.y, 0, 0x150);
 
@@ -259,9 +248,8 @@ void daObjCRVGATE_c::KeyVib() {
     }
 }
 
-/* 80BD0F9C-80BD10C0 000C7C 0124+00 1/1 0/0 0/0 .text            DoorVib__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::DoorVib() {
-    mDoorVib.y -= 0x100;
+    mDoorVib.y -= (s16)(KREG_S(1) + 0x100);
     mDoorVib.z += mDoorVib.y;
     cLib_chaseAngleS(&mDoorVib.x, 0, 0x40);
 
@@ -276,14 +264,11 @@ void daObjCRVGATE_c::DoorVib() {
     }
 }
 
-/* 80BD10C0-80BD10D0 000DA0 0010+00 1/1 0/0 0/0 .text            VibStop__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::VibStop() {
     mDoorVib.y = 0;
     mDoorVib.x = 0;
 }
 
-/* 80BD10D0-80BD1110 000DB0 0040+00 1/1 0/0 0/0 .text            CloseVibration__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::CloseVibration() {
     if (mStatus != 0x4) {
         KeyVib();
@@ -291,21 +276,19 @@ void daObjCRVGATE_c::CloseVibration() {
     DoorVib();
 }
 
-/* 80BD315C-80BD3160 00009C 0004+00 0/2 0/0 0/0 .rodata          @4086           UNUSED */
 static f32 dummyFloat1() {
     return 350.0f;
 }
 
-/* 80BD3160-80BD3164 0000A0 0004+00 0/2 0/0 0/0 .rodata          @4087          UNUSED */
 static f32 dummyFloat2() {
     return 120.0f;
 }
 
-/* 80BD1110-80BD18E0 000DF0 07D0+00 2/2 0/0 0/0 .text            CloseAction__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::CloseAction() {
     daPy_py_c* player = daPy_getPlayerActorClass();
-    cXyz* player_pos = fopAcM_GetPosition_p(player);
+    cXyz* player_pos = &fopAcM_GetPosition(player);
     csXyz og_DoorOpenAngle(mDoorOpenAngle.x, mDoorOpenAngle.y, mDoorOpenAngle.z);
+    int local_44 = 0;
 
     if (mXyzSph[1].absXZ(*player_pos) < 300.0f && player->checkFrontRollCrash()) {
         if (mKeyParam == 0x01) {
@@ -331,7 +314,9 @@ void daObjCRVGATE_c::CloseAction() {
     }
 
     for (int i = 0; i < 3; i++) {
-        cLib_addCalcAngleS(&mDoorOpenAngle.x, 0, 2, 0x2000, 0x400);
+        if (local_44 == 0) {
+            cLib_addCalcAngleS(&mDoorOpenAngle.x, 0, 2, 0x2000, 0x400);
+        }
 
         if (mSph[i].ChkTgHit()) {
             if (!mFlagGateClosed) {
@@ -357,17 +342,22 @@ void daObjCRVGATE_c::CloseAction() {
             break;
         }
         if (mSph[i].ChkCoHit()) {
-            cCcD_Obj* hitObj = mSph[i].GetCoHitObj();
+            fopAc_ac_c* hitObj = dCc_GetAc(mSph[i].GetCoHitObj()->GetAc());
             fopAc_ac_c* boar_ac;
 
-            if (fopAcM_GetName(hitObj->GetAc()) == PROC_E_WB && player->checkBoarRun() != 0 &&
+            if (fopAcM_GetName(hitObj) == PROC_E_WB && player->checkBoarRun() != 0 &&
                 fopAcM_SearchByName(PROC_E_WB, &boar_ac) != 0)
             {
-                cXyz* boar_speed = fopAcM_GetSpeed_p(boar_ac);
+                cXyz* boar_speed = &fopAcM_GetSpeed(boar_ac);
                 daPy_py_c* player = daPy_getPlayerActorClass();
+                cXyz* player_pos = &fopAcM_GetPosition(player);
 
                 if (dComIfGp_event_runCheck() != 0) {
-                    if (fopAcM_GetPosition(player).absXZ(mXyzSph[i]) < 490.0f &&
+                    cXyz* boar_speed = &fopAcM_GetSpeed(boar_ac);
+                    daPy_py_c* player = daPy_getPlayerActorClass();
+                    cXyz* player_pos = &fopAcM_GetPosition(player);
+
+                    if (player_pos->absXZ(mXyzSph[i]) < KREG_F(0) + 490.0f &&
                         boar_speed->absXZ() > 0.0f)
                     {
                         // Start escape event, destroying the door
@@ -386,7 +376,7 @@ void daObjCRVGATE_c::CloseAction() {
                             mpDoorPair->mDoorSwingTargetAngle = -0x7000;
                         }
 
-                        mPosAccel.set(10.0f, 70.0f, -30.0f);
+                        mPosAccel.set(10.0f, KREG_F(0) + 70.0f, -30.0f);
                     }
                 }
             }
@@ -404,14 +394,14 @@ void daObjCRVGATE_c::CloseAction() {
     }
 }
 
-/* 80BD18E0-80BD21E4 0015C0 0904+00 1/1 0/0 0/0 .text            OpenAction__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::OpenAction() {
     daPy_py_c* player = daPy_getPlayerActorClass();
-    s16 og_DoorAngle = mDoorAngle;
-    s16 new_DoorAngle = og_DoorAngle;
+    cXyz* player_pos = &fopAcM_GetPosition(player);
+    s16 doorAngle1 = mDoorAngle;
+    s16 doorAngle2 = mDoorAngle;
+    int local_3c = 0;
 
     if (CheckVec() != 0) {
-        cXyz* player_pos = fopAcM_GetPosition_p(player);
         if (mXyzSph[1].absXZ(*player_pos) < 300.0f && player->checkFrontRollCrash()) {
             mDoorSwingTargetAngle = mDoorAngle + 0x1000;
             mFlagDoorMove = true;
@@ -428,7 +418,9 @@ void daObjCRVGATE_c::OpenAction() {
 
             } else {
                 if (mSph[i].ChkCoHit() != 0) {
-                    if (fopAcM_GetName(mSph[i].GetCoHitObj()->GetAc()) == PROC_E_WB) {
+                    local_3c++;
+                    fopAc_ac_c* hitObj = dCc_GetAc(mSph[i].GetCoHitObj()->GetAc());
+                    if (fopAcM_GetName(hitObj) == PROC_E_WB) {
                         if (mKeyParam == 0xff) {
                             Z2GetAudioMgr()->seStart(Z2SE_OBJ_CRVN_GATE_BREAK, &current.pos, 0, 0,
                                                      1.0f, 1.0f, -1.0f, -1.0f, 0);
@@ -437,16 +429,16 @@ void daObjCRVGATE_c::OpenAction() {
                         mDoorSwingTargetAngle = mDoorAngle + fopAcM_GetSpeedF(player) * 288.0f;
                         mFlagDoorMove = true;
                     } else {
-                        new_DoorAngle = mDoorAngle + fopAcM_GetSpeedF(player) * 112.0f;
-                        if (new_DoorAngle > 0x4000) {
-                            new_DoorAngle = 0x4000;
+                        doorAngle1 = mDoorAngle + fopAcM_GetSpeedF(player) * (nREG_S(0) + 112);
+                        if (doorAngle1 > 0x4000) {
+                            doorAngle1 = 0x4000;
                         }
 
-                        if (new_DoorAngle != og_DoorAngle && !field_0x5a5) {
+                        if (doorAngle1 != doorAngle2 && !field_0x5a5) {
                             field_0x5a5 = true;
                             Z2GetAudioMgr()->seStart(Z2SE_OBJ_CRVN_GATE_CREAK, &current.pos, 0, 0,
                                                      1.0f, 1.0f, -1.0f, -1.0f, 0);
-                        } else if (new_DoorAngle == og_DoorAngle) {
+                        } else if (doorAngle1 == doorAngle2) {
                             field_0x5a5 = false;
                         }
                     }
@@ -456,7 +448,7 @@ void daObjCRVGATE_c::OpenAction() {
             }
         }
 
-        if (new_DoorAngle == og_DoorAngle) {
+        if (doorAngle1 == doorAngle2) {
             field_0x5a5 = false;
         }
 
@@ -470,12 +462,10 @@ void daObjCRVGATE_c::OpenAction() {
                 mFlagDoorMove = false;
             }
         } else {
-            cLib_addCalcAngleS(&mDoorAngle, new_DoorAngle, 6, 0x2000, 0x50);
+            cLib_addCalcAngleS(&mDoorAngle, doorAngle1, 6, 0x2000, 0x50);
         }
     } else {
-        if (mXyzSph[1].absXZ(*fopAcM_GetPosition_p(player)) < 300.0f &&
-            player->checkFrontRollCrash())
-        {
+        if (mXyzSph[1].absXZ(*player_pos) < 300.0f && player->checkFrontRollCrash()) {
             mDoorSwingTargetAngle = -0x1000;  //??
             mDoorSwingTargetAngle = (mDoorAngle - 0x1000);
             mFlagDoorMove = true;
@@ -492,7 +482,9 @@ void daObjCRVGATE_c::OpenAction() {
 
             } else {
                 if (mSph[i].ChkCoHit() != 0) {
-                    if (fopAcM_GetName(mSph[i].GetCoHitObj()->GetAc()) == PROC_E_WB) {
+                    local_3c++;
+                    fopAc_ac_c* hitObj = dCc_GetAc(mSph[i].GetCoHitObj()->GetAc());
+                    if (fopAcM_GetName(hitObj) == PROC_E_WB) {
                         daPy_py_c* player = daPy_getPlayerActorClass();
 
                         mDoorSwingTargetAngle = mDoorAngle - fopAcM_GetSpeedF(player) * 288.0f;
@@ -503,22 +495,22 @@ void daObjCRVGATE_c::OpenAction() {
                                                      1.0f, 1.0f, -1.0f, -1.0f, 0);
                         }
                     } else {
-                        new_DoorAngle = mDoorAngle - fopAcM_GetSpeedF(player) * 112.0f;
+                        doorAngle1 = mDoorAngle - fopAcM_GetSpeedF(player) * (nREG_S(0) + 112);
 
                         if (mKeyParam == 0x01) {
-                            if (new_DoorAngle < -0x2300) {
-                                new_DoorAngle = -0x2300;
+                            if (doorAngle1 < -0x2300) {
+                                doorAngle1 = -0x2300;
                             }
-                        } else if (new_DoorAngle < -0x4000) {
-                            new_DoorAngle = -0x4000;
+                        } else if (doorAngle1 < -0x4000) {
+                            doorAngle1 = -0x4000;
                         }
 
-                        if (new_DoorAngle != og_DoorAngle && !field_0x5a5) {
+                        if (doorAngle1 != doorAngle2 && !field_0x5a5) {
                             field_0x5a5 = true;
                             Z2GetAudioMgr()->seStart(Z2SE_OBJ_CRVN_GATE_CREAK, &current.pos, 0, 0,
                                                      1.0f, 1.0f, -1.0f, -1.0f, 0);
                         } else {
-                            if (new_DoorAngle == og_DoorAngle) {
+                            if (doorAngle1 == doorAngle2) {
                                 field_0x5a5 = false;
                             }
                         }
@@ -527,7 +519,7 @@ void daObjCRVGATE_c::OpenAction() {
             }
         }
 
-        if (new_DoorAngle == og_DoorAngle) {
+        if (doorAngle1 == doorAngle2) {
             field_0x5a5 = false;
         }
 
@@ -545,18 +537,17 @@ void daObjCRVGATE_c::OpenAction() {
                 mFlagDoorMove = false;
             }
         } else {
-            cLib_addCalcAngleS(&mDoorAngle, new_DoorAngle, 6, 0x2000, 0x50);
+            cLib_addCalcAngleS(&mDoorAngle, doorAngle1, 6, 0x2000, 0x50);
         }
     }
 }
 
-/* 80BD21E4-80BD22C8 001EC4 00E4+00 1/1 0/0 0/0 .text            HakaiMotion__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::HakaiMotion() {
     if (mDoorAngle < -0x6000) {
         mDoorSwingTargetAngle = -0x6000 - (mDoorSwingTargetAngle + 0x6000);
     }
 
-    cLib_addCalcAngleS(&mDoorAngle, (int)mDoorSwingTargetAngle, 6, 0x2000, 0x50);
+    cLib_addCalcAngleS(&mDoorAngle, mDoorSwingTargetAngle, 6, 0x2000, 0x50);
     cLib_addCalcAngleS(&mpDoorPair->mDoorAngle, (int)-mDoorSwingTargetAngle, 6, 0x2000, 0x50);
 
     if (mPos.y <= mMinHeight) {
@@ -572,7 +563,6 @@ void daObjCRVGATE_c::HakaiMotion() {
     }
 }
 
-/* 80BD22C8-80BD2338 001FA8 0070+00 1/1 0/0 0/0 .text            DoorAction__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::DoorAction() {
     switch (mStatus) {
     case 0:
@@ -594,18 +584,14 @@ void daObjCRVGATE_c::DoorAction() {
     }
 }
 
-/* 80BD3180-80BD3184 0000C0 0004+00 0/0 0/0 0/0 .rodata          @4671          UNUSED */
 static f32 const dummyFloat3() {
     return 50.0f;
 }
 
-/* 80BD3184-80BD3188 0000C4 0004+00 0/0 0/0 0/0 .rodata          @4672          UNUSED */
 static f32 const dummyFloat4() {
     return -10.0f;
 }
 
-/* 80BD2338-80BD245C 002018 0124+00 1/1 0/0 0/0 .text            B_CloseAction__14daObjCRVGATE_cFv
- */
 void daObjCRVGATE_c::B_CloseAction() {
     if (mDoorStep > 0x10) {
         cLib_chaseAngleS(&mDoorAngle, mDoorTargetAngle, mDoorStep);
@@ -615,7 +601,7 @@ void daObjCRVGATE_c::B_CloseAction() {
                 Z2GetAudioMgr()->seStart(Z2SE_OBJ_CRVN_GATE_CLOSE, &current.pos, 0, 0, 1.0f, 1.0f,
                                          -1.0f, -1.0f, 0);
             }
-            mDoorStep *= (7.0f / 10.0f);
+            mDoorStep *= (JREG_F(2) + 0.7f);
             mDoorTargetAngle = -0.7 * mDoorTargetAngle;
         }
     } else {
@@ -623,7 +609,6 @@ void daObjCRVGATE_c::B_CloseAction() {
     }
 }
 
-/* 80BD245C-80BD2528 00213C 00CC+00 0/0 0/0 1/1 .text            SetB_Close__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::SetB_Close() {
     Z2GetAudioMgr()->seStart(Z2SE_OBJ_CRVN_GATE_CREAK, &current.pos, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
                              0);
@@ -633,20 +618,19 @@ void daObjCRVGATE_c::SetB_Close() {
     }
 
     mStatus = 0x4;
-    mDoorStep = 0xc18;
+    mDoorStep = JREG_S(0) + 3096.0f;
 
     if (abs(mDoorStep) < 0x500) {
         mDoorStep = 0x500;
     }
 
     if (mDoorAngle > 0x0) {
-        mDoorTargetAngle = -0xa30;
+        mDoorTargetAngle = -(JREG_S(1) + 2608.0f);
     } else {
-        mDoorTargetAngle = 0xa30;
+        mDoorTargetAngle = JREG_S(1) + 2608.0f;
     }
 }
 
-/* 80BD2528-80BD2624 002208 00FC+00 1/1 0/0 0/0 .text            setBaseMtx__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::setBaseMtx() {
     cXyz local(0.0f, 0.0f, 35.0f);
     mDoMtx_stack_c::transS(mPos);
@@ -654,13 +638,13 @@ void daObjCRVGATE_c::setBaseMtx() {
     mDoMtx_stack_c::transM(local);
 
     if (mFlagDemoEventPlay == true) {
-        mDoMtx_stack_c::transM(0.0f, -55.0f, 0.0f);
+        mDoMtx_stack_c::transM(0.0f, nREG_F(5) + -55.0f, 0.0f);
     }
 
     mDoMtx_stack_c::ZXYrotM(mDoorOpenAngle);
 
     if (mFlagDemoEventPlay == true) {
-        mDoMtx_stack_c::transM(0.0f, 55.0f, 0.0f);
+        mDoMtx_stack_c::transM(0.0f, nREG_F(5) + 55.0f, 0.0f);
     }
 
     mpModelKey->setBaseTRMtx(mDoMtx_stack_c::get());
@@ -668,32 +652,32 @@ void daObjCRVGATE_c::setBaseMtx() {
     mDoMtx_stack_c::ZXYrotM(shape_angle);
     mDoMtx_stack_c::YrotM(mDoorAngle);
     mpModelGate->setBaseTRMtx(mDoMtx_stack_c::get());
-    MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
+    cMtx_copy(mDoMtx_stack_c::get(), mBgMtx);
 }
 
-/* 80BD2624-80BD2650 002304 002C+00 1/0 0/0 0/0 .text daObjCRVGATE_Draw__FP14daObjCRVGATE_c */
 static int daObjCRVGATE_Draw(daObjCRVGATE_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 80BD2650-80BD2670 002330 0020+00 2/1 0/0 0/0 .text daObjCRVGATE_Execute__FP14daObjCRVGATE_c */
 static int daObjCRVGATE_Execute(daObjCRVGATE_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 80BD2670-80BD2758 002350 00E8+00 1/0 0/0 0/0 .text            CreateHeap__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::CreateHeap() {
     J3DModelData* model_data_gate =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName, "CaravanGate.bmd");
+
+    JUT_ASSERT(762, model_data_gate != NULL)
+
     mpModelGate = mDoExt_J3DModel__create(model_data_gate, 0x80000, 0x11000084);
 
     if (mpModelGate == NULL) {
         return 0;
     }
 
+    J3DModelData* model_data_key;
     if (mKeyParam == 0x00) {
-        J3DModelData* model_data_key =
-            (J3DModelData*)dComIfG_getObjectRes(l_arcName, "CaravanKey.bmd");
+        model_data_key = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "CaravanKey.bmd");
         mpModelKey = mDoExt_J3DModel__create(model_data_key, 0x80000, 0x11000084);
     }
 
@@ -704,31 +688,25 @@ int daObjCRVGATE_c::CreateHeap() {
     return 1;
 }
 
-/* 80BD2758-80BD28C0 002438 0168+00 1/1 0/0 0/0 .text            SetDoor__14daObjCRVGATE_cFv */
 void daObjCRVGATE_c::SetDoor() {
-    cXyz* ac_pos = fopAcM_GetPosition_p(this);
-    csXyz* ac_angle = fopAcM_GetShapeAngle_p(this);
+    cXyz child_pos(current.pos.x + cM_scos(shape_angle.y) * 700.0f, current.pos.y,
+                   current.pos.z - cM_ssin(shape_angle.y) * 700.0f);
 
-    cXyz child_pos(ac_pos->x + cM_scos(ac_angle->y) * 700.0f, ac_pos->y,
-                   ac_pos->z - cM_ssin(ac_angle->y) * 700.0f);
+    mPos.set(current.pos.x + cM_scos(shape_angle.y) * 350.0f, 120.0f + current.pos.y,
+             current.pos.z - cM_ssin(shape_angle.y) * 350.0f);
 
-    mPos.set(ac_pos->x + cM_scos(ac_angle->y) * 350.0f, 120.0f + ac_pos->y,
-             ac_pos->z - cM_ssin(ac_angle->y) * 350.0f);
-
-    csXyz child_angle(ac_angle->x, ac_angle->y + 0x8000, ac_angle->z);
+    csXyz child_angle(shape_angle.x, shape_angle.y + 0x8000, shape_angle.z);
 
     if (mKeyParam == 0xff) {
         attention_info.position = mPos;
-        attention_info.flags = 0x20;
-        attention_info.distances[5] = 0x0F;
+        attention_info.flags = fopAc_AttnFlag_DOOR_e;
+        attention_info.distances[fopAc_attn_DOOR_e] = 0x0F;
 
         mKeyParam = 0x01;
-        s8 child_room = fopAcM_GetRoomNo(this);
-        fpc_ProcID parent_id = fopAcM_GetID(this);
 
         // Create the second (identical) part of the door (swinging gate).
-        mDoorPairProcID = fopAcM_createChild(PROC_Obj_CRVGATE, parent_id, 1, &child_pos, child_room,
-                                             &child_angle, NULL, -1, 0);
+        mDoorPairProcID = fopAcM_createChild(PROC_Obj_CRVGATE, fopAcM_GetID(this), 1, &child_pos,
+                                             fopAcM_GetRoomNo(this), &child_angle, NULL, -1, 0);
         mDoorY = shape_angle.y;
     } else {
         mKeyParam = 0x00;
@@ -737,19 +715,24 @@ void daObjCRVGATE_c::SetDoor() {
     }
 }
 
-/* 80BD28C0-80BD2BE4 0025A0 0324+00 1/1 0/0 0/0 .text            create__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::create() {
-    fopAcM_SetupActor(this, daObjCRVGATE_c);
-    int ret = dComIfG_resLoad(&mPhaseReq, l_arcName);
+    fopAcM_ct(this, daObjCRVGATE_c);
+    cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, l_arcName);
 
-    if (ret == cPhs_COMPLEATE_e) {
-        gravity = -9.0f;
+    if (phase == cPhs_COMPLEATE_e) {
+        gravity = nREG_F(0) + -9.0f;
 
         int dzb_id = dComIfG_getObjctResName2Index(l_arcName, "CaravanGate.dzb");
-        ret = MoveBGCreate(l_arcName, dzb_id, dBgS_MoveBGProc_TypicalRotY, 0x1480, NULL);
+        if (dzb_id == -1) {
+            // "dzb data not found!<%s>"
+            OS_REPORT("dzbデータが見つかりませんでした!<%s>\n\n", l_arcName);
+            JUT_ASSERT(783, dzb_id != -1)
+        }
+        phase =
+            (cPhs__Step)MoveBGCreate(l_arcName, dzb_id, dBgS_MoveBGProc_TypicalRotY, 0x1480, NULL);
 
-        if (ret == cPhs_ERROR_e) {
-            return ret;
+        if (phase == cPhs_ERROR_e) {
+            return phase;
         }
 
         mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, &mAcchCir,
@@ -783,24 +766,19 @@ int daObjCRVGATE_c::create() {
         daObjCRVGATE_Execute(this);
     }
 
-    return ret;
+    return phase;
 }
 
-/* 80BD2E80-80BD2E88 002B60 0008+00 1/0 0/0 0/0 .text daObjCRVGATE_IsDelete__FP14daObjCRVGATE_c
- */
 static int daObjCRVGATE_IsDelete(daObjCRVGATE_c* i_this) {
     return 1;
 }
 
-/* 80BD2E88-80BD2ECC 002B68 0044+00 1/0 0/0 0/0 .text            Create__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::Create() {
     fopAcM_setCullSizeBox(this, -1000.0f, -500.0f, -1000.0f, 1000.0f, 500.0f, 1000.0f);
     return cPhs_COMPLEATE_e;
 }
 
-/* 80BD2ECC-80BD2FB8 002BAC 00EC+00 1/0 0/0 0/0 .text Execute__14daObjCRVGATE_cFPPA3_A4_f
- */
-int daObjCRVGATE_c::Execute(f32 (**param_0)[3][4]) {
+int daObjCRVGATE_c::Execute(Mtx** param_0) {
     s_CoCount = 0;
 
     if (mKeyParam == 0x01) {
@@ -828,12 +806,11 @@ int daObjCRVGATE_c::Execute(f32 (**param_0)[3][4]) {
     return 1;
 }
 
-/* 80BD2FB8-80BD3074 002C98 00BC+00 1/0 0/0 0/0 .text            Draw__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::Draw() {
     g_env_light.settingTevStruct(8, &current.pos, &tevStr);
-    g_env_light.setLightTevColorType_MAJI(mpModelGate->mModelData, &tevStr);
+    g_env_light.setLightTevColorType_MAJI(mpModelGate, &tevStr);
     if (mKeyParam == 0x01) {
-        g_env_light.setLightTevColorType_MAJI(mpModelKey->mModelData, &tevStr);
+        g_env_light.setLightTevColorType_MAJI(mpModelKey, &tevStr);
     }
 
     dComIfGd_setListBG();
@@ -846,20 +823,17 @@ int daObjCRVGATE_c::Draw() {
     return 1;
 }
 
-/* 80BD3074-80BD30A8 002D54 0034+00 1/0 0/0 0/0 .text            Delete__14daObjCRVGATE_cFv */
 int daObjCRVGATE_c::Delete() {
     dComIfG_resDelete(&mPhaseReq, l_arcName);
     return 1;
 }
 
-/* 80BD31F8-80BD3218 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjCRVGATE_Method */
 static actor_method_class l_daObjCRVGATE_Method = {
     (process_method_func)daObjCRVGATE_Create,  (process_method_func)daObjCRVGATE_Delete,
     (process_method_func)daObjCRVGATE_Execute, (process_method_func)daObjCRVGATE_IsDelete,
     (process_method_func)daObjCRVGATE_Draw,
 };
 
-/* 80BD3218-80BD3248 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_CRVGATE */
 extern actor_process_profile_definition g_profile_Obj_CRVGATE = {
     fpcLy_CURRENT_e,         // mLayerID
     3,                       // mListID

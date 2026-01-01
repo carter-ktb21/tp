@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/ax.h>
 #include "fake_tgmath.h"
 
@@ -472,7 +472,7 @@ void __AXVPBInit(void) {
     AXVPB* pvpb;
     u32* p;
 
-#ifdef DEBUG
+#if DEBUG
     OSReport("Initializing AXVPB code module\n");
 #endif
     __AXMaxDspCycles = OS_BUS_CLOCK / 400;
@@ -536,7 +536,7 @@ void __AXVPBInit(void) {
 }
 
 void __AXVPBQuit(void) {
-#ifdef DEBUG
+#if DEBUG
     OSReport("Shutting down AXVPB code module\n");
 #endif
 }

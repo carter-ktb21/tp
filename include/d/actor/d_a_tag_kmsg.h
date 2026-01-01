@@ -26,12 +26,12 @@ public:
     /* 0x5C3 */ u8 field_0x5c3;
     /* 0x5C4 */ bool field_0x5c4;
 
-    /* 8048DE78 */ int create();
-    /* 8048DFDC */ int Delete();
-    /* 8048E010 */ int Execute();
-    /* 8048E8B8 */ int Draw();
-    /* 8048E8C0 */ int isDelete();
-    /* 8048EA30 */ virtual ~daTag_KMsg_c() {
+    int create();
+    int Delete();
+    int Execute();
+    int Draw();
+    int isDelete();
+    virtual ~daTag_KMsg_c() {
         if (getType() == KMSG_TYPE_3) {
             dComIfG_resDelete(&mPhase, "Lv6Gate");
         }
@@ -59,50 +59,46 @@ public:
 
     u32 getFlowNodeNo() {
         u16 rv = home.angle.z;
-        if (rv == 0xffff) {
-            return -1;
-        }
-        return rv;
+        return rv == 0xFFFF ? -1 : rv;
     }
 
     u8 getBitSW() {
-        return home.angle.x;
+        u16 r31 = home.angle.x;
+        return (u16)(r31 & 0xFF);
     }
 
     u32 getTalkAngle() {
-        u32 talkAngle = (fopAcM_GetParam(this) & 0xe0) >> 5;
-        if (talkAngle == 7) {
-            return 0;
-        } else {
-            return talkAngle > 6 ? 6 : talkAngle;
-        }
+        u32 talkAngle = (fopAcM_GetParam(this) & 0xE0) >> 5;
+        return talkAngle == 7 ? 0 :
+            talkAngle > 6 ? 6 :
+            talkAngle;
     }
 
     u32 getTalkDis() {
-        u32 talkDis = fopAcM_GetParam(this) & 0x1f;
-        if (talkDis == 0x1f) {
-            return 0;
-        } else {
-            return talkDis > 0x13 ? 0x13 : talkDis;
-        }
+        u32 talkDis = fopAcM_GetParam(this) & 0x1F;
+        return talkDis == 0x1F ? 0 :
+            talkDis > 0x13 ? 0x13 :
+            talkDis;
     }
 
     f32 getAttnPosOffset() {
         u32 attnPosOffset = (fopAcM_GetParam(this) & 0xff0000) >> 0x10;
-        if (attnPosOffset == 0xff) {
-            return 1000000000.0f;
-        } else {
-            return attnPosOffset;
+        if (attnPosOffset == 0xFF) {
+            return G_CM3D_F_INF;
         }
+        f32 f31 = attnPosOffset;
+        return f31;
     }
 
-    u32 getChkType() {
-        return home.angle.x & 0x8000;
+    u8 getChkType() {
+        u16 r31 = home.angle.x;
+        return (bool)(r31 & 0x8000);
     }
 
     f32 getEyePosOffset() {
         u32 eyeOffset = (fopAcM_GetParam(this) & 0xff00) >> 8;
-        return (eyeOffset == 0xff) ? 0 : eyeOffset;
+        f32 f31 = eyeOffset == 0xFF ? 0 : eyeOffset;
+        return f31;
     }
 };
 

@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRCompArchive.h"
 #include "JSystem/JKernel/JKRAram.h"
 #include "JSystem/JKernel/JKRAramArchive.h"
@@ -10,9 +12,8 @@
 #include "JSystem/JUtility/JUTException.h"
 #include "math.h"
 #include "string.h"
+#include <stdint.h>
 
-/* 802D87D4-802D887C 2D3114 00A8+00 0/0 1/1 0/0 .text
- * __ct__14JKRCompArchiveFlQ210JKRArchive15EMountDirection      */
 JKRCompArchive::JKRCompArchive(s32 entryNum, JKRArchive::EMountDirection eMountDirection)
     : JKRArchive(entryNum, MOUNT_COMP) {
     mMountDirection = eMountDirection;
@@ -27,7 +28,6 @@ JKRCompArchive::JKRCompArchive(s32 entryNum, JKRArchive::EMountDirection eMountD
     mIsMounted = true;
 }
 
-/* 802D887C-802D89BC 2D31BC 0140+00 1/0 0/0 0/0 .text            __dt__14JKRCompArchiveFv */
 JKRCompArchive::~JKRCompArchive() {
     if (mArcInfoBlock != NULL) {
         SDIFileEntry* file = mFiles;
@@ -60,7 +60,6 @@ JKRCompArchive::~JKRCompArchive() {
     mIsMounted = false;
 }
 
-/* 802D89BC-802D8F40 2D32FC 0584+00 1/1 0/0 0/0 .text            open__14JKRCompArchiveFl */
 bool JKRCompArchive::open(s32 entryNum) {
     mArcInfoBlock = NULL;
     field_0x64 = 0;
@@ -104,10 +103,10 @@ bool JKRCompArchive::open(s32 entryNum) {
             }
             else
             {
-                JKRDvdToMainRam(entryNum, (u8 *)mArcInfoBlock, EXPAND_SWITCH_UNKNOWN1, (u32)arcHeader->file_data_offset + mSizeOfMemPart,
+                JKRDvdToMainRam(entryNum, (u8 *)mArcInfoBlock, EXPAND_SWITCH_UNKNOWN1, (uintptr_t)arcHeader->file_data_offset + mSizeOfMemPart,
                                 NULL, JKRDvdRipper::ALLOC_DIRECTION_FORWARD, 0x20, NULL, NULL);
-                DCInvalidateRange(mArcInfoBlock, (u32)arcHeader->file_data_offset + mSizeOfMemPart);
-                field_0x64 = (u32)mArcInfoBlock + arcHeader->file_data_offset;
+                DCInvalidateRange(mArcInfoBlock, (uintptr_t)arcHeader->file_data_offset + mSizeOfMemPart);
+                field_0x64 = (uintptr_t)mArcInfoBlock + arcHeader->file_data_offset;
 
                 if (mSizeOfAramPart != 0) {
                     mAramPart = (JKRAramBlock*)JKRAllocFromAram(mSizeOfAramPart, JKRAramHeap::HEAD);
@@ -119,9 +118,9 @@ bool JKRCompArchive::open(s32 entryNum) {
                     JKRDvdToAram(entryNum, mAramPart->getAddress(), EXPAND_SWITCH_UNKNOWN1, arcHeader->header_length + arcHeader->file_data_offset + mSizeOfMemPart, 0, NULL);
                 }
 
-                mNodes = (SDIDirEntry*)((u32)mArcInfoBlock + mArcInfoBlock->node_offset);
-                mFiles = (SDIFileEntry *)((u32)mArcInfoBlock + mArcInfoBlock->file_entry_offset);
-                mStringTable = (char*)((u32)mArcInfoBlock + mArcInfoBlock->string_table_offset);
+                mNodes = (SDIDirEntry*)((uintptr_t)mArcInfoBlock + mArcInfoBlock->node_offset);
+                mFiles = (SDIFileEntry *)((uintptr_t)mArcInfoBlock + mArcInfoBlock->file_entry_offset);
+                mStringTable = (char*)((uintptr_t)mArcInfoBlock + mArcInfoBlock->string_table_offset);
                 field_0x6c = arcHeader->header_length + arcHeader->file_data_offset;
             }
             break;
@@ -155,7 +154,7 @@ bool JKRCompArchive::open(s32 entryNum) {
                     else {
                         // arcHeader + 1 should lead to 0x20, which is the data after the header
                         JKRHeap::copyMemory((u8 *)mArcInfoBlock, arcHeader + 1, (arcHeader->file_data_offset + mSizeOfMemPart));
-                        field_0x64 = (u32)mArcInfoBlock + arcHeader->file_data_offset;
+                        field_0x64 = (uintptr_t)mArcInfoBlock + arcHeader->file_data_offset;
                         if (mSizeOfAramPart != 0) {
                             mAramPart = (JKRAramBlock*)JKRAllocFromAram(mSizeOfAramPart, JKRAramHeap::HEAD);
                             if(mAramPart == NULL) {
@@ -169,9 +168,9 @@ bool JKRCompArchive::open(s32 entryNum) {
                     }
                 }
             }
-            mNodes = (SDIDirEntry *)((u32)mArcInfoBlock + mArcInfoBlock->node_offset);
-            mFiles = (SDIFileEntry *)((u32)mArcInfoBlock + mArcInfoBlock->file_entry_offset);
-            mStringTable = (char *)((u32)mArcInfoBlock + mArcInfoBlock->string_table_offset);
+            mNodes = (SDIDirEntry *)((uintptr_t)mArcInfoBlock + mArcInfoBlock->node_offset);
+            mFiles = (SDIFileEntry *)((uintptr_t)mArcInfoBlock + mArcInfoBlock->file_entry_offset);
+            mStringTable = (char *)((uintptr_t)mArcInfoBlock + mArcInfoBlock->string_table_offset);
             field_0x6c = arcHeader->header_length + arcHeader->file_data_offset;
             break;
         }
@@ -207,10 +206,8 @@ bool JKRCompArchive::open(s32 entryNum) {
     {
         JKRFreeToSysHeap(arcHeader);
     }
-    if(mMountMode == 0) {
-#ifdef DEBUG
-        OSReport(":::[%s: %d] Cannot alloc memory in mounting CompArchive\n", __FILE__, 567);
-#endif
+    if (mMountMode == 0) {
+        OS_REPORT(":::[%s: %d] Cannot alloc memory in mounting CompArchive\n", __FILE__, 567);
         if(mDvdFile != NULL) {
             delete mDvdFile;
         }
@@ -220,8 +217,6 @@ bool JKRCompArchive::open(s32 entryNum) {
 }
 
 
-/* 802D8F40-802D90C0 2D3880 0180+00 1/0 0/0 0/0 .text
- * fetchResource__14JKRCompArchiveFPQ210JKRArchive12SDIFileEntryPUl */
 void* JKRCompArchive::fetchResource(SDIFileEntry *fileEntry, u32 *pSize) {
     JUT_ASSERT(597, isMounted());
     u32 ptrSize;
@@ -266,10 +261,7 @@ void* JKRCompArchive::fetchResource(SDIFileEntry *fileEntry, u32 *pSize) {
     return fileEntry->data;
 }
 
-/* ############################################################################################## */
 
-/* 802D90C0-802D9260 2D3A00 01A0+00 1/0 0/0 0/0 .text
- * fetchResource__14JKRCompArchiveFPvUlPQ210JKRArchive12SDIFileEntryPUl */
 void *JKRCompArchive::fetchResource(void *data, u32 compressedSize, SDIFileEntry *fileEntry, u32 *pSize)
 {
     u32 size = 0;
@@ -317,7 +309,6 @@ void *JKRCompArchive::fetchResource(void *data, u32 compressedSize, SDIFileEntry
     return data;
 }
 
-/* 802D9260-802D92F4 2D3BA0 0094+00 1/0 0/0 0/0 .text removeResourceAll__14JKRCompArchiveFv */
 void JKRCompArchive::removeResourceAll() {
     if (mArcInfoBlock != NULL && mMountMode != MOUNT_MEM) {
         SDIFileEntry* fileEntry = mFiles;
@@ -335,8 +326,6 @@ void JKRCompArchive::removeResourceAll() {
     }
 }
 
-/* 802D92F4-802D9360 2D3C34 006C+00 1/0 0/0 0/0 .text            removeResource__14JKRCompArchiveFPv
- */
 bool JKRCompArchive::removeResource(void* resource) {
     SDIFileEntry* fileEntry = findPtrResource(resource);
     if (!fileEntry)
@@ -350,9 +339,7 @@ bool JKRCompArchive::removeResource(void* resource) {
     return true;
 }
 
-/* ############################################################################################## */
 
-/* 802D9360-802D9518 2D3CA0 01B8+00 1/0 0/0 0/0 .text getExpandedResSize__14JKRCompArchiveCFPCv */
 u32 JKRCompArchive::getExpandedResSize(const void *resource) const
 {
     if (mExpandedSize == NULL) {
@@ -374,7 +361,7 @@ u32 JKRCompArchive::getExpandedResSize(const void *resource) const
     }
 
     u8 buf[64];
-    u8 *bufPtr = (u8 *)ALIGN_NEXT((u32)buf, 32);
+    u8 *bufPtr = (u8 *)ALIGN_NEXT((uintptr_t)buf, 32);
     if ((flags & 0x20) != 0) {
         u32 addr = mAramPart->mAddress;
         addr = fileEntry->data_offset + addr;

@@ -9,8 +9,8 @@
  */
 class JAUAudioArcInterpreter {
 public:
-    /* 802A4244 */ JAUAudioArcInterpreter();
-    /* 802A4260 */ virtual ~JAUAudioArcInterpreter();
+    JAUAudioArcInterpreter();
+    virtual ~JAUAudioArcInterpreter();
     virtual void readWS(u32, void const*, u32) = 0;
     virtual void readBNK(u32, void const*) = 0;
     virtual void readBSC(void const*, u32) = 0;
@@ -24,9 +24,9 @@ public:
     virtual void readMaxSeCategory(int, int, int) = 0;
     virtual void beginBNKList(u32, u32) = 0;
     virtual void endBNKList() = 0;
-    /* 802A42A8 */ bool parse(void const*);
-    /* 802A4314 */ virtual bool readCommandMore(u32);
-    /* 802A431C */ bool readCommand_();
+    bool parse(void const*);
+    virtual bool readCommandMore(u32);
+    bool readCommand_();
 
     u8 readU8_() {
         return *mReadPtr++;
@@ -37,7 +37,7 @@ public:
         mReadPtr += 4;
         return temp;
     }
-    const void* getContent_(u32 param_0) { return mBase + param_0; }
+    const void* getContent_(u32 param_0) const { return mBase + param_0; }
 
 
     /* 0x04 */ const u8* mReadPtr;

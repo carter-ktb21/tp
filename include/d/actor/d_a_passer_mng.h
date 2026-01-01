@@ -2,6 +2,7 @@
 #define D_A_PASSER_MNG_H
 
 #include "SSystem/SComponent/c_lib.h"
+#include "d/d_kankyo.h"
 #include "f_op/f_op_actor_mng.h"
 
 class dPath;
@@ -16,33 +17,27 @@ class dPath;
  */
 class daPasserMng_c : public fopAc_ac_c {
 public:
-    /* 80D45738 */ int execute();
-    /* 80D4597C */ int getPasserParam();
-    /* 80D45E14 */ int getLuggageParamHigh(u32);
-    /* 80D46768 */ int create();
-    /* 80D467C0 */ void create_init();
+    int execute();
+    int getPasserParam();
+    int getLuggageParamHigh(u32);
+    int create();
+    void create_init();
     ~daPasserMng_c() { delete [] childProcIds; }
 
-    u8 getDetailLevel() { return subtype; }
+    u8 getDetailLevel() { return argument; }
     u8 getPathID() { return fopAcM_GetParam(this); }
     u8 getIntervalTime() { return fopAcM_GetParam(this) >> 24; }
     int getStartTime() { return (fopAcM_GetParam(this) >> 8) & 0xff; }
     u8 getEndTime() { return (fopAcM_GetParam(this) >> 16) & 0xff; }
-    u8 getMaxNum() { return shape_angle.x; }
+    u8 getMaxNum() { return shape_angle.x & 0xFF; }
     u8 getGroupNo() { return (shape_angle.x >> 8) & 0xff; }
 
     int getTimeHour() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_hour();
-        } 
-        return dKy_getdaytime_hour();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_hour() : dKy_getdaytime_hour();
     }
 
     int getTimeMinute() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_minute();
-        } 
-        return dKy_getdaytime_minute();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_minute() : dKy_getdaytime_minute();
     }
 
     int getTime() {
@@ -50,10 +45,7 @@ public:
     }
 
     int getDayOfWeek() {
-        if (dKy_darkworld_check()) {
-            return dKy_getDarktime_week();
-        }
-        return dKy_get_dayofweek();
+        return (dKy_darkworld_check()) ? dKy_getDarktime_week() : dKy_get_dayofweek();
     }
 
     int getChildNum() {
@@ -253,7 +245,7 @@ public:
             break;
         default:
             OS_REPORT("%s: Line.%d arg=%d\n", "d_a_passer_mng.cpp", 1049, param_1);
-            JUT_PANIC(1050, 0);
+            JUT_ASSERT(1050, FALSE);
             break;
         }
         return paramLow << 8;

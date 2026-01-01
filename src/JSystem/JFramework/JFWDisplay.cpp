@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JFramework/JFWDisplay.h"
 #include "JSystem/J2DGraph/J2DOrthoGraph.h"
 #include "JSystem/JUtility/JUTAssert.h"
@@ -7,8 +9,8 @@
 #include "dolphin/gx.h"
 #include <dolphin/vi.h>
 #include "global.h"
+#include "stdint.h"
 
-/* 80272040-802720F8 26C980 00B8+00 1/1 0/0 0/0 .text            ctor_subroutine__10JFWDisplayFb */
 void JFWDisplay::ctor_subroutine(bool enableAlpha) {
     mEnableAlpha = enableAlpha;
     mClamp = GX_CLAMP_TOP | GX_CLAMP_BOTTOM;
@@ -16,7 +18,7 @@ void JFWDisplay::ctor_subroutine(bool enableAlpha) {
     mZClear = 0xFFFFFF;
     mGamma = 0;
     mFader = NULL;
-    mFrameRate = 1;
+    mFrameRate = 1; 
     mTickRate = 0;
     mCombinationRatio = 0.0f;
     field_0x30 = 0;
@@ -34,30 +36,24 @@ void JFWDisplay::ctor_subroutine(bool enableAlpha) {
     field_0x44 = 0;
 }
 
-/* ############################################################################################## */
-/* 803C4020-803C4060 021140 0030+10 1/1 0/0 0/0 .data            e_mtx */
-static Mtx e_mtx ALIGN_DECL(32) = {
+static Mtx e_mtx ATTRIBUTE_ALIGN(32) = {
     {1.0f, 0.0f, 0.0f, 0.0f},
     {0.0f, 1.0f, 0.0f, 0.0f},
     {0.0f, 0.0f, 1.0f, 0.0f},
 };
 
-/* 803C4060-803C40A0 021180 0040+00 1/1 0/0 0/0 .data            clear_z_TX */
-static u8 clear_z_TX[64] ALIGN_DECL(32) = {
+static u8 clear_z_TX[64] ATTRIBUTE_ALIGN(32) = {
     0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
     0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF, 0x00, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
 };
 
-/* 802720F8-80272160 26CA38 0068+00 1/1 0/0 0/0 .text
- * __ct__10JFWDisplayFP7JKRHeapQ26JUTXfb10EXfbNumberb           */
 JFWDisplay::JFWDisplay(JKRHeap* p_heap, JUTXfb::EXfbNumber xfb_num, bool enableAlpha) {
     ctor_subroutine(enableAlpha);
     mXfbManager = JUTXfb::createManager(p_heap, xfb_num);
 }
 
-/* 80272160-802721DC 26CAA0 007C+00 1/0 0/0 0/0 .text            __dt__10JFWDisplayFv */
 JFWDisplay::~JFWDisplay() {
     if (JUTVideo::getManager() != NULL) {
         waitBlanking(2);
@@ -67,12 +63,8 @@ JFWDisplay::~JFWDisplay() {
     mXfbManager = NULL;
 }
 
-/* ############################################################################################## */
-/* 804511C0-804511C4 0006C0 0004+00 2/2 40/40 1/1 .sbss            sManager__10JFWDisplay */
 JFWDisplay* JFWDisplay::sManager;
 
-/* 802721DC-80272260 26CB1C 0084+00 0/0 1/1 0/0 .text
- * createManager__10JFWDisplayFPC16_GXRenderModeObjP7JKRHeapQ26JUTXfb10EXfbNumberb */
 JFWDisplay* JFWDisplay::createManager(_GXRenderModeObj const* p_rObj, JKRHeap* p_heap,
                                       JUTXfb::EXfbNumber xfb_num, bool enableAlpha) {
     if (p_rObj != NULL) {
@@ -86,7 +78,6 @@ JFWDisplay* JFWDisplay::createManager(_GXRenderModeObj const* p_rObj, JKRHeap* p
     return sManager;
 }
 
-/* 80272260-802722B8 26CBA0 0058+00 2/2 0/0 0/0 .text            callDirectDraw__Fv */
 static void callDirectDraw() {
     JUTChangeFrameBuffer(JUTXfb::getManager()->getDrawingXfb(),
                          JUTVideo::getManager()->getEfbHeight(),
@@ -94,7 +85,6 @@ static void callDirectDraw() {
     JUTAssertion::flushMessage();
 }
 
-/* 802722B8-802723AC 26CBF8 00F4+00 3/3 0/0 0/0 .text            prepareCopyDisp__10JFWDisplayFv */
 void JFWDisplay::prepareCopyDisp() {
     u16 width = JUTVideo::getManager()->getFbWidth();
     u16 height = JUTVideo::getManager()->getEfbHeight();
@@ -117,8 +107,6 @@ void JFWDisplay::prepareCopyDisp() {
     }
 }
 
-/* 802723AC-802723F4 26CCEC 0048+00 1/1 0/0 0/0 .text            drawendXfb_single__10JFWDisplayFv
- */
 void JFWDisplay::drawendXfb_single() {
     JUTXfb* manager = JUTXfb::getManager();
     if (manager->getDrawingXfbIndex() >= 0) {
@@ -129,8 +117,6 @@ void JFWDisplay::drawendXfb_single() {
     }
 }
 
-/* 802723F4-802724FC 26CD34 0108+00 1/1 0/0 0/0 .text            exchangeXfb_double__10JFWDisplayFv
- */
 void JFWDisplay::exchangeXfb_double() {
     JUTXfb* xfbMng = JUTXfb::getManager();
 
@@ -165,8 +151,6 @@ void JFWDisplay::exchangeXfb_double() {
     }
 }
 
-/* 802724FC-80272574 26CE3C 0078+00 1/1 0/0 0/0 .text            exchangeXfb_triple__10JFWDisplayFv
- */
 void JFWDisplay::exchangeXfb_triple() {
     JUTXfb* xfbMng = JUTXfb::getManager();
 
@@ -185,7 +169,6 @@ void JFWDisplay::exchangeXfb_triple() {
     xfbMng->setDrawingXfbIndex(drawing_idx);
 }
 
-/* 80272574-802725F8 26CEB4 0084+00 1/1 0/0 0/0 .text            copyXfb_triple__10JFWDisplayFv */
 void JFWDisplay::copyXfb_triple() {
     JUTXfb* xfbMng = JUTXfb::getManager();
 
@@ -199,7 +182,6 @@ void JFWDisplay::copyXfb_triple() {
     }
 }
 
-/* 802725F8-8027268C 26CF38 0094+00 1/1 0/0 0/0 .text            preGX__10JFWDisplayFv */
 void JFWDisplay::preGX() {
     GXInvalidateTexAll();
     GXInvalidateVtxCache();
@@ -218,7 +200,6 @@ void JFWDisplay::preGX() {
     }
 }
 
-/* 8027268C-80272798 26CFCC 010C+00 1/1 0/0 0/0 .text            endGX__10JFWDisplayFv */
 void JFWDisplay::endGX() {
     f32 width = JUTVideo::getManager()->getFbWidth();
     f32 height = JUTVideo::getManager()->getEfbHeight();
@@ -246,7 +227,6 @@ void JFWDisplay::endGX() {
     GXFlush();
 }
 
-/* 80272798-80272A04 26D0D8 026C+00 1/0 0/0 0/0 .text            beginRender__10JFWDisplayFv */
 void JFWDisplay::beginRender() {
     if (field_0x40) {
         JUTProcBar::getManager()->wholeLoopEnd();
@@ -258,7 +238,7 @@ void JFWDisplay::beginRender() {
     }
 
     waitForTick(mTickRate, mFrameRate);
-    JUTVideo::getManager()->waitRetraceIfNeed();
+    // JUTVideo::getManager()->waitRetraceIfNeed();  // Boofener: Disabled VSync to unlock framerate
 
     OSTick tick = OSGetTick();
     field_0x30 = tick - field_0x2c;
@@ -307,7 +287,6 @@ void JFWDisplay::beginRender() {
     }
 }
 
-/* 80272A04-80272AB0 26D344 00AC+00 1/0 0/0 0/0 .text            endRender__10JFWDisplayFv */
 void JFWDisplay::endRender() {
     endGX();
 
@@ -328,7 +307,6 @@ void JFWDisplay::endRender() {
     calcCombinationRatio();
 }
 
-/* 80272AB0-80272C60 26D3F0 01B0+00 1/0 0/0 0/0 .text            endFrame__10JFWDisplayFv */
 void JFWDisplay::endFrame() {
     JUTProcBar::getManager()->cpuEnd();
 
@@ -361,16 +339,14 @@ void JFWDisplay::endFrame() {
     }
 }
 
-/* 80272C60-80272CB0 26D5A0 0050+00 1/1 1/1 0/0 .text            waitBlanking__10JFWDisplayFi */
 void JFWDisplay::waitBlanking(int param_0) {
     while (param_0-- > 0) {
         waitForTick(mTickRate, mFrameRate);
     }
 }
 
-/* 80272CB0-80272DD0 26D5F0 0120+00 2/2 0/0 0/0 .text            waitForTick__FUlUs */
 static void waitForTick(u32 p1, u16 p2) {
-    if (p1 != 0) {
+    if (false) { // Boofener: Changed p1 != 0 to False (unlock fps)
         static OSTime nextTick = OSGetTime();
         OSTime time = OSGetTime();
         while (time < nextTick) {
@@ -380,30 +356,80 @@ static void waitForTick(u32 p1, u16 p2) {
         nextTick = time + p1;
     }
     else {
-        static u32 nextCount = VIGetRetraceCount();
-        u32 uVar1 = (p2 == 0) ? 1 : p2;
-        OSMessage msg;
+        // Boofener: Frame limiter for unlocked render loop.
+        //
+        // What this replaces:
+        // - A simple "measure last frame in milliseconds and spin-wait until >= targetFrameTimeMS".
+        //   That version used `OSTicksToMilliseconds(...)` (integer truncation), which quantizes time
+        //   to whole milliseconds and can create periodic cadence hiccups (especially when target
+        //   frametimes are not an integer number of milliseconds).
+        //
+        // Current approach:
+        // - Keep a target `nextFrameTime` in OS ticks and spin until `OSGetTime()` reaches it.
+        // - Advance `nextFrameTime` by a fixed `ticksPerFrame` each frame and carry remainder forward.
+        //   This avoids drift and reduces periodic spikes.
+        // - Use integer math (no `double`) because Metrowerks can otherwise emit helper calls like
+        //   `__cvt_sll_dbl` that aren't linked in this project.
+        static OSTime nextFrameTime = 0;
+        static OSTime lastFrameTicks = 0;
+
+        const float targetFPS = getTargetFramerate();
+        if (targetFPS <= 0.0f) {
+            nextFrameTime = 0;
+            lastFrameTicks = 0;
+            return;
+        }
+
+        const u32 ticksPerSecond = (u32)OSSecondsToTicks(1);
+        const u32 fpsMilli = (u32)(targetFPS * 1000.0f + 0.5f);
+        const u64 numerator = (u64)ticksPerSecond * 1000ull;
+        const OSTime ticksPerFrame = (fpsMilli != 0) ? (OSTime)((numerator + (fpsMilli / 2)) / fpsMilli) : 0;
+        const OSTime now = OSGetTime();
+
+        if (ticksPerFrame <= 0) {
+            nextFrameTime = 0;
+            lastFrameTicks = 0;
+            return;
+        }
+
+        if (nextFrameTime == 0 || lastFrameTicks != ticksPerFrame) {
+            nextFrameTime = now + ticksPerFrame;
+            lastFrameTicks = ticksPerFrame;
+            return;
+        }
+
+        // Spin-wait until we hit the target time (tick-accurate; avoids millisecond truncation jitter).
+        OSTime currentTime = now;
+        while (currentTime < nextFrameTime) {
+            currentTime = OSGetTime();
+        }
+
+        // Carry remainder forward to avoid drift and periodic spikes.
         do {
-            if (!OSReceiveMessage(JUTVideo::getManager()->getMessageQueue(), &msg, OS_MESSAGE_BLOCK)) {
-                msg = 0;
-            }
-        } while (((int)msg - (int)nextCount) < 0);
-        nextCount = (int)msg + uVar1;
+            nextFrameTime += ticksPerFrame;
+        } while (nextFrameTime <= currentTime);
+
+        // Original:
+        // static u32 nextCount = VIGetRetraceCount();
+        // u32 uVar1 = (p2 == 0) ? 1 : p2;
+        // OSMessage msg;
+        // do {
+        //     if (!OSReceiveMessage(JUTVideo::getManager()->getMessageQueue(), &msg, OS_MESSAGE_BLOCK)) {
+        //         msg = 0;
+        //     }
+        // } while (((intptr_t)msg - (intptr_t)nextCount) < 0);
+        // nextCount = (intptr_t)msg + uVar1;
     }
 }
 
-/* 80430FE4-80430FF0 05DD04 000C+00 4/4 0/0 0/0 .bss             sList__8JFWAlarm */
 JSUList<JFWAlarm> JFWAlarm::sList(false);
 
-/* 80272DD0-80272E10 26D710 0040+00 1/1 0/0 0/0 .text JFWThreadAlarmHandler__FP7OSAlarmP9OSContext
- */
 static void JFWThreadAlarmHandler(OSAlarm* p_alarm, OSContext* p_ctx) {
     JFWAlarm* alarm = static_cast<JFWAlarm*>(p_alarm);
     alarm->removeLink();
     OSResumeThread(alarm->getThread());
 }
 
-/* 80272E10-80272EB8 26D750 00A8+00 1/1 0/0 0/0 .text            threadSleep__10JFWDisplayFx */
 void JFWDisplay::threadSleep(s64 time) {
     JFWAlarm alarm;
     alarm.createAlarm();
@@ -416,23 +442,18 @@ void JFWDisplay::threadSleep(s64 time) {
     OSRestoreInterrupts(status);
 }
 
-/* ############################################################################################## */
-/* 80430FF0-80431010 05DD10 0020+00 2/2 0/0 0/0 .bss             clear_z_tobj */
 static GXTexObj clear_z_tobj;
 
-/* 80272EB8-80272F2C 26D7F8 0074+00 1/1 0/0 0/0 .text            clearEfb_init__10JFWDisplayFv */
 void JFWDisplay::clearEfb_init() {
     GXInitTexObj(&clear_z_tobj, &clear_z_TX, 4, 4, GX_TF_Z24X8, GX_REPEAT, GX_REPEAT, GX_FALSE);
     GXInitTexObjLOD(&clear_z_tobj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE,
                     GX_ANISO_1);
 }
 
-/* 80272F2C-80272F58 26D86C 002C+00 1/1 0/0 0/0 .text            clearEfb__10JFWDisplayFv */
 void JFWDisplay::clearEfb() {
     clearEfb(mClearColor);
 }
 
-/* 80272F58-80272F9C 26D898 0044+00 3/3 0/0 0/0 .text            clearEfb__10JFWDisplayF8_GXColor */
 void JFWDisplay::clearEfb(GXColor color) {
     int width = JUTVideo::getManager()->getFbWidth();
     int height = JUTVideo::getManager()->getEfbHeight();
@@ -440,7 +461,6 @@ void JFWDisplay::clearEfb(GXColor color) {
     clearEfb(0, 0, width, height, color);
 }
 
-/* 80272F9C-8027331C 26D8DC 0380+00 1/1 0/0 0/0 .text clearEfb__10JFWDisplayFiiii8_GXColor */
 void JFWDisplay::clearEfb(int param_0, int param_1, int param_2, int param_3, GXColor color) {
     u16 width;
     u16 height;
@@ -507,7 +527,6 @@ void JFWDisplay::clearEfb(int param_0, int param_1, int param_2, int param_3, GX
     }
 }
 
-/* 8027331C-802733A8 26DC5C 008C+00 1/1 0/0 0/0 .text calcCombinationRatio__10JFWDisplayFv */
 void JFWDisplay::calcCombinationRatio() {
     u32 vidInterval = JUTVideo::getVideoInterval();
     s32 unk30 = field_0x30 * 2;
@@ -526,7 +545,6 @@ void JFWDisplay::calcCombinationRatio() {
     }
 }
 
-/* 802733A8-80273484 26DCE8 00DC+00 2/2 0/0 0/0 .text            JFWDrawDoneAlarm__Fv */
 static void JFWDrawDoneAlarm() {
     JFWAlarm alarm;
     s32 status = OSDisableInterrupts();
@@ -539,8 +557,6 @@ static void JFWDrawDoneAlarm() {
     OSRestoreInterrupts(status);
 }
 
-/* 80273484-802734FC 26DDC4 0078+00 1/1 0/0 0/0 .text
- * JFWGXAbortAlarmHandler__FP7OSAlarmP9OSContext                */
 static void JFWGXAbortAlarmHandler(OSAlarm* param_0, OSContext* param_1) {
     diagnoseGpHang();
     GXAbortFrame();
@@ -556,7 +572,6 @@ static void JFWGXAbortAlarmHandler(OSAlarm* param_0, OSContext* param_1) {
     GXSetDrawDone();
 }
 
-/* 802734FC-802736DC 26DE3C 01E0+00 1/1 0/0 0/0 .text            diagnoseGpHang__Fv */
 static void diagnoseGpHang() {
     u32 sp28;
     u32 sp24;

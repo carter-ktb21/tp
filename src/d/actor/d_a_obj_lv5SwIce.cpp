@@ -3,34 +3,16 @@
  * Snowpeak Ruins Ice Switch
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lv5SwIce.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
 
-/* 80C6D560-80C6D56C 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80C6D56C-80C6D580 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 80C6C94C-80C6C97C 0000EC 0030+00 1/1 0/0 0/0 .text            __ct__16daLv5SwIce_HIO_cFv */
 daLv5SwIce_HIO_c::daLv5SwIce_HIO_c() {
     hitcount = 3;
 }
 
-/* 80C6CA20-80C6CAA8 0001C0 0088+00 2/2 0/0 0/0 .text            setBaseMtx__12daLv5SwIce_cFv */
 void daLv5SwIce_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::ZXYrotM(shape_angle.x, shape_angle.y, shape_angle.z);
@@ -39,10 +21,9 @@ void daLv5SwIce_c::setBaseMtx() {
     mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80C6CAA8-80C6CB14 000248 006C+00 1/0 0/0 0/0 .text            CreateHeap__12daLv5SwIce_cFv */
 int daLv5SwIce_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("L5SwIce", 4);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0, 0x11000084);
     if (mpModel == NULL) {
@@ -52,9 +33,8 @@ int daLv5SwIce_c::CreateHeap() {
     return 1;
 }
 
-/* 80C6CB14-80C6CCE4 0002B4 01D0+00 1/1 0/0 0/0 .text            create__12daLv5SwIce_cFv */
 int daLv5SwIce_c::create() {
-    fopAcM_SetupActor(this, daLv5SwIce_c);
+    fopAcM_ct(this, daLv5SwIce_c);
 
     mSwBit1 = getSwBit1();
     if (mSwBit1 != 0xFF && fopAcM_isSwitch(this, mSwBit1)) {
@@ -80,8 +60,6 @@ int daLv5SwIce_c::create() {
     return phase;
 }
 
-/* 80C6CDD0-80C6CE28 000570 0058+00 1/0 0/0 0/0 .text            Execute__12daLv5SwIce_cFPPA3_A4_f
- */
 int daLv5SwIce_c::Execute(Mtx** param_0) {
     procMain();
     *param_0 = &mpModel->getBaseTRMtx();
@@ -90,10 +68,8 @@ int daLv5SwIce_c::Execute(Mtx** param_0) {
     return 1;
 }
 
-/* 80C6D6D4-80C6D6DC 000014 0008+00 2/2 0/0 0/0 .bss             l_HIO */
 static daLv5SwIce_HIO_c l_HIO;
 
-/* 80C6D508-80C6D538 000000 0030+00 3/3 0/0 0/0 .rodata          mCcDObjInfo__12daLv5SwIce_c */
 const dCcD_SrcGObjInf daLv5SwIce_c::mCcDObjInfo = {
     {0, {{0x100, 1, 0}, {0x400000, 0x11}, {0}}},
     {dCcD_SE_SWORD, 0, 0, 2, 1},
@@ -101,7 +77,6 @@ const dCcD_SrcGObjInf daLv5SwIce_c::mCcDObjInfo = {
     {0},
 };
 
-/* 80C6D580-80C6D5C4 000020 0044+00 2/2 0/0 0/0 .data            mCcDCyl__12daLv5SwIce_c */
 dCcD_SrcCyl daLv5SwIce_c::mCcDCyl = {
     daLv5SwIce_c::mCcDObjInfo,
     {
@@ -111,7 +86,6 @@ dCcD_SrcCyl daLv5SwIce_c::mCcDCyl = {
     }  // mCyl
 };
 
-/* 80C6CE28-80C6CEB4 0005C8 008C+00 1/1 0/0 0/0 .text            procMain__12daLv5SwIce_cFv */
 void daLv5SwIce_c::procMain() {
     typedef void (daLv5SwIce_c::*procFunc)();
     static procFunc mode_proc[] = {
@@ -122,13 +96,11 @@ void daLv5SwIce_c::procMain() {
     (this->*mode_proc[mMode])();
 }
 
-/* 80C6CEB4-80C6CED0 000654 001C+00 1/1 0/0 0/0 .text            init_modeWait__12daLv5SwIce_cFv */
 void daLv5SwIce_c::init_modeWait() {
     mHitcount = l_HIO.hitcount;
     mMode = MODE_WAIT;
 }
 
-/* 80C6CED0-80C6D0F4 000670 0224+00 1/0 0/0 0/0 .text            modeWait__12daLv5SwIce_cFv */
 void daLv5SwIce_c::modeWait() {
     if (mCcCyl.ChkTgHit()) {
         dCcD_GObjInf* hit_obj = mCcCyl.GetTgHitGObj();
@@ -166,7 +138,6 @@ void daLv5SwIce_c::modeWait() {
     }
 }
 
-/* 80C6D0F4-80C6D144 000894 0050+00 1/1 0/0 0/0 .text            init_modeBreak__12daLv5SwIce_cFv */
 void daLv5SwIce_c::init_modeBreak() {
     if (mSwBit1 != 0xFF) {
         fopAcM_onSwitch(this, mSwBit1);
@@ -175,7 +146,6 @@ void daLv5SwIce_c::init_modeBreak() {
     mMode = MODE_BREAK;
 }
 
-/* 80C6D144-80C6D260 0008E4 011C+00 1/0 0/0 0/0 .text            modeBreak__12daLv5SwIce_cFv */
 void daLv5SwIce_c::modeBreak() {
     cXyz ptcl_scale(0.75f, 0.75f, 0.75f);
     for (int i = 0; i < 2; i++) {
@@ -188,7 +158,6 @@ void daLv5SwIce_c::modeBreak() {
     fopAcM_delete(this);
 }
 
-/* 80C6D260-80C6D314 000A00 00B4+00 1/0 0/0 0/0 .text            Draw__12daLv5SwIce_cFv */
 int daLv5SwIce_c::Draw() {
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpModel, &tevStr);
@@ -201,43 +170,33 @@ int daLv5SwIce_c::Draw() {
     return 1;
 }
 
-/* 80C6D314-80C6D344 000AB4 0030+00 1/0 0/0 0/0 .text            Delete__12daLv5SwIce_cFv */
 int daLv5SwIce_c::Delete() {
     dComIfG_resDelete(&mPhase, "L5SwIce");
     return 1;
 }
 
-/* 80C6D344-80C6D370 000AE4 002C+00 1/0 0/0 0/0 .text            daLv5SwIce_Draw__FP12daLv5SwIce_c
- */
 static int daLv5SwIce_Draw(daLv5SwIce_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 80C6D370-80C6D390 000B10 0020+00 1/0 0/0 0/0 .text daLv5SwIce_Execute__FP12daLv5SwIce_c */
 static int daLv5SwIce_Execute(daLv5SwIce_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 80C6D390-80C6D3B0 000B30 0020+00 1/0 0/0 0/0 .text            daLv5SwIce_Delete__FP12daLv5SwIce_c
- */
 static int daLv5SwIce_Delete(daLv5SwIce_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 80C6D3B0-80C6D3D0 000B50 0020+00 1/0 0/0 0/0 .text            daLv5SwIce_Create__FP10fopAc_ac_c
- */
 static int daLv5SwIce_Create(fopAc_ac_c* i_this) {
     return ((daLv5SwIce_c*)i_this)->create();
 }
 
-/* 80C6D5F4-80C6D614 -00001 0020+00 1/0 0/0 0/0 .data            l_daLv5SwIce_Method */
 static actor_method_class l_daLv5SwIce_Method = {
     (process_method_func)daLv5SwIce_Create,  (process_method_func)daLv5SwIce_Delete,
     (process_method_func)daLv5SwIce_Execute, (process_method_func)NULL,
     (process_method_func)daLv5SwIce_Draw,
 };
 
-/* 80C6D614-80C6D644 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Lv5SwIce */
 extern actor_process_profile_definition g_profile_Obj_Lv5SwIce = {
     fpcLy_CURRENT_e,         // mLayerID
     3,                       // mListID

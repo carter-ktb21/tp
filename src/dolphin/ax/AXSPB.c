@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/ax.h>
 
 #include "__ax.h"
@@ -58,7 +58,7 @@ void __AXPrintStudio(void) {
 }
 
 void __AXSPBInit(void) {
-#ifdef DEBUG
+#if DEBUG
     OSReport("Initializing AXSPB code module\n");
 #endif
     __AXSpbAL = 
@@ -73,7 +73,7 @@ void __AXSPBInit(void) {
 }
 
 void __AXSPBQuit(void) {
-#ifdef DEBUG
+#if DEBUG
     OSReport("Shutting down AXSPB code module\n");
 #endif
 }

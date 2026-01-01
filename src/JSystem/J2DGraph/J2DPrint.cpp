@@ -1,23 +1,19 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/J2DGraph/J2DPrint.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "JSystem/JUtility/JUTFont.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "global.h"
 
-/* 80451580-80451584 000A80 0004+00 3/3 0/0 0/0 .sbss            mStrBuff__8J2DPrint */
 char* J2DPrint::mStrBuff;
 
-/* 80451584-80451588 000A84 0004+00 1/1 0/0 0/0 .sbss            None */
 static bool sStrBufInitialized;
 
-/* 80451588-8045158C 000A88 0004+00 3/3 0/0 0/0 .sbss            mStrBuffSize__8J2DPrint */
 size_t J2DPrint::mStrBuffSize;
 
-/* 8045158C-80451590 000A8C 0004+00 2/2 0/0 0/0 .sbss            None */
 static u8 data_8045158C[4];
 
-/* 802F42F0-802F4394 2EEC30 00A4+00 1/1 0/0 0/0 .text            J2DPrint_print_alpha_va */
 f32 J2DPrint_print_alpha_va(J2DPrint* pPrint, u8 alpha, const char* fmt, va_list args) {
     pPrint->initchar();
     s32 length = vsnprintf(J2DPrint::mStrBuff, J2DPrint::mStrBuffSize, fmt, args);
@@ -46,7 +42,6 @@ J2DPrint::J2DPrint(JUTFont* pFont, f32 charSpacing, f32 lineSpacing, JUtility::T
     private_initiate(pFont, charSpacing, lineSpacing, charColor, gradColor, blackColor, whiteColor, false);
 }
 
-/* 802F4420-802F4468 2EED60 0048+00 1/0 6/6 0/0 .text            __dt__8J2DPrintFv */
 J2DPrint::~J2DPrint() {}
 
 void J2DPrint::initiate() {
@@ -95,7 +90,6 @@ void J2DPrint::private_initiate(JUTFont* pFont, f32 charSpacing, f32 lineSpacing
     initchar();
 }
 
-/* 802F4658-802F46C4 2EEF98 006C+00 1/1 1/1 0/0 .text            setBuffer__8J2DPrintFUl */
 u8* J2DPrint::setBuffer(size_t size) {
     JUT_ASSERT(335, size > 0);
 
@@ -110,7 +104,6 @@ u8* J2DPrint::setBuffer(size_t size) {
     return u8Buff;
 }
 
-/* 802F46C4-802F475C 2EF004 0098+00 1/1 0/0 0/0 .text            setFontSize__8J2DPrintFv */
 void J2DPrint::setFontSize() {
     if (mFont != NULL) {
         mFontSizeX = mFont->getCellWidth();
@@ -118,7 +111,6 @@ void J2DPrint::setFontSize() {
     }
 }
 
-/* 802F475C-802F4778 2EF09C 001C+00 2/2 2/2 0/0 .text            locate__8J2DPrintFff */
 void J2DPrint::locate(f32 cursorH, f32 cursorV) {
     field_0x24 = cursorH;
     field_0x28 = cursorV;
@@ -127,7 +119,6 @@ void J2DPrint::locate(f32 cursorH, f32 cursorV) {
     field_0x34 = 0.0f;
 }
 
-/* 802F4778-802F4828 2EF0B8 00B0+00 0/0 2/2 0/0 .text            print__8J2DPrintFffUcPCce */
 f32 J2DPrint::print(f32 cursorH, f32 cursorV, u8 alpha, char const* fmt, ...) {
     locate(cursorH, cursorV);
 
@@ -139,8 +130,6 @@ f32 J2DPrint::print(f32 cursorH, f32 cursorV, u8 alpha, char const* fmt, ...) {
     return var_f31;
 }
 
-/* 802F4828-802F4B4C 2EF168 0324+00 0/0 4/4 0/0 .text
- * printReturn__8J2DPrintFPCcff18J2DTextBoxHBinding18J2DTextBoxVBindingffUc */
 void J2DPrint::printReturn(char const* pString, f32 param_1, f32 param_2,
                            J2DTextBoxHBinding hBind, J2DTextBoxVBinding vBind, f32 param_5,
                            f32 param_6, u8 alpha) {
@@ -199,8 +188,6 @@ void J2DPrint::printReturn(char const* pString, f32 param_1, f32 param_2,
     }
 }
 
-/* 802F4B4C-802F52E8 2EF48C 079C+00 2/2 0/0 0/0 .text
- * parse__8J2DPrintFPCUciiPUsRQ28J2DPrint5TSizeUcb              */
 f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
                     TSize& size, u8 alpha, bool param_6) {
     if (mFont == NULL) {
@@ -237,7 +224,7 @@ f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
             b2ByteCharacter = true;
         }
 
-        if (iCharacter == 0 || ((u32)pString - (u32)pStringStart) > length) {
+        if (iCharacter == 0 || ((uintptr_t)pString - (uintptr_t)pStringStart) > length) {
             if (!param_6 && param_3 != NULL) {
                 param_3[someIndex] = 0.5f + f31;
             }
@@ -284,7 +271,7 @@ f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
                         f31 = 0.0f;
                     }
                 }
-            } else if (b2ByteCharacter && ((u32)pString - (u32)pStringStart > (u32)length)) {
+            } else if (b2ByteCharacter && ((uintptr_t)pString - (uintptr_t)pStringStart > (u32)length)) {
                 if (!param_6 && param_3 != NULL) {
                     param_3[someIndex] = 0.5f + f31;
                 }
@@ -386,7 +373,6 @@ f32 J2DPrint::parse(const u8* pString, int length, int param_2, u16* param_3,
     return local_a8 - prevCursorV;
 }
 
-/* 802F52E8-802F5410 2EFC28 0128+00 2/1 0/0 0/0 .text            doCtrlCode__8J2DPrintFi */
 void J2DPrint::doCtrlCode(int iCharacter) {
     switch (iCharacter) {
     case '\b':
@@ -423,7 +409,6 @@ void J2DPrint::doCtrlCode(int iCharacter) {
     }
 }
 
-/* 802F5410-802F594C 2EFD50 053C+00 1/1 0/0 0/0 .text            doEscapeCode__8J2DPrintFPPCUcUc */
 u16 J2DPrint::doEscapeCode(const u8** ppu8String, u8 alpha) {
     const u8* pStringStart = *ppu8String;
     u16 code = 0;
@@ -533,7 +518,6 @@ u16 J2DPrint::doEscapeCode(const u8** ppu8String, u8 alpha) {
     return code;
 }
 
-/* 802F594C-802F59C0 2F028C 0074+00 3/3 0/0 0/0 .text            initchar__8J2DPrintFv */
 void J2DPrint::initchar() {
     field_0x8 = mCharColor;
     field_0xc = mGradColor;
@@ -545,7 +529,6 @@ void J2DPrint::initchar() {
     mScaleY = mFontSizeY;
 }
 
-/* 802F59C0-802F5AC4 2F0300 0104+00 1/1 0/0 0/0 .text            getNumberS32__8J2DPrintFPPCUclli */
 s32 J2DPrint::getNumberS32(const u8** ppu8String, s32 defaultValue, s32 errorValue, int base) {
     const u8* pStringStart = *ppu8String;
     if (**ppu8String != '[') {
@@ -560,8 +543,8 @@ s32 J2DPrint::getNumberS32(const u8** ppu8String, s32 defaultValue, s32 errorVal
         number = strtol((char*)*ppu8String, &pEnd, base);
     } else if (base == 16) {
         number = strtoul((char*)*ppu8String, &pEnd, base);
-        if ((u32)pEnd - (u32)*ppu8String != 8) {
-            if ((u32)pEnd - (u32)*ppu8String == 6) {
+        if ((uintptr_t)pEnd - (uintptr_t)*ppu8String != 8) {
+            if ((uintptr_t)pEnd - (uintptr_t)*ppu8String == 6) {
                 number = (number << 8) | 0xFF;
             } else {
                 *ppu8String = pStringStart;
@@ -585,7 +568,6 @@ s32 J2DPrint::getNumberS32(const u8** ppu8String, s32 defaultValue, s32 errorVal
     return number;
 }
 
-/* 802F5AC4-802F5BF8 2F0404 0134+00 1/1 0/0 0/0 .text            getNumberF32__8J2DPrintFPPCUcffi */
 f32 J2DPrint::getNumberF32(const u8** ppu8String, f32 defaultValue, f32 errorValue, int base) {
     const u8* pStringStart = *ppu8String;
     if (**ppu8String != '[') {
@@ -600,8 +582,8 @@ f32 J2DPrint::getNumberF32(const u8** ppu8String, f32 defaultValue, f32 errorVal
         number = strtol((char*)*ppu8String, &pEnd, base);
     } else if (base == 16) {
         number = strtoul((char*)*ppu8String, &pEnd, base);
-        if ((u32)pEnd - (u32)*ppu8String != 8) {
-            if ((u32)pEnd - (u32)*ppu8String == 6) {
+        if ((uintptr_t)pEnd - (uintptr_t)*ppu8String != 8) {
+            if ((uintptr_t)pEnd - (uintptr_t)*ppu8String == 6) {
                 number = (number << 8) | 0xFF;
             } else {
                 *ppu8String = pStringStart;

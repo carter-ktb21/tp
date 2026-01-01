@@ -3,6 +3,8 @@
  * Enemy - Skull Kid
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_pm.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "SSystem/SComponent/c_math.h"
@@ -11,11 +13,44 @@
 #include "d/d_camera.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
+#include "d/actor/d_a_alink.h"
 #include "d/actor/d_a_e_fs.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_smw_stone.h"
-UNK_REL_DATA
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_PM_HIO_c {
+public:
+    daE_PM_HIO_c();
+    virtual ~daE_PM_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 mLampParticleScale;
+    /* 0x0C */ f32 mGlowEffectScale;
+    /* 0x10 */ f32 mEscapeRange;
+    /* 0x14 */ s16 mGlowColor1R;
+    /* 0x16 */ s16 mGlowColor1G;
+    /* 0x18 */ s16 mGlowColor1B;
+    /* 0x1A */ s16 mGlowColor2R;
+    /* 0x1C */ s16 mGlowColor2G;
+    /* 0x1E */ s16 mGlowColor2B;
+    /* 0x20 */ s16 mGlowColor1A;
+    /* 0x22 */ s16 mBossEscapeTimer;
+    /* 0x24 */ s16 field_0x24;
+    /* 0x26 */ s16 mAdditionalPuppetNum;
+    /* 0x28 */ f32 mCreateTimer;
+    /* 0x2C */ f32 field_0x2c;
+    /* 0x30 */ f32 field_0x30;
+    /* 0x34 */ f32 field_0x34;
+    /* 0x38 */ f32 mBossLightR;
+    /* 0x3C */ f32 mBossLightG;
+    /* 0x40 */ f32 mBossLightB;
+    /* 0x44 */ f32 field_0x44;
+    /* 0x48 */ f32 field_0x48;
+};
+
+STATIC_ASSERT(sizeof(daE_PM_HIO_c) == 0x4C);
 
 enum Action {
     /* 0x0 */ ACT_START,
@@ -78,33 +113,26 @@ enum Joint {
     /* 0x19 */ JNT_FOOT_R,
     /* 0x1A */ JNT_SKIRT,
 };
- 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
 
-/* 8074C384-8074C388 -00001 0004+00 2/2 0/0 0/0 .bss             None */
-/* 8074C384 0001+00 data_8074C384 @1009 */
+enum Mode {
+#if VERSION == VERSION_GCN_JPN
+    /* 0x00 */ Mode0_JPN,
+#endif
+    /* 0x00 */ Mode0,
+    /* 0x01 */ Mode1,
+    /* 0x02 */ Mode2,
+    /* 0x03 */ Mode3,
+    /* 0x04 */ Mode4,
+    /* 0x05 */ Mode5,
+    /* 0x06 */ Mode6,
+    /* 0x07 */ Mode7,
+};
+
 /* 8074C385 0003+00 data_8074C385 None */
-static u8 struct_8074C384;
-static bool hioInit;
+static bool hio_set;
 
-/* 8074C394-8074C3E0 000054 004C+00 11/13 0/0 0/0 .bss             l_HIO */
 static daE_PM_HIO_c l_HIO;
 
-/* 80741EEC-80741FB4 0000EC 00C8+00 1/1 0/0 0/0 .text            __ct__12daE_PM_HIO_cFv */
 daE_PM_HIO_c::daE_PM_HIO_c() {
     field_0x4 = -1;
     mLampParticleScale = 1.3f;
@@ -131,14 +159,12 @@ daE_PM_HIO_c::daE_PM_HIO_c() {
     field_0x48 = 4.0f;
 }
 
-/* 80741FB4-80742004 0001B4 0050+00 1/1 0/0 0/0 .text            DemoSkip__8daE_PM_cFi */
 void daE_PM_c::DemoSkip(int param_0) {
     cDmr_SkipInfo = 1;
     dComIfGp_getVibration().StopQuake(0x1f);
     SkipChk();
 }
 
-/* 80742004-80742038 000204 0034+00 2/2 0/0 0/0 .text            DemoSkipCallBack__8daE_PM_cFPvi */
 int daE_PM_c::DemoSkipCallBack(void* i_this, int param_1) {
     if (i_this != NULL) {
         static_cast<daE_PM_c*>(i_this)->DemoSkip(param_1);
@@ -147,7 +173,6 @@ int daE_PM_c::DemoSkipCallBack(void* i_this, int param_1) {
     return 0;
 }
 
-/* 80742038-80742388 000238 0350+00 1/1 0/0 0/0 .text            CreateHeap__8daE_PM_cFv */
 int daE_PM_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes("E_PM", 0x1d);
     mpMorf = new mDoExt_McaMorfSO(model_data, NULL, NULL,
@@ -193,12 +218,10 @@ int daE_PM_c::CreateHeap() {
     return 1;
 }
 
-/* 807423D0-807423F0 0005D0 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     return static_cast<daE_PM_c*>(i_this)->CreateHeap();
 }
 
-/* 807423F0-80742448 0005F0 0058+00 2/2 0/0 0/0 .text            s_pm_sub__FPvPv */
 static void* s_pm_sub(void* i_proc, void* i_data) {
     if (fopAc_IsActor(i_proc) && fopAcM_GetName(i_proc) == PROC_E_PM
                               && static_cast<daE_PM_c*>(i_proc)->SwitchChk() == 1) {
@@ -207,7 +230,6 @@ static void* s_pm_sub(void* i_proc, void* i_data) {
     return NULL;
 }
 
-/* 80742448-807424C0 000648 0078+00 1/1 0/0 0/0 .text            initCcCylinder__8daE_PM_cFv */
 void daE_PM_c::initCcCylinder() {
     const static dCcD_SrcCyl ccCylSrc = {
         {
@@ -231,13 +253,11 @@ void daE_PM_c::initCcCylinder() {
     mCcCyl.OnTgSetBit();
 }
 
-/* 807424C0-80742508 0006C0 0048+00 1/1 0/0 0/0 .text            setCcCylinder__8daE_PM_cFv */
 void daE_PM_c::setCcCylinder() {
     mCcCyl.SetC(current.pos);
     dComIfG_Ccsp()->Set(&mCcCyl);
 }
 
-/* 80742508-807425B4 000708 00AC+00 1/1 0/0 0/0 .text ctrlJoint__8daE_PM_cFP8J3DJointP8J3DModel */
 int daE_PM_c::ctrlJoint(J3DJoint* i_joint, J3DModel* i_model) {
     int jntNo = i_joint->getJntNo();
     mDoMtx_stack_c::copy(i_model->getAnmMtx(jntNo));
@@ -250,7 +270,6 @@ int daE_PM_c::ctrlJoint(J3DJoint* i_joint, J3DModel* i_model) {
     return 1;
 }
 
-/* 807425B4-80742600 0007B4 004C+00 1/1 0/0 0/0 .text            JointCallBack__FP8J3DJointi */
 static int JointCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         J3DModel* model = j3dSys.getModel();
@@ -262,19 +281,20 @@ static int JointCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 80742600-80742674 000800 0074+00 6/6 0/0 0/0 .text            Particle_Set__8daE_PM_cFUs4cXyz */
 void daE_PM_c::Particle_Set(u16 i_id, cXyz i_pos) {
     dComIfGp_particle_set(i_id, &i_pos, &tevStr, &shape_angle, NULL);
 }
 
-/* 80742674-80742720 000874 00AC+00 20/20 0/0 0/0 .text            SetAnm__8daE_PM_cFiiff */
 void daE_PM_c::SetAnm(int i_anm, int i_attr, f32 i_morf, f32 i_rate) {
     J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes("E_PM", i_anm);
     mpMorf->setAnm(bck, i_attr, i_morf, i_rate, 0.0f, -1.0f);
     mAnm = i_anm;
 }
 
-/* 80742768-80742810 000968 00A8+00 2/2 0/0 0/0 .text way_bg_check2__FP8daE_PM_c4cXyz4cXyz */
+static void dummy() {
+    delete (cM3dGPla*)NULL;
+}
+
 static BOOL way_bg_check2(daE_PM_c* i_this, cXyz i_start, cXyz i_end) {
     dBgS_LinChk lin_chk;
     i_start.y += 30.0f;
@@ -286,7 +306,6 @@ static BOOL way_bg_check2(daE_PM_c* i_this, cXyz i_start, cXyz i_end) {
     }
 }
 
-/* 80742810-807428A8 000A10 0098+00 1/1 0/0 0/0 .text            Yazirushi__8daE_PM_cFv */
 void daE_PM_c::Yazirushi() {
     cXyz zero;
     MTXCopy(mpMorf->getModel()->getAnmMtx(JNT_HEAD), *calc_mtx);
@@ -296,7 +315,6 @@ void daE_PM_c::Yazirushi() {
     attention_info.position.y += 40.0f;
 }
 
-/* 807428A8-80742958 000AA8 00B0+00 1/1 0/0 0/0 .text            SearchRndP__8daE_PM_cFv */
 void daE_PM_c::SearchRndP() {
     int index;
     do {
@@ -308,28 +326,26 @@ void daE_PM_c::SearchRndP() {
 
 namespace {
 
-/* 8074C3E0-8074C3E4 0000A0 0004+00 2/5 0/0 0/0 .bss             s_dis__22@unnamed@d_a_e_pm_cpp@ */
 static f32 s_dis;
 
-/* 8074C3E4-8074C3E8 0000A4 0004+00 10/11 0/0 0/0 .bss s_LinkPos__22@unnamed@d_a_e_pm_cpp@ */
 static cXyz* s_LinkPos;
 
-/* 8074C3E8-8074C3EC 0000A8 0002+02 13/16 0/0 0/0 .bss s_TargetAngle__22@unnamed@d_a_e_pm_cpp@ */
 static s16 s_TargetAngle;
 
 }  // namespace
 
-/* 80742958-80742C94 000B58 033C+00 1/1 0/0 0/0 .text            SearchFarP__8daE_PM_cFv */
-// NONMATCHING regalloc, instruction order
 void daE_PM_c::SearchFarP() {
     //! @bug best_distance is not initialized
     f32 best_distance;
     int best_index;
     dPnt* pnt = dPath_GetPnt(mpPath, 0);
-    cXyz point(pnt->m_position.x, pnt->m_position.y, pnt->m_position.z);
+    Vec pos;
+    pos = pnt->m_position;
+    cXyz point(pos.x, pos.y, pos.z);
     for (int i = 0; i < mpPath->m_num; i++) {
         pnt = dPath_GetPnt(mpPath, i);
-        point.set(pnt->m_position.x, pnt->m_position.y, pnt->m_position.z);
+        pos = pnt->m_position;
+        point.set(pos.x, pos.y, pos.z);
         if (s_LinkPos->absXZ(point) > best_distance && mPointIndex != i) {
             best_index = i;
             best_distance = s_LinkPos->absXZ(point);
@@ -340,7 +356,6 @@ void daE_PM_c::SearchFarP() {
     mPoint = pnt->m_position;
 }
 
-/* 80742C94-80742E1C 000E94 0188+00 3/3 0/0 0/0 .text            SearchNearP__8daE_PM_cFv */
 void daE_PM_c::SearchNearP() {
     //! @bug Whatever this function is supposed to do is almost certainly not what it actually does.
     dPnt* pnt = dPath_GetPnt(mpPath, 0);
@@ -349,7 +364,6 @@ void daE_PM_c::SearchNearP() {
     }
 }
 
-/* 80742E1C-80742FB4 00101C 0198+00 2/2 0/0 0/0 .text            SearchNextPos__8daE_PM_cFv */
 BOOL daE_PM_c::SearchNextPos() {
     cXyz point(mPoint.x, mPoint.y, mPoint.z);
     if (current.pos.abs(point) < 100.0f) {
@@ -363,7 +377,6 @@ BOOL daE_PM_c::SearchNextPos() {
     return FALSE;
 }
 
-/* 80742FB4-807430C4 0011B4 0110+00 1/1 0/0 0/0 .text            SetGakkiEffect__8daE_PM_cFv */
 void daE_PM_c::SetGakkiEffect() {
     static u16 gakki_eff_id[3] = {0x8201, 0x8202, 0x8203};
     for (int i = 0; i < 3; i++) {
@@ -377,7 +390,6 @@ void daE_PM_c::SetGakkiEffect() {
     }
 }
 
-/* 807430C4-80743210 0012C4 014C+00 4/4 0/0 0/0 .text            CameraSet__8daE_PM_cFv */
 bool daE_PM_c::CameraSet() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     dCamera_c* camera_body = dCam_getBody();
@@ -400,13 +412,11 @@ bool daE_PM_c::CameraSet() {
     return true;
 }
 
-/* 80743210-80743294 001410 0084+00 5/5 0/0 0/0 .text            SetStopingCam__8daE_PM_cFv */
 void daE_PM_c::SetStopingCam() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     camera->mCamera.Set(mCamCenter, mCamEye, mCamFovY, 0);
 }
 
-/* 80743294-807433E8 001494 0154+00 6/6 0/0 0/0 .text            SetStopCam__8daE_PM_cF4cXyzffs */
 void daE_PM_c::SetStopCam(cXyz i_center, f32 i_offsetXZ, f32 i_offsetY, s16 i_angle) {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     cXyz offset(0.0f, i_offsetY, i_offsetXZ);
@@ -421,7 +431,6 @@ void daE_PM_c::SetStopCam(cXyz i_center, f32 i_offsetXZ, f32 i_offsetY, s16 i_an
     camera->mCamera.Set(mCamCenter, mCamEye, mCamFovY, 0);
 }
 
-/* 807433E8-80743524 0015E8 013C+00 1/1 0/0 0/0 .text            SetMoveCam2__8daE_PM_cFff */
 void daE_PM_c::SetMoveCam2(f32 i_scale, f32 i_step) {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     cLib_addCalcPos(&mCamCenterTarget2, mCamCenterTarget, i_scale * 2.0f, i_step * 2.0f, 0.0f);
@@ -431,7 +440,6 @@ void daE_PM_c::SetMoveCam2(f32 i_scale, f32 i_step) {
     camera->mCamera.Set(mCamCenter, mCamEye, mCamFovY, 0);
 }
 
-/* 80743524-80743600 001724 00DC+00 9/9 0/0 0/0 .text            SetMoveCam__8daE_PM_cFff */
 void daE_PM_c::SetMoveCam(f32 i_scale, f32 i_step) {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     cLib_addCalcPos(&mCamCenter, mCamCenterTarget, i_scale, i_step, 0.0f);
@@ -439,7 +447,6 @@ void daE_PM_c::SetMoveCam(f32 i_scale, f32 i_step) {
     camera->mCamera.Set(mCamCenter, mCamEye, mCamFovY, 0);
 }
 
-/* 80743600-807436A4 001800 00A4+00 7/7 0/0 0/0 .text            SetReleaseCam__8daE_PM_cFv */
 void daE_PM_c::SetReleaseCam() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     camera->mCamera.Reset(mCamCenter, mCamEye);
@@ -448,7 +455,6 @@ void daE_PM_c::SetReleaseCam() {
     dComIfGp_event_reset();
 }
 
-/* 807436A4-80743D10 0018A4 066C+00 1/1 0/0 0/0 .text            Ap_StartAction__8daE_PM_cFv */
 void daE_PM_c::Ap_StartAction() {
     cXyz offset;
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
@@ -459,13 +465,26 @@ void daE_PM_c::Ap_StartAction() {
     bool bVar3 = false;
 
     switch (mMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (mAppear) {
+            bVar3 = true;
+            mMode++;
+        } else if (mSecondEncounter && fopAcM_searchPlayerDistanceXZ(this) < 800.0f) {
+            bVar3 = true;
+            mMode++;
+        }
+        break;
+    case Mode0:
+        bVar3 = true;
+#else
+    case Mode0:
         if (mAppear) {
             bVar3 = true;
         } else if (mSecondEncounter && fopAcM_searchPlayerDistanceXZ(this) < 800.0f) {
             bVar3 = true;
         }
-
+#endif
         if (bVar3 && CameraSet()) {
             if (dComIfG_play_c::getLayerNo(0) == 2) {
                 player_pos.set(-10477.0f, mAcch.GetGroundH(), 17710.0f);
@@ -483,7 +502,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 1:
+    case Mode1:
         if (fopAcM_SearchByName(PROC_Obj_SmWStone, (fopAc_ac_c**)&stone) && stone != NULL) {
             stone->deleteStone();
         }
@@ -506,7 +525,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 2:
+    case Mode2:
         if (mTimer[0] == 0) {
             mTargetAngleY = shape_angle.y;
             mMode++;
@@ -523,7 +542,7 @@ void daE_PM_c::Ap_StartAction() {
         }
         break;
 
-    case 3:
+    case Mode3:
         mParticleKey = dComIfGp_particle_set(mParticleKey, 0x880C, &current.pos, &tevStr,
                                              &current.angle, &scale, 0xff, NULL, -1,
                                              NULL, NULL, NULL);
@@ -560,7 +579,7 @@ void daE_PM_c::Ap_StartAction() {
         SetMoveCam2(0.15f, 50.0f);
         break;
 
-    case 4:
+    case Mode4:
         if (mTimer[0] == 0) {
             mAction = ACT_CREATE;
             mMode = 0;
@@ -570,7 +589,6 @@ void daE_PM_c::Ap_StartAction() {
     }
 }
 
-/* 80743D10-80743D8C 001F10 007C+00 1/1 0/0 0/0 .text            s_obj_sub__FPvPv */
 static void* s_obj_sub(void* i_proc, void* i_data) {
     for (int i = 0; i < 5; i++) {
         if (fopAc_IsActor(i_proc) && fopAcM_GetName(i_proc) == PROC_E_PM && i_proc != NULL
@@ -581,7 +599,6 @@ static void* s_obj_sub(void* i_proc, void* i_data) {
     return NULL;
 }
 
-/* 80743D8C-807444F0 001F8C 0764+00 1/2 0/0 0/0 .text            Ap_CreateAction__8daE_PM_cFv */
 void daE_PM_c::Ap_CreateAction() {
     cXyz vec1;
     cXyz vec2(500.0f, 150.0f, 0.0f);
@@ -693,7 +710,6 @@ void daE_PM_c::Ap_CreateAction() {
     SetMoveCam(0.1f, 50.0f);
 }
 
-/* 807444F0-80744790 0026F0 02A0+00 1/1 0/0 0/0 .text            Ap_EscapeAction__8daE_PM_cFv */
 void daE_PM_c::Ap_EscapeAction() {
     cXyz point;
     SetMoveCam(0.1f, 50.0f);
@@ -754,7 +770,6 @@ void daE_PM_c::Ap_EscapeAction() {
     }
 }
 
-/* 80744790-80744878 002990 00E8+00 1/1 0/0 0/0 .text            AppearAction__8daE_PM_cFv */
 void daE_PM_c::AppearAction() {
     mTargetHeadAngleX = 0;
 
@@ -779,7 +794,6 @@ void daE_PM_c::AppearAction() {
     }
 }
 
-/* 80744878-80744DA0 002A78 0528+00 1/1 0/0 0/0 .text            DemoBeforeEscape__8daE_PM_cFv */
 void daE_PM_c::DemoBeforeEscape() {
     cXyz vec1, vec2;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -797,6 +811,11 @@ void daE_PM_c::DemoBeforeEscape() {
             for (int i = 0; i < 4; i++) {
                 e_fs_class* puppet;
                 if (fopAcM_SearchByID(mPuppetID[i], (fopAc_ac_c**)&puppet)) {
+#if VERSION == VERSION_GCN_JPN
+                    if (puppet == NULL) {
+                        continue;
+                    }
+#endif
                     puppet->mAction = e_fs_class::ACT_END;
                     puppet->mMode = 0;
                 }
@@ -869,7 +888,6 @@ void daE_PM_c::DemoBeforeEscape() {
     mTargetAngleY = cLib_targetAngleY(&current.pos, &mCamEye);
 }
 
-/* 80744DA0-807453F4 002FA0 0654+00 1/1 0/0 0/0 .text            DemoAfterEscape__8daE_PM_cFv */
 void daE_PM_c::DemoAfterEscape() {
     cXyz vec1, vec2;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -987,7 +1005,6 @@ void daE_PM_c::DemoAfterEscape() {
     attention_info.position.y += 10000.0f;
 }
 
-/* 807453F4-80745438 0035F4 0044+00 1/1 0/0 0/0 .text            DemoMoveAction__8daE_PM_cFv */
 void daE_PM_c::DemoMoveAction() {
     switch (mMode) {
     case 0:
@@ -999,7 +1016,6 @@ void daE_PM_c::DemoMoveAction() {
     }
 }
 
-/* 80745438-807455F4 003638 01BC+00 1/1 0/0 0/0 .text            WaitAction__8daE_PM_cFv */
 void daE_PM_c::WaitAction() {
     switch (mMode) {
     case 0:
@@ -1044,7 +1060,6 @@ void daE_PM_c::WaitAction() {
     }
 }
 
-/* 807455F4-807458F8 0037F4 0304+00 1/1 0/0 0/0 .text            GroundCheck__8daE_PM_cFv */
 void daE_PM_c::GroundCheck() {
     mTargetAngleY = s_TargetAngle + 0x8000;
 
@@ -1091,7 +1106,6 @@ void daE_PM_c::GroundCheck() {
     }
 }
 
-/* 80745970-80745C44 003B70 02D4+00 1/1 0/0 0/0 .text            EscapeAction__8daE_PM_cFv */
 void daE_PM_c::EscapeAction() {
     switch (mMode) {
     case 0:
@@ -1170,7 +1184,6 @@ void daE_PM_c::EscapeAction() {
     }
 }
 
-/* 80745C44-80745DBC 003E44 0178+00 1/1 0/0 0/0 .text            DeathAction__8daE_PM_cFv */
 void daE_PM_c::DeathAction() {
     switch (mMode) {
     case 0:
@@ -1203,7 +1216,6 @@ void daE_PM_c::DeathAction() {
     mTargetAngleY = s_TargetAngle;
 }
 
-/* 80745DBC-80745ED0 003FBC 0114+00 2/1 0/0 0/0 .text            Action__8daE_PM_cFv */
 void daE_PM_c::Action() {
     mTargetHeadAngleX = 0;
 
@@ -1247,12 +1259,18 @@ void daE_PM_c::Action() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80745ED0-80746624 0040D0 0754+00 2/1 0/0 0/0 .text            DemoBossStart2__8daE_PM_cFv */
 void daE_PM_c::DemoBossStart2() {
+    daPy_py_c* player;
     bool bVar1 = false;
     cXyz vec1, vec2;
 
-    if (mDemoMode != 0) {
+    player = (daPy_py_c*)dComIfGp_getPlayer(0);
+
+#if VERSION == VERSION_GCN_JPN
+    if (mDemoMode > Mode0) {
+#else
+    if (mDemoMode != Mode0) {
+#endif
         SetMoveCam(0.1f, 50.0f);
     } else {
         SetMoveCam(0.03f, 50.0f);
@@ -1261,7 +1279,34 @@ void daE_PM_c::DemoBossStart2() {
     mTargetAngleY = s_TargetAngle;
 
     switch (mDemoMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (!CameraSet()) {
+            break;
+        }
+
+        mPuppetNum = 4;
+        gravity = -9.0f;
+        mTimer[0] = 130;
+        if (mSecondEncounter) {
+            mTimer[0] = 180;
+            vec1.set(current.pos.x, 1900.0f, current.pos.z);
+            SetStopCam(vec1, 500.0f, 0.0f, s_TargetAngle);
+            mCamEye.set(mCamEyeTarget);
+            actor_status &= ~0x100;
+        }
+        if (mSecondEncounter) {
+            player->mDemo.setDemoType(daPy_demo_c::DEMO_TYPE_ORIGINAL_e);
+            player->mDemo.setParam0(0);
+            player->mDemo.setDemoMode(4);
+            player->mDemo.setParam0(0);
+            player->mDemo.setParam1(0);
+            player->mDemo.setParam2(0);
+        }
+        mDemoMode++;
+        break;
+#endif
+    case Mode0:
         current.pos.y = 10000.0f;
         old.pos.y = current.pos.y;
         if (mTimer[0] < 150) {
@@ -1278,7 +1323,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 1:
+    case Mode1:
         if (mAnm == ANM_APPEAR01) {
             mParticleKey = dComIfGp_particle_set(mParticleKey, 0x880C, &current.pos, &tevStr,
                                                  &current.angle, &scale, 0xff, NULL, -1,
@@ -1298,7 +1343,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 2:
+    case Mode2:
         if (mpMorf->isStop()) {
             mDemoMode++;
 
@@ -1329,7 +1374,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 3:
+    case Mode3:
         if (mTimer[0] == 0) {
             SetAnm(ANM_FOGBLOW_ST, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_V_FOGBLOW, -1);
@@ -1340,7 +1385,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 4:
+    case Mode4:
         vec1.set(current.pos.x, current.pos.y, current.pos.z);
         GakkiLoopAction(vec1, 400.0f);
 
@@ -1356,7 +1401,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 5:
+    case Mode5:
         if (mpMorf->isStop()) {
             SetAnm(ANM_WAIT01, J3DFrameCtrl::EMode_LOOP, 5.0f, 1.0f);
             mpTrumpetMorf->setPlaySpeed(0.0f);
@@ -1365,7 +1410,7 @@ void daE_PM_c::DemoBossStart2() {
         }
         break;
 
-    case 6:
+    case Mode6:
         if (mTimer[0] == 0) {
             if (mDoorAction == 0) {
                 SetReleaseCam();
@@ -1385,16 +1430,31 @@ void daE_PM_c::DemoBossStart2() {
     }
 }
 
-/* 80746624-80747194 004824 0B70+00 2/1 0/0 0/0 .text            DemoBossStart__8daE_PM_cFv */
 void daE_PM_c::DemoBossStart() {
     bool bVar1 = false;
     cXyz vec1, vec2;
-    if (mDemoMode > 2) {
+    if (mDemoMode > Mode2) {
         mTargetAngleY = cLib_targetAngleY(&current.pos, s_LinkPos);
     }
 
     switch (mDemoMode) {
-    case 0:
+#if VERSION == VERSION_GCN_JPN
+    case Mode0_JPN:
+        if (!CameraSet()) {
+            break;
+        }
+
+        mPuppetNum = 4;
+        gravity = -9.0f;
+        mTimer[0] = 130;
+        vec1.set(current.pos.x, current.pos.y + 80.0f, current.pos.z);
+        mTargetAngleY = shape_angle.y;
+        SetStopCam(vec1, 500.0f, -150.0f, shape_angle.y);
+        mDemoMode++;
+
+        break;
+#endif
+    case Mode0:
         if (mTimer[0] == 100) {
             vec1.set(0.0f, 50.0f, 300.0f);
             cLib_offsetPos(&mCamEyeTarget, &current.pos, shape_angle.y, &vec1);
@@ -1409,7 +1469,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 1:
+    case Mode1:
         if (mpMorf->isStop()) {
             SetAnm(ANM_HIDE, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_FADEOUT, -1);
@@ -1446,7 +1506,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 2:
+    case Mode2:
         if (mpMorf->isStop() && mAnm == ANM_HIDE) {
             mPoint = dPath_GetPnt(mpPath, 1)->m_position;
             current.pos.set(mPoint.x, mPoint.y + 10000.0f, mPoint.z);
@@ -1489,7 +1549,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 3:
+    case Mode3:
         mCamCenterTarget.y = current.pos.y + 100.0f;
 
         if (mAnm == ANM_APPEAR01) {
@@ -1519,7 +1579,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.08f, 50.0f);
         break;
 
-    case 4:
+    case Mode4:
         if (mTimer[0] == 0) {
             SetAnm(ANM_FOGBLOW_ST, J3DFrameCtrl::EMode_NONE, 5.0f, 1.0f);
             mCreatureSound.startCreatureVoice(Z2SE_EN_PM_V_FOGBLOW, -1);
@@ -1532,7 +1592,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 5:
+    case Mode5:
         vec1.set(current.pos.x, current.pos.y, current.pos.z);
         GakkiLoopAction(vec1, 400.0f);
 
@@ -1550,7 +1610,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 6:
+    case Mode6:
         if (mpMorf->isStop()) {
             SetAnm(ANM_WAIT01, J3DFrameCtrl::EMode_LOOP, 5.0f, 1.0f);
             mpTrumpetMorf->setPlaySpeed(0.0f);
@@ -1561,7 +1621,7 @@ void daE_PM_c::DemoBossStart() {
         SetMoveCam(0.1f, 50.0f);
         break;
 
-    case 7:
+    case Mode7:
         if (mTimer[0] == 0) {
             if (mDoorAction == 0) {
                 SetReleaseCam();
@@ -1577,7 +1637,6 @@ void daE_PM_c::DemoBossStart() {
     }
 }
 
-/* 80747194-80747500 005394 036C+00 1/1 0/0 0/0 .text            BossEscapeAction__8daE_PM_cFv */
 void daE_PM_c::BossEscapeAction() {
     cXyz vec1;
 
@@ -1623,7 +1682,7 @@ void daE_PM_c::BossEscapeAction() {
 
     case 3:
         if (mpMorf->isStop()) {
-            attention_info.flags = 4;
+            attention_info.flags = fopAc_AttnFlag_BATTLE_e;
             mAction = ACT_WAIT;
             mMode = 0;
             if (mBossHealth < 3) {
@@ -1634,7 +1693,6 @@ void daE_PM_c::BossEscapeAction() {
     }
 }
 
-/* 80747500-807476A0 005700 01A0+00 2/2 0/0 0/0 .text            s_boss_sub__FPvPv */
 static void* s_boss_sub(void* i_actor, void* param_1) {
     daPy_py_c* player = daPy_getPlayerActorClass();
     fopAc_ac_c* actor = static_cast<fopAc_ac_c*>(i_actor);
@@ -1649,7 +1707,6 @@ static void* s_boss_sub(void* i_actor, void* param_1) {
     return NULL;
 }
 
-/* 807476A0-80747F38 0058A0 0898+00 2/1 0/0 0/0 .text            BossDamageAction__8daE_PM_cFv */
 void daE_PM_c::BossDamageAction() {
     cXyz vec1, vec2, vec3, vec4;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -1797,7 +1854,6 @@ void daE_PM_c::BossDamageAction() {
     }
 }
 
-/* 80747F38-807480A4 006138 016C+00 1/1 0/0 0/0 .text            BossWaitAction__8daE_PM_cFv */
 void daE_PM_c::BossWaitAction() {
     switch (mMode) {
     case 0:
@@ -1834,7 +1890,6 @@ void daE_PM_c::BossWaitAction() {
     }
 }
 
-/* 807480A4-80748964 0062A4 08C0+00 1/1 0/0 0/0 .text            BossDeathAction__8daE_PM_cFv */
 void daE_PM_c::BossDeathAction() {
     cXyz vec1, vec2, vec3;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -1941,7 +1996,6 @@ void daE_PM_c::BossDeathAction() {
     }
 }
 
-/* 80748964-80748B18 006B64 01B4+00 2/1 0/0 0/0 .text            BossAction__8daE_PM_cFv */
 void daE_PM_c::BossAction() {
     mTargetHeadAngleX = 0;
 
@@ -2001,9 +2055,9 @@ void daE_PM_c::BossAction() {
     }
 }
 
-/* 80748B18-80748D74 006D18 025C+00 1/1 0/0 0/0 .text            Execute__8daE_PM_cFv */
 int daE_PM_c::Execute() {
-    s_LinkPos = &fopAcM_GetPosition(daPy_getPlayerActorClass());
+    daPy_py_c* actor = daPy_getPlayerActorClass();
+    s_LinkPos = &fopAcM_GetPosition(actor);
     s_TargetAngle = cLib_targetAngleY(&current.pos, s_LinkPos);
     s_dis = current.pos.abs(*s_LinkPos);
 
@@ -2025,7 +2079,8 @@ int daE_PM_c::Execute() {
     }
 
     LampAction();
-    setMidnaBindEffect(this, &mCreatureSound, &current.pos, &cXyz(1.5f, 1.5f, 1.5f));
+    cXyz i_effSize(1.5f, 1.5f, 1.5f);
+    setMidnaBindEffect(this, &mCreatureSound, &current.pos, &i_effSize);
     EyeMove();
     mpMorf->play(0, dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
     setCcCylinder();
@@ -2037,7 +2092,6 @@ int daE_PM_c::Execute() {
     return 1;
 }
 
-/* 80748D74-8074954C 006F74 07D8+00 2/2 0/0 0/0 .text            StartAction__8daE_PM_cFv */
 void daE_PM_c::StartAction() {
     cXyz pos;
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -2148,13 +2202,17 @@ void daE_PM_c::StartAction() {
             old.pos.y = current.pos.y;
         }
         if (fopAcM_gc_c::gndCheck(&pos) && current.pos.absXZ(*s_LinkPos) < 1000.0f
-            && mAnm == ANM_WAIT01 && s_LinkPos->y <= fopAcM_gc_c::getGroundY() + 100.0f
-            && CameraSet())
+            && mAnm == ANM_WAIT01 && s_LinkPos->y <= fopAcM_gc_c::getGroundY() + 100.0f)
         {
+#if VERSION != VERSION_GCN_JPN
+            if (!CameraSet()) {
+                break;
+            }
+
             mPuppetNum = 4;
             gravity = -9.0f;
             mAction = ACT_DEMO;
-            mMode = 1;
+            mMode = Mode1;
             mTimer[0] = 130;
 
             if (mSecondEncounter) {
@@ -2173,12 +2231,16 @@ void daE_PM_c::StartAction() {
                 player->changeOriginalDemo();
                 player->changeDemoMode(4, 0, 0, 0);
             }
+#else
+            mPuppetNum = 4;
+            mAction = 6;
+            mMode = Mode0;
+            mDemoMode = 0;
+#endif
         }
     }
 }
 
-/* 8074954C-807499C0 00774C 0474+00 4/4 0/0 0/0 .text            GakkiLoopAction__8daE_PM_cF4cXyzf
- */
 void daE_PM_c::GakkiLoopAction(cXyz param_0, f32 param_1) {
     cXyz vec1(0.0f, 0.0f, 0.0f);
     cXyz vec2(0.0f, 0.0f, param_1);
@@ -2239,7 +2301,6 @@ void daE_PM_c::GakkiLoopAction(cXyz param_0, f32 param_1) {
     }
 }
 
-/* 807499C0-80749C0C 007BC0 024C+00 1/1 0/0 0/0 .text            DemoCreateAction__8daE_PM_cFv */
 void daE_PM_c::DemoCreateAction() {
     cXyz vec1, vec2, vec3;
     switch (mMode) {
@@ -2290,7 +2351,6 @@ void daE_PM_c::DemoCreateAction() {
     mTargetAngleY = s_TargetAngle;
 }
 
-/* 80749C0C-80749D9C 007E0C 0190+00 1/1 0/0 0/0 .text            CreateAction__8daE_PM_cFv */
 void daE_PM_c::CreateAction() {
     cXyz vec;
 
@@ -2326,7 +2386,6 @@ void daE_PM_c::CreateAction() {
     mTargetAngleY = s_TargetAngle;
 }
 
-/* 80749D9C-80749ED0 007F9C 0134+00 2/2 0/0 0/0 .text            CreateChk__8daE_PM_cFv */
 void daE_PM_c::CreateChk() {
     for (int i = 0; i < mPuppetNum; i++) {
         fopAc_ac_c* puppet = fopAcM_SearchByID(mPuppetID[i]);
@@ -2352,7 +2411,6 @@ void daE_PM_c::CreateChk() {
     }
 }
 
-/* 80749ED0-8074A14C 0080D0 027C+00 1/1 0/0 0/0 .text            LampAction__8daE_PM_cFv */
 void daE_PM_c::LampAction() {
     cXyz vec = mOldLampPosition - mLampPosition;
     f32 dist = vec.abs();
@@ -2363,7 +2421,6 @@ void daE_PM_c::LampAction() {
     mOldLampPosition = mLampPosition;
 }
 
-/* 8074A14C-8074A210 00834C 00C4+00 1/1 0/0 0/0 .text            DamageAction__8daE_PM_cFv */
 void daE_PM_c::DamageAction() {
     switch (mMode) {
     case 0:
@@ -2383,9 +2440,8 @@ void daE_PM_c::DamageAction() {
     mTargetAngleY = s_TargetAngle;
 }
 
-/* 8074A210-8074A3DC 008410 01CC+00 1/1 0/0 0/0 .text            At_Check__8daE_PM_cFv */
-// NONMATCHING regalloc
 void daE_PM_c::At_Check() {
+    fopAc_ac_c* player = dComIfGp_getPlayer(0);
     mAtInfo.mpCollider = mCcCyl.GetTgHitObj();
     mAtInfo.mpActor = at_power_check(&mAtInfo);
 
@@ -2394,12 +2450,11 @@ void daE_PM_c::At_Check() {
             mAtInfo.mAttackPower = 0;
         }
 
-        s16 attack_power = mAtInfo.mAttackPower;
-        if (attack_power > 0) {
-            health -= attack_power;
+        if ((s16)mAtInfo.mAttackPower > 0) {
+            health -= (s16)mAtInfo.mAttackPower;
         }
 
-        u32 pause_timer;
+        u32 pause_timer = 0;
         if (mAtInfo.mAttackPower != 0 && health <= l_HIO.field_0x34) {
             mAtInfo.mHitStatus = 2;
             pause_timer = 5;
@@ -2413,7 +2468,8 @@ void daE_PM_c::At_Check() {
             pause_timer = 0;
         }
 
-        u8 sound = ((dCcD_GObjInf*)mAtInfo.mpCollider)->GetAtSe();
+        dCcD_GObjInf* collider = (dCcD_GObjInf*)mAtInfo.mpCollider;
+        u32 sound = collider->GetAtSe();
         u32 var1 = 30;
         if (mAtInfo.mHitStatus == 1) {
             var1 = 31;
@@ -2423,7 +2479,7 @@ void daE_PM_c::At_Check() {
 
         if (mAtInfo.mpSound != NULL) {
             if (mAtInfo.field_0x18 != 0) {
-                mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), var1);
+                mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), mAtInfo.field_0x18);
             } else {
                 mAtInfo.mpSound->startCollisionSE(dCcD_GObjInf::getHitSeID(sound, FALSE), var1);
             }
@@ -2438,7 +2494,6 @@ void daE_PM_c::At_Check() {
     }
 }
 
-/* 8074A3DC-8074A644 0085DC 0268+00 2/2 0/0 0/0 .text            ObjHit__8daE_PM_cFv */
 void daE_PM_c::ObjHit() {
     mIFrameTimer--;
     if (mIFrameTimer <= 0) {
@@ -2501,7 +2556,6 @@ void daE_PM_c::ObjHit() {
     }
 }
 
-/* 8074A644-8074A6CC 008844 0088+00 1/1 0/0 0/0 .text            EyeMove__8daE_PM_cFv */
 void daE_PM_c::EyeMove() {
     if (mEyeAnmTimer == 0) {
         mEyeAnmTimer = cM_rndF(100.0f) + 30.0f;
@@ -2515,7 +2569,6 @@ void daE_PM_c::EyeMove() {
     }
 }
 
-/* 8074A6CC-8074AAC0 0088CC 03F4+00 1/1 0/0 0/0 .text            Draw__8daE_PM_cFv */
 int daE_PM_c::Draw() {
     if (mSecondEncounter && mBossLightOn) {
         GXColor color;
@@ -2568,12 +2621,11 @@ int daE_PM_c::Draw() {
     return 1;
 }
 
-/* 8074AAC0-8074AB28 008CC0 0068+00 1/1 0/0 0/0 .text            Delete__8daE_PM_cFv */
 int daE_PM_c::Delete() {
     dComIfG_resDelete(&mPhase, "E_PM");
     
     if (mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
 
     if (heap != NULL) {
@@ -2583,7 +2635,6 @@ int daE_PM_c::Delete() {
     return 1;
 }
 
-/* 8074AB28-8074ABA8 008D28 0080+00 1/1 0/0 0/0 .text            setBaseMtx__8daE_PM_cFv */
 void daE_PM_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(shape_angle);
@@ -2592,14 +2643,12 @@ void daE_PM_c::setBaseMtx() {
     mpEyeAnm->setFrame(mEyeAnmFrame);
 }
 
-/* 8074ABA8-8074AC10 008DA8 0068+00 1/1 0/0 0/0 .text            setGakkiBaseMtx__8daE_PM_cFv */
 void daE_PM_c::setGakkiBaseMtx() {
     mpTrumpetMorf->getModel()->setBaseTRMtx(mpMorf->getModel()->getAnmMtx(JNT_HAND_L));
     mpTrumpetMorf->play(NULL, 0, 0);
     mpTrumpetMorf->modelCalc();
 }
 
-/* 8074AC10-8074AE90 008E10 0280+00 1/1 0/0 0/0 .text            setLampBaseMtx__8daE_PM_cFv */
 void daE_PM_c::setLampBaseMtx() {
     cXyz vec1, vec2;
     MTXCopy(mpMorf->getModel()->getAnmMtx(JNT_HAND_R), *calc_mtx);
@@ -2630,27 +2679,22 @@ void daE_PM_c::setLampBaseMtx() {
     mpGlowEffectMorf->modelCalc();
 }
 
-/* 8074AE90-8074AEB0 009090 0020+00 1/0 0/0 0/0 .text            daE_PM_Draw__FP8daE_PM_c */
 static int daE_PM_Draw(daE_PM_c* i_this) {
     return i_this->Draw();
 }
 
-/* 8074AEB0-8074AED0 0090B0 0020+00 2/1 0/0 0/0 .text            daE_PM_Execute__FP8daE_PM_c */
 static int daE_PM_Execute(daE_PM_c* i_this) {
     return i_this->Execute();
 }
 
-/* 8074AED0-8074AED8 0090D0 0008+00 1/0 0/0 0/0 .text            daE_PM_IsDelete__FP8daE_PM_c */
 static int daE_PM_IsDelete(daE_PM_c* i_this) {
     return 1;
 }
 
-/* 8074AED8-8074AEF8 0090D8 0020+00 1/0 0/0 0/0 .text            daE_PM_Delete__FP8daE_PM_c */
 static int daE_PM_Delete(daE_PM_c* i_this) {
     return i_this->Delete();
 }
 
-/* 8074AEF8-8074B4DC 0090F8 05E4+00 1/1 0/0 0/0 .text            SkipChk__8daE_PM_cFv */
 void daE_PM_c::SkipChk() {
     fopAc_ac_c* puppet;
     cXyz vec1, vec2, vec3;
@@ -2749,9 +2793,8 @@ void daE_PM_c::SkipChk() {
     }
 }
 
-/* 8074B4DC-8074B834 0096DC 0358+00 1/1 0/0 0/0 .text            Create__8daE_PM_cFv */
 cPhs__Step daE_PM_c::Create() {
-    fopAcM_SetupActor(this, daE_PM_c);
+    fopAcM_ct(this, daE_PM_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "E_PM");
 
     if (step == cPhs_COMPLEATE_e) {
@@ -2759,8 +2802,8 @@ cPhs__Step daE_PM_c::Create() {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
-            hioInit = true;
+        if (!hio_set) {
+            hio_set = true;
             mHIOInit = true;
             l_HIO.field_0x4 = -1;
         }
@@ -2770,7 +2813,7 @@ cPhs__Step daE_PM_c::Create() {
         mpPath = dPath_GetRoomPath(mPathIndex, fopAcM_GetRoomNo(this));
         mSwBit = (fopAcM_GetParam(this) >> 0x18) & 0xFF;
 
-        attention_info.flags = 4;
+        attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         attention_info.distances[fopAc_attn_BATTLE_e] = 86;
         fopAcM_SetMtx(this, mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(this, -200.0f, 0.0f, -200.0f);
@@ -2791,7 +2834,7 @@ cPhs__Step daE_PM_c::Create() {
         mCreatureSound.setEnemyName("E_PM");
 
         J3DModel* model = mpMorf->getModel();
-        model->setUserArea((u32)this);
+        model->setUserArea((uintptr_t)this);
         model->getModelData()->getJointNodePointer(JNT_HEAD)->setCallBack(JointCallBack);
 
         if (dComIfG_play_c::getLayerNo(0) == 2 || dComIfG_play_c::getLayerNo(0) == 5) {
@@ -2811,14 +2854,12 @@ cPhs__Step daE_PM_c::Create() {
     return step;
 }
 
-/* 8074BA00-8074BA20 009C00 0020+00 1/0 0/0 0/0 .text            daE_PM_Create__FP10fopAc_ac_c */
 static cPhs__Step daE_PM_Create(fopAc_ac_c* i_this) {
     return static_cast<daE_PM_c*>(i_this)->Create();
 }
 
 AUDIO_INSTANCES;
 
-/* 8074C23C-8074C25C -00001 0020+00 1/0 0/0 0/0 .data            l_daE_PM_Method */
 static actor_method_class l_daE_PM_Method = {
     (process_method_func)daE_PM_Create,
     (process_method_func)daE_PM_Delete,
@@ -2827,7 +2868,6 @@ static actor_method_class l_daE_PM_Method = {
     (process_method_func)daE_PM_Draw,
 };
 
-/* 8074C25C-8074C28C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_PM */
 extern actor_process_profile_definition g_profile_E_PM = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

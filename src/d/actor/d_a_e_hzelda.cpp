@@ -3,10 +3,13 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_hzelda.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "SSystem/SComponent/c_math.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 #include "m_Do/m_Do_graphic.h"
 #include "d/d_s_play.h"
@@ -95,23 +98,17 @@ enum hzelda_timer {
     TIMER_ATTACK_WAIT = 0,
 };
 
-UNK_REL_DATA
-
-/* 806F0D4C-806F0D70 0000EC 0024+00 1/1 0/0 0/0 .text            __ct__16daE_HZELDA_HIO_cFv */
 daE_HZELDA_HIO_c::daE_HZELDA_HIO_c() {
     field_0x4 = -1;
     mModelSize = 1.0f;
 }
 
-/* 806F0D70-806F0E1C 000110 00AC+00 5/5 0/0 0/0 .text            anm_init__FP14e_hzelda_classifUcf
- */
 static void anm_init(e_hzelda_class* i_this, int i_resID, f32 i_morf, u8 i_attr,
                      f32 i_speed) {
     i_this->mpModelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("Hzelda", i_resID), i_attr, i_morf, i_speed, 0.0f, -1.0f);
     i_this->mAnm = i_resID;
 }
 
-/* 806F0E1C-806F1004 0001BC 01E8+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
@@ -144,8 +141,6 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 806F1004-806F1214 0003A4 0210+00 1/0 0/0 0/0 .text            daE_HZELDA_Draw__FP14e_hzelda_class
- */
 static int daE_HZELDA_Draw(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     J3DModel* model = i_this->mpModelMorf->getModel();
@@ -185,7 +180,6 @@ static int daE_HZELDA_Draw(e_hzelda_class* i_this) {
     return 1;
 }
 
-/* 806F1214-806F13A8 0005B4 0194+00 1/1 0/0 0/0 .text            shot_s_sub__FPvPv */
 static void* shot_s_sub(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_ARROW && (fopAcM_GetParam(i_actor) == 1 || fopAcM_GetParam(i_actor) == 2)) {
         cXyz vec = ((fopAc_ac_c*)i_data)->current.pos - ((fopAc_ac_c*)i_actor)->current.pos;
@@ -197,8 +191,6 @@ static void* shot_s_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 806F13A8-806F1758 000748 03B0+00 1/1 0/0 0/0 .text            e_hzelda_wait__FP14e_hzelda_class
- */
 static void e_hzelda_wait(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -291,7 +283,6 @@ static void e_hzelda_wait(e_hzelda_class* i_this) {
     cLib_addCalc0(&i_this->mDodgeMove, 1.0f, 2.0f);
 }
 
-/* 806F1758-806F1C9C 000AF8 0544+00 1/1 0/0 0/0 .text e_hzelda_attack_a__FP14e_hzelda_class */
 static int e_hzelda_attack_a(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -386,7 +377,6 @@ static int e_hzelda_attack_a(e_hzelda_class* i_this) {
     return ret;
 }
 
-/* 806F1C9C-806F1FA4 00103C 0308+00 1/1 0/0 0/0 .text e_hzelda_attack_b__FP14e_hzelda_class */
 static void e_hzelda_attack_b(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -455,7 +445,6 @@ static void e_hzelda_attack_b(e_hzelda_class* i_this) {
     cLib_addCalc2(&i_this->current.pos.z, i_this->mTargetMovePos.z, 0.05f, i_this->mMoveStep);
 }
 
-/* 806F1FA4-806F2054 001344 00B0+00 2/2 0/0 0/0 .text ball_crash_eff_set__FP14e_hzelda_classf */
 static void ball_crash_eff_set(e_hzelda_class* i_this, f32 i_size) {
     cXyz size(i_size, i_size, i_size);
     for (int i = 0; i < 3; i++) {
@@ -464,7 +453,6 @@ static void ball_crash_eff_set(e_hzelda_class* i_this, f32 i_size) {
     }
 }
 
-/* 806F2054-806F28C8 0013F4 0874+00 1/1 0/0 0/0 .text e_hzelda_attack_c__FP14e_hzelda_class */
 static void e_hzelda_attack_c(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -621,8 +609,6 @@ static void e_hzelda_attack_c(e_hzelda_class* i_this) {
     cLib_addCalc2(&a_this->current.pos.z, i_this->mTargetMovePos.z, 0.05f, i_this->mMoveStep);
 }
 
-/* 806F28C8-806F2A3C 001C68 0174+00 2/1 0/0 0/0 .text            e_hzelda_damage__FP14e_hzelda_class
- */
 static void e_hzelda_damage(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -664,7 +650,6 @@ static void e_hzelda_damage(e_hzelda_class* i_this) {
     }
 }
 
-/* 806F2A3C-806F2F9C 001DDC 0560+00 1/1 0/0 0/0 .text            action__FP14e_hzelda_class */
 static void action(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -709,7 +694,7 @@ static void action(e_hzelda_class* i_this) {
 
     if (on_attention) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -822,8 +807,6 @@ static void action(e_hzelda_class* i_this) {
     }
 }
 
-/* 806F2F9C-806F3084 00233C 00E8+00 1/1 0/0 0/0 .text            ball_bg_check__FP14e_hzelda_class
- */
 static BOOL ball_bg_check(e_hzelda_class* i_this) {
     cXyz start;
     cXyz end;
@@ -841,7 +824,6 @@ static BOOL ball_bg_check(e_hzelda_class* i_this) {
     return FALSE;
 }
 
-/* 806F3084-806F3388 002424 0304+00 1/1 0/0 0/0 .text            demo_camera__FP14e_hzelda_class */
 static void demo_camera(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
@@ -919,7 +901,6 @@ static void demo_camera(e_hzelda_class* i_this) {
     }
 }
 
-/* 806F3388-806F3590 002728 0208+00 1/1 0/0 0/0 .text            anm_se_set__FP14e_hzelda_class */
 static void anm_se_set(e_hzelda_class* i_this) {
     if (i_this->mAnm == ANM_BEFORE_ATTACK && i_this->mpModelMorf->checkFrame(21)) {
         i_this->mSound.startCreatureVoice(Z2SE_EN_HZE_V_ATK_YOKOKU, -1);
@@ -936,13 +917,10 @@ static void anm_se_set(e_hzelda_class* i_this) {
     }
 }
 
-/* 806F5928-806F592C 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 l_initHIO;
+static u8 hio_set;
 
-/* 806F5938-806F5944 000018 000C+00 3/3 0/0 0/0 .bss             l_HIO */
 static daE_HZELDA_HIO_c l_HIO;
 
-/* 806F3590-806F474C 002930 11BC+00 2/1 0/0 0/0 .text daE_HZELDA_Execute__FP14e_hzelda_class */
 static int daE_HZELDA_Execute(e_hzelda_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp114;
@@ -1049,7 +1027,7 @@ static int daE_HZELDA_Execute(e_hzelda_class* i_this) {
     BOOL on_player_at_sph = FALSE;
 
     if (daPy_py_c::checkMasterSwordEquip()) {
-        if (daPy_getPlayerActorClass()->getCutType() != 0) {
+        if (daPy_getPlayerActorClass()->getCutType() != daPy_py_c::CUT_TYPE_NONE) {
             i_this->mSwordAtTimer++;
             if (i_this->mSwordAtTimer < 6) {
                 on_player_at_sph = TRUE;
@@ -1315,17 +1293,15 @@ static int daE_HZELDA_Execute(e_hzelda_class* i_this) {
     return 1;
 }
 
-/* 806F474C-806F4754 003AEC 0008+00 1/0 0/0 0/0 .text daE_HZELDA_IsDelete__FP14e_hzelda_class */
 static int daE_HZELDA_IsDelete(e_hzelda_class* i_this) {
     return 1;
 }
 
-/* 806F4754-806F47C4 003AF4 0070+00 1/0 0/0 0/0 .text daE_HZELDA_Delete__FP14e_hzelda_class */
 static int daE_HZELDA_Delete(e_hzelda_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "Hzelda");
 
     if (i_this->mInitHIO) {
-        l_initHIO = 0;
+        hio_set = 0;
     }
 
     if (i_this->heap != NULL) {
@@ -1336,33 +1312,32 @@ static int daE_HZELDA_Delete(e_hzelda_class* i_this) {
     return 1;
 }
 
-/* 806F47C4-806F4AD4 003B64 0310+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
-// NONMATCHING - equivalent. r30/r31 regswap
 static int useHeapInit(fopAc_ac_c* i_this) {
     e_hzelda_class* a_this = (e_hzelda_class*)i_this;
-    J3DModelData* modelData;
 
-    a_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1B), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("Hzelda", 0x15), 2, 1.0f, 0, -1, &a_this->mSound, 0x80000, 0x11000284);
+    a_this->mpModelMorf = new mDoExt_McaMorfSO(static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1B)), NULL, NULL,
+                                               static_cast<J3DAnmTransform*>(dComIfG_getObjectRes("Hzelda", 0x15)),
+                                               J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1, &a_this->mSound, 0x80000, 0x11000284);
     if (a_this->mpModelMorf == NULL || a_this->mpModelMorf->getModel() == NULL) {
         return 0;
     }
 
     J3DModel* model = a_this->mpModelMorf->getModel();
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1C);
-    JUT_ASSERT(2129, modelData != 0);
+    J3DModelData* modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1C));
+    JUT_ASSERT(2129, modelData != NULL);
     a_this->mpSwordModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (a_this->mpSwordModel == NULL) {
         return 0;
     }
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("Hzelda", 0x1A);
-    JUT_ASSERT(2149, modelData != 0);
+    modelData = static_cast<J3DModelData*>(dComIfG_getObjectRes("Hzelda", 0x1A));
+    JUT_ASSERT(2149, modelData != NULL);
     a_this->mpTriangleAtModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
     if (a_this->mpTriangleAtModel == NULL) {
         return 0;
@@ -1373,7 +1348,8 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpTriangleAtBrk->init(modelData, (J3DAnmTevRegKey*)dComIfG_getObjectRes("Hzelda", 0x1F), TRUE, 2, 1.0f, 0, -1)) {
+    if (a_this->mpTriangleAtBrk->init(modelData, static_cast<J3DAnmTevRegKey*>(dComIfG_getObjectRes("Hzelda", 0x1F)),
+                                       TRUE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
@@ -1382,7 +1358,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         return 0;
     }
 
-    if (!a_this->mpTriangleAtBtk->init(a_this->mpTriangleAtModel->getModelData(), (J3DAnmTextureSRTKey*)dComIfG_getObjectRes("Hzelda", 0x23), TRUE, 2, 1.0f, 0, -1)) {
+    if (a_this->mpTriangleAtBtk->init(a_this->mpTriangleAtModel->getModelData(),
+                                       static_cast<J3DAnmTextureSRTKey*>(dComIfG_getObjectRes("Hzelda", 0x23)),
+                                       TRUE, J3DFrameCtrl::EMode_LOOP, 1.0f, 0, -1) == FALSE) {
         return 0;
     }
 
@@ -1391,11 +1369,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 806F4B1C-806F4E48 003EBC 032C+00 1/0 0/0 0/0 .text            daE_HZELDA_Create__FP10fopAc_ac_c
- */
 static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
     e_hzelda_class* a_this = (e_hzelda_class*)i_this;
-    fopAcM_SetupActor(a_this, e_hzelda_class);
+    fopAcM_ct(a_this, e_hzelda_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "Hzelda");
     a_this->mPrm0 = fopAcM_GetParam(i_this);
@@ -1415,9 +1391,9 @@ static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (l_initHIO == 0) {
+        if (hio_set == 0) {
             a_this->mInitHIO = 1;
-            l_initHIO = 1;
+            hio_set = 1;
             l_HIO.field_0x4 = -1;
         }
 
@@ -1483,7 +1459,7 @@ static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
 
         a_this->mBallSphAt.Set(ball_at_sph_src);
         a_this->mBallSphAt.SetStts(&a_this->field_0xd3c);
-        a_this->mBallSphAt.SetAtMtrl(dCcD_MTRL_UNK_5);
+        a_this->mBallSphAt.SetAtMtrl(dCcD_MTRL_ELECTRIC);
 
         static dCcD_SrcSph ball_tg_sph_src = {
             {
@@ -1554,7 +1530,6 @@ static int daE_HZELDA_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 806F5854-806F5874 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_HZELDA_Method */
 static actor_method_class l_daE_HZELDA_Method = {
     (process_method_func)daE_HZELDA_Create,
     (process_method_func)daE_HZELDA_Delete,
@@ -1563,7 +1538,6 @@ static actor_method_class l_daE_HZELDA_Method = {
     (process_method_func)daE_HZELDA_Draw,
 };
 
-/* 806F5874-806F58A4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_HZELDA */
 extern actor_process_profile_definition g_profile_E_HZELDA = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

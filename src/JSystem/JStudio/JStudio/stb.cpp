@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio/stb.h"
 #include "JSystem/JStudio/JStudio/jstudio-object.h"
 #include "JSystem/JUtility/JUTException.h"
@@ -65,12 +67,20 @@ void TObject::setFlag_operation(u8 op, int val) {
     }
 }
 
+#if !PLATFORM_SHIELD || DEBUG
 void TObject::reset(const void* arg1) {
     bSequence_ = 0;
     mStatus = STATUS_STILL;
     pSequence_next = arg1;
     u32Wait_ = 0;
 }
+#endif
+
+#if DEBUG
+void TObject::reset() {
+    reset(NULL);
+}
+#endif
 
 bool TObject::forward(u32 arg1) {
     bool temp = false;
@@ -196,29 +206,31 @@ void TObject::process_sequence_() {
     switch (type) {
     case 0:
         JUT_EXPECT(u32Value == 0);
-        JUT_EXPECT(pContent == 0);
+        JUT_EXPECT(pContent == NULL);
         break;
     case 1:
-        JUT_EXPECT(pContent == 0);
+        JUT_EXPECT(pContent == NULL);
         setFlag_operation_(u32Value);
         break;
     case 2:
-        JUT_EXPECT(pContent == 0);
+        JUT_EXPECT(pContent == NULL);
         setWait(u32Value);
         break;
-    case 3:
-        JUT_EXPECT(pContent == 0);
+    case 3: {
+        JUT_EXPECT(pContent == NULL);
         s32 off = toInt32FromUInt24_(u32Value);
         void* nextseq = (void*)getSequence_offset(off);
         setSequence_next(nextseq);
         break;
-    case 4:
-        JUT_EXPECT(pContent == 0);
+    }
+    case 4: {
+        JUT_EXPECT(pContent == NULL);
         u32 val = toInt32FromUInt24_(u32Value);
         suspend(val);
         break;
-    case 0x80:
-        ASSERT(pContent != 0);
+    }
+    case 0x80: {
+        ASSERT(pContent != NULL);
         void* p = (void*)pContent;
         data::TParse_TParagraph para(NULL);
         while (p < pNext) {
@@ -232,10 +244,11 @@ void TObject::process_sequence_() {
                 on_paragraph(para_dat.type, para_dat.content, para_dat.param);
             }
             p = (void*)para_dat.next;
-            ASSERT(p != 0);
+            ASSERT(p != NULL);
         }
         JUT_EXPECT(p == pNext);
         break;
+    }
     default:
         JUTWarn w;
         w << "unknown sequence : " << dat.type;
@@ -246,32 +259,34 @@ void TObject::process_sequence_() {
 void TObject::process_paragraph_reserved_(u32 arg1, const void* pContent, u32 uSize) {
     switch (arg1) {
     case 0x1:
-        ASSERT(pContent != 0);
+        ASSERT(pContent != NULL);
         ASSERT(uSize == 4);
         setFlag_operation_(*(u32*)pContent);
         break;
     case 0x2:
-        ASSERT(pContent != 0);
+        ASSERT(pContent != NULL);
         ASSERT(uSize == 4);
         setWait(*(u32*)pContent);
         break;
-    case 0x3:
-        ASSERT(pContent != 0);
+    case 0x3: {
+        ASSERT(pContent != NULL);
         ASSERT(uSize == 4);
         const void* seq = getSequence_offset(*(s32*)pContent);
         setSequence_next(seq);
         break;
+    }
     case 0x80:
         on_data(NULL, 0, pContent, uSize);
         break;
-    case 0x81:
+    case 0x81: {
         data::TParse_TParagraph_dataID dataID(pContent);
         const void* temp = dataID.getContent();
         on_data(dataID.get_ID(), dataID.get_IDSize(), temp,
-                uSize - ((u32)temp - (u32)dataID.getRaw()));
+                uSize - ((uintptr_t)temp - (uintptr_t)dataID.getRaw()));
         break;
+    }
     case 0x82:
-        ASSERT(pContent != 0);
+        ASSERT(pContent != NULL);
         break;
     }
 }
@@ -290,15 +305,13 @@ TControl::~TControl() {
     JUT_EXPECT(ocObject_.empty());
 }
 
-/* 80289228-80289278 283B68 0050+00 1/1 0/0 0/0 .text
- * appendObject__Q37JStudio3stb8TControlFPQ37JStudio3stb7TObject */
 void TControl::appendObject(TObject* p) {
     p->setControl_(this);
     mObjectContainer.Push_back(p);
 }
 
 void TControl::removeObject(TObject* p) {
-    ASSERT(p != 0);
+    ASSERT(p != NULL);
     ASSERT(p->getControl() == this);
     p->setControl_(NULL);
     mObjectContainer.Erase(p);
@@ -306,19 +319,16 @@ void TControl::removeObject(TObject* p) {
 
 void TControl::destroyObject(TObject* p) {
     removeObject(p);
-    ASSERT(pFactory != 0);
+    ASSERT(pFactory != NULL);
     pFactory->destroy(p);
 }
 
-/* 80289300-80289364 283C40 0064+00 0/0 2/2 0/0 .text destroyObject_all__Q37JStudio3stb8TControlFv
- */
 void TControl::destroyObject_all() {
     while (!mObjectContainer.empty()) {
         destroyObject(&mObjectContainer.back());
     }
 }
 
-/* 80289364-80289404 283CA4 00A0+00 1/1 0/0 0/0 .text getObject__Q37JStudio3stb8TControlFPCvUl */
 // NONMATCHING - TPRObject_ID_equal copy issue
 TObject* TControl::getObject(void const* param_0, u32 param_1) {
     JGadget::TLinkList<TObject, -12>::iterator begin = mObjectContainer.begin();
@@ -330,24 +340,21 @@ TObject* TControl::getObject(void const* param_0, u32 param_1) {
     return NULL;
 }
 
-/* 80289404-802894B4 283D44 00B0+00 0/0 1/1 0/0 .text            reset__Q37JStudio3stb8TControlFv */
 void TControl::reset() {
     resetStatus_();
-    mObject_control.reset(NULL);
-    JGadget::TContainerEnumerator<JStudio::stb::TObject, -12> aTStack_18(&mObjectContainer);
+    mObject_control.reset();
+    JGadget::TContainerEnumerator<JGadget::TLinkList<JStudio::stb::TObject, -12> > aTStack_18(mObjectContainer);
     while (aTStack_18) {
-        (*aTStack_18).reset(NULL);
+        (*aTStack_18).reset();
     }
 }
 
-/* 802894B4-802895B4 283DF4 0100+00 0/0 2/2 0/0 .text            forward__Q37JStudio3stb8TControlFUl
- */
 bool TControl::forward(u32 param_0) {
     _54 = mObject_control.getSuspend();
     bool rv = mObject_control.forward(param_0);
     int uVar7 = 0xf;
     int uVar6 = 0;
-    JGadget::TContainerEnumerator<JStudio::stb::TObject, -12> aTStack_38(&mObjectContainer);
+    JGadget::TContainerEnumerator<JGadget::TLinkList<JStudio::stb::TObject, -12> > aTStack_38(mObjectContainer);
     while (aTStack_38) {
         JStudio::stb::TObject& this_00 = *aTStack_38;
         rv = this_00.forward(param_0) || rv;
@@ -374,11 +381,11 @@ TParse::TParse(TControl* pControl) : pControl(pControl) {}
 TParse::~TParse() {}
 
 bool TParse::parseHeader_next(const void** ppData_inout, u32* puBlock_out, u32 flags) {
-    ASSERT(ppData_inout != 0);
-    ASSERT(puBlock_out != 0);
+    ASSERT(ppData_inout != NULL);
+    ASSERT(puBlock_out != NULL);
 
     const void* pData = *ppData_inout;
-    ASSERT(pData != 0);
+    ASSERT(pData != NULL);
 
     const data::TParse_THeader header(pData);
     *ppData_inout = header.getContent();
@@ -398,7 +405,7 @@ bool TParse::parseHeader_next(const void** ppData_inout, u32* puBlock_out, u32 f
     u16 version = header.get_version();
     if (version < 1) {
         JUTWarn w;
-        w << "obselete version : " << (long)0;
+        w << "obselete version : " << (s32)0;
         return false;
     } else if (version > 3) {
         JUTWarn w;
@@ -409,11 +416,11 @@ bool TParse::parseHeader_next(const void** ppData_inout, u32* puBlock_out, u32 f
 }
 
 bool TParse::parseBlock_next(void const** ppData_inout, u32* puData_out, u32 flags) {
-    ASSERT(ppData_inout != 0);
-    ASSERT(puData_out != 0);
+    ASSERT(ppData_inout != NULL);
+    ASSERT(puData_out != NULL);
 
     const void* pData = *ppData_inout;
-    ASSERT(pData != 0);
+    ASSERT(pData != NULL);
 
     data::TParse_TBlock blk(pData);
     *ppData_inout = blk.getNext();
@@ -431,7 +438,7 @@ bool TParse::parseBlock_block(const data::TParse_TBlock& ppBlock, u32 flags) {
 
 bool TParse::parseBlock_object(const data::TParse_TBlock_object& ppObject, u32 flags) {
     TControl* pControl = getControl();
-    ASSERT(pControl != 0);
+    ASSERT(pControl != NULL);
 
     if (ppObject.get_type() == data::BLOCK_NONE) {
         TObject_control& ref = pControl->referObject_control();

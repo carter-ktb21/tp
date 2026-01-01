@@ -33,6 +33,7 @@ public:
     void GetMinMaxCube(cXyz&, cXyz&) const;
     const cXyz& GetC(void) const { return mCenter; }
     const cXyz* GetCP() const { return &mCenter; }
+    cXyz* GetCP() { return &mCenter; }
     const f32 GetR(void) const { return mRadius; }
     f32 GetCX(void) const { return mCenter.x; }
     f32 GetCY(void) const { return mCenter.y; }
@@ -44,10 +45,5 @@ public:
 };  // Size = 0x14
 
 STATIC_ASSERT(0x14 == sizeof(cM3dGSph));
-
-// additional symbols needed for cM3dGSph
-extern "C" {
-void Set__8cM3dGSphFRC4cXyzf(void);
-}
 
 #endif

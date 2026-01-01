@@ -2,11 +2,11 @@
 // control
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio_JAudio2/control.h"
 #include "JSystem/JGadget/pointer.h"
 
-/* 8028D550-8028D5B0 287E90 0060+00 1/0 0/0 0/0 .text __dt__Q215JStudio_JAudio213TCreateObjectFv
- */
 JStudio_JAudio2::TCreateObject::~TCreateObject() {}
 
 /* 8028D5B0-8028D624 287EF0 0074+00 1/0 0/0 0/0 .text
@@ -14,7 +14,7 @@ JStudio_JAudio2::TCreateObject::~TCreateObject() {}
  */
 bool JStudio_JAudio2::TCreateObject::create(
     JStudio::TObject** ppObject, JStudio::stb::data::TParse_TBlock_object const& param_2) {
-    JUT_ASSERT(40, ppObject!=0);
+    JUT_ASSERT(40, ppObject!=NULL);
     CreateFunc func;
     switch (param_2.get_type()) {
     case 'JSND':

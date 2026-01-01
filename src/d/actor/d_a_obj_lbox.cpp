@@ -3,40 +3,24 @@
  * Object - Unused Block (HIO Label is "Block for boss battle")
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_lbox.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "f_op/f_op_actor_mng.h"
 #include "m_Do/m_Do_hostIO.h"
 
-/* 80C54008-80C54048 000000 0040+00 1/1 0/0 0/0 .data            cc_sph_src$3950 */
-static dCcD_SrcSph cc_sph_src = {
-    {
-        {0x0, {{0x0, 0x0, 0x0}, {0xd8fbfdff, 0x3}, 0x0}},  // mObj
-        {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},                // mGObjAt
-        {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x2},                // mGObjTg
-        {0x0},                                             // mGObjCo
-    },                                                     // mObjInf
-    {
-        {{0.0f, 0.0f, 0.0f}, 40.0f}  // mSph
-    }                                // mSphAttr
-};
+static u8 hio_set;
 
-/* 80C540E8-80C540EC 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 data_80C540E8;
-
-/* 80C540F8-80C54108 000018 0010+00 3/3 0/0 0/0 .bss             l_HIO */
 static daObj_Lbox_HIO_c l_HIO;
 
-/* 80C5356C-80C5359C 0000EC 0030+00 1/1 0/0 0/0 .text            __ct__16daObj_Lbox_HIO_cFv */
 daObj_Lbox_HIO_c::daObj_Lbox_HIO_c() {
     field_0x4 = -1;
     mSize = 2.0f;
     mHeight = 0.0f;
 }
 
-/* 80C5359C-80C53600 00011C 0064+00 1/0 0/0 0/0 .text            daObj_Lbox_Draw__FP14obj_lbox_class
- */
 static int daObj_Lbox_Draw(obj_lbox_class* i_this) {
     g_env_light.settingTevStruct(16, &i_this->current.pos, &i_this->tevStr);
     g_env_light.setLightTevColorType_MAJI(i_this->mpModel, &i_this->tevStr);
@@ -44,7 +28,6 @@ static int daObj_Lbox_Draw(obj_lbox_class* i_this) {
     return 1;
 }
 
-/* 80C53600-80C5396C 000180 036C+00 1/1 0/0 0/0 .text            action__FP14obj_lbox_class */
 static void action(obj_lbox_class* i_this) {
     switch (i_this->field_0x57a) {
     case 2:
@@ -102,7 +85,6 @@ static void action(obj_lbox_class* i_this) {
     i_this->attention_info.position = i_this->eyePos;
 }
 
-/* 80C5396C-80C539C8 0004EC 005C+00 2/1 0/0 0/0 .text daObj_Lbox_Execute__FP14obj_lbox_class */
 static int daObj_Lbox_Execute(obj_lbox_class* i_this) {
     i_this->field_0x578++;
     for (int i = 0; i < 2; i++) {
@@ -114,28 +96,25 @@ static int daObj_Lbox_Execute(obj_lbox_class* i_this) {
     return 1;
 }
 
-/* 80C539C8-80C539D0 000548 0008+00 1/0 0/0 0/0 .text daObj_Lbox_IsDelete__FP14obj_lbox_class */
 static int daObj_Lbox_IsDelete(obj_lbox_class* i_this) {
     return 1;
 }
 
-/* 80C539D0-80C53A38 000550 0068+00 1/0 0/0 0/0 .text daObj_Lbox_Delete__FP14obj_lbox_class */
 static int daObj_Lbox_Delete(obj_lbox_class* i_this) {
     fopAcM_GetID(i_this);
     dComIfG_resDelete(&i_this->mPhaseReq, "Obj_lbox");
     if (i_this->field_0xa8c != 0) {
-        data_80C540E8 = 0;
+        hio_set = 0;
     }
     dComIfG_Bgsp().Release(i_this->mpBgW);
     return 1;
 }
 
-/* 80C53A38-80C53B3C 0005B8 0104+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     obj_lbox_class* a_this = static_cast<obj_lbox_class*>(i_this);
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Obj_lbox", 4);
-    JUT_ASSERT(478, modelData != 0);
+    JUT_ASSERT(478, modelData != NULL);
     a_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (a_this->mpModel == NULL) {
         return 0;
@@ -155,11 +134,21 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80C53B3C-80C53E14 0006BC 02D8+00 1/0 0/0 0/0 .text            daObj_Lbox_Create__FP10fopAc_ac_c
- */
 static cPhs__Step daObj_Lbox_Create(fopAc_ac_c* i_this) {
+    static dCcD_SrcSph cc_sph_src = {
+        {
+            {0x0, {{0x0, 0x0, 0x0}, {0xd8fbfdff, 0x3}, 0x0}},  // mObj
+            {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},                // mGObjAt
+            {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x2},                // mGObjTg
+            {0x0},                                             // mGObjCo
+        },                                                     // mObjInf
+        {
+            {{0.0f, 0.0f, 0.0f}, 40.0f}  // mSph
+        }                                // mSphAttr
+    };
+
     obj_lbox_class* a_this = static_cast<obj_lbox_class*>(i_this);
-    fopAcM_SetupActor(a_this, obj_lbox_class);
+    fopAcM_ct(a_this, obj_lbox_class);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&a_this->mPhaseReq, "Obj_lbox");
 
     if (step == cPhs_COMPLEATE_e) {
@@ -176,9 +165,9 @@ static cPhs__Step daObj_Lbox_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (data_80C540E8 == 0) {
+        if (hio_set == 0) {
             a_this->field_0xa8c = 1;
-            data_80C540E8 = 1;
+            hio_set = 1;
             l_HIO.field_0x4 = -1;
         }
 
@@ -201,13 +190,11 @@ static cPhs__Step daObj_Lbox_Create(fopAc_ac_c* i_this) {
     return step;
 }
 
-/* 80C54048-80C54068 -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Lbox_Method */
 static actor_method_class l_daObj_Lbox_Method = {
     (process_method_func)daObj_Lbox_Create, (process_method_func)daObj_Lbox_Delete,
     (process_method_func)daObj_Lbox_Execute, (process_method_func)daObj_Lbox_IsDelete,
     (process_method_func)daObj_Lbox_Draw};
 
-/* 80C54068-80C54098 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_LBOX */
 extern actor_process_profile_definition g_profile_OBJ_LBOX = {
     fpcLy_CURRENT_e,
     3,
@@ -224,19 +211,3 @@ extern actor_process_profile_definition g_profile_OBJ_LBOX = {
     fopAc_ACTOR_e,
     fopAc_CULLBOX_CUSTOM_e,
 };
-
-/* 80C53E14-80C53E5C 000994 0048+00 1/0 0/0 0/0 .text            __dt__8cM3dGSphFv */
-
-/* 80C53E5C-80C53EA4 0009DC 0048+00 1/0 0/0 0/0 .text            __dt__8cM3dGAabFv */
-
-/* 80C53EA4-80C53F14 000A24 0070+00 3/2 0/0 0/0 .text            __dt__12dBgS_ObjAcchFv */
-
-/* 80C53F14-80C53F5C 000A94 0048+00 2/1 0/0 0/0 .text            __dt__16daObj_Lbox_HIO_cFv */
-
-/* 80C53F5C-80C53F98 000ADC 003C+00 0/0 1/0 0/0 .text            __sinit_d_a_obj_lbox_cpp */
-
-/* 80C53F98-80C53FA0 000B18 0008+00 1/0 0/0 0/0 .text            @36@__dt__12dBgS_ObjAcchFv */
-
-/* 80C53FA0-80C53FA8 000B20 0008+00 1/0 0/0 0/0 .text            @20@__dt__12dBgS_ObjAcchFv */
-
-/* 80C53FFC-80C53FFC 000040 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

@@ -3,14 +3,29 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_th.h"
 #include "d/actor/d_a_e_th_ball.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_item.h"
 #include "c/c_damagereaction.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+#include "f_op/f_op_camera_mng.h"
+
+class daE_TH_HIO_c : public JORReflexible {
+public:
+    daE_TH_HIO_c();
+    virtual ~daE_TH_HIO_c() {}
+
+    void genMessage(JORMContext*);
+
+    /* 0x04 */ s8 no;
+    /* 0x08 */ f32 base_size;
+    /* 0x0C */ u8 unk_0xC[0x10 - 0xC];
+    /* 0x10 */ f32 move_range;
+    /* 0x14 */ f32 middle_move_range;
+};
 
 enum daE_TH_ACTION {
     ACTION_WAIT,
@@ -23,7 +38,6 @@ enum daE_TH_ACTION {
     ACTION_END = 25,
 };
 
-/* 807B038C-807B03C4 0000EC 0038+00 1/1 0/0 0/0 .text            __ct__12daE_TH_HIO_cFv */
 daE_TH_HIO_c::daE_TH_HIO_c() {
     no = -1;
     base_size = 1.0f;
@@ -31,7 +45,6 @@ daE_TH_HIO_c::daE_TH_HIO_c() {
     middle_move_range = 700.0f;
 }
 
-/* 807B03C4-807B0434 000124 0070+00 1/1 0/0 0/0 .text            s_md_sub1__FPvPv */
 static void* s_md_sub1(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_MD && (fopAcM_GetParam(i_actor) & 0xFF00) == 0xFF00 && ((fopAc_ac_c*)i_actor)->current.pos.z == 560.0f) {
         fopAcM_delete((fopAc_ac_c*)i_actor);
@@ -40,7 +53,6 @@ static void* s_md_sub1(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 807B0434-807B04A4 000194 0070+00 1/1 0/0 0/0 .text            s_md_sub2__FPvPv */
 static void* s_md_sub2(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_MD && (fopAcM_GetParam(i_actor) & 0xFF00) != 0xFF00 && ((fopAc_ac_c*)i_actor)->current.pos.z == -950.0f) {
         fopAcM_delete((fopAc_ac_c*)i_actor);
@@ -49,13 +61,11 @@ static void* s_md_sub2(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 807B04A4-807B0550 000204 00AC+00 6/6 0/0 0/0 .text            anm_init__FP10e_th_classifUcf */
 static void anm_init(e_th_class* i_this, int i_anm, f32 i_morf, u8 i_mode, f32 i_speed) {
     i_this->mpModelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("E_th", i_anm), i_mode, i_morf, i_speed, 0.0f, -1.0f);
     i_this->mAnm = i_anm;
 }
 
-/* 807B0550-807B0630 0002B0 00E0+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
@@ -74,7 +84,6 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 807B0630-807B09A4 000390 0374+00 1/1 0/0 0/0 .text ke_control__FP10e_th_classP7th_ke_si */
 static void ke_control(e_th_class* i_this, th_ke_s* i_ke_s, int i_no) {
     cXyz sp4C;
     cXyz sp40;
@@ -129,7 +138,6 @@ static void ke_control(e_th_class* i_this, th_ke_s* i_ke_s, int i_no) {
     }
 }
 
-/* 807B09A4-807B09E8 000704 0044+00 1/1 0/0 0/0 .text ke_pos_set__FP10e_th_classP7th_ke_si */
 static void ke_pos_set(e_th_class* i_this, th_ke_s* i_ke_s, int param_2) {
     cXyz* pos_p = i_this->mKeLineMat.getPos(param_2);
     for (int i = 0; i < 15; i++, pos_p++) {
@@ -137,14 +145,12 @@ static void ke_pos_set(e_th_class* i_this, th_ke_s* i_ke_s, int param_2) {
     }
 }
 
-/* 807B09E8-807B0A6C 000748 0084+00 1/1 0/0 0/0 .text            ke_disp__FP10e_th_class */
 static void ke_disp(e_th_class* i_this) {
     static GXColor l_color = {0x50, 0x0A, 0x0A, 0xFF};
     i_this->mKeLineMat.update(15, 3.5f + TREG_F(11), l_color, 1, &i_this->tevStr);
     dComIfGd_set3DlineMat(&i_this->mKeLineMat);
 }
 
-/* 807B0A6C-807B0BD0 0007CC 0164+00 1/1 0/0 0/0 .text            ke_move__FP10e_th_class */
 static void ke_move(e_th_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp28;
@@ -181,7 +187,6 @@ static void ke_move(e_th_class* i_this) {
     }
 }
 
-/* 807B0BD0-807B0D7C 000930 01AC+00 1/0 0/0 0/0 .text            daE_TH_Draw__FP10e_th_class */
 static int daE_TH_Draw(e_th_class* i_this) {
     J3DModel* model_p = i_this->mpModelMorf->getModel();
     if (i_this->mNoDraw) {
@@ -211,7 +216,6 @@ static int daE_TH_Draw(e_th_class* i_this) {
     return 1;
 }
 
-/* 807B0D7C-807B0EFC 000ADC 0180+00 1/1 0/0 0/0 .text            e_th_wait__FP10e_th_class */
 static void e_th_wait(e_th_class* i_this) {
     i_this->field_0x6a4 = 5;
 
@@ -245,7 +249,6 @@ static void e_th_wait(e_th_class* i_this) {
     }
 }
 
-/* 807B0EFC-807B0F20 000C5C 0024+00 1/1 0/0 0/0 .text            e_th_spin__FP10e_th_class */
 static void e_th_spin(e_th_class* i_this) {
     cXyz sp14;
     cXyz sp8;
@@ -256,7 +259,6 @@ static void e_th_spin(e_th_class* i_this) {
     i_this->mMode = 0;
 }
 
-/* 807B0F20-807B12B0 000C80 0390+00 2/1 0/0 0/0 .text            e_th_spin_B__FP10e_th_class */
 static void e_th_spin_B(e_th_class* i_this) {
     cXyz sp18;
     cXyz spC;
@@ -352,7 +354,6 @@ static void e_th_spin_B(e_th_class* i_this) {
     cLib_addCalc2(&i_this->speedF, speed_target, 1.0f, 0.1f);
 }
 
-/* 807B12B0-807B141C 001010 016C+00 1/1 0/0 0/0 .text            e_th_shot__FP10e_th_class */
 static s16 e_th_shot(e_th_class* i_this) {
     s16 angle_chase_step = 0;
     int anm_frame = i_this->mpModelMorf->getFrame();
@@ -395,7 +396,6 @@ static s16 e_th_shot(e_th_class* i_this) {
     return angle_chase_step;
 }
 
-/* 807B141C-807B1670 00117C 0254+00 1/1 0/0 0/0 .text            e_th_return__FP10e_th_class */
 static void e_th_return(e_th_class* i_this) {
     e_th_ball_class* ball_p = (e_th_ball_class*)fopAcM_SearchByID(i_this->mBallID);
     cXyz ball_vec;
@@ -445,7 +445,6 @@ static void e_th_return(e_th_class* i_this) {
     }
 }
 
-/* 807B1670-807B176C 0013D0 00FC+00 1/1 0/0 0/0 .text            e_th_damage__FP10e_th_class */
 static void e_th_damage(e_th_class* i_this) {
     switch (i_this->mMode) {
     case 0:
@@ -466,7 +465,6 @@ static void e_th_damage(e_th_class* i_this) {
     }
 }
 
-/* 807B176C-807B18C0 0014CC 0154+00 1/1 0/0 0/0 .text            e_th_start__FP10e_th_class */
 static void e_th_start(e_th_class* i_this) {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     i_this->field_0x6a4 = 5;
@@ -495,7 +493,6 @@ static void e_th_start(e_th_class* i_this) {
     }
 }
 
-/* 807B18C0-807B19AC 001620 00EC+00 1/1 0/0 0/0 .text            e_th_end__FP10e_th_class */
 static void e_th_end(e_th_class* i_this) {
     i_this->field_0x6a4 = 5;
     dComIfGp_getPlayer(0);
@@ -520,7 +517,6 @@ static void e_th_end(e_th_class* i_this) {
     }
 }
 
-/* 807B19AC-807B1B78 00170C 01CC+00 1/1 0/0 0/0 .text            damage_check__FP10e_th_class */
 static void damage_check(e_th_class* i_this) {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
     i_this->mCcStts.Move();
@@ -574,7 +570,6 @@ static void damage_check(e_th_class* i_this) {
     }
 }
 
-/* 807B1B78-807B1EB4 0018D8 033C+00 2/1 0/0 0/0 .text            action__FP10e_th_class */
 static void action(e_th_class* i_this) {
     fopEn_enemy_c* a_this = (fopEn_enemy_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -627,7 +622,7 @@ static void action(e_th_class* i_this) {
 
     if (on_attention) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -676,7 +671,6 @@ static void action(e_th_class* i_this) {
     }
 }
 
-/* 807B1EB4-807B1F98 001C14 00E4+00 1/1 0/0 0/0 .text            cam_3d_morf__FP10e_th_classf */
 static void cam_3d_morf(e_th_class* i_this, f32 param_1) {
     cLib_addCalc2(&i_this->mDemoCamCenter.x, i_this->mDemoCamCenterTarget.x, param_1, i_this->mDemoCamCenterSpd.x * i_this->field_0xd88);
     cLib_addCalc2(&i_this->mDemoCamCenter.y, i_this->mDemoCamCenterTarget.y, param_1, i_this->mDemoCamCenterSpd.y * i_this->field_0xd88);
@@ -687,7 +681,6 @@ static void cam_3d_morf(e_th_class* i_this, f32 param_1) {
     cLib_addCalc2(&i_this->mDemoCamEye.z, i_this->mDemoCamEyeTarget.z, param_1, i_this->mDemoCamEyeSpd.z * i_this->field_0xd88);
 }
 
-/* 807B1F98-807B2DEC 001CF8 0E54+00 2/1 0/0 0/0 .text            demo_camera__FP10e_th_class */
 static void demo_camera(e_th_class* i_this) {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
@@ -825,13 +818,13 @@ static void demo_camera(e_th_class* i_this) {
             }
         }
         break;
-    case 10:
+    case 10: {
         if (!i_this->eventInfo.checkCommandDemoAccrpt()) {
             fopAcM_orderPotentialEvent(i_this, 2, 0xFFFF, 0);
             i_this->eventInfo.onCondition(2);
             return;
         }
-    
+
         camera->mCamera.Stop();
         i_this->mDemoCamMode = 11;
         i_this->mDemoCamTimer = 0;
@@ -871,6 +864,7 @@ static void demo_camera(e_th_class* i_this) {
         anm_init(i_this, 0xE, 2.0f, 0, 1.0f);
         i_this->mMode = 1;
         dComIfGs_onSaveSwitch(94);
+    }
     case 11:
         if (i_this->mDemoCamTimer == 55 && i_this->field_0x567 != 0) {
             daPy_getPlayerActorClass()->changeDemoMode(0x17, 1, 2, 0);
@@ -1007,7 +1001,6 @@ static void demo_camera(e_th_class* i_this) {
     }
 }
 
-/* 807B2DEC-807B300C 002B4C 0220+00 1/1 0/0 0/0 .text            anm_se_set__FP10e_th_class */
 static void anm_se_set(e_th_class* i_this) {
     u32 sound_id = 0;
     u32 voice_id = 0;
@@ -1041,13 +1034,10 @@ static void anm_se_set(e_th_class* i_this) {
     }
 }
 
-/* 807B4870-807B4874 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 l_initHIO;
+static u8 hio_set;
 
-/* 807B4880-807B4898 000018 0018+00 3/3 0/0 0/0 .bss             l_HIO */
 static daE_TH_HIO_c l_HIO;
 
-/* 807B300C-807B3514 002D6C 0508+00 2/1 0/0 0/0 .text            daE_TH_Execute__FP10e_th_class */
 static int daE_TH_Execute(e_th_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp2C;
@@ -1162,18 +1152,16 @@ static int daE_TH_Execute(e_th_class* i_this) {
     return 1;
 }
 
-/* 807B3514-807B351C 003274 0008+00 1/0 0/0 0/0 .text            daE_TH_IsDelete__FP10e_th_class */
 static int daE_TH_IsDelete(e_th_class* i_this) {
     return 1;
 }
 
-/* 807B351C-807B3584 00327C 0068+00 1/0 0/0 0/0 .text            daE_TH_Delete__FP10e_th_class */
 static int daE_TH_Delete(e_th_class* i_this) {
     fopAcM_GetID(i_this);
     dComIfG_resDelete(&i_this->mPhase, "E_th");
 
     if (i_this->mInitHIO) {
-        l_initHIO = FALSE;
+        hio_set = FALSE;
         mDoHIO_DELETE_CHILD(l_HIO.no);
     }
 
@@ -1184,7 +1172,6 @@ static int daE_TH_Delete(e_th_class* i_this) {
     return 1;
 }
 
-/* 807B3584-807B36D0 0032E4 014C+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* a_this) {
     e_th_class* i_this = (e_th_class*)a_this;
 
@@ -1194,7 +1181,7 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     }
 
     J3DModel* model_p = i_this->mpModelMorf->getModel();
-    model_p->setUserArea((u32)i_this);
+    model_p->setUserArea((uintptr_t)i_this);
 
     for (u16 i = 0; i < model_p->getModelData()->getJointNum(); i++) {
         model_p->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -1207,10 +1194,9 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     return 1;
 }
 
-/* 807B36D0-807B3B58 003430 0488+00 1/0 0/0 0/0 .text            daE_TH_Create__FP10fopAc_ac_c */
 static int daE_TH_Create(fopAc_ac_c* a_this) {
     e_th_class* i_this = (e_th_class*)a_this;
-    fopAcM_SetupActor(i_this, e_th_class);
+    fopAcM_ct(i_this, e_th_class);
 
     int phase_state = dComIfG_resLoad(&i_this->mPhase, "E_th");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -1242,9 +1228,9 @@ static int daE_TH_Create(fopAc_ac_c* a_this) {
             return cPhs_ERROR_e;
         }
 
-        if (!l_initHIO) {
+        if (!hio_set) {
             i_this->mInitHIO = TRUE;
-            l_initHIO = TRUE;
+            hio_set = TRUE;
             l_HIO.no = mDoHIO_CREATE_CHILD("鉄球兵", &l_HIO);
         }
 
@@ -1313,7 +1299,6 @@ static int daE_TH_Create(fopAc_ac_c* a_this) {
     return phase_state;
 }
 
-/* 807B4794-807B47B4 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_TH_Method */
 static actor_method_class l_daE_TH_Method = {
     (process_method_func)daE_TH_Create,
     (process_method_func)daE_TH_Delete,
@@ -1322,7 +1307,6 @@ static actor_method_class l_daE_TH_Method = {
     (process_method_func)daE_TH_Draw,
 };
 
-/* 807B47B4-807B47E4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_TH */
 extern actor_process_profile_definition g_profile_E_TH = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

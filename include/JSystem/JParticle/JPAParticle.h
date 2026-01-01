@@ -20,19 +20,21 @@ struct JPAEmitterWorkData;
 class JPABaseParticle {
 public:
     ~JPABaseParticle() {}
-    /* 8027EFEC */ void init_p(JPAEmitterWorkData*);
-    /* 8027F8C8 */ void init_c(JPAEmitterWorkData*, JPABaseParticle*);
-    /* 8027FFD0 */ bool calc_p(JPAEmitterWorkData*);
-    /* 80280260 */ bool calc_c(JPAEmitterWorkData*);
-    /* 802804C8 */ bool canCreateChild(JPAEmitterWorkData*);
-    /* 80280548 */ f32 getWidth(JPABaseEmitter const*) const;
-    /* 80280568 */ f32 getHeight(JPABaseEmitter const*) const;
-    int getAge() { return mAge; }
+    void init_p(JPAEmitterWorkData*);
+    void init_c(JPAEmitterWorkData*, JPABaseParticle*);
+    bool calc_p(JPAEmitterWorkData*);
+    bool calc_c(JPAEmitterWorkData*);
+    bool canCreateChild(JPAEmitterWorkData*);
+    f32 getWidth(JPABaseEmitter const*) const;
+    f32 getHeight(JPABaseEmitter const*) const;
+    int getAge() const { return mAge; }
     void setOffsetPosition(const JGeometry::TVec3<f32>& pos) { mOffsetPosition.set(pos); }
     void setOffsetPosition(f32 x, f32 y, f32 z) { mOffsetPosition.set(x, y, z); }
     void getOffsetPosition(JGeometry::TVec3<f32>& pos) { pos.set(mOffsetPosition); }
+    void getOffsetPosition(JGeometry::TVec3<f32>* pos) const { pos->set(mOffsetPosition); }
     u16 getRotateAngle() const { return mRotateAngle; }
     void getGlobalPosition(JGeometry::TVec3<f32>& pos) const { pos.set(mPosition); }
+    void getGlobalPosition(JGeometry::TVec3<f32>* pos) const { pos->set(mPosition); }
     f32 getParticleScaleX() const { return mParticleScaleX; }
     f32 getParticleScaleY() const { return mParticleScaleY; }
     void setStatus(u32 flag) { mStatus |= flag; }
@@ -42,7 +44,9 @@ public:
     void setDeleteParticleFlag() { setStatus(2); }
     void getVelVec(JGeometry::TVec3<f32>& vec) const { vec.set(mVelocity); }
     void getLocalPosition(JGeometry::TVec3<f32>& vec) const { vec.set(mLocalPosition); }
+    void getLocalPosition(JGeometry::TVec3<f32>* vec) const { vec->set(mLocalPosition); }
     void getBaseAxis(JGeometry::TVec3<f32>& vec) const { vec.set(mBaseAxis); }
+    void getBaseAxis(JGeometry::TVec3<f32>* vec) const { vec->set(mBaseAxis); }
 
 public:
     /* 0x00 */ JGeometry::TVec3<f32> mPosition;
@@ -79,7 +83,6 @@ public:
  */
 class JPAParticleCallBack {
 public:
-    JPAParticleCallBack() {}
     virtual ~JPAParticleCallBack() = 0;
     virtual void execute(JPABaseEmitter*, JPABaseParticle*) {}
     virtual void draw(JPABaseEmitter*, JPABaseParticle*) {}

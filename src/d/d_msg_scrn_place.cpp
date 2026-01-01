@@ -3,15 +3,15 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_place.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
+#include "d/d_camera.h"
 #include "d/d_msg_object.h"
 #include "d/d_pane_class.h"
 
-extern "C" extern dMsgObject_HIO_c g_MsgObject_HIO_c;
-
-/* 802463CC-802467C4 240D0C 03F8+00 0/0 1/1 0/0 .text            __ct__15dMsgScrnPlace_cFv */
 dMsgScrnPlace_c::dMsgScrnPlace_c() {
     static u64 t_tag[7] = {
         'sfontb0', 'sfontb1', 'sfontb2', 'sfontl0', 'sfontl1', 'sfontl2', 'sfont00',
@@ -28,7 +28,11 @@ dMsgScrnPlace_c::dMsgScrnPlace_c() {
     }
 
     mpScreen = new J2DScreen();
+#if VERSION == VERSION_GCN_JPN
+    mpScreen->setPriority("zelda_stage_title.blo", 0x20000, dComIfGp_getMsgArchive(4));
+#else
     mpScreen->setPriority("zelda_stage_title_foreign.blo", 0x20000, dComIfGp_getMsgArchive(4));
+#endif
     dPaneClass_showNullPane(mpScreen);
 
     mpPmP_c = new CPaneMgr(mpScreen, 'n_all', 2, NULL);
@@ -50,7 +54,9 @@ dMsgScrnPlace_c::dMsgScrnPlace_c() {
         mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getRubyFont());
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setString(0x80, "");
+#if VERSION != VERSION_GCN_JPN
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setCharSpace(1.0f);
+#endif
     }
 
     ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getFontSize(mFontSize);
@@ -69,7 +75,6 @@ dMsgScrnPlace_c::dMsgScrnPlace_c() {
     mTextBoxPosY = mpTm_c[0]->getGlobalPosY();
 }
 
-/* 802467C4-80246924 241104 0160+00 1/0 0/0 0/0 .text            __dt__15dMsgScrnPlace_cFv */
 dMsgScrnPlace_c::~dMsgScrnPlace_c() {
     delete mpScreen;
     mpScreen = NULL;
@@ -91,7 +96,6 @@ dMsgScrnPlace_c::~dMsgScrnPlace_c() {
     dComIfGp_getMsgArchive(4)->removeResourceAll();
 }
 
-/* 80246924-80246A44 241264 0120+00 1/0 0/0 0/0 .text            exec__15dMsgScrnPlace_cFv */
 void dMsgScrnPlace_c::exec() {
     mpPmP_c->scale(g_MsgObject_HIO_c.mStageTitleScaleX, g_MsgObject_HIO_c.mStageTitleScaleY);
 
@@ -110,14 +114,12 @@ void dMsgScrnPlace_c::exec() {
     }
 }
 
-/* 80246A44-80246A9C 241384 0058+00 1/0 0/0 0/0 .text            drawSelf__15dMsgScrnPlace_cFv */
 void dMsgScrnPlace_c::drawSelf() {
     J2DGrafContext* grafContext = dComIfGp_getCurrentGrafPort();
     grafContext->setup2D();
     drawOutFont(0.0f, 0.0f, 1.0f);
 }
 
-/* 80246A9C-80246B28 2413DC 008C+00 1/0 0/0 0/0 .text            fukiAlpha__15dMsgScrnPlace_cFf */
 void dMsgScrnPlace_c::fukiAlpha(f32 i_rate) {
     mpPmP_c->setAlphaRate(i_rate);
     mpBaseParent->setAlphaRate(i_rate * g_MsgObject_HIO_c.mStageTitleBaseAlpha);
@@ -127,11 +129,8 @@ void dMsgScrnPlace_c::fukiAlpha(f32 i_rate) {
     }
 }
 
-/* 80246B28-80246B2C 241468 0004+00 1/0 0/0 0/0 .text            fukiScale__15dMsgScrnPlace_cFf */
 void dMsgScrnPlace_c::fukiScale(f32) {}
 
-/* 80246B2C-80246B30 24146C 0004+00 1/0 0/0 0/0 .text            fukiTrans__15dMsgScrnPlace_cFff */
 void dMsgScrnPlace_c::fukiTrans(f32, f32) {}
 
-/* 80246B30-80246B34 241470 0004+00 1/0 0/0 0/0 .text            fontAlpha__15dMsgScrnPlace_cFf */
 void dMsgScrnPlace_c::fontAlpha(f32) {}

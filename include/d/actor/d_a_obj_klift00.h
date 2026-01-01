@@ -16,14 +16,14 @@
  */
 class daObjKLift00_c : public dBgS_MoveBgActor, public request_of_phase_process_class {
 public:
-    /* 8058B02C */ cPhs__Step create1st();
-    /* 8058B0D0 */ void setMtx();
-    /* 8058B4B0 */ void rideActor(fopAc_ac_c*);
-    /* 8058B5EC */ int CreateHeap();
-    /* 8058B77C */ int Create();
-    /* 8058B97C */ int Execute(Mtx**);
-    /* 8058BEEC */ int Draw();
-    /* 8058C014 */ int Delete();
+    cPhs__Step create1st();
+    void setMtx();
+    void rideActor(fopAc_ac_c*);
+    int CreateHeap();
+    int Create();
+    int Execute(Mtx**);
+    int Draw();
+    int Delete();
 
     enum Param_e {
         LOCK_e = (1 << 6), NO_BASE_DISP = (1 << 7)
@@ -67,20 +67,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daObjKLift00_c) == 0x1160);
-
-struct daObjKLift00_HIO_c : public mDoHIO_entry_c {
-    daObjKLift00_HIO_c();
-    ~daObjKLift00_HIO_c() {};
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ f32 mChainGravity;
-    /* 0x08 */ f32 mRideParameters;
-    /* 0x0C */ f32 mWindSwayOccuranceFactor;
-    /* 0x10 */ f32 mWindMagnitudeChain;
-    /* 0x14 */ f32 mWindMagnitudeFoundation;
-    /* 0x18 */ f32 mChainHitSpeed;
-    /* 0x1C */ f32 field_0x1C;
-};
 
 #endif /* D_A_OBJ_KLIFT00_H */

@@ -3,11 +3,25 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_e_rb.h"
 #include "d/d_com_inf_game.h"
-
-UNK_REL_DATA;
 #include "f_op/f_op_actor_enemy.h"
+
+class daE_RB_HIO_c : public JORReflexible {
+public:
+    daE_RB_HIO_c();
+    virtual ~daE_RB_HIO_c() {}
+
+#if DEBUG
+    void genMessage(JORMContext*);
+#endif
+
+    /* 0x4 */ s8 id;
+    /* 0x8 */ f32 base_size;
+    /* 0xC */ f32 ground_depth;
+};
 
 enum daE_RB_ACTION {
     ACTION_STAY,
@@ -18,26 +32,21 @@ enum daE_RB_ACTION {
     ACTION_DAMAGE = 10,
 };
 
-/* 8076238C-807623BC 0000EC 0030+00 1/1 0/0 0/0 .text            __ct__12daE_RB_HIO_cFv */
 daE_RB_HIO_c::daE_RB_HIO_c() {
     id = -1;
     base_size = 1.5f;
     ground_depth = -5.0f;
 }
 
-/* 807623BC-80762464 00011C 00A8+00 5/5 0/0 0/0 .text            anm_init__FP10e_rb_classifUcf */
 static void anm_init(e_rb_class* i_this, int i_anm, f32 i_morf, u8 i_mode, f32 i_speed) {
     i_this->anm = i_anm;
     i_this->modelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("E_rb", i_anm), i_mode, i_morf, i_speed, 0.0f, -1.0f);
 }
 
-/* 80764F80-80764F84 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 l_HIOInit;
+static u8 hio_set;
 
-/* 80764F90-80764FA0 000018 0010+00 8/8 0/0 0/0 .bss             l_HIO */
 static daE_RB_HIO_c l_HIO;
 
-/* 80762464-80762554 0001C4 00F0+00 1/0 0/0 0/0 .text            daE_RB_Draw__FP10e_rb_class */
 static int daE_RB_Draw(e_rb_class* i_this) {
     if (!i_this->isChild) {
         return 1;
@@ -60,7 +69,6 @@ static int daE_RB_Draw(e_rb_class* i_this) {
     return 1;
 }
 
-/* 80762554-80762764 0002B4 0210+00 1/1 0/0 0/0 .text            damage_check__FP10e_rb_class */
 static void damage_check(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
 
@@ -125,7 +133,6 @@ static void damage_check(e_rb_class* i_this) {
     }
 }
 
-/* 80762764-807627E4 0004C4 0080+00 1/1 0/0 0/0 .text            e_rb_stay__FP10e_rb_class */
 static void e_rb_stay(e_rb_class* i_this) {
     i_this->invincibilityTimer = 3;
 
@@ -140,7 +147,6 @@ static void e_rb_stay(e_rb_class* i_this) {
     }
 }
 
-/* 807627E4-807629D8 000544 01F4+00 1/1 0/0 0/0 .text            e_rb_appear__FP10e_rb_class */
 static s8 e_rb_appear(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
 
@@ -190,7 +196,6 @@ static s8 e_rb_appear(e_rb_class* i_this) {
     return 2;
 }
 
-/* 807629D8-80762C4C 000738 0274+00 1/1 0/0 0/0 .text            e_rb_move__FP10e_rb_class */
 static void e_rb_move(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -244,7 +249,6 @@ static void e_rb_move(e_rb_class* i_this) {
     i_this->sound.startCreatureSoundLevel(Z2SE_EN_RB_MOVE, enemy->speedF, -1);
 }
 
-/* 80762C4C-80762E90 0009AC 0244+00 1/1 0/0 0/0 .text            e_rb_attack__FP10e_rb_class */
 static void e_rb_attack(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     dComIfGp_getPlayer(0);
@@ -307,7 +311,6 @@ static void e_rb_attack(e_rb_class* i_this) {
     i_this->sound.startCreatureSoundLevel(Z2SE_EN_RB_MOVE, enemy->speedF, -1);
 }
 
-/* 80762E90-80762FD4 000BF0 0144+00 1/1 0/0 0/0 .text            e_rb_disappear__FP10e_rb_class */
 static s8 e_rb_disappear(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     s8 ret = 0;
@@ -340,7 +343,6 @@ static s8 e_rb_disappear(e_rb_class* i_this) {
     return ret;
 }
 
-/* 80762FD4-807631E0 000D34 020C+00 1/1 0/0 0/0 .text            e_rb_damage__FP10e_rb_class */
 static void e_rb_damage(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     i_this->invincibilityTimer = 10;
@@ -385,7 +387,6 @@ static void e_rb_damage(e_rb_class* i_this) {
     }
 }
 
-/* 807631E0-80763554 000F40 0374+00 2/1 0/0 0/0 .text            action__FP10e_rb_class */
 static void action(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     cXyz sp18;
@@ -468,7 +469,7 @@ static void action(e_rb_class* i_this) {
 
     if (attention_ON) {
         fopAcM_OnStatus(enemy, 0);
-        enemy->attention_info.flags = 4;
+        enemy->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(enemy, 0);
         enemy->attention_info.flags = 0;
@@ -489,7 +490,6 @@ static void action(e_rb_class* i_this) {
     }
 }
 
-/* 80763554-80763618 0012B4 00C4+00 1/1 0/0 0/0 .text            e_rb_base_0__FP10e_rb_class */
 static void e_rb_base_0(e_rb_class* i_this) {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
 
@@ -502,13 +502,10 @@ static void e_rb_base_0(e_rb_class* i_this) {
     i_this->field_0xa10 = player->current.pos + (player->speed * (50.0f + hREG_F(13)));
 }
 
-/* 80764FA0-80764FC8 000028 0028+00 2/2 0/0 0/0 .bss             child */
 static e_rb_class* child[10];
 
-/* 80764FC8-80764FCC 000050 0004+00 2/2 0/0 0/0 .bss             target_info_count */
 static int target_info_count;
 
-/* 80763618-807636BC 001378 00A4+00 1/1 0/0 0/0 .text            s_s_sub__FPvPv */
 static void* s_s_sub(void* i_actor, void* i_data) {
     fopAc_ac_c* parent;
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_RB &&
@@ -522,7 +519,6 @@ static void* s_s_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 807636BC-80763CF0 00141C 0634+00 1/1 0/0 0/0 .text            e_rb_base_1__FP10e_rb_class */
 static void e_rb_base_1(e_rb_class* i_this) {
     fopAc_ac_c* enemy = &i_this->enemy;
     fopAc_ac_c* player = (fopAc_ac_c*)dComIfGp_getPlayer(0);
@@ -601,7 +597,7 @@ static void e_rb_base_1(e_rb_class* i_this) {
                         sp108.SetPos(&sp68);
                         
                         f32 ground_y = dComIfG_Bgsp().GroundCross(&sp108);
-                        if (-1000000000.0f != ground_y) {
+                        if (-G_CM3D_F_INF != ground_y) {
                             child[i]->enemy.current.pos = child[i]->enemy.old.pos = child[i]->field_0xa10;
                             child[i]->enemy.old.pos.y = ground_y;
                             child[i]->enemy.current.pos.y = ground_y;
@@ -653,7 +649,6 @@ static void e_rb_base_1(e_rb_class* i_this) {
     }
 }
 
-/* 80763DB0-80763DF4 001B10 0044+00 1/1 0/0 0/0 .text            e_rb_base__FP10e_rb_class */
 static void e_rb_base(e_rb_class* i_this) {
     switch (i_this->action) {
     case ACTION_STAY:
@@ -665,7 +660,6 @@ static void e_rb_base(e_rb_class* i_this) {
     }
 }
 
-/* 80763DF4-80764104 001B54 0310+00 2/1 0/0 0/0 .text            daE_RB_Execute__FP10e_rb_class */
 static int daE_RB_Execute(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     cXyz sp30;
@@ -738,19 +732,17 @@ static int daE_RB_Execute(e_rb_class* i_this) {
     return 1;
 }
 
-/* 80764104-8076410C 001E64 0008+00 1/0 0/0 0/0 .text            daE_RB_IsDelete__FP10e_rb_class */
 static int daE_RB_IsDelete(e_rb_class* i_this) {
     return 1;
 }
 
-/* 8076410C-80764174 001E6C 0068+00 1/0 0/0 0/0 .text            daE_RB_Delete__FP10e_rb_class */
 static int daE_RB_Delete(e_rb_class* i_this) {
     fopEn_enemy_c* enemy = &i_this->enemy;
     fopAcM_GetID(i_this);
     dComIfG_resDelete(&i_this->phase, "E_rb");
 
     if (i_this->HIOInit) {
-        l_HIOInit = FALSE;
+        hio_set = FALSE;
         mDoHIO_DELETE_CHILD(l_HIO.id);
     }
 
@@ -761,7 +753,6 @@ static int daE_RB_Delete(e_rb_class* i_this) {
     return 1;
 }
 
-/* 80764174-8076424C 001ED4 00D8+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     e_rb_class* a_this = (e_rb_class*)i_this;
 
@@ -773,10 +764,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 8076424C-80764624 001FAC 03D8+00 1/0 0/0 0/0 .text            daE_RB_Create__FP10fopAc_ac_c */
 static int daE_RB_Create(fopAc_ac_c* i_this) {
     e_rb_class* a_this = (e_rb_class*)i_this;
-    fopAcM_SetupActor(i_this, e_rb_class);
+    fopAcM_ct(i_this, e_rb_class);
 
     int phase_state = dComIfG_resLoad(&a_this->phase, "E_rb");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -826,13 +816,13 @@ static int daE_RB_Create(fopAc_ac_c* i_this) {
         }
     
         OS_REPORT("//////////////E_RB SET 2 !!\n");
-        if (!l_HIOInit) {
+        if (!hio_set) {
             a_this->HIOInit = TRUE;
-            l_HIOInit = TRUE;
-            //l_HIO.id = mDoHIO_CREATE_CHILD("リーバ", &l_HIO);
+            hio_set = TRUE;
+            l_HIO.id = mDoHIO_CREATE_CHILD("リーバ", &l_HIO);
         }
-    
-        i_this->attention_info.flags = 4;
+
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(i_this, a_this->modelMorf->getModel()->getBaseTRMtx());
         i_this->health = 1;
         i_this->field_0x560 = 1;
@@ -871,7 +861,6 @@ static int daE_RB_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 80764E80-80764EA0 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_RB_Method */
 static actor_method_class l_daE_RB_Method = {
     (process_method_func)daE_RB_Create,
     (process_method_func)daE_RB_Delete,
@@ -880,7 +869,6 @@ static actor_method_class l_daE_RB_Method = {
     (process_method_func)daE_RB_Draw,
 };
 
-/* 80764EA0-80764ED0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_RB */
 extern actor_process_profile_definition g_profile_E_RB = {
     fpcLy_CURRENT_e,       // mLayerID
     7,                     // mListID

@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_dmap.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -27,11 +29,6 @@
 #else
 #define POINTER_OPT 0
 #endif
-
-/* 803BC7E0-803BC7EC 019900 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_Dmap_c::*ProcFunc)();
 
@@ -81,8 +78,6 @@ static ProcFunc map_move_process[3] = {
     &dMenu_Dmap_c::zoomOut_proc,
 };
 
-/* 801B7F20-801B8110 1B2860 01F0+00 1/1 0/0 0/0 .text
- * __ct__14dMenu_DmapBg_cFP10JKRExpHeapP9STControl              */
 dMenu_DmapBg_c::dMenu_DmapBg_c(JKRExpHeap* i_heap, STControl* i_stick) {
     mpHeap = i_heap;
     mpStick = i_stick;
@@ -100,15 +95,15 @@ dMenu_DmapBg_c::dMenu_DmapBg_c(JKRExpHeap* i_heap, STControl* i_stick) {
     field_0xdd8 = 1;
 
     mString = new dMsgString_c();
-    JUT_ASSERT(621, mString != 0);
+    JUT_ASSERT(621, mString != NULL);
 
     mpTalkHeap = JKRCreateExpHeap(0x32000, mpHeap, false);
-    JUT_ASSERT(624, mpTalkHeap != 0);
+    JUT_ASSERT(624, mpTalkHeap != NULL);
 
     mpItemExplain = NULL;
 
     mpMeterHaihai = new dMeterHaihai_c(2);
-    JUT_ASSERT(630, mpMeterHaihai != 0);
+    JUT_ASSERT(630, mpMeterHaihai != NULL);
 
     field_0xdda = 0;
 
@@ -139,12 +134,10 @@ dMenu_DmapBg_c::dMenu_DmapBg_c(JKRExpHeap* i_heap, STControl* i_stick) {
     field_0xdd0 = 0;
 }
 
-/* 801B8110-801B884C 1B2A50 073C+00 1/1 0/0 0/0 .text            mapScreenInit__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::mapScreenInit() {
     for (int i = 0; i < 2; i++) {
         mMapScreen[i] = new J2DScreen();
-        JUT_ASSERT(689, mMapScreen[i] != 0);
+        JUT_ASSERT(689, mMapScreen[i] != NULL);
 
         bool fg = mMapScreen[i]->setPriority("zelda_dungeon_map_map.blo", 0x20000, dComIfGp_getDmapResArchive());
         JUT_ASSERT(693, fg != false);
@@ -154,7 +147,7 @@ void dMenu_DmapBg_c::mapScreenInit() {
     
     #if (PLATFORM_WII || PLATFORM_SHIELD)
     mpBlack = new CPaneMgrAlpha(mMapScreen[0], 'm_black', 2, NULL);
-    JUT_ASSERT(699, mpBlack != 0);
+    JUT_ASSERT(699, mpBlack != NULL);
     mpBlack->setAlphaRate(0.0f);
     #else
     mpBlack = NULL;
@@ -185,11 +178,11 @@ void dMenu_DmapBg_c::mapScreenInit() {
 
     for (int i = 0; i < 2; i++) {
         mpMapRoot[i] = new CPaneMgrAlphaMorf(mMapScreen[i], 'ROOT', 2, NULL);
-        JUT_ASSERT(751, mpMapRoot[i] != 0);
+        JUT_ASSERT(751, mpMapRoot[i] != NULL);
     }
 
     void* btk0 = JKRGetNameResource("zelda_dungeon_map_map.btk", dComIfGp_getDmapResArchive());
-    JUT_ASSERT(766, btk0 != 0);
+    JUT_ASSERT(766, btk0 != NULL);
 
     field_0xd28[0] = (J2DAnmTextureSRTKey*)J2DAnmLoaderDataBase::load(btk0);
     field_0xd28[0]->searchUpdateMaterialID(mMapScreen[0]);
@@ -219,14 +212,12 @@ void dMenu_DmapBg_c::mapScreenInit() {
 
     for (int i = 0; i < 2; i++) {
         mpMapSpace[i] = new CPaneMgr(mMapScreen[i], 'mapspace', 0, NULL);
-        JUT_ASSERT(817, mpMapSpace[i] != 0);
+        JUT_ASSERT(817, mpMapSpace[i] != NULL);
 
         mpMapSpace[i]->paneTrans(0.0f, -15.0f);
     }
 }
 
-/* 801B884C-801B88F4 1B318C 00A8+00 1/1 0/0 0/0 .text            mapScreenAnime__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::mapScreenAnime() {
     if (0.0f == field_0xd94 && 0.0f == field_0xd98) {
         for (int i = 0; i < 1; i++) {
@@ -240,7 +231,6 @@ void dMenu_DmapBg_c::mapScreenAnime() {
     }
 }
 
-/* 801B88F4-801B893C 1B3234 0048+00 1/1 0/0 0/0 .text mapIconScaleSet__14dMenu_DmapBg_cFUc */
 void dMenu_DmapBg_c::mapIconScaleSet(u8 param_1) {
     f32 fVar1;
     f32 fVar2;
@@ -255,7 +245,6 @@ void dMenu_DmapBg_c::mapIconScaleSet(u8 param_1) {
     iconScale(1, fVar1, fVar1, fVar2);
 }
 
-/* 801B893C-801B8954 1B327C 0018+00 2/2 0/0 0/0 .text iconScaleAnmInit__14dMenu_DmapBg_cFffUc */
 void dMenu_DmapBg_c::iconScaleAnmInit(f32 param_0, f32 param_1, u8 param_2) {
     field_0xdac = param_0;
     field_0xdb0 = param_1;
@@ -263,7 +252,6 @@ void dMenu_DmapBg_c::iconScaleAnmInit(f32 param_0, f32 param_1, u8 param_2) {
     field_0xdd2 = 0;
 }
 
-/* 801B8954-801B8A0C 1B3294 00B8+00 2/2 0/0 0/0 .text            iconScaleAnm__14dMenu_DmapBg_cFv */
 bool dMenu_DmapBg_c::iconScaleAnm() {
     bool rv = false;
     if (field_0xdd2 > field_0xdd1) {
@@ -292,16 +280,21 @@ bool dMenu_DmapBg_c::iconScaleAnm() {
     return rv;
 }
 
-/* 801B8A0C-801B8DE4 1B334C 03D8+00 1/1 0/0 0/0 .text buttonIconScreenInit__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::buttonIconScreenInit() {
     static u64 const cont_at[5] = {'cont_at', 'cont_at1', 'cont_at2', 'cont_at3', 'cont_at4'};
     static u64 const cont_bt[5] = {'cont_bt', 'cont_bt1', 'cont_bt2', 'cont_bt3', 'cont_bt4'};
     static u64 const font_at[5] = {'font_at', 'font_at1', 'font_at2', 'font_at3', 'font_at4'};
     static u64 const font_bt[5] = {'font_bt', 'font_bt1', 'font_bt2', 'font_bt3', 'font_bt4'};
-    static u64 const c_tag[2] = {'f_text_s', 'f_text'};
+    static u64 const c_tag[2] = {
+        #if VERSION == VERSION_GCN_JPN
+        'c_text_s', 'c_text'
+        #else
+        'f_text_s', 'f_text'
+        #endif
+    };
 
     mButtonScreen = new J2DScreen();
-    JUT_ASSERT(916, mButtonScreen != 0);
+    JUT_ASSERT(916, mButtonScreen != NULL);
 
     bool fg = mButtonScreen->setPriority("zelda_dungeon_map_spot_button.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(922, fg != false);
@@ -309,14 +302,14 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
 
     #if (PLATFORM_WII || PLATFORM_SHIELD)
     mDecorateScreen = new J2DScreen();
-    JUT_ASSERT(926, mDecorateScreen != 0);
+    JUT_ASSERT(926, mDecorateScreen != NULL);
 
     fg = mDecorateScreen->setPriority("zelda_dungeon_map_decoration_revo.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(930, fg != false);
     dPaneClass_showNullPane(mDecorateScreen);
 
     mpDecorateRoot = new CPaneMgrAlphaMorf(mDecorateScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(934, mpDecorateRoot != 0);
+    JUT_ASSERT(934, mpDecorateRoot != NULL);
     #else
     mDecorateScreen = NULL;
     mpDecorateRoot = NULL;
@@ -326,7 +319,7 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     #endif
 
     mpButtonRoot = new CPaneMgrAlphaMorf(mButtonScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(952, mpButtonRoot != 0);
+    JUT_ASSERT(952, mpButtonRoot != NULL);
 
     for (int i = 0; i < 2; i++) {
         mpButtonAB[i] = NULL;
@@ -334,16 +327,25 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     }
 
     mpCButton = new CPaneMgrAlpha(mButtonScreen, 'c_btn', 2, NULL);
-    JUT_ASSERT(978, mpCButton != 0);
+    JUT_ASSERT(978, mpCButton != NULL);
     mpJButton = NULL;
 
     for (int i = 0; i < 5; i++) {
+        #if VERSION == VERSION_GCN_JPN
+        ((J2DTextBox*)mButtonScreen->search(cont_at[i]))->setFont(mDoExt_getMesgFont());
+        ((J2DTextBox*)mButtonScreen->search(cont_bt[i]))->setFont(mDoExt_getMesgFont());
+        ((J2DTextBox*)mButtonScreen->search(cont_at[i]))->setString(32, "");
+        ((J2DTextBox*)mButtonScreen->search(cont_bt[i]))->setString(32, "");
+        ((J2DTextBox*)mButtonScreen->search(font_at[i]))->hide();
+        ((J2DTextBox*)mButtonScreen->search(font_bt[i]))->hide();
+        #else
         ((J2DTextBox*)mButtonScreen->search(font_at[i]))->setFont(mDoExt_getMesgFont());
         ((J2DTextBox*)mButtonScreen->search(font_bt[i]))->setFont(mDoExt_getMesgFont());
         ((J2DTextBox*)mButtonScreen->search(font_at[i]))->setString(32, "");
         ((J2DTextBox*)mButtonScreen->search(font_bt[i]))->setString(32, "");
         ((J2DTextBox*)mButtonScreen->search(cont_at[i]))->hide();
         ((J2DTextBox*)mButtonScreen->search(cont_bt[i]))->hide();
+        #endif
     }
 
     field_0xcf4 = new CPaneMgr(mButtonScreen, 'c_n', 2, NULL);
@@ -367,9 +369,14 @@ void dMenu_DmapBg_c::buttonIconScreenInit() {
     field_0xcf4->paneTrans(321.0f, 0.0f);
 }
 
-/* 801B8DE4-801B8EBC 1B3724 00D8+00 7/7 0/0 0/0 .text setAButtonString__14dMenu_DmapBg_cFUl */
 void dMenu_DmapBg_c::setAButtonString(u32 i_msgNo) {
-    static u64 const cont_at[5] = {'font_at', 'font_at1', 'font_at2', 'font_at3', 'font_at4'};
+    static u64 const cont_at[5] = {
+        #if VERSION == VERSION_GCN_JPN
+        'cont_at', 'cont_at1', 'cont_at2', 'cont_at3', 'cont_at4'
+        #else
+        'font_at', 'font_at1', 'font_at2', 'font_at3', 'font_at4'
+        #endif
+    };
     for (int i = 0; i < 5; i++) {
         if (i_msgNo == 0) {
             strcpy(((J2DTextBox*)mButtonScreen->search(cont_at[i]))->getStringPtr(), "");
@@ -379,9 +386,14 @@ void dMenu_DmapBg_c::setAButtonString(u32 i_msgNo) {
     }
 }
 
-/* 801B8EBC-801B8F94 1B37FC 00D8+00 8/8 0/0 0/0 .text setBButtonString__14dMenu_DmapBg_cFUl */
 void dMenu_DmapBg_c::setBButtonString(u32 i_msgNo) {
-    static u64 const cont_bt[5] = {'font_bt', 'font_bt1', 'font_bt2', 'font_bt3', 'font_bt4'};
+    static u64 const cont_bt[5] = {
+        #if VERSION == VERSION_GCN_JPN
+        'cont_bt', 'cont_bt1', 'cont_bt2', 'cont_bt3', 'cont_bt4'
+        #else
+        'font_bt', 'font_bt1', 'font_bt2', 'font_bt3', 'font_bt4'
+        #endif
+    };
     for (int i = 0; i < 5; i++) {
         if (i_msgNo == 0) {
             strcpy(((J2DTextBox*)mButtonScreen->search(cont_bt[i]))->getStringPtr(), "");
@@ -391,18 +403,20 @@ void dMenu_DmapBg_c::setBButtonString(u32 i_msgNo) {
     }
 }
 
-/* 80451078-8045107C 000578 0004+00 1/1 0/0 0/0 .sbss            player_px */
 static f32 player_px;
 
-/* 8045107C-80451080 00057C 0004+00 1/1 0/0 0/0 .sbss            player_py */
 static f32 player_py;
 
-/* 80451080-80451088 000580 0004+04 6/6 0/0 0/0 .sbss            myclass__12dMenu_Dmap_c */
 dMenu_Dmap_c* dMenu_Dmap_c::myclass;
 
-/* 801B8F94-801B90BC 1B38D4 0128+00 1/1 0/0 0/0 .text setCButtonString__14dMenu_DmapBg_cFUl */
 void dMenu_DmapBg_c::setCButtonString(u32 i_msgNo) {
-    static u64 const c_tag[2] = {'f_text_s', 'f_text'};
+    static u64 const c_tag[2] = {
+        #if VERSION == VERSION_GCN_JPN
+        'c_text_s', 'c_text'
+        #else
+        'f_text_s', 'f_text'
+        #endif
+    };
     int i;
 
     u32 msgNo;
@@ -425,25 +439,20 @@ void dMenu_DmapBg_c::setCButtonString(u32 i_msgNo) {
     }
 }
 
-/* 801B90BC-801B90E0 1B39FC 0024+00 1/1 0/0 0/0 .text setJButtonString__14dMenu_DmapBg_cFUl */
 void dMenu_DmapBg_c::setJButtonString(u32 i_msgNo) {
     dMenu_Dmap_c::myclass->isMapMoveState();
 }
 
-/* 801B90E0-801B9164 1B3A20 0084+00 1/1 0/0 0/0 .text            createExplain__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::createExplain() {
     if (mpItemExplain == NULL) {
         JKRHeap* prevHeap = mDoExt_setCurrentHeap(mpTalkHeap);
         mpItemExplain = new dMenu_ItemExplain_c(mpTalkHeap, dComIfGp_getDmapResArchive(), mpStick, true);
-        JUT_ASSERT(1308, mpItemExplain != 0);
+        JUT_ASSERT(1308, mpItemExplain != NULL);
 
         mDoExt_setCurrentHeap(prevHeap);
     }
 }
 
-/* 801B9164-801B91DC 1B3AA4 0078+00 2/2 0/0 0/0 .text            deleteExplain__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::deleteExplain() {
     if (mpItemExplain != NULL) {
         JKRHeap* prevHeap = mDoExt_setCurrentHeap(mpTalkHeap);
@@ -453,18 +462,16 @@ void dMenu_DmapBg_c::deleteExplain() {
     }
 }
 
-/* 801B91DC-801B944C 1B3B1C 0270+00 1/1 0/0 0/0 .text            baseScreenInit__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::baseScreenInit() {
     mBaseScreen = new J2DScreen();
-    JUT_ASSERT(1336, mBaseScreen != 0);
+    JUT_ASSERT(1336, mBaseScreen != NULL);
 
     bool fg = mBaseScreen->setPriority("zelda_dungeon_map_base.blo", 0x20000, dComIfGp_getDmapResArchive());
     JUT_ASSERT(1347, fg != false);
     dPaneClass_showNullPane(mBaseScreen);
 
     mFloorScreen = new J2DScreen();
-    JUT_ASSERT(1351, mFloorScreen != 0);
+    JUT_ASSERT(1351, mFloorScreen != NULL);
 
     fg = mFloorScreen->setPriority("zelda_dungeon_map_floor_parts.blo", 0x20000,
                                    dComIfGp_getDmapResArchive());
@@ -474,19 +481,24 @@ void dMenu_DmapBg_c::baseScreenInit() {
     mBaseScreen->search('w_btn_n')->hide();
 
     mpBaseRoot = new CPaneMgrAlphaMorf(mBaseScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(1396, mpBaseRoot != 0);
+    JUT_ASSERT(1396, mpBaseRoot != NULL);
 
     mpFloorRoot = new CPaneMgrAlphaMorf(mFloorScreen, 'ROOT', 2, NULL);
-    JUT_ASSERT(1399, mpFloorRoot != 0);
+    JUT_ASSERT(1399, mpFloorRoot != NULL);
 
     mpDrawCursor = new dSelect_cursor_c(2, 1.0f, NULL);
-    JUT_ASSERT(1403, mpDrawCursor != 0);
+    JUT_ASSERT(1403, mpDrawCursor != NULL);
 
     mpDrawCursor->setAlphaRate(1.0f);
     mpDrawCursor->setParam(0.95f, 0.9f, 0.1f, 0.6f, 0.5f);
 
+    #if VERSION == VERSION_GCN_JPN
+    J2DTextBox* uVar9 = (J2DTextBox*)mBaseScreen->search('t_t00');
+    mBaseScreen->search('f_t_00')->hide();
+    #else
     J2DTextBox* uVar9 = (J2DTextBox*)mBaseScreen->search('f_t_00');
     mBaseScreen->search('t_t00')->hide();
+    #endif
     uVar9->setFont(mDoExt_getSubFont());
     uVar9->setString(32, "");
 
@@ -498,8 +510,6 @@ void dMenu_DmapBg_c::baseScreenInit() {
     }
 }
 
-/* 801B944C-801BA0B4 1B3D8C 0C68+00 1/1 0/0 0/0 .text            setFloorMessage__14dMenu_DmapBg_cFv
- */
 void dMenu_DmapBg_c::setFloorMessage() {
     int var_r26 = -5;
 
@@ -512,82 +522,90 @@ void dMenu_DmapBg_c::setFloorMessage() {
         0x036E, 0x036F, 0x03DC, 0x03DD, 0x03D9, 0x03D8,
     };
 
-    floor_textbox_1[0] = (J2DTextBox*)mFloorScreen->search('ffoor7_1');
-    floor_textbox_2[0] = (J2DTextBox*)mFloorScreen->search('ffoor7_2');
-    floor_textbox_3[0] = (J2DTextBox*)mFloorScreen->search('ffoor7_3');
-    mFloorScreen->search('floor7_1')->hide();
-    mFloorScreen->search('floor7_2')->hide();
-    mFloorScreen->search('floor7_3')->hide();
+    #if VERSION == VERSION_GCN_JPN
+    #define FLOOR_TAG(A, B) ('ffoor0_0' | (A<<16) | (B))
+    #define FFOOR_TAG(A, B) ('floor0_0' | (A<<16) | (B))
+    #else
+    #define FLOOR_TAG(A, B) ('floor0_0' | (A<<16) | (B))
+    #define FFOOR_TAG(A, B) ('ffoor0_0' | (A<<16) | (B))
+    #endif
+
+    floor_textbox_1[0] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(7, 1));
+    floor_textbox_2[0] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(7, 2));
+    floor_textbox_3[0] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(7, 3));
+    mFloorScreen->search(FLOOR_TAG(7, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(7, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(7, 3))->hide();
     floor_textbox_1[0]->setFont(mDoExt_getSubFont());
     floor_textbox_2[0]->setFont(mDoExt_getSubFont());
     floor_textbox_3[0]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[1] = (J2DTextBox*)mFloorScreen->search('ffoor0_1');
-    floor_textbox_2[1] = (J2DTextBox*)mFloorScreen->search('ffoor0_2');
-    floor_textbox_3[1] = (J2DTextBox*)mFloorScreen->search('ffoor0_3');
-    mFloorScreen->search('floor0_1')->hide();
-    mFloorScreen->search('floor0_2')->hide();
-    mFloorScreen->search('floor0_3')->hide();
+    floor_textbox_1[1] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(0, 1));
+    floor_textbox_2[1] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(0, 2));
+    floor_textbox_3[1] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(0, 3));
+    mFloorScreen->search(FLOOR_TAG(0, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(0, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(0, 3))->hide();
     floor_textbox_1[1]->setFont(mDoExt_getSubFont());
     floor_textbox_2[1]->setFont(mDoExt_getSubFont());
     floor_textbox_3[1]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[2] = (J2DTextBox*)mFloorScreen->search('ffoor1_1');
-    floor_textbox_2[2] = (J2DTextBox*)mFloorScreen->search('ffoor1_2');
-    floor_textbox_3[2] = (J2DTextBox*)mFloorScreen->search('ffoor1_3');
-    mFloorScreen->search('floor1_1')->hide();
-    mFloorScreen->search('floor1_2')->hide();
-    mFloorScreen->search('floor1_3')->hide();
+    floor_textbox_1[2] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(1, 1));
+    floor_textbox_2[2] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(1, 2));
+    floor_textbox_3[2] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(1, 3));
+    mFloorScreen->search(FLOOR_TAG(1, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(1, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(1, 3))->hide();
     floor_textbox_1[2]->setFont(mDoExt_getSubFont());
     floor_textbox_2[2]->setFont(mDoExt_getSubFont());
     floor_textbox_3[2]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[3] = (J2DTextBox*)mFloorScreen->search('ffoor2_1');
-    floor_textbox_2[3] = (J2DTextBox*)mFloorScreen->search('ffoor2_2');
-    floor_textbox_3[3] = (J2DTextBox*)mFloorScreen->search('ffoor2_3');
-    mFloorScreen->search('floor2_1')->hide();
-    mFloorScreen->search('floor2_2')->hide();
-    mFloorScreen->search('floor2_3')->hide();
+    floor_textbox_1[3] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(2, 1));
+    floor_textbox_2[3] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(2, 2));
+    floor_textbox_3[3] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(2, 3));
+    mFloorScreen->search(FLOOR_TAG(2, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(2, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(2, 3))->hide();
     floor_textbox_1[3]->setFont(mDoExt_getSubFont());
     floor_textbox_2[3]->setFont(mDoExt_getSubFont());
     floor_textbox_3[3]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[4] = (J2DTextBox*)mFloorScreen->search('ffoor3_1');
-    floor_textbox_2[4] = (J2DTextBox*)mFloorScreen->search('ffoor3_2');
-    floor_textbox_3[4] = (J2DTextBox*)mFloorScreen->search('ffoor3_3');
-    mFloorScreen->search('floor3_1')->hide();
-    mFloorScreen->search('floor3_2')->hide();
-    mFloorScreen->search('floor3_3')->hide();
+    floor_textbox_1[4] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(3, 1));
+    floor_textbox_2[4] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(3, 2));
+    floor_textbox_3[4] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(3, 3));
+    mFloorScreen->search(FLOOR_TAG(3, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(3, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(3, 3))->hide();
     floor_textbox_1[4]->setFont(mDoExt_getSubFont());
     floor_textbox_2[4]->setFont(mDoExt_getSubFont());
     floor_textbox_3[4]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[5] = (J2DTextBox*)mFloorScreen->search('ffoor4_1');
-    floor_textbox_2[5] = (J2DTextBox*)mFloorScreen->search('ffoor4_2');
-    floor_textbox_3[5] = (J2DTextBox*)mFloorScreen->search('ffoor4_3');
-    mFloorScreen->search('floor4_1')->hide();
-    mFloorScreen->search('floor4_2')->hide();
-    mFloorScreen->search('floor4_3')->hide();
+    floor_textbox_1[5] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(4, 1));
+    floor_textbox_2[5] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(4, 2));
+    floor_textbox_3[5] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(4, 3));
+    mFloorScreen->search(FLOOR_TAG(4, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(4, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(4, 3))->hide();
     floor_textbox_1[5]->setFont(mDoExt_getSubFont());
     floor_textbox_2[5]->setFont(mDoExt_getSubFont());
     floor_textbox_3[5]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[6] = (J2DTextBox*)mFloorScreen->search('ffoor5_1');
-    floor_textbox_2[6] = (J2DTextBox*)mFloorScreen->search('ffoor5_2');
-    floor_textbox_3[6] = (J2DTextBox*)mFloorScreen->search('ffoor5_3');
-    mFloorScreen->search('floor5_1')->hide();
-    mFloorScreen->search('floor5_2')->hide();
-    mFloorScreen->search('floor5_3')->hide();
+    floor_textbox_1[6] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(5, 1));
+    floor_textbox_2[6] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(5, 2));
+    floor_textbox_3[6] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(5, 3));
+    mFloorScreen->search(FLOOR_TAG(5, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(5, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(5, 3))->hide();
     floor_textbox_1[6]->setFont(mDoExt_getSubFont());
     floor_textbox_2[6]->setFont(mDoExt_getSubFont());
     floor_textbox_3[6]->setFont(mDoExt_getSubFont());
 
-    floor_textbox_1[7] = (J2DTextBox*)mFloorScreen->search('ffoor6_1');
-    floor_textbox_2[7] = (J2DTextBox*)mFloorScreen->search('ffoor6_2');
-    floor_textbox_3[7] = (J2DTextBox*)mFloorScreen->search('ffoor6_3');
-    mFloorScreen->search('floor6_1')->hide();
-    mFloorScreen->search('floor6_2')->hide();
-    mFloorScreen->search('floor6_3')->hide();
+    floor_textbox_1[7] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(6, 1));
+    floor_textbox_2[7] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(6, 2));
+    floor_textbox_3[7] = (J2DTextBox*)mFloorScreen->search(FFOOR_TAG(6, 3));
+    mFloorScreen->search(FLOOR_TAG(6, 1))->hide();
+    mFloorScreen->search(FLOOR_TAG(6, 2))->hide();
+    mFloorScreen->search(FLOOR_TAG(6, 3))->hide();
     floor_textbox_1[7]->setFont(mDoExt_getSubFont());
     floor_textbox_2[7]->setFont(mDoExt_getSubFont());
     floor_textbox_3[7]->setFont(mDoExt_getSubFont());
@@ -616,13 +634,11 @@ void dMenu_DmapBg_c::setFloorMessage() {
     }
 }
 
-/* 801BA0B4-801BA0BC 1B49F4 0008+00 1/1 0/0 0/0 .text dpdMove__14dMenu_DmapBg_cFScScScPUcUc */
 bool dMenu_DmapBg_c::dpdMove(s8 param_0, s8 param_1, s8 param_2, u8* param_3, u8 param_4) {
     bool var_r31 = false;
     return var_r31;
 }
 
-/* 801BA0BC-801BA60C 1B49FC 0550+00 2/1 0/0 0/0 .text            __dt__14dMenu_DmapBg_cFv */
 dMenu_DmapBg_c::~dMenu_DmapBg_c() {
     dComIfGp_getDmapResArchive()->removeResourceAll();
     delete mString;
@@ -745,7 +761,6 @@ dMenu_DmapBg_c::~dMenu_DmapBg_c() {
     }
 }
 
-/* 801BA60C-801BA700 1B4F4C 00F4+00 2/2 0/0 0/0 .text setAllAlphaRate__14dMenu_DmapBg_cFfb */
 void dMenu_DmapBg_c::setAllAlphaRate(f32 i_rate, bool param_2) {
     field_0xd9c = i_rate;
 
@@ -778,7 +793,6 @@ void dMenu_DmapBg_c::setAllAlphaRate(f32 i_rate, bool param_2) {
     }
 }
 
-/* 801BA700-801BA7F0 1B5040 00F0+00 3/3 0/0 0/0 .text setGoldAnimation__14dMenu_DmapBg_cFb */
 void dMenu_DmapBg_c::setGoldAnimation(bool param_1) {
     J2DPane* gold0 = mMapScreen[0]->search('gold00_0');
     J2DPane* gold1 = mMapScreen[0]->search('gold00_1');
@@ -792,7 +806,6 @@ void dMenu_DmapBg_c::setGoldAnimation(bool param_1) {
     }
 }
 
-/* 801BA7F0-801BA974 1B5130 0184+00 3/3 0/0 0/0 .text setGoldFrameAlphaRate__14dMenu_DmapBg_cFf */
 void dMenu_DmapBg_c::setGoldFrameAlphaRate(f32 i_rate) {
     if (0.0f == i_rate) {
         mMapScreen[0]->search('gold00_0')->hide();
@@ -805,7 +818,6 @@ void dMenu_DmapBg_c::setGoldFrameAlphaRate(f32 i_rate) {
     }
 }
 
-/* 801BA974-801BAA4C 1B52B4 00D8+00 1/1 0/0 0/0 .text addGoldFrameAlphaRate__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::addGoldFrameAlphaRate() {
     f32 rate;
     if (field_0xdd7 >= g_fmapHIO.mDisplayFrameNum) {
@@ -822,7 +834,6 @@ void dMenu_DmapBg_c::addGoldFrameAlphaRate() {
     setGoldFrameAlphaRate(rate);
 }
 
-/* 801BAA4C-801BAB10 1B538C 00C4+00 1/1 0/0 0/0 .text decGoldFrameAlphaRate__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::decGoldFrameAlphaRate() {
     f32 rate;
     setGoldAnimation(false);
@@ -842,7 +853,6 @@ void dMenu_DmapBg_c::decGoldFrameAlphaRate() {
     setGoldFrameAlphaRate(rate);
 }
 
-/* 801BAB10-801BB334 1B5450 0824+00 1/0 0/0 0/0 .text            draw__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::draw() {
     u32 scissor_left;
     u32 scissor_top;
@@ -853,14 +863,14 @@ void dMenu_DmapBg_c::draw() {
     grafContext->setup2D();
 
     GXGetScissor(&scissor_left, &scissor_top, &scissor_width, &scissor_height);
-    grafContext->scissor(field_0xd94, 0.0f, 608.0f, 448.0f);
+    grafContext->scissor(field_0xd94, 0.0f, FB_WIDTH, FB_HEIGHT);
     grafContext->setScissor();
 
     mBaseScreen->draw(field_0xd94, field_0xd98, grafContext);
     dMenu_Dmap_c::myclass->drawFloorScreenBack(mFloorScreen, field_0xd94, field_0xd98, grafContext);
 
-    f32 dVar21 = mDoGph_gInf_c::getWidthF() / 608.0f;
-    f32 dVar16 = mDoGph_gInf_c::getHeightF() / 448.0f;
+    f32 dVar21 = mDoGph_gInf_c::getWidthF() / FB_WIDTH;
+    f32 dVar16 = mDoGph_gInf_c::getHeightF() / FB_HEIGHT;
     mMapScreen[0]->draw(field_0xd94, field_0xd98, grafContext);
 
     if (mpBackTexture != NULL) {
@@ -944,7 +954,6 @@ void dMenu_DmapBg_c::draw() {
     grafContext->setup2D();
 }
 
-/* 801BB334-801BB464 1B5C74 0130+00 1/1 0/0 0/0 .text            update__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::update() {
     if (mpArchiveMount != NULL) {
         if (mpArchiveMount->sync() && mpArchive == NULL) {
@@ -953,10 +962,10 @@ void dMenu_DmapBg_c::update() {
             mpArchiveMount = NULL;
 
             ResTIMG* mp_image = (ResTIMG*)mpArchive->getResource("tex/bg.bti");
-            JUT_ASSERT(2321, mp_image != 0);
+            JUT_ASSERT(2321, mp_image != NULL);
 
             mpBackTexture = new J2DPicture(mp_image);
-            JUT_ASSERT(2323, mpBackTexture != 0);
+            JUT_ASSERT(2323, mpBackTexture != NULL);
 
             void* spec = mpArchive->getResource("spec/spec.dat");
             memcpy(&field_0xd80, spec, 20);
@@ -971,16 +980,12 @@ void dMenu_DmapBg_c::update() {
     }
 }
 
-/* 801BB464-801BB468 1B5DA4 0004+00 1/1 0/0 0/0 .text            calcCursor__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::calcCursor() {}
 
-/* 801BB468-801BB498 1B5DA8 0030+00 1/1 0/0 0/0 .text            drawCursor__14dMenu_DmapBg_cFv */
 void dMenu_DmapBg_c::drawCursor() {
     mpDrawCursor->draw();
 }
 
-/* 801BB498-801BB634 1B5DD8 019C+00 0/0 1/1 0/0 .text
- * __ct__12dMenu_Dmap_cFP10JKRExpHeapP9STControlP10CSTControlUcUc */
 dMenu_Dmap_c::dMenu_Dmap_c(JKRExpHeap* param_1, STControl* param_2, CSTControl* param_3,
                            u8 param_4, u8 param_5) {
     dMeter2Info_setMapDrugFlag(0);
@@ -1054,7 +1059,6 @@ dMenu_Dmap_c::dMenu_Dmap_c(JKRExpHeap* param_1, STControl* param_2, CSTControl* 
     mpDresArchive = 0;
 }
 
-/* 801BB634-801BC788 1B5F74 1154+00 1/1 0/0 0/0 .text            screenInit__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::screenInit() {
     static u64 const floor_tag[8] = {'floor7_n', 'floor0_n', 'floor1_n', 'floor2_n',
                                      'floor3_n', 'floor4_n', 'floor5_n', 'floor6_n'};
@@ -1072,16 +1076,16 @@ void dMenu_Dmap_c::screenInit() {
     for (int i = 0; i < 8; i++) {
         field_0x114[i] = 0.0f;
         mSelFloor[i] = new CPaneMgr(mpDrawBg->mFloorScreen, floor_tag[i], 3, NULL);
-        JUT_ASSERT(2654, mSelFloor[i] != 0);
+        JUT_ASSERT(2654, mSelFloor[i] != NULL);
         mIconLinkPos[i] = new CPaneMgr(mpDrawBg->mFloorScreen, icon_tag[i], 0, NULL);
-        JUT_ASSERT(2657, mIconLinkPos[i] != 0);
+        JUT_ASSERT(2657, mIconLinkPos[i] != NULL);
         mIconBossPos[i] = new CPaneMgr(mpDrawBg->mFloorScreen, boss_tag[i], 0, NULL);
-        JUT_ASSERT(2660, mIconBossPos[i] != 0);
+        JUT_ASSERT(2660, mIconBossPos[i] != NULL);
     }
 
     for (int i = 0; i < 2; i++) {
         mStayIcon[i] = new CPaneMgr(mpDrawBg->mFloorScreen, stay_tag[i], 0, NULL);
-        JUT_ASSERT(2665, mStayIcon[i] != 0);
+        JUT_ASSERT(2665, mStayIcon[i] != NULL);
         mStayIcon[i]->hide();
 
         field_0x14c[i] = mStayIcon[i]->getGlobalVtxCenter(false, 0);
@@ -1208,9 +1212,13 @@ void dMenu_Dmap_c::screenInit() {
             if (dComIfGs_isDungeonItemBossKey()) {
                 itemNo = fpcNm_ITEM_LV5_BOSS_KEY;
                 field_0x174[2] = (u8)dComIfGs_isDungeonItemBossKey() ? fpcNm_ITEM_LV5_BOSS_KEY : 0;
+                                                                    /* dSv_event_flag_c::F_0003 - Snowpeak Ruins - Handed over 
+                                                                                                  tomato puree and left room */
             } else if (checkItemGet(fpcNm_ITEM_TOMATO_PUREE, 1) && !dComIfGs_isEventBit(2)) {
                 itemNo = fpcNm_ITEM_TOMATO_PUREE;
                 field_0x174[2] = fpcNm_ITEM_TOMATO_PUREE;
+                                                             /* dSv_event_flag_c::F_0004 - Snowpeak Ruins - Handed over secret 
+                                                                                           ingredient and left room */
             } else if (checkItemGet(fpcNm_ITEM_TASTE, 1) && !dComIfGs_isEventBit(1)) {
                 itemNo = fpcNm_ITEM_TASTE;
                 field_0x174[2] = fpcNm_ITEM_TASTE;
@@ -1265,7 +1273,6 @@ void dMenu_Dmap_c::screenInit() {
     field_0x98->hide();
 }
 
-/* 801BC788-801BC848 1B70C8 00C0+00 1/1 0/0 0/0 .text getPlayerIconPos__12dMenu_Dmap_cFScf */
 void dMenu_Dmap_c::getPlayerIconPos(s8 i_floorNo, f32 param_2) {
     if (i_floorNo == field_0x172) {
         f32 pos_x;
@@ -1278,7 +1285,6 @@ void dMenu_Dmap_c::getPlayerIconPos(s8 i_floorNo, f32 param_2) {
     }
 }
 
-/* 801BC848-801BCDF4 1B7188 05AC+00 2/2 0/0 0/0 .text            getIconPos__12dMenu_Dmap_cFScf */
 void dMenu_Dmap_c::getIconPos(s8 i_floorNo, f32 param_2) {
     f32 pos_x;
     f32 pos_y;
@@ -1396,7 +1402,6 @@ void dMenu_Dmap_c::getIconPos(s8 i_floorNo, f32 param_2) {
     getPlayerIconPos(i_floorNo, param_2);
 }
 
-/* 801BCDF4-801BD144 1B7734 0350+00 1/0 0/0 0/0 .text            __dt__12dMenu_Dmap_cFv */
 dMenu_Dmap_c::~dMenu_Dmap_c() {
     s32 iVar2 = field_0xe8->getTotalFreeSize();
     s32 iVar4 = field_0xe8->getTotalFreeSize();
@@ -1491,20 +1496,16 @@ dMenu_Dmap_c::~dMenu_Dmap_c() {
     dMenu_Dmap_c::myclass = NULL;
 }
 
-/* 801BD1D4-801BD1E8 1B7B14 0014+00 10/10 0/0 0/0 .text            getCurFloorPos__12dMenu_Dmap_cFv
- */
 s8 dMenu_Dmap_c::getCurFloorPos() {
     s8 i_floor = field_0x16c - mBottomFloor;
     JUT_ASSERT(3393, i_floor >= 0 && i_floor < (8));
     return i_floor;
 }
 
-/* 801BD1E8-801BD208 1B7B28 0020+00 4/4 0/0 0/0 .text getDefaultCurFloorPos__12dMenu_Dmap_cFv */
 s8 dMenu_Dmap_c::getDefaultCurFloorPos() {
     return getCurFloorPos();
 }
 
-/* 801BD208-801BD3B8 1B7B48 01B0+00 4/4 0/0 0/0 .text            iconMoveCalc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::iconMoveCalc() {
     s32 iVar7 = ((s16)field_0x172 - (s16)mBottomFloor);
     mStayIcon[0]->show();
@@ -1529,8 +1530,6 @@ void dMenu_Dmap_c::iconMoveCalc() {
     }
 }
 
-/* 801BD3B8-801BD524 1B7CF8 016C+00 1/1 0/0 0/0 .text
- * drawFloorScreenBack__12dMenu_Dmap_cFP9J2DScreenffP13J2DOrthoGraph */
 void dMenu_Dmap_c::drawFloorScreenBack(J2DScreen* i_screen, f32 i_transX, f32 i_transY,
                                        J2DOrthoGraph* i_ortho) {
     for (int i = 0; i < getFloorAll(); i++) {
@@ -1558,8 +1557,6 @@ void dMenu_Dmap_c::drawFloorScreenBack(J2DScreen* i_screen, f32 i_transX, f32 i_
     i_screen->draw(i_transX, i_transY, i_ortho);
 }
 
-/* 801BD524-801BD690 1B7E64 016C+00 1/1 0/0 0/0 .text
- * drawFloorScreenTop__12dMenu_Dmap_cFP9J2DScreenffP13J2DOrthoGraph */
 void dMenu_Dmap_c::drawFloorScreenTop(J2DScreen* i_screen, f32 i_transX, f32 i_transY,
                                       J2DOrthoGraph* i_ortho) {
     for (int i = 0; i < getFloorAll(); i++) {
@@ -1587,7 +1584,6 @@ void dMenu_Dmap_c::drawFloorScreenTop(J2DScreen* i_screen, f32 i_transX, f32 i_t
     i_screen->draw(i_transX, i_transY, i_ortho);
 }
 
-/* 801BD690-801BD6C4 1B7FD0 0034+00 3/3 0/0 0/0 .text            isMapMoveState__12dMenu_Dmap_cFv */
 bool dMenu_Dmap_c::isMapMoveState() {
     field_0x184 = true;
     if (mMapCtrl->getDisableZoomMoveFlgX() == true && mMapCtrl->getDisableZoomMoveFlgZ() == true) {
@@ -1597,8 +1593,6 @@ bool dMenu_Dmap_c::isMapMoveState() {
     return field_0x184;
 }
 
-/* 801BD6C4-801BD7C0 1B8004 00FC+00 1/1 0/0 0/0 .text            floorChangeMode__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::floorChangeMode() {
     if (field_0x16d > field_0x16c) {
         field_0x16e = field_0x16c;
@@ -1627,19 +1621,18 @@ void dMenu_Dmap_c::floorChangeMode() {
     }
 }
 
-/* 801BD7C0-801BDD40 1B8100 0580+00 1/1 0/0 0/0 .text            _create__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::_create() {
     u32 sp30 = field_0xe8->getTotalFreeSize();
     OS_REPORT("MenuDmap create前 最大===========> %d bytes max\n", field_0xe8->getFreeSize());
     OS_REPORT("MenuDmap create前================> %d bytes remain\n", sp30);
 
     mDmapHeap = JKRCreateExpHeap(field_0xe8->getFreeSize() - 0x10, field_0xe8, false);
-    JUT_ASSERT(3732, mDmapHeap != 0);
+    JUT_ASSERT(3732, mDmapHeap != NULL);
     JKRHeap* heap = mDoExt_setCurrentHeap(mDmapHeap);
     u32 sp28 = mDmapHeap->getTotalFreeSize();
     
     mMapCtrl = new dMenu_DmapMapCtrl_c();
-    JUT_ASSERT(3739, mMapCtrl != 0);
+    JUT_ASSERT(3739, mMapCtrl != NULL);
 
     mCMessageNum = 0;
     mJMessageNum = 0;
@@ -1650,15 +1643,15 @@ void dMenu_Dmap_c::_create() {
     }
 
     mSelStick = new STControl(5, 2, 1, 1, 0.9f, 0.5f, 0, 0x800);
-    JUT_ASSERT(3753, mSelStick != 0);
+    JUT_ASSERT(3753, mSelStick != NULL);
     mSelStick->setFirstWaitTime(8);
 
     u32 sp24 = field_0xe8->getTotalFreeSize();
     mpDrawBg = new dMenu_DmapBg_c(mDmapHeap, mpStick);
-    JUT_ASSERT(3763, mpDrawBg != 0);
+    JUT_ASSERT(3763, mpDrawBg != NULL);
 
     mItemTexBuf = (u8*)mDmapHeap->alloc(0xC00, 0x20);
-    JUT_ASSERT(3766, mItemTexBuf != 0);
+    JUT_ASSERT(3766, mItemTexBuf != NULL);
 
     if (mZoomState) {
         if (POINTER_OPT == 0) {
@@ -1751,7 +1744,6 @@ void dMenu_Dmap_c::_create() {
     (this->*map_init_process[field_0x17e])();
 }
 
-/* 801BDDA4-801BDEF8 1B86E4 0154+00 0/0 1/1 0/0 .text            _move__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::_move() {
     u8 prev_process = m_process;
     JKRHeap* prev_heap = mDoExt_setCurrentHeap(mDmapHeap);
@@ -1792,18 +1784,15 @@ void dMenu_Dmap_c::_move() {
     mDoExt_setCurrentHeap(prev_heap);
 }
 
-/* 801BDEF8-801BDF48 1B8838 0050+00 1/1 0/0 0/0 .text            setMapTexture__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::setMapTexture() {
     f32 mapBlendPer = mMapCtrl->getMapBlendPer();
     mpDrawBg->getMapPane()->setBlendRatio(mapBlendPer, 1.0f - mapBlendPer);
 }
 
-/* 801BDF48-801BDF6C 1B8888 0024+00 1/1 0/0 0/0 .text            mapBgAnime__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::mapBgAnime() {
     mpDrawBg->mapScreenAnime();
 }
 
-/* 801BDF6C-801BE328 1B88AC 03BC+00 1/1 0/0 0/0 .text            mapControl__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::mapControl() {
     u8 temp_r27 = field_0x17e;
     if (m_process == 0 || field_0x183 == 0) {
@@ -1884,7 +1873,6 @@ void dMenu_Dmap_c::mapControl() {
     }
 }
 
-/* 801BE328-801BE670 1B8C68 0348+00 0/0 1/1 0/0 .text            isOpen__12dMenu_Dmap_cFv */
 bool dMenu_Dmap_c::isOpen() {
     bool var_r28 = false;
     bool var_r27 = false;
@@ -1904,7 +1892,7 @@ bool dMenu_Dmap_c::isOpen() {
             mpDresArchiveMount = NULL;
 
             mpBinData = mpDresArchive->getResource("dat/data.dat");
-            JUT_ASSERT(4377, mpBinData != 0);
+            JUT_ASSERT(4377, mpBinData != NULL);
 
             _create();
         } else {
@@ -1956,7 +1944,6 @@ bool dMenu_Dmap_c::isOpen() {
     return var_r28;
 }
 
-/* 801BE670-801BE7E0 1B8FB0 0170+00 0/0 1/1 0/0 .text            isClose__12dMenu_Dmap_cFv */
 bool dMenu_Dmap_c::isClose() {
     bool var_r30 = true;
     bool var_r29 = false;
@@ -1996,8 +1983,6 @@ bool dMenu_Dmap_c::isClose() {
     return var_r30;
 }
 
-/* 801BE7E0-801BEAFC 1B9120 031C+00 0/0 1/1 0/0 .text            _draw__12dMenu_Dmap_cFv */
-// NONMATCHING - not sure what the 2nd param of getGlobalVtxCenter is supposed to be
 void dMenu_Dmap_c::_draw() {
     if (mMapCtrl != NULL) {
         mMapCtrl->draw();
@@ -2043,7 +2028,9 @@ void dMenu_Dmap_c::_draw() {
                 spC.y = mpDrawBg->mMapScreen[0]->search('center_n')->getGlbBounds().i.y + (mpDrawBg->mMapScreen[0]->search('center_n')->getHeight() / 2);
                 
                 CPaneMgr sp70;
-                Vec sp34 = sp70.getGlobalVtxCenter(mpDrawBg->getMapPane(), false, 0);
+                //!@bug It's unclear what this is supposed to be, but a stack pointer being converted to a bool is probably not intended.
+                u8 sp40[0x30];
+                Vec sp34 = sp70.getGlobalVtxCenter(mpDrawBg->getMapPane(), (bool)sp40, 0);
 
                 spC.x = sp34.x;
                 spC.y = sp34.y;
@@ -2056,18 +2043,15 @@ void dMenu_Dmap_c::_draw() {
     }
 }
 
-/* 801BEAFC-801BEB0C 1B943C 0010+00 1/0 0/0 0/0 .text itemInfo_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::itemInfo_init_proc() {
     m_itemSubProcess = 0;
     field_0x185 = 0;
 }
 
-/* 801BEB0C-801BEB44 1B944C 0038+00 1/0 0/0 0/0 .text            itemInfo_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::itemInfo_proc() {
     (this->*itemInfo_subProcess[m_itemSubProcess])();
 }
 
-/* 801BEB44-801BEF28 1B9484 03E4+00 1/0 0/0 0/0 .text            itemSelect__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::itemSelect() {
     if (mpDrawBg->field_0xdd4 == -99 && mpDrawBg->field_0xdd5 == 0xFF) {
         mSelStick->checkTrigger();
@@ -2159,7 +2143,6 @@ void dMenu_Dmap_c::itemSelect() {
     }
 }
 
-/* 801BEF28-801BEFCC 1B9868 00A4+00 1/1 0/0 0/0 .text            getNextItem__12dMenu_Dmap_cFi */
 int dMenu_Dmap_c::getNextItem(int param_0) {
     if (!itemCarryCheck()) {
         return -1;
@@ -2184,8 +2167,6 @@ int dMenu_Dmap_c::getNextItem(int param_0) {
     return var_r28;
 }
 
-/* 801BEFCC-801BF030 1B990C 0064+00 1/1 0/0 0/0 .text            itemSelectAnmInit__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::itemSelectAnmInit() {
     field_0x94->hide();
     field_0x88[field_0x178]->scaleAnimeStart(0);
@@ -2193,7 +2174,6 @@ void dMenu_Dmap_c::itemSelectAnmInit() {
     m_itemSubProcess = 1;
 }
 
-/* 801BF030-801BF180 1B9970 0150+00 1/0 0/0 0/0 .text            itemSelectAnm__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::itemSelectAnm() {
     bool temp_r29 = field_0x88[field_0x178]->scaleAnime(field_0x179, 1.0f, 0.9f, 0);
     bool temp_r28 = field_0x88[field_0x177]->scaleAnime(field_0x179, 0.9f, 1.0f, 0);
@@ -2209,13 +2189,10 @@ void dMenu_Dmap_c::itemSelectAnm() {
     }
 }
 
-/* 801BF180-801BF18C 1B9AC0 000C+00 1/0 0/0 0/0 .text            itemInfoOpenAnm__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::itemInfoOpenAnm() {
     m_itemSubProcess = 3;
 }
 
-/* 801BF18C-801BF278 1B9ACC 00EC+00 1/0 0/0 0/0 .text            itemInfoWait__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::itemInfoWait() {
     mpDrawBg->getItemExplainPtr()->move();
 
@@ -2243,8 +2220,6 @@ void dMenu_Dmap_c::itemInfoWait() {
     }
 }
 
-/* 801BF278-801BF334 1B9BB8 00BC+00 1/0 0/0 0/0 .text            itemInfoCloseAnm__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::itemInfoCloseAnm() {
     bool var_r30 = false;
     mpDrawBg->getItemExplainPtr()->move();
@@ -2274,7 +2249,6 @@ void dMenu_Dmap_c::itemInfoCloseAnm() {
     }
 }
 
-/* 801BF334-801BF410 1B9C74 00DC+00 0/0 1/1 0/0 .text            getNextStatus__12dMenu_Dmap_cFv */
 u8 dMenu_Dmap_c::getNextStatus() {
     if (POINTER_OPT != 0) {
         if ((dMw_LEFT_TRIGGER() || (dMw_B_TRIGGER() && (!getZoomState() || (m_process == 0 && m_itemSubProcess == 0)))) && !isKeyCheck()) {
@@ -2299,7 +2273,6 @@ u8 dMenu_Dmap_c::getNextStatus() {
     return 0;
 }
 
-/* 801BF410-801BF464 1B9D50 0054+00 1/1 1/1 0/0 .text            isSync__12dMenu_Dmap_cFv */
 bool dMenu_Dmap_c::isSync() {
     if (mpDrawBg != NULL && (mpDrawBg->mpArchiveMount != NULL) && !mpDrawBg->mpArchiveMount->sync()) {
         return false;
@@ -2312,7 +2285,6 @@ bool dMenu_Dmap_c::isSync() {
     return true;
 }
 
-/* 801BF464-801BF4A4 1B9DA4 0040+00 1/1 0/0 0/0 .text            isKeyCheck__12dMenu_Dmap_cFv */
 bool dMenu_Dmap_c::isKeyCheck() {
     if (!isSync()) {
         return true;
@@ -2321,8 +2293,6 @@ bool dMenu_Dmap_c::isKeyCheck() {
     return field_0x185;
 }
 
-/* 801BF4A4-801BF528 1B9DE4 0084+00 1/0 0/0 0/0 .text infoModeChange_init_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::infoModeChange_init_proc() {
     field_0x10->hide();
     mSelFloor[getCurFloorPos()]->scaleAnimeStart(0);
@@ -2330,7 +2300,6 @@ void dMenu_Dmap_c::infoModeChange_init_proc() {
     field_0x88[field_0x177]->scaleAnimeStart(0);
 }
 
-/* 801BF528-801BF688 1B9E68 0160+00 1/0 0/0 0/0 .text infoModeChange_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::infoModeChange_proc() {
     bool temp_r29 = mSelFloor[getCurFloorPos()]->scaleAnime(field_0x179, 1.0f, 0.9f, 0);
     bool temp_r27 = mSelFloor[getCurFloorPos()]->alphaAnime(field_0x179, 0xFF, 0x80, 0);
@@ -2348,7 +2317,6 @@ void dMenu_Dmap_c::infoModeChange_proc() {
     iconMoveCalc();
 }
 
-/* 801BF688-801BF70C 1B9FC8 0084+00 1/0 0/0 0/0 .text mapModeChange_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::mapModeChange_init_proc() {
     field_0x94->hide();
     mSelFloor[getCurFloorPos()]->scaleAnimeStart(0);
@@ -2356,7 +2324,6 @@ void dMenu_Dmap_c::mapModeChange_init_proc() {
     field_0x88[field_0x177]->scaleAnimeStart(0);
 }
 
-/* 801BF70C-801BF8A0 1BA04C 0194+00 1/0 0/0 0/0 .text mapModeChange_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::mapModeChange_proc() {
     bool temp_r29 = mSelFloor[getCurFloorPos()]->scaleAnime(field_0x179, 0.9f, 1.0f, 0);
     bool temp_r27 = mSelFloor[getCurFloorPos()]->alphaAnime(field_0x179, 0x80, 0xFF, 0);
@@ -2376,14 +2343,12 @@ void dMenu_Dmap_c::mapModeChange_proc() {
     iconMoveCalc();
 }
 
-/* 801BF8A0-801BF8F8 1BA1E0 0058+00 1/0 0/0 0/0 .text lv5_talk_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::lv5_talk_init_proc() {
     field_0x185 = true;
     dMsgObject_setTalkHeap(mpDrawBg->mpTalkHeap);
     mpDrawBg->mMsgFlow.init(NULL, 0x202, 0, NULL);
 }
 
-/* 801BF8F8-801BF9D4 1BA238 00DC+00 1/0 0/0 0/0 .text            lv5_talk_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::lv5_talk_proc() {
     u16 msg_status = dMsgObject_c::getStatus();
     if (msg_status == 15 || msg_status == 16) {
@@ -2409,13 +2374,10 @@ void dMenu_Dmap_c::lv5_talk_proc() {
     }
 }
 
-/* 801BF9D4-801BF9E0 1BA314 000C+00 1/0 0/0 0/0 .text            mapMode_init_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::mapMode_init_proc() {
     field_0x185 = false;
 }
 
-/* 801BF9E0-801BFA84 1BA320 00A4+00 1/0 0/0 0/0 .text            mapMode_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::mapMode_proc() {
     u8 temp_r30 = field_0x17d;
     if (mpDrawBg->field_0xdd4 == -99 && mpDrawBg->field_0xdd5 == 0xFF) {
@@ -2429,11 +2391,8 @@ void dMenu_Dmap_c::mapMode_proc() {
     }
 }
 
-/* 801BFA84-801BFA88 1BA3C4 0004+00 1/0 0/0 0/0 .text floorSelect_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::floorSelect_init_proc() {}
 
-/* 801BFA88-801BFC78 1BA3C8 01F0+00 1/0 0/0 0/0 .text            floorSelect_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::floorSelect_proc() {
     if (field_0x16d != field_0x16c) {
         floorChangeMode();
@@ -2467,7 +2426,6 @@ void dMenu_Dmap_c::floorSelect_proc() {
     }
 }
 
-/* 801BFC78-801BFCAC 1BA5B8 0034+00 2/2 0/0 0/0 .text            itemCarryCheck__12dMenu_Dmap_cFv */
 int dMenu_Dmap_c::itemCarryCheck() {
     int var_r29 = 0;
     for (int i = 0; i < 3; i++) {
@@ -2479,7 +2437,6 @@ int dMenu_Dmap_c::itemCarryCheck() {
     return var_r29;
 }
 
-/* 801BFCAC-801BFD5C 1BA5EC 00B0+00 1/0 0/0 0/0 .text floorChange_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::floorChange_init_proc() {
     field_0x10->hide();
     mSelFloor[getCurFloorPos()]->scaleAnimeStart(0);
@@ -2488,8 +2445,6 @@ void dMenu_Dmap_c::floorChange_init_proc() {
     mSelFloor[getFloorPos(field_0x16e)]->alphaAnimeStart(0);
 }
 
-/* 801BFD5C-801BFF84 1BA69C 0228+00 1/0 0/0 0/0 .text            floorChange_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::floorChange_proc() {
     bool temp_r29 = mSelFloor[getCurFloorPos()]->scaleAnime(field_0x179, 0.9f, 1.0f, 0);
     bool temp_r28 = mSelFloor[getFloorPos(field_0x16e)]->scaleAnime(field_0x179, 1.0f, 0.9f, 0);
@@ -2509,10 +2464,8 @@ void dMenu_Dmap_c::floorChange_proc() {
     iconMoveCalc();
 }
 
-/* 801BFF84-801BFF88 1BA8C4 0004+00 1/0 0/0 0/0 .text zoomWait_init_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::zoomWait_init_proc() {}
 
-/* 801BFF88-801C008C 1BA8C8 0104+00 1/0 0/0 0/0 .text            zoomWait_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::zoomWait_proc() {
     if (m_process == 1) {
         if (mDoCPd_c::getTrigA(PAD_1) && (((POINTER_OPT == 1 && mpDrawBg->field_0xdd3 != 0xFF) || POINTER_OPT == 0) && !dMeter2Info_isTouchKeyCheck(0xC))) {
@@ -2532,8 +2485,6 @@ void dMenu_Dmap_c::zoomWait_proc() {
     }
 }
 
-/* 801C008C-801C01A0 1BA9CC 0114+00 1/0 0/0 0/0 .text            zoomIn_init_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::zoomIn_init_proc() {
     Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_ZOOMIN, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
 
@@ -2561,7 +2512,6 @@ void dMenu_Dmap_c::zoomIn_init_proc() {
     mJMessageNum = 0;
 }
 
-/* 801C01A0-801C023C 1BAAE0 009C+00 1/0 0/0 0/0 .text            zoomIn_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::zoomIn_proc() {
     bool temp_r30 = mMapCtrl->isEndZoomIn();
     bool temp_r29 = mpDrawBg->iconScaleAnm();
@@ -2577,8 +2527,6 @@ void dMenu_Dmap_c::zoomIn_proc() {
     }
 }
 
-/* 801C023C-801C02F0 1BAB7C 00B4+00 1/0 0/0 0/0 .text            zoomOut_init_proc__12dMenu_Dmap_cFv
- */
 void dMenu_Dmap_c::zoomOut_init_proc() {
     Z2GetAudioMgr()->seStart(Z2SE_SY_MAP_ZOOMOUT, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     mMapCtrl->initZoomOut(10);
@@ -2593,7 +2541,6 @@ void dMenu_Dmap_c::zoomOut_init_proc() {
     mJMessageNum = 0;
 }
 
-/* 801C02F0-801C0380 1BAC30 0090+00 1/0 0/0 0/0 .text            zoomOut_proc__12dMenu_Dmap_cFv */
 void dMenu_Dmap_c::zoomOut_proc() {
     bool temp_r30 = mMapCtrl->isEndZoomOut();
     bool temp_r29 = mpDrawBg->iconScaleAnm();

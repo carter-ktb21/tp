@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_light.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -7,9 +9,9 @@
 
 class dMsgScrnLight_HIO_c {
 public:
-    /* 8024575C */ dMsgScrnLight_HIO_c();
-    /* 802457C4 */ void updateColor(u8);
-    /* 80246348 */ virtual ~dMsgScrnLight_HIO_c() {}
+    dMsgScrnLight_HIO_c();
+    void updateColor(u8);
+    virtual ~dMsgScrnLight_HIO_c() {}
 
     enum {
         COLOR_DEFAULT_e,
@@ -36,7 +38,6 @@ public:
     /* 0x45 */ u8 mWhiteA[COLOR_MAX_e];
 };
 
-/* 8024575C-802457C4 24009C 0068+00 1/1 0/0 0/0 .text            __ct__19dMsgScrnLight_HIO_cFv */
 dMsgScrnLight_HIO_c::dMsgScrnLight_HIO_c() {
     mDebugON = false;
 
@@ -53,7 +54,6 @@ dMsgScrnLight_HIO_c::dMsgScrnLight_HIO_c() {
     }
 }
 
-/* 802457C4-80245934 240104 0170+00 1/1 0/0 0/0 .text updateColor__19dMsgScrnLight_HIO_cFUc */
 void dMsgScrnLight_HIO_c::updateColor(u8 i_colorType) {
     switch (i_colorType) {
     case 0:
@@ -111,12 +111,10 @@ void dMsgScrnLight_HIO_c::updateColor(u8 i_colorType) {
     }
 }
 
-/* 804306D4-80430728 05D3F4 0050+04 3/3 0/0 0/0 .bss             g_MsgScrnLight_HIO_c */
 static dMsgScrnLight_HIO_c g_MsgScrnLight_HIO_c;
 
 static u8 l_lightCount;
 
-/* 80245934-80245B00 240274 01CC+00 0/0 4/4 1/1 .text            __ct__15dMsgScrnLight_cFUcUc */
 dMsgScrnLight_c::dMsgScrnLight_c(u8 i_colorType, u8 param_1) {
     mColorType = i_colorType;
     field_0x21 = param_1;
@@ -129,7 +127,7 @@ dMsgScrnLight_c::dMsgScrnLight_c(u8 i_colorType, u8 param_1) {
     g_MsgScrnLight_HIO_c.updateColor(i_colorType);
 
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
     bool fg = mpScreen->setPriority("zelda_message_window_text_light.blo", 0x20000,
                                     dComIfGp_getMain2DArchive());
     JUT_ASSERT(0, fg != false);
@@ -146,7 +144,7 @@ dMsgScrnLight_c::dMsgScrnLight_c(u8 i_colorType, u8 param_1) {
     mBpkFrame = 0.0f;
 
     mpParent_c = new CPaneMgr(mpScreen, 'moya00', 0, NULL);
-    JUT_ASSERT(0, mpParent_c != 0);
+    JUT_ASSERT(0, mpParent_c != NULL);
 
     mpParent_c->getPanePtr()->setAnimation(mpBck);
     mpParent_c->getPanePtr()->setAnimation(mpBpk);
@@ -154,7 +152,6 @@ dMsgScrnLight_c::dMsgScrnLight_c(u8 i_colorType, u8 param_1) {
     mAlpha = 0.0f;
 }
 
-/* 80245B00-80245C04 240440 0104+00 1/0 0/0 0/0 .text            __dt__15dMsgScrnLight_cFv */
 dMsgScrnLight_c::~dMsgScrnLight_c() {
     l_lightCount--;
 
@@ -171,8 +168,6 @@ dMsgScrnLight_c::~dMsgScrnLight_c() {
     mpParent_c = NULL;
 }
 
-/* 80245C04-80245F90 240544 038C+00 0/0 2/2 0/0 .text            draw__15dMsgScrnLight_cFPffffffUc
- */
 void dMsgScrnLight_c::draw(f32* i_anmFrame, f32 i_posX, f32 i_posY, f32 i_scaleX, f32 i_scaleY,
                            f32 i_alpha, u8 i_colorType) {
     if (g_MsgScrnLight_HIO_c.mDebugON) {
@@ -219,8 +214,6 @@ void dMsgScrnLight_c::draw(f32* i_anmFrame, f32 i_posX, f32 i_posY, f32 i_scaleX
     drawCommon(i_posX, i_posY, i_scaleX, i_scaleY, i_alpha);
 }
 
-/* 80245F90-802460DC 2408D0 014C+00 0/0 1/1 1/1 .text
- * draw__15dMsgScrnLight_cFPfffffffQ28JUtility6TColorQ28JUtility6TColor */
 void dMsgScrnLight_c::draw(f32* i_anmFrame, f32 i_posX, f32 i_posY, f32 i_scaleX, f32 i_scaleY,
                            f32 i_alpha, f32 i_anmRate, JUtility::TColor i_black,
                            JUtility::TColor i_white) {
@@ -240,8 +233,6 @@ void dMsgScrnLight_c::draw(f32* i_anmFrame, f32 i_posX, f32 i_posY, f32 i_scaleX
     drawCommon(i_posX, i_posY, i_scaleX, i_scaleY, i_alpha);
 }
 
-/* 802460DC-80246348 240A1C 026C+00 2/2 0/0 0/0 .text            drawCommon__15dMsgScrnLight_cFfffff
- */
 void dMsgScrnLight_c::drawCommon(f32 i_posX, f32 i_posY, f32 i_scaleX, f32 i_scaleY, f32 i_alpha) {
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
     graf_ctx->setup2D();

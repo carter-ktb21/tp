@@ -6,11 +6,11 @@
 
 class daTagPati_c : public fopAc_ac_c {
 public:
-    /* 80D5D438 */ ~daTagPati_c();
-    /* 80D5D570 */ int create();
-    /* 80D5D78C */ int Execute();
-    /* 80D5D7C8 */ void col_set();
-    /* 80D5D830 */ u32 chk_CoHit();
+    ~daTagPati_c();
+    int create();
+    int Execute();
+    void col_set();
+    u32 chk_CoHit();
 
     u32 get_prm() {
         u32 retVal = fopAcM_GetParam(this) & 0xFF;
@@ -18,6 +18,16 @@ public:
             retVal = 0;
         }
         return retVal;
+    }
+
+    BOOL isDistChkTag1() { return field_0x6E0 == 0; }
+    BOOL isDistChkTag2() { return field_0x6E0 == 1; }
+    BOOL isEscapeChkTag1() { return field_0x6E0 == 2; }
+    BOOL isEscapeChkTag2() { return field_0x6E0 == 3; }
+    BOOL is_CoHit() const { return field_0x6E4; }
+    void clr_CoHit() { 
+        mCyl.ClrCoHit();
+        field_0x6E4 = 0;
     }
 
     /* 0x568 */ dCcD_Cyl mCyl;

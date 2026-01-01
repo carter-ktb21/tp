@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wchain.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_player.h"
@@ -11,10 +13,8 @@
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 
-/* 80D31924-80D3192C 000000 0007+01 8/8 0/0 0/0 .rodata          l_arcName */
 static char const l_arcName[7] = "Wchain";
 
-/* 80D2FEF8-80D2FF9C 000078 00A4+00 1/1 0/0 0/0 .text            createHeap__13daObjWchain_cFv */
 int daObjWchain_c::createHeap() {
     J3DModelData* handle_model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
     mpHandleModel = mDoExt_J3DModel__create(handle_model_data, 0x80000, 0x11000084);
@@ -22,18 +22,16 @@ int daObjWchain_c::createHeap() {
         return 0;
     }
     mpChainModelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 3);
-    mShape.setUserArea((u32)this);
+    mShape.setUserArea((uintptr_t)this);
     return 1;
 }
 
-/* 80D2FF9C-80D2FFBC 00011C 0020+00 1/1 0/0 0/0 .text daObjWchain_createHeap__FP10fopAc_ac_c */
 static int daObjWchain_createHeap(fopAc_ac_c* i_this) {
     return static_cast<daObjWchain_c*>(i_this)->createHeap();
 }
 
-/* 80D2FFBC-80D30394 00013C 03D8+00 1/1 0/0 0/0 .text            create__13daObjWchain_cFv */
 cPhs__Step daObjWchain_c::create() {
-    fopAcM_SetupActor(this, daObjWchain_c);
+    fopAcM_ct(this, daObjWchain_c);
     mSw = fopAcM_GetParam(this) & 0xff;
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (step == cPhs_COMPLEATE_e) {
@@ -84,24 +82,19 @@ cPhs__Step daObjWchain_c::create() {
     return step;
 }
 
-/* 80D30414-80D30434 000594 0020+00 1/0 0/0 0/0 .text            daObjWchain_Create__FP10fopAc_ac_c
- */
 static cPhs__Step daObjWchain_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjWchain_c*>(i_this)->create();
 }
 
-/* 80D30434-80D3050C 0005B4 00D8+00 1/1 0/0 0/0 .text            __dt__13daObjWchain_cFv */
 daObjWchain_c::~daObjWchain_c() {
     dComIfG_resDelete(&mPhaseReq, l_arcName);
 }
 
-/* 80D3050C-80D30534 00068C 0028+00 1/0 0/0 0/0 .text daObjWchain_Delete__FP13daObjWchain_c */
 static int daObjWchain_Delete(daObjWchain_c* i_this) {
     i_this->~daObjWchain_c();
     return 1;
 }
 
-/* 80D30534-80D305E4 0006B4 00B0+00 2/2 0/0 0/0 .text            setMatrix__13daObjWchain_cFv */
 void daObjWchain_c::setMatrix() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::ZrotM(mHandleRotation);
@@ -112,7 +105,6 @@ void daObjWchain_c::setMatrix() {
     mDoMtx_stack_c::multVec(&eyeOffset, &eyePos);
 }
 
-/* 80D305E4-80D3080C 000764 0228+00 1/1 0/0 0/0 .text getChainAngleZ__13daObjWchain_cFP4cXyzi */
 s16 daObjWchain_c::getChainAngleZ(cXyz* param_0, int param_1) {
     cXyz vec(param_0->x, 0.0f, param_0->z);
     f32 len = vec.abs();
@@ -127,10 +119,14 @@ s16 daObjWchain_c::getChainAngleZ(cXyz* param_0, int param_1) {
     }
 }
 
-/* 80D3080C-80D310AC 00098C 08A0+00 1/1 0/0 0/0 .text            setChainPos__13daObjWchain_cFv */
-// NONMATCHING regalloc, instruction ordering
 void daObjWchain_c::setChainPos() {
     cXyz prev_pos, vec1;
+
+    int i;
+    cXyz* chain_pos;     // dbg r27
+    cXyz* chain_speed;   // dbg sp_0x1C
+    csXyz* chain_angle;  // dbg r28
+    s16* chain_rotation; // dbg r26
     if (mRide) {
         shape_angle.y = daPy_getLinkPlayerActorClass()->shape_angle.y;
         shape_angle.z = 0;
@@ -147,13 +143,14 @@ void daObjWchain_c::setChainPos() {
         mDoMtx_stack_c::ZXYrotM(shape_angle.x, shape_angle.y, shape_angle.z);
         static Vec const currentOffset = {0.0f, 0.0f, -53.75f};
         mDoMtx_stack_c::multVec(&currentOffset, &current.pos);
-        cXyz* chain_pos = &mChainPos[0xf];
-        csXyz* chain_angle = &mChainAngle[0xf];
-        cXyz* chain_speed = &mChainSpeed[0xf];
-        s16* chain_rotation = &mChainRotation[0xf];
+
+        chain_pos = &mChainPos[0xf];
+        chain_angle = &mChainAngle[0xf];
+        chain_speed = &mChainSpeed[0xf];
+        chain_rotation = &mChainRotation[0xf];
         prev_pos = current.pos;
-        int svar7 = shape_angle.z;
-        for (int i = 0xf; i >= 0; i--, chain_pos--, chain_angle--, chain_speed--, chain_rotation--) {
+        s16 svar7 = shape_angle.z;
+        for (i = 0xf; i >= 0; i--, chain_pos--, chain_angle--, chain_speed--, chain_rotation--) {
             chain_angle->z += getChainAngleZ(chain_speed, abs((s16)(chain_angle->z - svar7)));
             *chain_speed = (prev_pos - *chain_pos) * 0.75;
             *chain_pos = prev_pos;
@@ -183,32 +180,40 @@ void daObjWchain_c::setChainPos() {
         }
         f32 fvar2 = mInitOutLength + mPullLength - 53.75f;
         int local_68 = fvar2 * (1.0f / 17.5f);
-        int ivar5 = local_68 <= 0xf ? local_68 + 1 : 0x10;
-        int chain_no = 0x10 - ivar5;
-        cXyz* chain_pos = &mChainPos[chain_no];
-        csXyz* chain_angle = &mChainAngle[chain_no];
-        s16* chain_rotation = &mChainRotation[chain_no];
+        if (local_68 > 0xF) {
+            local_68 = 0x10;
+        } else {
+            ++local_68;
+        }
+
+        f32 reg_f28 = (17.5f - (local_68 * 17.5f - fvar2));
+        int chain_no = 0x10 - local_68;
+
+        chain_pos = &mChainPos[chain_no];
+        chain_angle = &mChainAngle[chain_no];
+        chain_speed = &mChainSpeed[chain_no];
+        chain_rotation = &mChainRotation[chain_no];
         chain_pos->set(
             mRoofPos.x,
-            field_0x7a8 + (mRoofPos.y - (17.5f - (ivar5 * 17.5f - fvar2))),
+            field_0x7a8 + (mRoofPos.y - reg_f28),
             mRoofPos.z
         );
         chain_angle->x = 0x4000;
         *chain_rotation = 0;
-        chain_pos = mChainPos + 1 + chain_no;
-        chain_angle++;
-        cXyz* chain_speed = mChainSpeed + 1 + chain_no;
-        chain_rotation++;
+        ++chain_pos;
+        ++chain_angle;
+        ++chain_speed;
+        ++chain_rotation;
         mDoMtx_stack_c::YrotS(-shape_angle.y);
-        f32 prob = 0.2f;
         cXyz local_90;
-        if (!mEnd && cM_rnd() < prob) {
-            f32 ang = cM_rnd() * 6.283185f;
+        f32 prob = 0.2f;
+        if (!mEnd && cM_rnd() < 0.2f) {
+            f32 ang = cM_rnd() * 6.2831855f;
             local_90.set(cM_fsin(ang), 0.0f, cM_fcos(ang));
         } else {
             local_90 = cXyz::Zero;
         }
-        for (int i = chain_no + 1; i < 0x10; i++, chain_pos++, chain_angle++, chain_speed++, chain_rotation++) {
+        for (i = chain_no + 1; i < 0x10; i++, chain_pos++, chain_angle++, chain_speed++, chain_rotation++) {
             prev_pos = *chain_pos;
             vec1 = *chain_pos - chain_pos[-1];
             if (chain_speed->abs2XZ() < 0.04f && cM_rnd() < prob) {
@@ -240,7 +245,6 @@ void daObjWchain_c::setChainPos() {
     }
 }
 
-/* 80D310AC-80D313F8 00122C 034C+00 1/1 0/0 0/0 .text            execute__13daObjWchain_cFv */
 int daObjWchain_c::execute() {
     if (!mRidePrev && mRide) {
         fopAcM_seStartCurrent(this, Z2SE_OBJ_GNAW_CHAIN_SW, 0);
@@ -264,12 +268,12 @@ int daObjWchain_c::execute() {
     setChainPos();
     
     if (daPy_py_c::checkNowWolf() && !mRide && mPullLength < 0.1f) {
-        attention_info.flags |= 1;
+        attention_info.flags |= fopAc_AttnFlag_LOCK_e;
     } else {
-        attention_info.flags &= ~1;
+        attention_info.flags &= ~fopAc_AttnFlag_LOCK_e;
     }
     attention_info.position = current.pos;
-    attention_info.position.y += 150.0f;
+    attention_info.position.y += 15.0f;
     
     setMatrix();
     
@@ -296,12 +300,10 @@ int daObjWchain_c::execute() {
 }
 
 
-/* 80D313F8-80D31418 001578 0020+00 1/0 0/0 0/0 .text daObjWchain_Execute__FP13daObjWchain_c */
 static int daObjWchain_Execute(daObjWchain_c* i_this) {
     return i_this->execute();
 }
 
-/* 80D31418-80D31810 001598 03F8+00 1/0 0/0 0/0 .text            draw__19daObjWchain_shape_cFv */
 void daObjWchain_shape_c::draw() {
     daObjWchain_c* chain = (daObjWchain_c*)getUserArea();
     cXyz* pos = chain->getChainPos();
@@ -360,7 +362,6 @@ void daObjWchain_shape_c::draw() {
 }
 
 
-/* 80D31810-80D318A0 001990 0090+00 1/1 0/0 0/0 .text            draw__13daObjWchain_cFv */
 int daObjWchain_c::draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpHandleModel, &tevStr);
@@ -370,13 +371,10 @@ int daObjWchain_c::draw() {
     return 1;
 }
 
-/* 80D318A0-80D318C0 001A20 0020+00 1/0 0/0 0/0 .text            daObjWchain_Draw__FP13daObjWchain_c
- */
 static int daObjWchain_Draw(daObjWchain_c* i_this) {
     return i_this->draw();
 }
 
-/* 80D319E4-80D31A04 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjWchain_Method */
 static actor_method_class l_daObjWchain_Method = {
     (process_method_func)daObjWchain_Create,
     (process_method_func)daObjWchain_Delete,
@@ -385,7 +383,6 @@ static actor_method_class l_daObjWchain_Method = {
     (process_method_func)daObjWchain_Draw,
 };
 
-/* 80D31A04-80D31A34 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Wchain */
 extern actor_process_profile_definition g_profile_Obj_Wchain = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

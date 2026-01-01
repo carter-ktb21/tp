@@ -1,7 +1,9 @@
 /**
- * @file d_a_e_tk2.cpp
+* @file d_a_e_tk2.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_e_tk2.h"
 #include "d/actor/d_a_e_tk_ball.h"
@@ -36,13 +38,10 @@ enum Mode {  // Not sure if these are correct...
     /* 0xC */ MODE_TK2_WAIT01,
 };
 
-/* 807BBF40-807BBF44 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 807BBF50-807BBF6C 000018 001C+00 6/6 0/0 0/0 .bss             l_HIO */
 static daE_TK2_HIO_c l_HIO;
 
-/* 807BA56C-807BA5B4 0000EC 0048+00 1/1 0/0 0/0 .text            __ct__13daE_TK2_HIO_cFv */
 daE_TK2_HIO_c::daE_TK2_HIO_c() {
     field_0x04 = -1;
     mRadiusScale = 2.3f;
@@ -52,7 +51,6 @@ daE_TK2_HIO_c::daE_TK2_HIO_c() {
     mSpeedModifier2 = 25.0f;
 }
 
-/* 807BA5B4-807BA660 000134 00AC+00 4/4 0/0 0/0 .text            anm_init__FP11e_tk2_classifUcf */
 static void anm_init(e_tk2_class* i_this, int i_index, f32 i_morf, u8 i_attr, f32 i_rate) {
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes("E_tk2", i_index);
 
@@ -60,7 +58,6 @@ static void anm_init(e_tk2_class* i_this, int i_index, f32 i_morf, u8 i_attr, f3
     i_this->mAnim = i_index;
 }
 
-/* 807BA660-807BA6D0 0001E0 0070+00 1/0 0/0 0/0 .text            daE_TK2_Draw__FP11e_tk2_class */
 static int daE_TK2_Draw(e_tk2_class* i_this) {
     J3DModel* model = i_this->mpMorf->getModel();
 
@@ -70,8 +67,6 @@ static int daE_TK2_Draw(e_tk2_class* i_this) {
     return 1;
 }
 
-/* 807BA6D0-807BA7A8 000250 00D8+00 1/1 0/0 0/0 .text other_bg_check__FP11e_tk2_classP10fopAc_ac_c
- */
 static int other_bg_check(e_tk2_class* i_this, fopAc_ac_c* i_ac) {
     fopAc_ac_c* actor = i_this;
     dBgS_LinChk line_check;
@@ -92,7 +87,6 @@ static int other_bg_check(e_tk2_class* i_this, fopAc_ac_c* i_ac) {
     }
 }
 
-/* 807BA7A8-807BA824 000328 007C+00 2/2 0/0 0/0 .text            pl_check__FP11e_tk2_classfs */
 static int pl_check(e_tk2_class* i_this, f32 i_limit, s16 i_max_diff) {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
 
@@ -106,7 +100,6 @@ static int pl_check(e_tk2_class* i_this, f32 i_limit, s16 i_max_diff) {
     return 0;
 }
 
-/* 807BA824-807BA940 0003A4 011C+00 1/1 0/0 0/0 .text            damage_check__FP11e_tk2_class */
 static void damage_check(e_tk2_class* i_this) {
     if (i_this->mInvincibilityTimer == 0) {
         i_this->mStts.Move();
@@ -147,7 +140,6 @@ static void damage_check(e_tk2_class* i_this) {
     }
 }
 
-/* 807BA940-807BA9E8 0004C0 00A8+00 1/1 0/0 0/0 .text            e_tk2_wait_0__FP11e_tk2_class */
 static void e_tk2_wait_0(e_tk2_class* i_this) {
     i_this->mAttentionOFF = true;
 
@@ -168,7 +160,6 @@ static void e_tk2_wait_0(e_tk2_class* i_this) {
     cLib_addCalcAngleS2(&i_this->shape_angle.y, i_this->mSomeAngle, 0x10, 0x400);
 }
 
-/* 807BA9E8-807BACF8 000568 0310+00 2/1 0/0 0/0 .text            e_tk2_find__FP11e_tk2_class */
 static void e_tk2_find(e_tk2_class* i_this) {
     switch (i_this->mMode) {
     case MODE_TK2_NONE:
@@ -244,7 +235,6 @@ static void e_tk2_find(e_tk2_class* i_this) {
     cLib_addCalcAngleS2(&(i_this)->shape_angle.y, i_this->mPlayerAngleY, 4, 0x800);
 }
 
-/* 807BACF8-807BAED0 000878 01D8+00 1/1 0/0 0/0 .text            e_tk2_attack__FP11e_tk2_class */
 static void e_tk2_attack(e_tk2_class* i_this) {
     switch (i_this->mMode) {
     case MODE_TK2_NONE:
@@ -281,7 +271,6 @@ static void e_tk2_attack(e_tk2_class* i_this) {
     cLib_addCalcAngleS2(&i_this->shape_angle.y, i_this->mPlayerAngleY, 4, 0x800);
 }
 
-/* 807BAED0-807BAF60 000A50 0090+00 1/1 0/0 0/0 .text            e_tk2_s_damage__FP11e_tk2_class */
 static void e_tk2_s_damage(e_tk2_class* i_this) {
     switch (i_this->mMode) {
     case MODE_TK2_NONE:
@@ -298,7 +287,6 @@ static void e_tk2_s_damage(e_tk2_class* i_this) {
     }
 }
 
-/* 807BAF60-807BB028 000AE0 00C8+00 1/1 0/0 0/0 .text            e_tk2_damage__FP11e_tk2_class */
 static void e_tk2_damage(e_tk2_class* i_this) {
     i_this->mInvincibilityTimer = 6;
     i_this->mAttentionOFF = true;
@@ -318,7 +306,6 @@ static void e_tk2_damage(e_tk2_class* i_this) {
     }
 }
 
-/* 807BB028-807BB128 000BA8 0100+00 1/1 0/0 0/0 .text            action__FP11e_tk2_class */
 static void action(e_tk2_class* i_this) {
     fopAc_ac_c* actor = i_this;
     i_this->mPlayerAngleY = fopAcM_searchPlayerAngleY(actor);
@@ -353,7 +340,6 @@ static void action(e_tk2_class* i_this) {
     }
 }
 
-/* 807BB128-807BB7E4 000CA8 06BC+00 2/1 0/0 0/0 .text            daE_TK2_Execute__FP11e_tk2_class */
 static int daE_TK2_Execute(e_tk2_class* i_this) {
     cXyz cStack_94;
     cXyz cStack_a0;
@@ -455,7 +441,7 @@ static int daE_TK2_Execute(e_tk2_class* i_this) {
         i_this->attention_info.flags = 0;
     } else {
         fopAcM_OnStatus(i_this, 0);
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     }
 
     MTXCopy(model->getAnmMtx(2), *calc_mtx);
@@ -470,17 +456,14 @@ static int daE_TK2_Execute(e_tk2_class* i_this) {
     return 1;
 }
 
-/* 807BB7E4-807BB7EC 001364 0008+00 1/0 0/0 0/0 .text            daE_TK2_IsDelete__FP11e_tk2_class
- */
 static int daE_TK2_IsDelete(e_tk2_class* i_this) {
     return 1;
 }
 
-/* 807BB7EC-807BB854 00136C 0068+00 1/0 0/0 0/0 .text            daE_TK2_Delete__FP11e_tk2_class */
 static int daE_TK2_Delete(e_tk2_class* i_this) {
     dComIfG_resDelete(&i_this->mPhaseReq, "E_tk2");
     if (i_this->mInitHIO) {
-        hioInit = false;
+        hio_set = false;
     }
     if (i_this->heap != NULL) {
         i_this->mpMorf->stopZelAnime();
@@ -488,7 +471,6 @@ static int daE_TK2_Delete(e_tk2_class* i_this) {
     return 1;
 }
 
-/* 807BB854-807BB94C 0013D4 00F8+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* a_this) {
     e_tk2_class* i_this = static_cast<e_tk2_class*>(a_this);
 
@@ -504,22 +486,20 @@ static int useHeapInit(fopAc_ac_c* a_this) {
     return 1;
 }
 
-/* 807BBE5C-807BBE9C 000034 0040+00 1/1 0/0 0/0 .data            cc_sph_src$4256 */
-static dCcD_SrcSph cc_sph_src = {
-    {
-        {0x0, {{0x0, 0x0, 0xd}, {0xd8fbfdff, 0x3}, 0x75}},  // mObj
-        {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},                 // mGObjAt
-        {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x2},                 // mGObjTg
-        {0x0},                                              // mGObjCo
-    },                                                      // mObjInf
-    {
-        {{0.0f, 0.0f, 0.0f}, 40.0f}  // mSph
-    }  // mSphAttr
-};
-
-/* 807BB94C-807BBC00 0014CC 02B4+00 1/0 0/0 0/0 .text            daE_TK2_Create__FP10fopAc_ac_c */
 static int daE_TK2_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_tk2_class);
+    static dCcD_SrcSph cc_sph_src = {
+        {
+            {0x0, {{0x0, 0x0, 0xd}, {0xd8fbfdff, 0x3}, 0x75}},  // mObj
+            {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x0},                 // mGObjAt
+            {dCcD_SE_NONE, 0x0, 0x0, 0x0, 0x2},                 // mGObjTg
+            {0x0},                                              // mGObjCo
+        },                                                      // mObjInf
+        {
+            {{0.0f, 0.0f, 0.0f}, 40.0f}  // mSph
+        }  // mSphAttr
+    };
+
+    fopAcM_ct(i_this, e_tk2_class);
     e_tk2_class* a_this = static_cast<e_tk2_class*>(i_this);
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&a_this->mPhaseReq, "E_tk2");
@@ -532,13 +512,13 @@ static int daE_TK2_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (hioInit == false) {
+        if (hio_set == false) {
             a_this->mInitHIO = true;
-            hioInit = true;
+            hio_set = true;
             l_HIO.field_0x04 = -1;
         }
 
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
 
         fopAcM_SetMtx(a_this, a_this->mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -100.0f, -100.0f, -100.0f);
@@ -565,14 +545,12 @@ static int daE_TK2_Create(fopAc_ac_c* i_this) {
     return phase;
 }
 
-/* 807BBE9C-807BBEBC -00001 0020+00 1/0 0/0 0/0 .data            l_daE_TK2_Method */
 static actor_method_class l_daE_TK2_Method = {
     (process_method_func)daE_TK2_Create,  (process_method_func)daE_TK2_Delete,
     (process_method_func)daE_TK2_Execute, (process_method_func)daE_TK2_IsDelete,
     (process_method_func)daE_TK2_Draw,
 };
 
-/* 807BBEBC-807BBEEC -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_TK2 */
 extern actor_process_profile_definition g_profile_E_TK2 = {
     fpcLy_CURRENT_e,         // mLayerID
     7,                       // mListID

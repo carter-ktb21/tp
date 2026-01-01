@@ -10,7 +10,8 @@
  *
  * @details
  *
- */
+*/
+
 class obj_web0_class : public fopAc_ac_c {
 public:
     /* 0x568 */ request_of_phase_process_class mPhase;
@@ -36,8 +37,8 @@ STATIC_ASSERT(sizeof(obj_web0_class) == 0x73C);
 
 class daObj_Web0_HIO_c {
 public:
-    /* 80D3452C */ daObj_Web0_HIO_c();
-    /* 80D350E4 */ virtual ~daObj_Web0_HIO_c() {}
+    daObj_Web0_HIO_c();
+    virtual ~daObj_Web0_HIO_c() {}
 
     /* 0x4 */ s8 field_0x4;
 };

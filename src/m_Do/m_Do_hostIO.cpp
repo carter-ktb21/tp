@@ -1,7 +1,8 @@
 #include "m_Do/m_Do_hostIO.h"
-#include <dolphin.h>
+#include "JSystem/JHostIO/JORServer.h"
+#include <dolphin/dolphin.h>
 
-#ifdef DEBUG
+#if DEBUG
 
 mDoHIO_root_c mDoHIO_root;
 

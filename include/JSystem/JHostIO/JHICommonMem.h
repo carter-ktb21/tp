@@ -11,6 +11,12 @@ inline u32 JHIhtonl(u32 v) {
 #endif
 }
 
+inline u32 JHIntohl(u32 v) {
+    return v;
+}
+
+template<typename T> class JHIComPortManager;
+
 template <typename T>
 struct JHITag {
     JHITag(u32 tag) {
@@ -18,25 +24,25 @@ struct JHITag {
         mp_data = NULL;
     }
 
-    // NONMATCHING - stack stuff
-    const void* send(const void* param_0, s32 param_1) {
-        u32 sp10 = JHIhtonl(m_tag);
-        u32 sp14 = JHIhtonl(param_1);
+    s32 send(const void* param_0, s32 param_1) {
+        u32 sp10[2];
+        sp10[0] = JHIhtonl(m_tag);
+        sp10[1] = JHIhtonl(param_1);
 
-        if (mp_data->sendBegin() >= param_1 + 8) {
-            mp_data->sendCont(&sp10, 8);
-            mp_data->sendCont(param_0, param_1);
-            mp_data->sendEnd();
+        if (mp_data->port.sendBegin() >= param_1 + 8) {
+            mp_data->port.sendCont(sp10, 8);
+            mp_data->port.sendCont(param_0, param_1);
+            mp_data->port.sendEnd();
         }
 
-        return param_0;
+        return param_1;
     }
-    
+
     virtual ~JHITag() {}
-    virtual void receive(const char*, s32);
+    virtual void receive(const char*, s32) {}
 
     /* 0x4 */ u32 m_tag;
-    /* 0x8 */ T* mp_data;
+    /* 0x8 */ JHIComPortManager<T>* mp_data;
 };
 
 class JHIMemBuf;

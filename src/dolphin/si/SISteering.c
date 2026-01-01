@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/si.h>
 
 #include "__si.h"
@@ -80,7 +80,7 @@ s32 SIResetSteering(s32 chan) {
     SISteeringControl* sc;
     s32 ret;
 
-#ifndef DEBUG
+#if !DEBUG
     u32 padding;
 #endif
 

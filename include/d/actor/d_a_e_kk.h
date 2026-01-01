@@ -11,43 +11,43 @@
 /**
  * @ingroup actors-enemies
  * @class daE_KK_c
- * @brief Chilfos
+ * @brief Chilfos (Koori no Kenshi)
  *
  * @details Enemy - Ice Knight
  *
  */
 class daE_KK_c : public fopEn_enemy_c {
 public:
-    /* 806FA75C */ int ctrlJoint(J3DJoint*, J3DModel*);
-    /* 806FA7FC */ static int JointCallBack(J3DJoint*, int);
-    /* 806FA848 */ int draw();
-    /* 806FAA68 */ void setBck(int, u8, f32, f32);
-    /* 806FAB14 */ void setWeaponBck(int, u8, f32, f32);
-    /* 806FABC0 */ bool mCutTypeCheck(int);
-    /* 806FAC80 */ void setActionMode(int, int);
-    /* 806FAC8C */ void damage_check();
-    /* 806FB2EC */ void nextActionCheck();
-    /* 806FB4F4 */ bool way_gake_check();
-    /* 806FB6C0 */ void mDeadEffSet(cXyz&);
-    /* 806FB7D8 */ void executeWait();
-    /* 806FB908 */ void executeIcicleWait();
-    /* 806FBB1C */ void executeWalk();
-    /* 806FBE98 */ void executeSpearThrow();
-    /* 806FC370 */ void executeBackWalk();
-    /* 806FC75C */ void executeYoroke();
-    /* 806FC8F4 */ void executeGuard();
-    /* 806FCA28 */ void executeDamage();
-    /* 806FCC34 */ void executeAttack();
-    /* 806FD068 */ void executeDead();
-    /* 806FD294 */ void executeWeaponMove();
-    /* 806FD930 */ void action();
-    /* 806FDD0C */ void mtx_set();
-    /* 806FDF0C */ void weapon_mtx_set();
-    /* 806FE0B8 */ void cc_set();
-    /* 806FE2A8 */ int execute();
-    /* 806FE3E0 */ int _delete();
-    /* 806FE480 */ int CreateHeap();
-    /* 806FE6B8 */ int create();
+    int ctrlJoint(J3DJoint*, J3DModel*);
+    static int JointCallBack(J3DJoint*, int);
+    int draw();
+    void setBck(int, u8, f32, f32);
+    void setWeaponBck(int, u8, f32, f32);
+    bool mCutTypeCheck(int);
+    void setActionMode(int, int);
+    void damage_check();
+    void nextActionCheck();
+    bool way_gake_check();
+    void mDeadEffSet(cXyz&);
+    void executeWait();
+    void executeIcicleWait();
+    void executeWalk();
+    void executeSpearThrow();
+    void executeBackWalk();
+    void executeYoroke();
+    void executeGuard();
+    void executeDamage();
+    void executeAttack();
+    void executeDead();
+    void executeWeaponMove();
+    void action();
+    void mtx_set();
+    void weapon_mtx_set();
+    void cc_set();
+    int execute();
+    int _delete();
+    int CreateHeap();
+    int create();
 
 private:
     /* 0x05AC */ request_of_phase_process_class mPhaseReq;
@@ -96,21 +96,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daE_KK_c) == 0x13d4);
-
-class daE_KK_HIO_c : public JORReflexible {
-public:
-    /* 806FA70C */ daE_KK_HIO_c();
-    /* 806FF0F0 */ virtual ~daE_KK_HIO_c() {}
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ s8 field_0x4;
-    /* 0x08 */ f32 model_size;
-    /* 0x0C */ f32 spear_throw_range;
-    /* 0x10 */ f32 direct_attack_range;
-    /* 0x14 */ f32 default_moving_range;
-    /* 0x18 */ s16 escape_time;
-    /* 0x1A */ u8 range_display;
-};
 
 #endif /* D_A_E_KK_H */

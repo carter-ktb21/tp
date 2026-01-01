@@ -3,15 +3,24 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_nan.h"
 #include "SSystem/SComponent/c_xyz.h"
 #include "d/d_menu_insect.h"
 #include "d/d_cc_uty.h"
 #include "d/d_com_inf_game.h"
 
-UNK_REL_DATA
+class daObj_NanHIO_c {
+public:
+    daObj_NanHIO_c();
+    virtual ~daObj_NanHIO_c() {}
 
-/* 80CA32D0-80CA3310 000020 0040+00 0/1 0/0 0/0 .data cc_sph_src__25@unnamed@d_a_obj_nan_cpp@ */
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 field_0x8;
+    /* 0x0C */ f32 field_0xc;
+};
+
 static dCcD_SrcSph cc_sph_src = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x014040, 0x43}, 0}}, // mObj
@@ -24,15 +33,12 @@ static dCcD_SrcSph cc_sph_src = {
     } // mSphAttr
 };
 
-/* 80CA05AC-80CA05D4 0000EC 0028+00 1/1 0/0 0/0 .text            __ct__14daObj_NanHIO_cFv */
 daObj_NanHIO_c::daObj_NanHIO_c() {
     field_0x4 = -1;
     field_0xc = 1.2f;
     field_0x8 = 1.2f;
 }
 
-/* 80CA05D4-80CA0678 000114 00A4+00 9/9 0/0 0/0 .text
- * setAction__10daObjNAN_cFM10daObjNAN_cFPCvPv_v                */
 void daObjNAN_c::setAction(actionFunc action) {
     if (mAction != NULL) {
         field_0x7d0 = -1;
@@ -44,20 +50,17 @@ void daObjNAN_c::setAction(actionFunc action) {
     (this->*mAction)();
 }
 
-/* ############################################################################################## */
-/* 80CA31C0-80CA31C8 000004 0008+00 0/1 0/0 0/0 .rodata          l_nan_brk_index */
 static int const l_nan_brk_index[2] = {
     13, 12,
 };
 
-/* 80CA31C8-80CA31D0 00000C 0008+00 0/1 0/0 0/0 .rodata          l_nan_btk_index */
 static int const l_nan_btk_index[2] = {
     17, 16,
 };
 
 inline int daObjNAN_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("I_Nan", 9);
-    JUT_ASSERT(254, modelData != 0);
+    JUT_ASSERT(254, modelData != NULL);
     mMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL,
                                        (J3DAnmTransform*)dComIfG_getObjectRes("I_Nan", 6), 2, 1.0f,
                                        0, -1, &mCreatureSound, 0, 0x11000284);
@@ -87,25 +90,21 @@ inline int daObjNAN_c::CreateHeap() {
     return 1;
 }
 
-/* 80CA0678-80CA08EC 0001B8 0274+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     return static_cast<daObjNAN_c*>(i_this)->CreateHeap();
 }
 
-/* 80CA0934-80CA0954 000474 0020+00 1/0 0/0 0/0 .text            daObjNAN_Create__FP10fopAc_ac_c */
 static int daObjNAN_Create(fopAc_ac_c* i_this) {
     fopAcM_GetID(i_this);
     return static_cast<daObjNAN_c*>(i_this)->create();
 }
 
-/* 80CA0954-80CA0978 000494 0024+00 1/0 0/0 0/0 .text            daObjNAN_Delete__FP10daObjNAN_c */
 static int daObjNAN_Delete(daObjNAN_c* i_this) {
     fopAcM_GetID(i_this);
     static_cast<daObjNAN_c*>(i_this)->_delete();
     return 1;
 }
 
-/* 80CA0978-80CA0A2C 0004B8 00B4+00 1/1 0/0 0/0 .text            nan_posMove__10daObjNAN_cFv */
 void daObjNAN_c::nan_posMove() {
     if (field_0x7fc == 0) {
         cLib_chaseAngleS(&field_0x7d4.x, field_0x7da.x, 0x100);
@@ -119,7 +118,6 @@ void daObjNAN_c::nan_posMove() {
     current.pos += posOffset;
 }
 
-/* 80CA0A2C-80CA0D54 00056C 0328+00 4/0 0/0 0/0 .text            turn__10daObjNAN_cFv */
 void daObjNAN_c::turn() {
     if (field_0x7d0 == 0) {
         speedF = 0.0f;
@@ -162,7 +160,6 @@ void daObjNAN_c::turn() {
     }
 }
 
-/* 80CA0D9C-80CA0E7C 0008DC 00E0+00 2/2 0/0 0/0 .text            nan_WalkAnm__10daObjNAN_cFv */
 u8 daObjNAN_c::nan_WalkAnm() {
     if (mMorf->getFrame() == 39.0f ||
         mMorf->getFrame() == 79.0f)
@@ -179,7 +176,6 @@ u8 daObjNAN_c::nan_WalkAnm() {
     return 0;
 }
 
-/* 80CA0E7C-80CA1184 0009BC 0308+00 1/0 0/0 0/0 .text            wait__10daObjNAN_cFv */
 void daObjNAN_c::wait() {
     if (field_0x7d0 == 0) {
         field_0x7d0++;
@@ -218,7 +214,6 @@ void daObjNAN_c::wait() {
     }
 }
 
-/* 80CA1184-80CA1904 000CC4 0780+00 4/0 0/0 0/0 .text            walk__10daObjNAN_cFv */
 void daObjNAN_c::walk() {
     if (field_0x7d0 == 0) {
         field_0x7e0 = 180;
@@ -315,13 +310,12 @@ void daObjNAN_c::walk() {
     }
 }
 
-/* 80CA1904-80CA1A20 001444 011C+00 1/0 0/0 0/0 .text            bin_wait__10daObjNAN_cFv */
 void daObjNAN_c::bin_wait() {
     if (field_0x7d0 == 0) {
         fopAcM_OnStatus(this, 0x4000);
         mDraw = false;
         field_0x7d0++;
-    } else if (field_0x7d0 != -1 && field_0x56C != 0) {
+    } else if (field_0x7d0 != -1 && field_0x56c != 0) {
         current.angle.y = daPy_getPlayerActorClass()->current.angle.y - 0x4000;
         if (strcmp("R_SP160", dComIfGp_getStartStageName()) == 0 &&
             dComIfGp_getStartStageRoomNo() == 3)
@@ -335,7 +329,6 @@ void daObjNAN_c::bin_wait() {
     }
 }
 
-/* 80CA1A20-80CA1B50 001560 0130+00 1/0 0/0 0/0 .text            bin_action__10daObjNAN_cFv */
 void daObjNAN_c::bin_action() {
     if (field_0x7d0 == 0) {
         mDraw = true;
@@ -367,7 +360,6 @@ void daObjNAN_c::bin_action() {
     }
 }
 
-/* 80CA1B50-80CA1D5C 001690 020C+00 6/6 0/0 0/0 .text            nan_setParticle__10daObjNAN_cFv */
 void daObjNAN_c::nan_setParticle() {
     if (CheckZ()) {
         cLib_chaseF(&field_0x7e8, 0.0f, 1.0f);
@@ -399,7 +391,6 @@ void daObjNAN_c::nan_setParticle() {
     }
 }
 
-/* 80CA1D5C-80CA1F60 00189C 0204+00 1/0 0/0 0/0 .text            hook__10daObjNAN_cFv */
 void daObjNAN_c::hook() {
     if (field_0x7d0 == 0) {
         daPy_py_c* player = daPy_getPlayerActorClass();
@@ -414,7 +405,7 @@ void daObjNAN_c::hook() {
         if (mDraw) {
             nan_setParticle();
         }
-        if (!fopAcM_checkStatus(this, 0x100000)) {
+        if (!fopAcM_CheckStatus(this, 0x100000)) {
             setAction(&daObjNAN_c::drop);
         }
         dBgS_LinChk linkChk;
@@ -434,7 +425,6 @@ void daObjNAN_c::hook() {
     }
 }
 
-/* 80CA1F60-80CA2368 001AA0 0408+00 1/0 0/0 0/0 .text            boomerang__10daObjNAN_cFv */
 void daObjNAN_c::boomerang() {
     if (field_0x7d0 == 0) {
         mSph.SetTgType(0);
@@ -488,7 +478,6 @@ void daObjNAN_c::boomerang() {
     }
 }
 
-/* 80CA2368-80CA2658 001EA8 02F0+00 3/0 0/0 0/0 .text            drop__10daObjNAN_cFv */
 void daObjNAN_c::drop() {
     if (field_0x7d0 == 0) {
         speedF = 0.0f;
@@ -526,7 +515,6 @@ void daObjNAN_c::drop() {
     }
 }
 
-/* 80CA2658-80CA270C 002198 00B4+00 1/1 0/0 0/0 .text            hit_check__10daObjNAN_cFv */
 void daObjNAN_c::hit_check() {
     dCcU_AtInfo local_40;
     mStts.Move();
@@ -540,7 +528,6 @@ void daObjNAN_c::hit_check() {
     }
 }
 
-/* 80CA270C-80CA276C 00224C 0060+00 1/1 0/0 0/0 .text            action__10daObjNAN_cFv */
 void daObjNAN_c::action() {
     (this->*mAction)();
     shape_angle = current.angle;
@@ -549,16 +536,13 @@ void daObjNAN_c::action() {
     }
 }
 
-/* ############################################################################################## */
-/* 80CA3270-80CA3274 0000B4 0002+02 0/1 0/0 0/0 .rodata          l_nan_itemno */
 static u8 const l_nan_itemno[2] = {
-    0xC8, 0xC9,
+    fpcNm_ITEM_M_NANAFUSHI, fpcNm_ITEM_F_NANAFUSHI,
 };
 
-/* 80CA276C-80CA2904 0022AC 0198+00 1/1 0/0 0/0 .text            execute__10daObjNAN_cFv */
 int daObjNAN_c::execute() {
     if (ChkGetDemo()) {
-        field_0x57C = field_0x578 + 10000.0f;
+        field_0x57c = field_0x578 + 10000.0f;
         mCreatureSound.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
         Insect_GetDemoMain();
         nan_setParticle();
@@ -589,15 +573,12 @@ int daObjNAN_c::execute() {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 80CA3498-80CA349C 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 l_hio_init;
+static u8 hio_set;
 
-/* 80CA2904-80CA296C 002444 0068+00 1/1 0/0 0/0 .text            _delete__10daObjNAN_cFv */
 int daObjNAN_c::_delete() {
     dComIfG_resDelete(&mPhase, "I_Nan");
     if (field_0x7fd != 0) {
-        l_hio_init = 0;
+        hio_set = 0;
     }
     if (heap != NULL) {
         mMorf->stopZelAnime();
@@ -605,7 +586,6 @@ int daObjNAN_c::_delete() {
     return 1;
 }
 
-/* 80CA296C-80CA29EC 0024AC 0080+00 1/1 0/0 0/0 .text            setBaseMtx__10daObjNAN_cFv */
 void daObjNAN_c::setBaseMtx() {
     J3DModel* model = mMorf->getModel();
     mDoMtx_stack_c::transS(current.pos);
@@ -633,7 +613,7 @@ inline int daObjNAN_c::draw() {
                 cStack_88.y += 20.0f;
                 gndChk.SetPos(&cStack_88);
                 f32 groundCross = dComIfG_Bgsp().GroundCross(&gndChk);
-                if (groundCross != 1000000000.0f) {
+                if (groundCross != G_CM3D_F_INF) {
                     dComIfGd_setSimpleShadow(&current.pos, groundCross, 15.0f, gndChk, 0, -0.6f, 
                                              dDlst_shadowControl_c::getSimpleTex());
                 }
@@ -643,30 +623,26 @@ inline int daObjNAN_c::draw() {
     return 1;
 }
 
-/* 80CA29EC-80CA2B48 00252C 015C+00 1/0 0/0 0/0 .text            daObjNAN_Draw__FP10daObjNAN_c */
 static int daObjNAN_Draw(daObjNAN_c* i_this) {
     return i_this->draw();
 }
 
-/* 80CA2B48-80CA2B68 002688 0020+00 2/1 0/0 0/0 .text            daObjNAN_Execute__FP10daObjNAN_c */
 static int daObjNAN_Execute(daObjNAN_c* i_this) {
     return i_this->execute();
 }
 
-/* ############################################################################################## */
-/* 80CA3294-80CA3298 0000D8 0004+00 0/1 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x0199, 0x019A};
+static u16 const l_musiya_num[2] = {
+    0x0199, /* dSv_event_flag_c::F_0409 - Misc. - Phasmid (M) */
+    0x019A, /* dSv_event_flag_c::F_0410 - Misc. - Phasmid (F) */
+};
 
-/* 80CA3298-80CA329C 0000DC 0004+00 0/1 0/0 0/0 .rodata          l_heapsize */
 static u16 const l_heapsize[2] = {0x0EE0, 0x0EC0};
 
-/* 80CA34A8-80CA34B8 000018 0010+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_NanHIO_c l_HIO;
 
-/* 80CA2B68-80CA2FDC 0026A8 0474+00 1/1 0/0 0/0 .text            create__10daObjNAN_cFv */
 int daObjNAN_c::create() {
     u8 uVar6 = (fopAcM_GetParam(this) & 0xf00) >> 8;
-    fopAcM_SetupActor(this, daObjNAN_c);
+    fopAcM_ct(this, daObjNAN_c);
     int rv = dComIfG_resLoad(&mPhase, "I_Nan");
     if (rv == cPhs_COMPLEATE_e) {
         OS_REPORT("NAN PARAM %x\n", fopAcM_GetParam(this));
@@ -710,8 +686,8 @@ int daObjNAN_c::create() {
             return cPhs_ERROR_e;
         }
         OS_REPORT("/////////////// I_NAN SET OK //////////\n");
-        if (l_hio_init == 0) {
-            l_hio_init = 1;
+        if (hio_set == 0) {
+            hio_set = 1;
             field_0x7fd = 1;
             l_HIO.field_0x4 = -1;
         }
@@ -739,13 +715,10 @@ int daObjNAN_c::create() {
     return rv;
 }
 
-/* 80CA30C8-80CA30D0 002C08 0008+00 1/0 0/0 0/0 .text            daObjNAN_IsDelete__FP10daObjNAN_c
- */
 static int daObjNAN_IsDelete(daObjNAN_c* i_this) {
     return 1;
 }
 
-/* 80CA33D0-80CA33F0 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjNAN_Method */
 static actor_method_class l_daObjNAN_Method = {
     (process_method_func)daObjNAN_Create,
     (process_method_func)daObjNAN_Delete,
@@ -754,7 +727,6 @@ static actor_method_class l_daObjNAN_Method = {
     (process_method_func)daObjNAN_Draw,
 };
 
-/* 80CA33F0-80CA3420 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Nan */
 extern actor_process_profile_definition g_profile_Obj_Nan = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -771,5 +743,3 @@ extern actor_process_profile_definition g_profile_Obj_Nan = {
   fopAc_ENV_e,            // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-/* 80CA32A0-80CA32A0 0000E4 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

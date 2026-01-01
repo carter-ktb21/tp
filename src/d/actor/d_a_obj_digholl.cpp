@@ -3,13 +3,14 @@
  * Object - Dig Hole
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_digholl.h"
 #include "d/actor/d_a_player.h"
 #include "f_op/f_op_actor_mng.h"
 
-/* 80BDC618-80BDC73C 000078 0124+00 1/1 0/0 0/0 .text            create__14daObjDigholl_cFv */
 int daObjDigholl_c::create() {
-    fopAcM_SetupActor(this, daObjDigholl_c);
+    fopAcM_ct(this, daObjDigholl_c);
     field_0x569 = fopAcM_GetParam(this);
     field_0x56a = fopAcM_GetParam(this) >> 8;
     field_0x56c = fopAcM_GetParam(this) >> 0x10 & 0xff;
@@ -28,28 +29,24 @@ int daObjDigholl_c::create() {
     return cPhs_COMPLEATE_e;
 }
 
-/* 80BDC73C-80BDC75C 00019C 0020+00 1/0 0/0 0/0 .text            daObjDigholl_Create__FP10fopAc_ac_c */
 static int daObjDigholl_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjDigholl_c*>(i_this)->create();
 }
 
-/* 80BDC75C-80BDC7B0 0001BC 0054+00 1/1 0/0 0/0 .text            __dt__14daObjDigholl_cFv */
 daObjDigholl_c::~daObjDigholl_c() {}
 
-/* 80BDC7B0-80BDC7D8 000210 0028+00 1/0 0/0 0/0 .text daObjDigholl_Delete__FP14daObjDigholl_c */
 static int daObjDigholl_Delete(daObjDigholl_c* i_this) {
     i_this->~daObjDigholl_c();
     return 1;
 }
 
-/* 80BDC7D8-80BDCAEC 000238 0314+00 1/1 0/0 0/0 .text            execute__14daObjDigholl_cFv */
 int daObjDigholl_c::execute() {
     daPy_py_c* player = daPy_getLinkPlayerActorClass();
     if (player->checkNowWolf() &&
         (field_0x56a == 0xff || fopAcM_isSwitch(this, field_0x56a)) &&
         (f32)fabsf(current.pos.y - player->current.pos.y) < 40.0f)
     {
-        attention_info.flags = 0x80;
+        attention_info.flags = fopAc_AttnFlag_ETC_e;
     } else {
         attention_info.flags = 0;
     }
@@ -86,29 +83,24 @@ int daObjDigholl_c::execute() {
     return 1;
 }
 
-/* 80BDCAEC-80BDCB0C 00054C 0020+00 1/0 0/0 0/0 .text daObjDigholl_Execute__FP14daObjDigholl_c */
 static int daObjDigholl_Execute(daObjDigholl_c* i_this) {
     return i_this->execute();
 }
 
-/* 80BDCB0C-80BDCB14 00056C 0008+00 1/1 0/0 0/0 .text            draw__14daObjDigholl_cFv */
 int daObjDigholl_c::draw() {
     return 1;
 }
 
-/* 80BDCB14-80BDCB34 000574 0020+00 1/0 0/0 0/0 .text daObjDigholl_Draw__FP14daObjDigholl_c */
 static int daObjDigholl_Draw(daObjDigholl_c* i_this) {
     return i_this->draw();
 }
 
-/* 80BDCB80-80BDCBA0 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjDigholl_Method */
 static actor_method_class l_daObjDigholl_Method = {
     (process_method_func)daObjDigholl_Create,  (process_method_func)daObjDigholl_Delete,
     (process_method_func)daObjDigholl_Execute, (process_method_func)NULL,
     (process_method_func)daObjDigholl_Draw,
 };
 
-/* 80BDCBA0-80BDCBD0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Digholl */
 extern actor_process_profile_definition g_profile_Obj_Digholl = {
     fpcLy_CURRENT_e,
     3,

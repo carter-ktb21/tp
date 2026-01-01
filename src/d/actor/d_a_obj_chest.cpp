@@ -4,6 +4,8 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_chest.h"
 #include "JSystem/JKernel/JKRHeap.h"
 #include "SSystem/SComponent/c_math.h"
@@ -11,16 +13,13 @@
 #include "d/d_bg_s.h"
 #include "d/d_bg_w.h"
 #include "d/d_procname.h"
-#include "dol2asm.h"
 #include "d/actor/d_a_obj_eff.h"
 
-/* 80BC8EF8-80BC8F34 000078 003C+00 1/1 0/0 0/0 .text            initBaseMtx__12daObjChest_cFv */
 void daObjChest_c::initBaseMtx() {
     mpModel->setBaseScale(scale);
     setBaseMtx();
 }
 
-/* 80BC9FFC-80BCA040 000000 0044+00 3/3 0/0 0/0 .rodata          l_cyl_src */
 const static dCcD_SrcCyl l_cyl_src = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0xffffffff, 0x0}, 0x19}},  // mObj
@@ -35,7 +34,6 @@ const static dCcD_SrcCyl l_cyl_src = {
     }                        // mCyl
 };
 
-/* 80BC8F34-80BC9088 0000B4 0154+00 2/2 0/0 0/0 .text            setBaseMtx__12daObjChest_cFv */
 void daObjChest_c::setBaseMtx() {
     mRandomRotX -= 0x8C;
     mModifyRotX += mRandomRotX;
@@ -60,7 +58,6 @@ void daObjChest_c::setBaseMtx() {
     MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
 }
 
-/* 80BC9088-80BC9240 000208 01B8+00 1/0 0/0 0/0 .text            Create__12daObjChest_cFv */
 int daObjChest_c::Create() {
     u8 switch_no = getSwNo();
     if (fopAcM_isSwitch(this, switch_no)) {
@@ -94,28 +91,8 @@ int daObjChest_c::Create() {
     return 1;
 }
 
-/* 80BCA0B8-80BCA0C4 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80BCA0C4-80BCA0D8 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 80BCA0D8-80BCA0DC -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "H_Tansu";
 
-/* 80BC9240-80BC92B0 0003C0 0070+00 1/0 0/0 0/0 .text            CreateHeap__12daObjChest_cFv */
 int daObjChest_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 4);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -125,9 +102,8 @@ int daObjChest_c::CreateHeap() {
     return 0;
 }
 
-/* 80BC92B0-80BC93F0 000430 0140+00 1/1 0/0 0/0 .text            create__12daObjChest_cFv */
 int daObjChest_c::create() {
-    fopAcM_SetupActor(this, daObjChest_c);
+    fopAcM_ct(this, daObjChest_c);
 
     int phase = dComIfG_resLoad(&mPhaseReq, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
@@ -139,8 +115,6 @@ int daObjChest_c::create() {
     return phase;
 }
 
-/* 80BC970C-80BC9764 00088C 0058+00 1/0 0/0 0/0 .text            Execute__12daObjChest_cFPPA3_A4_f
- */
 int daObjChest_c::Execute(Mtx** i_mtx) {
     mLifeCycleLength++;
     action();
@@ -149,7 +123,6 @@ int daObjChest_c::Execute(Mtx** i_mtx) {
     return 1;
 }
 
-/* 80BC9764-80BC9808 0008E4 00A4+00 1/1 0/0 0/0 .text            action__12daObjChest_cFv */
 void daObjChest_c::action() {
     typedef void (daObjChest_c::*actionFunc)();
     static actionFunc l_func[3] = {
@@ -161,7 +134,6 @@ void daObjChest_c::action() {
     (this->*l_func[mAction])();
 }
 
-/* 80BC9808-80BC9BF0 000988 03E8+00 1/0 0/0 0/0 .text            actionWait__12daObjChest_cFv */
 void daObjChest_c::actionWait() {
     daPy_py_c* player = daPy_getPlayerActorClass();
 
@@ -203,7 +175,6 @@ void daObjChest_c::actionWait() {
     }
 }
 
-/* 80BC9BF0-80BC9DFC 000D70 020C+00 1/0 0/0 0/0 .text            actionMove__12daObjChest_cFv */
 void daObjChest_c::actionMove() {
     if (cLib_calcTimer<u8>(&mMoveStartTimer) == 0) {
         mExtraRot.x += 0x80;
@@ -235,12 +206,10 @@ void daObjChest_c::actionMove() {
     }
 }
 
-/* 80BC9DFC-80BC9E00 000F7C 0004+00 1/0 0/0 0/0 .text            actionEnd__12daObjChest_cFv */
 void daObjChest_c::actionEnd() {
     /* empty function */
 }
 
-/* 80BC9E00-80BC9EA4 000F80 00A4+00 1/0 0/0 0/0 .text            Draw__12daObjChest_cFv */
 int daObjChest_c::Draw() {
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpModel, &tevStr);
@@ -250,43 +219,33 @@ int daObjChest_c::Draw() {
     return 1;
 }
 
-/* 80BC9EA4-80BC9ED8 001024 0034+00 1/0 0/0 0/0 .text            Delete__12daObjChest_cFv */
 int daObjChest_c::Delete() {
     dComIfG_resDelete(&mPhaseReq, l_arcName);
     return 1;
 }
 
-/* 80BC9ED8-80BC9F04 001058 002C+00 1/0 0/0 0/0 .text            daObjChest_Draw__FP12daObjChest_c
- */
 static int daObjChest_Draw(daObjChest_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 80BC9F04-80BC9F24 001084 0020+00 1/0 0/0 0/0 .text daObjChest_Execute__FP12daObjChest_c */
 static int daObjChest_Execute(daObjChest_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 80BC9F24-80BC9F44 0010A4 0020+00 1/0 0/0 0/0 .text            daObjChest_Delete__FP12daObjChest_c
- */
 static int daObjChest_Delete(daObjChest_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 80BC9F44-80BC9F64 0010C4 0020+00 1/0 0/0 0/0 .text            daObjChest_Create__FP10fopAc_ac_c
- */
 static int daObjChest_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjChest_c*>(i_this)->create();
 }
 
-/* 80BCA124-80BCA144 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjChest_Method */
 static actor_method_class l_daObjChest_Method = {
     (process_method_func)daObjChest_Create,  (process_method_func)daObjChest_Delete,
     (process_method_func)daObjChest_Execute, (process_method_func)NULL,
     (process_method_func)daObjChest_Draw,
 };
 
-/* 80BCA144-80BCA174 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Chest */
 extern actor_process_profile_definition g_profile_Obj_Chest = {
     fpcLy_CURRENT_e,         // mLayerID
     3,                       // mListID

@@ -3,11 +3,10 @@
  * 
 */
 
-#include "d/actor/d_a_obj_testcube.h"
-#include "dol2asm.h"
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
-/* ############################################################################################## */
-/* 80D0BB60-80D0BB90 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_TestCube */
+#include "d/actor/d_a_obj_testcube.h"
+
 extern actor_process_profile_definition g_profile_Obj_TestCube = {
   fpcLy_CURRENT_e,        // mLayerID
   3,                      // mListID

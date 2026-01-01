@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_swhit0.h"
 #include "d/d_com_inf_game.h"
 
@@ -11,20 +13,16 @@
 #define COLOR_RED    2
 #define COLOR_GREEN  3
 
-/* 804873BC-804873C0 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "S_swHit00";
 
-/* 80485FF8-80486004 000078 000C+00 9/9 0/0 0/0 .text            getSwNo__10daSwhit0_cFv */
 int daSwhit0_c::getSwNo() {
     return fopAcM_GetParam(this) & 0xFF;
 }
 
-/* 80486004-80486010 000084 000C+00 1/1 0/0 0/0 .text            getSwNo2__10daSwhit0_cFv */
 int daSwhit0_c::getSwNo2() {
     return home.angle.z & 0xFF;
 }
 
-/* 80486010-8048602C 000090 001C+00 3/3 0/0 0/0 .text            getEvNo__10daSwhit0_cFv */
 u8 daSwhit0_c::getEvNo() {
     u8 evNo = (fopAcM_GetParam(this) >> 8) & 0xFF;
     if (evNo == 0xFE) {
@@ -34,7 +32,6 @@ u8 daSwhit0_c::getEvNo() {
     return evNo;
 }
 
-/* 8048602C-80486048 0000AC 001C+00 1/1 0/0 0/0 .text            getTimer__10daSwhit0_cFv */
 u8 daSwhit0_c::getTimer() {
     u8 timer = (fopAcM_GetParam(this) >> 16) & 0xFF;
     if (timer == 0xFF) {
@@ -44,7 +41,6 @@ u8 daSwhit0_c::getTimer() {
     return timer;
 }
 
-/* 80486048-80486064 0000C8 001C+00 4/4 0/0 0/0 .text            getType__10daSwhit0_cFv */
 u8 daSwhit0_c::getType() {
     u8 type = (fopAcM_GetParam(this) >> 30);
     if (type >= 4) {
@@ -54,7 +50,6 @@ u8 daSwhit0_c::getType() {
     return type;
 }
 
-/* 80486064-804860EC 0000E4 0088+00 1/1 0/0 0/0 .text            makeEventId__10daSwhit0_cFv */
 void daSwhit0_c::makeEventId() {
     u8 prm = (fopAcM_GetParam(this) >> 8) & 0xFF;
     if (prm == 0xFE) {
@@ -64,10 +59,9 @@ void daSwhit0_c::makeEventId() {
     }
 }
 
-/* 804860EC-80486214 00016C 0128+00 1/1 0/0 0/0 .text            CreateHeap__10daSwhit0_cFv */
 int daSwhit0_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 8);
-    JUT_ASSERT(193, modelData != 0);
+    JUT_ASSERT(193, modelData != NULL);
 
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000202);
     if (mpModel == NULL) {
@@ -85,7 +79,6 @@ int daSwhit0_c::CreateHeap() {
     return 1;
 }
 
-/* 804873C0-80487400 000004 0040+00 1/1 0/0 0/0 .data            l_sph_src */
 static dCcD_SrcSph l_sph_src = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0xd8fafdff, 0x51}, 0x0}}, // mObj
@@ -98,7 +91,6 @@ static dCcD_SrcSph l_sph_src = {
     } // mSphAttr
 };
 
-/* 80486214-80486390 000294 017C+00 1/1 0/0 0/0 .text            CreateInit__10daSwhit0_cFv */
 int daSwhit0_c::CreateInit() {
     shape_angle.z = 0;
     current.angle.z = 0;
@@ -127,16 +119,14 @@ int daSwhit0_c::CreateInit() {
     return 1;
 }
 
-/* 80486390-804863B0 000410 0020+00 1/1 0/0 0/0 .text            CheckCreateHeap__FP10fopAc_ac_c */
 static int CheckCreateHeap(fopAc_ac_c* i_this) {
     return ((daSwhit0_c*)i_this)->CreateHeap();
 }
 
-/* 804863B0-804865B4 000430 0204+00 1/1 0/0 0/0 .text            create__10daSwhit0_cFv */
 int daSwhit0_c::create() {
-    fopAcM_SetupActor(this, daSwhit0_c);
+    fopAcM_ct(this, daSwhit0_c);
 
-    if (subtype != 0) {
+    if (argument != 0) {
         setDrawMtx();
         cMtx_copy(mDoMtx_stack_c::get(), field_0x5a8);
         fopAcM_SetMtx(this, field_0x5a8);
@@ -160,7 +150,6 @@ int daSwhit0_c::create() {
     return phase_state;
 }
 
-/* 8048668C-80486704 00070C 0078+00 2/2 0/0 0/0 .text            checkHit__10daSwhit0_cFv */
 bool daSwhit0_c::checkHit() {
     if (dComIfGp_event_runCheck()) {
         return false;
@@ -174,7 +163,6 @@ bool daSwhit0_c::checkHit() {
     return false;
 }
 
-/* 80486704-80486788 000784 0084+00 1/1 0/0 0/0 .text            setCombackTimer__10daSwhit0_cFv */
 void daSwhit0_c::setCombackTimer() {
     if (getType() == 0 || getType() == 3) {
         mCombackTimer = 0;
@@ -185,7 +173,6 @@ void daSwhit0_c::setCombackTimer() {
     }
 }
 
-/* 80486788-80486800 000808 0078+00 1/1 0/0 0/0 .text            endCombackTimer__10daSwhit0_cFv */
 int daSwhit0_c::endCombackTimer() {
     if (mCombackTimer > 0) {
         if (!fopAcM_isSwitch(this, getSwNo2()) && --mCombackTimer == 0) {
@@ -196,20 +183,17 @@ int daSwhit0_c::endCombackTimer() {
     return 0;
 }
 
-/* 80486800-80486858 000880 0058+00 4/4 0/0 0/0 .text            onSwitch__10daSwhit0_cFv */
 void daSwhit0_c::onSwitch() {
     fopAcM_onSwitch(this, getSwNo());
     onFlag(1);
     setCombackTimer();
 }
 
-/* 80486858-804868A8 0008D8 0050+00 4/4 0/0 0/0 .text            offSwitch__10daSwhit0_cFv */
 void daSwhit0_c::offSwitch() {
     fopAcM_offSwitch(this, getSwNo());
     offFlag(1);
 }
 
-/* 804868A8-804869C4 000928 011C+00 2/2 0/0 0/0 .text            DemoProc__10daSwhit0_cFv */
 int daSwhit0_c::DemoProc() {
     static char* action_table[2] = {
         "WAIT",
@@ -235,7 +219,6 @@ int daSwhit0_c::DemoProc() {
     return 1;
 }
 
-/* 804869C4-80486ABC 000A44 00F8+00 2/2 0/0 0/0 .text            orderEvent__10daSwhit0_cFv */
 void daSwhit0_c::orderEvent() {
     if (strcmp(dComIfGp_getStartStageName(), "D_MN06") == 0 && dComIfGp_getStartStageRoomNo() == 4 && fopAcM_isSwitch(this, 50) && fopAcM_isSwitch(this, 51)) {
         fopAcM_orderOtherEventId(this, mEventId, getEvNo(), 0xFFFF, 0, 1);
@@ -246,7 +229,6 @@ void daSwhit0_c::orderEvent() {
     eventInfo.onCondition(2);
 }
 
-/* 80486ABC-80486BC4 000B3C 0108+00 1/1 0/0 0/0 .text            actionOffWait__10daSwhit0_cFv */
 int daSwhit0_c::actionOffWait() {
     if (checkHit()) {
         fopAcM_seStart(this, JA_SE_OBJ_HIT_SHOCK_SWITCH, 0);
@@ -270,7 +252,6 @@ int daSwhit0_c::actionOffWait() {
     return 1;
 }
 
-/* 80486BC4-80486C28 000C44 0064+00 1/1 0/0 0/0 .text            actionToOnReady__10daSwhit0_cFv */
 int daSwhit0_c::actionToOnReady() {
     if (dComIfGp_event_runCheck()) {
         return 1;
@@ -287,7 +268,6 @@ int daSwhit0_c::actionToOnReady() {
     return 1;
 }
 
-/* 80486C28-80486CE4 000CA8 00BC+00 1/1 0/0 0/0 .text            actionToOnOrder__10daSwhit0_cFv */
 int daSwhit0_c::actionToOnOrder() {
     if (eventInfo.checkCommandDemoAccrpt()) {
         if (dComIfGp_evmng_isMapToolCamera(getEvNo())) {
@@ -307,7 +287,6 @@ int daSwhit0_c::actionToOnOrder() {
     return 1;
 }
 
-/* 80486CE4-80486D88 000D64 00A4+00 1/1 0/0 0/0 .text            actionToOnDemo__10daSwhit0_cFv */
 int daSwhit0_c::actionToOnDemo() {
     if (dComIfGp_evmng_endCheck(mEventId)) {
         if (fopAcM_isSwitch(this, getSwNo())) {
@@ -324,7 +303,6 @@ int daSwhit0_c::actionToOnDemo() {
     return 1;
 }
 
-/* 80486D88-80486EC4 000E08 013C+00 1/1 0/0 0/0 .text            actionToOnDemo2__10daSwhit0_cFv */
 int daSwhit0_c::actionToOnDemo2() {
     if (mReadyTimer != 0) {
         mReadyTimer--;
@@ -355,7 +333,6 @@ int daSwhit0_c::actionToOnDemo2() {
     return 1;
 }
 
-/* 80486EC4-80486FC0 000F44 00FC+00 1/1 0/0 0/0 .text            actionSwWait__10daSwhit0_cFv */
 int daSwhit0_c::actionSwWait() {
     if (dComIfGp_event_runCheck()) {
         return 0;
@@ -376,7 +353,6 @@ int daSwhit0_c::actionSwWait() {
     return 1;
 }
 
-/* 80486FC0-804870E0 001040 0120+00 1/1 0/0 0/0 .text            actionOnWait__10daSwhit0_cFv */
 int daSwhit0_c::actionOnWait() {
     if (!fopAcM_isSwitch(this, getSwNo()) || endCombackTimer()) {
         offSwitch();
@@ -402,7 +378,6 @@ int daSwhit0_c::actionOnWait() {
     return 1;
 }
 
-/* 804870E0-80487138 001160 0058+00 1/1 0/0 0/0 .text            setDrawMtx__10daSwhit0_cFv */
 void daSwhit0_c::setDrawMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::XYZrotM(current.angle.x, current.angle.y, current.angle.z);
@@ -434,9 +409,8 @@ int daSwhit0_c::draw() {
     return 1;
 }
 
-/* 80487138-80487228 0011B8 00F0+00 1/0 0/0 0/0 .text            daSwhit0_Draw__FP10daSwhit0_c */
 static int daSwhit0_Draw(daSwhit0_c* i_this) {
-    if (i_this->subtype != 0) {
+    if (i_this->argument != 0) {
         return 1;
     }
 
@@ -475,7 +449,6 @@ int daSwhit0_c::execute() {
     return 1;
 }
 
-/* 80487228-804872E4 0012A8 00BC+00 2/0 0/0 0/0 .text            daSwhit0_Execute__FP10daSwhit0_c */
 static int daSwhit0_Execute(daSwhit0_c* i_this) {
     i_this->mBck.play();
     i_this->execute();
@@ -483,21 +456,18 @@ static int daSwhit0_Execute(daSwhit0_c* i_this) {
     return 1;
 }
 
-/* 804872E4-8048732C 001364 0048+00 1/0 0/0 0/0 .text            daSwhit0_Delete__FP10daSwhit0_c */
 static int daSwhit0_Delete(daSwhit0_c* i_this) {
-    if (i_this->subtype == 0) {
+    if (i_this->argument == 0) {
         dComIfG_resDelete(i_this, l_arcName);
     }
 
     return 1;
 }
 
-/* 8048732C-8048734C 0013AC 0020+00 1/0 0/0 0/0 .text            daSwhit0_Create__FP10fopAc_ac_c */
 static int daSwhit0_Create(fopAc_ac_c* i_this) {
     return ((daSwhit0_c*)i_this)->create();
 }
 
-/* 8048743C-8048745C -00001 0020+00 1/0 0/0 0/0 .data            l_daSwhit0_Method */
 static actor_method_class l_daSwhit0_Method = {
     (process_method_func)daSwhit0_Create,
     (process_method_func)daSwhit0_Delete,
@@ -506,7 +476,6 @@ static actor_method_class l_daSwhit0_Method = {
     (process_method_func)daSwhit0_Draw,
 };
 
-/* 8048745C-8048748C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_SWHIT0 */
 extern actor_process_profile_definition g_profile_SWHIT0 = {
   fpcLy_CURRENT_e,       // mLayerID
   8,                     // mListID

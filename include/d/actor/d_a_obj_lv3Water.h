@@ -26,19 +26,19 @@ public:
 
     daLv3Water_c() : dEvLib_callback_c(this) {}
 
-    /* 80C58838 */ void setBaseMtx();
-    /* 80C5891C */ virtual int CreateHeap();
-    /* 80C58ABC */ int create();
-    /* 80C58D68 */ virtual int Execute(Mtx**);
-    /* 80C58E20 */ void effectSet();
-    /* 80C596F4 */ void mode_proc_wait();
-    /* 80C59754 */ void mode_init_levelCtrl();
-    /* 80C597FC */ void mode_proc_levelCtrl();
-    /* 80C598BC */ virtual int Draw();
-    /* 80C59AA0 */ virtual int Delete();
+    void setBaseMtx();
+    virtual int CreateHeap();
+    int create();
+    virtual int Execute(Mtx**);
+    void effectSet();
+    void mode_proc_wait();
+    void mode_init_levelCtrl();
+    void mode_proc_levelCtrl();
+    virtual int Draw();
+    virtual int Delete();
 
-    /* 80C59D80 */ virtual ~daLv3Water_c();
-    /* 80C59AE0 */ virtual bool eventStart();
+    virtual ~daLv3Water_c() {}
+    virtual bool eventStart();
 
     int getParam() { return fpcM_GetParam(this) >> 0xC & 0x0FFF; }
     int getParamSw() { return fpcM_GetParam(this) & 0xFF; }
@@ -65,16 +65,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daLv3Water_c) == 0x628);
-
-class daLv3Water_HIO_c : public mDoHIO_entry_c {
-public:
-    /* 80C587CC */ daLv3Water_HIO_c();
-    /* 80C59C34 */ virtual ~daLv3Water_HIO_c();
-
-    void genMessage(JORMContext*);
-
-    /* 0x00 */ /* vtable */
-    /* 0x04 */ u8 field_0x04;
-};
 
 #endif /* D_A_OBJ_LV3WATER_H */

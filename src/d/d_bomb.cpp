@@ -3,6 +3,8 @@
  * dolzel2 - Bomb
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_bomb.h"
 #include "d/actor/d_a_nbomb.h"
 

@@ -33,30 +33,6 @@ enum daE_FZ_Action {
 };
 
 /**
- * @brief Temporary HIO struct to get a match. Remove later. 
- * 
- */
-struct daE_FZ_HIO_c_tmp {
-    void* vtable;
-    /* 0x04 */ s8 field_0x04;
-    /* 0x05 */ u8 field_0x05[0x06 - 0x05];
-    /* 0x06 */ s16 field_0x06;
-    /* 0x08 */ s16 field_0x08;
-    /* 0x0A */ u8 field_0x0A[0x0C - 0x0A];
-    /* 0x0C */ f32 field_0x0c;
-    /* 0x10 */ f32 field_0x10;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-    /* 0x1C */ f32 field_0x1c;
-    /* 0x20 */ f32 field_0x20;
-    /* 0x24 */ f32 field_0x24;
-    /* 0x28 */ f32 field_0x28;
-    /* 0x2C */ f32 field_0x2c;
-    /* 0x30 */ f32 field_0x30;
-    /* 0x34 */ f32 field_0x34;
-};
-
-/**
  * @ingroup actors-enemies
  * @class daE_FZ_c
  * @brief Mini Freezard
@@ -66,26 +42,26 @@ struct daE_FZ_HIO_c_tmp {
  */
 class daE_FZ_c : public fopEn_enemy_c {
 public:
-    /* 806BE9D4 */ s32 draw();
-    /* 806BEAF8 */ void setActionMode(int, int);
-    /* 806BEB04 */ void setReflectAngle();
-    /* 806BEBA0 */ void mBoundSoundset();
-    /* 806BEC08 */ void deadnextSet(bool);
-    /* 806BED34 */ void damage_check();
-    /* 806BF444 */ bool way_gake_check();
-    /* 806BF58C */ void executeWait();
-    /* 806BF8E8 */ void executeMove();
-    /* 806BFA64 */ void executeAttack();
-    /* 806BFB60 */ void executeDamage();
-    /* 806BFF94 */ void executeRollMove();
-    /* 806C0224 */ void action();
-    /* 806C06DC */ void mtx_set();
-    /* 806C0760 */ void cc_set();
-    /* 806C08C4 */ s32 execute();
-    /* 806C0B20 */ void demoDelete();
-    /* 806C0B94 */ s32 _delete();
-    /* 806C0C28 */ s32 CreateHeap();
-    /* 806C0CD0 */ s32 create();
+    s32 draw();
+    void setActionMode(int, int);
+    void setReflectAngle();
+    void mBoundSoundset();
+    void deadnextSet(bool);
+    void damage_check();
+    bool way_gake_check();
+    void executeWait();
+    void executeMove();
+    void executeAttack();
+    void executeDamage();
+    void executeRollMove();
+    void action();
+    void mtx_set();
+    void cc_set();
+    s32 execute();
+    void demoDelete();
+    s32 _delete();
+    s32 CreateHeap();
+    s32 create();
 
 private:
     /* 0x5AC */ request_of_phase_process_class mPhaseReq;   /**< Phase request used when creating the actor. */
@@ -142,29 +118,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daE_FZ_c) == 0xC24);
-
-class daE_FZ_HIO_c {
-public:
-    /* 806BE94C */ daE_FZ_HIO_c();
-    /* 806C1440 */ virtual ~daE_FZ_HIO_c() {};
-
-public:
-    /* 0x04 */ s8 field_0x04;
-    /* 0x05 */ u8 field_0x05[0x06 - 0x05];
-    /* 0x06 */ s16 field_0x06;
-    /* 0x08 */ s16 field_0x08;
-    /* 0x0A */ u8 field_0x0A[0x0C - 0x0A];
-    /* 0x0C */ f32 field_0x0c;
-    /* 0x10 */ f32 field_0x10;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-    /* 0x1C */ f32 field_0x1c;
-    /* 0x20 */ f32 field_0x20;
-    /* 0x24 */ f32 field_0x24;
-    /* 0x28 */ f32 field_0x28;
-    /* 0x2C */ f32 field_0x2c;
-    /* 0x30 */ f32 field_0x30;
-    /* 0x34 */ f32 field_0x34;
-};
 
 #endif /* D_A_E_FZ_H */

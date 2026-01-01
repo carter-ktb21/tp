@@ -3,21 +3,20 @@
  * Spider Web (Wall)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_web0.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_bg_w.h"
-#include "dol2asm.h"
+#include "d/d_s_play.h"
 #include "f_op/f_op_actor_mng.h"
 #include "global.h"
 
-/* 80D3452C-80D34544 0000EC 0018+00 1/1 0/0 0/0 .text            __ct__16daObj_Web0_HIO_cFv */
 daObj_Web0_HIO_c::daObj_Web0_HIO_c() {
     field_0x4 = -1;
 }
 
-/* 80D34544-80D345C0 000104 007C+00 1/0 0/0 0/0 .text            daObj_Web0_Draw__FP14obj_web0_class
- */
 static int daObj_Web0_Draw(obj_web0_class* i_this) {
     g_env_light.settingTevStruct(16, &i_this->current.pos, &i_this->tevStr);
     g_env_light.setLightTevColorType_MAJI(i_this->mpModel, &i_this->tevStr);
@@ -27,7 +26,6 @@ static int daObj_Web0_Draw(obj_web0_class* i_this) {
     return 1;
 }
 
-/* 80D345C0-80D34794 000180 01D4+00 1/1 0/0 0/0 .text            damage_check__FP14obj_web0_class */
 static void damage_check(obj_web0_class* i_this) {
     i_this->mStts.Move();
 
@@ -36,7 +34,7 @@ static void damage_check(obj_web0_class* i_this) {
     }
 
     if (i_this->mSphCc.ChkTgHit()) {
-        i_this->mHitTimer = 6;
+        i_this->mHitTimer = 6 * SCALE_TIME;
 
         if (i_this->mSphCc.GetTgHitObj()->ChkAtType(AT_TYPE_IRON_BALL)) {
             i_this->mDeleteTimer = 41;
@@ -54,25 +52,24 @@ static void damage_check(obj_web0_class* i_this) {
             return;
         }
 
-        i_this->mReboundTimer = 20;
+        i_this->mReboundTimer = 20 * SCALE_TIME;
         fopAcM_seStart(i_this, Z2SE_OBJ_WEB_BOUND_L, 0);
     }
 
     if (i_this->mSphCc.ChkCoHit()) {
-        i_this->mReboundTimer = 10;
+        i_this->mReboundTimer = 10 * SCALE_TIME;
     }
 
     if (daPy_getPlayerActorClass()->checkFrontRollCrash() &&
         fopAcM_searchPlayerDistanceXZ(i_this) < i_this->scale.x * 260.0f) {
-        i_this->mReboundTimer = 20;
+        i_this->mReboundTimer = 20 * SCALE_TIME;
         fopAcM_seStart(i_this, Z2SE_OBJ_WEB_BOUND_L, 0);
     }
 }
 
-/* 80D34794-80D34B24 000354 0390+00 2/1 0/0 0/0 .text daObj_Web0_Execute__FP14obj_web0_class */
-// NONMATCHING - reg alloc
 static int daObj_Web0_Execute(obj_web0_class* i_this) {
-    fopAc_ac_c* player = dComIfGp_getPlayer(0);
+    fopAc_ac_c* base_p = i_this;
+    fopAc_ac_c* player = (fopAc_ac_c*) dComIfGp_getPlayer(0);
 
     i_this->field_0x57c++;
 
@@ -88,20 +85,21 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
 
     if (i_this->mDeleteTimer != 0) {
         if (i_this->mDeleteTimer == 1) {
-            cXyz sp30(i_this->scale);
-            sp30.z = 1.0f;
+            cXyz sp20(base_p->scale);
+            sp20.z = 1.0f;
 
-            dComIfGp_particle_set(0x840C, &i_this->current.pos, &i_this->shape_angle, &sp30);
+            dComIfGp_particle_set(0x840C, &base_p->current.pos, &base_p->shape_angle, &sp20);
             i_this->mpBrk->setPlaySpeed(1.0f);
         } else if (i_this->mDeleteTimer == 41) {
             i_this->mpBrk->setPlaySpeed(1.0f);
         }
 
-        fopAcM_seStartLevel(i_this, Z2SE_OBJ_WEB_BURN, 0);
+        fopAcM_seStartLevel(base_p, Z2SE_OBJ_WEB_BURN, 0);
 
         if (i_this->mDeleteTimer == 40 || i_this->mDeleteTimer == 80) {
-            dComIfGs_onSwitch(fopAcM_GetParam(i_this) >> 0x18, fopAcM_GetRoomNo(i_this));
-            fopAcM_delete(i_this);
+            u32 sp0C = (fopAcM_GetParam(base_p) & 0xff000000) >> 24;
+            dComIfGs_onSwitch(sp0C, fopAcM_GetRoomNo(base_p));
+            fopAcM_delete(base_p);
         }
 
         i_this->mDeleteTimer++;
@@ -109,10 +107,10 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
         damage_check(i_this);
     }
 
-    mDoMtx_stack_c::transS(i_this->current.pos.x, i_this->current.pos.y, i_this->current.pos.z);
-    mDoMtx_stack_c::YrotM(i_this->shape_angle.y);
-    mDoMtx_stack_c::ZrotM(i_this->shape_angle.z);
-    mDoMtx_stack_c::scaleM(i_this->scale.x, i_this->scale.y, i_this->scale.z);
+    mDoMtx_stack_c::transS(base_p->current.pos.x, base_p->current.pos.y, base_p->current.pos.z);
+    mDoMtx_stack_c::YrotM((s16)base_p->shape_angle.y);
+    mDoMtx_stack_c::ZrotM((s16)base_p->shape_angle.z);
+    mDoMtx_stack_c::scaleM(base_p->scale.x, base_p->scale.y, base_p->scale.z);
 
     i_this->mpBrk->play();
     i_this->mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
@@ -121,59 +119,57 @@ static int daObj_Web0_Execute(obj_web0_class* i_this) {
         i_this->mReboundTimer--;
     }
 
-    i_this->scale.z = i_this->mReboundTimer * cM_ssin(i_this->mReboundTimer * 0x1900) * 0.075f;
+    base_p->scale.z =
+        (i_this->mReboundTimer * DELTA_TIME) * cM_ssin((i_this->mReboundTimer * DELTA_TIME) * 0x1900) * (0.075f + TREG_F(0));
 
-    s16 tmp = (fopAcM_searchPlayerAngleY(i_this) + 0x4000) - i_this->shape_angle.y;
-    if (tmp < 0) {
+    s16 var_r28 = fopAcM_searchPlayerAngleY(base_p);
+    s16 sp08 = (var_r28 + 0x4000) - base_p->shape_angle.y;
+    if (sp08 < 0) {
         mDoMtx_stack_c::YrotM(-0x8000);
     }
     MTXCopy(mDoMtx_stack_c::get(), i_this->mMtx);
 
     i_this->mpBgW->Move();
 
-    cXyz sp3C(i_this->current.pos);
+    cXyz sp14(base_p->current.pos);
     if (i_this->field_0x57c & 1) {
-        sp3C.y -= i_this->scale.x * 70.0f;
+        sp14.y -= base_p->scale.x * 70.0f;
     }
 
-    s16 svar9 = i_this->shape_angle.y;
-    if (tmp < 0) {
-        svar9 += -0x8000;
+    var_r28 = base_p->shape_angle.y;
+    if (sp08 < 0) {
+        var_r28 += (s16) -0x8000;
     }
 
-    svar9 -= player->shape_angle.y;
-    if ((svar9 < 20000 && svar9 > -20000) || i_this->mHitTimer != 0) {
-        sp3C.x += 20000.0f;
+    var_r28 -= player->shape_angle.y;
+    if ((var_r28 < 20000 && var_r28 > -20000) || i_this->mHitTimer != 0) {
+        sp14.x += 20000.0f;
     }
 
-    i_this->mSphCc.SetC(sp3C);
-    i_this->mSphCc.SetR(i_this->scale.x * 150.0f);
+    i_this->mSphCc.SetC(sp14);
+    i_this->mSphCc.SetR((150.0f + TREG_F(2)) * base_p->scale.x);
 
     dComIfG_Ccsp()->Set(&i_this->mSphCc);
     return 1;
 }
 
-/* 80D34B24-80D34B2C 0006E4 0008+00 1/0 0/0 0/0 .text daObj_Web0_IsDelete__FP14obj_web0_class */
 static int daObj_Web0_IsDelete(obj_web0_class* i_this) {
     return 1;
 }
 
-/* 80D35290-80D35294 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 data_80D35290;
+static u8 hio_set;
 
-/* 80D34B2C-80D34B94 0006EC 0068+00 1/0 0/0 0/0 .text daObj_Web0_Delete__FP14obj_web0_class */
 static int daObj_Web0_Delete(obj_web0_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "Obj_web0");
 
     if (i_this->field_0x739) {
-        data_80D35290 = 0;
+        hio_set = 0;
     }
 
     dComIfG_Bgsp().Release(i_this->mpBgW);
     return 1;
 }
 
-/* 80D34B94-80D34D44 000754 01B0+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     obj_web0_class* _this = static_cast<obj_web0_class*>(i_this);
 
@@ -211,13 +207,10 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80D352A0-80D352A8 000018 0008+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_Web0_HIO_c l_HIO;
 
-/* 80D34D8C-80D35054 00094C 02C8+00 1/0 0/0 0/0 .text            daObj_Web0_Create__FP10fopAc_ac_c
- */
 static int daObj_Web0_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, obj_web0_class);
+    fopAcM_ct(i_this, obj_web0_class);
     obj_web0_class* _this = static_cast<obj_web0_class*>(i_this);
 
     static dCcD_SrcSph cc_sph_src = {
@@ -258,9 +251,9 @@ static int daObj_Web0_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (!data_80D35290) {
+        if (!hio_set) {
             _this->field_0x739 = 1;
-            data_80D35290 = true;
+            hio_set = true;
             l_HIO.field_0x4 = -1;
         }
 
@@ -287,14 +280,12 @@ static int daObj_Web0_Create(fopAc_ac_c* i_this) {
     return phase;
 }
 
-/* 80D35208-80D35228 -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Web0_Method */
 static actor_method_class l_daObj_Web0_Method = {
     (process_method_func)daObj_Web0_Create,  (process_method_func)daObj_Web0_Delete,
     (process_method_func)daObj_Web0_Execute, (process_method_func)daObj_Web0_IsDelete,
     (process_method_func)daObj_Web0_Draw,
 };
 
-/* 80D35228-80D35258 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_WEB0 */
 extern actor_process_profile_definition g_profile_OBJ_WEB0 = {
     fpcLy_CURRENT_e,
     3,

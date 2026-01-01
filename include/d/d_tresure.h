@@ -50,21 +50,21 @@ public:
         /* 0x8 */ u8 mNumber;
     };
 
-    /* 8009BBD8 */ static int createWork();
-    /* 8009BC18 */ static void create();
-    /* 8009BC60 */ static void remove();
-    /* 8009BC6C */ static void reset();
-    /* 8009BCB4 */ static void addData(dTres_c::list_class*, s8);
-    /* 8009BE28 */ static void checkTreasureBox(dTres_c::data_s*);
-    /* 8009C168 */ static void onStatus(u8, int, int);
-    /* 8009C1F0 */ static void offStatus(u8, int, int);
-    /* 8009C27C */ static bool getBossIconFloorNo(int*);
-    /* 8009C360 */ static typeGroupData_c* getFirstData(u8);
-    /* 8009C39C */ static typeGroupData_c* getNextData(dTres_c::typeGroupData_c*);
-    /* 8009C3B4 */ static typeGroupData_c* getNextData(dTres_c::typeGroupData_c const*);
-    /* 8009C3CC */ static void setPosition(int, u8, Vec const*, int);
-    /* 8009C49C */ static int getTypeGroupNoToType(u8);
-    /* 8009C4B0 */ static u8 getTypeToTypeGroupNo(u8);
+    static int createWork();
+    static void create();
+    static void remove();
+    static void reset();
+    static void addData(dTres_c::list_class*, s8);
+    static void checkTreasureBox(dTres_c::data_s*);
+    static void onStatus(u8, int, int);
+    static void offStatus(u8, int, int);
+    static bool getBossIconFloorNo(int*);
+    static typeGroupData_c* getFirstData(u8);
+    static typeGroupData_c* getNextData(dTres_c::typeGroupData_c*);
+    static typeGroupData_c* getNextData(dTres_c::typeGroupData_c const*);
+    static void setPosition(int, u8, Vec const*, int);
+    static int getTypeGroupNoToType(u8);
+    static u8 getTypeToTypeGroupNo(u8);
 
     static int getTypeGroupNumber(int index) {
         return mTypeGroupListAll[index].mNumber;
@@ -90,10 +90,30 @@ public:
         setPosition(i_tboxNo, 11, i_pos, -1);
     }
 
+    static void offStatus(int param_0, int i_flag) {
+        offStatus(0, param_0, i_flag);
+    }
+
+    static typeGroupData_c* getTypeGroupData() {
+        return mTypeGroupData;
+    }
+
     static u8 const typeToTypeGroup[17][2];
     static type_group_list mTypeGroupListAll[17];
     static typeGroupData_c* mTypeGroupData;
     static u16 mNum;
+
+    static void setNpcYkmPosition(int param_1, Vec* param_2) {
+        setPosition(param_1, 13, param_2, -1);
+    }
+
+    static void setNpcYkwPosition(int param_1, Vec* param_2) {
+        setPosition(param_1, 14, param_2, -1);
+    }
+
+    static void setCoachPosition(int param_1, const Vec* param_2, int param_3) {
+        setPosition(param_1, 10, param_2, param_3);
+    }
 };
 
 #endif /* D_D_TRESURE_H */

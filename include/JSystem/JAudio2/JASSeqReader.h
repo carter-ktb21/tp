@@ -9,13 +9,13 @@
  */
 class JASSeqReader {
 public:
-    /* 80296108 */ void init();
-    /* 80296148 */ void init(void*);
-    /* 8029618C */ bool call(u32);
-    /* 802961CC */ bool loopStart(u32);
-    /* 80296210 */ bool loopEnd();
-    /* 8029627C */ bool ret();
-    /* 802962B0 */ int readMidiValue();
+    void init();
+    void init(void*);
+    bool call(u32);
+    bool loopStart(u32);
+    bool loopEnd();
+    bool ret();
+    int readMidiValue();
 
     void jump(u32 param_1) {
         field_0x04 = field_0x00 + param_1;
@@ -37,11 +37,23 @@ public:
     u8* getCur() { return field_0x04; }
     u32 readByte() { return *field_0x04++; }
     u32 read16() {
+#ifdef __MWERKS__
         return *((u16*)field_0x04)++;
+#else
+        u16* value = (u16*)field_0x04;
+        field_0x04 += 2;
+        return *value;
+#endif
     }
     u32 read24() {
         field_0x04--;
+#ifdef __MWERKS__
         return (*((u32*)field_0x04)++) & 0x00ffffff;
+#else
+        u32* value = (u32*)field_0x04;
+        field_0x04 += 4;
+        return (*value) & 0x00ffffff;
+#endif
     }
     u16 getLoopCount() const { 
         if (field_0x08 == 0) {

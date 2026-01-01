@@ -131,7 +131,6 @@ protected:
     JKRArchive(s32, EMountMode);
 
 public:
-    virtual ~JKRArchive();
     bool getDirEntry(SDirEntry*, u32) const;
     void* getIdxResource(u32);
     void* getResource(u16);
@@ -167,6 +166,7 @@ public:
     /* vt[17] */ virtual void* fetchResource(void*, u32, SDIFileEntry*, u32*) = 0;
     /* vt[18] */ virtual void setExpandSize(SDIFileEntry*, u32);
     /* vt[19] */ virtual u32 getExpandSize(SDIFileEntry*) const;
+    virtual ~JKRArchive();
 
     u32 countFile() const { return mArcInfoBlock->num_file_entries; }
     s32 countDirectory() const { return mArcInfoBlock->num_nodes; }
@@ -202,12 +202,12 @@ public:
 
     static JKRCompression convertAttrToCompressionType(u32 attr) {
 #define JKRARCHIVE_ATTR_COMPRESSION 0x04
-#define JKRARCHIVE_ATTR_YAY0 0x80
+#define JKRARCHIVE_ATTR_YAZ0 0x80
 
         JKRCompression compression;
-        if (FLAG_ON(attr, JKRARCHIVE_ATTR_COMPRESSION)) {
+        if (!(attr & JKRARCHIVE_ATTR_COMPRESSION)) {
             compression = COMPRESSION_NONE;
-        } else if (!FLAG_ON(attr, JKRARCHIVE_ATTR_YAY0)) {
+        } else if (attr & JKRARCHIVE_ATTR_YAZ0) {
             compression = COMPRESSION_YAZ0;
         } else {
             compression = COMPRESSION_YAY0;

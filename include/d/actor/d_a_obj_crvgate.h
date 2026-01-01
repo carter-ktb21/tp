@@ -1,9 +1,11 @@
 #ifndef D_A_OBJ_CRVGATE_H
 #define D_A_OBJ_CRVGATE_H
 
-#include "d/d_bg_s_acch.h"
+#include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
+#include "d/actor/d_a_obj_eff.h"
 #include "d/d_bg_s_movebg_actor.h"
-#include "d/d_cc_d.h"
+#include "d/d_cc_uty.h"
 
 /**
  * @ingroup actors-objects
@@ -19,34 +21,34 @@
  */
 class daObjCRVGATE_c : public dBgS_MoveBgActor {
 public:
-    /* 80BD0398 */ void initCcCylinder();
-    /* 80BD0500 */ void setCcCylinder();
-    /* 80BD069C */ int checkOpen();
-    /* 80BD0880 */ void actionStartEvent();
-    /* 80BD0978 */ void actionWaitEvent();
-    /* 80BD0A64 */ void Demo_Set();
-    /* 80BD0B7C */ void SetOpen();
-    /* 80BD0B88 */ void actionDemoEvent();
-    /* 80BD0D28 */ void event_proc_call();
-    /* 80BD0D90 */ int CheckVec();
-    /* 80BD0E1C */ void KeyVib();
-    /* 80BD0F9C */ void DoorVib();
-    /* 80BD10C0 */ void VibStop();
-    /* 80BD10D0 */ void CloseVibration();
-    /* 80BD1110 */ void CloseAction();
-    /* 80BD18E0 */ void OpenAction();
-    /* 80BD21E4 */ void HakaiMotion();
-    /* 80BD22C8 */ void DoorAction();
-    /* 80BD2338 */ void B_CloseAction();
-    /* 80BD245C */ void SetB_Close();
-    /* 80BD2528 */ void setBaseMtx();
-    /* 80BD2670 */ int CreateHeap();
-    /* 80BD2758 */ void SetDoor();
-    /* 80BD28C0 */ int create();
-    /* 80BD2E88 */ int Create();
-    /* 80BD2ECC */ int Execute(f32 (**)[3][4]);
-    /* 80BD2FB8 */ int Draw();
-    /* 80BD3074 */ int Delete();
+    void initCcCylinder();
+    void setCcCylinder();
+    int checkOpen();
+    void actionStartEvent();
+    void actionWaitEvent();
+    void Demo_Set();
+    void SetOpen();
+    void actionDemoEvent();
+    void event_proc_call();
+    int CheckVec();
+    void KeyVib();
+    void DoorVib();
+    void VibStop();
+    void CloseVibration();
+    void CloseAction();
+    void OpenAction();
+    void HakaiMotion();
+    void DoorAction();
+    void B_CloseAction();
+    void SetB_Close();
+    void setBaseMtx();
+    int CreateHeap();
+    void SetDoor();
+    int create();
+    int Create();
+    int Execute(Mtx**);
+    int Draw();
+    int Delete();
 
 private:
     /* 0x5A0 */ s32 mEventID;
@@ -71,9 +73,9 @@ private:
     /* 0x5E0 */ cXyz mPos;
     /* 0x5EC */ cXyz mPosAccel;
     /* 0x5F8 */ cXyz mPosTmp;
-    /* 0x604 */ u8 field_0x604[6];
-    /* 0x60A */ csXyz mMoveAngle;
-    /* 0x610 */ csXyz mDoorVib;
+    /* 0x604 */ csXyz field_0x604;
+    /* 0x60A */ S16Vec mMoveAngle;
+    /* 0x610 */ S16Vec mDoorVib;
     /* 0x618 */ f32 mMinHeight;
     /* 0x61C */ cXyz mXyzSph[3];
     /* 0x640 */ fpc_ProcID mDoorPairProcID;
@@ -92,7 +94,8 @@ private:
     /* 0x89C */ dCcD_Stts mStts;
     /* 0x8D8 */ dCcD_Sph mSph[3];
     /* 0xC80 */ dCcD_Cyl mCyl;
-    /* 0xDBC */ u8 field_0xdbc[40];
+    /* 0xDBC */ dCcU_AtInfo mAtInfo;
+    /* 0xDE0 */ u8 field_0xde0[4];
 };
 
 STATIC_ASSERT(sizeof(daObjCRVGATE_c) == 0xde4);

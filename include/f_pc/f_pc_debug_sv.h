@@ -2,9 +2,9 @@
 #ifndef F_PC_DEBUG_SV_H_
 #define F_PC_DEBUG_SV_H_
 
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 
-#ifdef DEBUG
+#if DEBUG
 
 char* fpcDbSv_getNameString(s16 i_name);
 

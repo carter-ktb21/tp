@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/os.h>
 
 #include "__os.h"
@@ -77,7 +77,7 @@ char* __OSPIErrors[8] = {
 #endif
 
 // prototypes
-static void ExternalInterruptHandler(register __OSException exception, register OSContext* context);
+static void ExternalInterruptHandler(__REGISTER __OSException exception, __REGISTER OSContext* context);
 extern void __RAS_OSDisableInterrupts_begin(void);
 extern void __RAS_OSDisableInterrupts_end(void);
 
@@ -103,7 +103,7 @@ asm BOOL OSEnableInterrupts(void) {
     blr
 }
 
-asm BOOL OSRestoreInterrupts(register BOOL level) {
+asm BOOL OSRestoreInterrupts(__REGISTER BOOL level) {
     nofralloc
 
     cmpwi   level, 0
@@ -497,8 +497,8 @@ void __OSDispatchInterrupt(__OSException exception, OSContext* context) {
 }
 
 #ifdef __GEKKO__
-static asm void ExternalInterruptHandler(register __OSException exception,
-                                         register OSContext* context) {
+static asm void ExternalInterruptHandler(__REGISTER __OSException exception,
+                                         __REGISTER OSContext* context) {
 #pragma unused(exception)
     nofralloc 
     OS_EXCEPTION_SAVE_GPRS(context)

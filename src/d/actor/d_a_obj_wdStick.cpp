@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_wdStick.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -10,15 +12,10 @@
 #include "f_op/f_op_kankyo_mng.h"
 #include <cmath.h>
 
-UNK_REL_DATA
-
-/* 80D34424-80D34430 000014 000C+00 2/2 0/0 0/0 .bss             l_HIO */
 static daWdStick_HIO_c l_HIO;
 
-/* 80D3423C-80D3427C 000020 0040+00 2/2 0/0 0/0 .data            mCcDSph__11daWdStick_c */
 dCcD_SrcSph daWdStick_c::mCcDSph = {daWdStick_c::mCcDObjInfo, {{{0.0f, 0.0f, 0.0f}, 4.0f}}};
 
-/* 80D31B4C-80D31B88 0000EC 003C+00 1/1 0/0 0/0 .text            __ct__15daWdStick_HIO_cFv */
 daWdStick_HIO_c::daWdStick_HIO_c() {
     field_0x04 = 60;
     field_0x05 = 1;
@@ -26,7 +23,6 @@ daWdStick_HIO_c::daWdStick_HIO_c() {
     field_0x08 = 0;
 }
 
-/* 80D31BD0-80D31C58 000170 0088+00 2/2 0/0 0/0 .text            setBaseMtx__11daWdStick_cFv */
 void daWdStick_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::ZXYrotM(shape_angle.x, shape_angle.y, shape_angle.z);
@@ -34,16 +30,13 @@ void daWdStick_c::setBaseMtx() {
     mModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80D31C58-80D31CC4 0001F8 006C+00 1/0 0/0 0/0 .text            CreateHeap__11daWdStick_cFv */
 int daWdStick_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("H_Kinobou", 4);
-    JUT_ASSERT(245, modelData != 0);
+    JUT_ASSERT(245, modelData != NULL);
     mModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     return mModel != 0 ? 1 : 0;
 }
 
-/* ############################################################################################## */
-/* 80D34138-80D34168 000000 0030+00 10/10 0/0 0/0 .rodata          mCcDObjInfo__11daWdStick_c */
 dCcD_SrcGObjInf const daWdStick_c::mCcDObjInfo = {
     {0, {{0x200, 0, 0x1f}, {0xd8fbffff, 0x1f}, {0x0}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
@@ -51,9 +44,8 @@ dCcD_SrcGObjInf const daWdStick_c::mCcDObjInfo = {
     {0},
 };
 
-/* 80D31CC4-80D31F9C 000264 02D8+00 1/1 0/0 0/0 .text            create__11daWdStick_cFv */
 int daWdStick_c::create() {
-    fopAcM_SetupActor(this, daWdStick_c);
+    fopAcM_ct(this, daWdStick_c);
     int rv = dComIfG_resLoad(&mPhase, "H_Kinobou");
     if (rv == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, createHeapCallBack, 0x820) == 0) {
@@ -80,7 +72,7 @@ int daWdStick_c::create() {
         mSph2.Set(mCcDSph);
         mSph2.SetStts(&mStts);
         fopAcM_OnCarryType(this, fopAcM_CARRY_UNK_30);
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         attention_info.distances[4] = 59;
         misCarrying = fopAcM_checkCarryNow(this);
         mode_init_wait();
@@ -88,21 +80,16 @@ int daWdStick_c::create() {
     return rv;
 }
 
-/* 80D32168-80D32194 000708 002C+00 1/1 0/0 0/0 .text
- * createHeapCallBack__11daWdStick_cFP10fopAc_ac_c              */
 int daWdStick_c::createHeapCallBack(fopAc_ac_c* i_this) {
     return static_cast<daWdStick_c*>(i_this)->CreateHeap();
 }
 
-/* 80D32194-80D32198 000734 0004+00 1/1 0/0 0/0 .text            lightInit__11daWdStick_cFv */
 void daWdStick_c::lightInit() {
 }
 
-/* 80D32198-80D3219C 000738 0004+00 2/2 0/0 0/0 .text            setLight__11daWdStick_cFv */
 void daWdStick_c::setLight() {
 }
 
-/* 80D3219C-80D3269C 00073C 0500+00 1/1 0/0 0/0 .text            setFire__11daWdStick_cFv */
 void daWdStick_c::setFire() {
     mDoMtx_stack_c::ZXYrotS(shape_angle.x, shape_angle.y, shape_angle.z);
     cXyz local_24(75.0f, 4.0f, 0.0f);
@@ -137,7 +124,7 @@ void daWdStick_c::setFire() {
             JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(field_0xae4[i]);
             if (emitter != NULL) {
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&field_0xa94);
+                emitter->setUserWork((uintptr_t)&field_0xa94);
             }
         }
     }
@@ -150,13 +137,12 @@ void daWdStick_c::setFire() {
             JPABaseEmitter* emitter = dComIfGp_particle_getEmitter(field_0xaec[i]);
             if (emitter != NULL) {
                 emitter->setParticleCallBackPtr(dPa_control_c::getParticleTracePCB());
-                emitter->setUserWork((u32)&field_0xaa0);
+                emitter->setUserWork((uintptr_t)&field_0xaa0);
             }
         }
     }
 }
 
-/* 80D3269C-80D32A70 000C3C 03D4+00 1/0 0/0 0/0 .text            Execute__11daWdStick_cFv */
 int daWdStick_c::Execute() {
     field_0x594 = speed;
     field_0xa7c = field_0xa64;
@@ -214,14 +200,13 @@ int daWdStick_c::Execute() {
         OS_REPORT("=== 木の棒再セット (%f) ===\n", current.pos.y - home.pos.y);
         field_0xaac = 0;
         field_0xaad = 0;
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         current.pos = home.pos;
         mode_init_wait();
     }
     return 1;
 }
 
-/* 80D32A70-80D32D6C 001010 02FC+00 1/1 0/0 0/0 .text            bound__FP4cXyzRC13cBgS_PolyInfof */
 static f32 bound(cXyz* param_1, cBgS_PolyInfo const& param_2, f32 param_3) {
     cM3dGPla acStack_3c;
     if (dComIfG_Bgsp().GetTriPla(param_2, &acStack_3c) != 0) {
@@ -234,7 +219,6 @@ static f32 bound(cXyz* param_1, cBgS_PolyInfo const& param_2, f32 param_3) {
     return 0.0f;
 }
 
-/* 80D32DB4-80D33348 001354 0594+00 3/3 0/0 0/0 .text            bgCheck__11daWdStick_cFv */
 void daWdStick_c::bgCheck() {
     bool isRoofHit = mAcch.ChkRoofHit() != 0;
     bool isGroundLanding = mAcch.ChkGroundLanding() != 0;
@@ -293,7 +277,6 @@ void daWdStick_c::bgCheck() {
     }
 }
 
-/* 80D33348-80D333F4 0018E8 00AC+00 1/1 0/0 0/0 .text            setBoundSe__11daWdStick_cFv */
 void daWdStick_c::setBoundSe() {
     u32 uVar1 = fabsf(field_0x594.y) * 2.0f;
     if (uVar1 > 100) {
@@ -302,7 +285,6 @@ void daWdStick_c::setBoundSe() {
     mDoAud_seStart(Z2SE_OBJ_WOODSTICK_BOUND, &current.pos, uVar1, dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
 }
 
-/* 80D333F4-80D3350C 001994 0118+00 1/1 0/0 0/0 .text            mode_proc_call__11daWdStick_cFv */
 void daWdStick_c::mode_proc_call() {
     static daWdStick_c::modeFunc l_mode_func[5] = {
         &daWdStick_c::mode_proc_wait,
@@ -319,29 +301,25 @@ void daWdStick_c::mode_proc_call() {
     misCarrying = fopAcM_checkCarryNow(this);
 }
 
-/* 80D3350C-80D3353C 001AAC 0030+00 4/4 0/0 0/0 .text            mode_init_wait__11daWdStick_cFv */
 void daWdStick_c::mode_init_wait() {
-    cLib_onBit(attention_info.flags, 0x10UL);
+    cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     gravity = -10.0f;
     mMode = MODE_WAIT;
 }
 
-/* 80D3353C-80D33588 001ADC 004C+00 1/0 0/0 0/0 .text            mode_proc_wait__11daWdStick_cFv */
 void daWdStick_c::mode_proc_wait() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
     mAcch.CrrPos(dComIfG_Bgsp());
     bgCheck();
 }
 
-/* 80D33588-80D335AC 001B28 0024+00 1/1 0/0 0/0 .text            mode_init_carry__11daWdStick_cFv */
 void daWdStick_c::mode_init_carry() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     speedF = 0.0f;
     mMode = MODE_CARRY;
 }
 
-/* 80D335AC-80D3386C 001B4C 02C0+00 1/0 0/0 0/0 .text            mode_proc_carry__11daWdStick_cFv */
 void daWdStick_c::mode_proc_carry() {
     daPy_py_c* player = (daPy_py_c*)daPy_getPlayerActorClass();
     cXyz cStack_154(current.pos);
@@ -391,27 +369,23 @@ void daWdStick_c::mode_proc_carry() {
     }
 }
 
-/* 80D3386C-80D33890 001E0C 0024+00 1/1 0/0 0/0 .text            mode_init_drop__11daWdStick_cFv */
 void daWdStick_c::mode_init_drop() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     gravity = -5.0f;
     mMode = MODE_DROP;
 }
 
-/* 80D33890-80D338DC 001E30 004C+00 1/0 0/0 0/0 .text            mode_proc_drop__11daWdStick_cFv */
 void daWdStick_c::mode_proc_drop() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
     mAcch.CrrPos(dComIfG_Bgsp());
     bgCheck();
 }
 
-/* 80D338DC-80D338F4 001E7C 0018+00 2/2 0/0 0/0 .text            mode_init_roll__11daWdStick_cFv */
 void daWdStick_c::mode_init_roll() {
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mMode = MODE_ROLL;
 }
 
-/* 80D338F4-80D33CCC 001E94 03D8+00 1/0 0/0 0/0 .text            mode_proc_roll__11daWdStick_cFv */
 void daWdStick_c::mode_proc_roll() {
     f32 dVar14 = 70.0f;
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
@@ -425,7 +399,7 @@ void daWdStick_c::mode_proc_roll() {
     cM3dGPla cStack_ec;
     fopAcM_gc_c::gndCheck(&cStack_f8);
     bool iVar7 = fopAcM_gc_c::getTriPla(&cStack_ec);
-    if ((groundCross != -1000000000.0f) && iVar7 != 0) {
+    if ((groundCross != -G_CM3D_F_INF) && iVar7 != 0) {
         f32 dVar11 = cM_scos(cM_deg2s(dVar14 - 0.5f));
         cStack_104 = cStack_ec.mNormal;
         if (cStack_104.y < dVar11) {
@@ -455,7 +429,7 @@ void daWdStick_c::mode_proc_roll() {
             mode_init_wait();
         }
     } else {
-        cLib_offBit(attention_info.flags, 0x10UL);
+        cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
     mAcch.CrrPos(dComIfG_Bgsp());
     bgCheck();
@@ -463,20 +437,17 @@ void daWdStick_c::mode_proc_roll() {
 
 f32 dummyLiteral() { return 100.0f; }
 
-/* 80D33D44-80D33D68 0022E4 0024+00 2/2 0/0 0/0 .text            chkWaterLineIn__11daWdStick_cFv */
 BOOL daWdStick_c::chkWaterLineIn() {
     return mAcch.m_wtr.GetHeight() > current.pos.y + 40.0f;
 }
 
-/* 80D33D68-80D33D8C 002308 0024+00 1/1 0/0 0/0 .text            mode_init_sink__11daWdStick_cFv */
 void daWdStick_c::mode_init_sink() {
     field_0xab0 = 0;
     field_0xaae = 0;
-    cLib_offBit(attention_info.flags, 0x10UL);
+    cLib_offBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     mMode = MODE_SINK;
 }
 
-/* 80D33D8C-80D33EB0 00232C 0124+00 1/0 0/0 0/0 .text            mode_proc_sink__11daWdStick_cFv */
 void daWdStick_c::mode_proc_sink() {
     cLib_addCalc(&speedF, 0, 0.05f, 0.1f, 0.01f);
     speed.y = cLib_minMaxLimit(speed.y, -15.0f, 13.0f);
@@ -491,16 +462,15 @@ void daWdStick_c::mode_proc_sink() {
     fopAcM_posMoveF(this, mStts.GetCCMoveP());
     f32 waterHeight = mAcch.m_wtr.GetHeight();
     if (current.pos.y < waterHeight + 100.0f) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
         current.pos = home.pos;
         mode_init_wait();
     }
     if (mAcch.ChkGroundHit()) {
-        cLib_onBit(attention_info.flags, 0x10UL);
+        cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 }
 
-/* 80D33EB0-80D33F14 002450 0064+00 1/0 0/0 0/0 .text            Draw__11daWdStick_cFv */
 int daWdStick_c::Draw() {
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mModel, &tevStr);
@@ -508,35 +478,27 @@ int daWdStick_c::Draw() {
     return 1;
 }
 
-/* 80D33F14-80D33F44 0024B4 0030+00 1/0 0/0 0/0 .text            Delete__11daWdStick_cFv */
 int daWdStick_c::Delete() {
     dComIfG_resDelete(&mPhase, "H_Kinobou");
     return 1;
 }
 
-/* 80D33F44-80D33F70 0024E4 002C+00 1/0 0/0 0/0 .text            daWdStick_Draw__FP11daWdStick_c */
 static int daWdStick_Draw(daWdStick_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80D33F70-80D33F9C 002510 002C+00 1/0 0/0 0/0 .text            daWdStick_Execute__FP11daWdStick_c
- */
 static int daWdStick_Execute(daWdStick_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80D33F9C-80D33FC8 00253C 002C+00 1/0 0/0 0/0 .text            daWdStick_Delete__FP11daWdStick_c
- */
 static int daWdStick_Delete(daWdStick_c* i_this) {
     return i_this->Delete();
 }
 
-/* 80D33FC8-80D33FE8 002568 0020+00 1/0 0/0 0/0 .text            daWdStick_Create__FP10fopAc_ac_c */
 static int daWdStick_Create(fopAc_ac_c* i_this) {
     return static_cast<daWdStick_c*>(i_this)->create();
 }
 
-/* 80D342F4-80D34314 -00001 0020+00 1/0 0/0 0/0 .data            l_daWdStick_Method */
 static actor_method_class l_daWdStick_Method = {
     (process_method_func)daWdStick_Create,
     (process_method_func)daWdStick_Delete,
@@ -545,7 +507,6 @@ static actor_method_class l_daWdStick_Method = {
     (process_method_func)daWdStick_Draw,
 };
 
-/* 80D34314-80D34344 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_WdStick */
 extern actor_process_profile_definition g_profile_Obj_WdStick = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -562,5 +523,3 @@ extern actor_process_profile_definition g_profile_Obj_WdStick = {
   fopAc_ACTOR_e,          // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-/* 80D34210-80D34210 0000D8 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

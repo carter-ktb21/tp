@@ -1,7 +1,9 @@
 /**
- * @file d_a_obj_zraMark.cpp
+* @file d_a_obj_zraMark.cpp
  *
  */
+
+#include "d/dolzel_rel.h" // IWYU pragma: keep
 
 #include "d/actor/d_a_obj_zraMark.h"
 #include "SSystem/SComponent/c_lib.h"
@@ -10,17 +12,10 @@
 #include "d/actor/d_a_npc_hoz.h"
 #include "d/actor/d_a_npc_zra.h"
 
-_ZraMark_Hahen_c::_ZraMark_Hahen_c() {
-    mpModel = NULL;
-    setColor(0);
-}
-
-/* 80D42658-80D42678 000078 0020+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
 static int createSolidHeap(fopAc_ac_c* i_this) {
     return ((daObjZraMark_c*)i_this)->CreateHeap();
 }
 
-/* 80D43D88-80D43D9C 000000 0014+00 4/4 0/0 0/0 .rodata          l_DATA */
 static const daObjZraMark_Hio_Param_c l_DATA = {
     8.0f,    // mMarkSize
     2.0f,    // mInteriorMarkSize
@@ -29,7 +24,6 @@ static const daObjZraMark_Hio_Param_c l_DATA = {
     820.0f,  // mMarkCollisionHeight
 };
 
-/* 80D43D9C-80D43DE0 000014 0044+00 1/1 0/0 0/0 .rodata          l_sph_src */
 static const dCcD_SrcCyl l_sph_src = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0xD8FBFDFF, 0x11}, 0x79}},  // mObj
@@ -44,15 +38,12 @@ static const dCcD_SrcCyl l_sph_src = {
     }  // mCylAttr
 };
 
-/* 80D43DE0-80D43DF0 000058 0010+00 0/1 0/0 0/0 .rodata          l_arcIdx */
 static const int l_arcIdx[] = {3, 6, 5, 4};
 
-/* 80D43FA4-80D43FA8 -00001 0004+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName[1] = {"buoy"};
 
-/* 80D42678-80D4287C 000098 0204+00 1/1 0/0 0/0 .text            Create__14daObjZraMark_cFv */
 int daObjZraMark_c::Create() {
-    fopAcM_SetupActor(this, daObjZraMark_c);
+    fopAcM_ct(this, daObjZraMark_c);
 
     mType = getType();
 
@@ -84,10 +75,9 @@ int daObjZraMark_c::Create() {
     return phase_state;
 }
 
-/* 80D4287C-80D42A7C 00029C 0200+00 1/1 0/0 0/0 .text            CreateHeap__14daObjZraMark_cFv */
 int daObjZraMark_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], l_arcIdx[mType]);
-    JUT_ASSERT(0x176, modelData != 0);
+    JUT_ASSERT(0x176, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -134,7 +124,6 @@ int daObjZraMark_c::CreateHeap() {
     return TRUE;
 }
 
-/* 80D42A7C-80D42B0C 00049C 0090+00 1/1 0/0 0/0 .text            Execute__14daObjZraMark_cFv */
 int daObjZraMark_c::Execute() {
     if (is_blasted()) {
         if (is_branch_pat()) {
@@ -151,7 +140,6 @@ int daObjZraMark_c::Execute() {
     return 1;
 }
 
-/* 80D42B0C-80D42C98 00052C 018C+00 1/1 0/0 0/0 .text            Draw__14daObjZraMark_cFv */
 int daObjZraMark_c::Draw() {
     if (is_blasted()) {
         mHahenMngr.draw();
@@ -175,7 +163,6 @@ int daObjZraMark_c::Draw() {
     return 1;
 }
 
-/* 80D42C98-80D42CE0 0006B8 0048+00 1/1 0/0 0/0 .text            Delete__14daObjZraMark_cFv */
 int daObjZraMark_c::Delete() {
     for (int i = 0; i < 1; i++) {
         dComIfG_resDelete(&mPhase[i], l_arcName[i]);
@@ -185,7 +172,6 @@ int daObjZraMark_c::Delete() {
     return 1;
 }
 
-/* 80D42CE0-80D42D2C 000700 004C+00 1/1 0/0 0/0 .text            getType__14daObjZraMark_cFv */
 int daObjZraMark_c::getType() {
     u8 prm = fopAcM_GetParam(this) >> 8;
     switch (prm) {
@@ -200,7 +186,6 @@ int daObjZraMark_c::getType() {
     }
 }
 
-/* 80D42D2C-80D42EE0 00074C 01B4+00 2/2 0/0 0/0 .text            setBaseMtx__14daObjZraMark_cFv */
 void daObjZraMark_c::setBaseMtx() {
     static const Vec l_coOffset[] = {
         {8.0f, -50.0f, 0.0f},
@@ -241,7 +226,6 @@ void daObjZraMark_c::setBaseMtx() {
     mCcCyl.SetR(l_DATA.mMarkCollisionRadius * size);
 }
 
-/* 80D42EE0-80D42F5C 000900 007C+00 1/1 0/0 0/0 .text            col_init__14daObjZraMark_cFv */
 void daObjZraMark_c::col_init() {
     mCcStts.Init(0xFF, 0xFF, this);
     mCcCyl.Set(l_sph_src);
@@ -252,7 +236,6 @@ void daObjZraMark_c::col_init() {
     }
 }
 
-/* 80D42F5C-80D432C8 00097C 036C+00 1/1 0/0 0/0 .text            col_set__14daObjZraMark_cFv */
 void daObjZraMark_c::col_set() {
     if (mpHoz == NULL) {
         mpHoz = schHoz();
@@ -313,7 +296,6 @@ void daObjZraMark_c::col_set() {
     dComIfG_Ccsp()->Set(&mCcCyl);
 }
 
-/* 80D432C8-80D43314 000CE8 004C+00 1/1 0/0 0/0 .text            schHoz__14daObjZraMark_cFv */
 daNpc_Hoz_c* daObjZraMark_c::schHoz() {
     fopAc_ac_c* hoz = NULL;
     if (fopAcM_SearchByName(PROC_NPC_HOZ, &hoz) && hoz != NULL) {
@@ -323,8 +305,6 @@ daNpc_Hoz_c* daObjZraMark_c::schHoz() {
     return NULL;
 }
 
-/* 80D43314-80D43370 000D34 005C+00 0/0 0/0 1/1 .text entryPointer__14daObjZraMark_cFP10fopAc_ac_c
- */
 bool daObjZraMark_c::entryPointer(fopAc_ac_c* i_actor) {
     if (field_0x72c < 2) {
         mActorMngr[field_0x72c].entry(i_actor);
@@ -335,7 +315,6 @@ bool daObjZraMark_c::entryPointer(fopAc_ac_c* i_actor) {
     return false;
 }
 
-/* 80D43370-80D433F4 000D90 0084+00 1/1 0/0 0/0 .text            informBlast__14daObjZraMark_cFv */
 void daObjZraMark_c::informBlast() {
     if (field_0x72c != 0) {
         for (int i = 0; i < field_0x72c; i++) {
@@ -347,34 +326,26 @@ void daObjZraMark_c::informBlast() {
     }
 }
 
-/* 80D433F4-80D43414 000E14 0020+00 1/0 0/0 0/0 .text daObjZraMark_Execute__FP14daObjZraMark_c */
 static int daObjZraMark_Execute(daObjZraMark_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80D43414-80D43434 000E34 0020+00 1/0 0/0 0/0 .text daObjZraMark_Draw__FP14daObjZraMark_c */
 static int daObjZraMark_Draw(daObjZraMark_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80D43434-80D4343C 000E54 0008+00 1/0 0/0 0/0 .text daObjZraMark_IsDelete__FP14daObjZraMark_c */
 static int daObjZraMark_IsDelete(daObjZraMark_c* i_this) {
     return 1;
 }
 
-/* 80D4343C-80D4345C 000E5C 0020+00 1/0 0/0 0/0 .text daObjZraMark_Delete__FP14daObjZraMark_c */
 static int daObjZraMark_Delete(daObjZraMark_c* i_this) {
     return i_this->Delete();
 }
 
-/* 80D4345C-80D4347C 000E7C 0020+00 1/0 0/0 0/0 .text            daObjZraMark_create__FP10fopAc_ac_c
- */
 static int daObjZraMark_create(fopAc_ac_c* i_this) {
     return ((daObjZraMark_c*)i_this)->Create();
 }
 
-/* 80D4347C-80D434F8 000E9C 007C+00 1/1 0/0 0/0 .text create__16_ZraMark_Hahen_cFRC4cXyzScScScSc
- */
 int _ZraMark_Hahen_c::create(const cXyz& i_pos, s8 i_roomNo, s8 i_color, s8 param_3, s8 i_no) {
     setColor(i_color);
 
@@ -387,12 +358,11 @@ int _ZraMark_Hahen_c::create(const cXyz& i_pos, s8 i_roomNo, s8 i_color, s8 para
     return 0;
 }
 
-/* 80D434F8-80D4357C 000F18 0084+00 1/1 0/0 0/0 .text            loadModel__16_ZraMark_Hahen_cFv */
 BOOL _ZraMark_Hahen_c::loadModel() {
     static const int sHahenBmdType[] = {7, 8};
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName[0], sHahenBmdType[getColor()]);
-    JUT_ASSERT(0x428, modelData != 0);
+    JUT_ASSERT(0x428, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         // "--------------Can't load Fragment Model\n"
@@ -403,7 +373,6 @@ BOOL _ZraMark_Hahen_c::loadModel() {
     return 1;
 }
 
-/* 80D4357C-80D43808 000F9C 028C+00 1/1 0/0 0/0 .text init__16_ZraMark_Hahen_cFRC4cXyzScScSc */
 void _ZraMark_Hahen_c::init(cXyz const& i_pos, s8 i_roomNo, s8 param_2, s8 i_no) {
     static const f32 sScale[] = {
         3.0f, 2.0f, 6.0f, 4.0f, 2.0f, 6.0f, 3.0f, 1.0f, 0.5f, 0.69999999f, 0.5f, 1.2f, 1.0f, 0.8f,
@@ -498,7 +467,6 @@ void _ZraMark_Hahen_c::init(cXyz const& i_pos, s8 i_roomNo, s8 param_2, s8 i_no)
     dKy_tevstr_init(&mTevstr, i_roomNo, 0xFF);
 }
 
-/* 80D43808-80D43864 001228 005C+00 1/1 0/0 0/0 .text            calcSpeed__16_ZraMark_Hahen_cFv */
 void _ZraMark_Hahen_c::calcSpeed() {
     cXyz speed;
     speed.x = field_0x3c0 * cM_ssin(field_0x3bc);
@@ -508,7 +476,6 @@ void _ZraMark_Hahen_c::calcSpeed() {
     setSpeed(speed);
 }
 
-/* 80D43864-80D438C8 001284 0064+00 2/2 0/0 0/0 .text            setMtx__16_ZraMark_Hahen_cFv */
 void _ZraMark_Hahen_c::setMtx() {
     mDoMtx_stack_c::transS(mPos.x, mPos.y, mPos.z);
     mDoMtx_stack_c::XYZrotM(mAngle);
@@ -516,7 +483,6 @@ void _ZraMark_Hahen_c::setMtx() {
     mpModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80D438C8-80D43968 0012E8 00A0+00 1/1 0/0 0/0 .text            draw__16_ZraMark_Hahen_cFv */
 void _ZraMark_Hahen_c::draw() {
     g_env_light.settingTevStruct(16, &mPos, &mTevstr);
     g_env_light.setLightTevColorType_MAJI(mpModel, &mTevstr);
@@ -526,8 +492,6 @@ void _ZraMark_Hahen_c::draw() {
     dComIfGd_setList();
 }
 
-/* 80D43968-80D439F8 001388 0090+00 1/1 0/0 0/0 .text
- * create__20_ZraMark_Hahen_Mng_cFRC4cXyzScScScSc               */
 int _ZraMark_Hahen_Mng_c::create(const cXyz& i_pos, s8 i_roomNo, s8 i_color, s8 param_3,
                                  s8 unused) {
     _ZraMark_Hahen_c* hahen = mHahen;
@@ -542,7 +506,6 @@ int _ZraMark_Hahen_Mng_c::create(const cXyz& i_pos, s8 i_roomNo, s8 i_color, s8 
     return 1;
 }
 
-/* 80D439F8-80D43A74 001418 007C+00 1/1 0/0 0/0 .text            calc__20_ZraMark_Hahen_Mng_cFv */
 void _ZraMark_Hahen_Mng_c::calc() {
     if (getTimer() > 0) {
         _ZraMark_Hahen_c* hahen = mHahen;
@@ -554,7 +517,6 @@ void _ZraMark_Hahen_Mng_c::calc() {
     }
 }
 
-/* 80D43A74-80D43ACC 001494 0058+00 1/1 0/0 0/0 .text            draw__20_ZraMark_Hahen_Mng_cFv */
 void _ZraMark_Hahen_Mng_c::draw() {
     if (getTimer() > 0) {
         _ZraMark_Hahen_c* hahen = mHahen;
@@ -565,7 +527,6 @@ void _ZraMark_Hahen_Mng_c::draw() {
     }
 }
 
-/* 80D43FA8-80D43FC8 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjZraMark_Method */
 static actor_method_class l_daObjZraMark_Method = {
     (process_method_func)daObjZraMark_create,
     (process_method_func)daObjZraMark_Delete,
@@ -574,7 +535,6 @@ static actor_method_class l_daObjZraMark_Method = {
     (process_method_func)daObjZraMark_Draw,
 };
 
-/* 80D43FC8-80D43FF8 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_ZRA_MARK */
 extern actor_process_profile_definition g_profile_ZRA_MARK = {
     fpcLy_CURRENT_e,         // mLayerID
     7,                       // mListID

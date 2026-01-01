@@ -1,7 +1,6 @@
 #ifndef D_EVENT_D_EVENT_DEBUG_H
 #define D_EVENT_D_EVENT_DEBUG_H
 
-#ifdef DEBUG
 #include "JSystem/JHostIO/JORMContext.h"
 #include "d/d_event.h"
 
@@ -20,7 +19,7 @@ struct dEvDb_reg_c {
     /* 0x00 */ char* mFlagName;
     /* 0x04 */ char* mFlagDescription;
     /* 0x08 */ char* mFlagAuthor;
-    /* 0x0C */ const u16 mFlagValue;
+    /* 0x0C */ u16 mFlagValue;
     /* 0x10 */ char* mArea; // Area in the game where flag is used
     /* 0x14 */ u8 mRootReg;
     /* 0x15 */ u8 field_0x15;
@@ -41,9 +40,10 @@ struct dEvDb_flag_base_c {
 
 struct dEvM_play_HIO_c : public JORReflexible {
     dEvM_play_HIO_c();
+    virtual ~dEvM_play_HIO_c() {}
 
     /* 0x04 */ s16 mTargetEvent;
-    /* 0x06 */ s16 field_0x6;
+    /* 0x06 */ s16 mEventIdx;
     /* 0x08 */ s16 mEventCameraMode;
     /* 0x0A */ s16 field_0xA;
 
@@ -70,7 +70,7 @@ STATIC_ASSERT(sizeof(dEvM_play_HIO_c) == 0xC);
 
 struct dEvM_reg_HIO_c : public JORReflexible {
     dEvM_reg_HIO_c();
-    ~dEvM_reg_HIO_c();
+    virtual ~dEvM_reg_HIO_c() {}
 
     /* 0x04 */ dEvDb_flag_base_c* mFlagTables;
     /* 0x08 */ u8 field_0x008;
@@ -91,7 +91,7 @@ STATIC_ASSERT(sizeof(dEvM_reg_HIO_c) == 0xC);
 
 struct dEvM_bit_HIO_c : public JORReflexible {
     dEvM_bit_HIO_c();
-    ~dEvM_bit_HIO_c();
+    virtual ~dEvM_bit_HIO_c() {}
 
     /* 0x04 */ dEvDb_flag_base_c* mFlagTables;
     /* 0x08 */ u8 field_0x008;
@@ -112,6 +112,7 @@ STATIC_ASSERT(sizeof(dEvM_bit_HIO_c) == 0xC);
 
 struct dEvM_root_bit_HIO_c : public JORReflexible {
     dEvM_root_bit_HIO_c() {}
+    virtual ~dEvM_root_bit_HIO_c() {}
 
     dEvM_bit_HIO_c mBit[100];
     dEvDb_flag_base_c* mFlagTables;
@@ -123,6 +124,7 @@ STATIC_ASSERT(sizeof(dEvM_root_bit_HIO_c) == 0x4B8);
 
 struct dEvM_root_reg_HIO_c : public JORReflexible {
     dEvM_root_reg_HIO_c() {}
+    virtual ~dEvM_root_reg_HIO_c() {}
 
     dEvM_reg_HIO_c mReg[100];
     dEvDb_flag_base_c* mFlagTables;
@@ -134,7 +136,7 @@ STATIC_ASSERT(sizeof(dEvM_root_reg_HIO_c) == 0x4B8);
 
 struct dEvM_HIO_c : public JORReflexible {
     dEvM_HIO_c();
-    ~dEvM_HIO_c();
+    virtual ~dEvM_HIO_c() {}
 
     /* 0x004 */ s8 field_0x004;
     /* 0x005 */ u8 m_EVdata_output;
@@ -167,7 +169,5 @@ struct dEvM_HIO_c : public JORReflexible {
         BTN_FORCED_TERMINATION = (1 << 31) + 4
     };
 };
-
-#endif /* DEBUG */
 
 #endif /* D_EVENT_D_EVENT_DEBUG_H */

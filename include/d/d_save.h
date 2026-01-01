@@ -9,35 +9,36 @@
 #include "JSystem/JUtility/JUTAssert.h"
 #include "JSystem/JHostIO/JORReflexible.h"
 
-#define DEFAULT_SELECT_ITEM_INDEX 0
-#define MAX_SELECT_ITEM 4
-#define SELECT_ITEM_NUM 2
-#define MAX_EQUIPMENT 6
-#define MAX_EVENTS 256
-#define MAX_ITEM_SLOTS 24
-#define LIGHT_DROP_STAGE 4
-#define LETTER_INFO_BIT 64
-#define MAX_INSECT_NUM 24
-#define MAX_VISIBLE_HEARTPIECES 4
-#define MAX_POH_NUM 100
-#define TBOX_MAX 64
-#define DSV_MEMBIT_ENUM_MAX 8
-#define ITEM_MAX_DAN 128
-#define SWITCH_ZONE_MAX 0x20
-#define SWITCH_ONE_ZONE_MAX 0x10
-#define ITEM_ZONE_MAX 0x20
-#define ITEM_ONE_ZONE_MAX 0x10
-#define QUEST_LOG_SIZE 0xA94
-#define QUIVER_MAX 30
-#define BIG_QUIVER_MAX 60
-#define GIANT_QUIVER_MAX 100
-#define WALLET_MAX 300
-#define BIG_WALLET_MAX 600
-#define GIANT_WALLET_MAX 1000
-#define MAX_FINDABLE_FISHES 6
 
-#define ITEM_XY_MAX_DUMMY 8
-#define ITEM_BIT_MAX 0x100
+static const int DEFAULT_SELECT_ITEM_INDEX = 0;
+static const int MAX_SELECT_ITEM = 4;
+static const int SELECT_ITEM_NUM = 2;
+static const int MAX_EQUIPMENT = 6;
+static const int MAX_EVENTS = 256;
+static const int MAX_ITEM_SLOTS = 24;
+static const int LIGHT_DROP_STAGE = 4;
+static const int LETTER_INFO_BIT = 64;
+static const int MAX_INSECT_NUM = 24;
+static const int MAX_VISIBLE_HEARTPIECES = 4;
+static const int MAX_POH_NUM = 100;
+static const int TBOX_MAX = 64;
+static const int DSV_MEMBIT_ENUM_MAX = 8;
+static const int ITEM_MAX_DAN = 128;
+static const int SWITCH_ZONE_MAX = 0x20;
+static const int SWITCH_ONE_ZONE_MAX = 0x10;
+static const int ITEM_ZONE_MAX = 0x20;
+static const int ITEM_ONE_ZONE_MAX = 0x10;
+static const int QUEST_LOG_SIZE = 0xA94;
+static const int QUIVER_MAX = 30;
+static const int BIG_QUIVER_MAX = 60;
+static const int GIANT_QUIVER_MAX = 100;
+static const int WALLET_MAX = 300;
+static const int BIG_WALLET_MAX = 600;
+static const int GIANT_WALLET_MAX = 1000;
+static const int MAX_FINDABLE_FISHES = 6;
+
+static const int ITEM_BIT_MAX = 0x100;
+static const int ITEM_XY_MAX_DUMMY = 8;
 
 enum ButtonIndexes {
     /* 0 */ A_BUTTON,
@@ -395,6 +396,11 @@ public:
     BOOL isCollectMirror(u8 i_item) const;
 
     u8 getPohNum() const { return mPohNum; }
+    void addPohNum() {
+        if (mPohNum < 0xFF) {
+            mPohNum += 1;
+        }
+    };
 
 private:
     /* 0x0 */ u8 mItem[8];
@@ -451,8 +457,8 @@ public:
     void init();
     void addFishCount(u8 i_fishIndex);
     u16 getFishCount(u8 i_fishIndex) const { return mFishCount[i_fishIndex]; }
-    u8 getMaxSize(s32 i_sizeIndex) { return mMaxSize[i_sizeIndex]; }
-    void setMaxSize(s32 i_sizeIndex, u8 i_size) { mMaxSize[i_sizeIndex] = i_size; }
+    u8 getMaxSize(int i_sizeIndex) const { return mMaxSize[i_sizeIndex]; }
+    void setMaxSize(int i_sizeIndex, u8 i_size) { mMaxSize[i_sizeIndex] = i_size; }
 
 private:
     /* 0x00 */ u16 mFishCount[16];
@@ -463,6 +469,7 @@ class dSv_player_info_c {
 public:
     void init();
     char* getLinkName() { return mPlayerName; }
+    const char* getPlayerName() const { return mPlayerName; }
     char* getHorseName() { return mHorseName; }
     void setPlayerName(const char* i_name) { strcpy((char*)mPlayerName, i_name); }
     void setHorseName(const char* i_name) { strcpy((char*)mHorseName, i_name); }
@@ -499,6 +506,10 @@ public:
     void setVibration(u8 i_status);
     u8 getPalLanguage() const;
 
+    //TODO: placeholder name, actual name is not known
+    u8 getUnk0() { return unk0; }
+    void setUnk0(u8 i_unk0) { unk0 = i_unk0; }
+
     u8 getAttentionType() { return mAttentionType; }
     void setAttentionType(u8 i_mAttentionType) { mAttentionType = i_mAttentionType; }
     u16 getCalibrateDist() { return mCalibrateDist; }
@@ -511,6 +522,8 @@ public:
     void setCameraControl(u8 i_mCameraControl) { mCameraControl = i_mCameraControl; }
     bool getPointer() { return mPointer; }
     void setPointer(bool i_mPointer) { mPointer = i_mPointer; }
+    bool getCameraHInvert() { return mCameraHInvert; }  // Boofener: Horizontal camera inversion
+    void setCameraHInvert(bool i_invert) { mCameraHInvert = i_invert; }
 
     enum dSv_config_language {
         LANGAUGE_ENGLISH,
@@ -532,7 +545,8 @@ private:
     /* 0x9 */ bool mShortCut;      // Wii icon shortcut enabled/disabled.
     /* 0xA */ u8 mCameraControl;   // 0 : normal, 1 : inverted
     /* 0xB */ bool mPointer;       // Wii pointer enabled/disabled.
-};                                 // Size: 0xC
+    /* 0xC */ bool mCameraHInvert; // Boofener: Horizontal camera inversion (0 : normal, 1 : inverted)
+};                                 // Size: 0xD
 
 class dSv_player_c {
 public:
@@ -651,7 +665,7 @@ public:
     void onEventBit(const u16 i_no);
     void offEventBit(const u16 i_no);
     int isEventBit(const u16 i_no) const;
-    void setEventReg(const u16 i_reg, u8 i_no);
+    void setEventReg(u16 i_reg, u8 i_no);
     u8 getEventReg(u16 i_reg) const;
 
     void* getPEventBit() { return (void*)mEvent; }
@@ -664,12 +678,17 @@ class dSv_MiniGame_c {
 public:
     void init();
 
+    void setBalloonScore(u32 i_score) { mBalloonScore = i_score; }
+    void setRaceGameTime(u32 i_time) { mRaceGameTime = i_time; }
+    void setHookGameTime(u32 i_time) { mHookGameTime = i_time; }
+
     u32 getRaceGameTime() const { return mRaceGameTime; }
     u32 getBalloonScore() const { return mBalloonScore; }
+    u32 getHookGameTime() const { return mHookGameTime; }
 
 private:
     /* 0x00 */ u8 unk0[1][4];
-    /* 0x04 */ u32 mStarTime;
+    /* 0x04 */ u32 mHookGameTime;
     /* 0x08 */ u32 mBalloonScore;
     /* 0x0C */ u32 mRaceGameTime;
     /* 0x10 */ u32 unk16;
@@ -835,6 +854,7 @@ public:
     u32 getParam() const { return mParam; }
     cXyz& getPos() { return mPosition; }
     s16 getAngleY() const { return mAngleY; }
+    s8 getRoomNo() const { return unk18; }
 
     f32 getCameraFvy() const { return mCameraFvy; }
     void setCameraFvy(f32 i_fvy) { mCameraFvy = i_fvy; }
@@ -871,8 +891,12 @@ public:
 
     dSv_player_c& getPlayer() { return mPlayer; }
     dSv_event_c& getEvent() { return mEvent; }
-    dSv_memory_c& getSave(int i_stageNo) { return mSave[i_stageNo]; }
     dSv_MiniGame_c& getMiniGame() { return mMiniGame; }
+
+    dSv_memory_c& getSave(int i_stageNo) {
+        JUT_ASSERT(1412, 0 <= i_stageNo && i_stageNo < STAGE_MAX);
+        return mSave[i_stageNo];
+    }
 
     void putSave(int i_stageNo, dSv_memory_c mem) {
         JUT_ASSERT(1417, 0 <= i_stageNo && i_stageNo < dSv_save_c::STAGE_MAX);
@@ -974,7 +998,7 @@ public:
 
     static const int ZONE_MAX = 0x20;
 
-#if VERSION == VERSION_SHIELD_DEBUG
+#if DEBUG
     /* 0x000 */ u8 unk_0x0;
     /* 0x001 */ u8 unk_0x1;
     /* 0x000 */ u8 unk_0x2[0x48 - 0x2];
@@ -993,7 +1017,7 @@ public:
     /* 0xF1B */ u8 field_0xf1b[13];
     /* 0xF28 */ s64 mStartTime;
     /* 0xF30 */ s64 mSaveTotalTime;
-#if VERSION == VERSION_SHIELD_DEBUG
+#if DEBUG
     /* 0xF80 */ flagFile_c mFlagFile;
 #endif
 };  // Size: 0xF38
@@ -1007,7 +1031,12 @@ public:
 #if VERSION > VERSION_GCN_JPN
     const
 #endif
-    static u16 saveBitLabels[822];
+#if PLATFORM_SHIELD
+    s16
+#else
+    u16
+#endif
+    static saveBitLabels[822];
 };
 
 class dSv_event_tmp_flag_c {

@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/os.h>
 
 #include "__os.h"
@@ -111,7 +111,7 @@ static void DecrementerExceptionCallback(__OSException exception, OSContext* con
 
 #ifdef __GEKKO__
 static asm void DecrementerExceptionHandler(__OSException exception,
-                                            register OSContext* context) {
+                                            __REGISTER OSContext* context) {
     nofralloc
 
     stw r0, context->gpr[0]

@@ -2,6 +2,8 @@
 // Translation Unit: Boss Door L1
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_bossL1.h"
 #include "d/actor/d_a_obj_keyhole.h"
 #include "d/d_door_param2.h"
@@ -12,25 +14,6 @@
 #include "SSystem/SComponent/c_math.h"
 #include "f_op/f_op_actor_mng.h"
 
-/* 804E4DF8-804E4E04 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 804E4E04-804E4E18 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 804E4E18-804E4E68 -00001 0050+00 1/1 0/0 0/0 .data            l_stageName$3673 */
 static char* l_stageName[20] = {
     "D_MN05",
     "D_MN05A",
@@ -54,7 +37,6 @@ static char* l_stageName[20] = {
     "D_MN54A",
 };
 
-/* 804E1D98-804E1E2C 000078 0094+00 14/14 0/0 0/0 .text            getNowLevel__Fv */
 static int getNowLevel() {
     for (int i = 0; i < 20; i++) {
         if (strcmp(dComIfGp_getStartStageName(), l_stageName[i]) == 0) {
@@ -67,8 +49,6 @@ static int getNowLevel() {
     return -1;
 }
 
-/* 804E1E2C-804E1EE8 00010C 00BC+00 2/1 0/0 0/0 .text            getDoorEventName__11daBdoorL1_cFv
- */
 char* daBdoorL1_c::getDoorEventName() {
     switch (getNowLevel()) {
     case 1:
@@ -90,8 +70,6 @@ char* daBdoorL1_c::getDoorEventName() {
     }
 }
 
-/* 804E1EE8-804E1FA4 0001C8 00BC+00 2/1 0/0 0/0 .text            getDoorEventName2__11daBdoorL1_cFv
- */
 char* daBdoorL1_c::getDoorEventName2() {
     switch (getNowLevel()) {
     case 1:
@@ -114,7 +92,6 @@ char* daBdoorL1_c::getDoorEventName2() {
     }
 }
 
-/* 804E1FA4-804E2060 000284 00BC+00 6/5 0/0 0/0 .text            getArcName__11daBdoorL1_cFv */
 const char* daBdoorL1_c::getArcName() {
     switch (getNowLevel()) {
     case 1:
@@ -136,7 +113,6 @@ const char* daBdoorL1_c::getArcName() {
     }
 }
 
-/* 804E2060-804E20C4 000340 0064+00 5/5 0/0 0/0 .text            getAnmArcName__11daBdoorL1_cFv */
 const char* daBdoorL1_c::getAnmArcName() {
     switch(getDoorType()) {
     case DOOR_TYPE_0:
@@ -148,7 +124,6 @@ const char* daBdoorL1_c::getAnmArcName() {
     }
 }
 
-/* 804E20C4-804E2104 0003A4 0040+00 5/5 0/0 0/0 .text            getDoorType__11daBdoorL1_cFv */
 int daBdoorL1_c::getDoorType() {
     switch (getNowLevel()) {
     case 1:
@@ -159,7 +134,6 @@ int daBdoorL1_c::getDoorType() {
     }
 }
 
-/* 804E2104-804E2158 0003E4 0054+00 2/2 0/0 0/0 .text            getOpenAnm__11daBdoorL1_cFv */
 int daBdoorL1_c::getOpenAnm() {
     if (getDoorType() == 1) {
         return 5;
@@ -168,7 +142,6 @@ int daBdoorL1_c::getOpenAnm() {
     return getDoorType() == 0 ? 5 : -1;
 }
 
-/* 804E2158-804E21AC 000438 0054+00 1/1 0/0 0/0 .text            getCloseAnm__11daBdoorL1_cFv */
 int daBdoorL1_c::getCloseAnm() {
     if (getDoorType() == 1) {
         return 4;
@@ -177,51 +150,40 @@ int daBdoorL1_c::getCloseAnm() {
     return getDoorType() == 0 ? 4 : -1;
 }
 
-/* 804E21AC-804E21BC 00048C 0010+00 3/3 0/0 0/0 .text            getAlwaysArcName__11daBdoorL1_cFv
- */
 const char* daBdoorL1_c::getAlwaysArcName() {
     return "static";
 }
 
-/* 804E21BC-804E21CC 00049C 0010+00 1/1 0/0 0/0 .text            getBmd__11daBdoorL1_cFv */
 const char* daBdoorL1_c::getBmd() {
     return "door_shutterBoss.bmd";
 }
 
-/* 804E21CC-804E21DC 0004AC 0010+00 1/1 0/0 0/0 .text            getDzb__11daBdoorL1_cFv */
-/* 804E21BC-804E21CC 00049C 0010+00 1/1 0/0 0/0 .text            getBmd__11daBdoorL1_cFv */
 const char* daBdoorL1_c::getDzb() {
     return "door-shutterBoss.dzb";
 }
 
-/* 804E21DC-804E2238 0004BC 005C+00 1/1 0/0 0/0 .text            getDoorModelData__11daBdoorL1_cFv
- */
 J3DModelData* daBdoorL1_c::getDoorModelData() {
     J3DModelData* door_model = static_cast<J3DModelData*>(dComIfG_getObjectRes(getArcName(), getBmd()));
-    JUT_ASSERT(256, door_model != 0)
+    JUT_ASSERT(256, door_model != NULL)
     return door_model;
 }
 
-/* 804E2238-804E2258 000518 0020+00 1/1 0/0 0/0 .text            CheckCreateHeap__FP10fopAc_ac_c */
 static int CheckCreateHeap(fopAc_ac_c* i_this) {
     return static_cast<daBdoorL1_c*>(i_this)->CreateHeap();
 }
 
-/* 804E4A14-804E4A24 000000 000D+03 12/12 0/0 0/0 .rodata          l_staff_name */
 static char const l_staff_name[13] = "SHUTTER_DOOR";
 
-/* 804E4A24-804E4A50 000010 002C+00 1/1 0/0 0/0 .rodata          l_heap_size */
 static u32 const l_heap_size[11] = {
     0x00, 0x1500, 0x2260,
     0x00, 0x2100, 0x00, 0x1500,
     0x1500, 0x1600, 0x1500, 0x2260,
 };
 
-/* 804E2258-804E2530 000538 02D8+00 1/1 0/0 0/0 .text            CreateHeap__11daBdoorL1_cFv */
 int daBdoorL1_c::CreateHeap() {
     int nowLevel = getNowLevel();
     J3DModelData* modelData = getDoorModelData();
-    JUT_ASSERT(313, modelData != 0);
+    JUT_ASSERT(313, modelData != NULL);
     u32 dlistFlag = 0x11000084;
     if (nowLevel == 8) {
         dlistFlag |= 0x200;
@@ -241,14 +203,14 @@ int daBdoorL1_c::CreateHeap() {
     }
     if (nowLevel == 8) {
         J3DAnmTextureSRTKey* pbtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(getArcName(), "door_shutterBoss.btk");
-        JUT_ASSERT(341, pbtk != 0);
+        JUT_ASSERT(341, pbtk != NULL);
         field_0x58c = new mDoExt_btkAnm();
         if (field_0x58c == NULL || !field_0x58c->init(field_0x580->getModelData(), pbtk, 1, 0, 1.0f, 0, -1)) {
             return 0;
         }
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(354, anm != 0);
+    JUT_ASSERT(354, anm != NULL);
     field_0x588 = new mDoExt_bckAnm();
     if (field_0x588 == NULL || !field_0x588->init(anm, 1, 0, 1.0f, 0, -1,false)) {
         return 0;
@@ -288,7 +250,6 @@ static char* action_table[18] = {
     "INIT",
 };
 
-/* 804E2578-804E2754 000858 01DC+00 2/2 0/0 0/0 .text            calcMtx__11daBdoorL1_cFv */
 void daBdoorL1_c::calcMtx() {
     cXyz cStack_1c(0.0f, 0.0f, field_0x5a8);
     cXyz cStack_28(0.0f, 0.0f, 20.0f);
@@ -326,12 +287,11 @@ void daBdoorL1_c::calcMtx() {
         MTXCopy(mDoMtx_stack_c::get(), field_0x7ec);
         break;
     default:
-        JUT_ASSERT(442, 0);
+        JUT_ASSERT(442, FALSE);
         break;
     }
 }
 
-/* 804E2754-804E28E4 000A34 0190+00 1/1 0/0 0/0 .text            CreateInit__11daBdoorL1_cFv */
 int daBdoorL1_c::CreateInit() {
     field_0x7c4 = current.pos;
     field_0x7d0 = field_0x7c4;
@@ -342,7 +302,7 @@ int daBdoorL1_c::CreateInit() {
     setAction(ACTION_CLOSE_WAIT);
     attention_info.position.y += 250.0f;
     eyePos.y += 250.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     if (checkFront()) {
         field_0x5a8 = -60.0f;
     } else {
@@ -360,9 +320,8 @@ int daBdoorL1_c::CreateInit() {
     return 1;
 }
 
-/* 804E28E4-804E2A98 000BC4 01B4+00 1/1 0/0 0/0 .text            create__11daBdoorL1_cFv */
 int daBdoorL1_c::create() {
-    fopAcM_SetupActor(this, daBdoorL1_c);
+    fopAcM_ct(this, daBdoorL1_c);
     int rv = dComIfG_resLoad(&mPhase1, getArcName());
     if (rv != cPhs_COMPLEATE_e) {
         return rv;
@@ -394,12 +353,10 @@ int daBdoorL1_c::create() {
     return cPhs_ERROR_e;
 }
 
-/* 804E2B78-804E2BC0 000E58 0048+00 1/1 0/0 0/0 .text            getDemoAction__11daBdoorL1_cFv */
 int daBdoorL1_c::getDemoAction() {
     return dComIfGp_evmng_getMyActIdx(field_0x5a0, action_table, 18, 0, 0);
 }
 
-/* 804E2BC0-804E3180 000EA0 05C0+00 5/3 0/0 0/0 .text            demoProc__11daBdoorL1_cFv */
 void daBdoorL1_c::demoProc() {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     int demoAction = getDemoAction();
@@ -562,7 +519,6 @@ void daBdoorL1_c::demoProc() {
     }
 }
 
-/* 804E3180-804E357C 001460 03FC+00 1/1 0/0 0/0 .text            openInit__11daBdoorL1_cFv */
 int daBdoorL1_c::openInit() {
     static u16 const l_lv1_eff[3] = {0x8C42, 0x8C43, 0x8C44};
     static u16 const l_lv2_eff[3] = {0x8C45, 0x8C46, 0x8C47};
@@ -576,7 +532,7 @@ int daBdoorL1_c::openInit() {
         dComIfG_Bgsp().Release(field_0x590);
     }
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getOpenAnm());
-    JUT_ASSERT(811, anm != 0);
+    JUT_ASSERT(811, anm != NULL);
     int rt = field_0x588->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(813, rt == 0);
     if (field_0x59b != 0) {
@@ -630,7 +586,6 @@ int daBdoorL1_c::openInit() {
     return 1;
 }
 
-/* 804E357C-804E3794 00185C 0218+00 1/1 0/0 0/0 .text            openProc__11daBdoorL1_cFv */
 int daBdoorL1_c::openProc() {
     int rv = field_0x588->play();
     f32 frame = field_0x588->getFrame();
@@ -661,7 +616,6 @@ int daBdoorL1_c::openProc() {
     return rv;
 }
 
-/* 804E3794-804E3850 001A74 00BC+00 1/1 0/0 0/0 .text            openEnd__11daBdoorL1_cFv */
 int daBdoorL1_c::openEnd() {
     switch(getNowLevel()) {
     case 4:
@@ -678,10 +632,9 @@ int daBdoorL1_c::openEnd() {
     return 1;
 }
 
-/* 804E3850-804E3A2C 001B30 01DC+00 1/1 0/0 0/0 .text            closeInit__11daBdoorL1_cFv */
 int daBdoorL1_c::closeInit() {
     J3DAnmTransform* anm = (J3DAnmTransform*)dComIfG_getObjectRes(getAnmArcName(), getCloseAnm());
-    JUT_ASSERT(1020, anm != 0);
+    JUT_ASSERT(1020, anm != NULL);
     int rt = field_0x588->init(anm, 1, 0, 1.0f, 0, -1, true);
     JUT_ASSERT(1022, rt == 0);
     switch(getNowLevel()) {
@@ -703,7 +656,6 @@ int daBdoorL1_c::closeInit() {
     return 1;
 }
 
-/* 804E3A2C-804E3C0C 001D0C 01E0+00 1/1 0/0 0/0 .text            closeProc__11daBdoorL1_cFv */
 int daBdoorL1_c::closeProc() {
     int rv = field_0x588->play();
     f32 frame = field_0x588->getFrame();
@@ -743,12 +695,10 @@ int daBdoorL1_c::closeProc() {
     return rv;
 }
 
-/* 804E3C0C-804E3C14 001EEC 0008+00 1/1 0/0 0/0 .text            closeEnd__11daBdoorL1_cFv */
 int daBdoorL1_c::closeEnd() {
     return 1;
 }
 
-/* 804E3C14-804E3CCC 001EF4 00B8+00 1/1 0/0 0/0 .text            unlockInit__11daBdoorL1_cFv */
 int daBdoorL1_c::unlockInit() {
     if (mKeyHoleId == -1) {
         return 1;
@@ -756,13 +706,12 @@ int daBdoorL1_c::unlockInit() {
     obj_keyhole_class* keyhole = (obj_keyhole_class*)fopAcM_SearchByID(mKeyHoleId);
     if (keyhole != NULL) {
         keyhole->setOpen();
-        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN, &keyhole->current.pos, 0, 0);
+        mDoAud_seStart(Z2SE_OBJ_BOSS_LOCK_OPEN, &keyhole->actor.current.pos, 0, 0);
     }
     field_0x59b = 1;
     return 1;
 }
 
-/* 804E3CCC-804E3DE8 001FAC 011C+00 1/1 0/0 0/0 .text            setPos__11daBdoorL1_cFv */
 void daBdoorL1_c::setPos() {
     cXyz local_1c;
     cXyz local_28 = dComIfGp_getPlayer(0)->current.pos - current.pos;
@@ -783,7 +732,6 @@ void daBdoorL1_c::setPos() {
     dComIfGp_evmng_setGoal(&local_1c);
 }
 
-/* 804E3DE8-804E3F10 0020C8 0128+00 1/1 0/0 0/0 .text            calcGoal__11daBdoorL1_cFP4cXyzi */
 void daBdoorL1_c::calcGoal(cXyz* param_1, int param_2) {
     cXyz local_24 = dComIfGp_getPlayer(0)->current.pos - current.pos;
     mDoMtx_stack_c::YrotS(-current.angle.y);
@@ -803,7 +751,6 @@ void daBdoorL1_c::calcGoal(cXyz* param_1, int param_2) {
     param_1->z = local_24.z;
 }
 
-/* 804E3F10-804E3FF8 0021F0 00E8+00 1/1 0/0 0/0 .text            setAngle__11daBdoorL1_cFv */
 int daBdoorL1_c::setAngle() {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     cXyz playerPos = player->current.pos;
@@ -819,7 +766,6 @@ int daBdoorL1_c::setAngle() {
     return 0;
 }
 
-/* 804E3FF8-804E4100 0022D8 0108+00 1/1 0/0 0/0 .text            createKey__11daBdoorL1_cFv */
 int daBdoorL1_c::createKey() {
     if (field_0x598 == 0) {
         cXyz cStack_24(current.pos);
@@ -840,12 +786,10 @@ int daBdoorL1_c::createKey() {
     return 1;
 }
 
-/* 804E4100-804E4104 0023E0 0004+00 1/1 0/0 0/0 .text            smokeInit__11daBdoorL1_cFv */
 void daBdoorL1_c::smokeInit() {
     /* empty function */
 }
 
-/* 804E4104-804E4158 0023E4 0054+00 1/1 0/0 0/0 .text            deleteEmitter__11daBdoorL1_cFv */
 void daBdoorL1_c::deleteEmitter() {
     for (int i = 0; i < 2; i++) {
         if (field_0x7e4[i] != NULL) {
@@ -856,13 +800,11 @@ void daBdoorL1_c::deleteEmitter() {
     }
 }
 
-/* 804E4158-804E432C 002438 01D4+00 1/1 0/0 0/0 .text            checkArea__11daBdoorL1_cFv */
 int daBdoorL1_c::checkArea() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     cXyz local_48;
     cXyz local_54;
-    // Fake Match. Not the first time this solves this. Something is up with the check wolf (maybe only in REL).
-    if (dComIfGp_getLinkPlayer()->mNoResetFlg1 & daPy_py_c::FLG1_IS_WOLF) {
+    if (daPy_py_c::checkNowWolf()) {
         local_48 = player->attention_info.position - current.pos;
         local_54 = player->current.pos - current.pos;
     } else {
@@ -873,7 +815,7 @@ int daBdoorL1_c::checkArea() {
     if (fabsf(local_48.x) > 200.0f) {
         return 0;
     }
-    if (dComIfGp_getLinkPlayer()->mNoResetFlg1 & daPy_py_c::FLG1_IS_WOLF) {
+    if (daPy_py_c::checkNowWolf()) {
         mDoMtx_stack_c::multVec(&local_54, &local_54);
         if (fabsf(local_54.x) > 130.0f) {
             return 0;
@@ -889,7 +831,6 @@ int daBdoorL1_c::checkArea() {
     }
 }
 
-/* 804E432C-804E43A0 00260C 0074+00 3/3 0/0 0/0 .text            checkFront__11daBdoorL1_cFv */
 int daBdoorL1_c::checkFront() {
     if (strcmp(dComIfGp_getStartStageName(), "D_MN08A") == 0) {
         if (dComIfGp_roomControl_getStayNo() == 10) {
@@ -901,7 +842,6 @@ int daBdoorL1_c::checkFront() {
     return 1;
 }
 
-/* 804E43A0-804E4414 002680 0074+00 1/1 0/0 0/0 .text            checkOpen__11daBdoorL1_cFv */
 int daBdoorL1_c::checkOpen() {
     if (!dComIfGs_isDungeonItemBossKey()) {
         return 0;
@@ -916,12 +856,10 @@ int daBdoorL1_c::checkOpen() {
     }
 }
 
-/* 804E4414-804E441C 0026F4 0008+00 1/0 0/0 0/0 .text            actionWait__11daBdoorL1_cFv */
 int daBdoorL1_c::actionWait() {
     return 1;
 }
 
-/* 804E441C-804E44B4 0026FC 0098+00 1/0 0/0 0/0 .text            actionCloseWait__11daBdoorL1_cFv */
 int daBdoorL1_c::actionCloseWait() {
     if (eventInfo.checkCommandDoor()) {
         field_0x5a0 = dComIfGp_evmng_getMyStaffId(l_staff_name, 0, 0);
@@ -935,14 +873,12 @@ int daBdoorL1_c::actionCloseWait() {
     return 1;
 }
 
-/* 804E44B4-804E44EC 002794 0038+00 1/0 0/0 0/0 .text            actionOpen__11daBdoorL1_cFv */
 int daBdoorL1_c::actionOpen() {
     demoProc();
     dMeter2Info_onGameStatus(2);
     return 1;
 }
 
-/* 804E44EC-804E464C 0027CC 0160+00 1/0 0/0 0/0 .text            actionEnd__11daBdoorL1_cFv */
 int daBdoorL1_c::actionEnd() {
     if (!field_0x590->ChkUsed()) {
         bool rt = dComIfG_Bgsp().Regist(field_0x590, this);
@@ -968,10 +904,9 @@ int daBdoorL1_c::actionEnd() {
     return 1;
 }
 
-/* 804E464C-804E476C 00292C 0120+00 1/1 0/0 0/0 .text            execute__11daBdoorL1_cFv */
 int daBdoorL1_c::execute() {
     static actionFunc l_action[4] = {&daBdoorL1_c::actionWait, &daBdoorL1_c::actionCloseWait, &daBdoorL1_c::actionOpen, &daBdoorL1_c::actionEnd};
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         field_0x5a0 = dComIfGp_evmng_getMyStaffId(l_staff_name, 0, 0);
         dMeter2Info_onGameStatus(2);
         demoProc();
@@ -981,7 +916,6 @@ int daBdoorL1_c::execute() {
     return 1;
 }
 
-/* 804E476C-804E48BC 002A4C 0150+00 1/1 0/0 0/0 .text            draw__11daBdoorL1_cFv */
 int daBdoorL1_c::draw() {
     g_env_light.settingTevStruct( 0x10, &current.pos, &tevStr);
     dComIfGd_setListBG();
@@ -1004,7 +938,6 @@ int daBdoorL1_c::draw() {
     return 1;
 }
 
-/* 804E48BC-804E4958 002B9C 009C+00 1/1 0/0 0/0 .text            Delete__11daBdoorL1_cFv */
 int daBdoorL1_c::Delete() {
     deleteEmitter();
     if (heap != NULL && field_0x590->ChkUsed()) {
@@ -1016,31 +949,24 @@ int daBdoorL1_c::Delete() {
     return 1;
 }
 
-/* 804E4958-804E4978 002C38 0020+00 1/0 0/0 0/0 .text            daBdoorL1_Draw__FP11daBdoorL1_c */
 static int daBdoorL1_Draw(daBdoorL1_c* i_this) {
     return i_this->draw();
 }
 
-/* 804E4978-804E499C 002C58 0024+00 1/0 0/0 0/0 .text            daBdoorL1_Execute__FP11daBdoorL1_c
- */
 static int daBdoorL1_Execute(daBdoorL1_c* i_this) {
     i_this->execute();
     return 1;
 }
 
-/* 804E499C-804E49C0 002C7C 0024+00 1/0 0/0 0/0 .text            daBdoorL1_Delete__FP11daBdoorL1_c
- */
 static int daBdoorL1_Delete(daBdoorL1_c* i_this) {
     i_this->Delete();
     return 1;
 }
 
-/* 804E49C0-804E49E0 002CA0 0020+00 1/0 0/0 0/0 .text            daBdoorL1_Create__FP10fopAc_ac_c */
 static int daBdoorL1_Create(fopAc_ac_c* i_this) {
     return static_cast<daBdoorL1_c*>(i_this)->create();
 }
 
-/* 804E5018-804E5038 -00001 0020+00 1/0 0/0 0/0 .data            l_daBdoorL1_Method */
 static actor_method_class l_daBdoorL1_Method = {
     (process_method_func)daBdoorL1_Create,
     (process_method_func)daBdoorL1_Delete,
@@ -1049,7 +975,6 @@ static actor_method_class l_daBdoorL1_Method = {
     (process_method_func)daBdoorL1_Draw,
 };
 
-/* 804E5038-804E5068 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_L1BOSS_DOOR */
 extern actor_process_profile_definition g_profile_L1BOSS_DOOR = {
     fpcLy_CURRENT_e,
     7,

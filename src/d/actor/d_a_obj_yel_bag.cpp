@@ -3,56 +3,48 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_yel_bag.h"
 #include "d/actor/d_a_npc.h"
+#include "d/actor/d_a_npc4.h"
 #include "d/d_com_inf_game.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "SSystem/SComponent/c_lib.h"
 
-UNK_REL_DATA
-
-/* 80D3DD94-80D3DD9C 000020 0008+00 1/1 0/0 0/0 .data            l_bmdGetParamList */
 static int l_bmdGetParamList[2] = {
     3, 0,
 };
 
-/* 80D3DD9C-80D3DDA8 000028 000C+00 1/0 0/0 0/0 .data            l_loadRes_YBAG0 */
 static int l_loadRes_YBAG0[3] = {
     0, -1, -1,
 };
 
-/* 80D3DDA8-80D3DDB0 -00001 0008+00 1/2 0/0 0/0 .data            l_loadRes_list */
 static int* l_loadRes_list[2] = {
     l_loadRes_YBAG0,
     l_loadRes_YBAG0,
 };
 
-/* 80D3DDB0-80D3DDB4 -00001 0004+00 2/4 0/0 0/0 .data            l_resNames */
 static char* l_resNames[] = {"yel_bag"};
 
-/* 80D3DDB4-80D3DDF8 000040 0044+00 1/2 0/0 0/0 .data            mCcDCyl__12daObj_YBag_c */
 dCcD_SrcCyl daObj_YBag_c::mCcDCyl = {
     daNpcT_c::mCcDObjData,
     {{0.0f, 0.0f, 0.0f}, 0.0f, 0.0f}
 };
 
-/* 80D3DDF8-80D3DE00 000084 0008+00 1/1 0/0 0/0 .data            emttrId$4511 */
 static u16 emttrId[4] = {
     0x01B8, 0x01B9, 0x01BA, 0x01BB,
 };
 
-/* 80D3C0EC-80D3C200 0000EC 0114+00 1/1 0/0 0/0 .text            __ct__12daObj_YBag_cFv */
 daObj_YBag_c::daObj_YBag_c() {
 }
 
-/* 80D3C408-80D3C610 000408 0208+00 1/0 0/0 0/0 .text            __dt__12daObj_YBag_cFv */
 daObj_YBag_c::~daObj_YBag_c() {
     for (int i = 0; l_loadRes_list[mType][i] >= 0; i++) {
         dComIfG_resDelete(&mPhases[i], l_resNames[l_loadRes_list[mType][i]]);
     }
 }
 
-/* 80D3DC8C-80D3DCBC 000000 0030+00 4/4 0/0 0/0 .rodata          mCcDObjInfo__12daObj_YBag_c */
 const dCcD_SrcGObjInf daObj_YBag_c::mCcDObjInfo = {
     {0, {{0, 0, 0}, {0, 0x00}, {0x79}}},
     {dCcD_SE_NONE, 0, 0, 0, 0},
@@ -60,15 +52,13 @@ const dCcD_SrcGObjInf daObj_YBag_c::mCcDObjInfo = {
     {0},
 };
 
-/* 80D3DCBC-80D3DCE8 000030 002C+00 0/3 0/0 0/0 .rodata          m__18daObj_YBag_Param_c */
 f32 const daObj_YBag_Param_c::m[11] = {
     0.0f, -4.0f, 1.0f, 400.0f, 255.0f, 10.0f, 4.0f, 10.0f, 
     41.0f, 32.0f, 3.0f,
 };
 
-/* 80D3C610-80D3C898 000610 0288+00 1/1 0/0 0/0 .text            create__12daObj_YBag_cFv */
 int daObj_YBag_c::create() {
-    fopAcM_SetupActor(this, daObj_YBag_c);
+    fopAcM_ct(this, daObj_YBag_c);
     mType = getTypeFromParam();
     int successfulLoads = 0;
     int i = 0;
@@ -108,7 +98,6 @@ int daObj_YBag_c::create() {
     return cPhs_INIT_e;
 }
 
-/* 80D3C898-80D3C93C 000898 00A4+00 1/1 0/0 0/0 .text            CreateHeap__12daObj_YBag_cFv */
 int daObj_YBag_c::CreateHeap() {
     J3DModelData* modelData = NULL;
     if (l_bmdGetParamList[0] >= 0) {
@@ -123,14 +112,12 @@ int daObj_YBag_c::CreateHeap() {
     return mModel != NULL;
 }
 
-/* 80D3C93C-80D3C970 00093C 0034+00 1/1 0/0 0/0 .text            Delete__12daObj_YBag_cFv */
 int daObj_YBag_c::Delete() {
     fopAcM_GetID(this);
     this->~daObj_YBag_c();
     return 1;
 }
 
-/* 80D3C970-80D3D32C 000970 09BC+00 2/2 0/0 0/0 .text            Execute__12daObj_YBag_cFv */
 int daObj_YBag_c::Execute() {
     int local_8c = fopAcM_checkCarryNow(this) != 0;
     scale.set(daObj_YBag_Param_c::m[2], daObj_YBag_Param_c::m[2], daObj_YBag_Param_c::m[2]);
@@ -166,7 +153,7 @@ int daObj_YBag_c::Execute() {
             field_0xa33 = 1;
         } else {
             fopAcM_getWaterY(&current.pos, &field_0x9f4);
-            if (field_0x9f4 != -1e9f && daObj_YBag_Param_c::m[10] < field_0x9f4 - field_0x9f0 &&
+            if (field_0x9f4 != -G_CM3D_F_INF && daObj_YBag_Param_c::m[10] < field_0x9f4 - field_0x9f0 &&
                 current.pos.y <= field_0x9f4 && field_0xa32 == 0)
             {
                 if (field_0xa33 != 0) {
@@ -248,7 +235,7 @@ int daObj_YBag_c::Execute() {
                     }
                     if (mAcch.ChkGroundLanding()) {
                         if (field_0x9c4.y < -30.0f) {
-                            if (field_0x9f4 != -1e9f && current.pos.y <= field_0x9f4) {
+                            if (field_0x9f4 != -G_CM3D_F_INF && current.pos.y <= field_0x9f4) {
                                 setWaterPrtcl();
                             } else {
                                 setSmokePrtcl();
@@ -263,7 +250,7 @@ int daObj_YBag_c::Execute() {
                 }
             }
             if (field_0xa33 == 0) {
-                cLib_onBit(attention_info.flags, 0x10UL);
+                cLib_onBit<u32>(attention_info.flags, fopAc_AttnFlag_CARRY_e);
                 fopAcM_OnCarryType(this, fopAcM_CARRY_ITEM);
             }
             
@@ -318,7 +305,7 @@ int daObj_YBag_c::Execute() {
     mAcch.CrrPos(dComIfG_Bgsp());
     mGndChk = mAcch.m_gnd;
     field_0x9f0 = mAcch.GetGroundH();
-    if (field_0x9f0 != -1e9f) {
+    if (field_0x9f0 != -G_CM3D_F_INF) {
         field_0xa02 = daNpcF_getGroundAngle(&mGndChk, shape_angle.y);
         setEnvTevColor();
         setRoomNo();
@@ -339,7 +326,6 @@ int daObj_YBag_c::Execute() {
     return 1;
 }
 
-/* 80D3D32C-80D3D438 00132C 010C+00 1/1 0/0 0/0 .text            Draw__12daObj_YBag_cFv */
 int daObj_YBag_c::Draw() {
     g_env_light.settingTevStruct( 0,
                                          &current.pos, &tevStr);
@@ -347,7 +333,7 @@ int daObj_YBag_c::Draw() {
                                                   mModel,
                                                   &tevStr);
     mDoExt_modelUpdateDL(mModel);
-    if (field_0x9f0 != -1e9f) {
+    if (field_0x9f0 != -G_CM3D_F_INF) {
         fopAc_ac_c* grabActor = NULL;
         s32 grabActorId = daPy_getPlayerActorClass()->getGrabActorID();
         fopAcM_SearchByID(grabActorId, &grabActor);
@@ -364,37 +350,29 @@ int daObj_YBag_c::Draw() {
     return 1;
 }
 
-/* 80D3D438-80D3D458 001438 0020+00 1/1 0/0 0/0 .text
- * createHeapCallBack__12daObj_YBag_cFP10fopAc_ac_c             */
 int daObj_YBag_c::createHeapCallBack(fopAc_ac_c* i_this) {
     return static_cast<daObj_YBag_c*>(i_this)->CreateHeap();
 }
 
-/* 80D3D458-80D3D460 001458 0008+00 1/1 0/0 0/0 .text            getTypeFromParam__12daObj_YBag_cFv
- */
 int daObj_YBag_c::getTypeFromParam() {
     return 0;
 }
 
-/* 80D3D460-80D3D468 001460 0008+00 1/1 0/0 0/0 .text            isDelete__12daObj_YBag_cFv */
 int daObj_YBag_c::isDelete() {
     return 0;
 }
 
-/* 80D3D468-80D3D4C4 001468 005C+00 2/2 0/0 0/0 .text            setEnvTevColor__12daObj_YBag_cFv */
 void daObj_YBag_c::setEnvTevColor() {
     tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(mGndChk);
     tevStr.room_no = dComIfG_Bgsp().GetRoomId(mGndChk);
 }
 
-/* 80D3D4C4-80D3D508 0014C4 0044+00 2/2 0/0 0/0 .text            setRoomNo__12daObj_YBag_cFv */
 void daObj_YBag_c::setRoomNo() {
     int roomNo = dComIfG_Bgsp().GetRoomId(mGndChk);
     fopAcM_SetRoomNo(this, roomNo);
     mStts.SetRoomId(roomNo);
 }
 
-/* 80D3D508-80D3D5C8 001508 00C0+00 1/1 0/0 0/0 .text            reset__12daObj_YBag_cFv */
 void daObj_YBag_c::reset() {
     field_0x9c4.setall(0.0f);
     field_0x9d0.setall(0.0f);
@@ -426,7 +404,6 @@ void daObj_YBag_c::reset() {
     field_0xa34 = 0;
 }
 
-/* 80D3D5C8-80D3D69C 0015C8 00D4+00 1/1 0/0 0/0 .text            setMtx__12daObj_YBag_cFv */
 void daObj_YBag_c::setMtx() {
     s16 angleDiff = current.angle.y - shape_angle.y;
     s16 dVar5 = field_0xa04 * cM_scos(angleDiff);
@@ -438,7 +415,6 @@ void daObj_YBag_c::setMtx() {
     mModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80D3D69C-80D3D73C 00169C 00A0+00 1/1 0/0 0/0 .text            calcRollAngle__12daObj_YBag_cFsi */
 s16 daObj_YBag_c::calcRollAngle(s16 param_1, int param_2) {
     if (param_1 != 0) {
         int rv;
@@ -461,7 +437,6 @@ s16 daObj_YBag_c::calcRollAngle(s16 param_1, int param_2) {
     return 0;
 }
 
-/* 80D3D73C-80D3D8CC 00173C 0190+00 1/1 0/0 0/0 .text            getWallAngle__12daObj_YBag_cFsPs */
 int daObj_YBag_c::getWallAngle(s16 param_1, s16* param_2) {
     cXyz cStack_50;
     cXyz acStack_40[2];
@@ -487,34 +462,14 @@ int daObj_YBag_c::getWallAngle(s16 param_1, s16* param_2) {
     return 1;
 }
 
-/* 80D3D8CC-80D3D948 0018CC 007C+00 1/1 0/0 0/0 .text            setSmokePrtcl__12daObj_YBag_cFv */
 void daObj_YBag_c::setSmokePrtcl() {
     fopAcM_effSmokeSet1(&field_0xa10, &field_0xa14, &current.pos, NULL, 0.4f, &tevStr, 1);
     dComIfGp_particle_levelEmitterOnEventMove(field_0xa10);
     dComIfGp_particle_levelEmitterOnEventMove(field_0xa14);
 }
 
-UNK_BSS(1109);
-UNK_BSS(1107);
-UNK_BSS(1105);
-UNK_BSS(1104);
-UNK_BSS(1099);
-UNK_BSS(1097);
-UNK_BSS(1095);
-UNK_BSS(1094);
-UNK_BSS(1057);
-UNK_BSS(1055);
-UNK_BSS(1053);
-UNK_BSS(1052);
-UNK_BSS(1014);
-UNK_BSS(1012);
-UNK_BSS(1010);
-UNK_BSS(1009);
-
-/* 80D3DF1C-80D3DF20 000054 0004+00 1/1 0/0 0/0 .bss             l_HIO */
 static daObj_YBag_Param_c l_HIO;
 
-/* 80D3D948-80D3DA70 001948 0128+00 1/1 0/0 0/0 .text            setWaterPrtcl__12daObj_YBag_cFv */
 void daObj_YBag_c::setWaterPrtcl() {
     static const cXyz scl(0.4f, 0.4f, 0.4f);
 
@@ -526,38 +481,31 @@ void daObj_YBag_c::setWaterPrtcl() {
     }
 }
 
-/* 80D3DA70-80D3DAC0 001A70 0050+00 1/1 0/0 0/0 .text            setHamonPrtcl__12daObj_YBag_cFv */
 void daObj_YBag_c::setHamonPrtcl() {
     cXyz cStack_18(current.pos.x, field_0x9f4, current.pos.z);
     fopAcM_effHamonSet(field_0xa28, &cStack_18, 0.7f, 0.05f);
 }
 
-/* 80D3DAC0-80D3DAE0 001AC0 0020+00 1/0 0/0 0/0 .text            daObj_YBag_Create__FPv */
 static int daObj_YBag_Create(void* i_this) {
     return static_cast<daObj_YBag_c*>(i_this)->create();
 }
 
-/* 80D3DAE0-80D3DB00 001AE0 0020+00 1/0 0/0 0/0 .text            daObj_YBag_Delete__FPv */
 static int daObj_YBag_Delete(void* i_this) {
     return static_cast<daObj_YBag_c*>(i_this)->Delete();
 }
 
-/* 80D3DB00-80D3DB20 001B00 0020+00 1/0 0/0 0/0 .text            daObj_YBag_Execute__FPv */
 static int daObj_YBag_Execute(void* i_this) {
     return static_cast<daObj_YBag_c*>(i_this)->Execute();
 }
 
-/* 80D3DB20-80D3DB40 001B20 0020+00 1/0 0/0 0/0 .text            daObj_YBag_Draw__FPv */
 static int daObj_YBag_Draw(void* i_this) {
     return static_cast<daObj_YBag_c*>(i_this)->Draw();
 }
 
-/* 80D3DB40-80D3DB48 001B40 0008+00 1/0 0/0 0/0 .text            daObj_YBag_IsDelete__FPv */
 static int daObj_YBag_IsDelete(void* i_this) {
     return 1;
 }
 
-/* 80D3DE00-80D3DE20 -00001 0020+00 1/0 0/0 0/0 .data            daObj_YBag_MethodTable */
 static actor_method_class daObj_YBag_MethodTable = {
     (process_method_func)daObj_YBag_Create,
     (process_method_func)daObj_YBag_Delete,
@@ -566,7 +514,6 @@ static actor_method_class daObj_YBag_MethodTable = {
     (process_method_func)daObj_YBag_Draw,
 };
 
-/* 80D3DE20-80D3DE50 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_YBAG */
 extern actor_process_profile_definition g_profile_OBJ_YBAG = {
   fpcLy_CURRENT_e,         // mLayerID
   8,                       // mListID
@@ -585,5 +532,3 @@ extern actor_process_profile_definition g_profile_OBJ_YBAG = {
 };
 
 AUDIO_INSTANCES;
-
-/* 80D3DD6C-80D3DD6C 0000E0 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

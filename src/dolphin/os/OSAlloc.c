@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/os.h>
 
 #define ALIGNMENT 32
@@ -9,7 +9,7 @@
 #define HEADERSIZE 32u
 #define MINOBJSIZE 64u
 
-#ifdef DEBUG
+#if DEBUG
 #define ENABLE_HEAPDESC
 #endif
 

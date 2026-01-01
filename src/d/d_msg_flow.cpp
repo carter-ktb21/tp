@@ -1,3 +1,5 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_flow.h"
 #include "d/actor/d_a_alink.h"
 #include "d/d_com_static.h"
@@ -12,22 +14,13 @@
 #include "d/actor/d_a_obj_ss_base.h"
 #include "SSystem/SComponent/c_math.h"
 
-/* 803C14B8-803C14C4 01E5D8 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80249F00-80249F48 244840 0048+00 0/0 5/5 154/154 .text            __ct__10dMsgFlow_cFv */
 dMsgFlow_c::dMsgFlow_c() {
     mNonStopJunpFlowFlag = 0;
     setInitValue(1);
 }
 
-/* 80249F48-80249F90 244888 0048+00 1/0 7/7 111/111 .text            __dt__10dMsgFlow_cFv */
 dMsgFlow_c::~dMsgFlow_c() {}
 
-/* 80249F90-8024A13C 2448D0 01AC+00 0/0 10/10 86/86 .text
- * init__10dMsgFlow_cFP10fopAc_ac_ciiPP10fopAc_ac_c             */
 void dMsgFlow_c::init(fopAc_ac_c* i_partner, int i_flowID, int param_2, fopAc_ac_c** i_talkPartners) {
     if (!dMsgObject_isTalkNowCheck()) {
         if (i_talkPartners == NULL) {
@@ -48,10 +41,10 @@ void dMsgFlow_c::init(fopAc_ac_c* i_partner, int i_flowID, int param_2, fopAc_ac
             setInitValue(1);
             
             mFlow_p = getMsgDataBlock("FLW1");
-            JUT_ASSERT(121, 0 != mFlow_p);
+            JUT_ASSERT(121, NULL != mFlow_p);
 
             mLabelInfo_p = getMsgDataBlock("FLI1");
-            JUT_ASSERT(125, 0 != mLabelInfo_p);
+            JUT_ASSERT(125, NULL != mLabelInfo_p);
 
             labelInfoTBL = mLabelInfo_p + 0x10;
             mFlowNodeTBL = (mesg_flow*)(mFlow_p + 0x10);
@@ -75,7 +68,7 @@ void dMsgFlow_c::init(fopAc_ac_c* i_partner, int i_flowID, int param_2, fopAc_ac
 
             setNodeIndex(nodeIdx, i_talkPartners);
         }
-#ifdef DEBUG
+#if DEBUG
         dbgPrint();
 #endif
         dMsgObject_setSelectWordFlag(0);
@@ -96,8 +89,6 @@ void dMsgFlow_c::initWord(fopAc_ac_c* i_partner, const char* i_word, u8 i_output
     init(i_partner, flowID, param_3, param_4);
 }
 
-/* 8024A13C-8024A2D8 244A7C 019C+00 2/0 0/0 2/2 .text checkOpenDoor__10dMsgFlow_cFP10fopAc_ac_cPi
- */
 int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
     if (dMsgObject_isTalkNowCheck()) {
         return 0;
@@ -166,7 +157,7 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
         }
         case 0:
         default:
-            JUT_ASSERT(362, 0);
+            JUT_ASSERT(362, FALSE);
             break;
         }
     }
@@ -178,8 +169,6 @@ int dMsgFlow_c::checkOpenDoor(fopAc_ac_c* i_speaker_p, int* param_2) {
     return var_r27;
 }
 
-/* 8024A2D8-8024A424 244C18 014C+00 0/0 21/21 78/78 .text
- * doFlow__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_ci            */
 int dMsgFlow_c::doFlow(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners, int i_flowID) {
     BOOL check = FALSE;
     int var_r26 = 0;
@@ -224,7 +213,6 @@ int dMsgFlow_c::doFlow(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners, int
     return var_r26 != 0 || check;
 }
 
-/* 8024A424-8024A4C4 244D64 00A0+00 0/0 2/2 1/1 .text checkEventRender__10dMsgFlow_cFPiPiPiPi */
 int dMsgFlow_c::checkEventRender(int* param_0, int* param_1, int* param_2, int* param_3) {
     if (field_0x47) {
         if (param_0 != NULL) {
@@ -247,7 +235,6 @@ int dMsgFlow_c::checkEventRender(int* param_0, int* param_1, int* param_2, int* 
     return field_0x47 == 1;
 }
 
-/* 8024A4C4-8024A528 244E04 0064+00 0/0 0/0 10/10 .text            remove__10dMsgFlow_cFv */
 void dMsgFlow_c::remove() {
     field_0x27 = 0;
     field_0x26 = 1;
@@ -262,24 +249,20 @@ void dMsgFlow_c::remove() {
     daPy_py_c::setMidnaFaceNum(0);
 }
 
-/* 8024A528-8024A538 244E68 0010+00 0/0 2/2 66/66 .text            getEventId__10dMsgFlow_cFPi */
 u16 dMsgFlow_c::getEventId(int* oItemId_p) {
-    JUT_ASSERT(555, 0 != oItemId_p);
+    JUT_ASSERT(555, NULL != oItemId_p);
     *oItemId_p = field_0x30;
     return mEventId;
 }
 
-/* 8024A538-8024A540 244E78 0008+00 0/0 3/3 4/4 .text            getMsgNo__10dMsgFlow_cFv */
 u32 dMsgFlow_c::getMsgNo() {
     return mMsgNo;
 }
 
-/* 8024A540-8024A548 244E80 0008+00 0/0 0/0 12/12 .text            getNowMsgNo__10dMsgFlow_cFv */
 u32 dMsgFlow_c::getNowMsgNo() {
     return mNowMsgNo;
 }
 
-/* 8024A548-8024A580 244E88 0038+00 0/0 2/2 4/4 .text            getMsg__10dMsgFlow_cFv */
 msg_class* dMsgFlow_c::getMsg() {
     if (mMsg != fpcM_ERROR_PROCESS_ID_e) {
         return fopMsgM_SearchByID(mMsg);
@@ -288,7 +271,6 @@ msg_class* dMsgFlow_c::getMsg() {
     return NULL;
 }
 
-/* 8024A580-8024A618 244EC0 0098+00 5/5 0/0 0/0 .text            setInitValue__10dMsgFlow_cFi */
 void dMsgFlow_c::setInitValue(int param_0) {
     if (param_0 != 0) {
         mFlow_p = NULL;
@@ -323,8 +305,6 @@ void dMsgFlow_c::setInitValue(int param_0) {
     field_0x47 = 0;
 }
 
-/* 8024A618-8024A6EC 244F58 00D4+00 1/1 0/0 0/0 .text
- * setInitValueGroupChange__10dMsgFlow_cFiPP10fopAc_ac_c        */
 void dMsgFlow_c::setInitValueGroupChange(int i_msgNo, fopAc_ac_c** i_talkPartners) {
     u8* labelInfoTBL = NULL;
     u16 var_r28 = i_msgNo;
@@ -333,10 +313,10 @@ void dMsgFlow_c::setInitValueGroupChange(int i_msgNo, fopAc_ac_c** i_talkPartner
     setInitValue(0);
 
     mFlow_p = getMsgDataBlock("FLW1");
-    JUT_ASSERT(680, 0 != mFlow_p);
+    JUT_ASSERT(680, NULL != mFlow_p);
 
     mLabelInfo_p = getMsgDataBlock("FLI1");
-    JUT_ASSERT(684, 0 != mLabelInfo_p);
+    JUT_ASSERT(684, NULL != mLabelInfo_p);
 
     labelInfoTBL = mLabelInfo_p + 0x10;
 
@@ -347,8 +327,6 @@ void dMsgFlow_c::setInitValueGroupChange(int i_msgNo, fopAc_ac_c** i_talkPartner
     setNodeIndex(getInitNodeIndex(mFlow), i_talkPartners);
 }
 
-/* 8024A6EC-8024A784 24502C 0098+00 4/4 0/0 0/0 .text            getMsgDataBlock__10dMsgFlow_cFPCc
- */
 u8* dMsgFlow_c::getMsgDataBlock(char const* block_tag) {
     u8* block_p = NULL;
     u8* aMsgRes_p = NULL;
@@ -356,7 +334,7 @@ u8* dMsgFlow_c::getMsgDataBlock(char const* block_tag) {
     char tag[5] = {0};
 
     aMsgRes_p = dMsgObject_getMsgDtPtr();
-    JUT_ASSERT(742, 0 != aMsgRes_p);
+    JUT_ASSERT(742, NULL != aMsgRes_p);
 
     u32 num = *(u32*)(aMsgRes_p + 0xC);
     aMsgRes_p += 0x20;
@@ -375,13 +353,11 @@ u8* dMsgFlow_c::getMsgDataBlock(char const* block_tag) {
     return NULL;
 }
 
-/* 8024A784-8024A7CC 2450C4 0048+00 5/5 0/0 0/0 .text            getInitNodeIndex__10dMsgFlow_cFUs
- */
 u16 dMsgFlow_c::getInitNodeIndex(u16 param_1) {
     u8* var_r30 = NULL;
     u16 var_r27 = -1;
 
-    JUT_ASSERT(777, 0 != mLabelInfo_p);
+    JUT_ASSERT(777, NULL != mLabelInfo_p);
     var_r30 = mLabelInfo_p + 0x10;
 
     for (int i = 0; i < *(u16*)(mLabelInfo_p + 8); i++) {
@@ -395,13 +371,11 @@ u16 dMsgFlow_c::getInitNodeIndex(u16 param_1) {
     return var_r27;
 }
 
-/* 8024A7CC-8024A95C 24510C 0190+00 6/6 0/0 0/0 .text setNodeIndex__10dMsgFlow_cFUsPP10fopAc_ac_c
- */
 void dMsgFlow_c::setNodeIndex(u16 i_nodeIdx, fopAc_ac_c** i_talkPartners) {
     msg_class* aMsg_p = NULL;
     if (mMsg != fpcM_ERROR_PROCESS_ID_e) {
         aMsg_p = fopMsgM_SearchByID(mMsg);
-        JUT_ASSERT(806, 0 != aMsg_p);
+        JUT_ASSERT(806, NULL != aMsg_p);
     }
 
     if (i_nodeIdx == 0xFFFF) {
@@ -464,8 +438,6 @@ void dMsgFlow_c::setNodeIndex(u16 i_nodeIdx, fopAc_ac_c** i_talkPartners) {
     mNodeIdx = i_nodeIdx;
 }
 
-/* 8024A95C-8024AA50 24529C 00F4+00 1/1 0/0 0/0 .text
- * setSelectMsg__10dMsgFlow_cFP14mesg_flow_nodeP14mesg_flow_nodeP10fopAc_ac_c */
 int dMsgFlow_c::setSelectMsg(mesg_flow_node* i_flowNode_p, mesg_flow_node* param_2,
                              fopAc_ac_c* i_speaker_p) {
     u16* inf_p = NULL;
@@ -485,7 +457,7 @@ int dMsgFlow_c::setSelectMsg(mesg_flow_node* i_flowNode_p, mesg_flow_node* param
     // "Message Set (Select)"
     OS_REPORT("\x1B[44;37mメッセ−ジセット（選択）　　　　　　\x1B[m|:");
 
-#ifdef DEBUG
+#if DEBUG
     if (i_speaker_p != NULL) {
         const char* speaker_name = fopAcM_getProcNameString(i_speaker_p);
         OS_REPORT("flow:%d, msg:%d(%d), speaker:%s\n", mFlow, msg_no, temp_r25, speaker_name);
@@ -497,7 +469,7 @@ int dMsgFlow_c::setSelectMsg(mesg_flow_node* i_flowNode_p, mesg_flow_node* param
     if (mMsg != fpcM_ERROR_PROCESS_ID_e) {
         msg_class* aMsg_p = NULL;
         aMsg_p = fopMsgM_SearchByID(mMsg);
-        JUT_ASSERT(944, 0 != aMsg_p);
+        JUT_ASSERT(944, NULL != aMsg_p);
 
         aMsg_p->mode = 15;
         fopMsgM_messageSet(msg_no, temp_r25);
@@ -517,8 +489,6 @@ int dMsgFlow_c::setSelectMsg(mesg_flow_node* i_flowNode_p, mesg_flow_node* param
     return 1;
 }
 
-/* 8024AA50-8024AB30 245390 00E0+00 1/1 0/0 0/0 .text
- * setNormalMsg__10dMsgFlow_cFP14mesg_flow_nodeP10fopAc_ac_c    */
 int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16* inf_p = NULL;
     mesg_flow_node* var_r29 = NULL;
@@ -531,7 +501,7 @@ int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker
     // "Message Set"
     OS_REPORT("\x1B[44;37mメッセ−ジセット　　　　　　　　　　\x1B[m|:");
 
-#ifdef DEBUG
+#if DEBUG
     if (i_speaker_p != NULL) {
         const char* speaker_name = fopAcM_getProcNameString(i_speaker_p);
         OS_REPORT("flow:%d, msg:%d, speaker:%s\n", mFlow, msg_no, speaker_name);
@@ -543,7 +513,7 @@ int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker
     if (mMsg != fpcM_ERROR_PROCESS_ID_e) {
         msg_class* aMsg_p = NULL;
         aMsg_p = fopMsgM_SearchByID(mMsg);
-        JUT_ASSERT(1007, 0 != aMsg_p);
+        JUT_ASSERT(1007, NULL != aMsg_p);
 
         aMsg_p->mode = 15;
         fopMsgM_messageSet(msg_no, 1000);
@@ -563,8 +533,6 @@ int dMsgFlow_c::setNormalMsg(mesg_flow_node* i_flowNode_p, fopAc_ac_c* i_speaker
     return 1;
 }
 
-/* 8024AB30-8024AD54 245470 0224+00 2/1 0/0 0/0 .text
- * messageNodeProc__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_c    */
 int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node* flowNode_p = NULL;
     flowNode_p = &mFlowNodeTBL[mNodeIdx].message;
@@ -588,7 +556,7 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
                 }
             } else {
                 OS_REPORT("★sel select mesg ===> %d, %d, %d\n", mSelType, aNextNodeIndex, mFlowNodeTBL[aNextNodeIndex].message.type);
-                JUT_ASSERT(1077, 0);
+                JUT_ASSERT(1077, FALSE);
             }
         } else {
             if (setNormalMsg(&mFlowNodeTBL[mNodeIdx].message, i_speaker_p)) {
@@ -613,7 +581,7 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
             field_0x41 = 1;
             mNowMsgNo = aMsg_p->msg_idx;
             break;
-        case 6:
+        case 6: {
             field_0x40 = field_0x41;
 
             int mesgAnimeAttrInfo = -1;
@@ -635,6 +603,7 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
             field_0x41 = 0;
             mNowMsgNo = aMsg_p->msg_idx;
             break;
+        }
         case 14:
         case 18:
             setNodeIndex(flowNode_p->next_node_idx, i_talkPartners);
@@ -651,8 +620,6 @@ int dMsgFlow_c::messageNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPart
     return 0;
 }
 
-/* 8024AD54-8024ADEC 245694 0098+00 1/1 0/0 0/0 .text
- * branchNodeProc__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_c     */
 int dMsgFlow_c::branchNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node_branch* node = NULL;
     node = &mFlowNodeTBL[mNodeIdx].branch;
@@ -663,15 +630,13 @@ int dMsgFlow_c::branchNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartn
     return 1;
 }
 
-/* 8024ADEC-8024AFF8 24572C 020C+00 1/1 0/0 0/0 .text
- * eventNodeProc__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_c      */
 int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     mesg_flow_node_event* node = NULL;
     node = &mFlowNodeTBL[mNodeIdx].event;
     int proc_status = (this->*mEventList[node->event_idx])(node, i_speaker_p);
 
     switch (node->event_idx) {
-    case 8:
+    case 8: {
         getParam(&mEventId, &field_0x30, node->params);
         setNodeIndex(mFlowIdxTBL[node->next_node_idx], i_talkPartners);
 
@@ -683,6 +648,7 @@ int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartne
         setNodeIndex(-1, i_talkPartners);
         mNodeIdx = prev_idx;
         break;
+    }
     case 9:
         if (getParam(node->params) == 0) {
             int msgNum;
@@ -723,8 +689,6 @@ int dMsgFlow_c::eventNodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartne
     return 1;
 }
 
-/* 8024AFF8-8024B0F0 245938 00F8+00 1/1 0/0 0/0 .text
- * nodeProc__10dMsgFlow_cFP10fopAc_ac_cPP10fopAc_ac_c           */
 int dMsgFlow_c::nodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     fopAc_ac_c* aSpeaker_p = i_speaker_p;
     int proc_status = 1;
@@ -753,7 +717,7 @@ int dMsgFlow_c::nodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
             break;
         case 0:
         default:
-            JUT_ASSERT(1323, 0);
+            JUT_ASSERT(1323, FALSE);
             break;
         }
     }
@@ -761,8 +725,6 @@ int dMsgFlow_c::nodeProc(fopAc_ac_c* i_speaker_p, fopAc_ac_c** i_talkPartners) {
     return 0;
 }
 
-/* 8024B0F0-8024B108 245A30 0018+00 16/16 0/0 0/0 .text            getParam__10dMsgFlow_cFPUsPUsPUc
- */
 int dMsgFlow_c::getParam(u16* prm0, u16* prm1, u8* params) {
     *prm0 = *(u16*)params;
     *prm1 = *(u16*)(params + 2);
@@ -770,7 +732,6 @@ int dMsgFlow_c::getParam(u16* prm0, u16* prm1, u8* params) {
     return *(int*)params;
 }
 
-/* 8024B108-8024B130 245A48 0028+00 3/3 0/0 0/0 .text            getParam__10dMsgFlow_cFPUcPUc */
 int dMsgFlow_c::getParam(u8* prm0, u8* params) {
     for (int i = 0; i < 4; i++) {
         prm0[i] = params[i];
@@ -779,12 +740,10 @@ int dMsgFlow_c::getParam(u8* prm0, u8* params) {
     return *(int*)params;
 }
 
-/* 8024B130-8024B138 245A70 0008+00 20/20 0/0 0/0 .text            getParam__10dMsgFlow_cFPUc */
 int dMsgFlow_c::getParam(u8* params) {
     return *(int*)params;
 }
 
-/* 803C184C-803C1AC8 01E96C 027C+00 2/3 0/0 0/0 .data            mQueryList__10dMsgFlow_c */
 queryFunc dMsgFlow_c::mQueryList[53] = {
     &dMsgFlow_c::query005, &dMsgFlow_c::query001, &dMsgFlow_c::query002, &dMsgFlow_c::query003,
     &dMsgFlow_c::query006, &dMsgFlow_c::query007, &dMsgFlow_c::query004, &dMsgFlow_c::query008,
@@ -802,15 +761,13 @@ queryFunc dMsgFlow_c::mQueryList[53] = {
     &dMsgFlow_c::query053,
 };
 
-#ifdef DEBUG
+#if DEBUG
 void dMsgFlow_c::dbgPrint() {}
 #endif
 
-/* 8024B138-8024B180 245A78 0048+00 1/0 0/0 0/0 .text
- * query001__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query001(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
-    u16 ret = dComIfGs_isEventBit((u16)dSv_event_flag_c::saveBitLabels[prm0]) == false;
+    u16 ret = dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[prm0]) == false;
 
     if (param_2 != 0) {
         // "Flag Check"
@@ -821,8 +778,6 @@ u16 dMsgFlow_c::query001(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B180-8024B208 245AC0 0088+00 1/0 0/0 0/0 .text
- * query002__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query002(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u16 ret;
     if (daPy_py_c::checkNowWolf()) {
@@ -842,8 +797,6 @@ u16 dMsgFlow_c::query002(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B208-8024B250 245B48 0048+00 1/0 0/0 0/0 .text
- * query003__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query003(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret = cM_rndF(prm0);
@@ -858,8 +811,6 @@ u16 dMsgFlow_c::query003(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
 }
 
 
-/* 8024B250-8024B2C0 245B90 0070+00 1/0 0/0 0/0 .text
- * query004__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query004(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret;
@@ -879,11 +830,9 @@ u16 dMsgFlow_c::query004(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;    
 }
 
-/* 8024B2C0-8024B2F8 245C00 0038+00 2/1 1/1 1/1 .text
- * query005__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query005(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     msg_class* aMsg_p = fopMsgM_SearchByID(mMsg);
-    JUT_ASSERT(1668, 0 != aMsg_p);
+    JUT_ASSERT(1668, NULL != aMsg_p);
 
     u16 ret = aMsg_p->select_idx;
     mChoiceNo = ret;
@@ -897,8 +846,6 @@ u16 dMsgFlow_c::query005(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B2F8-8024B32C 245C38 0034+00 1/0 0/0 0/0 .text
- * query006__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query006(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u16 ret = query005(i_flowNode_p, i_speaker_p, 0);
     mChoiceNo = ret;
@@ -912,8 +859,6 @@ u16 dMsgFlow_c::query006(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B32C-8024B45C 245C6C 0130+00 1/0 0/0 0/0 .text
- * query007__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query007(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret;
@@ -945,8 +890,6 @@ u16 dMsgFlow_c::query007(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B45C-8024B4A4 245D9C 0048+00 1/0 0/0 0/0 .text
- * query008__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query008(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret = daNpcKakashi_getSwdTutorialStep() - 1 != prm0;
@@ -960,8 +903,6 @@ u16 dMsgFlow_c::query008(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B4A4-8024B4D0 245DE4 002C+00 1/0 0/0 0/0 .text
- * query009__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query009(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u16 ret = daNpcKakashi_getSwdTutorialResult() == FALSE;
 
@@ -974,8 +915,6 @@ u16 dMsgFlow_c::query009(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B4D0-8024B504 245E10 0034+00 1/0 0/0 0/0 .text
- * query010__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query010(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u16 ret = daNpcKakashi_getSuccessCount() != 1;
 
@@ -988,8 +927,6 @@ u16 dMsgFlow_c::query010(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B504-8024B54C 245E44 0048+00 1/0 0/0 0/0 .text
- * query011__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query011(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isTmpBit((u16)dSv_event_tmp_flag_c::tempBitLabels[prm0]) == FALSE;
@@ -1003,8 +940,6 @@ u16 dMsgFlow_c::query011(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B54C-8024B584 245E8C 0038+00 1/0 0/0 0/0 .text
- * query012__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query012(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isTbox(prm0) == FALSE;
@@ -1018,8 +953,6 @@ u16 dMsgFlow_c::query012(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B584-8024B5BC 245EC4 0038+00 1/0 0/0 0/0 .text
- * query013__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query013(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isSaveSwitch(prm0) == FALSE;
@@ -1033,8 +966,6 @@ u16 dMsgFlow_c::query013(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B5BC-8024B5F4 245EFC 0038+00 1/0 0/0 0/0 .text
- * query014__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query014(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isSaveItem(prm0) == FALSE;
@@ -1048,8 +979,6 @@ u16 dMsgFlow_c::query014(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B5F4-8024B62C 245F34 0038+00 1/0 0/0 0/0 .text
- * query015__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query015(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isSaveDunSwitch(prm0) == FALSE;
@@ -1063,8 +992,6 @@ u16 dMsgFlow_c::query015(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B62C-8024B664 245F6C 0038+00 1/0 0/0 0/0 .text
- * query016__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query016(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_isSaveDunItem(prm0) == FALSE;
@@ -1078,8 +1005,6 @@ u16 dMsgFlow_c::query016(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B664-8024B6A8 245FA4 0044+00 1/0 0/0 0/0 .text
- * query017__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query017(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     int roomNo = -1;
@@ -1099,8 +1024,6 @@ u16 dMsgFlow_c::query017(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B6A8-8024B6EC 245FE8 0044+00 1/0 0/0 0/0 .text
- * query018__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query018(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     int roomNo = -1;
@@ -1120,8 +1043,6 @@ u16 dMsgFlow_c::query018(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B6EC-8024B730 24602C 0044+00 1/0 0/0 0/0 .text
- * query019__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query019(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     int roomNo = -1;
@@ -1141,8 +1062,6 @@ u16 dMsgFlow_c::query019(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B730-8024B774 246070 0044+00 1/0 0/0 0/0 .text
- * query020__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query020(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     int roomNo = -1;
@@ -1162,8 +1081,6 @@ u16 dMsgFlow_c::query020(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B774-8024B8E4 2460B4 0170+00 1/0 0/0 0/0 .text
- * query021__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query021(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     u16 ret = 0;
@@ -1212,8 +1129,6 @@ u16 dMsgFlow_c::query021(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B8E4-8024B918 246224 0034+00 1/0 0/0 0/0 .text
- * query022__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query022(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     u16 ret = checkItemGet(prm0 & 0xFF, 1) ? 0 : 1;
@@ -1227,8 +1142,6 @@ u16 dMsgFlow_c::query022(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B918-8024B954 246258 003C+00 1/0 0/0 0/0 .text
- * query023__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query023(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     int i_bagNum = 3 - dComIfGs_checkBombBag(fpcNm_ITEM_NONE);
@@ -1245,8 +1158,6 @@ u16 dMsgFlow_c::query023(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B954-8024B974 246294 0020+00 1/0 0/0 0/0 .text
- * query024__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query024(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_getArrowNum() >= prm0 ? 0 : 1;
@@ -1260,8 +1171,6 @@ u16 dMsgFlow_c::query024(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B974-8024B9BC 2462B4 0048+00 1/0 0/0 0/0 .text
- * query025__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query025(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u8 prm0 = i_flowNode_p->param;
     u16 ret = dComIfGs_checkEmptyBottle() >= prm0 ? 0 : 1;
@@ -1275,8 +1184,6 @@ u16 dMsgFlow_c::query025(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B9BC-8024B9E8 2462FC 002C+00 1/0 0/0 0/0 .text
- * query026__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query026(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     dShopSystem_c* shop_ac = (dShopSystem_c*)i_speaker_p;
     const int prm0 = i_flowNode_p->param;
@@ -1291,8 +1198,6 @@ u16 dMsgFlow_c::query026(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024B9E8-8024BA4C 246328 0064+00 1/0 0/0 0/0 .text
- * query027__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query027(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 prm0 = i_flowNode_p->param & 0xFF;
     if (prm0 == 0) {
@@ -1310,8 +1215,6 @@ u16 dMsgFlow_c::query027(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BA4C-8024BAA0 24638C 0054+00 1/0 0/0 0/0 .text
- * query028__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query028(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const u16 prm0 = i_flowNode_p->param;
     u16 ret = dMeter2Info_getTimeMs() <= prm0 * 1000 + 999 ? 0 : 1;
@@ -1329,8 +1232,6 @@ u16 dMsgFlow_c::query028(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BAA0-8024BAE0 2463E0 0040+00 1/0 0/0 0/0 .text
- * query029__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query029(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 1;
     if (dComIfGs_getOil() == 0 || dComIfGs_getMaxOil() == 0) {
@@ -1348,8 +1249,6 @@ u16 dMsgFlow_c::query029(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BAE0-8024BB18 246420 0038+00 1/0 0/0 0/0 .text
- * query030__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query030(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = dComIfGs_getTmpReg(0xFBFF);
 
@@ -1362,8 +1261,6 @@ u16 dMsgFlow_c::query030(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BB18-8024BB74 246458 005C+00 1/0 0/0 0/0 .text
- * query031__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query031(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     int reg = dComIfGs_getEventReg(0xFF1F);
@@ -1385,8 +1282,6 @@ u16 dMsgFlow_c::query031(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BB74-8024BB9C 2464B4 0028+00 1/0 0/0 0/0 .text
- * query032__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query032(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
 
@@ -1404,8 +1299,6 @@ u16 dMsgFlow_c::query032(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BB9C-8024BBE4 2464DC 0048+00 1/0 0/0 0/0 .text
- * query033__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query033(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 1;
     if (daPy_getPlayerActorClass()->checkUseKandelaar(1)) {
@@ -1423,8 +1316,6 @@ u16 dMsgFlow_c::query033(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BBE4-8024BC14 246524 0030+00 1/0 0/0 0/0 .text
- * query034__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query034(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 0;
     ret = (int)(dComIfGs_getTime() * (1.0f / 15.0f)) & 0xFF;
@@ -1438,8 +1329,6 @@ u16 dMsgFlow_c::query034(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BC14-8024BC3C 246554 0028+00 1/0 0/0 0/0 .text
- * query035__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query035(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u8 ret = 0;
@@ -1456,11 +1345,9 @@ u16 dMsgFlow_c::query035(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BC3C-8024BC80 24657C 0044+00 1/0 0/0 0/0 .text
- * query036__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query036(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     msg_class* aMsg_p = fopMsgM_SearchByID(mMsg);
-    JUT_ASSERT(2751, 0 != aMsg_p);
+    JUT_ASSERT(2751, NULL != aMsg_p);
 
     u16 ret = aMsg_p->select_idx;
     if (dMsgObject_getMsgObjectClass()->getSelectPushFlag() == 2) {
@@ -1476,11 +1363,9 @@ u16 dMsgFlow_c::query036(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BC80-8024BCC4 2465C0 0044+00 1/0 0/0 0/0 .text
- * query037__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query037(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     msg_class* aMsg_p = fopMsgM_SearchByID(mMsg);
-    JUT_ASSERT(2789, 0 != aMsg_p);
+    JUT_ASSERT(2789, NULL != aMsg_p);
 
     u16 ret = aMsg_p->select_idx;
     if (dMsgObject_getMsgObjectClass()->getSelectPushFlag() == 2) {
@@ -1496,8 +1381,6 @@ u16 dMsgFlow_c::query037(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BCC4-8024BDB0 246604 00EC+00 1/0 0/0 0/0 .text
- * query038__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query038(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
 
@@ -1536,8 +1419,6 @@ u16 dMsgFlow_c::query038(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 } 
 
-/* 8024BDB0-8024BE4C 2466F0 009C+00 1/0 0/0 0/0 .text
- * query039__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query039(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
 
@@ -1561,8 +1442,6 @@ u16 dMsgFlow_c::query039(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BE4C-8024BF50 24678C 0104+00 1/0 0/0 0/0 .text
- * query040__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query040(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
 
@@ -1599,8 +1478,6 @@ u16 dMsgFlow_c::query040(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BF50-8024BFEC 246890 009C+00 1/0 0/0 0/0 .text
- * query041__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query041(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
 
@@ -1624,8 +1501,6 @@ u16 dMsgFlow_c::query041(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024BFEC-8024C0A8 24692C 00BC+00 1/0 0/0 0/0 .text
- * query042__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query042(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     daMidna_c* midna_p = daPy_py_c::getMidnaActor();
 
@@ -1649,8 +1524,6 @@ u16 dMsgFlow_c::query042(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C0A8-8024C144 2469E8 009C+00 1/0 0/0 0/0 .text
- * query043__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query043(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int prm0 = i_flowNode_p->param;
     u8 BombBag = dComIfGs_getTmpReg(0xFBFF) - 1;
@@ -1673,8 +1546,6 @@ u16 dMsgFlow_c::query043(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C144-8024C18C 246A84 0048+00 1/0 0/0 0/0 .text
- * query044__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query044(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret;
     if (daAlink_getAlinkActorClass()->checkAcceptDungeonWarpAlink(0)) {
@@ -1692,8 +1563,6 @@ u16 dMsgFlow_c::query044(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C18C-8024C218 246ACC 008C+00 1/0 0/0 0/0 .text
- * query045__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query045(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 insectNum = dComIfGs_checkGetInsectNum();
     u8 ret = 0;
@@ -1718,8 +1587,6 @@ u16 dMsgFlow_c::query045(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C218-8024C248 246B58 0030+00 1/0 0/0 0/0 .text
- * query046__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query046(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = dComIfGs_checkInsectBottle();
 
@@ -1732,8 +1599,6 @@ u16 dMsgFlow_c::query046(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C248-8024C250 246B88 0008+00 1/0 0/0 0/0 .text
- * query047__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query047(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 0;
 
@@ -1743,12 +1608,10 @@ u16 dMsgFlow_c::query047(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
         OS_REPORT("flow:%d, ret:%d\n", mFlow, ret);
     }
 
-    JUT_ASSERT(3305, 0);
+    JUT_ASSERT(3305, FALSE);
     return ret;
 }
 
-/* 8024C250-8024C2A0 246B90 0050+00 1/0 0/0 0/0 .text
- * query048__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query048(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = dMeter2Info_getNewLetterNum();
 
@@ -1769,8 +1632,6 @@ u16 dMsgFlow_c::query048(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C2A0-8024C2FC 246BE0 005C+00 1/0 0/0 0/0 .text
- * query049__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query049(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 num = dComIfGs_getPohSpiritNum();
 
@@ -1796,8 +1657,6 @@ u16 dMsgFlow_c::query049(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C2FC-8024C340 246C3C 0044+00 1/0 0/0 0/0 .text
- * query050__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query050(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     const int num = i_flowNode_p->param;
     u8 ret;
@@ -1816,8 +1675,6 @@ u16 dMsgFlow_c::query050(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C340-8024C3A0 246C80 0060+00 1/0 0/0 0/0 .text
- * query051__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query051(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     int num = dComIfGp_getMessageCountNumber();
     u8 ret;
@@ -1842,8 +1699,6 @@ u16 dMsgFlow_c::query051(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C3A0-8024C3D4 246CE0 0034+00 1/0 0/0 0/0 .text
- * query052__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query052(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 0;
     if (daPy_getPlayerActorClass()->checkWaterInMove() || dComIfGp_checkPlayerStatus0(0, 0x100000)) {
@@ -1859,8 +1714,6 @@ u16 dMsgFlow_c::query052(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 8024C3D4-8024C3FC 246D14 0028+00 1/0 0/0 0/0 .text
- * query053__10dMsgFlow_cFP21mesg_flow_node_branchP10fopAc_ac_ci */
 u16 dMsgFlow_c::query053(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_speaker_p, int param_2) {
     u8 ret = 0;
     if (daPy_getPlayerActorClass()->checkEquipHeavyBoots()) {
@@ -1876,7 +1729,6 @@ u16 dMsgFlow_c::query053(mesg_flow_node_branch* i_flowNode_p, fopAc_ac_c* i_spea
     return ret;
 }
 
-/* 803C1CCC-803C1ED0 01EDEC 0204+00 1/2 0/0 0/0 .data            mEventList__10dMsgFlow_c */
 eventFunc dMsgFlow_c::mEventList[43] = {
     &dMsgFlow_c::event000, &dMsgFlow_c::event001, &dMsgFlow_c::event002, &dMsgFlow_c::event003,
     &dMsgFlow_c::event004, &dMsgFlow_c::event005, &dMsgFlow_c::event006, &dMsgFlow_c::event007,
@@ -1891,8 +1743,6 @@ eventFunc dMsgFlow_c::mEventList[43] = {
     &dMsgFlow_c::event040, &dMsgFlow_c::event041, &dMsgFlow_c::event042,
 };
 
-/* 8024C3FC-8024C488 246D3C 008C+00 1/0 0/0 0/0 .text
- * event000__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event000(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -1903,18 +1753,16 @@ int dMsgFlow_c::event000(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     OS_REPORT("flow:%d, prm0:%d, prm1:%d\n", mFlow, prm0, prm1);
 
     if (prm0 != 0) {
-        dComIfGs_onEventBit((u16)dSv_event_flag_c::saveBitLabels[prm0]);
+        dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[prm0]);
     }
 
     if (prm1 != 0) {
-        dComIfGs_onEventBit((u16)dSv_event_flag_c::saveBitLabels[prm1]);
+        dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[prm1]);
     }
 
     return 1;
 }
 
-/* 8024C488-8024C514 246DC8 008C+00 1/0 0/0 0/0 .text
- * event001__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event001(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -1924,18 +1772,16 @@ int dMsgFlow_c::event001(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     OS_REPORT("flow:%d, prm0:%d, prm1:%d\n", mFlow, prm0, prm1);
 
     if (prm0 != 0) {
-        dComIfGs_offEventBit((u16)dSv_event_flag_c::saveBitLabels[prm0]);
+        dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[prm0]);
     }
 
     if (prm1 != 0) {
-        dComIfGs_offEventBit((u16)dSv_event_flag_c::saveBitLabels[prm1]);
+        dComIfGs_offEventBit(dSv_event_flag_c::saveBitLabels[prm1]);
     }
 
     return 1;
 }
 
-/* 8024C514-8024C550 246E54 003C+00 1/0 0/0 0/0 .text
- * event002__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event002(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemRupeeCount(prm0);
@@ -1947,8 +1793,6 @@ int dMsgFlow_c::event002(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C550-8024C590 246E90 0040+00 1/0 0/0 0/0 .text
- * event003__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event003(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemRupeeCount(-prm0);
@@ -1960,8 +1804,6 @@ int dMsgFlow_c::event003(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C590-8024C5F0 246ED0 0060+00 1/0 0/0 0/0 .text
- * event004__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event004(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     f32 prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemLifeCount(prm0, 0);
@@ -1973,8 +1815,6 @@ int dMsgFlow_c::event004(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C5F0-8024C654 246F30 0064+00 1/0 0/0 0/0 .text
- * event005__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event005(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     f32 prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemLifeCount((f32)-prm0, 0);
@@ -1986,8 +1826,6 @@ int dMsgFlow_c::event005(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C654-8024C694 246F94 0040+00 1/0 0/0 0/0 .text
- * event006__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event006(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemMagicCount(prm0);
@@ -1999,8 +1837,6 @@ int dMsgFlow_c::event006(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C694-8024C6D8 246FD4 0044+00 1/0 0/0 0/0 .text
- * event007__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event007(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dComIfGp_setItemMagicCount(-prm0);
@@ -2012,8 +1848,6 @@ int dMsgFlow_c::event007(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C6D8-8024C744 247018 006C+00 1/0 0/0 0/0 .text
- * event008__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event008(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2035,8 +1869,6 @@ int dMsgFlow_c::event008(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C744-8024C76C 247084 0028+00 1/0 0/0 0/0 .text
- * event009__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event009(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm0 = getParam(i_flowNode_p->params);
 
@@ -2047,8 +1879,6 @@ int dMsgFlow_c::event009(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C76C-8024C7F8 2470AC 008C+00 1/0 0/0 0/0 .text
- * event010__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event010(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2069,8 +1899,6 @@ int dMsgFlow_c::event010(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C7F8-8024C884 247138 008C+00 1/0 0/0 0/0 .text
- * event011__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event011(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2091,8 +1919,6 @@ int dMsgFlow_c::event011(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C884-8024C88C 2471C4 0008+00 1/0 0/0 0/0 .text
- * event012__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event012(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     // "Door OPEN"
     OS_REPORT("\x1B[44;32mドアＯＰＥＮ　　　　　　　　　　　　\x1B[m|:");
@@ -2101,8 +1927,6 @@ int dMsgFlow_c::event012(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C88C-8024C8CC 2471CC 0040+00 1/0 0/0 0/0 .text
- * event013__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event013(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     mSelType = SELTYPE_VERTICAL_e;
     mSelectMessage = 1;
@@ -2117,8 +1941,6 @@ int dMsgFlow_c::event013(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C8CC-8024C994 24720C 00C8+00 1/0 0/0 0/0 .text
- * event014__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event014(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2151,8 +1973,6 @@ int dMsgFlow_c::event014(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024C994-8024CA5C 2472D4 00C8+00 1/0 0/0 0/0 .text
- * event015__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event015(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2185,8 +2005,6 @@ int dMsgFlow_c::event015(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CA5C-8024CA94 24739C 0038+00 1/0 0/0 0/0 .text
- * event016__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event016(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     dShopSystem_c* shop = (dShopSystem_c*)i_speaker_p;
     shop->setEventParam(*(u32*)i_flowNode_p->params);
@@ -2201,8 +2019,6 @@ int dMsgFlow_c::event016(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CA94-8024CBB0 2473D4 011C+00 1/0 0/0 0/0 .text
- * event017__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event017(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2240,8 +2056,6 @@ int dMsgFlow_c::event017(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CBB0-8024CCA4 2474F0 00F4+00 1/0 0/0 0/0 .text
- * event018__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event018(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u8 prm[4];
     getParam(prm, i_flowNode_p->params);
@@ -2275,14 +2089,10 @@ int dMsgFlow_c::event018(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CCA4-8024CCAC 2475E4 0008+00 1/0 0/0 0/0 .text
- * event019__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event019(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     return 1;
 }
 
-/* 8024CCAC-8024CD84 2475EC 00D8+00 1/0 0/0 0/0 .text
- * event020__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event020(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     daPy_py_c* player = daPy_getPlayerActorClass();
@@ -2303,8 +2113,6 @@ int dMsgFlow_c::event020(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CD84-8024CDAC 2476C4 0028+00 1/0 0/0 0/0 .text
- * event021__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event021(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     cLib_calcTimer(&mTimer);
 
@@ -2315,8 +2123,6 @@ int dMsgFlow_c::event021(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CDAC-8024CE40 2476EC 0094+00 1/0 0/0 0/0 .text
- * event022__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event022(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     if (prm0 == 0) {
@@ -2334,8 +2140,6 @@ int dMsgFlow_c::event022(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CE40-8024CF2C 247780 00EC+00 2/0 0/0 0/0 .text
- * event023__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event023(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
 
@@ -2370,8 +2174,6 @@ int dMsgFlow_c::event023(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CF2C-8024CF54 24786C 0028+00 1/0 0/0 0/0 .text
- * event024__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event024(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     dShopSystem_c* shop = (dShopSystem_c*)i_speaker_p;
     shop->setSoldOutFlag();
@@ -2383,8 +2185,6 @@ int dMsgFlow_c::event024(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CF54-8024CF9C 247894 0048+00 1/0 0/0 0/0 .text
- * event025__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event025(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     u8 value = prm0 & 0xFF;
@@ -2397,8 +2197,6 @@ int dMsgFlow_c::event025(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024CF9C-8024D004 2478DC 0068+00 1/0 0/0 0/0 .text
- * event026__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event026(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     fopAc_ac_c* speaker_p;
     if (fopAcM_GetName(i_speaker_p) == PROC_MYNA) {
@@ -2425,8 +2223,6 @@ int dMsgFlow_c::event026(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D004-8024D3C4 247944 03C0+00 2/0 0/0 0/0 .text
- * event027__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event027(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2513,14 +2309,11 @@ int dMsgFlow_c::event027(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D3C4-8024D500 247D04 013C+00 1/0 0/0 0/0 .text
- * event028__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
-// NONMATCHING regalloc
 int dMsgFlow_c::event028(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u8 pos = dComIfGs_getTmpReg(0xFBFF) - 1;
-    dMsgObject_c::setSelectCursorPos(pos);
-    u8 BombBag = dMsgObject_c::getSelectBombBagID();
-    s16 BombPrice = dMsgObject_c::getSelectBombPrice();
+    dMsgObject_setSelectCursorPos(pos);
+    u8 BombBag = dMsgObject_getSelectBombBagID();
+    s16 BombPrice = dMsgObject_getSelectBombPrice();
 
     dComIfGp_setItemRupeeCount(BombPrice);
     dComIfGs_setBombNum(BombBag, 0);
@@ -2548,8 +2341,6 @@ int dMsgFlow_c::event028(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D500-8024D544 247E40 0044+00 1/0 0/0 0/0 .text
- * event029__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event029(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     mSelType = SELTYPE_HORIZONTAL_e;
     mSelectMessage = 1;
@@ -2565,8 +2356,6 @@ int dMsgFlow_c::event029(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D544-8024D5BC 247E84 0078+00 1/0 0/0 0/0 .text
- * event030__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event030(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2590,8 +2379,6 @@ int dMsgFlow_c::event030(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D5BC-8024D5EC 247EFC 0030+00 1/0 0/0 0/0 .text
- * event031__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event031(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     dMeter2Info_resetMiniGameItem(false);
 
@@ -2602,8 +2389,6 @@ int dMsgFlow_c::event031(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D5EC-8024D6BC 247F2C 00D0+00 1/0 0/0 0/0 .text
- * event032__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event032(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2633,8 +2418,6 @@ int dMsgFlow_c::event032(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D6BC-8024D788 247FFC 00CC+00 1/0 0/0 0/0 .text
- * event033__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event033(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2664,8 +2447,6 @@ int dMsgFlow_c::event033(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D788-8024D7C8 2480C8 0040+00 1/0 0/0 0/0 .text
- * event034__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event034(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dComIfGs_setWarashibeItem(prm0);
@@ -2677,8 +2458,6 @@ int dMsgFlow_c::event034(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D7C8-8024D870 248108 00A8+00 1/0 0/0 0/0 .text
- * event035__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event035(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
 
@@ -2697,8 +2476,6 @@ int dMsgFlow_c::event035(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D870-8024D8C4 2481B0 0054+00 1/0 0/0 0/0 .text
- * event036__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event036(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2713,8 +2490,6 @@ int dMsgFlow_c::event036(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D8C4-8024D918 248204 0054+00 1/0 0/0 0/0 .text
- * event037__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event037(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     u16 prm1;
     u16 prm0;
@@ -2729,8 +2504,6 @@ int dMsgFlow_c::event037(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D918-8024D93C 248258 0024+00 1/0 0/0 0/0 .text
- * event038__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event038(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     dMeter2Info_recieveLetter();
 
@@ -2741,8 +2514,6 @@ int dMsgFlow_c::event038(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D93C-8024D970 24827C 0034+00 1/0 0/0 0/0 .text
- * event039__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event039(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dMeter2Info_setTableMapRegionNo(prm0);
@@ -2754,8 +2525,6 @@ int dMsgFlow_c::event039(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024D970-8024DA78 2482B0 0108+00 2/0 0/0 0/0 .text
- * event040__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event040(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
 
@@ -2792,8 +2561,6 @@ int dMsgFlow_c::event040(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024DA78-8024DAA8 2483B8 0030+00 1/0 0/0 0/0 .text
- * event041__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event041(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     int prm0 = getParam(i_flowNode_p->params);
     dMsgObject_addOffering(prm0);
@@ -2805,8 +2572,6 @@ int dMsgFlow_c::event041(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speak
     return 1;
 }
 
-/* 8024DAA8-8024DAB0 2483E8 0008+00 1/0 0/0 0/0 .text
- * event042__10dMsgFlow_cFP20mesg_flow_node_eventP10fopAc_ac_c  */
 int dMsgFlow_c::event042(mesg_flow_node_event* i_flowNode_p, fopAc_ac_c* i_speaker_p) {
     return 1;
 }

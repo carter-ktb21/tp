@@ -3,12 +3,13 @@
 // City in the Sky Gate
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tag_Lv7Gate.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_path.h"
 #include "d/d_procname.h"
 
-/* 80D51B50-80D51B54 -00001 0004+00 5/5 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Lv7Gate";
 
 int daTagLv7Gate_c::createHeap() {
@@ -35,22 +36,18 @@ int daTagLv7Gate_c::createHeap() {
     return 1;
 }
 
-/* 80D50AB8-80D50BFC 000078 0144+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
 static int createSolidHeap(fopAc_ac_c* i_this) {
     return static_cast<daTagLv7Gate_c*>(i_this)->createHeap();
 }
 
-/* 80D50C44-80D50C64 000204 0020+00 1/0 0/0 0/0 .text            daTagLv7Gate_Create__FP10fopAc_ac_c
- */
 static int daTagLv7Gate_Create(fopAc_ac_c* i_this) {
     return static_cast<daTagLv7Gate_c*>(i_this)->create();
 }
 
-/* 80D50C64-80D50D30 000224 00CC+00 1/1 0/0 0/0 .text            create__14daTagLv7Gate_cFv */
 int daTagLv7Gate_c::create() {
     int phase;
 
-    fopAcM_SetupActor(this, daTagLv7Gate_c);
+    fopAcM_ct(this, daTagLv7Gate_c);
 
     if (fopAcM_GetPosition_p(daPy_getPlayerActorClass())->y < 7500.0f) {
         return cPhs_ERROR_e;
@@ -113,7 +110,6 @@ void daTagLv7Gate_c::setBaseMtx() {
     }
 }
 
-/* 80D50D30-80D511A8 0002F0 0478+00 1/1 0/0 0/0 .text            create_init__14daTagLv7Gate_cFv */
 void daTagLv7Gate_c::create_init() {
     attention_info.flags = 0;
     mLastFrame = 0;
@@ -170,7 +166,6 @@ void daTagLv7Gate_c::create_init() {
     fopAcM_orderOtherEventId(this, mEvtId, -1, -1, 2, 1);
 }
 
-/* 80D511A8-80D511C8 000768 0020+00 1/0 0/0 0/0 .text daTagLv7Gate_Execute__FP14daTagLv7Gate_c */
 static int daTagLv7Gate_Execute(daTagLv7Gate_c* i_this) {
     return i_this->execute();
 }
@@ -222,18 +217,18 @@ void daTagLv7Gate_c::flyAnime() {
     }
 }
 
-/* 80D511C8-80D51628 000788 0460+00 1/1 0/0 0/0 .text            execute__14daTagLv7Gate_cFv */
 int daTagLv7Gate_c::execute() {
     // Fakematch
     dComIfG_play_c& play = g_dComIfG_gameInfo.getPlay();
     if (dComIfGp_event_runCheck() != 0 && !eventInfo.checkCommandTalk()) {
-        s32 cut_index = dComIfGp_evmng_getMyStaffId(l_arcName, NULL, 0);
+        dEvent_manager_c& evtMgr = dComIfGp_getEventManager();
+        s32 cut_index = evtMgr.getMyStaffId(l_arcName, NULL, 0);
         if (cut_index != -1) {
-            int* cut_name = (int*)play.getEvtManager().getMyNowCutName(cut_index); // Fakematch
+            int* cut_name = (int*)evtMgr.getMyNowCutName(cut_index); // Fakematch
 
             daPy_getPlayerActorClass()->onShieldBackBone();
 
-            if (dComIfGp_evmng_getIsAddvance(cut_index)) {
+            if (evtMgr.getIsAddvance(cut_index)) {
                 switch (*cut_name) {
                 case '0002':
                     field_0x5b1 = true;
@@ -243,25 +238,31 @@ int daTagLv7Gate_c::execute() {
                     break;
                 case '0003':
                     break;
+                default:
+                    JUT_ASSERT(455, FALSE);
+                    break;
                 }
             }
 
             switch (*cut_name) {
             case '0001':
-                dComIfGp_evmng_cutEnd(cut_index);
+                evtMgr.cutEnd(cut_index);
                 break;
             case '0002':
-                mDoAud_seStartLevel(Z2SE_EN_DR_DEMO_FIRST, &mPos1, 0, 0);
+                Z2GetAudioMgr()->seStartLevel(Z2SE_EN_DR_DEMO_FIRST, &mPos1, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
                 if (!field_0x5b1) {
-                    dComIfGp_evmng_cutEnd(cut_index);
+                    evtMgr.cutEnd(cut_index);
                 }
                 break;
             case '0003':
                 break;
+            default:
+                JUT_ASSERT(477, FALSE);
+                break;
             }
 
             if (eventInfo.checkCommandDemoAccrpt() && mEvtId != -1 &&
-                dComIfGp_evmng_endCheck(mEvtId)) {
+                evtMgr.endCheck(mEvtId)) {
                 // dComIfGp_event_reset();
                 play.getEvent().reset(); // Fakematch
                 mEvtId = -1;
@@ -325,7 +326,6 @@ bool daTagLv7Gate_c::setNextPoint() {
     return bVar1;
 }
 
-/* 80D51628-80D519BC 000BE8 0394+00 1/1 0/0 0/0 .text            calcFly__14daTagLv7Gate_cFv */
 void daTagLv7Gate_c::calcFly() {
     f32 speed = speedF;
     if (checkPoint(speed)) {
@@ -349,12 +349,10 @@ int daTagLv7Gate_c::draw() {
     return 1;
 }
 
-/* 80D519BC-80D51A58 000F7C 009C+00 1/0 0/0 0/0 .text daTagLv7Gate_Draw__FP14daTagLv7Gate_c */
 static int daTagLv7Gate_Draw(daTagLv7Gate_c* i_this) {
     return i_this->draw();
 }
 
-/* 80D51A58-80D51A60 001018 0008+00 1/0 0/0 0/0 .text daTagLv7Gate_IsDelete__FP14daTagLv7Gate_c */
 static int daTagLv7Gate_IsDelete(daTagLv7Gate_c* i_this) {
     return 1;
 }
@@ -365,20 +363,17 @@ daTagLv7Gate_c::~daTagLv7Gate_c() {
     dComIfG_resDelete(&mPhase, l_arcName);
 }
 
-/* 80D51A60-80D51ACC 001020 006C+00 1/0 0/0 0/0 .text daTagLv7Gate_Delete__FP14daTagLv7Gate_c */
 static int daTagLv7Gate_Delete(daTagLv7Gate_c* i_this) {
     i_this->~daTagLv7Gate_c();
     return 1;
 }
 
-/* 80D51B54-80D51B74 -00001 0020+00 1/0 0/0 0/0 .data            l_daTagLv7Gate_Method */
 static actor_method_class l_daTagLv7Gate_Method = {
     (process_method_func)daTagLv7Gate_Create,  (process_method_func)daTagLv7Gate_Delete,
     (process_method_func)daTagLv7Gate_Execute, (process_method_func)daTagLv7Gate_IsDelete,
     (process_method_func)daTagLv7Gate_Draw,
 };
 
-/* 80D51B74-80D51BA4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Tag_Lv7Gate */
 extern actor_process_profile_definition g_profile_Tag_Lv7Gate = {
     fpcLy_CURRENT_e,         // mLayerID
     7,                       // mListID

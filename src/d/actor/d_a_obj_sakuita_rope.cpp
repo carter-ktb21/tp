@@ -3,12 +3,14 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_sakuita_rope.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_path.h"
 
-#ifdef DEBUG
-#include "d\d_a_obj.h"
+#if DEBUG
+#include "d/d_a_obj.h"
 
 class daObjItaRope_Hio_c : public JORReflexible {
 public:
@@ -56,19 +58,16 @@ void daObjItaRope_Hio_c::genMessage(JORMContext* ctx) {
 
 #endif
 
-/* 80CC5238-80CC527C 000078 0044+00 1/1 0/0 0/0 .text setModelData__9Sakuita_cFP12J3DModelData */
 int Sakuita_c::setModelData(J3DModelData* i_modelData) {
     mModel = mDoExt_J3DModel__create(i_modelData, 0x20000, 0x11000084);
-    JUT_ASSERT(140, mModel != 0);
+    JUT_ASSERT(140, mModel != NULL);
     return 1;
 }
 
-/* 80CC68F0-80CC6904 000000 0014+00 4/4 0/0 0/0 .rodata          M_attr__14daObjItaRope_c */
 daObjItaRope_Attr_c const daObjItaRope_c::M_attr = {
-    -5.0f, 0.2f, 0.5f, 0.8f, 0.0f,
+    -5.0f, 0.2f, 0.5f, 0.8f, 0,
 };
 
-/* 80CC527C-80CC5314 0000BC 0098+00 1/1 0/0 0/0 .text            create__9Sakuita_cFP4cXyzsSc */
 void Sakuita_c::create(cXyz* param_1, s16 param_2, s8 param_3) {
     field_0x04 = param_1;
     field_0x36 = param_2;
@@ -81,7 +80,6 @@ void Sakuita_c::create(cXyz* param_1, s16 param_2, s8 param_3) {
     initBaseMtx();
 }
 
-/* 80CC5314-80CC5354 000154 0040+00 1/1 0/0 0/0 .text            execute__9Sakuita_cFP4cXyzs */
 void Sakuita_c::execute(cXyz* param_1, s16 param_2) {
     field_0x36 = param_2;
     setPlatePos(param_1);
@@ -89,17 +87,14 @@ void Sakuita_c::execute(cXyz* param_1, s16 param_2) {
     setBaseMtx();
 }
 
-/* 80CC5354-80CC5390 000194 003C+00 1/1 0/0 0/0 .text            draw__9Sakuita_cFv */
 void Sakuita_c::draw() {
     dComIfGp_entrySimpleModel(mModel, field_0x3a);
 }
 
-/* 80CC5390-80CC53B0 0001D0 0020+00 1/1 0/0 0/0 .text            initBaseMtx__9Sakuita_cFv */
 void Sakuita_c::initBaseMtx() {
     setBaseMtx();
 }
 
-/* 80CC53B0-80CC5444 0001F0 0094+00 2/2 0/0 0/0 .text            setBaseMtx__9Sakuita_cFv */
 void Sakuita_c::setBaseMtx() {
     mDoMtx_stack_c::transS(field_0x04->x, field_0x04->y - 6.0f, field_0x04->z);
     mDoMtx_stack_c::ZrotM(mRotation.z);
@@ -108,7 +103,6 @@ void Sakuita_c::setBaseMtx() {
     mModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 80CC5444-80CC5720 000284 02DC+00 1/1 0/0 0/0 .text            setPlatePos__9Sakuita_cFP4cXyz */
 void Sakuita_c::setPlatePos(cXyz* param_1) {
     cXyz acStack_34(*param_1);
     f32 dVar5 = param_1->abs();
@@ -136,7 +130,6 @@ void Sakuita_c::setPlatePos(cXyz* param_1) {
     field_0x14 = field_0x08;
 }
 
-/* 80CC5720-80CC57E4 000560 00C4+00 2/2 0/0 0/0 .text            calcAngle__9Sakuita_cFv */
 void Sakuita_c::calcAngle() {
     cXyz local_28 = *field_0x04 - field_0x08;
     mRotation.x = cM_atan2s(local_28.z, local_28.y);
@@ -144,15 +137,14 @@ void Sakuita_c::calcAngle() {
     mRotation.z = -cM_atan2s(local_28.x, local_28.y);
 }
 
-/* 80CC6998-80CC699C -00001 0004+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "A_Sakuita";
 
-#ifdef DEBUG
+#if DEBUG
 daObjItaRope_Hio_c M_hio;
 #endif
 
 inline daObjItaRope_c::~daObjItaRope_c() {
-#ifdef DEBUG
+#if DEBUG
     M_hio.dt();
 #endif
     delete [] mRopes;
@@ -160,18 +152,17 @@ inline daObjItaRope_c::~daObjItaRope_c() {
 
     if (field_0x636 != 0) {
         J3DModelData* modelData = (J3DModelData*) dComIfG_getObjectRes(l_arcName, "A_Sakuita.bmd");
-        JUT_ASSERT(320, modelData != 0);
+        JUT_ASSERT(320, modelData != NULL);
         dComIfGp_removeSimpleModel(modelData, fopAcM_GetRoomNo(this));
     }
     dComIfG_resDelete(&mPhase, l_arcName);
 }
 
-/* 80CC57E4-80CC5E48 000624 0664+00 1/1 0/0 0/0 .text            create_init__14daObjItaRope_cFv */
 void daObjItaRope_c::create_init() {
     gravity = attr().mGravity;
     JUT_ASSERT(359, getPathID() != 0xff);
     dPath* path = dPath_GetRoomPath(getPathID(), fopAcM_GetRoomNo(this));
-    JUT_ASSERT(361, path != 0 && (path->m_num == 2));
+    JUT_ASSERT(361, path != NULL && (path->m_num == 2));
     cXyz cStack_60(path->m_points[0].m_position);
     cXyz cStack_6c(path->m_points[1].m_position);
     current.pos = (cStack_60 + cStack_6c) * 0.5f;
@@ -204,7 +195,7 @@ void daObjItaRope_c::create_init() {
     setNormalRopePos();
     initBaseMtx();
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "A_Sakuita.bmd");
-    JUT_ASSERT(420, modelData != 0);
+    JUT_ASSERT(420, modelData != NULL);
     if (dComIfGp_addSimpleModel(modelData, fopAcM_GetRoomNo(this), 0) == -1) {
         OS_REPORT("\x1b[43;30mカラカラ板：シンプルモデル登録失敗しました。\n\x1b[m");
     }
@@ -216,24 +207,21 @@ void daObjItaRope_c::create_init() {
         pSakuita->create(pPos, sVar12, fopAcM_GetRoomNo(this));
     }
 
-    #ifdef DEBUG
+    #if DEBUG
     M_hio.ct();
     #endif
 }
 
-/* 80CC5E48-80CC5E7C 000C88 0034+00 1/1 0/0 0/0 .text            initBaseMtx__14daObjItaRope_cFv */
 void daObjItaRope_c::initBaseMtx() {
     setBaseMtx();
     fopAcM_SetMtx(this, mMtx);
 }
 
-/* 80CC5E7C-80CC5ECC 000CBC 0050+00 1/1 0/0 0/0 .text            setBaseMtx__14daObjItaRope_cFv */
 void daObjItaRope_c::setBaseMtx() {
     mDoMtx_trans(mMtx, current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_ZXYrotM(mMtx, shape_angle.x, shape_angle.y, 0);
 }
 
-/* 80CC5ECC-80CC622C 000D0C 0360+00 2/2 0/0 0/0 .text setNormalRopePos__14daObjItaRope_cFv */
 void daObjItaRope_c::setNormalRopePos() {
     cXyz* pPos = mLineMat.getPos(0) + 1;
     RopeWork_c* pRope = mRopes;
@@ -303,7 +291,7 @@ inline int daObjItaRope_c::createHeap() {
     }
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, "A_Sakuita.bmd");
-    JUT_ASSERT(585, modelData != 0);
+    JUT_ASSERT(585, modelData != NULL);
 
     Sakuita_c* pSakuita = mSakuitas;
     for (int i = 0; i < field_0x635 - 2; i++, pSakuita++) {
@@ -312,22 +300,17 @@ inline int daObjItaRope_c::createHeap() {
     return 1;
 }
 
-/* 80CC622C-80CC63E4 00106C 01B8+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
 static int createSolidHeap(fopAc_ac_c* i_actor) {
     daObjItaRope_c* i_this = static_cast<daObjItaRope_c*>(i_actor);
     return i_this->createHeap();
 }
 
-/* 80CC63E4-80CC6420 001224 003C+00 2/2 0/0 0/0 .text            __dt__9Sakuita_cFv */
 Sakuita_c::~Sakuita_c() {}
 
-/* 80CC6420-80CC6424 001260 0004+00 1/1 0/0 0/0 .text            __ct__9Sakuita_cFv */
 Sakuita_c::Sakuita_c() {}
 
-/* 80CC6424-80CC6460 001264 003C+00 2/2 0/0 0/0 .text            __dt__10RopeWork_cFv */
 RopeWork_c::~RopeWork_c() {}
 
-/* 80CC6460-80CC6464 0012A0 0004+00 1/1 0/0 0/0 .text            __ct__10RopeWork_cFv */
 RopeWork_c::RopeWork_c() {}
 
 int daObjItaRope_c::draw() {
@@ -342,7 +325,6 @@ int daObjItaRope_c::draw() {
     return 1;
 }
 
-/* 80CC6464-80CC652C 0012A4 00C8+00 1/0 0/0 0/0 .text daObjItaRope_Draw__FP14daObjItaRope_c */
 static int daObjItaRope_Draw(daObjItaRope_c* i_this) {
     return i_this->draw();
 }
@@ -361,17 +343,14 @@ int daObjItaRope_c::execute() {
     return 1;
 }
 
-/* 80CC652C-80CC6610 00136C 00E4+00 1/0 0/0 0/0 .text daObjItaRope_Execute__FP14daObjItaRope_c */
 static int daObjItaRope_Execute(daObjItaRope_c* i_this) {
     return i_this->execute();
 }
 
-/* 80CC6610-80CC6618 001450 0008+00 1/0 0/0 0/0 .text daObjItaRope_IsDelete__FP14daObjItaRope_c */
 static int daObjItaRope_IsDelete(daObjItaRope_c* i_this) {
     return 1;
 }
 
-/* 80CC6618-80CC6738 001458 0120+00 1/0 0/0 0/0 .text daObjItaRope_Delete__FP14daObjItaRope_c */
 static int daObjItaRope_Delete(daObjItaRope_c* i_this) {
     fopAcM_RegisterDeleteID(i_this,  "Obj_ItaRope");
     i_this->~daObjItaRope_c();
@@ -379,7 +358,7 @@ static int daObjItaRope_Delete(daObjItaRope_c* i_this) {
 }
 
 int daObjItaRope_c::create() {
-    fopAcM_SetupActor(this, daObjItaRope_c);
+    fopAcM_ct(this, daObjItaRope_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     if (rv == cPhs_COMPLEATE_e) {
         field_0x635 = getJointNum() + 2;
@@ -394,14 +373,11 @@ int daObjItaRope_c::create() {
     return rv;
 }
 
-/* 80CC6738-80CC6844 001578 010C+00 1/0 0/0 0/0 .text            daObjItaRope_Create__FP10fopAc_ac_c
- */
 static int daObjItaRope_Create(fopAc_ac_c* i_actor) {
     fopAcM_RegisterCreateID(daObjItaRope_c, i_actor, "Obj_ItaRope");
     return static_cast<daObjItaRope_c*>(i_actor)->create();
 }
 
-/* 80CC69A0-80CC69C0 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjItaRope_Method */
 static actor_method_class l_daObjItaRope_Method = {
     (process_method_func)daObjItaRope_Create,
     (process_method_func)daObjItaRope_Delete,
@@ -410,7 +386,6 @@ static actor_method_class l_daObjItaRope_Method = {
     (process_method_func)daObjItaRope_Draw,
 };
 
-/* 80CC69C0-80CC69F0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_ItaRope */
 extern actor_process_profile_definition g_profile_Obj_ItaRope = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -427,5 +402,3 @@ extern actor_process_profile_definition g_profile_Obj_ItaRope = {
   fopAc_ACTOR_e,          // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-/* 80CC6970-80CC6970 000080 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

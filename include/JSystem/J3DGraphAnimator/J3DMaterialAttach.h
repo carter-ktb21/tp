@@ -1,8 +1,7 @@
 #ifndef J3DMATERIALATTACH_H
 #define J3DMATERIALATTACH_H
 
-#include "JSystem/JUtility/JUTAssert.h"
-#include "dolphin/types.h"
+#include "JSystem/J3DAssert.h"
 
 class J3DMaterial;
 class J3DTexture;
@@ -18,22 +17,22 @@ class JUTNameTab;
  */
 class J3DMaterialTable {
 public:
-    /* 8032F5A8 */ void clear();
-    /* 8032F5D0 */ J3DMaterialTable();
-    /* 8032F64C */ int removeMatColorAnimator(J3DAnmColor*);
-    /* 8032F6F8 */ int removeTexNoAnimator(J3DAnmTexPattern*);
-    /* 8032F7B4 */ int removeTexMtxAnimator(J3DAnmTextureSRTKey*);
-    /* 8032F880 */ int removeTevRegAnimator(J3DAnmTevRegKey*);
-    /* 8032F9C0 */ int createTexMtxForAnimator(J3DAnmTextureSRTKey*);
-    /* 8032FAF4 */ int entryMatColorAnimator(J3DAnmColor*);
-    /* 8032FBC8 */ int entryTexNoAnimator(J3DAnmTexPattern*);
-    /* 8032FCC4 */ int entryTexMtxAnimator(J3DAnmTextureSRTKey*);
-    /* 8032FE70 */ int entryTevRegAnimator(J3DAnmTevRegKey*);
+    void clear();
+    J3DMaterialTable();
+    int removeMatColorAnimator(J3DAnmColor*);
+    int removeTexNoAnimator(J3DAnmTexPattern*);
+    int removeTexMtxAnimator(J3DAnmTextureSRTKey*);
+    int removeTevRegAnimator(J3DAnmTevRegKey*);
+    int createTexMtxForAnimator(J3DAnmTextureSRTKey*);
+    int entryMatColorAnimator(J3DAnmColor*);
+    int entryTexNoAnimator(J3DAnmTexPattern*);
+    int entryTexMtxAnimator(J3DAnmTextureSRTKey*);
+    int entryTevRegAnimator(J3DAnmTevRegKey*);
 
-    /* 8032F604 */ virtual ~J3DMaterialTable();
+    virtual ~J3DMaterialTable();
 
     J3DMaterial* getMaterialNodePointer(u16 idx) const {
-        J3D_ASSERT(92, idx < mMaterialNum, "Error : range over.");
+        J3D_ASSERT_RANGE(92, idx < mMaterialNum);
         return mMaterialNodePointer[idx];
     }
 

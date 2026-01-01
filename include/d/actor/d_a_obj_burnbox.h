@@ -15,16 +15,16 @@
  */
 class daObjBurnBox_c : public dBgS_MoveBgActor {
 public:
-    /* 8046E698 */ void initBaseMtx();
-    /* 8046E6D4 */ void setBaseMtx();
-    /* 8046E738 */ int Create();
-    /* 8046E8BC */ int CreateHeap();
-    /* 8046E93C */ cPhs__Step create1st();
-    /* 8046E9EC */ int Execute(Mtx**);
-    /* 8046EABC */ int Draw();
-    /* 8046EC10 */ int Delete();
+    void initBaseMtx();
+    void setBaseMtx();
+    int Create();
+    int CreateHeap();
+    cPhs__Step create1st();
+    int Execute(Mtx**);
+    int Draw();
+    int Delete();
 
-    static void make_prm_burnBox(u32* param_0, u8 param_1) { *param_0 = param_1; }
+    static void make_prm_burnBox(u32* param_0, u8 param_1) { *param_0 = param_1 & 0xff; }
 
     u8 getType() { return fopAcM_GetParamBit(this, 0, 8); }
 

@@ -3,14 +3,30 @@
  * Combined Goron Child
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_gos.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/actor/d_a_b_go.h"
 
+enum Action {
+    /* 0x00 */ ACTION_WAIT,
+    /* 0x01 */ ACTION_WALK,
+    /* 0x02 */ ACTION_BALL,
+    /* 0x03 */ ACTION_STICK,
+};
 
+enum B_GOS_RES_FILE_ID {
+    /* BCK */
+    /* 0x04 */ BCK_GRA_WAIT_AGRA_RUN_A = 4,
+    /* 0x05 */ BCK_GRA_WAIT_AGRA_TO_STONE_NORMAL,
+    /* 0x06 */ BCK_GRA_WAIT_AGRA_WAIT_A,
 
-/* 8060541C-80605514 000000 00F8+00 1/1 0/0 0/0 .data            j_info */
+    /* BMDR */
+    /* 0x09 */ BMDR_GRA_A = 9,
+};
+
 static b_gos_j_info j_info[] = {
     {0x000E, 1.0f},   {0x000D, 1.0f},   {0x0F0D, 0.333f}, {0x0F0D, 0.666f}, {0x000F, 1.0f},
     {0x0003, 1.0f},   {0x0304, 0.5f},   {0x0004, 1.0f},   {0x0405, 0.5f},   {0x0005, 1.0f},
@@ -21,14 +37,12 @@ static b_gos_j_info j_info[] = {
     {0x0D08, 0.5f},
 };
 
-/* 8060426C-8060429C 0000EC 0030+00 1/1 0/0 0/0 .text            __ct__13daB_GOS_HIO_cFv */
 daB_GOS_HIO_c::daB_GOS_HIO_c() {
     field_0x4 = -1;
     mSize = 1.0f;
     mNormalSpeed = 10.0f;
 }
 
-/* 8060429C-80604370 00011C 00D4+00 1/0 0/0 0/0 .text            daB_GOS_Draw__FP11b_gos_class */
 static int daB_GOS_Draw(b_gos_class* i_this) {
     J3DModel* model = i_this->mpMorf->getModel();
 
@@ -45,51 +59,44 @@ static int daB_GOS_Draw(b_gos_class* i_this) {
     return 1;
 }
 
-/* 80604370-8060441C 0001F0 00AC+00 3/3 0/0 0/0 .text            anm_init__FP11b_gos_classifUcf */
 static void anm_init(b_gos_class* i_this, int i_anmID, f32 i_morf, u8 i_attribute, f32 i_speed) {
     J3DAnmTransform* bck = (J3DAnmTransform*)dComIfG_getObjectRes("B_gos", i_anmID);
     i_this->mpMorf->setAnm(bck, i_attribute, i_morf, i_speed, 0.0f, -1.0f);
     i_this->mAnmID = i_anmID;
 }
 
-/* 8060441C-80604420 00029C 0004+00 1/1 0/0 0/0 .text            damage_check__FP11b_gos_class */
 static void damage_check(b_gos_class* i_this) {}
 
-/* 80604420-806044D8 0002A0 00B8+00 1/1 0/0 0/0 .text            wait__FP11b_gos_class */
 static void wait(b_gos_class* i_this) {
     i_this->speedF = 0.0f;
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 6, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
+        anm_init(i_this, BCK_GRA_WAIT_AGRA_WAIT_A, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
         i_this->mMode = 1;
         i_this->mTimers[0] = cM_rndF(30) + 30.0f;
         break;
     case 1:
         if (i_this->mTimers[0] == 0) {
-            i_this->mAction = 1;
+            i_this->mAction = ACTION_WALK;
             i_this->mMode = 0;
         }
         break;
     }
 }
 
-/* 80605608-8060560C 000008 0004+00 3/3 0/0 0/0 .bss             boss */
 static b_go_class* boss;
 
-/* 8060560C-80605610 00000C 0004+00 2/2 0/0 0/0 .bss             None */
 static u8 data_8060560C;
 
-/* 8060561C-8060562C 00001C 0010+00 5/5 0/0 0/0 .bss             l_HIO */
 static daB_GOS_HIO_c l_HIO;
 
-/* 806044D8-806045E4 000358 010C+00 1/1 0/0 0/0 .text            walk__FP11b_gos_class */
 static void walk(b_gos_class* i_this) {
     f32 speed = 0.0f;
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, 4, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
+        anm_init(i_this, BCK_GRA_WAIT_AGRA_RUN_A, 5.0f, J3DFrameCtrl::EMode_LOOP, 1.0f);
         i_this->mMode = 1;
         i_this->mTimers[0] = cM_rndF(60) + 60.0f;
         i_this->mWalkDirection = cM_rndF(0x10000);
@@ -97,7 +104,7 @@ static void walk(b_gos_class* i_this) {
     case 1:
         speed = l_HIO.mNormalSpeed;
         if (i_this->mTimers[0] == 0) {
-            i_this->mAction = 0;
+            i_this->mAction = ACTION_WAIT;
             i_this->mMode = 0;
         }
         break;
@@ -107,7 +114,6 @@ static void walk(b_gos_class* i_this) {
     cLib_addCalcAngleS2(&i_this->current.angle.y, i_this->mWalkDirection, 1, 0x800);
 }
 
-/* 806045E4-806046E0 000464 00FC+00 1/1 0/0 0/0 .text            ball__FP11b_gos_class */
 static void ball(b_gos_class* i_this) {
     switch (i_this->mMode) {
     case 0:
@@ -116,14 +122,14 @@ static void ball(b_gos_class* i_this) {
         // fallthrough
     case 1:
         if (i_this->mTimers[0] == 0) {
-            anm_init(i_this, 5, 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
+            anm_init(i_this, BCK_GRA_WAIT_AGRA_TO_STONE_NORMAL, 5.0f, J3DFrameCtrl::EMode_NONE, 1.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = cM_rndF(30) + 60.0f;
         }
         break;
     case 2:
         if (i_this->mTimers[0] == 0) {
-            i_this->mAction = 3;
+            i_this->mAction = ACTION_STICK;
             i_this->mMode = 0;
         }
         break;
@@ -132,7 +138,6 @@ static void ball(b_gos_class* i_this) {
     cLib_addCalc0(&i_this->speedF, 1.0f, 1.0f);
 }
 
-/* 806046E0-806048E0 000560 0200+00 1/1 0/0 0/0 .text            stick__FP11b_gos_class */
 static void stick(b_gos_class* i_this) {
     cXyz offset;
     cXyz move_pos;
@@ -177,7 +182,6 @@ static void stick(b_gos_class* i_this) {
                         0x400);
 }
 
-/* 806048E0-80604B7C 000760 029C+00 1/1 0/0 0/0 .text            action__FP11b_gos_class */
 static void action(b_gos_class* i_this) {
     u8 var_r29;
     bool on_cyl_co;
@@ -197,17 +201,17 @@ static void action(b_gos_class* i_this) {
     var_r29 = 0;
 
     switch (i_this->mAction) {
-    case 0:
+    case ACTION_WAIT:
         wait(i_this);
         break;
-    case 1:
+    case ACTION_WALK:
         walk(i_this);
         break;
-    case 2:
+    case ACTION_BALL:
         ball(i_this);
         var_r29 = 1;
         break;
-    case 3:
+    case ACTION_STICK:
         stick(i_this);
         on_cyl_co = false;
         update_pos = false;
@@ -252,7 +256,7 @@ static void action(b_gos_class* i_this) {
         }
 
         if (boss->field_0x692 == 1) {
-            i_this->mAction = 0;
+            i_this->mAction = ACTION_WAIT;
             i_this->mMode = 0;
             i_this->speedF = cM_rndF(10);
             i_this->speed.y = cM_rndF(10);
@@ -262,14 +266,13 @@ static void action(b_gos_class* i_this) {
         cLib_addCalc0(&i_this->field_0x69c, 1.0f, 2.5f);
 
         if (boss->field_0x692 == 2) {
-            i_this->mAction = 2;
+            i_this->mAction = ACTION_BALL;
             i_this->mMode = 0;
             i_this->speedF = 0.0f;
         }
     }
 }
 
-/* 80604B7C-80604CF4 0009FC 0178+00 2/1 0/0 0/0 .text            daB_GOS_Execute__FP11b_gos_class */
 static int daB_GOS_Execute(b_gos_class* i_this) {
     i_this->field_0x66c++;
 
@@ -304,13 +307,10 @@ static int daB_GOS_Execute(b_gos_class* i_this) {
     return 1;
 }
 
-/* 80604CF4-80604CFC 000B74 0008+00 1/0 0/0 0/0 .text            daB_GOS_IsDelete__FP11b_gos_class
- */
 static int daB_GOS_IsDelete(b_gos_class* i_this) {
     return 1;
 }
 
-/* 80604CFC-80604D64 000B7C 0068+00 1/0 0/0 0/0 .text            daB_GOS_Delete__FP11b_gos_class */
 static int daB_GOS_Delete(b_gos_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "B_gos");
 
@@ -325,7 +325,6 @@ static int daB_GOS_Delete(b_gos_class* i_this) {
     return 1;
 }
 
-/* 80604D64-80604E5C 000BE4 00F8+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     b_gos_class* a_this = (b_gos_class*)i_this;
 
@@ -341,9 +340,8 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return true;
 }
 
-/* 80604E5C-80605024 000CDC 01C8+00 1/0 0/0 0/0 .text            daB_GOS_Create__FP10fopAc_ac_c */
 static int daB_GOS_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, b_gos_class);
+    fopAcM_ct(i_this, b_gos_class);
     b_gos_class* a_this = (b_gos_class*)i_this;
 
     OS_REPORT("B_GOS//////////////B_GOS SET 0 !!\n");
@@ -368,7 +366,7 @@ static int daB_GOS_Create(fopAc_ac_c* i_this) {
             l_HIO.field_0x4 = -1;
         }
 
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         fopAcM_SetMtx(a_this, a_this->mpMorf->getModel()->getBaseTRMtx());
         fopAcM_SetMin(a_this, -200.0f, -200.0f, -200.0f);
         fopAcM_SetMax(a_this, 200.0f, 200.0f, 200.0f);
@@ -383,7 +381,7 @@ static int daB_GOS_Create(fopAc_ac_c* i_this) {
         a_this->mAtInfo.mpSound = &a_this->mSound;
 
         a_this->gravity = -7.0f;
-        a_this->mAction = 0;
+        a_this->mAction = ACTION_WAIT;
 
         static dCcD_SrcCyl cc_cyl_src = {
             {
@@ -409,17 +407,14 @@ static int daB_GOS_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 80605024-806051D8 000EA4 01B4+00 1/1 0/0 0/0 .text            __ct__11b_gos_classFv */
 b_gos_class::b_gos_class() {}
 
-/* 80605558-80605578 -00001 0020+00 1/0 0/0 0/0 .data            l_daB_GOS_Method */
 static actor_method_class l_daB_GOS_Method = {
     (process_method_func)daB_GOS_Create,  (process_method_func)daB_GOS_Delete,
     (process_method_func)daB_GOS_Execute, (process_method_func)daB_GOS_IsDelete,
     (process_method_func)daB_GOS_Draw,
 };
 
-/* 80605578-806055A8 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_B_GOS */
 extern actor_process_profile_definition g_profile_B_GOS = {
     fpcLy_CURRENT_e,
     8,

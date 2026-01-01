@@ -1,6 +1,10 @@
 #ifndef D_A_OBJ_KUWAGATA_H
 #define D_A_OBJ_KUWAGATA_H
 
+#include "SSystem/SComponent/c_phase.h"
+#include "d/actor/d_a_player.h"
+#include "d/d_bg_s_acch.h"
+#include "d/d_cc_d.h"
 #include "d/d_insect.h"
 
 /**
@@ -11,42 +15,73 @@
  * @details
  *
  */
-class daObjKUW_c : public fopAc_ac_c {
+class daObjKUW_c : public dInsect_c {
 public:
-    /* 80C4A21C */ void InitCcSph();
-    /* 80C4A288 */ void SetCcSph();
-    /* 80C4A300 */ void CreateHeap();
-    /* 80C4A6E4 */ void ShopWaitAction();
-    /* 80C4A84C */ void WaitAction();
-    /* 80C4A9D0 */ void WallCheck();
-    /* 80C4AC44 */ void SpeedSet();
-    /* 80C4AD50 */ void WallWalk();
-    /* 80C4B1A0 */ void WalkAction();
-    /* 80C4B3A0 */ void MoveAction();
-    /* 80C4BB88 */ void Action();
-    /* 80C4BC4C */ void ShopAction();
-    /* 80C4BD08 */ void Insect_Release();
-    /* 80C4BD20 */ void Z_BufferChk();
-    /* 80C4BE9C */ void ParticleSet();
-    /* 80C4BFC0 */ void BoomChk();
-    /* 80C4C38C */ void ObjHit();
-    /* 80C4C514 */ void Execute();
-    /* 80C4C78C */ void Delete();
-    /* 80C4C7F4 */ void setBaseMtx();
-    /* 80C4C95C */ void CreateChk();
-    /* 80C4CB08 */ void create();
+    enum Action {
+        /* 0 */ ACTION_WAIT,
+        /* 1 */ ACTION_MOVE,
+        /* 2 */ ACTION_WALK,
+    };
+
+    void InitCcSph();
+    void SetCcSph();
+    int CreateHeap();
+    void ShopWaitAction();
+    void WaitAction();
+    BOOL WallCheck();
+    void SpeedSet();
+    void WallWalk();
+    void WalkAction();
+    void MoveAction();
+    void Action();
+    void ShopAction();
+    void Insect_Release();
+    void Z_BufferChk();
+    void ParticleSet();
+    void BoomChk();
+    void ObjHit();
+    int Execute();
+    int Delete();
+    void setBaseMtx();
+    bool CreateChk();
+    int create();
+    inline int Draw();
 
 private:
-    /* 0x568 */ u8 field_0x568[0xa68 - 0x568];
+    /* 0x590 */ dCcD_Stts mStts;
+    /* 0x5CC */ dCcD_Sph mSph;
+    /* 0x704 */ daPy_boomerangMove_c mBoomerangMove;
+    /* 0x710 */ dBgS_AcchCir mAcchCir;
+    /* 0x750 */ dBgS_ObjAcch mAcch;
+    /* 0x928 */ dBgS_GndChk mGndChk;
+    /* 0x97C */ int field_0x97c;
+    /* 0x980 */ u8 mAction;
+    /* 0x981 */ u8 mSubAction;
+    /* 0x982 */ s16 mTimers[3];
+    /* 0x988 */ f32 mSpeedFTarget;
+    /* 0x98C */ f32 mSpeedYTarget;
+    /* 0x990 */ s16 mAngleTarget;
+    /* 0x992 */ u8 field_0x992[0x99a - 0x992];
+    /* 0x99A */ csXyz field_0x99a;
+    /* 0x9A0 */ s16 field_0x9a0;
+    /* 0x9A2 */ s16 field_0x9a2;
+    /* 0x9A4 */ u8 field_0x9a4[0x9a8 - 0x9a4];
+    /* 0x9A8 */ f32 mParticleScale;
+    /* 0x9AC */ f32 mParticleScaleTarget;
+    /* 0x9B0 */ mDoExt_brkAnm* mpBrkAnm;
+    /* 0x9B4 */ mDoExt_btkAnm* mpBtkAnm;
+    /* 0x9B8 */ f32 field_0x9b8;
+    /* 0x9BC */ u32 field_0x9bc;
+    /* 0x9C0 */ u8 field_0x9c0;
+    /* 0x9C1 */ u8 field_0x9c1;
+    /* 0x9C2 */ u8 field_0x9c2;
+    /* 0x9C4 */ Z2Creature mSound;
+    /* 0xA54 */ int field_0xa54;
+    /* 0xA58 */ mDoExt_McaMorfSO* mpMorf;
+    /* 0xA5C */ request_of_phase_process_class mPhase;
+    /* 0xA64 */ bool mIsHIOOwner;
 };
 
 STATIC_ASSERT(sizeof(daObjKUW_c) == 0xa68);
-
-class daObj_KuwHIO_c {
-public:
-    /* 80C4A1EC */ daObj_KuwHIO_c();
-    /* 80C4D3E8 */ ~daObj_KuwHIO_c();
-};
-
 
 #endif /* D_A_OBJ_KUWAGATA_H */

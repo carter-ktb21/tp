@@ -24,12 +24,16 @@ void mDoMtx_ZrotM(Mtx mtx, s16 z);
 bool mDoMtx_inverseTranspose(f32 const (*param_0)[4], f32 (*param_1)[4]);
 void mDoMtx_QuatConcat(Quaternion const* param_0, Quaternion const* param_1, Quaternion* param_2);
 
-inline void mDoMtx_multVecSR(Mtx m, const Vec* src, Vec* dst) {
+inline void mDoMtx_multVecSR(const Mtx m, const Vec* src, Vec* dst) {
     MTXMultVecSR(m, src, dst);
 }
 
+inline void mDoMtx_concat(const Mtx a, const Mtx b, Mtx c) {
+    PSMTXConcat(a, b, c);
+}
+
 inline void cMtx_concat(const Mtx a, const Mtx b, Mtx ab) {
-    MTXConcat(a, b, ab);
+    mDoMtx_concat(a, b, ab);
 }
 
 inline void cMtx_scale(Mtx m, f32 x, f32 y, f32 z) {
@@ -37,15 +41,15 @@ inline void cMtx_scale(Mtx m, f32 x, f32 y, f32 z) {
 }
 
 inline void mDoMtx_multVec(CMtxP m, const Vec* src, Vec* dst) {
-    MTXMultVec(m, src, dst);
+    PSMTXMultVec(m, src, dst);
 }
 
-inline void mDoMtx_multVecArray(Mtx m, const Vec* src, Vec* dst, u32 count) {
+inline void mDoMtx_multVecArray(const Mtx m, const Vec* src, Vec* dst, u32 count) {
     MTXMultVecArray(m, src, dst, count);
 }
 
 inline void mDoMtx_copy(const Mtx src, Mtx dst) {
-    MTXCopy(src, dst);
+    PSMTXCopy(src, dst);
 }
 
 inline void mDoMtx_trans(Mtx m, f32 x, f32 y, f32 z) {
@@ -96,11 +100,15 @@ inline void cMtx_copy(const Mtx src, Mtx dst) {
     mDoMtx_copy(src, dst);
 }
 
-inline void cMtx_multVecArray(Mtx mtx, const Vec* src, Vec* dst, u32 count) {
+inline void cMtx_multVecArray(const Mtx mtx, const Vec* src, Vec* dst, u32 count) {
     mDoMtx_multVecArray(mtx, src, dst, count);
 }
 
-inline void mDoMtx_multVecZero(MtxP param_0, Vec* param_1) {
+inline void cMtx_inverseTranspose(const Mtx a, Mtx b) {
+    mDoMtx_inverseTranspose(a, b);
+}
+
+inline void mDoMtx_multVecZero(CMtxP param_0, Vec* param_1) {
     param_1->x = param_0[0][3];
     param_1->y = param_0[1][3];
     param_1->z = param_0[2][3];
@@ -120,10 +128,6 @@ inline void mDoMtx_quatRotAxisRad(Quaternion* q, const Vec* axis, f32 rad) {
 
 inline void mDoMtx_identity(Mtx m) {
     PSMTXIdentity(m);
-}
-
-inline void mDoMtx_concat(const Mtx a, const Mtx b, Mtx c) {
-    PSMTXConcat(a, b, c);
 }
 
 inline void mDoMtx_inverse(const Mtx a, Mtx b) {
@@ -153,20 +157,20 @@ public:
         end = buffer + 16;
     }
 
-    /* 8000CCC8 */ static bool push();
-    /* 8000CD14 */ static bool pop();
+    static bool push();
+    static bool pop();
 
     /**
      * Translates the `now` Matrix by the given cXyz
      * @param xyz The xyz translation vector
      */
-    /* 8000CD64 */ static void transS(cXyz const& xyz);
+    static void transS(cXyz const& xyz);
 
     /**
      * Translates a new Matrix by the given cXyz and then concatenates it with the `now` matrix
      * @param xyz The xyz translation vector
      */
-    /* 8000CDD4 */ static void transM(cXyz const& xyz);
+    static void transM(cXyz const& xyz);
 
     /**
      * Translates a new Matrix by the given X, Y, and Z values and then concatenates it with the `now` matrix
@@ -174,19 +178,19 @@ public:
      * @param y The y-axis translation value
      * @param z The z-axis translation value
      */
-    /* 8000CD9C */ static void transM(f32 x, f32 y, f32 z);
+    static void transM(f32 x, f32 y, f32 z);
 
     /**
      * Scales the `now` Matrix by the given cXyz
      * @param xyz The xyz scale vector
      */
-    /* 8000CE00 */ static void scaleS(cXyz const& xyz);
+    static void scaleS(cXyz const& xyz);
 
     /**
      * Scales a new Matrix by the given cXyz and then concatenates it with the `now` matrix
      * @param xyz The xyz scale vector
      */
-    /* 8000CE70 */ static void scaleM(cXyz const& xyz);
+    static void scaleM(cXyz const& xyz);
 
     /**
      * Scales a new Matrix by the given X, Y, and Z values and then concatenates it with the `now` matrix
@@ -194,30 +198,30 @@ public:
      * @param y The y-axis scale value
      * @param z The z-axis scale value
      */
-    /* 8000CE38 */ static void scaleM(f32 x, f32 y, f32 z);
+    static void scaleM(f32 x, f32 y, f32 z);
 
-    /* 8000CE9C */ static void XYZrotS(csXyz const& xyz);
+    static void XYZrotS(csXyz const& xyz);
 
     /**
      * Rotates the `now` matrix by the given csXyz in the order Z, Y, X
      * @param xyz The xyz rotation vector
      */
-    /* 8000CED4 */ static void XYZrotM(csXyz const& xyz);
+    static void XYZrotM(csXyz const& xyz);
 
-    /* 8000CF0C */ static void ZXYrotS(csXyz const& xyz);
+    static void ZXYrotS(csXyz const& xyz);
 
     /**
      * Rotates the `now` matrix by the given csXyz in the order X, Y, Z
      * @param xyz The xyz rotation vector
      */
-    /* 8000CF44 */ static void ZXYrotM(csXyz const& xyz);
+    static void ZXYrotM(csXyz const& xyz);
 
     static void quatS(const Quaternion* quat) {
         MTXQuat(now, quat);
     }
 
-    /* 8000CF7C */ static void quatM(Quaternion const*);
-    /* 8000D070 */ ~mDoMtx_stack_c() {}  // inline
+    static void quatM(Quaternion const*);
+    ~mDoMtx_stack_c() {}  // inline
 
     /**
      * Returns the `now` Matrix
@@ -246,7 +250,7 @@ public:
      * @param a The source Vec
      * @param b The output Vec
      */
-    static void multVec(const Vec* a, Vec* b) { MTXMultVec(now, a, b); }
+    static void multVec(const Vec* a, Vec* b) { PSMTXMultVec(now, a, b); }
 
     /**
      * Multiplies a given Vec `a` by the `now` Matrix's "Scale-and-Rotate" component and places the result into Vec `b`
@@ -264,7 +268,7 @@ public:
      * @param count The size of the array
      */
     static void multVecArray(const Vec* src, Vec* dst, u32 count) {
-        MTXMultVecArray(now, src, dst, count);
+        PSMTXMultVecArray(now, src, dst, count);
     }
 
     static void XYZrotS(s16 x, s16 y, s16 z) { mDoMtx_XYZrotS(now, x, y, z); }
@@ -323,7 +327,7 @@ public:
      */
     static void ZrotM(s16 z) { mDoMtx_ZrotM(now, z); }
 
-    static void inverse() { MTXInverse(now, now); }
+    static void inverse() { PSMTXInverse(now, now); }
 
     static void inverseTranspose() { mDoMtx_inverseTranspose(now, now); }
 
@@ -339,14 +343,14 @@ public:
      * Copies a given matrix `m` to the `now` matrix
      * @param m The source matrix to copy
      */
-    static void copy(const Mtx m) { MTXCopy(m, now); }
+    static void copy(const Mtx m) { PSMTXCopy(m, now); }
 
     static void rotAxisRadS(const Vec* axis, f32 rad) {
         MTXRotAxisRad(now, axis, rad);
     }
 
     static void identity() {
-        MTXIdentity(now);
+        PSMTXIdentity(now);
     }
 
     static Mtx now;

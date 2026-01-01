@@ -2,6 +2,8 @@
 // Door Knob
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_door_knob00.h"
 #include "f_op/f_op_actor_mng.h"
 #include "d/d_com_inf_game.h"
@@ -11,24 +13,18 @@
 #include "SSystem/SComponent/c_math.h"
 #include "printf.h"
 
-/* 8045E858-8045E864 000078 000C+00 1/1 0/0 0/0 .text getDoorModel__12knob_param_cFP10fopAc_ac_c
- */
 u32 knob_param_c::getDoorModel(fopAc_ac_c* i_this) {
     return fopAcM_GetParamBit(i_this, 5, 3);
 }
 
-/* 8045E864-8045E870 000084 000C+00 1/1 0/0 0/0 .text
- * getDoorLightInf__12knob_param_cFP10fopAc_ac_c                */
 u32 knob_param_c::getDoorLightInf(fopAc_ac_c* i_this) {
     return fopAcM_GetParamBit(i_this, 8, 3);
 }
 
-/* 8045E870-8045E87C 000090 000C+00 2/2 0/0 0/0 .text getMsgNo__12knob_param_cFP10fopAc_ac_c */
 u16 knob_param_c::getMsgNo(fopAc_ac_c* i_this) {
     return i_this->home.angle.x;
 }
 
-/* 8045E87C-8045E888 00009C 000C+00 2/2 0/0 0/0 .text getExitNo__12knob_param_cFP10fopAc_ac_c */
 u8 knob_param_c::getExitNo(fopAc_ac_c* i_this) {
     return fopAcM_GetParamBit(i_this, 25, 6);
 }
@@ -37,70 +33,42 @@ static char* dummyStringFunc() {
     return "door-knob_";
 }
 
-/* 8045E888-8045E898 0000A8 0010+00 4/4 0/0 0/0 .text            getAlwaysArcName__10daKnob20_cFv */
 char* daKnob20_c::getAlwaysArcName() {
     return "static";
 }
 
-/* 8045E898-8045E8A8 0000B8 0010+00 3/3 0/0 0/0 .text            getEvArcName__10daKnob20_cFv */
 char* daKnob20_c::getEvArcName() {
     return "DoorK10";
 }
 
-/* 8045E8A8-8045E8B8 0000C8 0010+00 1/1 0/0 0/0 .text            getDzb__10daKnob20_cFv */
 char* daKnob20_c::getDzb() {
     return "door-knob.dzb";
 }
 
-/* 8045E8B8-8045E8C8 0000D8 0010+00 1/1 0/0 0/0 .text            getDummyBmd__10daKnob20_cFv */
 char* daKnob20_c::getDummyBmd() {
     return "door-knobDummy.bmd";
 }
 
-/* 80460874-80460880 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80460880-80460894 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 80460894-80460898 -00001 0004+00 1/1 0/0 0/0 .data            l_bmd_base_name */
 static char* l_bmd_base_name = "door-knob_";
 
-/* 80460A98-80460AB8 000000 0020+00 1/1 0/0 0/0 .bss             l_bmdName$3809 */
-static char l_bmdName[32];
-
-/* 8045E8C8-8045E91C 0000E8 0054+00 1/1 0/0 0/0 .text            getBmd__10daKnob20_cFv */
 char* daKnob20_c::getBmd() {
+    static char l_bmdName[32];
+
     sprintf(l_bmdName, "%s%02d.bmd", l_bmd_base_name, knob_param_c::getDoorModel(this));
     return l_bmdName;
 }
 
-/* 8045E91C-8045E940 00013C 0024+00 1/1 0/0 0/0 .text            getDoorModelData__10daKnob20_cFv */
 J3DModelData* daKnob20_c::getDoorModelData() {
     return (J3DModelData*)dComIfG_getStageRes(getBmd());
 }
 
-/* 8045E940-8045E960 000160 0020+00 1/1 0/0 0/0 .text            CheckCreateHeap__FP10fopAc_ac_c */
 static int CheckCreateHeap(fopAc_ac_c* i_this) {
     return static_cast<daKnob20_c*>(i_this)->CreateHeap();
 }
 
-/* 8045E960-8045EBA0 000180 0240+00 1/1 0/0 0/0 .text            CreateHeap__10daKnob20_cFv */
 int daKnob20_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(getAlwaysArcName(), getDummyBmd());
-    JUT_ASSERT(201, modelData != 0);
+    JUT_ASSERT(201, modelData != NULL);
     mModel1 = mDoExt_J3DModel__create(modelData, 0, 0x11020203);
     if (mModel1 == NULL) {
         return 0;
@@ -111,14 +79,14 @@ int daKnob20_c::CreateHeap() {
     mModel1->setBaseTRMtx(mDoMtx_stack_c::get());
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), "FDoorA.bck");
-    JUT_ASSERT(222, anm != 0);
+    JUT_ASSERT(222, anm != NULL);
     if (field_0x57c.init(anm, 1, 0, 1.0f, 0, -1, false) == 0) {
         return 0;
     }
     mJoint = modelData->getJointName()->getIndex("FDoor");
     JUT_ASSERT(227, mJoint >= 0);
     modelData = getDoorModelData();
-    JUT_ASSERT(235, modelData != 0);
+    JUT_ASSERT(235, modelData != NULL);
     mModel2 = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mModel2 == 0) {
         return 0;
@@ -131,7 +99,7 @@ int daKnob20_c::CreateHeap() {
     field_0x57c.entry(mModel1->getModelData());
     mModel1->calc();
     cBgD_t* bgd = (cBgD_t*)dComIfG_getObjectRes(getAlwaysArcName(), getDzb());
-    JUT_ASSERT(261, bgd != 0);
+    JUT_ASSERT(261, bgd != NULL);
     if (field_0x5a0->Set(bgd, 1, (Mtx*)mModel1->getAnmMtx(mJoint)) == 1) {
         return 0;
     } else {
@@ -139,7 +107,6 @@ int daKnob20_c::CreateHeap() {
     }
 }
 
-/* 8045EBA0-8045EC44 0003C0 00A4+00 3/3 0/0 0/0 .text            calcMtx__10daKnob20_cFv */
 void daKnob20_c::calcMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::YrotM(current.angle.y);
@@ -149,7 +116,6 @@ void daKnob20_c::calcMtx() {
     mModel1->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 8045EC44-8045ED1C 000464 00D8+00 1/1 0/0 0/0 .text            CreateInit__10daKnob20_cFv */
 int daKnob20_c::CreateInit() {
     int rt = dComIfG_Bgsp().Regist(field_0x5a0, this);
     JUT_ASSERT(299, rt == 0);
@@ -157,7 +123,7 @@ int daKnob20_c::CreateInit() {
     setAction(ACTION_INIT);
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
     calcMtx();
     fopAcM_SetMtx(this, mModel1->getBaseTRMtx());
     fopAcM_setCullSizeFar(this, 2.0f);
@@ -169,9 +135,8 @@ int daKnob20_c::CreateInit() {
     return 1;
 }
 
-/* 8045ED1C-8045EE14 00053C 00F8+00 1/1 0/0 0/0 .text            create__10daKnob20_cFv */
 int daKnob20_c::create() {
-    fopAcM_SetupActor(this, daKnob20_c);
+    fopAcM_ct(this, daKnob20_c);
     int phase = dComIfG_resLoad(&mPhase2, getAlwaysArcName());
     if (phase != cPhs_COMPLEATE_e) {
         return phase;
@@ -187,7 +152,6 @@ int daKnob20_c::create() {
     return 4;
 }
 
-/* 8045EE5C-8045EEE4 00067C 0088+00 1/1 0/0 0/0 .text            checkOpenDoor__10daKnob20_cFPi */
 int daKnob20_c::checkOpenDoor(int* param_1) {
     int msgNo = knob_param_c::getMsgNo(this);
     if (msgNo == 0xffff) {
@@ -200,8 +164,6 @@ int daKnob20_c::checkOpenDoor(int* param_1) {
     return rv;
 }
 
-/* 8045EEE4-8045EFCC 000704 00E8+00 1/1 0/0 0/0 .text            setActionFromFlow__10daKnob20_cFv
- */
 void daKnob20_c::setActionFromFlow() {
     if (mAction == ACTION_INIT || mAction == ACTION_DEMO || mAction == ACTION_TALK) {
         return;
@@ -230,19 +192,17 @@ void daKnob20_c::setActionFromFlow() {
     }
 }
 
-/* 80460898-804608B4 -00001 001C+00 1/1 0/0 0/0 .data            ev_name_table$4009 */
-static char* ev_name_table[7] = {
-    "DEFAULT_KNOB_DOOR_F_OPEN",
-    "DEFAULT_KNOB_DOOR_B_OPEN",
-    "DEFAULT_KNOB_TALK",
-    "DEFAULT_KNOB_TALK_B",
-    "DEFAULT_KNOB_TALK_F_OPEN",
-    "DEFAULT_KNOB_TALK_B_OPEN",
-    "DEFAULT_KNOB_TALK",
-};
-
-/* 8045EFCC-8045F058 0007EC 008C+00 1/1 0/0 0/0 .text            setEventId__10daKnob20_cFv */
 void daKnob20_c::setEventId() {
+    static char* ev_name_table[7] = {
+        "DEFAULT_KNOB_DOOR_F_OPEN",
+        "DEFAULT_KNOB_DOOR_B_OPEN",
+        "DEFAULT_KNOB_TALK",
+        "DEFAULT_KNOB_TALK_B",
+        "DEFAULT_KNOB_TALK_F_OPEN",
+        "DEFAULT_KNOB_TALK_B_OPEN",
+        "DEFAULT_KNOB_TALK",
+    };
+
     for (int i = 0; i < 7; i++) {
         field_0x5b2[i] = 0xff;
         field_0x5a4[i] =
@@ -250,7 +210,6 @@ void daKnob20_c::setEventId() {
     }
 }
 
-/* 8045F058-8045F29C 000878 0244+00 1/1 0/0 0/0 .text            checkArea__10daKnob20_cFfff */
 int daKnob20_c::checkArea(f32 param_1, f32 param_2, f32 param_3) {
     daPy_py_c* player = daPy_getPlayerActorClass();
     cXyz playerDistance = player->current.pos - current.pos;
@@ -277,7 +236,6 @@ int daKnob20_c::checkArea(f32 param_1, f32 param_2, f32 param_3) {
     }
 }
 
-/* 8045F29C-8045F428 000ABC 018C+00 3/3 0/0 0/0 .text            setEventPrm__10daKnob20_cFv */
 void daKnob20_c::setEventPrm() {
     if (knob_param_c::getExitNo(this) == 62) {
         if (strcmp(dComIfGp_getStartStageName(), "F_SP116") == 0) {
@@ -318,7 +276,6 @@ void daKnob20_c::setEventPrm() {
     }
 }
 
-/* 8045F428-8045F478 000C48 0050+00 1/1 0/0 0/0 .text            releaseBG__10daKnob20_cFv */
 int daKnob20_c::releaseBG() {
     if (field_0x5a0->ChkUsed()) {
         dComIfG_Bgsp().Release(field_0x5a0);
@@ -326,7 +283,6 @@ int daKnob20_c::releaseBG() {
     return 1;
 }
 
-/* 8045F478-8045F520 000C98 00A8+00 1/1 0/0 0/0 .text            frontCheck__10daKnob20_cFv */
 int daKnob20_c::frontCheck() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     cXyz playerDist = player->current.pos - current.pos;
@@ -338,32 +294,29 @@ int daKnob20_c::frontCheck() {
     return 1;
 }
 
-/* 804608B4-804608F4 -00001 0040+00 1/1 0/0 0/0 .data            action_table$4177 */
-static char* action_table[16] = {
-    "WAIT",
-    "SETSTART",
-    "SETANGLE",
-    "ADJUSTMENT",
-    "OPEN_PUSH",
-    "OPEN_PULL",
-    "OPEN_PUSH2",
-    "OPEN_PULL2",
-    "OPEN_PUSH_STOP",
-    "OPEN_PULL_STOP",
-    "TALK",
-    "TALK_END",
-    "SETSTART_PUSH",
-    "SETSTART_PULL",
-    "DEMO_OPEN",
-    "DEMO_CLOSE",
-};
-
-/* 8045F520-8045F568 000D40 0048+00 1/1 0/0 0/0 .text            getDemoAction__10daKnob20_cFv */
 int daKnob20_c::getDemoAction() {
+    static char* action_table[16] = {
+        "WAIT",
+        "SETSTART",
+        "SETANGLE",
+        "ADJUSTMENT",
+        "OPEN_PUSH",
+        "OPEN_PULL",
+        "OPEN_PUSH2",
+        "OPEN_PULL2",
+        "OPEN_PUSH_STOP",
+        "OPEN_PULL_STOP",
+        "TALK",
+        "TALK_END",
+        "SETSTART_PUSH",
+        "SETSTART_PULL",
+        "DEMO_OPEN",
+        "DEMO_CLOSE",
+    };
+
     return dComIfGp_evmng_getMyActIdx(field_0x5bc, action_table, 16, 0, 0);
 }
 
-/* 8045F568-8045F8A4 000D88 033C+00 9/7 0/0 0/0 .text            demoProc__10daKnob20_cFv */
 int daKnob20_c::demoProc() {
     int demoAction;
     int rv = 0;
@@ -400,7 +353,8 @@ int daKnob20_c::demoProc() {
             field_0x610 = 10;
             break;
         case 10:
-            int msgNo = knob_param_c::getMsgNo(this);
+            int msgNo;
+            msgNo = knob_param_c::getMsgNo(this);
             if (msgNo != 0xffff) {
                 field_0x5c0.init(this, msgNo, 0, NULL);
             }
@@ -438,6 +392,7 @@ int daKnob20_c::demoProc() {
     case 10:
         dComIfGp_event_offHindFlag(1);
         if (field_0x5c0.doFlow(this, NULL, 0) != 0) {
+            OS_REPORT("会話終了！\n"); // Conversation over!
             int msgNo = knob_param_c::getMsgNo(this);
             if (msgNo != 0xffff) {
                 field_0x5c0.init(this, msgNo, 0, NULL);
@@ -453,12 +408,14 @@ int daKnob20_c::demoProc() {
     case 9:
         dComIfGp_evmng_cutEnd(field_0x5bc);
         break;
-    case 14:
-        if (cLib_addCalcAngleS(&field_0x612, -0x2800, 20, 500, 10) == 0) {
+    case 14: {
+        s16 tmp = cLib_addCalcAngleS(&field_0x612, -0x2800, 20, 500, 10);
+        if (tmp == 0) {
             dComIfGp_evmng_cutEnd(field_0x5bc);
         }
         calcMtx();
         break;
+    }
     case 15:
         dComIfGp_evmng_cutEnd(field_0x5bc);
         calcMtx();
@@ -470,7 +427,6 @@ int daKnob20_c::demoProc() {
     return rv;
 }
 
-/* 8045F8A4-8045F94C 0010C4 00A8+00 1/1 0/0 0/0 .text            setStart__10daKnob20_cFff */
 void daKnob20_c::setStart(f32 param_1, f32 param_2) {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     cXyz pos(current.pos);
@@ -480,12 +436,10 @@ void daKnob20_c::setStart(f32 param_1, f32 param_2) {
     player->setPlayerPosAndAngle(&pos, player->shape_angle.y, 0);
 }
 
-/* 8045F94C-8045F968 00116C 001C+00 1/1 0/0 0/0 .text            setAngle__10daKnob20_cFv */
 void daKnob20_c::setAngle() {
   static_cast<daPy_py_c*>(dComIfGp_getPlayer(0))->changeDemoMoveAngle(shape_angle.y + 0x7fff);
 }
 
-/* 8045F968-8045FA98 001188 0130+00 1/1 0/0 0/0 .text            adjustmentProc__10daKnob20_cFv */
 int daKnob20_c::adjustmentProc() {
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
     cXyz local_1c;
@@ -507,19 +461,17 @@ int daKnob20_c::adjustmentProc() {
     return 0;
 }
 
-/* 80460968-80460978 -00001 0010+00 1/1 0/0 0/0 .data            bck_table$4335 */
-static char* bck_table[4] = {
-    "FDoorA.bck",
-    "FDoorB.bck",
-    "FDoorA.bck",
-    "FDoorB.bck",
-};
-
-/* 8045FA98-8045FBF8 0012B8 0160+00 1/1 0/0 0/0 .text            openInit__10daKnob20_cFi */
 int daKnob20_c::openInit(int param_1) {
+    static char* bck_table[4] = {
+        "FDoorA.bck",
+        "FDoorB.bck",
+        "FDoorA.bck",
+        "FDoorB.bck",
+    };
+
     J3DAnmTransform* anm =
         (J3DAnmTransform*)dComIfG_getObjectRes(getAlwaysArcName(), bck_table[param_1]);
-    JUT_ASSERT(937, anm != 0);
+    JUT_ASSERT(937, anm != NULL);
     field_0x57c.init(anm, 1, 0, 1.0f, 0, -1, true);
     onFlag(1);
     if (param_1 >= 2) {
@@ -532,7 +484,6 @@ int daKnob20_c::openInit(int param_1) {
     return 1;
 }
 
-/* 8045FBF8-8045FCA4 001418 00AC+00 1/1 0/0 0/0 .text            openProc__10daKnob20_cFi */
 int daKnob20_c::openProc(int param_1) {
     if (field_0x57c.play() != 0) {
         return 1;
@@ -544,7 +495,6 @@ int daKnob20_c::openProc(int param_1) {
     return 0;
 }
 
-/* 8045FCA4-8045FDF8 0014C4 0154+00 1/1 0/0 0/0 .text            openEnd__10daKnob20_cFi */
 int daKnob20_c::openEnd(int param_1) {
     offFlag(1);
     int rt = dComIfG_Bgsp().Regist(field_0x5a0, this);
@@ -567,7 +517,6 @@ int daKnob20_c::openEnd(int param_1) {
     return 1;
 }
 
-/* 8045FDF8-8045FE68 001618 0070+00 3/3 0/0 0/0 .text            initOpenDemo__10daKnob20_cFv */
 void daKnob20_c::initOpenDemo() {
     shape_angle.y = current.angle.y;
     if (field_0x60f == 1) {
@@ -576,7 +525,6 @@ void daKnob20_c::initOpenDemo() {
     field_0x5bc = dComIfGp_evmng_getMyStaffId("SHUTTER_DOOR", 0, 0);
 }
 
-/* 8045FE68-8045FF08 001688 00A0+00 1/1 0/0 0/0 .text            startDemoProc__10daKnob20_cFv */
 void daKnob20_c::startDemoProc() {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
     field_0x5bc = dComIfGp_evmng_getMyStaffId("SHUTTER_DOOR", 0, 0);
@@ -592,7 +540,6 @@ void daKnob20_c::startDemoProc() {
     }
 }
 
-/* 8045FF08-8045FFB0 001728 00A8+00 1/0 0/0 0/0 .text            actionWait__10daKnob20_cFv */
 int daKnob20_c::actionWait() {
     if (eventInfo.checkCommandDoor()) {
         initOpenDemo();
@@ -610,8 +557,6 @@ int daKnob20_c::actionWait() {
     return 1;
 }
 
-/* 8045FFB0-8046002C 0017D0 007C+00 1/0 0/0 0/0 .text            actionSpecialDemo__10daKnob20_cFv
- */
 int daKnob20_c::actionSpecialDemo() {
     field_0x5bc = dComIfGp_evmng_getMyStaffId("kdoor", 0, 0);
     if (field_0x5bc == -1) {
@@ -623,7 +568,6 @@ int daKnob20_c::actionSpecialDemo() {
     return 1;
 }
 
-/* 8046002C-804600C0 00184C 0094+00 1/0 0/0 0/0 .text            actionDemo__10daKnob20_cFv */
 int daKnob20_c::actionDemo() {
     if ( dComIfGp_evmng_endCheck(field_0x5a4[field_0x5b9])) {
         setAction(ACTION_WAIT);
@@ -636,7 +580,6 @@ int daKnob20_c::actionDemo() {
     return 1;
 }
 
-/* 804600C0-8046012C 0018E0 006C+00 1/0 0/0 0/0 .text            actionTalk__10daKnob20_cFv */
 int daKnob20_c::actionTalk() {
     dMeter2Info_onGameStatus(2);
     if (demoProc()) {
@@ -647,7 +590,6 @@ int daKnob20_c::actionTalk() {
     return 1;
 }
 
-/* 8046012C-804601D4 00194C 00A8+00 1/0 0/0 0/0 .text            actionTalkWait__10daKnob20_cFv */
 int daKnob20_c::actionTalkWait() {
     if (eventInfo.checkCommandDoor()) {
         initOpenDemo();
@@ -665,7 +607,6 @@ int daKnob20_c::actionTalkWait() {
     return 1;
 }
 
-/* 804601D4-8046027C 0019F4 00A8+00 1/0 0/0 0/0 .text            actionTalkOpen__10daKnob20_cFv */
 int daKnob20_c::actionTalkOpen() {
     if (eventInfo.checkCommandDoor()) {
         initOpenDemo();
@@ -683,7 +624,6 @@ int daKnob20_c::actionTalkOpen() {
     return 1;
 }
 
-/* 8046027C-804602D8 001A9C 005C+00 1/0 0/0 0/0 .text            actionInit__10daKnob20_cFv */
 int daKnob20_c::actionInit() {
     if (!field_0x5a0->ChkUsed()) {
         dComIfG_Bgsp().Regist(field_0x5a0, this);
@@ -692,12 +632,10 @@ int daKnob20_c::actionInit() {
     return 1;
 }
 
-/* 804602D8-804602E0 001AF8 0008+00 1/0 0/0 0/0 .text            actionDead__10daKnob20_cFv */
 int daKnob20_c::actionDead() {
     return 1;
 }
 
-/* 804602E0-8046045C 001B00 017C+00 1/1 0/0 0/0 .text            execute__10daKnob20_cFv */
 int daKnob20_c::execute() {
     static actionFunc l_action[8] = {
         &daKnob20_c::actionInit, &daKnob20_c::actionWait,        &daKnob20_c::actionDemo,
@@ -707,7 +645,7 @@ int daKnob20_c::execute() {
 
     setActionFromFlow();
     field_0x60f = frontCheck();
-    if (fopAcM_checkStatus(this, 0x1000)) {
+    if (fopAcM_CheckStatus(this, 0x1000)) {
         startDemoProc();
         demoProc();
         dMeter2Info_onGameStatus(2);
@@ -717,7 +655,6 @@ int daKnob20_c::execute() {
     return 1;
 }
 
-/* 8046045C-80460550 001C7C 00F4+00 1/1 0/0 0/0 .text            draw__10daKnob20_cFv */
 int daKnob20_c::draw() {
     g_env_light.settingTevStruct(0x14, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mModel2, &tevStr);
@@ -730,7 +667,6 @@ int daKnob20_c::draw() {
     return 1;
 }
 
-/* 80460550-804605DC 001D70 008C+00 1/1 0/0 0/0 .text            Delete__10daKnob20_cFv */
 int daKnob20_c::Delete() {
     if (heap != NULL && field_0x5a0 != NULL && field_0x5a0->ChkUsed()) {
         dComIfG_Bgsp().Release(field_0x5a0);
@@ -740,35 +676,29 @@ int daKnob20_c::Delete() {
     return 1;
 }
 
-/* 804605DC-804605FC 001DFC 0020+00 1/0 0/0 0/0 .text            daKnob20_Draw__FP10daKnob20_c */
 static int daKnob20_Draw(daKnob20_c* i_this) {
     return i_this->draw();
 }
 
-/* 804605FC-80460620 001E1C 0024+00 1/0 0/0 0/0 .text            daKnob20_Execute__FP10daKnob20_c */
 static int daKnob20_Execute(daKnob20_c* i_this) {
     i_this->execute();
     return 1;
 }
 
-/* 80460620-80460640 001E40 0020+00 1/0 0/0 0/0 .text            daKnob20_Delete__FP10daKnob20_c */
 static int daKnob20_Delete(daKnob20_c* i_this) {
     return i_this->Delete();
 }
 
-/* 80460640-80460660 001E60 0020+00 1/0 0/0 0/0 .text            daKnob20_Create__FP10fopAc_ac_c */
 static int daKnob20_Create(fopAc_ac_c* i_this) {
     return static_cast<daKnob20_c*>(i_this)->create();
 }
 
-/* 80460A38-80460A58 -00001 0020+00 1/0 0/0 0/0 .data            l_daKnob20_Method */
 static actor_method_class l_daKnob20_Method = {
     (process_method_func)daKnob20_Create,  (process_method_func)daKnob20_Delete,
     (process_method_func)daKnob20_Execute, (process_method_func)NULL,
     (process_method_func)daKnob20_Draw,
 };
 
-/* 80460A58-80460A88 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_KNOB20 */
 extern actor_process_profile_definition g_profile_KNOB20 = {
     fpcLy_CURRENT_e,        // mLayerID
     7,                      // mListID

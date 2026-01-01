@@ -46,7 +46,7 @@ public:
     static void dump(void);
 
     static JKRAram* getManager() { return sAramObject; }
-    static JKRAramHeap* getAramHeap() { return getManager()->mAramHeap; }
+    static JKRAramHeap* getAramHeap() { return sAramObject->mAramHeap; }
     static JSUList<JKRAMCommand>& getCommandList() { return sAramCommandList; }
 
     static u8 decideAramGroupId(int groupId) {
@@ -85,8 +85,20 @@ inline u8* JKRAramToMainRam(u32 p1, u8* p2, u32 p3, JKRExpandSwitch p4, u32 p5, 
     return JKRAram::aramToMainRam(p1, p2, p3, p4, p5, p6, p7, p8);
 }
 
-inline JKRAramBlock *JKRMainRamToAram(u8 *buf, u32 bufSize, u32 alignedSize, JKRExpandSwitch expandSwitch, u32 fileSize, JKRHeap *heap, int id, u32 *pSize) {
+inline JKRAramBlock* JKRMainRamToAram(u8 *buf, u32 bufSize, u32 alignedSize, JKRExpandSwitch expandSwitch, u32 fileSize, JKRHeap *heap, int id, u32 *pSize) {
     return JKRAram::mainRamToAram(buf, bufSize, alignedSize, expandSwitch, fileSize, heap, id, pSize);
+}
+
+inline u32 JKRGetAramTotalFreeSize() {
+    return JKRAram::getAramHeap()->getTotalFreeSize();
+}
+
+inline u32 JKRGetAramFreeSize() {
+    return JKRAram::getAramHeap()->getFreeSize();
+}
+
+inline u32 JKRGetAramUsedSize(u8 param_0) {
+    return JKRAram::getAramHeap()->getUsedSize(param_0);
 }
 
 // void JKRDecompressFromAramToMainRam(u32, void*, u32, u32, u32, u32*);

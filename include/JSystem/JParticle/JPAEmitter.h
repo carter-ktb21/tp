@@ -2,6 +2,7 @@
 #define JPAEMITTER_H
 
 #include <dolphin/gx.h>
+#include <stdint.h>
 #include "JSystem/JParticle/JPAResource.h"
 #include "JSystem/JParticle/JPAList.h"
 #include "JSystem/JParticle/JPARandom.h"
@@ -74,12 +75,12 @@ struct JPAEmitterWorkData {
 class JPAEmitterCallBack {
 public:
     virtual ~JPAEmitterCallBack() = 0;
-    /* 80050368 */ virtual void execute(JPABaseEmitter*) {}
-    /* 80050374 */ virtual void executeAfter(JPABaseEmitter*) {}
-    /* 8005036C */ virtual void draw(JPABaseEmitter*) {}
-    /* 80050370 */ virtual void drawAfter(JPABaseEmitter*) {}
+    virtual void execute(JPABaseEmitter*) {}
+    virtual void executeAfter(JPABaseEmitter*) {}
+    virtual void draw(JPABaseEmitter*) {}
+    virtual void drawAfter(JPABaseEmitter*) {}
     
-    /* 8027E6A4 */ //~JPAEmitterCallBack();
+    //~JPAEmitterCallBack();
 };
 
 enum {
@@ -99,18 +100,18 @@ enum {
  */
 class JPABaseEmitter {
 public:
-    /* 8027E5EC */ ~JPABaseEmitter() {}
-    /* 8027E64C */ JPABaseEmitter() : mLink(this), mRndm(0) {}
-    /* 8027E6EC */ void init(JPAEmitterManager*, JPAResource*);
-    /* 8027EDD4 */ bool processTillStartFrame();
-    /* 8027EE14 */ bool processTermination();
-    /* 8027EEB0 */ void calcEmitterGlobalPosition(JGeometry::TVec3<f32>*) const;
-    /* 8027EC60 */ void deleteAllParticle();
-    /* 8027EB60 */ JPABaseParticle* createChild(JPABaseParticle*);
-    /* 8027EA40 */ JPABaseParticle* createParticle();
-    /* 8027EF30 */ u32 getCurrentCreateNumber() const;
-    /* 8027EF40 */ u8 getDrawCount() const;
-    /* 8027EF50 */ bool loadTexture(u8, GXTexMapID);
+    ~JPABaseEmitter() {}
+    JPABaseEmitter() : mLink(this), mRndm(0) {}
+    void init(JPAEmitterManager*, JPAResource*);
+    bool processTillStartFrame();
+    bool processTermination();
+    void calcEmitterGlobalPosition(JGeometry::TVec3<f32>*) const;
+    void deleteAllParticle();
+    JPABaseParticle* createChild(JPABaseParticle*);
+    JPABaseParticle* createParticle();
+    u32 getCurrentCreateNumber() const;
+    u8 getDrawCount() const;
+    bool loadTexture(u8, GXTexMapID);
 
     void initStatus(u32 status) { mStatus = status; }
     void setStatus(u32 status) { mStatus |= status; }
@@ -120,6 +121,7 @@ public:
     u8 getResourceManagerID() const { return mResMgrID; }
     u8 getGroupID() const { return mGroupID; }
     u8 getDrawTimes() const { return mDrawTimes; }
+    f32 getRate() const { return mRate; }
     void setRate(f32 rate) { mRate = rate; }
     void setDirectionalSpeed(f32 i_speed) { mDirSpeed = i_speed; }
     void setRandomDirectionSpeed(f32 i_speed) { mRndmDirSpeed = i_speed; }
@@ -132,14 +134,17 @@ public:
     void setGlobalTranslation(f32 x, f32 y, f32 z) { mGlobalTrs.set(x, y, z); }
     void setGlobalTranslation(const JGeometry::TVec3<f32>& trs) { mGlobalTrs.set(trs); }
     void getLocalTranslation(JGeometry::TVec3<f32>& vec) { vec.set(mLocalTrs); }
+    void getLocalTranslation(JGeometry::TVec3<f32>* vec) const { vec->set(mLocalTrs); }
     void setGlobalRotation(const JGeometry::TVec3<s16>& rot) {
         JPAGetXYZRotateMtx(rot.x, rot.y, rot.z, mGlobalRot); 
     }
     void getGlobalTranslation(JGeometry::TVec3<f32>* out) const { out->set(mGlobalTrs); }
     void setGlobalDynamicsScale(const JGeometry::TVec3<f32>& i_scale) { mGlobalScl.set(i_scale); }
+    void getGlobalDynamicsScale(JGeometry::TVec3<f32>* i_scale) const { i_scale->set(mGlobalScl); }
     void setGlobalAlpha(u8 alpha) { mGlobalPrmClr.a = alpha; }
-    u8 getGlobalAlpha() { return mGlobalPrmClr.a; }
+    u8 getGlobalAlpha() const { return mGlobalPrmClr.a; }
     void getGlobalPrmColor(GXColor& color) { color = mGlobalPrmClr; }
+    void getGlobalPrmColor(_GXColor* color) const { *color = mGlobalPrmClr; }
     void setGlobalPrmColor(u8 r, u8 g, u8 b) { mGlobalPrmClr.r = r; mGlobalPrmClr.g = g; mGlobalPrmClr.b = b; }
     void setGlobalEnvColor(u8 r, u8 g, u8 b) { mGlobalEnvClr.r = r; mGlobalEnvClr.g = g; mGlobalEnvClr.b = b; }
     void setVolumeSize(u16 size) { mVolumeSize = size; }
@@ -160,8 +165,29 @@ public:
     void setGlobalParticleScale(f32 scaleX, f32 scaleY) {
         mGlobalPScl.set(scaleX, scaleY);
     }
-    void getGlobalParticleScale(JGeometry::TVec3<f32>& scale) {
+    void getGlobalParticleScale(JGeometry::TVec3<f32>& scale) const {
+        //TODO: Possible fakematch. Debug and Wii indicate TVec3::set, but using it breaks regalloc
+        //      in dPa_gen_b_light8PcallBack::draw on GCN (where the call to set would normally be
+        //      inlined).
+#if PLATFORM_GCN
+        scale.x = mGlobalPScl.x;
+        scale.y = mGlobalPScl.y;
+        scale.z = 1.0f;
+#else
         scale.set(mGlobalPScl.x, mGlobalPScl.y, 1.0f);
+#endif
+    }
+    void getGlobalParticleScale(JGeometry::TVec3<f32>* scale) const {
+        //TODO: Possible fakematch. Debug and Wii indicate TVec3::set, but using it breaks regalloc
+        //      in dPa_gen_b_light8PcallBack::draw on GCN (where the call to set would normally be
+        //      inlined).
+#if PLATFORM_GCN
+        scale->x = mGlobalPScl.x;
+        scale->y = mGlobalPScl.y;
+        scale->z = 1.0f;
+#else
+        scale->set(mGlobalPScl.x, mGlobalPScl.y, 1.0f);
+#endif
     }
     void setGlobalScale(const JGeometry::TVec3<f32>& scale) {
         mGlobalScl.set(scale);
@@ -196,22 +222,26 @@ public:
     void stopDrawParticle() { setStatus(JPAEmtrStts_StopDraw); }
     void playDrawParticle() { clearStatus(JPAEmtrStts_StopDraw); }
 
-    u32 getUserWork() { return mpUserWork; }
-    void setUserWork(u32 userWork) { mpUserWork = userWork; }
-    u32 getParticleNumber() {
+    uintptr_t getUserWork() const { return mpUserWork; }
+    void setUserWork(uintptr_t userWork) { mpUserWork = userWork; }
+    u32 getParticleNumber() const {
         return mAlivePtclBase.getNum() + mAlivePtclChld.getNum();
     }
-    bool isEnableDeleteEmitter() {
+    bool isEnableDeleteEmitter() const {
         return checkStatus(JPAEmtrStts_EnableDeleteEmitter) && getParticleNumber() == 0;
     }
     void setDrawTimes(u8 drawTimes) { mDrawTimes = drawTimes; }
     void setParticleCallBackPtr(JPAParticleCallBack* cb) { mpPtclCallBack = cb; }
-    JPAParticleCallBack* getParticleCallBackPtr() { return mpPtclCallBack; }
+    JPAParticleCallBack* getParticleCallBackPtr() const { return mpPtclCallBack; }
     JPAEmitterCallBack* getEmitterCallBackPtr() const { return mpEmtrCallBack; }
     u32 getAge() const { return mTick; }
 
     void setVolumeMiniRadius(f32 param_1) {
         mVolumeMinRad = param_1;
+    }
+
+    void setMaxFrame(s32 maxFrame) {
+        mMaxFrame = maxFrame;
     }
 
 public:
@@ -248,7 +278,7 @@ public:
     /* 0xE8 */ JPAResource* mpRes;
     /* 0xEC */ JPAEmitterCallBack* mpEmtrCallBack;
     /* 0xF0 */ JPAParticleCallBack* mpPtclCallBack;
-    /* 0xF4 */ volatile u32 mStatus;
+    /* 0xF4 */ u32 mStatus;
     /* 0xF8 */ f32 mEmitCount;
     /* 0xFC */ f32 mScaleOut;
     /* 0x100 */ u32 mTick;

@@ -2,6 +2,8 @@
 // d_msg_scrn_kanban
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_kanban.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -11,12 +13,7 @@
 #include "d/d_msg_out_font.h"
 #include "d/d_pane_class.h"
 
-extern dMsgObject_HIO_c g_MsgObject_HIO_c;
-
-/* 80244E38-8024534C 23F778 0514+00 0/0 1/1 0/0 .text __ct__16dMsgScrnKanban_cFP10JKRExpHeap */
 dMsgScrnKanban_c::dMsgScrnKanban_c(JKRExpHeap* param_0) {
-    static u64 const t_tag[3] = {'mg_e4lin', 'f4_w', 't4_s'};
-
     if (param_0 != NULL) {
         field_0xd4 = param_0;
     } else {
@@ -27,7 +24,7 @@ dMsgScrnKanban_c::dMsgScrnKanban_c(JKRExpHeap* param_0) {
     init();
 
     mpScreen = new J2DScreen();
-    JUT_ASSERT(43, mpScreen != 0);
+    JUT_ASSERT(43, mpScreen != NULL);
     bool fg =
         mpScreen->setPriority("zelda_kanban_stone_a.blo", 0x1020000, dComIfGp_getMsgArchive(2));
     JUT_ASSERT(45, fg != false);
@@ -43,7 +40,7 @@ dMsgScrnKanban_c::dMsgScrnKanban_c(JKRExpHeap* param_0) {
     field_0xd8 = 0.0f;
 
     mpPmP_c = new CPaneMgr(mpScreen, 'n_size', 2, NULL);
-    JUT_ASSERT(60, mpPmP_c != 0);
+    JUT_ASSERT(60, mpPmP_c != NULL);
     mpPmP_c->getPanePtr()->setAnimation(field_0xcc);
 
     field_0xcc->setFrame(1.0f);
@@ -52,21 +49,54 @@ dMsgScrnKanban_c::dMsgScrnKanban_c(JKRExpHeap* param_0) {
     mpPmP_c->scale(g_MsgObject_HIO_c.mBoxStoneScaleX, g_MsgObject_HIO_c.mBoxStoneScaleY);
 
     mpBack_c = new CPaneMgr(mpScreen, 'back_b', 0, NULL);
-    JUT_ASSERT(68, mpBack_c != 0);
+    JUT_ASSERT(68, mpBack_c != NULL);
 
     mpSpot_c = new CPaneMgr(mpScreen, 'spot00', 0, NULL);
-    JUT_ASSERT(72, mpSpot_c != 0);
+    JUT_ASSERT(72, mpSpot_c != NULL);
 
     mpSpot_c->getPanePtr()->setAnimation(field_0xd0);
+
+
+#if VERSION == VERSION_GCN_JPN
+    if (dComIfGs_getOptUnk0() != 0) {
+        static u64 const t_tag[3] = {'mg_3line', 't3_w', 't3_s'};
+        for (int i = 0; i < 3; i++) {
+            mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+        }
+
+        mpScreen->search('n_3line')->show();
+        mpScreen->search('n_3fline')->hide();
+        mpScreen->search('n_e4line')->hide();
+    } else {
+        static u64 const t_tag_2[3] = {'t3fline', 't3f_w', 't3f_s'};
+        static u64 const tr_tag[3] = {'mg_3f', 'mg_3f_w', 'mg_3f_s'};
+
+        for (int i = 0; i < 3; i++) {
+            mpTm_c[i] = new CPaneMgr(mpScreen, t_tag_2[i], 0, NULL);
+            ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+
+            mpTmr_c[i] = new CPaneMgr(mpScreen, tr_tag[i], 0, NULL);
+            ((J2DTextBox*)mpTmr_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
+        }
+
+        mpScreen->search('n_3line')->hide();
+        mpScreen->search('n_3fline')->show();
+        mpScreen->search('n_e4line')->hide();
+    }
+#else
+    static u64 const t_tag[3] = {'mg_e4lin', 'f4_w', 't4_s'};
+
     for (int i = 0; i < 3; i++) {
         mpTm_c[i] = new CPaneMgr(mpScreen, t_tag[i], 0, NULL);
-        JUT_ASSERT(81, mpTm_c[i] != 0);
+        JUT_ASSERT(81, mpTm_c[i] != NULL);
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
     }
 
     mpScreen->search('n_3line')->hide();
     mpScreen->search('n_3fline')->hide();
     mpScreen->search('n_e4line')->show();
+#endif
 
     ((J2DTextBox*)mpTm_c[0]->getPanePtr())->getFontSize(mFontSize);
     mTBoxWidth = mpTm_c[0]->getSizeX();
@@ -98,7 +128,6 @@ dMsgScrnKanban_c::dMsgScrnKanban_c(JKRExpHeap* param_0) {
     OS_REPORT("remain ===> %d\n", uVar14 - field_0xd4->getTotalFreeSize());
 }
 
-/* 8024534C-80245528 23FC8C 01DC+00 1/0 0/0 0/0 .text            __dt__16dMsgScrnKanban_cFv */
 dMsgScrnKanban_c::~dMsgScrnKanban_c() {
     delete mpScreen;
     mpScreen = NULL;
@@ -130,7 +159,6 @@ dMsgScrnKanban_c::~dMsgScrnKanban_c() {
     dComIfGp_getMsgArchive(2)->removeResourceAll();
 }
 
-/* 80245528-80245618 23FE68 00F0+00 1/0 0/0 0/0 .text            exec__16dMsgScrnKanban_cFv */
 void dMsgScrnKanban_c::exec() {
     field_0xd8 += 1.0f;
     if (field_0xd8 >= field_0xd0->getFrameMax()) {
@@ -147,7 +175,6 @@ void dMsgScrnKanban_c::exec() {
     mpPmP_c->scale(g_MsgObject_HIO_c.mBoxStoneScaleX, g_MsgObject_HIO_c.mBoxStoneScaleY);
 }
 
-/* 80245618-802456A0 23FF58 0088+00 1/0 0/0 0/0 .text            draw__16dMsgScrnKanban_cFv */
 void dMsgScrnKanban_c::draw() {
     J2DGrafContext* grafContext = dComIfGp_getCurrentGrafPort();
     grafContext->setup2D();
@@ -155,7 +182,6 @@ void dMsgScrnKanban_c::draw() {
     mpOutFont->draw(NULL, 0.0f, 0.0f, 1.0f);
 }
 
-/* 802456A0-80245754 23FFE0 00B4+00 1/0 0/0 0/0 .text            fukiAlpha__16dMsgScrnKanban_cFf */
 void dMsgScrnKanban_c::fukiAlpha(f32 param_0) {
     mpBack_c->setAlphaRate(param_0);
     mpPmP_c->setAlphaRate(param_0 * g_MsgObject_HIO_c.mBoxStoneAlphaP);
@@ -168,8 +194,6 @@ void dMsgScrnKanban_c::fukiAlpha(f32 param_0) {
         }
     }
 }
-/* 80245754-80245758 240094 0004+00 1/0 0/0 0/0 .text            fukiScale__16dMsgScrnKanban_cFf */
 void dMsgScrnKanban_c::fukiScale(f32 param_0) {}
 
-/* 80245758-8024575C 240098 0004+00 1/0 0/0 0/0 .text            fukiTrans__16dMsgScrnKanban_cFff */
 void dMsgScrnKanban_c::fukiTrans(f32 param_0, f32 param_1) {}

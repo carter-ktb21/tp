@@ -12,32 +12,45 @@
 
 #define FP_NAN FP_QNAN
 
-#define fpclassify(x) ((sizeof(x) == sizeof(float)) ? __fpclassifyf(x) : __fpclassifyd(x))
+#if __REVOLUTION_SDK__
+#define fpclassify(x) \
+	((sizeof(x) == sizeof(float)) ? __fpclassifyf((float)(x)) : \
+	(sizeof(x) == sizeof(double)) ? __fpclassifyd((double)(x)) : \
+	__fpclassifyl((long double)(x)) )
+#else
+#define fpclassify(x) \
+	((sizeof(x) == sizeof(float)) ? __fpclassifyf((float)(x)) : \
+	__fpclassifyd((double)(x)) )
+#endif
 #define signbit(x) ((sizeof(x) == sizeof(float)) ? __signbitf(x) : __signbitd(x))
-#define isfinite(x) ((fpclassify(x) > 2))
+#define isfinite(x) ((fpclassify(x) > FP_INFINITE))
+#define isnan(x) (fpclassify(x) == FP_NAN)
+#define isinf(x) (fpclassify(x) == FP_INFINITE)
 
 #define __signbitf(x) ((int)(__HI(x) & 0x80000000))
 
 // TODO: OK?
 #define __signbitd(x) ((int)(__HI(x) & 0x80000000))
 
-extern unsigned long __float_nan[];
-extern unsigned long __float_huge[];
-extern unsigned long __float_max[];
-extern unsigned long __float_epsilon[];
+extern int __float_nan[];
+extern int __float_huge[];
+extern int __float_max[];
+extern int __float_epsilon[];
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 inline int __fpclassifyf(float __value) {
-    unsigned long integer = *(unsigned long*)&__value;
-
-    switch (integer & 0x7f800000) {
+    switch (*(int*)&__value & 0x7f800000) {
     case 0x7f800000:
-        if ((integer & 0x7fffff) != 0) {
+        if ((*(int*)&__value & 0x7fffff) != 0) {
             return FP_QNAN;
         }
         return FP_INFINITE;
 
     case 0:
-        if ((integer & 0x7fffff) != 0) {
+        if ((*(int*)&__value & 0x7fffff) != 0) {
             return FP_SUBNORMAL;
         }
         return FP_ZERO;
@@ -66,6 +79,13 @@ inline int __fpclassifyd(double __value) {
 	return FP_NORMAL;
 }
 
+// Stripped function.
+int __fpclassifyl(long double __value);
+
+#ifdef __cplusplus
+}; // extern "C"
+#endif
+
 #define FLT_MANT_DIG   24
 #define FLT_DIG        6
 #define FLT_MIN_EXP    (-125)
@@ -73,7 +93,7 @@ inline int __fpclassifyd(double __value) {
 #define FLT_MAX_EXP    128
 #define FLT_MAX_10_EXP 38
 
-#ifdef DEBUG
+#if DEBUG
 #define FLT_MAX 3.4028235e38f
 #define FLT_EPSILON 1.1920929e-7f
 #else

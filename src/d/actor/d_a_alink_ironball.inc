@@ -4,9 +4,8 @@
  */
 
 #include "d/actor/d_a_alink.h"
+#include "SSystem/SComponent/c_counter.h"
 
-/* 8011243C-80112458 10CD7C 001C+00 1/0 0/0 0/0 .text            getIronBallCenterPos__9daAlink_cFv
- */
 cXyz* daAlink_c::getIronBallCenterPos() {
     if (mEquipItem == fpcNm_ITEM_IRONBALL) {
         return &mIronBallCenterPos;
@@ -15,7 +14,6 @@ cXyz* daAlink_c::getIronBallCenterPos() {
     return NULL;
 }
 
-/* 80112458-80112474 10CD98 001C+00 1/0 0/0 0/0 .text            getIronBallBgHit__9daAlink_cCFv */
 int daAlink_c::getIronBallBgHit() const {
     if (mEquipItem == fpcNm_ITEM_IRONBALL) {
         return field_0x301c;
@@ -24,37 +22,30 @@ int daAlink_c::getIronBallBgHit() const {
     return 0;
 }
 
-/* 80112474-801124B4 10CDB4 0040+00 0/0 2/2 1/1 .text checkIronBallThrowMode__9daAlink_cCFv */
 bool daAlink_c::checkIronBallThrowMode() const {
     return mEquipItem == fpcNm_ITEM_IRONBALL &&
            (mItemVar0.field_0x3018 == 4 || mItemVar0.field_0x3018 == 5 || mItemVar0.field_0x3018 == 6 || mItemVar0.field_0x3018 == 3);
 }
 
-/* 801124B4-801124FC 10CDF4 0048+00 0/0 1/1 1/1 .text checkIronBallThrowReturnMode__9daAlink_cCFv
- */
 bool daAlink_c::checkIronBallThrowReturnMode() const {
     return mEquipItem == fpcNm_ITEM_IRONBALL && (mItemVar0.field_0x3018 == 4 || mItemVar0.field_0x3018 == 5 || mItemVar0.field_0x3018 == 6 ||
                                       mItemVar0.field_0x3018 == 7 || mItemVar0.field_0x3018 == 3);
 }
 
-/* 801124FC-80112524 10CE3C 0028+00 1/0 0/0 0/0 .text            checkIronBallReturn__9daAlink_cCFv
- */
 bool daAlink_c::checkIronBallReturn() const {
     return mEquipItem == fpcNm_ITEM_IRONBALL && mItemVar0.field_0x3018 == 7;
 }
 
-/* 80112524-80112568 10CE64 0044+00 1/0 0/0 0/0 .text checkIronBallGroundStop__9daAlink_cCFv */
 bool daAlink_c::checkIronBallGroundStop() const {
     return mEquipItem == fpcNm_ITEM_IRONBALL && mItemVar0.field_0x3018 != 0 && mItemVar0.field_0x3018 != 8 && field_0x301e == 0 &&
            field_0x301e < 10;
 }
 
-/* 80112568-80112628 10CEA8 00C0+00 5/5 0/0 0/0 .text setIronBallWaitUpperAnime__9daAlink_cFi */
 void daAlink_c::setIronBallWaitUpperAnime(int param_0) {
     if (!checkIronBallWaitAnime() && !checkIronBallPreSwingAnime() &&
         (mItemVar0.field_0x3018 == 0 || mItemVar0.field_0x3018 == 8) && (param_0 || checkNoUpperAnime())) {
-        setUpperAnimeBaseSpeed(0x19C, daAlinkHIO_ironBall_c0::m.mWaitAnmSpeed,
-                               daAlinkHIO_basic_c0::m.mAnmBlendFactor);
+        setUpperAnimeBaseSpeed(0x19C, mpHIO->mItem.mIronBall.m.mWaitAnmSpeed,
+                               mpHIO->mBasic.m.mBasicInterpolation);
         setFacePriBck(0xE8);
         field_0x2f96 = 254;
         field_0x2f97 = 5;
@@ -62,8 +53,6 @@ void daAlink_c::setIronBallWaitUpperAnime(int param_0) {
     }
 }
 
-/* 80112628-801126F8 10CF68 00D0+00 1/1 0/0 0/0 .text            checkIronBallDelete__9daAlink_cFv
- */
 void daAlink_c::checkIronBallDelete() {
     if (mProcID == PROC_IRON_BALL_SUBJECT || mProcID == PROC_IRON_BALL_MOVE ||
         mProcID == PROC_IRON_BALL_THROW || mProcID == PROC_IRON_BALL_RETURN) {
@@ -78,7 +67,6 @@ void daAlink_c::checkIronBallDelete() {
     }
 }
 
-/* 801126F8-80112768 10D038 0070+00 2/2 0/0 0/0 .text            setIronBallReturn__9daAlink_cFi */
 void daAlink_c::setIronBallReturn(int param_0) {
     if (param_0 && field_0x301e != 0) {
         field_0x301e--;
@@ -89,8 +77,6 @@ void daAlink_c::setIronBallReturn(int param_0) {
     }
 }
 
-/* 80112768-801127F0 10D0A8 0088+00 2/2 0/0 0/0 .text            setIronBallBgCheckPos__9daAlink_cFv
- */
 void daAlink_c::setIronBallBgCheckPos() {
     cXyz sp8;
     mDoMtx_stack_c::transS(*mIronBallChainPos);
@@ -101,7 +87,6 @@ void daAlink_c::setIronBallBgCheckPos() {
     cLib_chaseF(&mSearchBallScale, 0.0f, 2.0f);
 }
 
-/* 801127F0-80112C80 10D130 0490+00 1/1 0/0 0/0 .text            setIronBallModel__9daAlink_cFv */
 void daAlink_c::setIronBallModel() {
     JKRHeap* prev_heap = setItemHeap();
 
@@ -127,14 +112,15 @@ void daAlink_c::setIronBallModel() {
 
     mDoExt_setCurrentHeap(prev_heap);
 
-    mpHookChain->setUserArea((u32)this);
+    mpHookChain->setUserArea((uintptr_t)this);
 
     field_0xFB8.SetAtType(AT_TYPE_IRON_BALL);
     field_0xFB8.SetAtHitMark(3);
     field_0xFB8.SetAtSe(dCcD_SE_HAMMER);
     field_0xFB8.SetAtAtp(2);
     field_0xFB8.SetAtMtrl(dCcD_MTRL_NONE);
-    field_0xFB8.SetR(daAlinkHIO_ironBall_c0::m.mAttackRadius);
+    field_0xFB8.OnAtNoConHit();  // 60fps: prevent continuous re-hits while overlapping (ball & chain should not hit twice as often)
+    field_0xFB8.SetR(mpHIO->mItem.mIronBall.m.mAttackRadius);
 
     csXyz* var_r28 = mIronBallChainAngle;
     for (int i = 0; i < 102; i++, var_r28++) {
@@ -184,8 +170,6 @@ void daAlink_c::setIronBallModel() {
     field_0x1778.SetCoVsGrp(0x60);
 }
 
-/* 80112C84-80112E7C 10D5C4 01F8+00 1/1 0/0 0/0 .text
- * setIronBallGroundVec__9daAlink_cFPC4cXyzP4cXyz               */
 int daAlink_c::setIronBallGroundVec(cXyz const* param_0, cXyz* param_1) {
     cXyz sp3C(param_0->x, param_0->y + 50.0f, param_0->z);
 
@@ -212,9 +196,6 @@ int daAlink_c::setIronBallGroundVec(cXyz const* param_0, cXyz* param_1) {
     return 0;
 }
 
-/* 80112E7C-80113CA0 10D7BC 0E24+00 1/1 0/0 0/0 .text            setIronBallChainPos__9daAlink_cFv
- */
-// NONMATCHING - alot of regalloc
 void daAlink_c::setIronBallChainPos() {
     cXyz sp2A4;
     cXyz sp298;
@@ -225,9 +206,13 @@ void daAlink_c::setIronBallChainPos() {
     *(&mIronBallChainPos[mItemMode] + 1) = mHeldItemRootPos;
     *(&mIronBallChainAngle[mItemMode] + 1) = field_0x316c;
 
-    cXyz* var_r29;
     cXyz* var_r27;
+    cXyz* var_r29;
     cXyz* var_r26;
+    int i;
+    csXyz* sp3C;
+    int sp38;
+    int sp34;
 
     if (mItemVar0.field_0x3018 == 2) {
         var_r29 = mIronBallChainPos + 1;
@@ -237,11 +222,11 @@ void daAlink_c::setIronBallChainPos() {
         sp2A4 = mHookshotTopPos - *mIronBallChainPos;
         sp2A4.normalizeZP();
 
-        for (int i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
+        for (i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
             sp28C = *var_r29;
             *var_r29 = *var_r27 + (sp2A4 * 10.0f);
 
-            *var_r26 = (*var_r29 - sp28C) * daAlinkHIO_ironBall_c0::m.mChainSpeedRate;
+            *var_r26 = (*var_r29 - sp28C) * mpHIO->mItem.mIronBall.m.mChainSpeedRate;
             var_r27 = var_r29;
         }
     } else if (mItemVar0.field_0x3018 == 7) {
@@ -249,20 +234,20 @@ void daAlink_c::setIronBallChainPos() {
         var_r26 = &field_0x3848[mItemMode];
         var_r27 = var_r29 + 1;
 
-        int sp38 = mItemMode * daAlinkHIO_ironBall_c0::m.mReturnChainRate;
-        int sp34 = sp38;
+        sp38 = mItemMode * mpHIO->mItem.mIronBall.m.mReturnChainRate;
+        sp34 = sp38;
 
-        for (int i = mItemMode; i >= 0; i--, var_r29--, var_r26--) {
+        for (i = mItemMode; i >= 0; i--, var_r29--, var_r26--) {
             sp2A4 = (*var_r29 - *var_r27) + *var_r26;
 
             if (i == 0) {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mReturnBallGravity;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mReturnBallGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             } else {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mChainGravity;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mChainGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             }
 
             if (sp38 >= 0) {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mReturnChainAccelY;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mReturnChainAccelY * DELTA_TIME;  // 60fps: accel is per-30fps-frame
                 sp38--;
             }
 
@@ -285,12 +270,12 @@ void daAlink_c::setIronBallChainPos() {
         var_r27 = var_r29 - 1;
         var_r26 = field_0x3848 + 1;
 
-        for (int i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
+        for (i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
             sp28C = *var_r29;
             sp2A4 = (*var_r29 - *var_r27) + *var_r26;
-            sp2A4.y += daAlinkHIO_ironBall_c0::m.mChainGravity;
+            sp2A4.y += mpHIO->mItem.mIronBall.m.mChainGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             if (i >= mItemMode - sp34) {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mReturnChainAccelY;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mReturnChainAccelY * DELTA_TIME;  // 60fps: accel is per-30fps-frame
             }
 
             sp280 = sp2A4;
@@ -303,12 +288,11 @@ void daAlink_c::setIronBallChainPos() {
             }
 
             var_r27 = var_r29;
-            *var_r26 = (*var_r29 - sp28C) * daAlinkHIO_ironBall_c0::m.mChainSpeedRate;
+            *var_r26 = (*var_r29 - sp28C) * mpHIO->mItem.mIronBall.m.mChainSpeedRate;
         }
     } else if (mItemVar0.field_0x3018 == 1 || mItemVar0.field_0x3018 == 3 || mItemVar0.field_0x3018 == 4) {
         daPy_frameCtrl_c* sp30 = &mUnderFrameCtrl[0];
 
-        int sp38;
         if (mItemVar0.field_0x3018 == 1) {
             f32 temp_f25 = sp30->getEnd() - 13.0f;
             f32 temp_f29 = (sp30->getFrame() - 13.0f) / temp_f25;
@@ -318,15 +302,16 @@ void daAlink_c::setIronBallChainPos() {
             mDoMtx_stack_c::YrotM(sp12);
             mDoMtx_stack_c::multVec(&cXyz::BaseZ, &sp298);
 
-            sp298 *= 15.0f * (1.0f + temp_f29);
+            sp298 *= 15.0f * (1.0f + temp_f29) * DELTA_TIME;  // 60fps: per-frame impulse is per-30fps-frame
             sp38 = 1000;
         } else if (mItemVar0.field_0x3018 == 4) {
             Vec sp268 = {0.0f, 0.0f, 0.0f};
-            sp268.y = daAlinkHIO_ironBall_c0::m.mThrowChainAccelY;
-            sp268.z = daAlinkHIO_ironBall_c0::m.mThrowChainAccelZ;
+            sp268.y = mpHIO->mItem.mIronBall.m.mThrowChainAccelY;
+            sp268.z = mpHIO->mItem.mIronBall.m.mThrowChainAccelZ;
 
             mDoMtx_stack_c::ZXYrotS(mBodyAngle.x, shape_angle.y, 0);
             mDoMtx_stack_c::multVec(&sp268, &sp298);
+            sp298 *= DELTA_TIME;  // 60fps: per-frame impulse is per-30fps-frame
 
             sp38 = 2.0f * (1.0f + sp30->getFrame());
         } else {
@@ -337,14 +322,14 @@ void daAlink_c::setIronBallChainPos() {
         var_r26 = &field_0x3848[mItemMode];
         var_r27 = var_r29 + 1;
 
-        for (int i = mItemMode; i >= 0; i--, var_r29--, var_r26--) {
+        for (i = mItemMode; i >= 0; i--, var_r29--, var_r26--) {
             sp28C = *var_r29;
             sp2A4 = (*var_r29 - *var_r27) + *var_r26;
 
             if (i == 0) {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mBallGravity;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mBallGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             } else {
-                sp2A4.y += daAlinkHIO_ironBall_c0::m.mChainGravity;
+                sp2A4.y += mpHIO->mItem.mIronBall.m.mChainGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             }
 
             if (sp38 >= 0) {
@@ -361,12 +346,12 @@ void daAlink_c::setIronBallChainPos() {
                 *var_r29 = *var_r27 + (sp280 * 10.0f);
             }
 
-            *var_r26 = (*var_r29 - sp28C) * daAlinkHIO_ironBall_c0::m.mChainSpeedRate;
+            *var_r26 = (*var_r29 - sp28C) * mpHIO->mItem.mIronBall.m.mChainSpeedRate;
             var_r27 = var_r29;
         }
 
         sp2A4 = mIronBallCenterPos - *mIronBallChainPos;
-        sp2A4.y += daAlinkHIO_ironBall_c0::m.mBallGravity;
+        sp2A4.y += mpHIO->mItem.mIronBall.m.mBallGravity * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
 
         if (sp38 >= 0) {
             sp2A4 += sp298;
@@ -377,18 +362,18 @@ void daAlink_c::setIronBallChainPos() {
     } else {
         f32 var_f30;
         if (mItemVar0.field_0x3018 == 4 || mItemVar0.field_0x3018 == 5) {
-            var_f30 = daAlinkHIO_ironBall_c0::m.mThrowChainGravity;
+            var_f30 = mpHIO->mItem.mIronBall.m.mThrowChainGravity;
         } else {
-            var_f30 = daAlinkHIO_ironBall_c0::m.mChainGravity;
+            var_f30 = mpHIO->mItem.mIronBall.m.mChainGravity;
         }
-    
+
         var_r29 = mIronBallChainPos + 1;
         var_r27 = var_r29 - 1;
         var_r26 = field_0x3848 + 1;
 
-        for (int i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
+        for (i = 0; i < mItemMode; i++, var_r29++, var_r26++) {
             sp2A4 = (*var_r29 - *var_r27) + *var_r26;
-            sp2A4.y += var_f30;
+            sp2A4.y += var_f30 * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
             sp2A4.normalizeZP();
 
             *var_r29 = *var_r27 + (sp2A4 * 10.0f);
@@ -401,11 +386,11 @@ void daAlink_c::setIronBallChainPos() {
 
         BOOL sp2C = ((mItemVar0.field_0x3018 == 0 && checkUnderMove1BckNoArc(ANM_IRONBALL_WALK)) && mNowAnmPackUnder[1].getRatio() > 0.8f) && (mUnderFrameCtrl[1].getFrame() >= 24.0f || mUnderFrameCtrl[1].getFrame() <= 3.0f);
 
-        f32 temp_f31 = 5.0f * (5.0f * (mNowAnmPackUnder[1].getRatio() - 0.8f));
+        f32 temp_f31 = 5.0f * (5.0f * (mNowAnmPackUnder[1].getRatio() - 0.8f)) * DELTA_TIME;  // 60fps: per-frame sway is per-30fps-frame
         f32 temp_f28 = temp_f31 * cM_scos(shape_angle.y);
         temp_f31 *= cM_ssin(shape_angle.y);
 
-        for (int i = mItemMode; i > 0; i--, var_r29--, var_r26--) {
+        for (i = mItemMode; i > 0; i--, var_r29--, var_r26--) {
             sp28C = *var_r29;
 
             if (i == mItemMode) {
@@ -428,20 +413,21 @@ void daAlink_c::setIronBallChainPos() {
             }
 
             var_r27 = var_r29;
-            *var_r26 = (*var_r29 - sp28C) * daAlinkHIO_ironBall_c0::m.mChainSpeedRate;
+            *var_r26 = (*var_r29 - sp28C) * mpHIO->mItem.mIronBall.m.mChainSpeedRate;
         }
     }
 
-    csXyz* sp3C = mIronBallChainAngle + 1;
+    sp3C = mIronBallChainAngle + 1;
     var_r29 = mIronBallChainPos + 1;
     var_r27 = var_r29 - 1;
+    s16 sp10;
     s16 spE = mIronBallChainAngle->z + 0x3000;
 
-    for (int i = 0; i < mItemMode; i++, sp3C++, var_r29++, spE += 0x3000) {
+    for (i = 0; i < mItemMode; i++, sp3C++, var_r29++, spE += 0x3000) {
         sp2A4 = (*var_r27 - *var_r29);
 
-        s16 sp10;
-        if (sp2A4.absXZ() < 1.0f) {
+        f32 var_f27 = sp2A4.absXZ();
+        if (var_f27 < 1.0f) {
             sp10 = sp3C[-1].y;
         } else {
             sp10 = sp2A4.atan2sX_Z();
@@ -451,17 +437,16 @@ void daAlink_c::setIronBallChainPos() {
         var_r27 = var_r29;
     }
 
-    cXyz* temp_r29 = &mIronBallChainPos[mItemMode] + 1;
-    csXyz* sp3C_2 = &mIronBallChainAngle[mItemMode] + 1;
+    var_r29 = &mIronBallChainPos[mItemMode] + 1;
+    sp3C = &mIronBallChainAngle[mItemMode] + 1;
 
-    for (int i = mItemMode + 2; i < 102; i++) {
-        mIronBallChainPos[i] = *temp_r29;
-        mIronBallChainAngle[i] = *sp3C_2;
+    for (i = mItemMode + 2; i < 102; i++) {
+        mIronBallChainPos[i] = *var_r29;
+        mIronBallChainAngle[i] = *sp3C;
         field_0x3848[i] = cXyz::Zero;
     }
 }
 
-/* 80113CA0-80113D58 10E5E0 00B8+00 1/1 0/0 0/0 .text checkIronBallReturnChange__9daAlink_cFv */
 BOOL daAlink_c::checkIronBallReturnChange() {
     if (mProcID != PROC_IRON_BALL_THROW ||
         (!(mBodyAngle.x > 0x400) && mIronBallBgChkPos.y < (current.pos.y - 200.0f)) ||
@@ -475,7 +460,6 @@ BOOL daAlink_c::checkIronBallReturnChange() {
     return false;
 }
 
-/* 80113D58-801150E4 10E698 138C+00 1/1 0/0 0/0 .text            setIronBallPos__9daAlink_cFv */
 void daAlink_c::setIronBallPos() {
     cXyz sp10C;
     cXyz sp100;
@@ -546,17 +530,20 @@ void daAlink_c::setIronBallPos() {
             mDoMtx_MtxToRot(mDoMtx_stack_c::get(), mIronBallChainAngle);
         } else if (mItemVar0.field_0x3018 != 3) {
             if (mItemVar0.field_0x3018 == 4) {
-                mItemMode++;
+                // 60fps: `mItemMode` growth is tuned for 30fps; only increment once per 30fps tick.
+                if (SCALE_TIME <= 1 || (g_Counter.mCounter0 % SCALE_TIME) == 0) {
+                    mItemMode++;
+                }
                 checkIronBallReturnChange();
             } else if (mItemVar0.field_0x3018 == 5 || mItemVar0.field_0x3018 == 6) {
                 *mIronBallChainPos += *field_0x173c.GetCCMoveP();
 
                 if (!checkIronBallReturnChange()) {
                     f32 var_f29;
-                    f32 var_f28 = daAlinkHIO_ironBall_c0::m.mBallMaxFallSpeed;
+                    f32 var_f28 = mpHIO->mItem.mIronBall.m.mBallMaxFallSpeed;
 
                     if (mItemVar0.field_0x3018 == 5) {
-                        var_f29 = daAlinkHIO_ironBall_c0::m.mThrowBallGravity;
+                        var_f29 = mpHIO->mItem.mIronBall.m.mThrowBallGravity;
     
                         f32 sp1C;
                         if (fopAcM_getWaterY(mIronBallChainPos, &sp1C) && sp1C > mIronBallChainPos->y) {
@@ -568,24 +555,24 @@ void daAlink_c::setIronBallPos() {
                             var_f28 *= 0.5f;
                         }
                     } else {
-                        var_f29 = daAlinkHIO_ironBall_c0::m.mBallGravity;
+                        var_f29 = mpHIO->mItem.mIronBall.m.mBallGravity;
                     }
 
-                    sp10C = mIronBallCenterPos + (*field_0x3848 * 1.25f);
+                    sp10C = mIronBallCenterPos + (*field_0x3848 * (1.25f * DELTA_TIME));  // 60fps: prediction uses per-30fps-frame velocity
 
-                    s16 temp_r27 = daAlinkHIO_ironBall_c0::m.mThrowChainNum + 0.1f * mIronBallChainPos->abs(mHookshotTopPos);
+                    s16 temp_r27 = mpHIO->mItem.mIronBall.m.mThrowChainNum + 0.1f * mIronBallChainPos->abs(mHookshotTopPos);
                     if (temp_r27 > 100) {
                         mItemMode = 100;
                     } else if (mItemMode < temp_r27) {
                         mItemMode = temp_r27;
                     }
 
-                    field_0x3848->y += var_f29;
+                    field_0x3848->y += var_f29 * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
                     if (field_0x3848->y < var_f28) {
                         field_0x3848->y = var_f28;
                     }
 
-                    *mIronBallChainPos += *field_0x3848;
+                    *mIronBallChainPos += *field_0x3848 * DELTA_TIME;  // 60fps: velocity is per-30fps-frame
                     spF4 = *mIronBallChainPos - mHookshotTopPos;
                     f32 temp_f1 = spF4.abs();
 
@@ -603,7 +590,7 @@ void daAlink_c::setIronBallPos() {
                     }
 
                     spF4 = sp10C - *mIronBallChainPos;
-                    spF4.y += var_f29;
+                    spF4.y += var_f29 * DELTA_TIME;  // 60fps: gravity is per-30fps-frame
 
                     mIronBallChainAngle->set(spF4.atan2sY_XZ(), spF4.atan2sX_Z(), 0);
 
@@ -640,7 +627,7 @@ void daAlink_c::setIronBallPos() {
 
                         if (field_0x3026 == 0 && var_f31 > 3.0f) {
                             dComIfGp_getVibration().StartShock(3, 1, cXyz(0.0f, 1.0f, 0.0f));
-                            field_0x3026 = 0xF;
+                            field_0x3026 = (s16)(15.0f / DELTA_TIME + 0.5f);  // 60fps: convert 30fps frame count to ticks
                             var_r28 = 1;
 
                             spC4 = mIronBallBgChkPos;
@@ -657,7 +644,7 @@ void daAlink_c::setIronBallPos() {
 
                         if (field_0x3026 == 0 && var_f31 > 3.0f) {
                             dComIfGp_getVibration().StartShock(3, 1, cXyz(0.0f, 1.0f, 0.0f));
-                            field_0x3026 = 0xF;
+                            field_0x3026 = (s16)(15.0f / DELTA_TIME + 0.5f);  // 60fps: convert 30fps frame count to ticks
                             var_r28 = 1;
 
                             spC4 = mIronBallBgChkPos;
@@ -719,7 +706,7 @@ void daAlink_c::setIronBallPos() {
                             mItemVar0.field_0x3018 = 6;
                         } else if (field_0x3494 < 0.0f) {
                             setIronBallReturn(0);
-                        } else if (field_0x3848->y < daAlinkHIO_ironBall_c0::m.field_0x6C) {
+                        } else if (field_0x3848->y < mpHIO->mItem.mIronBall.m.field_0x6C) {
                             setIronBallReturn(1);
                         }
                     } else if (mItemVar0.field_0x3018 == 6 && var_r26 != 0) {
@@ -732,13 +719,13 @@ void daAlink_c::setIronBallPos() {
                 f32 sp18;
                 int var_r22;
                 if (fopAcM_getWaterY(mIronBallChainPos, &sp18) && sp18 > mIronBallChainPos->y) {
-                    var_r22 = daAlinkHIO_ironBall_c0::m.mReturnChainRemoveNum - 1;
+                    var_r22 = mpHIO->mItem.mIronBall.m.mReturnChainRemoveNum - 1;
                 } else {
-                    var_r22 = daAlinkHIO_ironBall_c0::m.mReturnChainRemoveNum;
+                    var_r22 = mpHIO->mItem.mIronBall.m.mReturnChainRemoveNum;
                 }
 
                 if (mItemMode > 6) {
-                    mItemMode -= var_r22;
+                    mItemMode -= (s16)(var_r22 * DELTA_TIME + 0.5f);  // 60fps: chain removal step is per-30fps-frame
                     if (mItemMode <= 6) {
                         mItemVar0.field_0x3018 = 8;
                     }
@@ -766,7 +753,7 @@ void daAlink_c::setIronBallPos() {
                 mDoMtx_stack_c::multVec(&ironBallPosVec, mIronBallChainPos);
                 
                 if (mItemMode > 6) {
-                    mItemMode -= 10;
+                    mItemMode -= (s16)(10.0f * DELTA_TIME + 0.5f);  // 60fps: return/catch chain shortening is per-30fps-frame
                     if (mItemMode < 6) {
                         mItemMode = 6;
                     }
@@ -823,19 +810,15 @@ void daAlink_c::setIronBallPos() {
     field_0x2f1c->setEffectCenter(&tevStr, &mIronBallBgChkPos, 0x3B, 0x40000, var_r25 ? &mIronBallBgChkPos : NULL, NULL, NULL, fopAcM_GetRoomNo(this), field_0x3420, 0.0f);
 }
 
-/* 801150E4-8011510C 10FA24 0028+00 10/10 0/0 0/0 .text            checkIronBallAnime__9daAlink_cCFv
- */
 BOOL daAlink_c::checkIronBallAnime() const {
     return checkIronBallPreSwingAnime() || checkIronBallSwingAnime();
 }
 
-/* 8011510C-801151E0 10FA4C 00D4+00 1/1 0/0 0/0 .text            setIronBallReadyAnime__9daAlink_cFv
- */
 void daAlink_c::setIronBallReadyAnime() {
     resetUpperAnime(UPPER_2, -1.0f);
-    setSingleAnime(ANM_IRONBALL_ATTACK, daAlinkHIO_ironBall_c0::m.mPrepareAnmSpeed, 0.0f,
-                   0x15, daAlinkHIO_ironBall_c0::m.mPrepareInterpolation);
-    setUpperAnimeBaseSpeed(0x19A, daAlinkHIO_ironBall_c0::m.mPrepareAnmSpeed, -1.0f);
+    setSingleAnime(ANM_IRONBALL_ATTACK, mpHIO->mItem.mIronBall.m.mPrepareAnmSpeed, 0.0f,
+                   0x15, mpHIO->mItem.mIronBall.m.mPrepareInterpolation);
+    setUpperAnimeBaseSpeed(0x19A, mpHIO->mItem.mIronBall.m.mPrepareAnmSpeed, -1.0f);
     mNowAnmPackUpper[2].setRatio(0.0f);
     voiceStart(Z2SE_AL_V_SWING_IB);
 
@@ -843,24 +826,20 @@ void daAlink_c::setIronBallReadyAnime() {
     field_0xFB8.ResetAtHit();
     field_0xFB8.SetAtAtp(2);
 
-    field_0x301e = 10;
+    field_0x301e = (s16)(10.0f / DELTA_TIME + 0.5f);  // 60fps: convert 30fps frame count to ticks
     field_0x3020 = 0;
     field_0x3494 = 5.0f;
     mSearchBallScale = 0.0f;
 }
 
-/* 801151E0-80115254 10FB20 0074+00 2/2 0/0 0/0 .text            setIronBallBaseAnime__9daAlink_cFv
- */
 void daAlink_c::setIronBallBaseAnime() {
     if (checkIronBallSwingAnime() && !checkUnderMove0BckNoArc(ANM_IRONBALL_TURN)) {
-        setSingleAnimeBaseSpeed(ANM_IRONBALL_TURN, daAlinkHIO_ironBall_c0::m.mTurnAnmSpeed, daAlinkHIO_ironBall_c0::m.mTurnInterpolation);
+        setSingleAnimeBaseSpeed(ANM_IRONBALL_TURN, mpHIO->mItem.mIronBall.m.mTurnAnmSpeed, mpHIO->mItem.mIronBall.m.mTurnInterpolation);
         mUnderFrameCtrl[0].setFrame(mUpperFrameCtrl[2].getFrame());
         getNowAnmPackUnder(UNDER_0)->setFrame(mUpperFrameCtrl[2].getFrame());
     }
 }
 
-/* 80115254-801153F8 10FB94 01A4+00 1/1 0/0 0/0 .text checkUpperItemActionIronBall__9daAlink_cFv
- */
 BOOL daAlink_c::checkUpperItemActionIronBall() {
     if (!itemButton() && checkReadyItem()) {
         field_0x3020 = 1;
@@ -874,11 +853,11 @@ BOOL daAlink_c::checkUpperItemActionIronBall() {
 
         if (frameCtrl->checkAnmEnd()) {
             if (checkModeFlg(1)) {
-                setSingleAnimeBaseSpeed(ANM_IRONBALL_TURN, daAlinkHIO_ironBall_c0::m.mTurnAnmSpeed, daAlinkHIO_ironBall_c0::m.mTurnInterpolation);
+                setSingleAnimeBaseSpeed(ANM_IRONBALL_TURN, mpHIO->mItem.mIronBall.m.mTurnAnmSpeed, mpHIO->mItem.mIronBall.m.mTurnInterpolation);
             }
 
             u16 upperId = getMainBckData(ANM_IRONBALL_TURN)->m_upperID;
-            setUpperAnimeBaseSpeed(upperId, daAlinkHIO_ironBall_c0::m.mTurnAnmSpeed, daAlinkHIO_ironBall_c0::m.mTurnInterpolation);
+            setUpperAnimeBaseSpeed(upperId, mpHIO->mItem.mIronBall.m.mTurnAnmSpeed, mpHIO->mItem.mIronBall.m.mTurnInterpolation);
             mItemVar0.field_0x3018 = 2;
             seStartOnlyReverb(Z2SE_AL_IB_SWING);
             return 1;
@@ -900,7 +879,6 @@ BOOL daAlink_c::checkUpperItemActionIronBall() {
     return cancelUpperItemReadyAnime(0);
 }
 
-/* 801153F8-801154E4 10FD38 00EC+00 2/2 0/0 0/0 .text checkNextActionIronBall__9daAlink_cFv */
 int daAlink_c::checkNextActionIronBall() {
     if (mFastShotTime != 0) {
         mFastShotTime--;
@@ -922,7 +900,6 @@ int daAlink_c::checkNextActionIronBall() {
     }
 }
 
-/* 801154E4-80115564 10FE24 0080+00 1/1 0/0 0/0 .text procIronBallSubjectInit__9daAlink_cFv */
 int daAlink_c::procIronBallSubjectInit() {
     if (!commonProcInitNotSameProc(PROC_IRON_BALL_SUBJECT)) {
         return 0;
@@ -939,8 +916,6 @@ int daAlink_c::procIronBallSubjectInit() {
     return 1;
 }
 
-/* 80115564-801155EC 10FEA4 0088+00 1/0 0/0 0/0 .text            procIronBallSubject__9daAlink_cFv
- */
 int daAlink_c::procIronBallSubject() {
     if (checkIronBallAnime()) {
         setDoStatus(0x12);
@@ -955,8 +930,6 @@ int daAlink_c::procIronBallSubject() {
     return 1;
 }
 
-/* 801155EC-80115674 10FF2C 0088+00 1/1 0/0 0/0 .text            procIronBallMoveInit__9daAlink_cFv
- */
 int daAlink_c::procIronBallMoveInit() {
     if (!commonProcInitNotSameProc(PROC_IRON_BALL_MOVE)) {
         return 0;
@@ -974,7 +947,6 @@ int daAlink_c::procIronBallMoveInit() {
     return 1;
 }
 
-/* 80115674-8011577C 10FFB4 0108+00 1/0 0/0 0/0 .text            procIronBallMove__9daAlink_cFv */
 int daAlink_c::procIronBallMove() {
     if (checkIronBallAnime()) {
         setDoStatus(0x12);
@@ -994,7 +966,7 @@ int daAlink_c::procIronBallMove() {
 
             if (field_0x2f98 != 2) {
                 field_0x2f98 = 2;
-                var_f31 = daAlinkHIO_basic_c0::m.mAnmBlendFactor;
+                var_f31 = mpHIO->mBasic.m.mBasicInterpolation;
             }
         } else {
             offModeFlg(1);
@@ -1012,11 +984,9 @@ int daAlink_c::procIronBallMove() {
     return 1;
 }
 
-/* 8011577C-80115860 1100BC 00E4+00 1/1 0/0 0/0 .text            procIronBallThrowInit__9daAlink_cFv
- */
 int daAlink_c::procIronBallThrowInit() {
     commonProcInit(PROC_IRON_BALL_THROW);
-    setSingleAnime(ANM_IRONBALL_ATTACK, daAlinkHIO_ironBall_c0::m.mPreThrowAnmSpeed, 22.0f, 30, daAlinkHIO_ironBall_c0::m.mPreThrowAnmInterpolation);
+    setSingleAnime(ANM_IRONBALL_ATTACK, mpHIO->mItem.mIronBall.m.mPreThrowAnmSpeed, 22.0f, 30, mpHIO->mItem.mIronBall.m.mPreThrowAnmInterpolation);
     field_0x2f99 = 12;
     field_0x3588 = l_ironBallBaseAnime;
     mNormalSpeed = 0.0f;
@@ -1032,7 +1002,6 @@ int daAlink_c::procIronBallThrowInit() {
     return 1;
 }
 
-/* 80115860-801159F0 1101A0 0190+00 1/0 0/0 0/0 .text            procIronBallThrow__9daAlink_cFv */
 int daAlink_c::procIronBallThrow() {
     daPy_frameCtrl_c* temp_r29 = &mUnderFrameCtrl[0];
 
@@ -1050,7 +1019,7 @@ int daAlink_c::procIronBallThrow() {
         mItemVar0.field_0x3018 = 5;
         mDoMtx_stack_c::ZXYrotS(mBodyAngle.x, shape_angle.y, 0);
         
-        Vec sp8 = {0.0f, daAlinkHIO_ironBall_c0::m.mThrowSpeedY, daAlinkHIO_ironBall_c0::m.mThrowSpeedZ};
+        Vec sp8 = {0.0f, mpHIO->mItem.mIronBall.m.mThrowSpeedY, mpHIO->mItem.mIronBall.m.mThrowSpeedZ};
         mDoMtx_stack_c::multVec(&sp8, field_0x3848);
         field_0x3022 = 0;
     }
@@ -1058,7 +1027,7 @@ int daAlink_c::procIronBallThrow() {
     if (checkAnmEnd(temp_r29)) {
         if (mProcVar2.field_0x300c == 0) {
             mProcVar2.field_0x300c = 1;
-            setSingleAnimeBaseSpeed(ANM_IRONBALL_THROW, daAlinkHIO_ironBall_c0::m.mThrowAnmSpeed, daAlinkHIO_ironBall_c0::m.mThrowInterpolation);
+            setSingleAnimeBaseSpeed(ANM_IRONBALL_THROW, mpHIO->mItem.mIronBall.m.mThrowAnmSpeed, mpHIO->mItem.mIronBall.m.mThrowInterpolation);
             field_0x2f99 = 0xC;
             mItemVar0.field_0x3018 = 4;
         } else if (mItemVar0.field_0x3018 == 7) {
@@ -1074,16 +1043,15 @@ int daAlink_c::procIronBallThrow() {
     return 1;
 }
 
-/* 801159F0-80115AA0 110330 00B0+00 2/2 0/0 0/0 .text procIronBallReturnInit__9daAlink_cFv */
 int daAlink_c::procIronBallReturnInit() {
     commonProcInit(PROC_IRON_BALL_RETURN);
 
     if (mItemVar0.field_0x3018 == 8) {
         mProcVar2.field_0x300c = 1;
-        setSingleAnimeParam(ANM_IRONBALL_CATCH, &daAlinkHIO_ironBall_c0::m.mCatchAnm);
+        setSingleAnimeParam(ANM_IRONBALL_CATCH, &mpHIO->mItem.mIronBall.m.mCatchAnm);
         field_0x2f99 = 12;
     } else {
-        setSingleAnimeBaseSpeed(ANM_IRONBALL_PULL, daAlinkHIO_ironBall_c0::m.mPullAnmSpeed, daAlinkHIO_ironBall_c0::m.mPullInterpolation);
+        setSingleAnimeBaseSpeed(ANM_IRONBALL_PULL, mpHIO->mItem.mIronBall.m.mPullAnmSpeed, mpHIO->mItem.mIronBall.m.mPullInterpolation);
         field_0x2f99 = 12;
         mProcVar2.field_0x300c = 0;
     }
@@ -1092,7 +1060,6 @@ int daAlink_c::procIronBallReturnInit() {
     return 1;
 }
 
-/* 80115AA0-80115C20 1103E0 0180+00 1/0 0/0 0/0 .text            procIronBallReturn__9daAlink_cFv */
 int daAlink_c::procIronBallReturn() {
     daPy_frameCtrl_c* frameCtrl = mUnderFrameCtrl;
 
@@ -1104,7 +1071,7 @@ int daAlink_c::procIronBallReturn() {
 
     if (mItemVar0.field_0x3018 == 8 && mProcVar2.field_0x300c == 0) {
         mProcVar2.field_0x300c = 1;
-        setSingleAnimeParam(ANM_IRONBALL_CATCH, &daAlinkHIO_ironBall_c0::m.mCatchAnm);
+        setSingleAnimeParam(ANM_IRONBALL_CATCH, &mpHIO->mItem.mIronBall.m.mCatchAnm);
         field_0x2f99 = 12;
         seStartOnlyReverb(Z2SE_AL_IB_CATCH);
 
@@ -1115,7 +1082,7 @@ int daAlink_c::procIronBallReturn() {
             setIronBallWaitUpperAnime(1);
             checkNextAction(0);
         }
-    } else if (mItemVar0.field_0x3018 == 8 && frameCtrl->getFrame() > daAlinkHIO_ironBall_c0::m.mCatchAnm.mCancelFrame) {
+    } else if (mItemVar0.field_0x3018 == 8 && frameCtrl->getFrame() > mpHIO->mItem.mIronBall.m.mCatchAnm.mCancelFrame) {
         mItemVar0.field_0x3018 = 0;
         setIronBallWaitUpperAnime(1);
         

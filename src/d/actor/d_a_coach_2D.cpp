@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_coach_2D.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
@@ -11,24 +13,99 @@
 #include "JSystem/J2DGraph/J2DScreen.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 
-/* 806569CC-80656A18 0000EC 004C+00 1/0 0/0 0/0 .text            draw__Q211daCoach2D_c6c_listFv */
+class daCoach2D_HIO_c : public mDoHIO_entry_c {
+public:
+    struct Param {
+        /* 0x00 */ f32 pos_x;
+        /* 0x04 */ f32 pos_y;
+        /* 0x08 */ f32 size;
+        /* 0x0C */ f32 alpha;
+        /* 0x10 */ f32 icon_space_x;
+        /* 0x14 */ f32 icon_pos_x;
+        /* 0x18 */ f32 icon_pos_y;
+        /* 0x1C */ f32 icon_size;
+        /* 0x20 */ f32 icon_alpha;
+        /* 0x24 */ f32 coach_pos_x;
+        /* 0x28 */ f32 coach_pos_y;
+        /* 0x2C */ f32 coach_size;
+        /* 0x30 */ f32 coach_alpha;
+        /* 0x34 */ f32 blink_speed_min;
+        /* 0x38 */ f32 blink_speed_max;
+        /* 0x3C */ f32 pikari_scale;
+        /* 0x40 */ f32 pikari_anim_speed;
+        /* 0x44 */ u8 pikari_moyaR0_R;
+        /* 0x45 */ u8 pikari_moyaR0_G;
+        /* 0x46 */ u8 pikari_moyaR0_B;
+        /* 0x47 */ u8 pikari_moyaR0_A;
+        /* 0x48 */ u8 pikari_moyaR1_R;
+        /* 0x49 */ u8 pikari_moyaR1_G;
+        /* 0x4A */ u8 pikari_moyaR1_B;
+        /* 0x4B */ u8 pikari_moyaR1_A;
+        /* 0x4C */ u8 unk_0x4C;
+        /* 0x4D */ u8 unk_0x4D;
+        /* 0x4E */ u8 unk_0x4E;
+        /* 0x4F */ u8 unk_0x4F;
+        /* 0x50 */ u8 unk_0x50;
+        /* 0x51 */ u8 unk_0x51;
+        /* 0x52 */ u8 unk_0x52;
+        /* 0x53 */ u8 unk_0x53;
+        /* 0x54 */ u8 debug_ON;
+        /* 0x55 */ u8 max_damage_num;
+        /* 0x56 */ u8 now_damage_num;
+        /* 0x57 */ u8 reverse_flag;
+    };
+
+    daCoach2D_HIO_c() {
+        static Param aParam = {
+            45.0f,
+            -15.0f,
+            1.0f,
+            1.0f,
+            7.5f,
+            -6.5f,
+            0.0f,
+            0.5f,
+            1.0f,
+            0.0f,
+            0.0f,
+            1.0f,
+            1.0f,
+            1.0f,
+            5.0f,
+            3.0f,
+            8.0f,
+            0xFF, 0xFF, 0xFF, 0xB9,
+            0x00, 0x9B, 0x00, 0x00,
+            0xFF, 0xFF, 0xFF, 0x57,
+            0x00, 0x73, 0x00, 0x00,
+            false,
+            20,
+            0,
+            1,
+        };
+
+        memcpy(&param, &aParam, sizeof(Param));
+    }
+
+    virtual ~daCoach2D_HIO_c() {}
+    void genMessage(JORMContext*) {}
+
+    /* 0x4 */ Param param;
+};
+
 void daCoach2D_c::c_list::draw() {
     dComIfGp_getCurrentGrafPort()->setup2D();
     mpCoach2D->drawMeter();
 }
 
-/* 80656A18-80656A38 000138 0020+00 1/1 0/0 0/0 .text daCoach2D_createHeap__FP10fopAc_ac_c */
 static int daCoach2D_createHeap(fopAc_ac_c* i_this) {
     return ((daCoach2D_c*)i_this)->createHeap();
 }
 
-/* 806579F4-806579F8 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Coach2D";
 
-/* 80657A9C-80657AF8 000014 005C+00 5/5 0/0 0/0 .bss             l_HOSTIO */
 static daCoach2D_HIO_c l_HOSTIO;
 
-/* 80656A38-80656D18 000158 02E0+00 1/1 0/0 0/0 .text            createHeap__11daCoach2D_cFv */
 int daCoach2D_c::createHeap() {
     mpScrn = new J2DScreen();
     if (mpScrn == NULL) {
@@ -36,7 +113,7 @@ int daCoach2D_c::createHeap() {
     }
 
     dRes_info_c* resInfo = dComIfG_getObjectResInfo(l_arcName);
-    JUT_ASSERT(285, resInfo != 0);
+    JUT_ASSERT(285, resInfo != NULL);
 
     JKRArchive* archive = resInfo->getArchive();
     mpScrn->setPriority("zelda_game_image_fire_icon.blo", 0x20000, archive);
@@ -72,7 +149,6 @@ int daCoach2D_c::createHeap() {
     return 1;
 }
 
-/* 80656D18-80656D94 000438 007C+00 1/1 0/0 0/0 .text            create__11daCoach2D_cFv */
 int daCoach2D_c::create() {
     int phase_state = dComIfG_resLoad(this, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -80,7 +156,7 @@ int daCoach2D_c::create() {
             return cPhs_ERROR_e;
         }
 
-#ifdef DEBUG
+#if DEBUG
         l_HOSTIO.entryHIO("馬車アイコン");
 #endif
     }
@@ -88,10 +164,9 @@ int daCoach2D_c::create() {
     return phase_state;
 }
 
-/* 80656D94-80656DE4 0004B4 0050+00 1/1 0/0 0/0 .text            destroy__11daCoach2D_cFv */
 int daCoach2D_c::destroy() {
     dComIfG_resDelete(this, l_arcName);
-#ifdef DEBUG
+#if DEBUG
         l_HOSTIO.removeHIO();
 #endif
 
@@ -99,7 +174,6 @@ int daCoach2D_c::destroy() {
     return 1;
 }
 
-/* 80656DE4-80656E94 000504 00B0+00 1/1 0/0 0/0 .text            draw__11daCoach2D_cFv */
 int daCoach2D_c::draw() {
     if (isVisible() && !dComIfGp_isPauseFlag() && !dMsgObject_isTalkNowCheck()) {
         dComIfGd_set2DOpa(&mList);
@@ -111,9 +185,8 @@ int daCoach2D_c::draw() {
     return 1;
 }
 
-/* 80656E94-80656ED0 0005B4 003C+00 1/1 0/0 0/0 .text            execute__11daCoach2D_cFv */
 int daCoach2D_c::execute() {
-#ifdef DEBUG
+#if DEBUG
     s32 freeSize = mDoExt_getCurrentHeap()->getTotalFreeSize();
 #endif
 
@@ -124,7 +197,6 @@ int daCoach2D_c::execute() {
     return 1;
 }
 
-/* 80656ED0-8065722C 0005F0 035C+00 1/1 0/0 0/0 .text            drawMeter__11daCoach2D_cFv */
 void daCoach2D_c::drawMeter() {
     update();
     if (l_HOSTIO.param.reverse_flag) {
@@ -196,7 +268,6 @@ void daCoach2D_c::drawMeter() {
     }
 }
 
-/* 8065722C-80657260 00094C 0034+00 1/1 0/0 0/0 .text            initiate__11daCoach2D_cFv */
 void daCoach2D_c::initiate() {
     for (int i = 0; i < 20; i++) {
         mIconInfo[i].field_0x15 = 0xFF;
@@ -205,7 +276,6 @@ void daCoach2D_c::initiate() {
     mMaxHitCount = l_HOSTIO.param.max_damage_num;
 }
 
-/* 80657260-80657490 000980 0230+00 1/1 0/0 0/0 .text            update__11daCoach2D_cFv */
 void daCoach2D_c::update() {
     f32 var_f29 = l_HOSTIO.param.icon_space_x;
     f32 icon_pos_x = l_HOSTIO.param.icon_pos_x + ((mMaxHitCount - 1) * var_f29);
@@ -237,7 +307,6 @@ void daCoach2D_c::update() {
     }
 }
 
-/* 80657490-8065764C 000BB0 01BC+00 2/2 0/0 0/0 .text            setBrkAnime__11daCoach2D_cFb */
 void daCoach2D_c::setBrkAnime(bool param_0) {
     if (mHitCount != 0) {
         mBrkSpeed = l_HOSTIO.param.blink_speed_min + ((l_HOSTIO.param.blink_speed_max - l_HOSTIO.param.blink_speed_min) * ((f32)mHitCount / (f32)mMaxHitCount));
@@ -260,31 +329,23 @@ void daCoach2D_c::setBrkAnime(bool param_0) {
     mpScrn->search('basha_p0')->setAnimation(mpFireIconBrk);
 }
 
-/* 8065764C-806576D4 000D6C 0088+00 1/0 0/0 0/0 .text            daCoach2D_create__FP11daCoach2D_c
- */
 static int daCoach2D_create(daCoach2D_c* i_this) {
-    fopAcM_SetupActor(i_this, daCoach2D_c);
+    fopAcM_ct(i_this, daCoach2D_c);
     return i_this->create();
 }
 
-/* 806576D4-806576F4 000DF4 0020+00 1/0 0/0 0/0 .text            daCoach2D_destroy__FP11daCoach2D_c
- */
 static int daCoach2D_destroy(daCoach2D_c* i_this) {
     return i_this->destroy();
 }
 
-/* 806576F4-80657714 000E14 0020+00 1/0 0/0 0/0 .text            daCoach2D_execute__FP11daCoach2D_c
- */
 static int daCoach2D_execute(daCoach2D_c* i_this) {
     return i_this->execute();
 }
 
-/* 80657714-80657734 000E34 0020+00 1/0 0/0 0/0 .text            daCoach2D_draw__FP11daCoach2D_c */
 static int daCoach2D_draw(daCoach2D_c* i_this) {
     return i_this->draw();
 }
 
-/* 806579F8-80657A18 -00001 0020+00 1/0 0/0 0/0 .data            daCoach2D_METHODS */
 static actor_method_class daCoach2D_METHODS = {
     (process_method_func)daCoach2D_create,
     (process_method_func)daCoach2D_destroy,
@@ -293,7 +354,6 @@ static actor_method_class daCoach2D_METHODS = {
     (process_method_func)daCoach2D_draw,
 };
 
-/* 80657A18-80657A48 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_COACH2D */
 extern actor_process_profile_definition g_profile_COACH2D = {
   fpcLy_CURRENT_e,       // mLayerID
   3,                     // mListID

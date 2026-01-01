@@ -21,28 +21,29 @@ public:
 
     struct chain_s {
     public:
-        /* 80BC5E58 */ ~chain_s();
-        /* 80BC5E94 */ chain_s();
+        ~chain_s();
+        chain_s();
 
         J3DModel* model;
         cXyz position;
     };
 
-    /* 80BC5A0C */ void initBaseMtx();
-    /* 80BC5A48 */ void setBaseMtx();
-    /* 80BC5ABC */ int Create();
-    /* 80BC5CF8 */ int CreateHeap();
-    /* 80BC5E98 */ int create();
-    /* 80BC6260 */ int Execute(f32 (**)[3][4]);
-    /* 80BC6270 */ void initWait();
-    /* 80BC627C */ void modeWait();
-    /* 80BC6414 */ void initWalk();
-    /* 80BC6430 */ void modeWalk();
-    /* 80BC65CC */ void getChainBasePos(cXyz*);
-    /* 80BC6648 */ void setPower(f32);
-    /* 80BC66DC */ BOOL checkWall();
-    /* 80BC6868 */ int Draw();
-    /* 80BC6870 */ int Delete();
+    void initBaseMtx();
+    void setBaseMtx();
+    int Create();
+    int CreateHeap();
+    int create();
+    int Execute(Mtx**);
+    void block_mode_proc_call();
+    void initWait();
+    void modeWait();
+    void initWalk();
+    void modeWalk();
+    void getChainBasePos(cXyz*);
+    void setPower(f32);
+    BOOL checkWall();
+    int Draw();
+    int Delete();
 
     u8 getArg0() { return fopAcM_GetParamBit(this, 0, 4); }
     u8 getSwNo() { return fopAcM_GetParamBit(this, 16, 8); }
@@ -70,6 +71,10 @@ private:
     /* 0xCA3 */ u8 field_0xca3;
     /* 0xCA4 */ s16 walkTimer;
     /* 0xCA6 */ s16 field_0xca6;
+#if DEBUG
+    /* 0xCB0 */ cXyz field_0xcb0_debug[2];
+    /* 0xCC8 */ cXyz field_0xcc8_debug[2];
+#endif
 };
 
 STATIC_ASSERT(sizeof(daObjCBlk_c) == 0xca8);

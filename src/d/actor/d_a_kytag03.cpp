@@ -3,6 +3,8 @@
  * Odor generation tag / rail
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag03.h"
 #include "SSystem/SComponent/c_counter.h"
 #include "SSystem/SComponent/c_math.h"
@@ -10,9 +12,8 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_kankyo_rain.h"
+#include "f_op/f_op_camera_mng.h"
 
-/* 80855ED8-808560DC 000078 0204+00 1/1 0/0 0/0 .text dEnvSe_getNearPathPos__FP4cXyzP4cXyzP5dPath
- */
 static void dEnvSe_getNearPathPos(cXyz* param_0, cXyz* param_1, dPath* i_path) {
     int var_r31 = 0;
     BOOL sp10[2] = {0, 0};
@@ -64,8 +65,6 @@ static void dEnvSe_getNearPathPos(cXyz* param_0, cXyz* param_1, dPath* i_path) {
     }
 }
 
-/* 80856124-80856238 0002C4 0114+00 1/1 0/0 0/0 .text            get_rail_ratio_pos__FP5dPathifPsPs
- */
 static cXyz get_rail_ratio_pos(dPath* i_path, int i_pointIdx, f32 param_2, s16* param_3,
                                s16* param_4) {
     cXyz point_a;
@@ -94,7 +93,6 @@ static cXyz get_rail_ratio_pos(dPath* i_path, int i_pointIdx, f32 param_2, s16* 
     return ret;
 }
 
-/* 80856238-80856280 0003D8 0048+00 1/1 0/0 0/0 .text            set_path_info__FP10fopAc_ac_c */
 static dPath* set_path_info(fopAc_ac_c* i_actor) {
     dPath* path_p = NULL;
     u8 path_id = fopAcM_GetParam(i_actor) >> 0x10;
@@ -106,7 +104,6 @@ static dPath* set_path_info(fopAc_ac_c* i_actor) {
     return path_p;
 }
 
-/* 80856280-80856354 000420 00D4+00 1/1 0/0 0/0 .text            getSound_pos__FP10fopAc_ac_c */
 static void getSound_pos(fopAc_ac_c* i_actor) {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     cXyz eye = camera->mCamera.Eye();
@@ -123,23 +120,18 @@ static void getSound_pos(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 80856354-80856364 0004F4 0010+00 1/1 0/0 0/0 .text
- * get_Extent_pos_start_get__FP13kytag03_classP5dPathP4cXyzfPi  */
 static dPath* get_Extent_pos_start_get(kytag03_class* i_this, dPath* i_path, cXyz*, f32,
                                        int* param_4) {
     *param_4 = 0;
     return i_path;
 }
 
-/* 80856364-80856378 000504 0014+00 1/1 0/0 0/0 .text
- * get_Extent_pos_end_get__FP13kytag03_classP5dPathP4cXyzfPi    */
 static dPath* get_Extent_pos_end_get(kytag03_class* i_this, dPath* i_path, cXyz*, f32,
                                      int* param_4) {
     *param_4 = i_path->m_num - 1;
     return i_path;
 }
 
-/* 80856378-80856E24 000518 0AAC+00 1/1 0/0 0/0 .text            odour_move__FP13kytag03_class */
 static void odour_move(kytag03_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     camera_class* camera = (camera_class*)dComIfGp_getCamera(0);
@@ -150,7 +142,7 @@ static void odour_move(kytag03_class* i_this) {
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
 
     dPath* var_r27;
-    dKankyo_odour_Packet* packet = kankyo->mpOdourPacket;
+    dKankyo_odour_Packet* packet = kankyo->mOdourData.mpOdourPacket;
     dPath* var_r25;
 
     cXyz sp94;
@@ -286,13 +278,10 @@ static void odour_move(kytag03_class* i_this) {
     }
 }
 
-/* 80856E24-80856E2C 000FC4 0008+00 1/0 0/0 0/0 .text            daKytag03_Draw__FP13kytag03_class
- */
 static int daKytag03_Draw(kytag03_class* i_this) {
     return 1;
 }
 
-/* 80856E2C-808573F4 000FCC 05C8+00 1/0 0/0 0/0 .text daKytag03_Execute__FP13kytag03_class */
 static int daKytag03_Execute(kytag03_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
@@ -376,13 +365,13 @@ static int daKytag03_Execute(kytag03_class* i_this) {
                     daPy_py_c::checkNowWolf() && !var_r28)
                 {
                     i_this->attention_info.distances[fopAc_attn_ETC_e] = 0x3D;
-                    a_this->attention_info.flags |= 0x80;
+                    a_this->attention_info.flags |= fopAc_AttnFlag_ETC_e;
                 } else {
-                    a_this->attention_info.flags &= ~0x80;
+                    a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
                 }
 
                 if (i_this->field_0x588 == 1) {
-                    a_this->attention_info.flags &= ~0x80;
+                    a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
                     i_this->field_0x587 = 1;
                     i_this->field_0x58a = 30;
                 }
@@ -397,20 +386,17 @@ static int daKytag03_Execute(kytag03_class* i_this) {
                 i_this->field_0x587 = 0;
             }
         } else {
-            a_this->attention_info.flags &= ~0x80;
+            a_this->attention_info.flags &= ~fopAc_AttnFlag_ETC_e;
         }
     }
 
     return 1;
 }
 
-/* 808573F4-808573FC 001594 0008+00 1/0 0/0 0/0 .text daKytag03_IsDelete__FP13kytag03_class */
 static int daKytag03_IsDelete(kytag03_class* i_this) {
     return 1;
 }
 
-/* 808573FC-80857470 00159C 0074+00 1/0 0/0 0/0 .text            daKytag03_Delete__FP13kytag03_class
- */
 static int daKytag03_Delete(kytag03_class* i_this) {
     if (i_this->mpEmitter != NULL) {
         i_this->mpEmitter->deleteAllParticle();
@@ -422,10 +408,9 @@ static int daKytag03_Delete(kytag03_class* i_this) {
     return 1;
 }
 
-/* 80857470-80857648 001610 01D8+00 1/0 0/0 0/0 .text            daKytag03_Create__FP10fopAc_ac_c */
 static int daKytag03_Create(fopAc_ac_c* i_this) {
     kytag03_class* a_this = (kytag03_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag03_class);
+    fopAcM_ct(i_this, kytag03_class);
 
     a_this->field_0x584 = (fopAcM_GetParam(i_this) >> 0x18) & 3;
     a_this->field_0x585 = fopAcM_GetParam(i_this);
@@ -449,7 +434,7 @@ static int daKytag03_Create(fopAc_ac_c* i_this) {
         a_this->mpPath = set_path_info(i_this);
         a_this->field_0x570 = 0.0f;
         a_this->field_0x580 = 0;
-        g_env_light.field_0xf21 = 1;
+        g_env_light.mOdourData.field_0xf21 = 1;
     } else {
         if (a_this->field_0x585 == 0xFF) {
             return cPhs_UNK3_e;
@@ -465,14 +450,12 @@ static int daKytag03_Create(fopAc_ac_c* i_this) {
     return cPhs_COMPLEATE_e;
 }
 
-/* 80857708-80857728 -00001 0020+00 1/0 0/0 0/0 .data            l_daKytag03_Method */
 static actor_method_class l_daKytag03_Method = {
     (process_method_func)daKytag03_Create,  (process_method_func)daKytag03_Delete,
     (process_method_func)daKytag03_Execute, (process_method_func)daKytag03_IsDelete,
     (process_method_func)daKytag03_Draw,
 };
 
-/* 80857728-80857758 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_KYTAG03 */
 extern actor_process_profile_definition g_profile_KYTAG03 = {
     fpcLy_CURRENT_e,
     7,

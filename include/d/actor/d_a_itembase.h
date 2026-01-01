@@ -33,9 +33,9 @@ public:
     void hide();
     void show();
     void changeDraw();
-    u8 chkDraw();
+    bool chkDraw();
     void dead();
-    u8 chkDead();
+    bool chkDead();
     int CreateItemHeap(char const*, s16, s16, s16, s16, s16, s16, s16);
     int DeleteBase(char const*);
     void setListEnd();

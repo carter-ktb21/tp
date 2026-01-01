@@ -3,27 +3,24 @@
  * Object - Tree
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ki.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
 
-/* 80C44B90-80C44B98 000000 0008+00 1/1 0/0 0/0 .data            ki_bmd */
 static int ki_bmd[2] = {9, 10};
 
-/* 80C44C08-80C44C0C 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 80C44C18-80C44C20 000018 0008+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_Ki_HIO_c l_HIO;
 
-/* 80C43EEC-80C43F0C 0000EC 0020+00 1/1 0/0 0/0 .text            __ct__14daObj_Ki_HIO_cFv */
 daObj_Ki_HIO_c::daObj_Ki_HIO_c() {
     field_0x4 = -1;
     field_0x5 = 0;
 }
 
-/* 80C43F0C-80C44010 00010C 0104+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
@@ -41,7 +38,6 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 80C44010-80C44080 000210 0070+00 1/0 0/0 0/0 .text            daObj_Ki_Draw__FP12obj_ki_class */
 static int daObj_Ki_Draw(obj_ki_class* i_this) {
     J3DModel* model = i_this->mpMorf->getModel();
     g_env_light.settingTevStruct(0, &i_this->current.pos, &i_this->tevStr);
@@ -50,7 +46,6 @@ static int daObj_Ki_Draw(obj_ki_class* i_this) {
     return 1;
 }
 
-/* 80C44080-80C4408C 000280 000C+00 1/1 0/0 0/0 .text            action__FP12obj_ki_class */
 static void action(obj_ki_class* i_this) {
     cXyz vec;
     if (i_this->field_0x57a == 0) {
@@ -58,8 +53,6 @@ static void action(obj_ki_class* i_this) {
     }
 }
 
-/* 80C440C8-80C443E0 0002C8 0318+00 2/1 0/0 0/0 .text            daObj_Ki_Execute__FP12obj_ki_class
- */
 static int daObj_Ki_Execute(obj_ki_class* i_this) {
     i_this->mCounter++;
     for (int i = 0; i < 4; i++) {
@@ -100,24 +93,19 @@ static int daObj_Ki_Execute(obj_ki_class* i_this) {
     return 1;
 }
 
-/* 80C4441C-80C44424 00061C 0008+00 1/0 0/0 0/0 .text            daObj_Ki_IsDelete__FP12obj_ki_class
- */
 static int daObj_Ki_IsDelete(obj_ki_class* i_this) {
     return 1;
 }
 
-/* 80C44424-80C4448C 000624 0068+00 1/0 0/0 0/0 .text            daObj_Ki_Delete__FP12obj_ki_class
- */
 static int daObj_Ki_Delete(obj_ki_class* i_this) {
     dComIfG_resDelete(&i_this->mPhaseReq, "Obj_Ki");
     if (i_this->mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
     dComIfG_Bgsp().Release(i_this->mpBgW);
     return 1;
 }
 
-/* 80C4448C-80C4466C 00068C 01E0+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     obj_ki_class* _this = static_cast<obj_ki_class*>(i_this);
 
@@ -132,7 +120,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     }
     
     J3DModel* model = _this->mpMorf->getModel();
-    model->setUserArea((u32)_this);
+    model->setUserArea((uintptr_t)_this);
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
     }
@@ -151,10 +139,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80C4466C-80C449F8 00086C 038C+00 1/0 0/0 0/0 .text            daObj_Ki_Create__FP10fopAc_ac_c */
 static cPhs__Step daObj_Ki_Create(fopAc_ac_c* i_this) {
     obj_ki_class* _this = static_cast<obj_ki_class*>(i_this);
-    fopAcM_SetupActor(_this, obj_ki_class);
+    fopAcM_ct(_this, obj_ki_class);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhaseReq, "Obj_Ki");
 
     if (step == cPhs_COMPLEATE_e) {
@@ -173,9 +160,9 @@ static cPhs__Step daObj_Ki_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
+        if (!hio_set) {
             _this->mHIOInit = true;
-            hioInit = true;
+            hio_set = true;
             l_HIO.field_0x4 = -1;
         }
 
@@ -229,7 +216,6 @@ static cPhs__Step daObj_Ki_Create(fopAc_ac_c* i_this) {
     return step;
 }
 
-/* 80C44BA0-80C44BC0 -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Ki_Method */
 static actor_method_class l_daObj_Ki_Method = {
     (process_method_func)daObj_Ki_Create,
     (process_method_func)daObj_Ki_Delete,
@@ -238,7 +224,6 @@ static actor_method_class l_daObj_Ki_Method = {
     (process_method_func)daObj_Ki_Draw,
 };
 
-/* 80C44BC0-80C44BF0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_KI */
 extern actor_process_profile_definition g_profile_OBJ_KI = {
     fpcLy_CURRENT_e,
     7,

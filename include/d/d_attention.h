@@ -4,17 +4,17 @@
 #include "SSystem/SComponent/c_angle.h"
 #include "m_Do/m_Do_ext.h"
 #include "f_pc/f_pc_base.h"
-#include "JSystem/JHostIO/JORReflexible.h"
+#include "m_Do/m_Do_hostIO.h"
 
 class fopAc_ac_c;
 
 class dAttHint_c {
 public:
-    /* 800738B4 */ fpc_ProcID getPId(void*);
-    /* 800738CC */ fopAc_ac_c* convPId(fpc_ProcID);
-    /* 800738FC */ int request(fopAc_ac_c*, int);
-    /* 80073958 */ void init();
-    /* 80073970 */ void proc();
+    fpc_ProcID getPId(void*);
+    fopAc_ac_c* convPId(fpc_ProcID);
+    int request(fopAc_ac_c*, int);
+    void init();
+    void proc();
 
     fopAc_ac_c* getZHintTarget() { return convPId(field_0x8); }
 
@@ -45,8 +45,8 @@ private:
 
 class dAttParam_c : public JORReflexible {
 public:
-#ifdef DEBUG
-    /* 0x04 */ u8 unk_0x4;
+#if DEBUG
+    /* 0x04 */ s8 mHIOChildNo;
 #endif
 
     /* 0x00 */ u16 mFlags;
@@ -66,19 +66,27 @@ public:
     /* 0x35 */ u8 mAttnCursorDisappearFrames;
     /* 0x38 */ f32 field_0x38;
     /* 0x3C */ f32 field_0x3c;
-#ifdef DEBUG
-    /* 0x44 */ int unk_0x44;
-    /* 0x48 */ int unk_0x48;
+#if DEBUG
+    /* 0x44 */ s32 mDebugDispPosX;
+    /* 0x48 */ s32 mDebugDispPosY;
 #endif
 
 public:
     dAttParam_c() {}
-    /* 80070038 */ dAttParam_c(s32);
+    dAttParam_c(s32);
 
-#ifdef DEBUG
+#if DEBUG
+    void connectHIO(char* i_name) {
+        mHIOChildNo = mDoHIO_CREATE_CHILD(i_name, this);
+    }
+
+    void releaseHIO() {
+        mDoHIO_DELETE_CHILD(mHIOChildNo);
+    }
+
     virtual void genMessage(JORMContext*);
 #endif
-    /* 80070110 */ virtual ~dAttParam_c();
+    virtual ~dAttParam_c();
 
     enum EFlag {
         EFlag_HOLD_MODE    = (1 << 0),
@@ -90,17 +98,25 @@ public:
         EFlag_MARGIN_DEBUG = (1 << 15),
     };
 
-    bool CheckFlag(u16 flag) { return mFlags & flag; }
+    bool CheckFlag(u16 flag) { return flag & mFlags ? true : false; }
+
+    f32 FreeStick() {
+#if DEBUG
+        return mSWModeDisable;
+#else
+        return -0.9f;
+#endif
+    }
 
     /* 0x40 vtable */
 };  // Size: 0x44
 
 class dAttLook_c {
 public:
-    /* 80073CA4 */ fopAc_ac_c* convPId(fpc_ProcID);
-    /* 80073CD4 */ void init();
-    /* 80073CEC */ void proc();
-    /* 80073D08 */ int request(fopAc_ac_c*, f32, f32, f32, s16, int);
+    fopAc_ac_c* convPId(fpc_ProcID);
+    void init();
+    void proc();
+    int request(fopAc_ac_c*, f32, f32, f32, s16, int);
 
     fopAc_ac_c* getLookTarget() { return convPId(mLookTargetID); }
 
@@ -113,10 +129,10 @@ private:
 
 class dAttList_c {
 public:
-    /* 800304D0 */ ~dAttList_c() {}
-    /* 8003050C */ dAttList_c() {}
-    /* 80073864 */ fopAc_ac_c* getActor();
-    /* 80073898 */ void setActor(fopAc_ac_c*);
+    ~dAttList_c() {}
+    dAttList_c() {}
+    fopAc_ac_c* getActor();
+    void setActor(fopAc_ac_c*);
 
     fpc_ProcID getPid() { return mActorID; }
 
@@ -129,12 +145,12 @@ public:
 
 class dAttDraw_c {
 public:
-    /* 8003054C */ ~dAttDraw_c() {}
-    /* 800307F0 */ dAttDraw_c() {}
-    /* 80072DD8 */ void setAnm(u8, f32);
-    /* 80072FE8 */ void setAlphaAnm(u8, u8);
-    /* 80073004 */ void alphaAnm();
-    /* 800732B0 */ void draw(cXyz&, f32 (*)[4]);
+    ~dAttDraw_c() {}
+    dAttDraw_c() {}
+    void setAnm(u8, f32);
+    void setAlphaAnm(u8, u8);
+    void alphaAnm();
+    void draw(cXyz&, f32 (*)[4]);
 
     /* 0x000 */ J3DModel* mModel[2];
     /* 0x008 */ mDoExt_bckAnm mNoticeCursorBck[2];
@@ -161,7 +177,7 @@ STATIC_ASSERT(sizeof(dAttDraw_c) == 0x178);
 
 class dAttDraw_CallBack_c : public mDoExt_McaMorfCallBack1_c {
 public:
-    /* 80070178 */ virtual int execute(u16, J3DTransformInfo*);
+    virtual int execute(u16, J3DTransformInfo*);
 };
 
 struct dist_entry {
@@ -188,47 +204,52 @@ public:
     };
 
     dAttention_c() {}
-    /* 80070198 */ dAttention_c(fopAc_ac_c*, u32);
-    /* 80070774 */ ~dAttention_c();
-    /* 80070844 */ dAttList_c* GetLockonList(s32);
-    /* 80070880 */ dAttList_c* getActionBtnB();
-    /* 80070974 */ dAttList_c* getActionBtnXY();
-    /* 80070A70 */ int chkAttMask(u32, u32);
-    /* 80070E90 */ f32 calcWeight(int, fopAc_ac_c*, f32, s16, s16, u32*);
-    /* 800710C0 */ void setList(int, fopAc_ac_c*, f32, f32, cSAngle, u32);
-    /* 80071240 */ void initList(u32);
-    /* 800713CC */ int makeList();
-    /* 80071424 */ void setOwnerAttentionPos();
-    /* 80071488 */ int SelectAttention(fopAc_ac_c*);
-    /* 800716B8 */ void sortList();
-    /* 800718A4 */ void stockAttention();
-    /* 80071960 */ fopAc_ac_c* nextAttention();
-    /* 80071A68 */ int freeAttention();
-    /* 80071A98 */ bool chaseAttention();
-    /* 80071CC0 */ f32 EnemyDistance(fopAc_ac_c*);
-    /* 80071DEC */ void runSoundProc();
-    /* 80071E84 */ void runDrawProc();
-    /* 800720F4 */ void runDebugDisp();
-    /* 800720F8 */ void checkButton();
-    /* 800722A0 */ bool triggerProc();
-    /* 800722EC */ int lostCheck();
-    /* 80072344 */ void judgementStatus4Hold();
-    /* 800725F0 */ void judgementStatus4Switch();
-    /* 80072924 */ int Run();
-    /* 80072BD4 */ void Draw();
-    /* 80072D80 */ void lockSoundStart(u32);
-    /* 8007353C */ fopAc_ac_c* LockonTarget(s32);
-    /* 800735DC */ f32 LockonReleaseDistanse();
-    /* 800736CC */ fpc_ProcID LockonTargetPId(s32);
-    /* 80073734 */ fopAc_ac_c* ActionTarget(s32);
-    /* 8007378C */ fopAc_ac_c* CheckObjectTarget(s32);
-    /* 800737E4 */ bool LockonTruth();
-    /* 80073838 */ int checkDistance(cXyz*, s16, cXyz*, f32, f32, f32, f32);
-    /* 8016E424 */ bool LockEdge() { return chkFlag(8) || chkFlag(0x20); }
-    /* 80182994 */ int GetCheckObjectCount() { return mCheckObjectCount; }
-    /* 80182AD0 */ void keepLock(int timer) { mAttnBlockTimer = timer; }
-    /* 8014B010 */ static dist_entry& getDistTable(int i_no) { return dist_table[i_no]; }
+    dAttention_c(fopAc_ac_c*, u32);
+    ~dAttention_c();
+    dAttList_c* GetLockonList(s32);
+    dAttList_c* getActionBtnB();
+    dAttList_c* getActionBtnXY();
+    int chkAttMask(u32, u32);
+    f32 calcWeight(int, fopAc_ac_c*, f32, s16, s16, u32*);
+    void setList(int, fopAc_ac_c*, f32, f32, cSAngle, u32);
+    void initList(u32);
+    int makeList();
+    void setOwnerAttentionPos();
+    int SelectAttention(fopAc_ac_c*);
+    void sortList();
+    void stockAttention();
+    fopAc_ac_c* nextAttention();
+    int freeAttention();
+    bool chaseAttention();
+    f32 EnemyDistance(fopAc_ac_c*);
+    void runSoundProc();
+    void runDrawProc();
+    void runDebugDisp();
+    void checkButton();
+    bool triggerProc();
+    int lostCheck();
+    void judgementStatus4Hold();
+    void judgementStatus4Switch();
+    int Run();
+    void Draw();
+    void lockSoundStart(u32);
+    fopAc_ac_c* LockonTarget(s32);
+    f32 LockonReleaseDistanse();
+    fpc_ProcID LockonTargetPId(s32);
+    fopAc_ac_c* ActionTarget(s32);
+    fopAc_ac_c* CheckObjectTarget(s32);
+    bool LockonTruth();
+    int checkDistance(cXyz*, s16, cXyz*, f32, f32, f32, f32);
+    bool LockEdge() { return chkFlag(8) || chkFlag(0x20); }
+    int GetCheckObjectCount() { return mCheckObjectCount; }
+    void keepLock(int timer) { mAttnBlockTimer = timer; }
+    static dist_entry& getDistTable(int i_no) { return dist_table[i_no]; }
 
+#if DEBUG
+    void runDebugDisp0();
+#endif
+
+    JKRSolidHeap* getHeap() { return heap; }
     fopAc_ac_c* getCatghTarget() { return mCatghTarget.getCatghTarget(); }
     fopAc_ac_c* getZHintTarget() { return mZHintTarget.getZHintTarget(); }
     u8 getCatchChgItem() { return mCatghTarget.getChangeItem(); }
@@ -315,11 +336,11 @@ public:
     /* 0x49C */ dAttCatch_c mCatghTarget;
     /* 0x4B4 */ dAttLook_c mLookTarget;
     /* 0x4C4 */ int mAttnBlockTimer;
-#ifdef DEBUG
+#if PLATFORM_WII || PLATFORM_SHIELD
     /* 0x4C8 */ u8 field_0x4c8[0x4D0 - 0x4C8];
 #endif
     /* 0x4C8 */ dAttParam_c mAttParam;
-#ifdef DEBUG
+#if PLATFORM_WII || PLATFORM_SHIELD
     /* 0x51C */ u8 field_0x50c[0x520 - 0x51C];
 #else
     /* 0x50C */ u8 field_0x50c[0x514 - 0x50c];

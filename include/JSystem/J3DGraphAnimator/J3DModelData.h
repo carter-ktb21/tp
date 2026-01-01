@@ -8,7 +8,6 @@
 #include "JSystem/J3DGraphBase/J3DSys.h"
 #include "JSystem/J3DGraphBase/J3DVertex.h"
 
-typedef struct _GXColor GXColor;
 class JUTNameTab;
 
 /**
@@ -17,16 +16,16 @@ class JUTNameTab;
  */
 class J3DModelData {
 public:
-    /* 80325D88 */ void clear();
-    /* 80325DA0 */ J3DModelData();
-    /* 80325E14 */ s32 newSharedDisplayList(u32);
-    /* 80325EC8 */ void indexToPtr();
-    /* 80325F94 */ void makeSharedDL();
-    /* 8032600C */ void simpleCalcMaterial(u16, Mtx);
-    /* 803260CC */ void syncJ3DSysPointers() const;
-    /* 803260F8 */ void syncJ3DSysFlags() const;
+    void clear();
+    J3DModelData();
+    s32 newSharedDisplayList(u32);
+    void indexToPtr();
+    void makeSharedDL();
+    void simpleCalcMaterial(u16, Mtx);
+    void syncJ3DSysPointers() const;
+    void syncJ3DSysFlags() const;
 
-    /* 8032617C */ virtual ~J3DModelData() {}
+    virtual ~J3DModelData() {}
 
     void simpleCalcMaterial(Mtx mtx) { simpleCalcMaterial(0, mtx); }
     J3DMaterialTable& getMaterialTable() { return mMaterialTable; }
@@ -68,7 +67,7 @@ public:
     bool checkFlag(u32 flag) const { return (mFlags & flag) ? true : false; }
     u32 getFlag() const { return mFlags; }
     void const* getRawData() const { return mpRawData; }
-    u16 checkBumpFlag() const { return mbHasBumpArray; }
+    bool checkBumpFlag() const { return mbHasBumpArray == 1; }
     void setBumpFlag(u32 flag) { mbHasBumpArray = flag; }
     bool checkBBoardFlag() const { return mbHasBillboard == 1; }
     bool isLocked() { return mMaterialTable.isLocked(); }
@@ -87,13 +86,19 @@ public:
     int removeMatColorAnimator(J3DAnmColor* anm) {
         return mMaterialTable.removeMatColorAnimator(anm);
     }
-    void syncJ3DSys() {
+    void syncJ3DSys() const {
         syncJ3DSysFlags();
         syncJ3DSysPointers();
     }
     void makeHierarchy(J3DJoint* joint, J3DModelHierarchy const** hierarchy) {
         mJointTree.makeHierarchy(joint, hierarchy, &mMaterialTable, &mShapeTable);
         mShapeTable.initShapeNodes(getDrawMtxData(), &getVertexData());
+    }
+    void show() {
+        mShapeTable.show();
+    }
+    void hide() {
+        mShapeTable.hide();
     }
 
 private:

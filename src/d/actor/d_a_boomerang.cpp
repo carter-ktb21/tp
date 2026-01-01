@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_boomerang.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "d/actor/d_a_alink.h"
@@ -11,9 +13,8 @@
 #include "d/actor/d_a_mirror.h"
 #include "Z2AudioLib/Z2Instances.h"
 #include "SSystem/SComponent/c_math.h"
+#include "global.h"  // Boofener: For DELTA_TIME scaling
 
-/* 8049E0B8-8049E36C 000078 02B4+00 1/1 0/0 0/0 .text            createHeap__19daBoomerang_sight_cFv
- */
 int daBoomerang_sight_c::createHeap() {
     void* tmpData;
     JKRArchive* archive = dComIfG_getObjectResInfo(daAlink_c::getAlinkArcName())->getArchive();
@@ -101,21 +102,18 @@ int daBoomerang_sight_c::createHeap() {
     return 1;
 }
 
-/* 804A2850-804A285C 000000 000C+00 7/7 0/0 0/0 .rodata          @4078 */
 // unused
 static u8 const lit_4078[12] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-/* 804A285C-804A2868 00000C 000C+00 0/0 0/0 0/0 .rodata          l_blurTop */
 // unused
 static u8 const l_blurTop[12] = {
     0x42, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-/* 804A2868-804A287A 000018 000C+06 0/0 0/0 0/0 .rodata          l_blurRoot */
 // unused
-static u8 const l_blurRoot[12 + 6] = {
+static u8 const l_blurRoot[12] = {
     0xC2,
     0x20,
     0x00,
@@ -128,6 +126,10 @@ static u8 const l_blurRoot[12 + 6] = {
     0x00,
     0x00,
     0x00,
+};
+
+// TODO: what is this?
+static const u8 lbl_46_rodata_24[6] = {
     0xB4,
     0xA0,
     0x8C,
@@ -136,27 +138,18 @@ static u8 const l_blurRoot[12 + 6] = {
     0x1E,
 };
 
-/* 804A287A-804A287C 00002A 0002+00 0/0 0/0 0/0 .rodata m_lockWaitTime__18daBoomerang_HIO_c0 */
 const u16 daBoomerang_HIO_c0::m_lockWaitTime = 10;
 
-/* 804A287C-804A2880 00002C 0004+00 0/0 0/0 0/0 .rodata          m_minCircleR__18daBoomerang_HIO_c0
- */
 const f32 daBoomerang_HIO_c0::m_minCircleR = 28.0f;
 
-/* 804A2880-804A2884 000030 0004+00 0/0 0/0 0/0 .rodata m_middleCircleR__18daBoomerang_HIO_c0 */
 const f32 daBoomerang_HIO_c0::m_middleCircleR = 35.0f;
 
-/* 804A2884-804A2888 000034 0004+00 0/0 0/0 0/0 .rodata          m_maxCircleR__18daBoomerang_HIO_c0
- */
 const f32 daBoomerang_HIO_c0::m_maxCircleR = 80.0f;
 
-/* 804A2888-804A288C 000038 0004+00 0/0 0/0 0/0 .rodata          m_scale__18daBoomerang_HIO_c0 */
 const f32 daBoomerang_HIO_c0::m_scale = 3.0f / 5.0f;
 
-/* 804A288C-804A2890 00003C 0004+00 0/0 0/0 0/0 .rodata m_lockWindScale__18daBoomerang_HIO_c0 */
 const f32 daBoomerang_HIO_c0::m_lockWindScale = 2.0f;
 
-/* 804A2890-804A28A4 000040 0014+00 0/1 0/0 0/0 .rodata          l_lockSeFlg */
 static const u32 l_lockSeFlg[BOOMERANG_LOCK_MAX] = {
     Z2SE_SY_BOOM_LOCK_ON_1,
     Z2SE_SY_BOOM_LOCK_ON_2,
@@ -165,8 +158,6 @@ static const u32 l_lockSeFlg[BOOMERANG_LOCK_MAX] = {
     Z2SE_SY_BOOM_LOCK_ON_5,
 };
 
-/* 8049E36C-8049EB64 00032C 07F8+00 1/1 0/0 0/0 .text            initialize__19daBoomerang_sight_cFv
- */
 void daBoomerang_sight_c::initialize() {
     m_cursorYellowAllPane = m_cursorYellowScrn->search('n_all');
     m_cursorYellow0Pane = m_cursorYellowScrn->search('cursor0');
@@ -261,21 +252,19 @@ void daBoomerang_sight_c::initialize() {
     m_cursorOrangeAllPane->setUserInfo(' ');
 }
 
-/* 8049EB64-8049EDA8 000B24 0244+00 1/1 0/0 0/0 .text            playAnime__19daBoomerang_sight_cFii
- */
 int daBoomerang_sight_c::playAnime(int param_0, int param_1) {
     int i;
-    f32* var_r30 = field_0x98;
+    f32* cursorAngle = field_0x98;
     f32* var_r29 = field_0xb0;
     u8* alpha_p = m_alpha;
 
-    for (i = 0; i < BOOMERANG_LOCK_MAX; i++, var_r30++, var_r29++, alpha_p++) {
-        *var_r30 += 1.1f;
-        if (*var_r30 >= 50.0f) {
-            *var_r30 += -29.0f;
+    for (i = 0; i < BOOMERANG_LOCK_MAX; i++, cursorAngle++, var_r29++, alpha_p++) {
+        *cursorAngle += 1.1f * DELTA_TIME;
+        if (*cursorAngle >= 50.0f) {
+            *cursorAngle += -29.0f;
         }
 
-        *var_r29 += 1.1f;
+        *var_r29 += 1.1f * DELTA_TIME;
         if (*var_r29 >= (f32)m_cursorYellow2Brk->getFrameMax()) {
             *var_r29 -= (f32)m_cursorYellow2Brk->getFrameMax();
         }
@@ -290,13 +279,13 @@ int daBoomerang_sight_c::playAnime(int param_0, int param_1) {
         }
     }
 
-    if (*var_r30 < 21.0f) {
-        *var_r30 = 21.0f;
+    if (*cursorAngle < 21.0f) {
+        *cursorAngle = 21.0f;
     }
 
-    *var_r30 += 0.9f;
-    if (*var_r30 >= 50.0f) {
-        *var_r30 += -29.0f;
+    *cursorAngle += 0.9f;
+    if (*cursorAngle >= 50.0f) {
+        *cursorAngle += -29.0f;
     }
 
     *var_r29 += 0.9f;
@@ -311,8 +300,6 @@ int daBoomerang_sight_c::playAnime(int param_0, int param_1) {
     return cLib_chaseUC(alpha_p, 0, 30);
 }
 
-/* 8049EDA8-8049EDE8 000D68 0040+00 2/2 0/0 0/0 .text            initFrame__19daBoomerang_sight_cFi
- */
 void daBoomerang_sight_c::initFrame(int i_no) {
     m_alpha[i_no] = 0;
     field_0x98[i_no] = 4.0f;
@@ -323,7 +310,6 @@ void daBoomerang_sight_c::initFrame(int i_no) {
     }
 }
 
-/* 8049EDE8-8049EE8C 000DA8 00A4+00 1/1 0/0 0/0 .text copyNumData__19daBoomerang_sight_cFi */
 void daBoomerang_sight_c::copyNumData(int i_no) {
     int next_no = i_no + 1;
 
@@ -345,7 +331,6 @@ void daBoomerang_sight_c::copyNumData(int i_no) {
     m_pos[next_no] = temp_pos;
 }
 
-/* 8049EEC8-8049EF60 000E88 0098+00 1/1 0/0 0/0 .text setSight__19daBoomerang_sight_cFPC4cXyzi */
 void daBoomerang_sight_c::setSight(const cXyz* i_pos, int i_no) {
     if (m_alpha[i_no]) {
         if (i_pos != NULL) {
@@ -359,7 +344,6 @@ void daBoomerang_sight_c::setSight(const cXyz* i_pos, int i_no) {
     }
 }
 
-/* 8049EF60-8049F280 000F20 0320+00 1/0 0/0 0/0 .text            draw__19daBoomerang_sight_cFv */
 void daBoomerang_sight_c::draw() {
     J2DGrafContext* ctx = dComIfGp_getCurrentGrafPort();
     u8* alpha_p = m_alpha;
@@ -427,7 +411,6 @@ void daBoomerang_sight_c::draw() {
     }
 }
 
-/* 8049F280-8049F360 001240 00E0+00 1/1 0/0 0/0 .text windModelCallBack__13daBoomerang_cFv */
 void daBoomerang_c::windModelCallBack() {
     mDoMtx_stack_c::YrotS(shape_angle.y);
     mDoMtx_stack_c::ZrotM(-shape_angle.z);
@@ -443,8 +426,6 @@ void daBoomerang_c::windModelCallBack() {
     mp_shippuModel->setAnmMtx(4, mDoMtx_stack_c::get());
 }
 
-/* 8049F360-8049F39C 001320 003C+00 1/1 0/0 0/0 .text daBoomeang_windModelCallBack__FP8J3DJointi
- */
 static int daBoomeang_windModelCallBack(J3DJoint* i_joint, int param_1) {
     daBoomerang_c* boomerang = (daBoomerang_c*)j3dSys.getModel()->getUserArea();
     if (param_1 == 0) {
@@ -454,7 +435,6 @@ static int daBoomeang_windModelCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* 8049F39C-8049F5D4 00135C 0238+00 1/1 0/0 0/0 .text            draw__13daBoomerang_cFv */
 int daBoomerang_c::draw() {
     if (!checkStateFlg0(FLG0_4)) {
         for (int i = 0; i < BOOMERANG_LOCK_MAX; i++) {
@@ -511,14 +491,10 @@ int daBoomerang_c::draw() {
     return 1;
 }
 
-/* 8049F5D4-8049F5F4 001594 0020+00 1/0 0/0 0/0 .text            daBoomerang_Draw__FP13daBoomerang_c
- */
 static int daBoomerang_Draw(daBoomerang_c* i_this) {
     return i_this->draw();
 }
 
-/* 8049F5F4-8049F63C 0015B4 0048+00 1/1 0/0 0/0 .text
- * lockLineCallback__13daBoomerang_cFP10fopAc_ac_c              */
 void daBoomerang_c::lockLineCallback(fopAc_ac_c* i_actor) {
     if (i_actor != NULL && fopAcM_GetName(i_actor) != PROC_Obj_glowSphere &&
         fopAcM_GetName(i_actor) != PROC_E_VT && fopAcM_GetName(i_actor) != PROC_OBJ_BRG)
@@ -527,16 +503,12 @@ void daBoomerang_c::lockLineCallback(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 8049F63C-8049F660 0015FC 0024+00 1/1 0/0 0/0 .text
- * daBoomerang_lockLineCallback__FP10fopAc_ac_cP12dCcD_GObjInfP10fopAc_ac_cP12dCcD_GObjInf */
 static void daBoomerang_lockLineCallback(fopAc_ac_c* i_actorP1, dCcD_GObjInf* param_1,
                                          fopAc_ac_c* i_actorP2, dCcD_GObjInf* param_3) {
     daBoomerang_c* boomerang = (daBoomerang_c*)i_actorP1;
     boomerang->lockLineCallback(i_actorP2);
 }
 
-/* 8049F660-8049F6EC 001620 008C+00 1/1 0/0 0/0 .text
- * moveLineCallback__13daBoomerang_cFP10fopAc_ac_c              */
 void daBoomerang_c::moveLineCallback(fopAc_ac_c* i_actor) {
     if (i_actor != NULL) {
         for (int i = 0; i < BOOMERANG_LOCK_MAX; i++) {
@@ -554,15 +526,12 @@ void daBoomerang_c::moveLineCallback(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 8049F6EC-8049F710 0016AC 0024+00 1/1 0/0 0/0 .text
- * daBoomerang_moveLineCallback__FP10fopAc_ac_cP12dCcD_GObjInfP10fopAc_ac_cP12dCcD_GObjInf */
 static void daBoomerang_moveLineCallback(fopAc_ac_c* i_actorP1, dCcD_GObjInf* param_1,
                                          fopAc_ac_c* i_actorP2, dCcD_GObjInf* param_3) {
     daBoomerang_c* boomerang = (daBoomerang_c*)i_actorP1;
     boomerang->moveLineCallback(i_actorP2);
 }
 
-/* 8049F710-8049F818 0016D0 0108+00 3/3 0/0 0/0 .text            pushLockList__13daBoomerang_cFi */
 void daBoomerang_c::pushLockList(int param_0) {
     if (param_0 == 0) {
         m_sight.offRedSight();
@@ -590,8 +559,6 @@ void daBoomerang_c::pushLockList(int param_0) {
     }
 }
 
-/* 8049F818-8049F874 0017D8 005C+00 1/0 0/0 0/0 .text
- * cancelLockActorBase__13daBoomerang_cFP10fopAc_ac_c           */
 void daBoomerang_c::cancelLockActorBase(fopAc_ac_c* i_actor) {
     for (int i = 0; i < m_lockCnt; i++) {
         if (m_lockActors[i] == i_actor) {
@@ -601,8 +568,6 @@ void daBoomerang_c::cancelLockActorBase(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 8049F874-8049F8B0 001834 003C+00 1/0 0/0 0/0 .text
- * setAimActorBase__13daBoomerang_cFP10fopAc_ac_c               */
 void daBoomerang_c::setAimActorBase(fopAc_ac_c* i_actor) {
     if (m_lockCnt == 0) {
         onStateFlg0(FLG0_4);
@@ -610,8 +575,6 @@ void daBoomerang_c::setAimActorBase(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 8049F8B0-8049F9A4 001870 00F4+00 2/2 0/0 0/0 .text setLockActor__13daBoomerang_cFP10fopAc_ac_ci
- */
 int daBoomerang_c::setLockActor(fopAc_ac_c* i_actor, BOOL i_isLockline) {
     if (m_lockCnt >= BOOMERANG_LOCK_MAX) {
         return 0;
@@ -642,8 +605,6 @@ int daBoomerang_c::setLockActor(fopAc_ac_c* i_actor, BOOL i_isLockline) {
     return 1;
 }
 
-/* 8049F9A4-8049F9F0 001964 004C+00 3/3 0/0 0/0 .text            resetLockActor__13daBoomerang_cFv
- */
 void daBoomerang_c::resetLockActor() {
     for (int i = 0; i < BOOMERANG_LOCK_MAX; i++) {
         m_lockActorIDs[i] = fpcM_ERROR_PROCESS_ID_e;
@@ -655,13 +616,12 @@ void daBoomerang_c::resetLockActor() {
     field_0x951 = 0;
 }
 
-/* 8049F9F0-8049FAA4 0019B0 00B4+00 2/2 0/0 0/0 .text            setRoomInfo__13daBoomerang_cFv */
 void daBoomerang_c::setRoomInfo() {
     m_gndChk.SetPos(&current.pos);
     mGroundY = dComIfG_Bgsp().GroundCross(&m_gndChk);
 
     int roomNo;
-    if (mGroundY != -1000000000.0f) {
+    if (mGroundY != -G_CM3D_F_INF) {
         roomNo = dComIfG_Bgsp().GetRoomId(m_gndChk);
         tevStr.YukaCol = dComIfG_Bgsp().GetPolyColor(m_gndChk);
     } else {
@@ -674,7 +634,6 @@ void daBoomerang_c::setRoomInfo() {
     fopAcM_SetRoomNo(this, roomNo);
 }
 
-/* 8049FAA4-8049FBAC 001A64 0108+00 2/2 0/0 0/0 .text            setKeepMatrix__13daBoomerang_cFv */
 void daBoomerang_c::setKeepMatrix() {
     daAlink_c* player = daAlink_getAlinkActorClass();
 
@@ -690,7 +649,6 @@ void daBoomerang_c::setKeepMatrix() {
     mp_setboomEfModel->setBaseTRMtx(player->getLeftItemMatrix());
 }
 
-/* 8049FBAC-8049FCD0 001B6C 0124+00 1/1 0/0 0/0 .text            setMoveMatrix__13daBoomerang_cFv */
 void daBoomerang_c::setMoveMatrix() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(shape_angle);
@@ -715,7 +673,6 @@ void daBoomerang_c::setMoveMatrix() {
     mp_boomModel->setBaseTRMtx(mDoMtx_stack_c::get());
 }
 
-/* 8049FCD0-8049FD6C 001C90 009C+00 1/1 0/0 0/0 .text            setRotAngle__13daBoomerang_cFv */
 void daBoomerang_c::setRotAngle() {
     s16 prev_rot = m_modelRotY;
 
@@ -725,7 +682,6 @@ void daBoomerang_c::setRotAngle() {
     }
 }
 
-/* 8049FD6C-8049FE6C 001D2C 0100+00 2/2 0/0 0/0 .text            setAimPos__13daBoomerang_cFv */
 void daBoomerang_c::setAimPos() {
     if (checkStateFlg0(FLG0_1)) {
         if (fopAcM_GetParam(this) != 1)
@@ -752,7 +708,6 @@ void daBoomerang_c::setAimPos() {
     }
 }
 
-/* 8049FE6C-804A006C 001E2C 0200+00 2/2 0/0 0/0 .text checkBgHit__13daBoomerang_cFP4cXyzP4cXyz */
 void daBoomerang_c::checkBgHit(cXyz* i_start, cXyz* i_end) {
     m_lineChk.Set(i_start, i_end, this);
     if (dComIfG_Bgsp().LineCross(&m_lineChk)) {
@@ -807,8 +762,6 @@ void daBoomerang_c::checkBgHit(cXyz* i_start, cXyz* i_end) {
     }
 }
 
-/* 804A006C-804A012C 00202C 00C0+00 1/1 0/0 0/0 .text setEffectTraceMatrix__13daBoomerang_cFPUlUs
- */
 JPABaseEmitter* daBoomerang_c::setEffectTraceMatrix(u32* i_emitterID, u16 i_name) {
     *i_emitterID = dComIfGp_particle_set(*i_emitterID, i_name, &current.pos, &tevStr);
 
@@ -820,13 +773,8 @@ JPABaseEmitter* daBoomerang_c::setEffectTraceMatrix(u32* i_emitterID, u16 i_name
     return emitter;
 }
 
-UNK_REL_DATA;
-UNK_REL_BSS;
-
-/* 804A2D10-804A2D14 000040 0001+03 0/0 0/0 0/0 .bss             l_HIO */
 static daBoomerang_HIO_c0 l_HIO;
 
-/* 804A012C-804A082C 0020EC 0700+00 1/1 0/0 0/0 .text            setEffect__13daBoomerang_cFv */
 void daBoomerang_c::setEffect() {
     static JGeometry::TVec3<f32> effDirection(0.0f, 1.0f, 0.0f);
     static JGeometry::TVec3<f32> effScale0(1.5f, 1.5f, 1.5f);
@@ -932,8 +880,6 @@ void daBoomerang_c::setEffect() {
     }
 }
 
-/* 804A0874-804A0F0C 002834 0698+00 2/0 0/0 0/0 .text            procWait__13daBoomerang_cFv */
-// NONMATCHING - small regalloc
 int daBoomerang_c::procWait() {
     daAlink_c* player = daAlink_getAlinkActorClass();
     speedF = 0.0f;
@@ -974,7 +920,7 @@ int daBoomerang_c::procWait() {
             offStateFlg0(FLG0_10);
         }
     
-        current.angle.y += 0x1830;
+        current.angle.y += (s16)0x1830;
         shape_angle.x = current.angle.x;
         shape_angle.y = current.angle.y;
         shape_angle.z = 0x1000;
@@ -994,7 +940,7 @@ int daBoomerang_c::procWait() {
         procMove();
     } else if (dCam_getBody()->Mode() != 8) {
         if (dComIfGp_checkPlayerStatus0(0, 0x80000) && player->getAtnActor() != NULL && m_lockCnt < BOOMERANG_LOCK_MAX) {
-            fpc_ProcID atn_actor_id = fopAcM_GetID(player->getAtnActor());
+            fpc_ProcID atn_actor_id = (fpc_ProcID)fopAcM_GetID(player->getAtnActor());
             
             int var_r27 = 0;
             while (var_r27 < m_lockCnt) {
@@ -1084,7 +1030,6 @@ int daBoomerang_c::procWait() {
     return 1;
 }
 
-/* 804A0F0C-804A1814 002ECC 0908+00 2/1 0/0 0/0 .text            procMove__13daBoomerang_cFv */
 int daBoomerang_c::procMove() {
     daAlink_c* player = daAlink_getAlinkActorClass();
 
@@ -1220,9 +1165,9 @@ int daBoomerang_c::procMove() {
     }
 
     current.angle.x = sp2C.atan2sY_XZ();
-    current.pos.x += speedF * cM_scos(current.angle.x) * cM_ssin(current.angle.y);
-    current.pos.y -= speedF * cM_ssin(current.angle.x);
-    current.pos.z += speedF * cM_scos(current.angle.x) * cM_scos(current.angle.y);
+    current.pos.x += speedF * DELTA_TIME * cM_scos(current.angle.x) * cM_ssin(current.angle.y);  // Boofener: Scale movement by delta time
+    current.pos.y -= speedF * DELTA_TIME * cM_ssin(current.angle.x);  // Boofener: Scale movement by delta time
+    current.pos.z += speedF * DELTA_TIME * cM_scos(current.angle.x) * cM_scos(current.angle.y);  // Boofener: Scale movement by delta time
 
     cXyz sp20 = m_aimPos - current.pos;
 
@@ -1273,8 +1218,7 @@ int daBoomerang_c::procMove() {
 
     if (!dComIfGp_event_runCheck()) {
         dComIfG_Ccsp()->Set(&m_windAtCyl);
-        g_dComIfG_gameInfo.play.mCcs.mMass_Mng.Set(&m_windAtCyl, 1);
-        //dComIfG_Ccsp()->SetMass(&m_windAtCyl, 1);
+        dComIfG_Ccsp()->SetMass(&m_windAtCyl, 1);
     } else {
         m_atCps.ResetAtHit();
         m_windAtCyl.ResetAtHit();
@@ -1283,7 +1227,6 @@ int daBoomerang_c::procMove() {
     return 1;
 }
 
-/* 804A1814-804A1BD4 0037D4 03C0+00 1/1 0/0 0/0 .text            execute__13daBoomerang_cFv */
 int daBoomerang_c::execute() {
     if (field_0x957 != 0) {
         current.pos = field_0x9b8;
@@ -1296,7 +1239,7 @@ int daBoomerang_c::execute() {
         if (fopAcM_rc_c::roofCheck(&spC) && dComIfG_Bgsp().GetUnderwaterRoofCode(*fopAcM_rc_c::getRoofCheck()) == 0) {
             roof_y = fopAcM_rc_c::getRoofY();
         } else {
-            roof_y = 1000000000.0f;
+            roof_y = G_CM3D_F_INF;
         }
 
         if (roof_y > fopAcM_wt_c::getWaterY() && current.pos.y < fopAcM_wt_c::getWaterY() - 50.0f) {
@@ -1390,23 +1333,19 @@ int daBoomerang_c::execute() {
     return 1;
 }
 
-/* 804A1BD4-804A1BF4 003B94 0020+00 1/0 0/0 0/0 .text daBoomerang_Execute__FP13daBoomerang_c */
 static int daBoomerang_Execute(daBoomerang_c* i_this) {
     return i_this->execute();
 }
 
-/* 804A1BF4-804A1EBC 003BB4 02C8+00 1/1 0/0 0/0 .text            __dt__13daBoomerang_cFv */
 daBoomerang_c::~daBoomerang_c() {
     m_sound.deleteObject();
 }
 
-/* 804A1EBC-804A1EE4 003E7C 0028+00 1/0 0/0 0/0 .text daBoomerang_Delete__FP13daBoomerang_c */
 static int daBoomerang_Delete(daBoomerang_c* i_this) {
     i_this->~daBoomerang_c();
     return 1;
 }
 
-/* 804A1EE4-804A2064 003EA4 0180+00 1/1 0/0 0/0 .text            createHeap__13daBoomerang_cFv */
 int daBoomerang_c::createHeap() {
     if (!m_sight.createHeap()) {
         return 0;
@@ -1415,21 +1354,21 @@ int daBoomerang_c::createHeap() {
     m_sight.initialize();
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x1F);
-    JUT_ASSERT(2882, modelData != 0);
+    JUT_ASSERT(2882, modelData != NULL);
     mp_boomModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mp_boomModel == NULL) {
         return 0;
     }
 
     modelData = (J3DModelData*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x34);
-    JUT_ASSERT(2898, modelData != 0);
+    JUT_ASSERT(2898, modelData != NULL);
     mp_shippuModel = mDoExt_J3DModel__create(modelData, 0, 0x11000284);
     if (mp_shippuModel == NULL) {
         return 0;
     }
 
     J3DAnmTransform* transAnm = (J3DAnmTransform*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x13);
-    JUT_ASSERT(2911, transAnm != 0);
+    JUT_ASSERT(2911, transAnm != NULL);
     if (m_shippuBck.init(transAnm, 0, 2, 1.0f, 0, -1, false) == 0) {
         return 0;
     }
@@ -1444,12 +1383,10 @@ int daBoomerang_c::createHeap() {
     return 1;
 }
 
-/* 804A2064-804A2084 004024 0020+00 1/1 0/0 0/0 .text daBoomerang_createHeap__FP10fopAc_ac_c */
 static int daBoomerang_createHeap(fopAc_ac_c* i_this) {
     return ((daBoomerang_c*)i_this)->createHeap();
 }
 
-/* 804A2B14-804A2B60 000038 004C+00 0/1 0/0 0/0 .data            l_atCpsSrc */
 static dCcD_SrcCps l_atCpsSrc = {
     {
         {0, {{AT_TYPE_BOOMERANG, 0, 0x3B}, {0, 0}, 0}},
@@ -1466,7 +1403,6 @@ static dCcD_SrcCps l_atCpsSrc = {
     }
 };
 
-/* 804A2B60-804A2BA4 000084 0044+00 0/1 0/0 0/0 .data            l_windAtCylSrc */
 static dCcD_SrcCyl l_windAtCylSrc = {
     {
         {0, {{AT_TYPE_BOOMERANG, 0, 0x1B}, {0, 0}, 0}},
@@ -1481,10 +1417,9 @@ static dCcD_SrcCyl l_windAtCylSrc = {
     }
 };
 
-/* 804A2084-804A230C 004044 0288+00 1/1 0/0 0/0 .text            create__13daBoomerang_cFv */
 int daBoomerang_c::create() {
     fpc_ProcID id = fopAcM_GetID(this);
-    fopAcM_SetupActor(this, daBoomerang_c);
+    fopAcM_ct(this, daBoomerang_c);
 
     if (!fopAcM_entrySolidHeap(this, daBoomerang_createHeap, 0xC0D0)) {
         return cPhs_ERROR_e;
@@ -1521,7 +1456,7 @@ int daBoomerang_c::create() {
     m_windBtk->searchUpdateMaterialID(mp_shippuModel->getModelData());
     mp_shippuModel->getModelData()->entryTexMtxAnimator(m_windBtk);
     mp_shippuModel->getModelData()->getJointNodePointer(4)->setCallBack(daBoomeang_windModelCallBack);
-    mp_shippuModel->setUserArea((u32)this);
+    mp_shippuModel->setUserArea((uintptr_t)this);
 
     m_waitEffBtk = (J3DAnmTextureSRTKey*)dComIfG_getObjectRes(daAlink_c::getAlinkArcName(), 0x47);
     JUT_ASSERT(3011, m_waitEffBtk);
@@ -1542,20 +1477,16 @@ int daBoomerang_c::create() {
     m_lineChk.OffFullGrp();
     m_lineChk.OnWaterGrp();
 
-    m_shippuSize = 1.0f;
+    m_shippuSize = 1.0f; // (negative?) size of the wind around boom when throwing
     return cPhs_COMPLEATE_e;
 }
 
-/* 804A230C-804A2524 0042CC 0218+00 1/1 0/0 0/0 .text            __ct__13daBoomerang_cFv */
 daBoomerang_c::daBoomerang_c() {}
 
-/* 804A26F8-804A2718 0046B8 0020+00 1/0 0/0 0/0 .text            daBoomerang_Create__FP10fopAc_ac_c
- */
 static int daBoomerang_Create(fopAc_ac_c* i_this) {
     return ((daBoomerang_c*)i_this)->create();
 }
 
-/* 804A2BC8-804A2BE8 -00001 0020+00 1/0 0/0 0/0 .data            l_daBoomerang_Method */
 static actor_method_class l_daBoomerang_Method = {
     (process_method_func)daBoomerang_Create,
     (process_method_func)daBoomerang_Delete,
@@ -1564,7 +1495,6 @@ static actor_method_class l_daBoomerang_Method = {
     (process_method_func)daBoomerang_Draw,
 };
 
-/* 804A2BE8-804A2C18 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_BOOMERANG */
 extern actor_process_profile_definition g_profile_BOOMERANG = {
   fpcLy_CURRENT_e,       // mLayerID
   6,                     // mListID
@@ -1583,3 +1513,6 @@ extern actor_process_profile_definition g_profile_BOOMERANG = {
 };
 
 AUDIO_INSTANCES;
+class JAUSectionHeap;
+template<>
+JAUSectionHeap* JASGlobalInstance<JAUSectionHeap>::sInstance;

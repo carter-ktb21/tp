@@ -3,6 +3,8 @@
  * Item Get Handling
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_item.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_meter2_info.h"
@@ -769,7 +771,6 @@ void item_func_HAWK_EYE() {
     dComIfGs_setItem(SLOT_5, fpcNm_ITEM_HAWK_EYE);
 }
 
-/* 800986C4-80098718 093004 0054+00 1/0 0/0 0/0 .text            item_func_WOOD_STICK__Fv */
 void item_func_WOOD_STICK() {
     dComIfGs_setCollectSword(COLLECT_WOODEN_SWORD);
     dComIfGs_setSelectEquipSword(fpcNm_ITEM_WOOD_STICK);
@@ -1030,6 +1031,7 @@ void item_func_BILL() {
 }
 
 void item_func_WOOD_STATUE() {
+    /* dSv_event_flag_c::F_283 - Hyrule Field - Get wood carving */
     dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[283]);
     dComIfGs_setItem(SLOT_21, fpcNm_ITEM_WOOD_STATUE);
 }
@@ -1478,7 +1480,6 @@ int item_getcheck_func_LIGHT_SWORD() {
     return dComIfGs_isCollectSword(COLLECT_LIGHT_SWORD);
 }
 
-/* 8009A0C8-8009A1FC 094A08 0134+00 7/6 0/0 0/0 .text item_getcheck_func_FISHING_ROD_1__Fv */
 int item_getcheck_func_FISHING_ROD_1() {
     return (dComIfGs_getItem(SLOT_20, true) == fpcNm_ITEM_FISHING_ROD_1 ||
             dComIfGs_getItem(SLOT_20, true) == fpcNm_ITEM_BEE_ROD ||
@@ -1997,7 +1998,6 @@ int isArrow(u8 i_itemNo) {
     return is_arrow;
 }
 
-/* 8009B708-8009B77C 096048 0074+00 0/0 4/4 1/1 .text            isBottleItem__FUc */
 BOOL isBottleItem(u8 i_itemNo) {
     switch (i_itemNo) {
     case fpcNm_ITEM_OIL_BOTTLE3:
@@ -2124,7 +2124,6 @@ u8 check_itemno(int i_itemNo) {
     return i_itemNo;
 }
 
-/* 8009B940-8009BBD8 096280 0298+00 11/11 0/0 0/0 .text            addBombCount__FUcUc */
 int addBombCount(u8 i_bombType, u8 i_addNum) {
     u8 bombType[3];
     int bombNum[3];
@@ -2187,5 +2186,4 @@ int addBombCount(u8 i_bombType, u8 i_addNum) {
     return i_addNum;
 }
 
-/* 80450F90-80450F98 000490 0004+04 0/0 2/2 0/0 .sbss            mData__12dEnemyItem_c */
 u8* dEnemyItem_c::mData;

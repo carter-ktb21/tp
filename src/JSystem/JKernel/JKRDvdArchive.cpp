@@ -1,3 +1,5 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JKernel/JKRDvdArchive.h"
 #include "JSystem/JKernel/JKRDecomp.h"
 #include "JSystem/JKernel/JKRDvdFile.h"
@@ -7,9 +9,8 @@
 #include "math.h"
 #include "string.h"
 #include "global.h"
+#include <stdint.h>
 
-/* 802D7BF0-802D7C98 2D2530 00A8+00 0/0 1/1 0/0 .text
- * __ct__13JKRDvdArchiveFlQ210JKRArchive15EMountDirection       */
 JKRDvdArchive::JKRDvdArchive(s32 entryNum, JKRArchive::EMountDirection mountDirection)
     : JKRArchive(entryNum, MOUNT_DVD) {
     mMountDirection = mountDirection;
@@ -22,7 +23,6 @@ JKRDvdArchive::JKRDvdArchive(s32 entryNum, JKRArchive::EMountDirection mountDire
     mIsMounted = true;
 }
 
-/* 802D7C98-802D7DB4 2D25D8 011C+00 1/0 0/0 0/0 .text            __dt__13JKRDvdArchiveFv */
 JKRDvdArchive::~JKRDvdArchive() {
     if (mIsMounted == true) {
         if (mArcInfoBlock) {
@@ -52,7 +52,6 @@ JKRDvdArchive::~JKRDvdArchive() {
     }
 }
 
-/* 802D7DB4-802D8050 2D26F4 029C+00 1/1 0/0 0/0 .text            open__13JKRDvdArchiveFl */
 bool JKRDvdArchive::open(s32 entryNum) {
     mArcInfoBlock = NULL;
     mDataOffset = 0;
@@ -76,7 +75,8 @@ bool JKRDvdArchive::open(s32 entryNum) {
                     JKRDvdRipper::ALLOC_DIRECTION_FORWARD, 0, &mCompression, NULL);
     DCInvalidateRange(arcHeader, sizeof(SArcHeader));
 
-    int alignment = mMountDirection == MOUNT_DIRECTION_HEAD ? 0x20 : -0x20;
+    int alignment;
+    alignment = mMountDirection == MOUNT_DIRECTION_HEAD ? 0x20 : -0x20;
 
     mArcInfoBlock = (SArcDataInfo*)JKRAllocFromHeap(mHeap, arcHeader->file_data_offset, alignment);
     if (!mArcInfoBlock) {
@@ -89,13 +89,15 @@ bool JKRDvdArchive::open(s32 entryNum) {
                     sizeof(SArcHeader), NULL, NULL);
     DCInvalidateRange(mArcInfoBlock, arcHeader->file_data_offset);
 
-    mNodes = (SDIDirEntry*)((int)&mArcInfoBlock->num_nodes + mArcInfoBlock->node_offset);
-    mFiles = (SDIFileEntry*)((int)&mArcInfoBlock->num_nodes + mArcInfoBlock->file_entry_offset);
-    mStringTable = (char*)((int)&mArcInfoBlock->num_nodes + mArcInfoBlock->string_table_offset);
+    mNodes = (SDIDirEntry*)((intptr_t)&mArcInfoBlock->num_nodes + mArcInfoBlock->node_offset);
+    mFiles = (SDIFileEntry*)((intptr_t)&mArcInfoBlock->num_nodes + mArcInfoBlock->file_entry_offset);
+    mStringTable = (char*)((intptr_t)&mArcInfoBlock->num_nodes + mArcInfoBlock->string_table_offset);
     mExpandedSize = NULL;
 
-    u8 useCompression = 0;
-    SDIFileEntry* fileEntry = mFiles;
+    u8 useCompression;
+    useCompression = 0;
+    SDIFileEntry* fileEntry;
+    fileEntry = mFiles;
     for (u32 i = 0; i < mArcInfoBlock->num_file_entries; fileEntry++, i++) {
         if (fileEntry->isUnknownFlag1()) {
             useCompression |= fileEntry->getCompressFlag();
@@ -125,9 +127,7 @@ cleanup:
     }
 
     if (mMountMode == UNKNOWN_MOUNT_MODE) {
-#ifdef DEBUG
-        OSReport(":::Cannot alloc memory [%s][%d]\n", __FILE__, 397);
-#endif
+        OS_REPORT(":::Cannot alloc memory [%s][%d]\n", __FILE__, 397);
         if (mDvdFile) {
             delete mDvdFile;
         }
@@ -137,8 +137,6 @@ cleanup:
     return true;
 }
 
-/* 802D8050-802D8168 2D2990 0118+00 1/0 0/0 0/0 .text
- * fetchResource__13JKRDvdArchiveFPQ210JKRArchive12SDIFileEntryPUl */
 void* JKRDvdArchive::fetchResource(SDIFileEntry* fileEntry, u32* returnSize) {
     JUT_ASSERT(428, isMounted());
     u32 tempReturnSize;
@@ -173,8 +171,6 @@ void* JKRDvdArchive::fetchResource(SDIFileEntry* fileEntry, u32* returnSize) {
     return fileEntry->data;
 }
 
-/* 802D8168-802D826C 2D2AA8 0104+00 1/0 0/0 0/0 .text
- * fetchResource__13JKRDvdArchiveFPvUlPQ210JKRArchive12SDIFileEntryPUl */
 void* JKRDvdArchive::fetchResource(void* buffer, u32 bufferSize, SDIFileEntry* fileEntry,
                                    u32* returnSize) {
     JUT_ASSERT(504, isMounted());
@@ -208,8 +204,6 @@ void* JKRDvdArchive::fetchResource(void* buffer, u32 bufferSize, SDIFileEntry* f
     return buffer;
 }
 
-/* 802D826C-802D8474 2D2BAC 0208+00 1/1 1/1 0/0 .text
- * fetchResource_subroutine__13JKRDvdArchiveFlUlUlPUcUlii       */
 u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, u8* dst,
                                             u32 dstLength, JKRCompression fileCompression,
                                             JKRCompression archiveCompression) {
@@ -233,7 +227,7 @@ u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, 
             // The dst pointer to JKRDvdToMainRam should be aligned to 32 bytes. This will align
             // arcHeader to 32 bytes on the stack.
             char arcHeaderBuffer[64];
-            u8* arcHeader = (u8*)ALIGN_NEXT((u32)arcHeaderBuffer, 0x20);
+            u8* arcHeader = (u8*)ALIGN_NEXT((uintptr_t)arcHeaderBuffer, 0x20);
             JKRDvdToMainRam(entryNum, arcHeader, EXPAND_SWITCH_UNKNOWN2, sizeof(SArcHeader),
                             NULL, JKRDvdRipper::ALLOC_DIRECTION_FORWARD, offset, NULL, NULL);
             DCInvalidateRange(arcHeader, sizeof(SArcHeader));
@@ -273,8 +267,6 @@ u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, 
     }
 }
 
-/* 802D8474-802D8698 2D2DB4 0224+00 1/1 1/1 0/0 .text
- * fetchResource_subroutine__13JKRDvdArchiveFlUlUlP7JKRHeapiiPPUc */
 u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, JKRHeap* heap,
                                             JKRCompression fileCompression,
                                             JKRCompression archiveCompression,
@@ -287,7 +279,7 @@ u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, 
         switch (fileCompression) {
         case COMPRESSION_NONE:
             buffer = (u8*)JKRAllocFromHeap(heap, alignedSize, sizeof(SArcHeader));
-            JUT_ASSERT(675, buffer != 0);
+            JUT_ASSERT(675, buffer != NULL);
 
             JKRDvdToMainRam(entryNum, buffer, EXPAND_SWITCH_UNKNOWN0, alignedSize, NULL,
                             JKRDvdRipper::ALLOC_DIRECTION_FORWARD, offset, NULL, NULL);
@@ -300,7 +292,7 @@ u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, 
             // The dst pointer to JKRDvdToMainRam should be aligned to 32 bytes. This will align
             // arcHeader to 32 bytes on the stack.
             char arcHeaderBuffer[64];
-            u8* arcHeader = (u8*)ALIGN_NEXT((u32)arcHeaderBuffer, 0x20);
+            u8* arcHeader = (u8*)ALIGN_NEXT((uintptr_t)arcHeaderBuffer, 0x20);
             JKRDvdToMainRam(entryNum, arcHeader, EXPAND_SWITCH_UNKNOWN2, sizeof(SArcHeader),
                             NULL, JKRDvdRipper::ALLOC_DIRECTION_FORWARD, offset, NULL, NULL);
             DCInvalidateRange(arcHeader, sizeof(SArcHeader));
@@ -340,7 +332,6 @@ u32 JKRDvdArchive::fetchResource_subroutine(s32 entryNum, u32 offset, u32 size, 
     }
 }
 
-/* 802D8698-802D87D4 2D2FD8 013C+00 1/0 0/0 0/0 .text getExpandedResSize__13JKRDvdArchiveCFPCv */
 u32 JKRDvdArchive::getExpandedResSize(const void* resource) const {
     u32 resourceSize;
     if (!mExpandedSize) {
@@ -364,7 +355,7 @@ u32 JKRDvdArchive::getExpandedResSize(const void* resource) const {
     // The dst pointer to JKRDvdToMainRam should be aligned to 32 bytes. This will align arcHeader
     // to 32 bytes on the stack.
     char buffer[64];
-    u8* arcHeader = (u8*)ALIGN_NEXT((u32)buffer, 0x20);
+    u8* arcHeader = (u8*)ALIGN_NEXT((uintptr_t)buffer, 0x20);
     JKRDvdToMainRam(mEntryNum, arcHeader, EXPAND_SWITCH_UNKNOWN2, sizeof(SArcHeader), NULL,
                     JKRDvdRipper::ALLOC_DIRECTION_FORWARD,
                     mDataOffset + fileEntry->data_offset, NULL, NULL);

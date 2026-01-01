@@ -6,15 +6,15 @@
 
 class daTagHstop_c : public fopAc_ac_c {
 public:
-    /* 805A43EC */ int create();
-    /* 805A45F8 */ ~daTagHstop_c();
-    /* 805A46B8 */ void setActive();
-    /* 805A475C */ int execute();
+    int create();
+    ~daTagHstop_c();
+    void setActive();
+    int execute();
 
     static daTagHstop_c* getTop() { return m_top; }
 
     daTagHstop_c* getNext() { return mNext; }
-    bool getActiveFlg() const { return mActive; }
+    u8 getActiveFlg() const { return mActive; }
 
     void onTagStop() {
         if (field_0x573 == 0) {
@@ -28,7 +28,7 @@ public:
     /* 0x568 */ daTagHstop_c* mNext;
     /* 0x568 */ daTagHstop_c* mPrev;
     /* 0x570 */ u8 mPrm0;
-    /* 0x571 */ bool mActive;
+    /* 0x571 */ u8 mActive;
     /* 0x572 */ u8 mPrm1;
     /* 0x573 */ u8 field_0x573;
     /* 0x574 */ int field_0x574;

@@ -3,12 +3,13 @@
  *
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_kytag04.h"
-#include "d/actor/d_a_npc.h"
+#include "d/actor/d_a_npc4.h"
+#include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 
-/* 8046CB58-8046CFE8 000078 0490+00 1/0 0/0 0/0 .text            daKytag04_Draw__FP13kytag04_class
- */
 static int daKytag04_Draw(kytag04_class* i_this) {
     dScnKy_env_light_c* kankyo = dKy_getEnvlight();
     camera_class* camera = dComIfGp_getCamera(0);
@@ -103,7 +104,6 @@ static int daKytag04_Draw(kytag04_class* i_this) {
     return 1;
 }
 
-/* 8046CFE8-8046D354 000508 036C+00 1/0 0/0 0/0 .text daKytag04_Execute__FP13kytag04_class */
 static int daKytag04_Execute(kytag04_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -193,13 +193,10 @@ static int daKytag04_Execute(kytag04_class* i_this) {
     return 1;
 }
 
-/* 8046D354-8046D35C 000874 0008+00 1/0 0/0 0/0 .text daKytag04_IsDelete__FP13kytag04_class */
 static int daKytag04_IsDelete(kytag04_class* i_this) {
     return 1;
 }
 
-/* 8046D35C-8046D474 00087C 0118+00 1/0 0/0 0/0 .text            daKytag04_Delete__FP13kytag04_class
- */
 static int daKytag04_Delete(kytag04_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "Kytag04");
 
@@ -230,12 +227,11 @@ static int daKytag04_Delete(kytag04_class* i_this) {
     return 1;
 }
 
-/* 8046D474-8046D59C 000994 0128+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     kytag04_class* a_this = (kytag04_class*)i_this;
 
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Kytag04", 5);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
 
     a_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11020202);
     if (a_this->mpModel != NULL) {
@@ -257,10 +253,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 8046D59C-8046D9C8 000ABC 042C+00 1/0 0/0 0/0 .text            daKytag04_Create__FP10fopAc_ac_c */
 static int daKytag04_Create(fopAc_ac_c* i_this) {
     kytag04_class* a_this = (kytag04_class*)i_this;
-    fopAcM_SetupActor(i_this, kytag04_class);
+    fopAcM_ct(i_this, kytag04_class);
 
     a_this->mNeedDropNum = i_this->current.angle.z & 0xFF;
 
@@ -358,14 +353,12 @@ static int daKytag04_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 8046DA78-8046DA98 -00001 0020+00 1/0 0/0 0/0 .data            l_daKytag04_Method */
 static actor_method_class l_daKytag04_Method = {
     (process_method_func)daKytag04_Create,  (process_method_func)daKytag04_Delete,
     (process_method_func)daKytag04_Execute, (process_method_func)daKytag04_IsDelete,
     (process_method_func)daKytag04_Draw,
 };
 
-/* 8046DA98-8046DAC8 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_KYTAG04 */
 extern actor_process_profile_definition g_profile_KYTAG04 = {
     fpcLy_CURRENT_e,
     7,

@@ -11,9 +11,9 @@ namespace ctb {
 struct TObject : public object::TObject_ID {
     TObject(const void* id, u32 size, const void* param_2) : object::TObject_ID(id, size) {
         pData_ = param_2;
-        JUT_ASSERT(82, pData_!=0);
+        JUT_ASSERT(82, pData_!=NULL);
     }
-    /* 80280F18 */ virtual ~TObject() = 0;
+    virtual ~TObject() = 0;
     virtual int getScheme() const = 0;
     const void* getData() const { return pData_; }
 
@@ -55,8 +55,7 @@ struct data {
         }
 
         const void* getContent() const {
-            const THeaderData* header = (THeaderData*) getRaw();
-            return header->content;
+            return ((THeaderData*) getRaw())->content;
         }
     };
 
@@ -86,7 +85,7 @@ struct data {
         }
 
         const void* getBlockEnd_() const {
-            return get()->field_0x8;
+            return ((const TBlockData*)getRaw())->field_0x8;
         }
 
         const void* get_ID() const {
@@ -110,42 +109,42 @@ struct data {
 };
 
 struct TObject_TxyzRy : public TObject {
-    /* 80280F60 */ TObject_TxyzRy(JStudio::ctb::data::TParse_TBlock const&);
+    TObject_TxyzRy(JStudio::ctb::data::TParse_TBlock const&);
     
-    /* 80281554 */ virtual ~TObject_TxyzRy() {}
-    /* 80280FBC */ virtual int getScheme() const;
+    virtual ~TObject_TxyzRy() {}
+    virtual int getScheme() const;
 };
 
 struct TFactory {
     TFactory() {}
 
-    /* 80281274 */ virtual ~TFactory();
-    /* 802812BC */ virtual TObject* create(JStudio::ctb::data::TParse_TBlock const&);
-    /* 80281320 */ virtual void destroy(JStudio::ctb::TObject*);
+    virtual ~TFactory();
+    virtual TObject* create(JStudio::ctb::data::TParse_TBlock const&);
+    virtual void destroy(JStudio::ctb::TObject*);
 };
 
 struct TControl {
-    /* 80280FC4 */ TControl();
-    /* 80280FF4 */ virtual ~TControl();
-    /* 80281060 */ void appendObject(JStudio::ctb::TObject*);
-    /* 802810AC */ void removeObject(JStudio::ctb::TObject*);
-    /* 802810DC */ void destroyObject(JStudio::ctb::TObject*);
-    /* 8028112C */ void destroyObject_all();
-    /* 80281190 */ JStudio::ctb::TObject* getObject(void const*, u32);
-    /* 80281230 */ JStudio::ctb::TObject* getObject_index(u32);
+    TControl();
+    virtual ~TControl();
+    void appendObject(JStudio::ctb::TObject*);
+    void removeObject(JStudio::ctb::TObject*);
+    void destroyObject(JStudio::ctb::TObject*);
+    void destroyObject_all();
+    JStudio::ctb::TObject* getObject(void const*, u32);
+    JStudio::ctb::TObject* getObject_index(u32);
 
-    TFactory* getFactory() { return pFactory_; }
+    TFactory* getFactory() const { return pFactory_; }
     void setFactory(TFactory* factory) { pFactory_ = factory; }
 
     /* 0x4 */ TFactory* pFactory_;
-    /* 0x8 */ JGadget::TLinkList<TObject, -12> mList;
+    /* 0x8 */ JGadget::TLinkList<TObject, -12> ocObject_;
 };
 
 struct TParse : public JGadget::binary::TParse_header_block {
-    /* 8028135C */ TParse(JStudio::ctb::TControl*);
-    /* 8028137C */ virtual ~TParse();
-    /* 802813DC */ virtual bool parseHeader_next(void const**, u32*, u32);
-    /* 80281470 */ virtual bool parseBlock_next(void const**, u32*, u32);
+    TParse(JStudio::ctb::TControl*);
+    virtual ~TParse();
+    virtual bool parseHeader_next(void const**, u32*, u32);
+    virtual bool parseBlock_next(void const**, u32*, u32);
 
     TControl* getControl() { return pControl_; }
 

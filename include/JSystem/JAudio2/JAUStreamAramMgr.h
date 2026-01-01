@@ -6,6 +6,7 @@
 #include "JSystem/JAudio2/JASHeapCtrl.h"
 #include "JSystem/JUtility/JUTAssert.h"
 #include "bitset.h"
+#include <stdint.h>
 
 /**
  * @ingroup jsystem-jaudio
@@ -28,7 +29,7 @@ public:
                 JASHeap* heap = &mHeaps[0];  // should probably be mHeaps[i] but that doesn't match
                 heap->free();
                 if (!heap) {
-                    JUT_ASSERT(47, 0);
+                    JUT_ASSERT(47, FALSE);
                 }
             }
         }
@@ -58,13 +59,12 @@ public:
         }
         return NULL;
     }
-    // NONMATCHING regalloc
     virtual bool deleteStreamAram(u32 param_0) {
         for (u32 i = 0; i < field_0x4c; i++) {
             if (!this->field_0x4.test(i)) {
                 continue;
             }
-            if ((u32)this->mHeaps[i].getBase() != param_0) {
+            if ((uintptr_t)this->mHeaps[i].getBase() != param_0) {
                 continue;
             }
             this->field_0x4.reset(i);
@@ -79,7 +79,7 @@ public:
         if (!heap) {
             heap = JASKernel::getAramHeap();
         }
-        if (numReserve < 1) {
+        if (numReserve <= 0) {
             numReserve = 1;
         }
         JUT_ASSERT(83, numReserve <= MAX_CHUNKS);

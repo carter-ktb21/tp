@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/ax.h>
 
 #include "__ax.h"
@@ -25,7 +25,7 @@ void __AXAuxInit(void) {
     s32* pA;
     s32* pB;
 
-#ifdef DEBUG
+#if DEBUG
     OSReport("Initializing AXAux code module\n");
 #endif
     __AXCallbackAuxA = NULL;
@@ -48,7 +48,7 @@ void __AXAuxInit(void) {
 }
 
 void __AXAuxQuit(void) {
-#ifdef DEBUG
+#if DEBUG
     OSReport("Shutting down AXAux code module\n");
 #endif
     __AXCallbackAuxA = NULL;

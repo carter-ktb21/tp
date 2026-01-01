@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_a_item_static.h"
 
 u32 daItem_c::startCtrl() {

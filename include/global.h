@@ -21,9 +21,19 @@
 #define PLATFORM_WII    (VERSION >= VERSION_WII_USA_R0 && VERSION <= VERSION_WII_PAL_KIOSK)
 #define PLATFORM_SHIELD (VERSION >= VERSION_SHIELD && VERSION <= VERSION_SHIELD_DEBUG)
 
-#define ALIGN_DECL(ALIGNMENT) __attribute__((aligned(ALIGNMENT)))
+#define REGION_USA (VERSION == VERSION_GCN_USA || VERSION == VERSION_WII_USA_R0 || VERSION == VERSION_WII_USA_R2 || VERSION == VERSION_WII_USA_KIOSK)
+#define REGION_PAL (VERSION == VERSION_GCN_PAL || VERSION == VERSION_WII_PAL || VERSION == VERSION_WII_PAL_KIOSK)
+#define REGION_JPN (VERSION == VERSION_GCN_JPN || VERSION == VERSION_WII_JPN)
+#define REGION_KOR (VERSION == VERSION_WII_KOR)
+#define REGION_CHN (VERSION == VERSION_SHIELD || VERSION == VERSION_SHIELD_PROD || VERSION == VERSION_SHIELD_DEBUG)
 
-#define ARRAY_SIZE(o) (sizeof((o)) / sizeof(*(o)))
+// define DEBUG if it isn't already so it can be used in conditions
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
+#define ARRAY_SIZE(o) (s32)(sizeof(o) / sizeof(o[0]))
+#define ARRAY_SIZEU(o) (sizeof(o) / sizeof(o[0]))
 
 // Align X to the previous N bytes (N must be power of two)
 #define ALIGN_PREV(X, N) ((X) & ~((N)-1))
@@ -35,11 +45,11 @@
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
-#define JUT_EXPECT(...)
-#define FLAG_ON(V, F) (((V) & (F)) == 0)
+#ifndef decltype
+#define decltype __decltype__
+#endif
 
-#define FLOAT_LABEL(x) (*(f32*)&x)
-#define DOUBLE_LABEL(x) (*(f64*)&x)
+#define JUT_EXPECT(...)
 
 #define _SDA_BASE_(dummy) 0
 #define _SDA2_BASE_(dummy) 0
@@ -48,7 +58,7 @@
 #define GLUE(a, b) a##b
 #define GLUE2(a, b) GLUE(a, b)
 
-#if VERSION != VERSION_SHIELD_DEBUG
+#if VERSION == VERSION_GCN_USA
 #define STATIC_ASSERT(cond) typedef char GLUE2(static_assertion_failed, __LINE__)[(cond) ? 1 : -1]
 #else
 #define STATIC_ASSERT(...)
@@ -57,13 +67,13 @@
 #define STATIC_ASSERT(...)
 #endif
 
-// hack to make functions that return comparisons as int match
-extern int __cntlzw(unsigned int);
-inline BOOL checkEqual(s32 a, s32 b) {
-    return (u32)__cntlzw(a - b) >> 5;
-}
-
 #ifndef __MWERKS__
+// Silence clangd errors about MWCC PPC intrinsics by declaring them here.
+extern int __cntlzw(unsigned int);
+extern int __rlwimi(int, int, int, int, int);
+extern void __dcbz(void*, int);
+extern void __sync();
+extern int __abs(int);
 void* __memcpy(void*, const void*, int);
 #endif
 
@@ -71,44 +81,97 @@ void* __memcpy(void*, const void*, int);
 
 #define SQUARE(x) ((x) * (x))
 
+#define POINTER_ADD_TYPE(type_, ptr_, offset_) ((type_)((unsigned long)(ptr_) + (unsigned long)(offset_)))
+#define POINTER_ADD(ptr_, offset_) POINTER_ADD_TYPE(__typeof__(ptr_), ptr_, offset_)
+
+// floating-point constants
+#define _HUGE_ENUF 1e+300
+#define INFINITY ((float)(_HUGE_ENUF * _HUGE_ENUF))
+#define HUGE_VAL ((double)INFINITY)
+#define HUGE_VALL ((long double)INFINITY)
+#define DOUBLE_INF HUGE_VAL
+static const float INF = 2000000000.0f;
+
+// Boofener: Deltatime system for frame-independent physics
+extern float g_deltaTime;
+extern int g_scaleTime;
+extern float g_targetFrameTime;
+extern float g_targetFramerate;
+extern int g_shouldUpdateLogic;  // Always 1 (legacy; kept for compatibility)
+#define DELTA_TIME g_deltaTime
+#define SCALE_TIME g_scaleTime
+
+inline f32 ScaleHUDXRight(f32 baseX) {
+    #if WIDESCREEN_SUPPORT
+    const f32 screenCenter = 320.0f;
+    const f32 scale = 1.3f;
+    return -((baseX - screenCenter) * scale + screenCenter);
+    #else
+    return 1.0f;
+    #endif
+}
+inline f32 ScaleHUDXLeft(f32 baseX) {
+    #if WIDESCREEN_SUPPORT
+    const f32 screenCenter = 320.0f;
+    const f32 scale = 1.3f;
+    return (baseX - screenCenter) * scale + screenCenter;
+    #else
+    return 1.0f;
+    #endif
+}
+
+void updateDeltaTime();
+void setTargetFramerate(float fps);
+float getTargetFramerate();
+void setSelectedFramerate(float fps);
+float getSelectedFramerate();
+void setStaleMode(int enabled);
+int getStaleMode();
+int shouldUpdateGameLogic();
+
 // hack to make strings with no references compile properly
 #define DEAD_STRING(s) OSReport(s)
 
-#define UNK_BSS(name) \
-    static u8 lit_##name[1 + 3 /* padding */];
-
-#define UNK_REL_BSS \
-    static u8 lit_1109[1]; \
-    static u8 lit_1107[1]; \
-    static u8 lit_1105[1]; \
-    static u8 lit_1104[1]; \
-    static u8 lit_1099[1]; \
-    static u8 lit_1097[1]; \
-    static u8 lit_1095[1]; \
-    static u8 lit_1094[1]; \
-    static u8 lit_1057[1]; \
-    static u8 lit_1055[1]; \
-    static u8 lit_1053[1]; \
-    static u8 lit_1052[1]; \
-    static u8 lit_1014[1]; \
-    static u8 lit_1012[1]; \
-    static u8 lit_1010[1]; \
-    static u8 lit_1009[1];
-
-
-#define UNK_REL_DATA \
-    static u8 cNullVec__6Z2Calc[12] = { \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
-    }; \
-    static u32 lit_1787[1 + 4 /* padding */] = { \
-        0x02000201, \
-        0x40080000, \
-        0x00000000, \
-        0x3FE00000, \
-        0x00000000, \
-    };
-
 #define READU32_BE(ptr, offset) \
     (((u32)ptr[offset] << 24) | ((u32)ptr[offset + 1] << 16) | ((u32)ptr[offset + 2] << 8) | (u32)ptr[offset + 3]);
+
+#ifndef NO_INLINE
+#ifdef __MWERKS__
+#define NO_INLINE __attribute__((never_inline))
+#else
+#define NO_INLINE
+#endif
+#endif
+    
+// Hack to trick the compiler into not inlining functions that use this macro.
+#define FORCE_DONT_INLINE \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; \
+    (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0; (void*)0;
+
+#ifdef __MWERKS__
+#define SJIS(character, value) character
+#else
+#define SJIS(character, value) ((u32)value)
+#endif
+
+#ifdef __MWERKS__
+#define ASM asm
+#else
+#define ASM
+#endif
 
 #endif

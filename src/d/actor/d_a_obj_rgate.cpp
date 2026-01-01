@@ -3,6 +3,8 @@
  * Bulblin Gate
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_rgate.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_bg_w.h"
@@ -32,7 +34,6 @@ enum {
     AREA_CHECK_HORSE,
 };
 
-/* 80CB9C98-80CB9CE8 000078 0050+00 3/3 0/0 0/0 .text            search_coach__FPvPv */
 static void* search_coach(void* i_actor, void* i_data) {
     if (i_actor != NULL && fopAcM_IsActor(i_actor) && fopAcM_GetProfName(i_actor) == PROC_NPC_COACH)
     {
@@ -42,7 +43,6 @@ static void* search_coach(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 80CB9CE8-80CB9DF8 0000C8 0110+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
@@ -67,14 +67,11 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 80CBC368-80CBC380 000000 0018+00 7/7 0/0 0/0 .rodata          l_cull_box */
-static const Vec l_cull_box[2] = {
+static const cull_box l_cull_box = {
     {-400.0f, 0.0f, -400.0f},
     {400.0f, 450.0f, 400.0f},
 };
 
-/* 80CBC380-80CBC3C4 000018 0044+00 0/0 0/0 0/0 .rodata          l_cyl_src */
 static const dCcD_SrcCyl l_cyl_src = {
     {
         {0x0, {{0x0, 0x0, 0x1e}, {0x20, 0x11}, 0x78}},  // mObj
@@ -89,7 +86,6 @@ static const dCcD_SrcCyl l_cyl_src = {
     }                        // mCyl
 };
 
-/* 80CB9DF8-80CB9F4C 0001D8 0154+00 1/1 0/0 0/0 .text            initBaseMtx__12daObjRgate_cFv */
 void daObjRgate_c::initBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
@@ -116,7 +112,6 @@ void daObjRgate_c::initBaseMtx() {
     setBaseMtx();
 }
 
-/* 80CB9F4C-80CBA468 00032C 051C+00 2/2 0/0 0/0 .text            setBaseMtx__12daObjRgate_cFv */
 void daObjRgate_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
@@ -213,35 +208,16 @@ void daObjRgate_c::setBaseMtx() {
     }
 }
 
-/* 80CBC4A0-80CBC4AC 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80CBC4AC-80CBC4C0 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 80CBC4C0-80CBC4C4 -00001 0004+00 4/4 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "M_RGate00";
 
-/* 80CBA468-80CBA654 000848 01EC+00 1/0 0/0 0/0 .text            Create__12daObjRgate_cFv */
 int daObjRgate_c::Create() {
     static char* l_evName = "RIDER_GATE_OPEN00";
 
     u8 sw_no = getSwNo();
     if (sw_no != 0xFF && !fopAcM_isSwitch(this, sw_no) &&
+         /* dSv_event_flag_c::M_035 - Cutscene - [cutscene: 35] after carriage guarding event */
         !dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[68]))
-    {
+    {\
         eventInfo.setArchiveName(l_arcName);
 
         mEventID = dComIfGp_getEventManager().getEventIdx(this, l_evName, 0xFF);
@@ -255,26 +231,24 @@ int daObjRgate_c::Create() {
 
     attention_info.position.y += 150.0f;
     eyePos.y += 150.0f;
-    attention_info.flags = 0x20;
+    attention_info.flags = fopAc_AttnFlag_DOOR_e;
 
     initBaseMtx();
     fopAcM_SetMtx(this, field_0xb14);
-    fopAcM_setCullSizeBox(this, l_cull_box[0].x, l_cull_box[0].y, l_cull_box[0].z, l_cull_box[1].x,
-                          l_cull_box[1].y, l_cull_box[1].z);
+    fopAcM_setCullSizeBox(this, l_cull_box.min.x, l_cull_box.min.y, l_cull_box.min.z, l_cull_box.max.x,
+                          l_cull_box.max.y, l_cull_box.max.z);
 
     if (dComIfG_Bgsp().Regist(mpBgW, this)) {
-#ifdef DEBUG
-        OSReport_Error("キコルの門：ＢＧ登録失敗しました\n");
-#endif
+        OS_REPORT_ERROR("キコルの門：ＢＧ登録失敗しました\n");
         return 0;
     } else {
         for (u16 i = 0; i < mpGateModel->getModelData()->getJointNum(); i++) {
             if ((int)i == 1 || (int)i == 2) {
                 J3DJoint* jnt = mpGateModel->getModelData()->getJointNodePointer(i);
-                JUT_ASSERT(448, jnt != 0);
+                JUT_ASSERT(448, jnt != NULL);
 
                 jnt->setCallBack(nodeCallBack);
-                mpGateModel->setUserArea((u32)this);
+                mpGateModel->setUserArea((uintptr_t)this);
             }
         }
     }
@@ -282,10 +256,9 @@ int daObjRgate_c::Create() {
     return 1;
 }
 
-/* 80CBA654-80CBA828 000A34 01D4+00 1/0 0/0 0/0 .text            CreateHeap__12daObjRgate_cFv */
 int daObjRgate_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-    JUT_ASSERT(472, modelData != 0);
+    JUT_ASSERT(472, modelData != NULL);
 
     mpGateModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpGateModel == NULL) {
@@ -294,10 +267,10 @@ int daObjRgate_c::CreateHeap() {
 
     if (getSwNo() != 0xFF) {
         modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 7);
-        JUT_ASSERT(485, modelData != 0);
+        JUT_ASSERT(485, modelData != NULL);
 
         J3DModelData* modelData2 = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 5);
-        JUT_ASSERT(495, modelData2 != 0);
+        JUT_ASSERT(495, modelData2 != NULL);
 
         mDoExt_setupShareTexture(modelData, modelData2);
         mpKeyModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -306,7 +279,7 @@ int daObjRgate_c::CreateHeap() {
         }
 
         modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 6);
-        JUT_ASSERT(511, modelData != 0);
+        JUT_ASSERT(511, modelData != NULL);
 
         mDoExt_setupShareTexture(modelData, modelData2);
         mpHookModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
@@ -326,7 +299,6 @@ int daObjRgate_c::CreateHeap() {
     return 1;
 }
 
-/* 80CBA828-80CBA8A8 000C08 0080+00 1/1 0/0 0/0 .text            create1st__12daObjRgate_cFv */
 int daObjRgate_c::create1st() {
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -340,7 +312,6 @@ int daObjRgate_c::create1st() {
     return phase_state;
 }
 
-/* 80CBA8A8-80CBAC38 000C88 0390+00 1/1 0/0 0/0 .text checkAreaL__12daObjRgate_cFPC4cXyzPC4cXyz */
 int daObjRgate_c::checkAreaL(cXyz const* unused1, cXyz const* unused2) {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
     Mtx m;
@@ -416,7 +387,6 @@ int daObjRgate_c::checkAreaL(cXyz const* unused1, cXyz const* unused2) {
     return 0;
 }
 
-/* 80CBAC38-80CBAFC4 001018 038C+00 1/1 0/0 0/0 .text checkAreaR__12daObjRgate_cFPC4cXyzPC4cXyz */
 int daObjRgate_c::checkAreaR(cXyz const* unused1, cXyz const* unused2) {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
     Mtx m;
@@ -494,7 +464,6 @@ int daObjRgate_c::checkAreaR(cXyz const* unused1, cXyz const* unused2) {
     return 0;
 }
 
-/* 80CBAFC4-80CBB0F0 0013A4 012C+00 1/1 0/0 0/0 .text            checkOpen__12daObjRgate_cFv */
 BOOL daObjRgate_c::checkOpen() {
     if (dComIfGs_getKeyNum() == 0) {
         return false;
@@ -523,7 +492,6 @@ BOOL daObjRgate_c::checkOpen() {
     return false;
 }
 
-/* 80CBB0F0-80CBB180 0014D0 0090+00 1/1 0/0 0/0 .text checkDirL__12daObjRgate_cFP10fopAc_ac_c */
 BOOL daObjRgate_c::checkDirL(fopAc_ac_c* i_actor) {
     Mtx m;
     mDoMtx_inverse(field_0xc30, m);
@@ -539,7 +507,6 @@ BOOL daObjRgate_c::checkDirL(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 80CBB180-80CBB210 001560 0090+00 1/1 0/0 0/0 .text checkDirR__12daObjRgate_cFP10fopAc_ac_c */
 BOOL daObjRgate_c::checkDirR(fopAc_ac_c* i_actor) {
     Mtx m;
     mDoMtx_inverse(field_0xc00, m);
@@ -555,18 +522,16 @@ BOOL daObjRgate_c::checkDirR(fopAc_ac_c* i_actor) {
     }
 }
 
-/* 80CBB210-80CBB28C 0015F0 007C+00 1/1 0/0 0/0 .text            setAtkSE__12daObjRgate_cFv */
 void daObjRgate_c::setAtkSE() {
     fopAcM_seStart(this, Z2SE_OBJ_RIDER_GATE_ATK, 0);
 }
 
-/* 80CBB28C-80CBB308 00166C 007C+00 1/1 0/0 0/0 .text            setCrkSE__12daObjRgate_cFv */
 void daObjRgate_c::setCrkSE() {
     fopAcM_seStart(this, Z2SE_OBJ_RIDER_GATE_CRK, 0);
 }
 
-/* 80CBB308-80CBB370 0016E8 0068+00 1/1 0/0 0/0 .text            action__12daObjRgate_cFv */
 void daObjRgate_c::action() {
+        /* dSv_event_flag_c::M_035 - Cutscene - [cutscene: 35] after carriage guarding event */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[68])) {
         mGateLAngle = 0x4000;
         mGateRAngle = -0x4000;
@@ -575,7 +540,6 @@ void daObjRgate_c::action() {
     }
 }
 
-/* 80CBB370-80CBBA10 001750 06A0+00 1/1 0/0 0/0 .text            action_typeA__12daObjRgate_cFv */
 void daObjRgate_c::action_typeA() {
     u8 sw_no = getSwNo();
     daPy_py_c* player_p = daPy_getPlayerActorClass();
@@ -761,8 +725,6 @@ void daObjRgate_c::action_typeA() {
     }
 }
 
-/* 80CBBA10-80CBBAF4 001DF0 00E4+00 1/0 0/0 0/0 .text            actionWaitEvent__12daObjRgate_cFv
- */
 void daObjRgate_c::actionWaitEvent() {
     if (eventInfo.checkCommandDoor()) {
         setAction(ACT_EVENT);
@@ -776,7 +738,6 @@ void daObjRgate_c::actionWaitEvent() {
     }
 }
 
-/* 80CBBAF4-80CBBB5C 001ED4 0068+00 1/0 0/0 0/0 .text            actionEvent__12daObjRgate_cFv */
 void daObjRgate_c::actionEvent() {
     if (dComIfGp_evmng_endCheck(mEventID)) {
         setAction(ACT_DEAD);
@@ -786,11 +747,8 @@ void daObjRgate_c::actionEvent() {
     }
 }
 
-/* 80CBBB5C-80CBBB60 001F3C 0004+00 1/0 0/0 0/0 .text            actionDead__12daObjRgate_cFv */
 void daObjRgate_c::actionDead() {}
 
-/* 80CBBB60-80CBBC04 001F40 00A4+00 1/1 0/0 0/0 .text            event_proc_call__12daObjRgate_cFv
- */
 void daObjRgate_c::event_proc_call() {
     typedef void (daObjRgate_c::*func)();
     static func l_func[] = {&daObjRgate_c::actionWaitEvent, &daObjRgate_c::actionEvent,
@@ -799,14 +757,13 @@ void daObjRgate_c::event_proc_call() {
     (this->*l_func[mAction])();
 }
 
-/* 80CBBC04-80CBBD68 001FE4 0164+00 1/1 0/0 0/0 .text            demoProc__12daObjRgate_cFv */
 void daObjRgate_c::demoProc() {
     mStaffID = dComIfGp_evmng_getMyStaffId("K_GATE", NULL, 0);
     int demo_action = getDemoAction();
 
     if (dComIfGp_evmng_getIsAddvance(mStaffID)) {
         switch (demo_action) {
-        case DEMO_ACT_WAIT:
+        case DEMO_ACT_WAIT: {
             int* timer_p = dComIfGp_evmng_getMyIntegerP(mStaffID, "Timer");
             if (timer_p == NULL) {
                 mTimer = 1;
@@ -814,6 +771,7 @@ void daObjRgate_c::demoProc() {
                 mTimer = *timer_p;
             }
             break;
+        }
         case DEMO_ACT_OPEN:
             mGateLMove = 1000;
             mGateRMove = -1000;
@@ -842,15 +800,12 @@ void daObjRgate_c::demoProc() {
     }
 }
 
-/* 80CBBD68-80CBBDB0 002148 0048+00 1/1 0/0 0/0 .text            getDemoAction__12daObjRgate_cFv */
 int daObjRgate_c::getDemoAction() {
     static char* action_table[] = {"WAIT", "ADJUSTMENT", "UNLOCK", "OPEN"};
 
-    return dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZE(action_table), 0, 0);
+    return dComIfGp_evmng_getMyActIdx(mStaffID, action_table, ARRAY_SIZEU(action_table), 0, 0);
 }
 
-/* 80CBBDB0-80CBBE18 002190 0068+00 1/0 0/0 0/0 .text            Execute__12daObjRgate_cFPPA3_A4_f
- */
 int daObjRgate_c::Execute(Mtx** param_0) {
     event_proc_call();
     action();
@@ -862,7 +817,6 @@ int daObjRgate_c::Execute(Mtx** param_0) {
     return 1;
 }
 
-/* 80CBBE18-80CBBF34 0021F8 011C+00 1/0 0/0 0/0 .text            Draw__12daObjRgate_cFv */
 int daObjRgate_c::Draw() {
     g_env_light.settingTevStruct(0x10, &current.pos, &tevStr);
     g_env_light.setLightTevColorType_MAJI(mpGateModel, &tevStr);
@@ -888,13 +842,10 @@ int daObjRgate_c::Draw() {
     return 1;
 }
 
-/* 80CBBF34-80CBBFA0 002314 006C+00 1/0 0/0 0/0 .text            Delete__12daObjRgate_cFv */
 int daObjRgate_c::Delete() {
     if (mpBgW != NULL && mpBgW->ChkUsed()) {
         if (dComIfG_Bgsp().Release(mpBgW)) {
-#ifdef DEBUG
-            OSReport("Release Error\n");
-#endif
+            OS_REPORT("Release Error\n");
         }
     }
 
@@ -902,37 +853,29 @@ int daObjRgate_c::Delete() {
     return 1;
 }
 
-/* 80CBBFA0-80CBC054 002380 00B4+00 1/0 0/0 0/0 .text daObjRgate_create1st__FP12daObjRgate_c */
 static int daObjRgate_create1st(daObjRgate_c* i_this) {
-    fopAcM_SetupActor(i_this, daObjRgate_c);
+    fopAcM_ct(i_this, daObjRgate_c);
     return i_this->create1st();
 }
 
-/* 80CBC290-80CBC2B0 002670 0020+00 1/0 0/0 0/0 .text daObjRgate_MoveBGDelete__FP12daObjRgate_c */
 static int daObjRgate_MoveBGDelete(daObjRgate_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 80CBC2B0-80CBC2D0 002690 0020+00 1/0 0/0 0/0 .text daObjRgate_MoveBGExecute__FP12daObjRgate_c
- */
 static int daObjRgate_MoveBGExecute(daObjRgate_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 80CBC2D0-80CBC2FC 0026B0 002C+00 1/0 0/0 0/0 .text daObjRgate_MoveBGDraw__FP12daObjRgate_c */
 static int daObjRgate_MoveBGDraw(daObjRgate_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* ############################################################################################## */
-/* 80CBC51C-80CBC53C -00001 0020+00 1/0 0/0 0/0 .data            daObjRgate_METHODS */
 static actor_method_class daObjRgate_METHODS = {
     (process_method_func)daObjRgate_create1st,     (process_method_func)daObjRgate_MoveBGDelete,
     (process_method_func)daObjRgate_MoveBGExecute, (process_method_func)NULL,
     (process_method_func)daObjRgate_MoveBGDraw,
 };
 
-/* 80CBC53C-80CBC56C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_RiderGate */
 extern actor_process_profile_definition g_profile_Obj_RiderGate = {
     fpcLy_CURRENT_e,
     3,

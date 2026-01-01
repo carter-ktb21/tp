@@ -14,15 +14,22 @@ struct daObjFlag3_Attr_c {
 
 class FlagCloth2_c : public J3DPacket {
 public:
-    /* 80BEEDE4 */ void execute();
-    /* 80BEEF74 */ inline void calcFlagNormal(cXyz*, int);
-    /* 80BEF278 */ inline cXyz calcFlagFactor(cXyz*, cXyz*, cXyz*, int);
-    /* 80BEF790 */ virtual ~FlagCloth2_c();
-    /* 80BEFD08 */ void initFlagPos(cXyz*, fopAc_ac_c*);
-    /* 80BF00A0 */ virtual void draw();
-    /* 80BF0434 */ cXyz getTargetPos()  { return mPositions[4]; }
+    void execute();
+    inline void calcFlagNormal(cXyz*, int);
+    inline static void initCcSphere(fopAc_ac_c*);
+    inline cXyz calcFlagFactor(cXyz*, cXyz*, cXyz*, int);
+    virtual ~FlagCloth2_c();
+    inline void initFlagPos(cXyz*, fopAc_ac_c*);
+    virtual void draw();
+    cXyz getTargetPos() { return mPositions[4]; }
 
-    inline void calcFlagNormalBack();
+    void calcFlagNormalBack() {
+        cXyz* pNormal = getNormal();
+        cXyz* pNormalBack = getNormalBack();
+        for (int i = 0; i < 36; pNormal++, pNormalBack++, i++) {
+            pNormalBack->set(-pNormal->x, -pNormal->y, -pNormal->z);
+        }
+    }
     cXyz* getPos() { return mPositions; }
     cXyz* getVec() { return mVecs; }
     cXyz* getNormal() { return mNormals; }
@@ -43,14 +50,7 @@ public:
         }
     }
 
-    void calcFlagFactorSub(cXyz* param_1, cXyz* param_2, cXyz* param_3, f32 param_4) {
-        cXyz acStack_2c = *param_2 - *param_1;
-        param_4 = acStack_2c.abs() - param_4;
-        cXyz cStack_38 = acStack_2c.normZC();
-        param_4 *= mSpringRate;
-        cStack_38 *= param_4;
-        *param_3 += cStack_38;
-    }
+    void calcFlagFactorSub(cXyz* param_1, cXyz* param_2, cXyz* param_3, f32 param_4);
 
     /* 0x010 */ GXTexObj mTexObj;
     /* 0x030 */ dKy_tevstr_c mTevStr;
@@ -85,11 +85,11 @@ public:
  */
 class daObjFlag3_c : public fopAc_ac_c {
 public:
-    /* 80BEEA78 */ int createHeap();
-    /* 80BEED3C */ int execute();
-    /* 80BEF700 */ ~daObjFlag3_c();
-    /* 80BEF95C */ int create();
-    /* 80BEFBC4 */ void create_init();
+    int createHeap();
+    int execute();
+    ~daObjFlag3_c();
+    int create();
+    inline void create_init();
     inline int draw();
     inline void initBaseMtx();
 

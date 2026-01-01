@@ -9,13 +9,11 @@
 #include "f_op/f_op_msg_mng.h"
 #include "f_pc/f_pc_manager.h"
 
-/* 8001F488-8001F4B0 019DC8 0028+00 1/0 0/0 0/0 .text            fopMsg_Draw__FPv */
 static int fopMsg_Draw(void* i_this) {
     msg_class* a_this = (msg_class*)i_this;
     return fpcLf_DrawMethod(a_this->sub_method, i_this);
 }
 
-/* 8001F4B0-8001F4E8 019DF0 0038+00 1/0 0/0 0/0 .text            fopMsg_Execute__FPv */
 static int fopMsg_Execute(void* i_this) {
     msg_class* a_this = (msg_class*)i_this;
 
@@ -27,7 +25,6 @@ static int fopMsg_Execute(void* i_this) {
     return ret;
 }
 
-/* 8001F4E8-8001F53C 019E28 0054+00 1/0 0/0 0/0 .text            fopMsg_IsDelete__FPv */
 static int fopMsg_IsDelete(void* i_this) {
     msg_class* a_this = (msg_class*)i_this;
 
@@ -39,7 +36,6 @@ static int fopMsg_IsDelete(void* i_this) {
     return ret;
 }
 
-/* 8001F53C-8001F588 019E7C 004C+00 1/0 0/0 0/0 .text            fopMsg_Delete__FPv */
 static int fopMsg_Delete(void* i_this) {
     msg_class* a_this = (msg_class*)i_this;
 
@@ -49,10 +45,12 @@ static int fopMsg_Delete(void* i_this) {
     return ret;
 }
 
-/* 80450CF0-80450CF8 0001F0 0004+04 1/1 0/0 0/0 .sbss            fopMsg_MSG_TYPE */
+#if DEBUG
+u8 fopMsg::MemCheck;
+#endif
+
 static int fopMsg_MSG_TYPE;
 
-/* 8001F588-8001F660 019EC8 00D8+00 1/0 0/0 0/0 .text            fopMsg_Create__FPv */
 int fopMsg_Create(void* i_this) {
     msg_class* a_this = (msg_class*)i_this;
 
@@ -75,14 +73,13 @@ int fopMsg_Create(void* i_this) {
 
     int ret = fpcMtd_Create(&a_this->sub_method->base, a_this);
     if (ret == cPhs_COMPLEATE_e) {
-        s32 priority = fpcLf_GetPriority(a_this);
+        s32 priority = fpcM_DrawPriority(a_this);
         fopDwTg_ToDrawQ(&a_this->draw_tag, priority);
     }
 
     return ret;
 }
 
-/* 803A3958-803A3970 -00001 0014+04 0/0 5/0 0/0 .data            g_fopMsg_Method */
 leafdraw_method_class g_fopMsg_Method = {
     (process_method_func)fopMsg_Create,  (process_method_func)fopMsg_Delete,
     (process_method_func)fopMsg_Execute, (process_method_func)fopMsg_IsDelete,

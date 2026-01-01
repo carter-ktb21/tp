@@ -30,6 +30,10 @@ struct dMfm_HIO_prm_res_src_s {
     static const dMfm_HIO_prm_res_src_s m_other;
 };
 
+struct dMfm_HIO_prm_res_dst_s {
+    static const void* m_res;
+};
+
 class renderingFmap_c : public dRenderingFDAmap_c {
 public:
     enum palette_e {
@@ -68,38 +72,38 @@ public:
         mDrawEnable = false;
     }
 
-    /* 801CE15C */ void init(u8*, u16, u16, u16, u16);
-    /* 801CE188 */ void entry(dMenu_Fmap_world_data_c*, int, f32, f32, f32);
-    /* 801CE224 */ bool isSwitchSpecialOff(int);
-    /* 801CE288 */ bool isSwitch(group_class const*);
-    /* 801CE3C0 */ int getPointStagePathInnerNo(dMenu_Fmap_region_data_c*, f32, f32, int, int*,
+    void init(u8*, u16, u16, u16, u16);
+    void entry(dMenu_Fmap_world_data_c*, int, f32, f32, f32);
+    bool isSwitchSpecialOff(int);
+    bool isSwitch(group_class const*);
+    int getPointStagePathInnerNo(dMenu_Fmap_region_data_c*, f32, f32, int, int*,
                                                 int*);
-    /* 801CE410 */ void preDrawPath();
-    /* 801CE4D4 */ bool isDrawPath();
-    /* 801CE4DC */ bool isDrawRoom();
-    /* 801CE560 */ void postDrawPath();
-    /* 801CE5B8 */ void postRenderingMap();
-    /* 801CE5EC */ void roomSetteing();
-    /* 801CE6A8 */ room_class* getFirstRoomPointer();
-    /* 801CE75C */ void getFirstRegion();
-    /* 801CE7A8 */ void getFirstStage();
-    /* 801CE80C */ void getFirstRoom();
-    /* 801CE84C */ bool getNextRoom();
-    /* 801CE8B8 */ bool getNextStage();
-    /* 801CE93C */ bool getNextRegion();
-    /* 801CE9A4 */ room_class* getNextRoomPointer();
+    void preDrawPath();
+    bool isDrawPath();
+    bool isDrawRoom();
+    void postDrawPath();
+    void postRenderingMap();
+    void roomSetteing();
+    room_class* getFirstRoomPointer();
+    void getFirstRegion();
+    void getFirstStage();
+    void getFirstRoom();
+    bool getNextRoom();
+    bool getNextStage();
+    bool getNextRegion();
+    room_class* getNextRoomPointer();
 
-    /* 801CF4D0 */ ~renderingFmap_c() {}
-    /* 801CF55C */ bool isRenderingFloor(int) { return true; }
-    /* 801CF564 */ void beforeDrawPath() {}
-    /* 801CF568 */ void afterDrawPath() {}
+    ~renderingFmap_c() {}
+    bool isRenderingFloor(int) { return true; }
+    void beforeDrawPath() {}
+    void afterDrawPath() {}
     int getNowDrawRegionNo() { return mRegionNo; }
     bool isDrawEnable() { return mDrawEnable; }
 
     /* 0x24 */ Mtx mViewMtx;
-    /* 0x54 */ cXyz mEye;
-    /* 0x60 */ cXyz mCenter;
-    /* 0x6C */ cXyz mUp;
+    /* 0x54 */ Vec mEye;
+    /* 0x60 */ Vec mCenter;
+    /* 0x6C */ Vec mUp;
     /* 0x78 */ dMenu_Fmap_world_data_c* mpWorldData;
     /* 0x7C */ dMenu_Fmap_region_data_c* mpRegionData;
     /* 0x80 */ dMenu_Fmap_stage_data_c* mpStageData;
@@ -120,28 +124,63 @@ public:
     /* 0xB9 */ u8 mSaveTableNo;
     /* 0xBA */ u8 mVisitedRoomSaveTableNo;
     /* 0xBB */ bool mDrawEnable;
- };
+};
+
+class dMfm_HIO_list_c : public dMpath_HIO_n::hioList_c {
+public:
+    virtual void copySrcToHio();
+    virtual void copyHioToDst();
+    virtual void copyBufToHio(const char*);
+};
+
+class dMfm_HIO_c : public dMpath_HIO_file_base_c {
+public:
+    dMfm_HIO_c();
+    virtual ~dMfm_HIO_c() { mMySelfPointer = NULL; }
+    virtual void listenPropertyEvent(const JORPropertyEvent*);
+    virtual void genMessage(JORMContext*);
+    virtual u32 addString(char* param_1, u32 param_2, u32 param_3) { return field_0xc.addString(param_1, param_2, param_3); }
+    virtual u32 addData(char* param_1, u32 param_2, u32 param_3) {
+        (void)param_2;
+        (void)param_3;
+        memcpy(param_1, dMfm_HIO_prm_res_dst_s::m_res, 366);
+        return 366;
+    }
+    virtual void copyReadBufToData(const char* param_1, s32 param_2) {
+        (void)param_2;
+        field_0xc.copyBufToHio(param_1);
+    }
+    virtual u32 addStringBinary(char* param_1, u32 param_2, u32 param_3) { return field_0xc.addStringBinary(param_1, param_2, param_3); }
+
+    /* 0x04 */ u8 field_0x4[0x8 - 0x4];
+    /* 0x08 */ dMenu_FmapMap_c* field_0x8;
+    /* 0x0C */ dMfm_HIO_list_c field_0xc;
+    /* 0x18 */ u8 field_0x18;
+
+    static dMfm_HIO_c* mMySelfPointer;
+    static dMpath_HIO_n::list_s l_list;
+};
 
 class dMenu_FmapMap_c : public renderingFmap_c {
 public:
-    /* 801CEAAC */ void setFmapPaletteColor(palette_e, GXColor const&);
-    /* 801CEA38 */ void setFmapPaletteColor(palette_e, u8, u8, u8, u8);
-    /* 801CEAE0 */ bool isFlashRoomNoCheck(int) const;
-    /* 801CEB1C */ void setPointColor(f32);
-    /* 801CEC24 */ dMenu_FmapMap_c();
-    /* 801CED38 */ ~dMenu_FmapMap_c();
-    /* 801CEDE8 */ void _create(u16, u16, u16, u16, void*);
-    /* 801CEE3C */ void _delete();
-    /* 801CEE94 */ void draw();
-    /* 801CF0B4 */ void rendering(line_class const*);
-    /* 801CF12C */ int getLineWidth(int);
-    /* 801CF1D4 */ bool isDrawType(int);
-    /* 801CF1E0 */ void setFlashOn(int, int, u8*, int);
-    /* 801CF208 */ const GXColor* getLineColor(int, int);
-    /* 801CF298 */ const GXColor* getBackColor() const;
-    /* 801CF2A0 */ const GXColor* getColor(int);
-    /* 801CF394 */ void setTexture(u16, u16, u16, u16);
-    /* 801CF450 */ void setRendering(dMenu_Fmap_world_data_c*, int, f32, f32, f32, f32);
+    void setFmapPaletteColor(palette_e, GXColor const&);
+    void setFmapPaletteColor(palette_e, u8, u8, u8, u8);
+    bool isFlashRoomNoCheck(int) const;
+    void setPointColor(f32);
+    dMenu_FmapMap_c();
+    ~dMenu_FmapMap_c();
+    void _create(u16, u16, u16, u16, void*);
+    void _delete();
+    void draw();
+    void rendering(line_class const*);
+    int getLineWidth(int);
+    bool isDrawType(int);
+    void setFlashOn(int, int, u8*, int);
+    const GXColor* getLineColor(int, int);
+    const GXColor* getBackColor() const;
+    const GXColor* getColor(int);
+    void setTexture(u16, u16, u16, u16);
+    void setRendering(dMenu_Fmap_world_data_c*, int, f32, f32, f32, f32);
 
     f32 getRateWithFrameCount(int param_0) {
         return (f32)(g_Counter.mCounter0 % param_0) / (f32)param_0;
@@ -166,12 +205,17 @@ public:
     }
 
     ResTIMG* getResTIMGPointer() { return mResTIMG; }
-
+#if DEBUG
+    dMenu_Fmap_world_data_c* getWorldData() { return mpWorldData; }
+#endif
     /* 0xBC */ ResTIMG* mResTIMG;
     /* 0xC0 */ u8* mMapImage_p;
     /* 0xC4 */ dMfm_prm_res_s* m_res;
     /* 0xC8 */ dMpath_RGB5A3_palDt_s* m_palette;
     /* 0xCC */ int field_0xcc;
+#if DEBUG
+    /* 0xD0 */ dMenu_Fmap_world_data_c* mpWorldData;
+#endif
     /* 0xD0 */ f32 mZoomRate;
     /* 0xD4 */ int mLineNo;
     /* 0xD8 */ bool mFlash;
@@ -180,8 +224,10 @@ public:
     /* 0xE0 */ int mLastStageCursor;
     /* 0xE4 */ u8 mRegionCursor;
     /* 0xE5 */ u8 mFlashTimer;
-    /* 0xE8 */ u8* mFlashRooms;
-    /* 0xEC */ int mFlashRoomCount;
+    /* 0xE8 */ u8* mp_roomList;
+    /* 0xEC */ int m_roomListNumber;
+
+    static dMenu_FmapMap_c* mMySelfPointer;
 };
 
 

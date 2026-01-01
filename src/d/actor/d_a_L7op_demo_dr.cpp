@@ -3,14 +3,16 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_L7op_demo_dr.h"
 #include "d/actor/d_a_player.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
-#include "d/actor/d_a_npc.h"
+#include "d/actor/d_a_npc4.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 
-/* 805AB098-805AB13C 000078 00A4+00 2/2 0/0 0/0 .text setAction__9daL7ODR_cFM9daL7ODR_cFPCvPv_v */
 void daL7ODR_c::setAction(daL7ODR_c::actionFn i_action) {
     if (mAction != NULL) {
         field_0x888 = -1;
@@ -23,13 +25,10 @@ void daL7ODR_c::setAction(daL7ODR_c::actionFn i_action) {
     (this->*mAction)();
 }
 
-/* 805AB13C-805AB164 00011C 0028+00 1/1 0/0 0/0 .text            action__9daL7ODR_cFv */
 void daL7ODR_c::action() {
     (this->*mAction)();
 }
 
-/* 805AB164-805AB208 000144 00A4+00 2/2 0/0 0/0 .text setDrAction__9daL7ODR_cFM9daL7ODR_cFPCvPv_v
- */
 void daL7ODR_c::setDrAction(daL7ODR_c::actionFn i_action) {
     if (mDrAction != NULL) {
         field_0x88c = -1;
@@ -42,12 +41,10 @@ void daL7ODR_c::setDrAction(daL7ODR_c::actionFn i_action) {
     (this->*mDrAction)();
 }
 
-/* 805AB208-805AB230 0001E8 0028+00 1/1 0/0 0/0 .text            dr_action__9daL7ODR_cFv */
 void daL7ODR_c::dr_action() {
     (this->*mDrAction)();
 }
 
-/* 805AB230-805AB2E8 000210 00B8+00 1/1 0/0 0/0 .text            mtx_set__9daL7ODR_cFv */
 void daL7ODR_c::mtx_set() {
     J3DModel* model = mpModelMorf->getModel();
 
@@ -63,7 +60,6 @@ void daL7ODR_c::mtx_set() {
     fopAcM_SetMtx(this, model->getBaseTRMtx());
 }
 
-/* 805AB2E8-805AB3D0 0002C8 00E8+00 1/1 0/0 0/0 .text            draw__9daL7ODR_cFv */
 int daL7ODR_c::draw() {
     if (field_0x8b4) {
         return 1;
@@ -81,12 +77,10 @@ int daL7ODR_c::draw() {
     return 1;
 }
 
-/* 805AB3D0-805AB3F0 0003B0 0020+00 1/0 0/0 0/0 .text            daL7ODR_Draw__FP9daL7ODR_c */
 static int daL7ODR_Draw(daL7ODR_c* i_this) {
     return i_this->draw();
 }
 
-/* 805AB3F0-805AB520 0003D0 0130+00 1/0 0/0 0/0 .text            wait__9daL7ODR_cFv */
 void daL7ODR_c::wait() {
     if (field_0x888 == 0) {
         field_0x888++;
@@ -111,7 +105,6 @@ void daL7ODR_c::wait() {
     }
 }
 
-/* 805AB520-805ABC2C 000500 070C+00 1/0 0/0 0/0 .text            pl_walk__9daL7ODR_cFv */
 void daL7ODR_c::pl_walk() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     camera_class* camera0 = dComIfGp_getCamera(0);
@@ -156,7 +149,7 @@ void daL7ODR_c::pl_walk() {
                 field_0x898 = 2.0f;
                 
                 dScnKy_env_light_c* kankyo = dKy_getEnvlight();
-                kankyo->field_0x12cc = 1;
+                kankyo->wether = 1;
                 field_0x888++;
             }
         } else if (field_0x888 == 2) {
@@ -238,8 +231,6 @@ void daL7ODR_c::pl_walk() {
     }
 }
 
-/* 805ABC2C-805ABCF8 000C0C 00CC+00 1/1 0/0 0/0 .text setZoomOutCamPos__9daL7ODR_cFR4cXyzR4cXyzf
- */
 void daL7ODR_c::setZoomOutCamPos(cXyz& param_0, cXyz& param_1, f32 param_2) {
     csXyz spC;
     spC.x = -cLib_targetAngleX(&param_1, &param_0);
@@ -253,7 +244,6 @@ void daL7ODR_c::setZoomOutCamPos(cXyz& param_0, cXyz& param_1, f32 param_2) {
     mDoMtx_stack_c::multVecZero(&param_0);
 }
 
-/* 805ABCF8-805ABE0C 000CD8 0114+00 1/0 0/0 0/0 .text            dr_wait__9daL7ODR_cFv */
 void daL7ODR_c::dr_wait() {
     if (field_0x88c == 0) {
         cXyz sp8(0.0f, 0.0f, 0.0f);
@@ -273,7 +263,6 @@ void daL7ODR_c::dr_wait() {
     }
 }
 
-/* 805ABE0C-805AD7B4 000DEC 19A8+00 2/0 0/0 0/0 .text            dr_fly__9daL7ODR_cFv */
 void daL7ODR_c::dr_fly() {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     camera_class* camera0 = dComIfGp_getCamera(0);
@@ -704,7 +693,7 @@ void daL7ODR_c::dr_fly() {
             if (7.0f == mpModelMorf->getFrame() || 37.0f == mpModelMorf->getFrame()) {
                 mSound.startCreatureSound(Z2SE_EN_DR_WING, 0, -1);
             } else if (62.0f == mpModelMorf->getFrame()) {
-                subtype = 1;
+                argument = 1;
             }
 
             if (mpModelMorf->isStop()) {
@@ -720,7 +709,6 @@ void daL7ODR_c::dr_fly() {
     }
 }
 
-/* 805AD7B4-805AD854 002794 00A0+00 1/1 0/0 0/0 .text            execute__9daL7ODR_cFv */
 int daL7ODR_c::execute() {
     if (field_0x8b5 != 0) {
         field_0x8b5--;
@@ -738,17 +726,14 @@ int daL7ODR_c::execute() {
     return 1;
 }
 
-/* 805AD854-805AD874 002834 0020+00 2/1 0/0 0/0 .text            daL7ODR_Execute__FP9daL7ODR_c */
 static int daL7ODR_Execute(daL7ODR_c* i_this) {
     return i_this->execute();
 }
 
-/* 805AD874-805AD87C 002854 0008+00 1/0 0/0 0/0 .text            daL7ODR_IsDelete__FP9daL7ODR_c */
 static int daL7ODR_IsDelete(daL7ODR_c* i_this) {
     return 1;
 }
 
-/* 805AD87C-805AD8EC 00285C 0070+00 1/1 0/0 0/0 .text            _delete__9daL7ODR_cFv */
 int daL7ODR_c::_delete() {
     fopAcM_GetID(this);
     dComIfG_resDelete(&mPhase, "B_dr");
@@ -764,15 +749,13 @@ int daL7ODR_c::_delete() {
     return 1;
 }
 
-/* 805AD8EC-805AD90C 0028CC 0020+00 1/0 0/0 0/0 .text            daL7ODR_Delete__FP9daL7ODR_c */
 static int daL7ODR_Delete(daL7ODR_c* i_this) {
     return i_this->_delete();
 }
 
-/* 805AD90C-805ADA0C 0028EC 0100+00 1/1 0/0 0/0 .text            CreateHeap__9daL7ODR_cFv */
 int daL7ODR_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("B_dr", 0x49);
-    JUT_ASSERT(1146, modelData != 0);
+    JUT_ASSERT(1146, modelData != NULL);
     mpModelMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_dr", 0x2F), 2, 1.0f, 0, -1, &mSound, 0, 0x11000084);
     field_0x890 = 0x2F;
     if (mpModelMorf == NULL || mpModelMorf->getModel() == NULL) {
@@ -782,13 +765,11 @@ int daL7ODR_c::CreateHeap() {
     return 1;
 }
 
-/* 805ADA0C-805ADA2C 0029EC 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     daL7ODR_c* a_this = (daL7ODR_c*)i_this;
     return a_this->CreateHeap();
 }
 
-/* 805ADA2C-805ADAC0 002A0C 0094+00 1/1 0/0 0/0 .text            check_start__9daL7ODR_cFv */
 BOOL daL7ODR_c::check_start() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     cXyz player_pos;
@@ -801,9 +782,8 @@ BOOL daL7ODR_c::check_start() {
     return FALSE;
 }
 
-/* 805ADAC0-805ADCD8 002AA0 0218+00 1/1 0/0 0/0 .text            create__9daL7ODR_cFv */
 int daL7ODR_c::create() {
-    fopAcM_SetupActor(this, daL7ODR_c);
+    fopAcM_ct(this, daL7ODR_c);
     field_0x8b7 = 0;
 
     int phase_state = dComIfG_resLoad(&mPhase, "B_DR");
@@ -830,7 +810,7 @@ int daL7ODR_c::create() {
         scale.setall(1.0f);
 
         attention_info.distances[fopAc_attn_BATTLE_e] = 0;
-        attention_info.flags &= ~0x4;
+        attention_info.flags &= ~fopAc_AttnFlag_BATTLE_e;
     
         fopAcM_SetGroup(this, 0);
         fopAcM_OffStatus(this, 0);
@@ -847,12 +827,10 @@ int daL7ODR_c::create() {
     return phase_state;
 }
 
-/* 805ADD48-805ADD68 002D28 0020+00 1/0 0/0 0/0 .text            daL7ODR_Create__FP9daL7ODR_c */
 static int daL7ODR_Create(daL7ODR_c* i_this) {
     return i_this->create();
 }
 
-/* 805AE0F4-805AE114 -00001 0020+00 1/0 0/0 0/0 .data            l_daL7ODR_Method */
 static actor_method_class l_daL7ODR_Method = {
     (process_method_func)daL7ODR_Create,
     (process_method_func)daL7ODR_Delete,
@@ -861,7 +839,6 @@ static actor_method_class l_daL7ODR_Method = {
     (process_method_func)daL7ODR_Draw,
 };
 
-/* 805AE114-805AE144 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_L7ODR */
 extern actor_process_profile_definition g_profile_L7ODR = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

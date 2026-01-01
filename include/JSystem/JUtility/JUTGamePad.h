@@ -3,7 +3,7 @@
 
 #include "JSystem/JKernel/JKRDisposer.h"
 #include "JSystem/JUtility/JUTAssert.h"
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 
 typedef void (*callbackFn)(int, void*);
 
@@ -81,6 +81,8 @@ public:
 
     u32 getButton() const { return mButton.mButton; }
     u32 getTrigger() const { return mButton.mTrigger; }
+    u32 getRelease() const { return mButton.mRelease; }
+    u32 getRepeat() const { return mButton.mRepeat; }
     f32 getMainStickX() const { return mMainStick.mPosX; }
     f32 getMainStickY() const { return mMainStick.mPosY; }
     f32 getMainStickValue() const { return mMainStick.mValue; }
@@ -100,7 +102,8 @@ public:
     JUTGamePadRecordBase* getPadReplay() const { return mPadReplay; }
     JUTGamePadRecordBase* getPadRecord() const { return mPadRecord; }
 
-    u32 testTrigger(u32 button) const { return mButton.mTrigger & button; }
+    bool testButton(u32 button) const { return mButton.mButton & button; }
+    bool testTrigger(u32 button) const { return mButton.mTrigger & button; }
 
     bool isPushing3ButtonReset() const {
         return mPortNum != EPortInvalid && mButtonReset.mReset != false;
@@ -110,7 +113,10 @@ public:
     void stopMotor() { mRumble.stopMotor(mPortNum, false); }
     void stopMotorHard() { mRumble.stopMotorHard(mPortNum); }
 
-    static s8 getPortStatus(u32 port) { return mPadStatus[port].err; }
+    static s8 getPortStatus(EPadPort port) {
+        JUT_ASSERT(360, 0 <= port && port < 4);
+        return mPadStatus[port].err;
+    }
 
     struct CButton {
         CButton() { clear(); }

@@ -18,7 +18,97 @@
  */
 class e_rdb_class {
 public:
-    /* 8076AA0C */ e_rdb_class() {};
+    enum E_RDB_RES_FILE_ID {
+        /* BCK */
+        /* 0x04 */ BCK_HORN_RPLAY_RUN = 4,
+        /* 0x05 */ BCK_HORN_RPLAY_STOP,
+        /* 0x06 */ BCK_HORN_RPLAY_STOP2,
+        /* 0x07 */ BCK_RB_ATTACK01,
+        /* 0x08 */ BCK_RB_ATTACK02,
+        /* 0x09 */ BCK_RB_ATTACK03_END,
+        /* 0x0A */ BCK_RB_ATTACK03_SPIN,
+        /* 0x0B */ BCK_RB_ATTACK03_START,
+        /* 0x0C */ BCK_RB_DAMAGEBL,
+        /* 0x0D */ BCK_RB_DAMAGEBR,
+        /* 0x0E */ BCK_RB_DAMAGEF,
+        /* 0x0F */ BCK_RB_DAMAGEFL,
+        /* 0x10 */ BCK_RB_DAMAGEFR,
+        /* 0x11 */ BCK_RB_DOWN,
+        /* 0x12 */ BCK_RB_DOWN_RETURN,
+        /* 0x13 */ BCK_RB_DOWN_WAIT,
+        /* 0x14 */ BCK_RB_ED_DEMO_DOWN,
+        /* 0x15 */ BCK_RB_ED_DEMO_DOWNUP,
+        /* 0x16 */ BCK_RB_ED_DEMO_DOWNWAIT,
+        /* 0x17 */ BCK_RB_ED_DEMO_DOWNWALK,
+        /* 0x18 */ BCK_RB_FALL,
+        /* 0x19 */ BCK_RB_GUARD,
+        /* 0x1A */ BCK_RB_LV9_END01,
+        /* 0x1B */ BCK_RB_LV9_END02,
+        /* 0x1C */ BCK_RB_LV9_END03,
+        /* 0x1D */ BCK_RB_LV9_OP01,
+        /* 0x1E */ BCK_RB_LV9_OP02,
+        /* 0x1F */ BCK_RB_OP_DEMO_SWING,
+        /* 0x20 */ BCK_RB_PUSH,
+        /* 0x21 */ BCK_RB_RCOMEON,
+        /* 0x22 */ BCK_RB_RDAMAGE01,
+        /* 0x23 */ BCK_RB_RDAMAGE02,
+        /* 0x24 */ BCK_RB_RDAMAGEB,
+        /* 0x25 */ BCK_RB_RDAMAGEL,
+        /* 0x26 */ BCK_RB_RDAMAGER,
+        /* 0x27 */ BCK_RB_RDEAD,
+        /* 0x28 */ BCK_RB_RDEAD2_DAMAGE,
+        /* 0x29 */ BCK_RB_RDEAD2_FALL,
+        /* 0x2A */ BCK_RB_RDEAD2_RUN,
+        /* 0x2B */ BCK_RB_RDOWNB,
+        /* 0x2C */ BCK_RB_RDOWNB_RUN,
+        /* 0x2D */ BCK_RB_RDOWNB_UP,
+        /* 0x2E */ BCK_RB_RGUARD_F,
+        /* 0x2F */ BCK_RB_RGUARD_L,
+        /* 0x30 */ BCK_RB_RGUARD_R,
+        /* 0x31 */ BCK_RB_RJUMP_A,
+        /* 0x32 */ BCK_RB_RJUMP_B,
+        /* 0x33 */ BCK_RB_RJUMP_C,
+        /* 0x34 */ BCK_RB_RNEIGH,
+        /* 0x35 */ BCK_RB_ROP_DEMO2_EXCITE,
+        /* 0x36 */ BCK_RB_ROP_DEMO2_WAIT,
+        /* 0x37 */ BCK_RB_RPLAY_RUNL,
+        /* 0x38 */ BCK_RB_RPLAY_RUNR,
+        /* 0x39 */ BCK_RB_RPLAY_STOP,
+        /* 0x3A */ BCK_RB_RPLAY_STOP2,
+        /* 0x3B */ BCK_RB_RRUN,
+        /* 0x3C */ BCK_RB_RSLIP,
+        /* 0x3D */ BCK_RB_RSTART,
+        /* 0x3E */ BCK_RB_RSTARTLOOP,
+        /* 0x3F */ BCK_RB_RSTEP,
+        /* 0x40 */ BCK_RB_RUN,
+        /* 0x41 */ BCK_RB_RWAIT,
+        /* 0x42 */ BCK_RB_RWAIT02,
+        /* 0x43 */ BCK_RB_RWALK,
+        /* 0x44 */ BCK_RB_STEP,
+        /* 0x45 */ BCK_RB_WAIT01,
+        /* 0x46 */ BCK_RB_WALK,
+
+        /* BMDR */
+        /* 0x49 */ BMDR_ARML2_ARMOR = 0x49,
+        /* 0x4A */ BMDR_ARML_ARMOR,
+        /* 0x4B */ BMDR_ARMR2_ARMOR,
+        /* 0x4C */ BMDR_ARMR_ARMOR,
+        /* 0x4D */ BMDR_FACE_ARMOR,
+        /* 0x4E */ BMDR_HEAD_ARMOR,
+        /* 0x4F */ BMDR_LEGL_ARMOR,
+        /* 0x50 */ BMDR_LEGR_ARMOR,
+        /* 0x51 */ BMDR_MUNE2_ARMOR,
+        /* 0x52 */ BMDR_MUNE_ARMOR,
+        /* 0x53 */ BMDR_RB,
+        /* 0x54 */ BMDR_RB_HORN,
+        /* 0x55 */ BMDR_RB_ONO,
+        /* 0x56 */ BMDR_RB_SHIELDL,
+        /* 0x57 */ BMDR_RB_SHIELDR,
+        /* 0x58 */ BMDR_SENA2_ARMOR,
+        /* 0x59 */ BMDR_SENA_ARMOR,
+        /* 0x5A */ BMDR_SHOULDERL_ARMOR,
+        /* 0x5B */ BMDR_SHOULDERR_ARMOR,
+    };
 
     /* 0x0000 */ fopEn_enemy_c enemy;
     /* 0x05ac */ request_of_phase_process_class mPhase;
@@ -29,7 +119,7 @@ public:
     /* 0x05CC */ f32 field_0x5cc;
     /* 0x05D0 */ Z2CreatureEnemy mSound;
     /* 0x0674 */ int mAnm;
-    /* 0x0678 */ J3DModel* field_0x678;
+    /* 0x0678 */ J3DModel* mpAxeModel;
     /* 0x067C */ s16 field_0x67c;
     /* 0x067E */ s16 mAction;
     /* 0x0680 */ s8 field_0x680;
@@ -101,21 +191,11 @@ public:
     /* 0x10F4 */ f32 mDemoCamFovy;
     /* 0x10F8 */ f32 field_0x10f8;
     /* 0x10FC */ u8 field_0x10fc[0x1104 - 0x10fc];
-    /* 0x1104 */ s8 field_0x1104;
+    /* 0x1104 */ u8 field_0x1104;
     /* 0x1105 */ u8 field_0x1105[0x1108 - 0x1105];
     /* 0x1108 */ dMsgFlow_c mMsgFlow;
 };
 
 STATIC_ASSERT(sizeof(e_rdb_class) == 0x1154);
-
-class daE_RDB_HIO_c : public JORReflexible {
-public:
-    /* 807650CC */ daE_RDB_HIO_c();
-    /* 8076AF64 */ virtual ~daE_RDB_HIO_c() {};
-
-    void genMessage(JORMContext*);
-    /* 0x04 */ s8 mID;
-    /* 0x08 */ f32 field_0x8;
-};
 
 #endif /* D_A_E_RDB_H */

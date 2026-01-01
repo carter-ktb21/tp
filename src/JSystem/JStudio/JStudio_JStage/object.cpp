@@ -2,6 +2,8 @@
 // object
 //
 
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JStudio/JStudio_JStage/object.h"
 
 /* 8028A1F8-8028A290 284B38 0098+00 0/0 2/2 0/0 .text
@@ -86,8 +88,6 @@ bool JStudio_JStage::transform_toLocalFromGlobal(
     return true;
 }
 
-/* 8028A470-8028A4BC 284DB0 004C+00 0/0 5/5 0/0 .text
- * adaptor_object_data___Q214JStudio_JStage16TAdaptor_object_FPCvUlPCvUl */
 void JStudio_JStage::TAdaptor_object_::adaptor_object_data_(void const* param_1, u32 param_2,
                                                             void const* param_3, u32 param_4) {
     int uVar3;
@@ -99,21 +99,17 @@ void JStudio_JStage::TAdaptor_object_::adaptor_object_data_(void const* param_1,
     pJSGObject_->JSGSetData(uVar3, param_3, param_4);
 }
 
-/* 8028A4BC-8028A50C 284DFC 0050+00 0/0 4/4 0/0 .text
- * adaptor_object_findJSGObject___Q214JStudio_JStage16TAdaptor_object_FPCc */
 JStage::TObject*
 JStudio_JStage::TAdaptor_object_::adaptor_object_findJSGObject_(char const* param_1) {
     JStage::TObject* pJSGObject;
     if (pJSGSystem_->JSGFindObject(&pJSGObject, param_1, JStage::OBJECT_UNDEFINED) == 0) {
-        JUT_ASSERT(122, pJSGObject != 0);
+        JUT_ASSERT(122, pJSGObject != NULL);
     } else {
         return NULL;
     }
     return pJSGObject;
 }
 
-/* 8028A50C-8028A550 284E4C 0044+00 0/0 4/4 0/0 .text
- * adaptor_object_findJSGObjectNode___Q214JStudio_JStage16TAdaptor_object_FPCQ26JStage7TObjectPCc */
 s32 JStudio_JStage::TAdaptor_object_::adaptor_object_findJSGObjectNode_(
     JStage::TObject const* param_1, char const* param_2) {
     if (param_1 == NULL) {
@@ -131,7 +127,7 @@ JStudio_JStage::TAdaptor_object_::adaptor_object_ENABLE_(JStudio::data::TEOperat
     switch (param_1) {
     case JStudio::data::UNK_0x2:
         JUT_ASSERT(157, uSize==4);
-        JUT_ASSERT(158, pContent!=0);
+        JUT_ASSERT(158, pContent!=NULL);
         if (*(u32*)pContent != 0) {
             pJSGObject_->JSGFEnableFlag(2);
         } else {

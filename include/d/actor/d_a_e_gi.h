@@ -17,32 +17,32 @@
  */
 class daE_GI_c : public fopEn_enemy_c {
 public:
-    /* 806CD4F4 */ int ctrlJoint(J3DJoint*, J3DModel*);
-    /* 806CD594 */ static int JointCallBack(J3DJoint*, int);
-    /* 806CD5E0 */ int draw();
-    /* 806CD868 */ void setBck(int, u8, f32, f32);
-    /* 806CD90C */ void setActionMode(int, int);
-    /* 806CD938 */ void damage_check();
-    /* 806CDD1C */ void setWeaponAtBit(u8);
-    /* 806CDD8C */ bool setCryStop();
-    /* 806CDED8 */ void setAttackEffect();
-    /* 806CDFB0 */ void setDragSwordEffect();
-    /* 806CE0D4 */ void setDeathSmokeEffect();
-    /* 806CE184 */ void setDamageEffect();
-    /* 806CE3C4 */ void executeSleep();
-    /* 806CE6AC */ void executeWait();
-    /* 806CE858 */ void executeChase();
-    /* 806CEC94 */ void executeAttack();
-    /* 806CF0B8 */ void executeDamage();
-    /* 806CF410 */ void executeBiteDamage();
-    /* 806CF720 */ void PushButtonCount();
-    /* 806CF878 */ void action();
-    /* 806CFB60 */ void mtx_set();
-    /* 806CFBF0 */ void cc_set();
-    /* 806CFDF4 */ int execute();
-    /* 806D0054 */ int _delete();
-    /* 806D00E8 */ int CreateHeap();
-    /* 806D027C */ int create();
+    int ctrlJoint(J3DJoint*, J3DModel*);
+    static int JointCallBack(J3DJoint*, int);
+    int draw();
+    void setBck(int, u8, f32, f32);
+    void setActionMode(int, int);
+    void damage_check();
+    void setWeaponAtBit(u8);
+    bool setCryStop();
+    void setAttackEffect();
+    void setDragSwordEffect();
+    void setDeathSmokeEffect();
+    void setDamageEffect();
+    void executeSleep();
+    void executeWait();
+    void executeChase();
+    void executeAttack();
+    void executeDamage();
+    void executeBiteDamage();
+    void PushButtonCount();
+    void action();
+    void mtx_set();
+    void cc_set();
+    int execute();
+    int _delete();
+    int CreateHeap();
+    int create();
 
     bool isBattleOn() { return mIsBattleOn; }
     bool isAttackStart() { return mIsAttackStart; }
@@ -92,25 +92,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daE_GI_c) == 0x107c);
-
-class daE_GI_HIO_c : public JORReflexible {
-public:
-    /* 806CD48C */ daE_GI_HIO_c();
-    /* 806D098C */ virtual ~daE_GI_HIO_c() {}
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ s8 id;
-    /* 0x08 */ f32 model_size;
-    /* 0x0C */ f32 move_speed;
-    /* 0x10 */ f32 player_detect_range;
-    /* 0x14 */ f32 player_attack_range;
-    /* 0x18 */ f32 attack_angle;
-    /* 0x1C */ f32 link_stun_time;
-    /* 0x20 */ f32 wolf_stun_time;
-    /* 0x24 */ f32 scream_prevention_time;
-    /* 0x28 */ f32 lever_spin_time;
-};
-
 
 #endif /* D_A_E_GI_H */

@@ -23,7 +23,7 @@ struct g_himo_s {
 
 class b_gnd_class : public fopEn_enemy_c {
 public:
-    /* 80601960 */ b_gnd_class();
+    b_gnd_class();
 
     bool checkAttackChance() { return field_0x2740 != 0; }
     bool checkPiyo() { return field_0x1e08 != 0; }
@@ -191,20 +191,5 @@ public:
 };
 
 STATIC_ASSERT(sizeof(b_gnd_class) == 0x2790);
-
-class daB_GND_HIO_c : public JORReflexible {
-public:
-    /* 805F4A4C */ daB_GND_HIO_c();
-    /* 80602230 */ virtual ~daB_GND_HIO_c() {}
-
-    void genMessage(JORMContext*);
-
-    /* 0x04 */ s8 no;
-    /* 0x08 */ f32 model_size;
-    /* 0x0C */ f32 field_0xc;
-    /* 0x10 */ f32 field_0x10;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-};
 
 #endif /* D_A_B_GND_H */

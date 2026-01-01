@@ -20,52 +20,52 @@ class msg_class;
  */
 class daB_YO_c : public fopEn_enemy_c {
 public:
-    /* 8062F51C */ int draw();
-    /* 8062FBEC */ void onIceBreak(u16);
-    /* 8062FC08 */ void setBck(int, u8, f32, f32);
-    /* 8062FE0C */ void setActionMode(int, int);
-    /* 8062FE18 */ void damage_check();
-    /* 806300F4 */ void setBreakFrizad();
-    /* 8063022C */ void setIcicleOperate(int);
-    /* 806302B4 */ void setIcicleSubNumber();
-    /* 80630330 */ void setWindowBreakEffect(int);
-    /* 8063040C */ void setHensinEffect();
-    /* 806305B8 */ void setLandingEffect(f32);
-    /* 806306F0 */ void setBreakIceEffect();
-    /* 8063089C */ void setWallHitEffect();
-    /* 80630A9C */ void setChillEffect();
-    /* 80630BF0 */ void setApperEffect();
-    /* 80630CA0 */ void setApperEffect2();
-    /* 80630DD8 */ void demo_skip(int);
-    /* 80630E3C */ static int DemoSkipCallBack(void*, int);
-    /* 80630E70 */ void setYoMessage(int);
-    /* 80630EAC */ int doYoMessage();
-    /* 80630F28 */ void executeOpening();
-    /* 80632598 */ void reflectFreeMove();
-    /* 80632660 */ void calcFreeMove(f32);
-    /* 8063290C */ void setReflectAngle();
-    /* 806329CC */ void executeChase();
-    /* 806331CC */ void executeSeriousDemo();
-    /* 80633EDC */ u8 checkIcecleRevival();
-    /* 80633F50 */ void createIcecleRevival(u8);
-    /* 80634040 */ void executeJump();
-    /* 80634548 */ void executeAttackIce();
-    /* 8063476C */ void executeAttackYose();
-    /* 80634CEC */ void checkDamageWithIceBreak();
-    /* 80634E04 */ void executeAttackBody();
-    /* 806352C8 */ void executeDemoRevival();
-    /* 80635798 */ void executeDamage();
-    /* 80635ABC */ void executeDeath();
-    /* 80636E9C */ void reviseIceCenterPos(cXyz*);
-    /* 80637048 */ void calcPlayerBufPos();
-    /* 806374BC */ void action();
-    /* 80637990 */ void mtx_set();
-    /* 80637B30 */ void cc_set();
-    /* 80637E10 */ int execute();
-    /* 80637FC8 */ int _delete();
-    /* 806380F8 */ int CreateHeap();
-    /* 806388A0 */ int CreateHeap2();
-    /* 806389C0 */ cPhs__Step create();
+    int draw();
+    void onIceBreak(u16);
+    void setBck(int, u8, f32, f32);
+    void setActionMode(int, int);
+    void damage_check();
+    void setBreakFrizad();
+    void setIcicleOperate(int);
+    void setIcicleSubNumber();
+    void setWindowBreakEffect(int);
+    void setHensinEffect();
+    void setLandingEffect(f32);
+    void setBreakIceEffect();
+    void setWallHitEffect();
+    void setChillEffect();
+    void setApperEffect();
+    void setApperEffect2();
+    void demo_skip(int);
+    static int DemoSkipCallBack(void*, int);
+    void setYoMessage(int);
+    int doYoMessage();
+    void executeOpening();
+    void reflectFreeMove();
+    void calcFreeMove(f32);
+    void setReflectAngle();
+    void executeChase();
+    void executeSeriousDemo();
+    u8 checkIcecleRevival();
+    void createIcecleRevival(u8);
+    void executeJump();
+    void executeAttackIce();
+    void executeAttackYose();
+    void checkDamageWithIceBreak();
+    void executeAttackBody();
+    void executeDemoRevival();
+    void executeDamage();
+    void executeDeath();
+    void reviseIceCenterPos(cXyz*);
+    void calcPlayerBufPos();
+    void action();
+    void mtx_set();
+    void cc_set();
+    int execute();
+    int _delete();
+    int CreateHeap();
+    int CreateHeap2();
+    cPhs__Step create();
 
     u8 getModelNo() { return mModelNo; }
     s16 getFrizadRollAngle() { return mIceAngle; }
@@ -77,6 +77,8 @@ public:
     f32 getPlayerXBuf(int param_0) { return mPlayerXBuf[param_0]; }
     f32 getPlayerZBuf(int param_0) { return mPlayerZBuf[param_0]; }
     void onIceStatus(u16 i_no) { mIceStatus |= (1 << i_no); }
+    void setDrawOff() { mIsInactive = 1; }
+    bool isEnemyDemoEnd() { return (u8)mIsEnemyDemoEnd != 0; }
 
 private:
     /* 0x05AC */ request_of_phase_process_class mPhase1;
@@ -169,7 +171,7 @@ private:
     /* 0x0FCF */ u8 mIsInactive2;
     /* 0x0FD0 */ bool mReverted;
     /* 0x0FD1 */ bool field_0xfd1;
-    /* 0x0FD2 */ bool unk_FD2;
+    /* 0x0FD2 */ bool mIsEnemyDemoEnd;
     /* 0x0FD4 */ s32 mWarpHoleID;
     /* 0x0FD8 */ int mMsgIdx;
     /* 0x0FDC */ u32 mMsgPcID;
@@ -230,29 +232,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daB_YO_c) == 0x1B88);
-
-class daB_YO_HIO_c {
-public:
-    /* 8062F46C */ daB_YO_HIO_c();
-    /* 806395E4 */ virtual ~daB_YO_HIO_c() {}
-
-    /* 0x04 */ s8 field_0x4;
-    /* 0x08 */ f32 mScale[8];
-    /* 0x28 */ f32 mFreezardNum;
-    /* 0x2C */ f32 mMaxFallSpeed;
-    /* 0x30 */ f32 mReboundSpeedRatio;
-    /* 0x34 */ f32 mChaseSpeed;
-    /* 0x38 */ f32 mReboundSpeedMax;
-    /* 0x3C */ bool field_0x3c;
-    /* 0x40 */ f32 mGatherTimer;
-    /* 0x44 */ f32 mAttackTimer;
-    /* 0x48 */ f32 mFreezardRadius;
-    /* 0x4C */ f32 field_0x4c;
-    /* 0x50 */ f32 field_0x50;
-    /* 0x54 */ bool field_0x54;
-    /* 0x58 */ f32 field_0x58;
-};
-
-STATIC_ASSERT(sizeof(daB_YO_HIO_c) == 0x5C);
 
 #endif /* D_A_B_YO_H */

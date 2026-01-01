@@ -3,6 +3,8 @@
  * Object - Frozen Zora
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_zra_freeze.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
@@ -10,13 +12,10 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
 
-/* 80D44BC4-80D44BC8 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "zrF";
 
-/* 80D44B48-80D44B50 000000 0008+00 3/3 0/0 0/0 .rodata          l_DATA */
 static f32 const l_DATA[2] = { 800.0f, 0.0f };
 
-/* 80D440B8-80D44124 000078 006C+00 2/2 0/0 0/0 .text            setBaseMtx__13daZraFreeze_cFv */
 void daZraFreeze_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos.x, current.pos.y, current.pos.z);
     mDoMtx_stack_c::XYZrotM(shape_angle);
@@ -24,8 +23,6 @@ void daZraFreeze_c::setBaseMtx() {
     PSMTXCopy(mDoMtx_stack_c::get(), mMtx);
 }
 
-/* 80D44124-80D4429C 0000E4 0178+00 1/1 0/0 0/0 .text            chkActorInScreen__13daZraFreeze_cFv
- */
 BOOL daZraFreeze_c::chkActorInScreen() {
     cXyz proj;
     cXyz vec[8];
@@ -42,7 +39,7 @@ BOOL daZraFreeze_c::chkActorInScreen() {
     PSMTXMultVecArray(mDoMtx_stack_c::get(), vec, vec, 8);
     for (int i = 0; i < 8; i++) {
         mDoLib_project(&vec[i], &proj);
-        if (0.0f < proj.x && proj.x < 608.0f && 0.0f < proj.y && proj.y < 448.0f) {
+        if (0.0f < proj.x && proj.x < FB_WIDTH && 0.0f < proj.y && proj.y < FB_HEIGHT) {
             continue;
         }
         return false;
@@ -50,14 +47,12 @@ BOOL daZraFreeze_c::chkActorInScreen() {
     return true;
 }
 
-/* 80D4429C-80D442BC 00025C 0020+00 1/1 0/0 0/0 .text            createSolidHeap__FP10fopAc_ac_c */
 static int createSolidHeap(fopAc_ac_c* i_this) {
     return static_cast<daZraFreeze_c*>(i_this)->CreateHeap();
 }
 
-/* 80D442BC-80D4443C 00027C 0180+00 1/1 0/0 0/0 .text            Create__13daZraFreeze_cFv */
 cPhs__Step daZraFreeze_c::Create() {
-    fopAcM_SetupActor(this, daZraFreeze_c);
+    fopAcM_ct(this, daZraFreeze_c);
     field_0x5b0 = (fopAcM_GetParam(this) >> 8) & 0xff;
     field_0x5b1 = (fopAcM_GetParam(this) >> 0x10) & 0xff;
     field_0x5b2 = (fopAcM_GetParam(this) >> 0x18) & 0xff;
@@ -84,14 +79,13 @@ cPhs__Step daZraFreeze_c::Create() {
     return step;
 }
 
-/* 80D4443C-80D444C0 0003FC 0084+00 1/1 0/0 0/0 .text            CreateHeap__13daZraFreeze_cFv */
 int daZraFreeze_c::CreateHeap() {
     static char* l_bmdName[3] = {
         "zrA_a_TW.bmd",
         "zrA_pain_TW.bmd",
         "zrA_sol_TW.bmd",
     };
-    J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdName[subtype]);
+    J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_bmdName[argument]);
     mpModel = mDoExt_J3DModel__create(model_data, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return 0;
@@ -99,8 +93,6 @@ int daZraFreeze_c::CreateHeap() {
     return 1;
 }
 
-/* 80D444C0-80D44698 000480 01D8+00 1/1 0/0 0/0 .text            setHitodamaPrtcl__13daZraFreeze_cFv
- */
 void daZraFreeze_c::setHitodamaPrtcl() {
     cXyz pos = current.pos;
     field_0x5dc = (u16)(field_0x5de << 1);
@@ -124,7 +116,6 @@ void daZraFreeze_c::setHitodamaPrtcl() {
     }
 }
 
-/* 80D44698-80D449E0 000658 0348+00 1/1 0/0 0/0 .text            Execute__13daZraFreeze_cFv */
 int daZraFreeze_c::Execute() {
     if (field_0x5b0 == 0xff || dComIfGs_isSwitch(field_0x5b0, fopAcM_GetRoomNo(this))) {
         setBaseMtx();
@@ -164,7 +155,6 @@ int daZraFreeze_c::Execute() {
     return 1;
 }
 
-/* 80D449E0-80D44A84 0009A0 00A4+00 1/1 0/0 0/0 .text            Draw__13daZraFreeze_cFv */
 int daZraFreeze_c::Draw() {
     if (field_0x5b0 == 0xff || dComIfGs_isSwitch(field_0x5b0, fopAcM_GetRoomNo(this))) {
         if (mTwilight != 0 && dComIfGs_wolfeye_effect_check() == true) {
@@ -176,41 +166,31 @@ int daZraFreeze_c::Draw() {
     return 1;
 }
 
-/* 80D44A84-80D44AB8 000A44 0034+00 1/1 0/0 0/0 .text            Delete__13daZraFreeze_cFv */
 int daZraFreeze_c::Delete() {
     dComIfG_resDelete(&mPhaseReq, l_arcName);
     return 1;
 }
 
-/* 80D44AB8-80D44AD8 000A78 0020+00 1/0 0/0 0/0 .text            daZraFreeze_Draw__FP13daZraFreeze_c
- */
 static int daZraFreeze_Draw(daZraFreeze_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80D44AD8-80D44AF8 000A98 0020+00 1/0 0/0 0/0 .text daZraFreeze_Execute__FP13daZraFreeze_c */
 static int daZraFreeze_Execute(daZraFreeze_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80D44AF8-80D44B00 000AB8 0008+00 1/0 0/0 0/0 .text daZraFreeze_IsDelete__FP13daZraFreeze_c */
 static int daZraFreeze_IsDelete(daZraFreeze_c* i_this) {
     return 1;
 }
 
-/* 80D44B00-80D44B20 000AC0 0020+00 1/0 0/0 0/0 .text daZraFreeze_Delete__FP13daZraFreeze_c */
 static int daZraFreeze_Delete(daZraFreeze_c* i_this) {
     return i_this->Delete();
 }
 
-/* 80D44B20-80D44B40 000AE0 0020+00 1/0 0/0 0/0 .text            daZraFreeze_create__FP10fopAc_ac_c
- */
 static cPhs__Step daZraFreeze_create(fopAc_ac_c* i_this) {
     return static_cast<daZraFreeze_c*>(i_this)->Create();
 }
 
-/* ############################################################################################## */
-/* 80D44BD4-80D44BF4 -00001 0020+00 1/0 0/0 0/0 .data            l_daZraFreeze_Method */
 static actor_method_class l_daZraFreeze_Method = {
     (process_method_func)daZraFreeze_create,
     (process_method_func)daZraFreeze_Delete,
@@ -219,7 +199,6 @@ static actor_method_class l_daZraFreeze_Method = {
     (process_method_func)daZraFreeze_Draw,
 };
 
-/* 80D44BF4-80D44C24 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_ZRAFREEZE */
 extern actor_process_profile_definition g_profile_OBJ_ZRAFREEZE = {
     fpcLy_CURRENT_e,
     7,

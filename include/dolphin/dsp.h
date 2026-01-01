@@ -1,6 +1,9 @@
 #ifndef _DOLPHIN_DSP_H_
 #define _DOLPHIN_DSP_H_
 
+#ifdef __REVOLUTION_SDK__
+#include <revolution/dsp.h>
+#else
 #include <dolphin/os.h>
 
 #ifdef __cplusplus
@@ -44,7 +47,7 @@ void DSPReset(void);
 void DSPHalt(void);
 void DSPUnhalt(void);
 u32 DSPGetDMAStatus(void);
-__declspec(weak) DSPTaskInfo* DSPAddTask(DSPTaskInfo* task);
+DECL_WEAK DSPTaskInfo* DSPAddTask(DSPTaskInfo* task);
 DSPTaskInfo* DSPCancelTask(DSPTaskInfo* task);
 DSPTaskInfo* DSPAssertTask(DSPTaskInfo* task);
 
@@ -54,4 +57,5 @@ DSPTaskInfo* __DSPGetCurrentTask(void);
 }
 #endif
 
+#endif
 #endif

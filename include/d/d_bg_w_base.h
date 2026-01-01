@@ -41,12 +41,12 @@ public:
     typedef fopAc_ac_c* (*PushPull_CallBack)(fopAc_ac_c*, fopAc_ac_c*, s16,
                                      dBgW_Base::PushPullLabel);
 
-    /* 8007E5A8 */ dBgW_Base();
-    /* 8007E69C */ void ClrDBgWBase();
-    /* 8007E6E0 */ void CalcDiffShapeAngleY(s16);
+    dBgW_Base();
+    void ClrDBgWBase();
+    void CalcDiffShapeAngleY(s16);
 
-    /* 8007E640 */ virtual ~dBgW_Base();
-    /* 8007E6D0 */ virtual bool ChkMemoryError();
+    virtual ~dBgW_Base();
+    virtual bool ChkMemoryError();
     virtual bool ChkNotReady() const = 0;
     virtual bool ChkLock() const = 0;
     virtual bool ChkMoveBg() const = 0;
@@ -57,7 +57,7 @@ public:
     virtual u32 GetGrpInf(cBgS_PolyInfo const&) const = 0;
     virtual void OffMoveFlag() = 0;
     virtual void GetTopUnder(f32*, f32*) const = 0;
-    /* 80074AB4 */ virtual void SetOldShapeAngleY(s16);
+    virtual void SetOldShapeAngleY(s16);
     virtual bool LineCheck(cBgS_LinChk*) = 0;
     virtual bool GroundCross(cBgS_GndChk*) = 0;
     virtual void ShdwDraw(cBgS_ShdwDraw*) = 0;
@@ -67,9 +67,9 @@ public:
     virtual bool RoofChk(dBgS_RoofChk*) = 0;
     virtual bool SplGrpChk(dBgS_SplGrpChk*) = 0;
     virtual bool SphChk(dBgS_SphChk*, void*) = 0;
-    virtual s32 GetGrpRoomIndex(cBgS_PolyInfo const&) const = 0;
-    virtual s32 GetExitId(cBgS_PolyInfo const&) = 0;
-    virtual s32 GetPolyColor(cBgS_PolyInfo const&) = 0;
+    virtual int GetGrpRoomIndex(cBgS_PolyInfo const&) const = 0;
+    virtual int GetExitId(cBgS_PolyInfo const&) = 0;
+    virtual int GetPolyColor(cBgS_PolyInfo const&) = 0;
     virtual BOOL GetHorseNoEntry(cBgS_PolyInfo const&) = 0;
     virtual int GetSpecialCode(cBgS_PolyInfo const&) = 0;
     virtual int GetSpecialCode(int) = 0;
@@ -86,23 +86,23 @@ public:
     virtual u32 GetUnderwaterRoofCode(int) = 0;
     virtual int GetMonkeyBarsCode(cBgS_PolyInfo const&) = 0;
     virtual int GetLinkNo(cBgS_PolyInfo const&) = 0;
-    virtual s32 GetWallCode(cBgS_PolyInfo const&) = 0;
+    virtual int GetWallCode(cBgS_PolyInfo const&) = 0;
     virtual int GetPolyAtt0(cBgS_PolyInfo const&) = 0;
     virtual int GetPolyAtt1(cBgS_PolyInfo const&) = 0;
     virtual int GetGroundCode(cBgS_PolyInfo const&) = 0;
     virtual u32 GetIronBallThrough(int) = 0;
     virtual u32 GetAttackThrough(int) = 0;
-    virtual s32 GetCamMoveBG(cBgS_PolyInfo const&) = 0;
-    virtual s32 GetRoomCamId(cBgS_PolyInfo const&) = 0;
-    virtual s32 GetRoomPathId(cBgS_PolyInfo const&) = 0;
-    virtual s32 GetRoomPathPntNo(cBgS_PolyInfo const&) = 0;
+    virtual int GetCamMoveBG(cBgS_PolyInfo const&) = 0;
+    virtual int GetRoomCamId(cBgS_PolyInfo const&) = 0;
+    virtual int GetRoomPathId(cBgS_PolyInfo const&) = 0;
+    virtual int GetRoomPathPntNo(cBgS_PolyInfo const&) = 0;
     virtual u8 GetPolyGrpRoomInfId(cBgS_PolyInfo const&) = 0;
     virtual int GetGrpSoundId(cBgS_PolyInfo const&) = 0;
     virtual void CrrPos(cBgS_PolyInfo const&, void*, bool, cXyz*, csXyz*, csXyz*) = 0;
     virtual void TransPos(cBgS_PolyInfo const&, void*, bool, cXyz*, csXyz*, csXyz*) = 0;
     virtual void MatrixCrrPos(cBgS_PolyInfo const&, void*, bool, cXyz*, csXyz*, csXyz*) = 0;
-    /* 8007E6D8 */ virtual void CallRideCallBack(fopAc_ac_c*, fopAc_ac_c*);
-    /* 8007E6DC */ virtual void CallArrowStickCallBack(fopAc_ac_c*, fopAc_ac_c*, cXyz&);
+    virtual void CallRideCallBack(fopAc_ac_c*, fopAc_ac_c*);
+    virtual void CallArrowStickCallBack(fopAc_ac_c*, fopAc_ac_c*, cXyz&);
 
     PushPull_CallBack GetPushPullCallback() const { return m_pushPull_Callback; }
     s16 GetDiffShapeAngleY() { return m_diff_ShapeAngleY; }

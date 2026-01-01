@@ -3,6 +3,8 @@
  * UI Mini-Game Text
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_meter_string.h"
 #include "JSystem/J2DGraph/J2DAnmLoader.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
@@ -15,7 +17,6 @@
 #include "d/d_meter_HIO.h"
 #include "d/d_pane_class.h"
 
-/* 8020ED60-8020EDF4 2096A0 0094+00 0/0 1/1 0/0 .text            __ct__14dMeterString_cFi */
 dMeterString_c::dMeterString_c(int i_stringID) {
     mpMapArchive = dComIfGp_getAllMapArchive();
     field_0x28 = 0;
@@ -27,12 +28,10 @@ dMeterString_c::dMeterString_c(int i_stringID) {
     }
 }
 
-/* 8020EDF4-8020EE70 209734 007C+00 1/0 0/0 0/0 .text            __dt__14dMeterString_cFv */
 dMeterString_c::~dMeterString_c() {
     _delete();
 }
 
-/* 8020EE70-8020F150 2097B0 02E0+00 1/0 0/0 0/0 .text            _create__14dMeterString_cFv */
 int dMeterString_c::_create() {
     if (mpMapArchive == NULL) {
         if (field_0x28 == 0) {
@@ -48,7 +47,7 @@ int dMeterString_c::_create() {
     }
 
     mpScreen = new J2DScreen();
-    JUT_ASSERT(0, mpScreen != 0);
+    JUT_ASSERT(0, mpScreen != NULL);
 
     bool fg = mpScreen->setPriority("zelda_game_image_cow_get_in.blo", 0x20000, mpMapArchive);
     JUT_ASSERT(0, fg != false);
@@ -59,13 +58,13 @@ int dMeterString_c::_create() {
         JKRGetNameResource("zelda_game_image_cow_get_in.bck", mpMapArchive));
 
     mpParentPane = new CPaneMgr(mpScreen, 'get_in_n', 2, NULL);
-    JUT_ASSERT(0, mpParentPane != 0);
+    JUT_ASSERT(0, mpParentPane != NULL);
 
     mpRootPane = new CPaneMgr(mpScreen, 'n_all', 0, NULL);
-    JUT_ASSERT(0, mpRootPane != 0);
+    JUT_ASSERT(0, mpRootPane != NULL);
 
     mpTextPane = new CPaneMgr(mpScreen, 'get_in', 0, NULL);
-    JUT_ASSERT(0, mpTextPane != 0);
+    JUT_ASSERT(0, mpTextPane != NULL);
 
     static_cast<J2DTextBox*>(mpScreen->search('get_in_s'))->setFont(mDoExt_getMesgFont());
     static_cast<J2DTextBox*>(mpScreen->search('get_in'))->setFont(mDoExt_getMesgFont());
@@ -82,7 +81,6 @@ int dMeterString_c::_create() {
     return cPhs_COMPLEATE_e;
 }
 
-/* 8020F150-8020F1B0 209A90 0060+00 1/0 0/0 0/0 .text            _execute__14dMeterString_cFUl */
 int dMeterString_c::_execute(u32 unused) {
     if (mpMapArchive == NULL) {
         _create();
@@ -95,7 +93,6 @@ int dMeterString_c::_execute(u32 unused) {
     return 1;
 }
 
-/* 8020F1B0-8020F49C 209AF0 02EC+00 1/0 0/0 0/0 .text            draw__14dMeterString_cFv */
 void dMeterString_c::draw() {
     if (mpMapArchive != NULL && !dComIfGp_isPauseFlag()) {
         J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();
@@ -142,7 +139,6 @@ void dMeterString_c::draw() {
     }
 }
 
-/* 8020F49C-8020F5A4 209DDC 0108+00 1/0 0/0 0/0 .text            _delete__14dMeterString_cFv */
 int dMeterString_c::_delete() {
     delete mpScreen;
     mpScreen = NULL;
@@ -166,7 +162,6 @@ int dMeterString_c::_delete() {
     return 1;
 }
 
-/* 8020F5A4-8020F66C 209EE4 00C8+00 2/2 1/1 0/0 .text            createString__14dMeterString_cFi */
 int dMeterString_c::createString(int i_stringID) {
     char str_buf[32];
     dMeter2Info_getString(i_stringID, str_buf, NULL);
@@ -181,7 +176,6 @@ int dMeterString_c::createString(int i_stringID) {
     return 1;
 }
 
-/* 8020F66C-8020F6EC 209FAC 0080+00 2/2 0/0 0/0 .text playBckAnimation__14dMeterString_cFf */
 void dMeterString_c::playBckAnimation(f32 i_frame) {
     mpParentPane->getPanePtr()->setAnimation(mpGetInBck);
     mpGetInBck->setFrame(i_frame);
@@ -189,7 +183,6 @@ void dMeterString_c::playBckAnimation(f32 i_frame) {
     mpParentPane->getPanePtr()->setAnimation((J2DAnmTransform*)NULL);
 }
 
-/* 8020F6EC-8020FA88 20A02C 039C+00 1/1 0/0 0/0 .text            drawPikari__14dMeterString_cFv */
 void dMeterString_c::drawPikari() {
     f32 anim_frame = mPikariAnimFrame;
     Vec center = mpTextPane->getGlobalVtxCenter(false, 0);
@@ -260,7 +253,6 @@ void dMeterString_c::drawPikari() {
     mPikariAnimFrame = frame;
 }
 
-/* 8020FA88-8020FAB4 20A3C8 002C+00 1/1 0/0 0/0 .text            isLeadByte__14dMeterString_cFi */
 bool dMeterString_c::isLeadByte(int c) {
     return (c >= 0x81 && c <= 0x9F) || (c >= 0xE0 && c <= 0xFC);
 }

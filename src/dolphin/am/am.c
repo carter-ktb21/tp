@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/am.h>
 
 #include "__am.h"
@@ -130,7 +130,7 @@ u32 AMPush(char* path) {
         OSFree(buffer);
         return ret_val;
     } else {
-#ifdef DEBUG
+#if DEBUG
         OSReport("AMPush(): WARNING: File has zero length.\n");
 #endif
         return 0;
@@ -234,13 +234,13 @@ u32 __AMPushBuffered(char* path, void* buffer, u32 buffer_size, AMCallback callb
                 }
             }
         } else {
-#ifdef DEBUG
+#if DEBUG
             OSReport("AMPushBuffered(): WARNING: Not enough space in ARAM.\n");
 #endif
             return 0;
         }
     } else {
-#ifdef DEBUG
+#if DEBUG
         OSReport("AMPushBuffered(): WARNING: Stack table is full.\n");
 #endif
         return 0;

@@ -2,44 +2,106 @@
 #define D_METER_D_METER_MAP_H
 
 #include "d/d_map_path_dmap.h"
+#include "JSystem/JHostIO/JORReflexible.h"
 
 class J2DPicture;
 class dMap_c;
+class dMap_HIO_c;
+
+class dMeter_map_HIO_c : public JORReflexible {
+public:
+    dMeter_map_HIO_c();
+    virtual void listenPropertyEvent(const JORPropertyEvent*);
+    virtual void genMessage(JORMContext*);
+    virtual ~dMeter_map_HIO_c() {
+        mMySelfPointer = NULL;
+        mAreaMap = NULL;
+        field_0x38 = 0;
+    }
+
+    void update();
+
+    static dMeter_map_HIO_c* mMySelfPointer;
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x05 */ u8 mDebugMapExpansion;
+    /* 0x06 */ u8 mMapDisplayLocation;
+    /* 0x08 */ s16 mWideBottomLeftX;
+    /* 0x0A */ s16 mWideY;
+    /* 0x0C */ s16 mNormalBottomLeftX;
+    /* 0x0E */ s16 mNormalY;
+    /* 0x10 */ s16 mGcBottomLeftX;
+    /* 0x12 */ s16 mGcY;
+    /* 0x14 */ s16 mHiddenRightX;
+    /* 0x16 */ u8 field_0x16;
+    /* 0x17 */ u8 mSizeTypeChange;
+    /* 0x18 */ s16 field_0x18;
+    /* 0x1A */ s16 mMediumHorizontal;
+    /* 0x1C */ s16 mMediumVertical;
+    /* 0x1E */ s16 mBigHorizontal;
+    /* 0x20 */ s16 mBigVertical;
+    /* 0x22 */ s16 mSmallHorizontal;
+    /* 0x24 */ s16 mSmallVertical;
+    /* 0x26 */ u8 mMapDisplaySize;
+    /* 0x28 */ s16 field_0x28;
+    /* 0x2A */ s16 field_0x2a;
+    /* 0x2C */ u8 mMapAlphaTest;
+    /* 0x2D */ u8 mAlpha;
+    /* 0x2E */ u8 mTextureResolutionHalved;
+    /* 0x2F */ u8 mForcedMapTopEdgeChange;
+    /* 0x30 */ s16 field_0x30;
+    /* 0x32 */ u8 mMapDisplayProhibited;
+    /* 0x33 */ u8 mMapRenderingProhibited;
+    /* 0x34 */ dMap_HIO_c* mAreaMap;
+    /* 0x38 */ int field_0x38;
+};
+
 class dMeterMap_c : public dDlst_base_c {
 public:
-    /* 8020D49C */ static bool isEnableDispMap();
-    /* 8020D528 */ static int getMapDispSizeTypeNo();
-    /* 8020D650 */ static bool isEnableDispMapAndMapDispSizeTypeNo();
-    /* 8020D690 */ f32 getMapDispEdgeBottomY_Layout();
-    /* 8020D698 */ bool isEventRunCheck();
-    /* 8020D72C */ f32 getMapDispEdgeLeftX_Layout();
-    /* 8020D75C */ f32 getMapDispEdgeTop();
-    /* 8020D7E4 */ s16 getDispPosInside_OffsetX();
-    /* 8020D7EC */ s16 getDispPosOutSide_OffsetX();
-    /* 8020D874 */ void setDispPosInsideFlg_SE_On();
-    /* 8020D8BC */ void setDispPosOutsideFlg_SE_On();
-    /* 8020D8F8 */ void setMapAlpha(u8);
-    /* 8020D900 */ static bool isMapOpenCheck();
-    /* 8020D948 */ dMeterMap_c(J2DScreen*);
-    /* 8020D9EC */ void _create(J2DScreen*);
-    /* 8020DC50 */ void _delete();
-    /* 8020DCE4 */ void _move(u32);
-    /* 8020DF1C */ void _draw();
-    /* 8020E070 */ void ctrlShowMap();
-    /* 8020E45C */ u8 checkMoveStatus();
-    /* 8020E4C8 */ static bool isShow(u32);
-    /* 8020E620 */ static bool isFmapScreen();
-    /* 8020E70C */ static bool isDmapScreen();
-    /* 8020E754 */ static void meter_map_move(u32);
-    /* 8020E9CC */ void keyCheck();
+    static bool isEnableDispMap();
+    static int getMapDispSizeTypeNo();
+    static bool isEnableDispMapAndMapDispSizeTypeNo();
+    f32 getMapDispEdgeBottomY_Layout();
+    bool isEventRunCheck();
+    f32 getMapDispEdgeLeftX_Layout();
+    f32 getMapDispEdgeTop();
+    s16 getDispPosInside_OffsetX();
+    s16 getDispPosOutSide_OffsetX();
+    void setDispPosInsideFlg_SE_On();
+    void setDispPosOutsideFlg_SE_On();
+    void setMapAlpha(u8);
+    static bool isMapOpenCheck();
+    dMeterMap_c(J2DScreen*);
+    void _create(J2DScreen*);
+    void setDispPosOutSide();
+    void setDispPosInSide();
+    void _delete();
+    void _move(u32);
+    void _draw();
+    void ctrlShowMap();
+    u8 checkMoveStatus();
+    static bool isShow(u32);
+    static bool isFmapScreen();
+    static bool isDmapScreen();
+    static void meter_map_move(u32);
+    void keyCheck();
 
-    /* 8020DF68 */ virtual void draw();
-    /* 8020D990 */ virtual ~dMeterMap_c();
+    virtual void draw();
+    virtual ~dMeterMap_c();
 
     bool isDispPosInsideFlg() { return field_0x2d != 0; }
+    dMeterMap_c* getMapPointer() { return (dMeterMap_c*)mMap; }
+    void setSizeW(f32 w) { mSizeW = w; }
+    void setSizeH(f32 h) { mSizeH = h; }
 
-    enum { MAP_SIZE_TYPE_BIG = 2, MAP_SIZE_TYPE_SMALL = 3, MAP_SIZE_TYPE_STAGE = 7 };
+    enum { MAP_SIZE_TYPE_BIG = 2, MAP_SIZE_TYPE_SMALL = 3, MAP_SIZE_TYPE_MEDIUM = 4, MAP_SIZE_TYPE_STAGE = 7 };
 
+    static dMeterMap_c* mMySelfPointer;
+
+#if DEBUG
+    /* 0x04 */ u8 field_0x4_debug;
+    /* 0x08 */ int field_0x8_debug;
+#endif
 private:
     /* 0x04 */ J2DPicture* mMapJ2DPicture;
     /* 0x08 */ dMap_c* mMap;

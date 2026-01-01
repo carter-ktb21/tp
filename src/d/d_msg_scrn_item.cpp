@@ -2,6 +2,8 @@
 // Item Message Screen
 //
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_msg_scrn_item.h"
 #include "d/d_msg_scrn_light.h"
 #include "d/d_msg_scrn_arrow.h"
@@ -21,7 +23,6 @@
 #include "JSystem/JKernel/JKRExpHeap.h"
 #include "JSystem/JUtility/JUTTexture.h"
 
-/* 8023E79C-8023F51C 2390DC 0D80+00 0/0 1/1 0/0 .text __ct__14dMsgScrnItem_cFUcUcP10JKRExpHeap */
 dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
     if (param_3 != NULL) {
         field_0x138 = param_3;
@@ -33,7 +34,7 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
     int iVar6 = dMsgObject_getMessageID();
     bool bVar5 = false;
 
-    #ifdef DEBUG
+    #if DEBUG
     if (dMsgObject_getMessageID() >= 0x10cc && dMsgObject_getMessageID() < 0x11cc) {
         mItemIndex = dMsgObject_getMessageID() - 0x10cc;
         bVar5 = true;
@@ -76,7 +77,7 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
         mpItemPane[i] = 0;
         field_0x0e0[i] = 0;
         mpItemTex[i] = field_0x138->alloc(0xc00, 0x20);
-        JUT_ASSERT(100, mpItemTex[i] != 0);
+        JUT_ASSERT(100, mpItemTex[i] != NULL);
     }
     int uStack_60 = 0xffffffff;
     if (mItemIndex == 0x46 || mItemIndex == 0x4c) {
@@ -108,7 +109,7 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
         JKRReadIdxResource(mpItemTex[0], 0xc00, 0x3d, dComIfGp_getItemIconArchive());
         field_0x0e0[0] = (ResTIMG*)mpItemTex[0];
         mpItemPane[0] = new J2DPicture(field_0x0e0[0]);
-        JUT_ASSERT(148, mpItemPane[0] != 0);
+        JUT_ASSERT(148, mpItemPane[0] != NULL);
     } else {
         int texNum =
             dMeter2Info_readItemTexture(mItemIndex, mpItemTex[0], (J2DPicture*)NULL, mpItemTex[1],
@@ -116,24 +117,24 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
         for (int i = 0; i < texNum; i++) {
             field_0x0e0[i] = (ResTIMG*)mpItemTex[i];
             mpItemPane[i] = new J2DPicture(field_0x0e0[i]);
-            JUT_ASSERT(165, mpItemPane[i] != 0);
+            JUT_ASSERT(165, mpItemPane[i] != NULL);
         }
         dMeter2Info_setItemColor(
             mItemIndex, mpItemPane[0], mpItemPane[1],
             mpItemPane[2], NULL);
-        #ifdef DEBUG
+        #if DEBUG
         if (mItemIndex == 0x81 || mItemIndex == 0x23) {
             field_0x19e = true;
         }
         #endif
     }
     mpScreen = new J2DScreen();
-    JUT_ASSERT(188, mpScreen != 0);
+    JUT_ASSERT(188, mpScreen != NULL);
     bool fg = mpScreen->setPriority("zelda_item_get_window.blo", 0x1020000, dComIfGp_getMsgArchive(3));
     JUT_ASSERT(195, fg != false);
     dPaneClass_showNullPane(mpScreen);
     mpTxScreen = new J2DScreen();
-    JUT_ASSERT(199, mpTxScreen != 0);
+    JUT_ASSERT(199, mpTxScreen != NULL);
     fg = mpTxScreen->setPriority("zelda_item_get_window_text.blo", 0x20000, dComIfGp_getMsgArchive(3));
     JUT_ASSERT(206, fg != false);
     dPaneClass_showNullPane(mpTxScreen);
@@ -156,13 +157,13 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
         }
     }
     mpArrow_c = new dMsgScrnArrow_c();
-    JUT_ASSERT(280, mpArrow_c != 0);
+    JUT_ASSERT(280, mpArrow_c != NULL);
     mpSelect_c = new dMsgScrn3Select_c();
-    JUT_ASSERT(284, mpSelect_c != 0);
+    JUT_ASSERT(284, mpSelect_c != NULL);
     mpLight_c = new dMsgScrnLight_c(3, param_2);
-    JUT_ASSERT(288, mpLight_c != 0);
+    JUT_ASSERT(288, mpLight_c != NULL);
     void* mpBuf = field_0x138->alloc(0x106a, 0x20);
-    JUT_ASSERT(291, mpBuf != 0);
+    JUT_ASSERT(291, mpBuf != NULL);
     memset(mpBuf, 0, 0x106a);
     mCharInfoPtr = (CharInfo_c*)mpBuf;
     field_0x160 = mpScreen->search('n_all')->getBounds().i.x;
@@ -174,11 +175,11 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
     }
     field_0x194 = 0.0f;
     mpArw_c = new CPaneMgr(mpScreen, 'set_ya_n', 0, NULL);
-    JUT_ASSERT(306, mpArw_c != 0);
+    JUT_ASSERT(306, mpArw_c != NULL);
     mpMg_c[0] = new CPaneMgr(mpScreen, 'mg_null', 0, NULL);
-    JUT_ASSERT(309, mpMg_c[0] != 0);
+    JUT_ASSERT(309, mpMg_c[0] != NULL);
     mpMg_c[1] = new CPaneMgr(mpTxScreen, 'mg_null', 0, NULL);
-    JUT_ASSERT(312, mpMg_c[1] != 0);
+    JUT_ASSERT(312, mpMg_c[1] != NULL);
     OSInitFastCast();
     fukiPosCalc(param_1);
     field_0x118[0] = (J2DAnmTextureSRTKey*)J2DAnmLoaderDataBase::load(JKRGetNameResource("zelda_item_get_window.btk", dComIfGp_getMsgArchive(3)));
@@ -192,17 +193,56 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
     field_0x154[1] = 0.0f;
     field_0x19d = false;
     mpPmP_c = new CPaneMgr(mpScreen, 'n_all', 3, NULL);
-    JUT_ASSERT(389, mpPmP_c != 0);
+    JUT_ASSERT(389, mpPmP_c != NULL);
+
     mpPmP_c->scale(g_MsgObject_HIO_c.mBoxItemScaleX, g_MsgObject_HIO_c.mBoxItemScaleY);
+
+#if VERSION == VERSION_GCN_JPN
+    if (dComIfGs_getOptUnk0() == 0) {
+        mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3flin', 0, NULL);
+        JUT_ASSERT(407, mpTm_c[0] != NULL);
+
+        mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3f_s', 0, NULL);
+        JUT_ASSERT(410, mpTm_c[1] != NULL);
+
+        mpTm_c[2] = new CPaneMgr(mpTxScreen, 't3f_w', 0, NULL);
+        JUT_ASSERT(413, mpTm_c[2] != NULL);
+
+        mpTmr_c[0] = new CPaneMgr(mpTxScreen, 'mg_3f', 0, NULL);
+        JUT_ASSERT(416, mpTmr_c[0] != NULL);
+
+        mpTmr_c[1] = new CPaneMgr(mpTxScreen, 'mg_3f_s', 0, NULL);
+        JUT_ASSERT(419, mpTmr_c[1] != NULL);
+
+        mpTmr_c[2] = new CPaneMgr(mpTxScreen, 'mg_3f_w', 0, NULL);
+        JUT_ASSERT(422, mpTmr_c[2] != NULL);
+
+        mpTxScreen->search('n_3line')->hide();
+        mpTxScreen->search('n_3fline')->show();
+        mpTxScreen->search('n_e4line')->hide();
+    } else {
+        mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_3line', 0, NULL);
+        JUT_ASSERT(407, mpTm_c[0] != NULL);
+        mpTm_c[1] = new CPaneMgr(mpTxScreen, 't3_s', 0, NULL);
+        JUT_ASSERT(410, mpTm_c[1] != NULL);
+        mpTm_c[2] = new CPaneMgr(mpTxScreen, 't3_w', 0, NULL);
+        JUT_ASSERT(413, mpTm_c[2] != NULL);
+        mpTxScreen->search('n_3line')->show();
+        mpTxScreen->search('n_3fline')->hide();
+        mpTxScreen->search('n_e4line')->hide();
+    }
+#else
     mpTm_c[0] = new CPaneMgr(mpTxScreen, 'mg_e4lin', 0, NULL);
-    JUT_ASSERT(407, mpTm_c[0] != 0);
+    JUT_ASSERT(407, mpTm_c[0] != NULL);
     mpTm_c[1] = new CPaneMgr(mpTxScreen, 't4_s', 0, NULL);
-    JUT_ASSERT(410, mpTm_c[1] != 0);
+    JUT_ASSERT(410, mpTm_c[1] != NULL);
     mpTm_c[2] = new CPaneMgr(mpTxScreen, 't4_w', 0, NULL);
-    JUT_ASSERT(413, mpTm_c[2] != 0);
+    JUT_ASSERT(413, mpTm_c[2] != NULL);
     mpTxScreen->search('n_3line')->hide();
     mpTxScreen->search('n_3fline')->hide();
     mpTxScreen->search('n_e4line')->show();
+#endif
+
     for (int i = 0; i < 3; i++) {
         ((J2DTextBox*)mpTm_c[i]->getPanePtr())->setFont(mDoExt_getMesgFont());
         if (mpTmr_c[i] != NULL) {
@@ -251,7 +291,6 @@ dMsgScrnItem_c::dMsgScrnItem_c(u8 param_1, u8 param_2, JKRExpHeap* param_3) {
 }
 
 
-/* 8023F51C-8023F888 239E5C 036C+00 1/0 0/0 0/0 .text            __dt__14dMsgScrnItem_cFv */
 dMsgScrnItem_c::~dMsgScrnItem_c() {
     for (int i = 0; i < 3; i++) {
         if (mpItemTex[i] != NULL) {
@@ -306,7 +345,6 @@ dMsgScrnItem_c::~dMsgScrnItem_c() {
     dComIfGp_getMsgCommonArchive()->removeResourceAll();;
 }
 
-/* 8023F888-8023FB24 23A1C8 029C+00 1/0 0/0 0/0 .text            exec__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::exec() {
     f32 dVar12 = field_0x13c;
     if (!field_0x19d) {
@@ -356,7 +394,6 @@ void dMsgScrnItem_c::exec() {
     mpMg_c[1]->scale(g_MsgObject_HIO_c.mBoxItemTextSizeX, g_MsgObject_HIO_c.mBoxItemTextSizeY);
 }
 
-/* 8023FB24-8023FF30 23A464 040C+00 1/0 0/0 0/0 .text            drawSelf__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::drawSelf() {
     J2DGrafContext* grafContext = dComIfGp_getCurrentGrafPort();
     grafContext->setup2D();
@@ -372,10 +409,14 @@ void dMsgScrnItem_c::drawSelf() {
     }
 
     f32 globalPosX = mpTm_c[0]->getGlobalPosX();
+    
+    #if WIDESCREEN_SUPPORT
     if (mDoGph_gInf_c::isWide()) {
         drawOutFont(g_MsgObject_HIO_c.mBoxItemTextPosX + 7.0f + YREG_F(2),
                     g_MsgObject_HIO_c.mBoxItemTextPosY, 1.0f);
-    } else {
+    } else
+    #endif
+    {
         drawOutFont(g_MsgObject_HIO_c.mBoxItemTextPosX - 2.0f + YREG_F(2),
                     g_MsgObject_HIO_c.mBoxItemTextPosY, 1.0f);
     }
@@ -446,68 +487,53 @@ void dMsgScrnItem_c::drawSelf() {
     }
 }
 
-/* 8023FF30-8023FF54 23A870 0024+00 1/0 0/0 0/0 .text            arwAnimeInit__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::arwAnimeInit() {
     mpArrow_c->arwAnimeInit();
 }
 
-/* 8023FF54-8023FF78 23A894 0024+00 1/0 0/0 0/0 .text            arwAnimeMove__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::arwAnimeMove() {
     mpArrow_c->arwAnimeMove();
 }
 
-/* 8023FF78-8023FF9C 23A8B8 0024+00 1/0 0/0 0/0 .text            dotAnimeInit__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::dotAnimeInit() {
     mpArrow_c->dotAnimeInit();
 }
 
-/* 8023FF9C-8023FFC0 23A8DC 0024+00 1/0 0/0 0/0 .text            dotAnimeMove__14dMsgScrnItem_cFv */
 void dMsgScrnItem_c::dotAnimeMove() {
     mpArrow_c->dotAnimeMove();
 }
 
-/* 8023FFC0-8023FFE4 23A900 0024+00 1/0 0/0 0/0 .text setSelectString__14dMsgScrnItem_cFPcPcPc */
 void dMsgScrnItem_c::setSelectString(char* param_0, char* param_1, char* param_2) {
     mpSelect_c->setString(param_0, param_1, param_2);
 }
 
-/* 8023FFE4-80240008 23A924 0024+00 1/0 0/0 0/0 .text setSelectRubyString__14dMsgScrnItem_cFPcPcPc
- */
 void dMsgScrnItem_c::setSelectRubyString(char* param_0, char* param_1, char* param_2) {
     mpSelect_c->setRubyString(param_0, param_1, param_2);
 }
 
-/* 80240008-8024002C 23A948 0024+00 1/0 0/0 0/0 .text            isSelect__14dMsgScrnItem_cFv */
 bool dMsgScrnItem_c::isSelect() {
     return mpSelect_c->isSelect();
 }
 
-/* 8024002C-8024005C 23A96C 0030+00 1/0 0/0 0/0 .text selectAnimeInit__14dMsgScrnItem_cFUcUcfUc */
 void dMsgScrnItem_c::selectAnimeInit(u8 param_0, u8 param_1, f32 param_2, u8 param_3) {
     mpSelect_c->selAnimeInit(param_0, param_1, field_0x19c, param_2, param_3);
 }
 
-/* 8024005C-80240080 23A99C 0024+00 1/0 0/0 0/0 .text selectAnimeMove__14dMsgScrnItem_cFUcUcb */
 bool dMsgScrnItem_c::selectAnimeMove(u8 param_0, u8 param_1, bool param_2) {
     return mpSelect_c->selAnimeMove(param_0, param_1, param_2);
 }
 
-/* 80240080-802400A4 23A9C0 0024+00 1/0 0/0 0/0 .text            selectAnimeEnd__14dMsgScrnItem_cFv
- */
 bool dMsgScrnItem_c::selectAnimeEnd() {
     return mpSelect_c->selAnimeEnd();
 }
 
-/* 802400A4-802400A8 23A9E4 0004+00 1/0 0/0 0/0 .text            fukiScale__14dMsgScrnItem_cFf */
 void dMsgScrnItem_c::fukiScale(f32 param_0) {
 }
 
-/* 802400A8-802400CC 23A9E8 0024+00 1/0 0/0 0/0 .text            fukiTrans__14dMsgScrnItem_cFff */
 void dMsgScrnItem_c::fukiTrans(f32 x, f32 y) {
     mpPmP_c->paneTrans(x, y);
 }
 
-/* 802400CC-80240174 23AA0C 00A8+00 1/0 0/0 0/0 .text            fukiAlpha__14dMsgScrnItem_cFf */
 void dMsgScrnItem_c::fukiAlpha(f32 param_1) {
     field_0x13c = param_1;
     field_0x194 = param_1;
@@ -520,7 +546,6 @@ void dMsgScrnItem_c::fukiAlpha(f32 param_1) {
     }
 }
 
-/* 80240174-8024074C 23AAB4 05D8+00 1/0 0/0 0/0 .text            fukiPosCalc__14dMsgScrnItem_cFUc */
 void dMsgScrnItem_c::fukiPosCalc(u8 param_1) {
     msg_class* iVar6 = dMsgObject_c::getActor();
     if (mpPmP_c != NULL) {
@@ -536,8 +561,8 @@ void dMsgScrnItem_c::fukiPosCalc(u8 param_1) {
             f3 = cStack_7c.y;
         } else {
             mDoLib_project(&iVar6->pos, &local_70);
-            if (local_70.x >= 0.0f && local_70.x <= 608.0f && local_70.y >= 0.0f &&
-                local_70.y <= 448.0f)
+            if (local_70.x >= 0.0f && local_70.x <= FB_WIDTH && local_70.y >= 0.0f &&
+                local_70.y <= FB_HEIGHT)
             {
                 f3 = 0.5f * (cStack_7c.y + local_70.y);
             } else {
@@ -613,26 +638,19 @@ void dMsgScrnItem_c::fukiPosCalc(u8 param_1) {
     }
 }
 
-/* 8024074C-802407E8 23B08C 009C+00 1/1 0/0 0/0 .text
- * setBtk0Animation__14dMsgScrnItem_cFP19J2DAnmTextureSRTKey    */
 void dMsgScrnItem_c::setBtk0Animation(J2DAnmTextureSRTKey* param_1) {
     mpScreen->search('gold00')->setAnimation(param_1);
     mpScreen->search('gold01')->setAnimation(param_1);
 }
 
-/* 802407E8-80240844 23B128 005C+00 1/1 0/0 0/0 .text
- * setBpk0Animation__14dMsgScrnItem_cFP11J2DAnmColor            */
 void dMsgScrnItem_c::setBpk0Animation(J2DAnmColor* param_0) {
     mpScreen->search('map0')->setAnimation(param_0);
 }
 
-/* 80240844-802408A4 23B184 0060+00 1/1 0/0 0/0 .text
- * setBpk1Animation__14dMsgScrnItem_cFP11J2DAnmColor            */
 void dMsgScrnItem_c::setBpk1Animation(J2DAnmColor* param_0) {
     mpScreen->search('moyou_1')->setAnimation(param_0);
 }
 
-/* 802408A4-8024096C 23B1E4 00C8+00 1/1 0/0 0/0 .text            isOugiID__14dMsgScrnItem_cFv */
 bool dMsgScrnItem_c::isOugiID() {
     switch(dMsgObject_getMessageID()) {
     case 0x17ed:
@@ -652,5 +670,3 @@ bool dMsgScrnItem_c::isOugiID() {
     }
     return false;
 }
-
-/* 80399990-80399990 025FF0 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

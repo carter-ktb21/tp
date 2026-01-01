@@ -2,15 +2,15 @@
 // Translation Unit: d_a_ep
 //
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_ep.h"
-#include "d/d_com_inf_game.h"
-#include "m_Do/m_Do_lib.h"
+#include "d/actor/d_a_player.h"
 #include "d/d_a_obj.h"
+#include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
+#include "m_Do/m_Do_lib.h"
 
-UNK_REL_DATA
-
-/* 804681F8-804682F8 000078 0100+00 1/1 0/0 0/0 .text            hahen_draw__FP8ep_class */
 static void hahen_draw(ep_class* i_this) {
     fopAc_ac_c* a_this = i_this;
     ep_hahen_s* epHahenS = i_this->mHahen;
@@ -33,7 +33,6 @@ static void hahen_draw(ep_class* i_this) {
     }
 }
 
-/* 804682F8-80468A70 000178 0778+00 2/2 0/0 0/0 .text            move_calc__FP8ep_classP10ep_hahen_s */
 static int move_calc(ep_class* i_this, ep_hahen_s* hahen_s) {
     fopAc_ac_c* a_this = i_this;
     static u16 w_eff_id[4] = {
@@ -152,12 +151,10 @@ static int move_calc(ep_class* i_this, ep_hahen_s* hahen_s) {
     return rv;
 }
 
-/* 80468A70-80468A90 0008F0 0020+00 1/1 0/0 0/0 .text hahen_normal__FP8ep_classP10ep_hahen_s */
 static void hahen_normal(ep_class* i_this, ep_hahen_s* hahen_s) {
     move_calc(i_this, hahen_s);
 }
 
-/* 80468A90-80468E50 000910 03C0+00 1/1 0/0 0/0 .text hahen_water__FP8ep_classP10ep_hahen_s */
 static void hahen_water(ep_class* i_this, ep_hahen_s* hahen_s) {
     fopAc_ac_c* a_this = i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -213,7 +210,6 @@ static void hahen_water(ep_class* i_this, ep_hahen_s* hahen_s) {
     fopAcM_effHamonSet(&hahen_s->field_0xa0, &hahen_s->field_0x4, 1.0f, 0.05f);
 }
 
-/* 80468E50-80469034 000CD0 01E4+00 1/1 0/0 0/0 .text hahen_carry__FP8ep_classP10ep_hahen_s */
 static void hahen_carry(ep_class* i_this, ep_hahen_s* hahen_s) {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
 
@@ -256,7 +252,6 @@ static void hahen_carry(ep_class* i_this, ep_hahen_s* hahen_s) {
     }
 }
 
-/* 80469034-804690F8 000EB4 00C4+00 1/1 0/0 0/0 .text hahen_cast__FP8ep_classP10ep_hahen_s */
 static void hahen_cast(ep_class* i_this, ep_hahen_s* hahen_s) {
     cXyz local_1c, local_28;
 
@@ -278,24 +273,22 @@ static void hahen_cast(ep_class* i_this, ep_hahen_s* hahen_s) {
     dComIfG_Ccsp()->Set(&i_this->mSph2);
 }
 
-/* 804690F8-80469568 000F78 0470+00 1/1 0/0 0/0 .text            hahen_move__FP8ep_class */
 static void hahen_move(ep_class* i_this) {
-    // NONMATCHING - equivalent in debug....
     fopAc_ac_c* a_this = i_this;
-    fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    dBgS_LinChk dStack_cc;
     ep_hahen_s* epHahenS;
+    daPy_py_c* player = static_cast<daPy_py_c*>(dComIfGp_getPlayer(0));
+    dBgS_LinChk dStack_cc;
 
     if (!fopAcM_checkCarryNow(a_this)) {
         f32 fVar1 = 50.0f;
         s8 bVar2 = false;
         cXyz local_d8;
         for (int iters = 0; iters < 10; iters++) {
-            epHahenS = i_this->mHahen;
+            epHahenS = static_cast<ep_hahen_s*>(i_this->mHahen);
             for (int j = 0; j < 6; j++, epHahenS++) {
                 local_d8 = player->current.pos - epHahenS->field_0x4;
                 if (local_d8.abs() < fVar1) {
-                    cLib_onBit<u32>(a_this->attention_info.flags, 0x80);
+                    cLib_onBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
                     a_this->current.pos = epHahenS->field_0x4;
                     a_this->attention_info.position = a_this->eyePos = a_this->current.pos;
                     a_this->current.angle = a_this->shape_angle = epHahenS->field_0x28;
@@ -313,7 +306,7 @@ static void hahen_move(ep_class* i_this) {
             fVar1 += 20.0f;
         }
     } else {
-        cLib_offBit<u32>(a_this->attention_info.flags, 0x80);
+        cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->mHahen[i_this->field_0xa78].field_0x97 =  3;
         i_this->mHahen[i_this->field_0xa78].field_0x4 = a_this->current.pos;
         i_this->mHahen[i_this->field_0xa78].field_0x28 = a_this->shape_angle;
@@ -325,7 +318,7 @@ static void hahen_move(ep_class* i_this) {
             if (epHahenS->field_0x98) {
                 --epHahenS->field_0x98;
             }
-        
+
             if (i_this->field_0xa79 == 3) {
                 if (epHahenS->field_0x97 == 1) {
                     hahen_normal(i_this, epHahenS);
@@ -355,7 +348,6 @@ static void hahen_move(ep_class* i_this) {
     }
 }
 
-/* 80469568-804695F8 0013E8 0090+00 1/0 0/0 0/0 .text            daEp_Draw__FP8ep_class */
 static int daEp_Draw(ep_class* i_this) {
     if (i_this->mpModel) {
         if (i_this->field_0x602 != 1) {
@@ -372,7 +364,6 @@ static int daEp_Draw(ep_class* i_this) {
     return 1;
 }
 
-/* 804695F8-80469658 001478 0060+00 2/2 0/0 0/0 .text            ep_switch_event_end__FP8ep_class */
 static BOOL ep_switch_event_end(ep_class* i_this) {
     int rv = FALSE;
     if (dComIfGp_evmng_endCheck("SHOKUDAI_SWITCH") != 0) {
@@ -382,7 +373,6 @@ static BOOL ep_switch_event_end(ep_class* i_this) {
     return rv;
 }
 
-/* 80469658-80469700 0014D8 00A8+00 1/1 0/0 0/0 .text            ep_switch_event_begin__FP8ep_class */
 static BOOL ep_switch_event_begin(ep_class* i_this) {
     BOOL rv = 0;
 
@@ -399,7 +389,6 @@ static BOOL ep_switch_event_begin(ep_class* i_this) {
     return rv;
 }
 
-/* 80469700-804697F4 001580 00F4+00 1/1 0/0 0/0 .text            ep_switch_event_move__FP8ep_class */
 static int ep_switch_event_move(ep_class* i_this) {
     static char* actions[2] = {
         "WAIT",
@@ -430,7 +419,6 @@ static int ep_switch_event_move(ep_class* i_this) {
     return rv;
 }
 
-/* 804697F4-80469EDC 001674 06E8+00 1/1 0/0 0/0 .text            ep_move__FP8ep_class */
 static void ep_move(ep_class* i_this) {
     static u16 l_particle_fire_A[2] = {
         0x0100, 0x8110,
@@ -616,7 +604,6 @@ static void ep_move(ep_class* i_this) {
     return;
 }
 
-/* 80469EDC-8046A0A8 001D5C 01CC+00 1/1 0/0 0/0 .text            daEp_set_mtx__FP8ep_class */
 static void daEp_set_mtx(ep_class* i_this) {
     if (i_this->mpModel) {
         f32 fVar1 = 70.0f;
@@ -656,7 +643,6 @@ static void daEp_set_mtx(ep_class* i_this) {
     }
 }
 
-/* 8046A0A8-8046A6D4 001F28 062C+00 1/0 0/0 0/0 .text            daEp_Execute__FP8ep_class */
 static int daEp_Execute(ep_class* i_this) {
     static u16 eff_name[3] = {
         0x8340, 0x8341, 0x8342,
@@ -747,7 +733,7 @@ static int daEp_Execute(ep_class* i_this) {
 
     fopAcM_OffStatus(a_this, 0);
     a_this->attention_info.flags = 0;
-    cLib_offBit<u32>(a_this->attention_info.flags, 4);
+    cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_BATTLE_e);
 
     if (i_this->field_0xa79 == 1) {
         i_this->field_0xa79 = 2;
@@ -797,32 +783,27 @@ static int daEp_Execute(ep_class* i_this) {
     return 1;
 }
 
-/* 8046A6D4-8046A6DC 002554 0008+00 1/0 0/0 0/0 .text            daEp_IsDelete__FP8ep_class */
 static int daEp_IsDelete(ep_class* i_this) {
     return 1;
 }
 
-/* 8046A6DC-8046A724 00255C 0048+00 1/0 0/0 0/0 .text            daEp_Delete__FP8ep_class */
 static int daEp_Delete(ep_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "Ep");
     dKy_plight_cut(&i_this->mLightInf);
     return 1;
 }
 
-/* 8046B13C-8046B15C 000044 0020+00 1/1 0/0 0/0 .data            model_d */
 static int model_d[8] = {
     3,4, 5, 6, 6, 6, 6, 6,
 };
 
-/* 8046A724-8046A858 0025A4 0134+00 1/1 0/0 0/0 .text            daEp_CreateHeap__FP10fopAc_ac_c */
 static int daEp_CreateHeap(fopAc_ac_c* a_this) {
-    // NONMATCHING - equiv in debug
     ep_class* i_this = (ep_class*)a_this;
 
-    J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("Ep", model_d[i_this->field_0xa5a]);
-    JUT_ASSERT(0x855, modelData != 0);
+    void* modelData = dComIfG_getObjectRes("Ep", model_d[i_this->field_0xa5a]);
+    JUT_ASSERT(0x855, modelData != NULL);
 
-    i_this->mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
+    i_this->mpModel = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
     if (i_this->mpModel == NULL) {
         return 0;
     }
@@ -830,11 +811,11 @@ static int daEp_CreateHeap(fopAc_ac_c* a_this) {
     MtxScale(0.0f, 0.0f, 0.0f, 0);
     i_this->mpModel->setBaseTRMtx(*calc_mtx);
 
-    modelData = (J3DModelData*)dComIfG_getObjectRes("Ep", 7);
-    JUT_ASSERT(0x884, modelData != 0);
+    modelData = dComIfG_getObjectRes("Ep", 7);
+    JUT_ASSERT(0x884, modelData != NULL);
 
     for (int i = 0; i < 6; i++) {
-        i_this->mHahen[i].mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
+        i_this->mHahen[i].mpModel = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
         if (i_this->mHahen[i].mpModel == NULL) {
             return 0;
         }
@@ -844,7 +825,6 @@ static int daEp_CreateHeap(fopAc_ac_c* a_this) {
     
 }
 
-/* 8046A858-8046A8D4 0026D8 007C+00 1/1 0/0 0/0 .text            daEp_CreateInit__FP10fopAc_ac_c */
 static void daEp_CreateInit(fopAc_ac_c* a_this) {
     ep_class* i_this = (ep_class*)a_this;
 
@@ -858,7 +838,6 @@ static void daEp_CreateInit(fopAc_ac_c* a_this) {
     i_this->field_0x602 = 0;
 }
 
-/* 8046A8D4-8046AB2C 002754 0258+00 1/0 0/0 0/0 .text            daEp_Create__FP10fopAc_ac_c */
 static int daEp_Create(fopAc_ac_c* a_this) {
     static dCcD_SrcSph sph_src = {
         {
@@ -900,7 +879,7 @@ static int daEp_Create(fopAc_ac_c* a_this) {
 
     int rv;
     ep_class* i_this = (ep_class*)a_this;
-    fopAcM_SetupActor(a_this, ep_class);
+    fopAcM_ct(a_this, ep_class);
 
     rv = dComIfG_resLoad(&i_this->mPhase, "Ep");
     if (rv == cPhs_COMPLEATE_e) {
@@ -967,7 +946,6 @@ static int daEp_Create(fopAc_ac_c* a_this) {
     return rv;
 }
 
-/* 8046B220-8046B240 -00001 0020+00 1/0 0/0 0/0 .data            l_daEp_Method */
 static actor_method_class l_daEp_Method = {
     (process_method_func)daEp_Create,
     (process_method_func)daEp_Delete,
@@ -976,7 +954,6 @@ static actor_method_class l_daEp_Method = {
     (process_method_func)daEp_Draw,
 };
 
-/* 8046B240-8046B270 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_EP */
 extern actor_process_profile_definition g_profile_EP = {
     fpcLy_CURRENT_e,
     7,

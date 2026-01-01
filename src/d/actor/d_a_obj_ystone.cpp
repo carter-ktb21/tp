@@ -3,11 +3,12 @@
  * Object - Dungeon Prize
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ystone.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_procname.h"
 
-/* 80D3ECBC-80D3ECD8 -00001 001C+00 4/4 0/0 0/0 .data            l_arcName */
 static char const* l_arcName[7] = {
     "N_gD_mskF",
     "N_gD_mskB",
@@ -18,30 +19,25 @@ static char const* l_arcName[7] = {
     "MirrorB",
 };
 
-/* 80D3ECD8-80D3ECFC -00001 0024+00 1/1 0/0 0/0 .data            l_stageName$3775 */
-static char const* l_stageName[9] = {
-    "D_MN05A",
-    "D_MN04A",
-    "D_MN01A",
-    "D_MN10A",
-    "D_MN11A",
-    "D_MN06A",
-    "D_MN07A",
-    "D_MN01A",
-    "D_MN01A",
-};
-
-/* 80D3EC0C-80D3EC28 000000 001C+00 2/2 0/0 0/0 .rodata          l_bmdIndex */
 static int const l_bmdIndex[7] = {4, 4, 4, 9, 9, 10, 11};
 
-/* 80D3EC28-80D3EC34 00001C 000C+00 0/1 0/0 0/0 .rodata          l_brkIndex */
 static int const l_brkIndex[3] = {7, 7, 7};
 
-/* 80D3EC34-80D3EC50 000028 001C+00 0/1 0/0 0/0 .rodata          l_btkIndex */
 static int const l_btkIndex[7] = {14, 14, 14, 14, 14, 15, 16};
 
-/* 80D3E018-80D3E090 000078 0078+00 1/1 0/0 0/0 .text            getNowLevel__Fv */
 static int getNowLevel() {
+    static char const* l_stageName[9] = {
+        "D_MN05A",
+        "D_MN04A",
+        "D_MN01A",
+        "D_MN10A",
+        "D_MN11A",
+        "D_MN06A",
+        "D_MN07A",
+        "D_MN01A",
+        "D_MN01A",
+    };
+
     for (int i = 0; i < 9; i++) {
         if (!strcmp(dComIfGp_getStartStageName(), l_stageName[i])) {
             return i + 1;
@@ -50,7 +46,6 @@ static int getNowLevel() {
     return -1;
 }
 
-/* 80D3E090-80D3E180 0000F0 00F0+00 1/0 0/0 0/0 .text daObj_Ystone_Draw__FP16obj_ystone_class */
 static int daObj_Ystone_Draw(obj_ystone_class* i_this) {
     g_env_light.settingTevStruct(0, &i_this->current.pos, &i_this->tevStr);
     if (i_this->mLevel < 3) {
@@ -71,7 +66,6 @@ static int daObj_Ystone_Draw(obj_ystone_class* i_this) {
     return 1;
 }
 
-/* 80D3E180-80D3E25C 0001E0 00DC+00 1/1 0/0 0/0 .text setModelBaseMtx__FP16obj_ystone_class */
 static void setModelBaseMtx(obj_ystone_class* i_this) {
     J3DModel* model;
     if (i_this->mLevel < 3) {
@@ -95,7 +89,6 @@ static u16 mirror_effect_id[10] = {
     0x89A0, 0x89A1, 0x89A2, 0x89A5, 0x89A6, 0x89A7, 0x89A8, 0x89A9, 0x89AA, 0x89AB
 };
 
-/* 80D3E25C-80D3E6EC 0002BC 0490+00 2/1 0/0 0/0 .text            action__FP16obj_ystone_class */
 static void action(obj_ystone_class* i_this) {
     if (i_this->mLevel < 3) {
         switch (i_this->mShadowMode) {
@@ -191,8 +184,6 @@ static void action(obj_ystone_class* i_this) {
     }
 }
 
-/* 80D3E6EC-80D3E770 00074C 0084+00 2/1 0/0 0/0 .text daObj_Ystone_Execute__FP16obj_ystone_class
- */
 static int daObj_Ystone_Execute(obj_ystone_class* i_this) {
     if (i_this->mLevel < 3 && i_this->field_0x59b) {
         return 1;
@@ -204,19 +195,15 @@ static int daObj_Ystone_Execute(obj_ystone_class* i_this) {
     }
 }
 
-/* 80D3E770-80D3E778 0007D0 0008+00 1/0 0/0 0/0 .text daObj_Ystone_IsDelete__FP16obj_ystone_class
- */
 static int daObj_Ystone_IsDelete(obj_ystone_class* i_this) {
     return 1;
 }
 
-/* 80D3E778-80D3E7B8 0007D8 0040+00 1/0 0/0 0/0 .text daObj_Ystone_Delete__FP16obj_ystone_class */
 static int daObj_Ystone_Delete(obj_ystone_class* i_this) {
     dComIfG_resDelete(&i_this->mPhaseReq, l_arcName[i_this->mLevel]);
     return 1;
 }
 
-/* 80D3E7B8-80D3EA38 000818 0280+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     obj_ystone_class* _this = static_cast<obj_ystone_class*>(i_this);
     void* model_data =
@@ -259,11 +246,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80D3EA80-80D3EC04 000AE0 0184+00 1/0 0/0 0/0 .text            daObj_Ystone_Create__FP10fopAc_ac_c
- */
 static cPhs__Step daObj_Ystone_Create(fopAc_ac_c* i_this) {
     obj_ystone_class* _this = static_cast<obj_ystone_class*>(i_this);
-    fopAcM_SetupActor(_this, obj_ystone_class);
+    fopAcM_ct(_this, obj_ystone_class);
     _this->mLevel = getNowLevel() - 1;
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhaseReq, l_arcName[_this->mLevel]);
 
@@ -300,7 +285,6 @@ static cPhs__Step daObj_Ystone_Create(fopAc_ac_c* i_this) {
 }
 
 
-/* 80D3ED2C-80D3ED4C -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Ystone_Method */
 static actor_method_class l_daObj_Ystone_Method = {
     (process_method_func)daObj_Ystone_Create,
     (process_method_func)daObj_Ystone_Delete,
@@ -309,7 +293,6 @@ static actor_method_class l_daObj_Ystone_Method = {
     (process_method_func)daObj_Ystone_Draw,
 };
 
-/* 80D3ED4C-80D3ED7C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_YSTONE */
 extern actor_process_profile_definition g_profile_OBJ_YSTONE = {
     fpcLy_CURRENT_e,
     8,

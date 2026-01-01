@@ -8,8 +8,8 @@
 #include "SSystem/SComponent/c_math.h"
 
 struct daFmtMng_Path_c {
-    /* 808365B0 */ bool checkPathEnd(cXyz, f32);
-    /* 8083665C */ bool checkPoint(cXyz, f32);
+    bool checkPathEnd(cXyz, f32);
+    bool checkPoint(cXyz, f32);
 
     bool isPathClose() { return dPath_ChkClose(mPath); }
     s8 getArg0() { return mPath->m_points[field_0x4].mArg0; }
@@ -78,7 +78,7 @@ struct daFmtMng_Path_c {
         } else {
             field_0x4 = decIndex(field_0x4);
         }
-        field_0x8 = 1000000000.0f;
+        field_0x8 = G_CM3D_F_INF;
     }
 
     void setNextPoint(cXyz *param_1) {
@@ -93,17 +93,12 @@ struct daFmtMng_Path_c {
 };
 
 struct FmtPos_c : public daFmtMng_Path_c {
-    /* 80836C24 */ ~FmtPos_c() {}
-    /* 80836C60 */ FmtPos_c() {}
     /* 0x10 */ cXyz field_0x10;
     /* 0x1C */ s16 field_0x1c;
     /* 0x1E */ s16 field_0x1e;
 };
 
 struct FmtMember_c {
-    /* 80837458 */ ~FmtMember_c() {}
-    /* 80837798 */ FmtMember_c() {}
-
     /* 0x00 */ u32 mNpcId;
     /* 0x04 */ cXyz field_0x04;
     /* 0x10 */ cXyz field_0x10;
@@ -131,21 +126,21 @@ struct FmtMngAttributes {
 };
 
 struct daFmtMng_c : public fopAc_ac_c {
-    /* 80835558 */ void initWait();
-    /* 80835624 */ void initMemberPos();
-    /* 80835B24 */ void executeWait();
-    /* 80835D28 */ void initWalk();
-    /* 80835DEC */ void executeWalk();
-    /* 8083622C */ void setMovePath(FmtPos_c*, int);
-    /* 80836810 */ void initReverse();
-    /* 808368A4 */ void executeReverse();
-    /* 80836C64 */ void initMotion();
-    /* 80836E20 */ void executeMotion();
-    /* 80836F78 */ void initFight();
-    /* 80837078 */ void executeFight();
-    /* 808374B4 */ int create();
-    /* 8083750C */ void create_init();
-    
+    void initWait();
+    void initMemberPos();
+    void executeWait();
+    void initWalk();
+    void executeWalk();
+    void setMovePath(FmtPos_c*, int);
+    void initReverse();
+    void executeReverse();
+    void initMotion();
+    void executeMotion();
+    void initFight();
+    void executeFight();
+    int create();
+    void create_init();
+
     ~daFmtMng_c() {
         FmtMember_c* member = mMember;
         for (int i = 0; i < mFormationLine * mFormationRow; i++, member++) {
@@ -158,14 +153,14 @@ struct daFmtMng_c : public fopAc_ac_c {
     int getTimeHour() {
         if (dKy_darkworld_check()) {
             return dKy_getDarktime_hour();
-        } 
+        }
         return dKy_getdaytime_hour();
     }
 
     int getTimeMinute() {
         if (dKy_darkworld_check()) {
             return dKy_getDarktime_minute();
-        } 
+        }
         return dKy_getdaytime_minute();
     }
 
@@ -180,7 +175,7 @@ struct daFmtMng_c : public fopAc_ac_c {
     int getEndTime() { return (fopAcM_GetParam(this) >> 24) & 0xff; }
 
     void callExecute() {
-        JUT_ASSERT(680, mAction != 0);
+        JUT_ASSERT(680, mAction != NULL);
         (this->*(mAction[1]))();
     }
 
@@ -208,7 +203,7 @@ struct daFmtMng_c : public fopAc_ac_c {
     }
 
     void callInit() {
-        JUT_ASSERT(667, mAction != 0)
+        JUT_ASSERT(667, mAction != NULL)
         (this->*(*mAction))();
     }
 

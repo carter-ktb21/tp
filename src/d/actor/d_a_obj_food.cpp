@@ -3,6 +3,8 @@
  * Object - Bone / Ball
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_food.h"
 #include "SSystem/SComponent/c_math.h"
 #include "JSystem/JKernel/JKRHeap.h"
@@ -12,20 +14,15 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_procname.h"
 
-/* 80BF1F40-80BF1F44 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 80BF1F50-80BF1F5C 000018 000C+00 3/3 0/0 0/0 .bss             l_HIO */
 static daObj_Food_HIO_c l_HIO;
 
-/* 80BF070C-80BF0730 0000EC 0024+00 1/1 0/0 0/0 .text            __ct__16daObj_Food_HIO_cFv */
 daObj_Food_HIO_c::daObj_Food_HIO_c() {
     field_0x4 = -1;
     mBoneScale = 1.0f;
 }
 
-/* 80BF0730-80BF0854 000110 0124+00 1/0 0/0 0/0 .text            daObj_Food_Draw__FP14obj_food_class
- */
 static int daObj_Food_Draw(obj_food_class* i_this) {
     if (daPy_py_c::wolfGrabSubjectNoDraw(i_this)) {
         return 1;
@@ -54,8 +51,6 @@ static int daObj_Food_Draw(obj_food_class* i_this) {
     return 1;
 }
 
-/* 80BF0854-80BF09A4 000234 0150+00 1/1 0/0 0/0 .text            ground_ang_set__FP14obj_food_class
- */
 static void ground_ang_set(obj_food_class* i_this) {
     dBgS_GndChk gnd_chk;
     Vec vec1;
@@ -67,7 +62,7 @@ static void ground_ang_set(obj_food_class* i_this) {
     vec1.z = vec2.z + 10.0f;
     gnd_chk.SetPos(&vec1);
     vec1.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (vec1.y != -1e9f) {
+    if (vec1.y != -G_CM3D_F_INF) {
         i_this->mGroundAngleX = -cM_atan2s(vec1.y - vec2.y, vec1.z - vec2.z);
     }
 
@@ -76,12 +71,11 @@ static void ground_ang_set(obj_food_class* i_this) {
     vec1.z = vec2.z;
     gnd_chk.SetPos(&vec1);
     vec1.y = dComIfG_Bgsp().GroundCross(&gnd_chk);
-    if (vec1.y != -1e9f) {
+    if (vec1.y != -G_CM3D_F_INF) {
         i_this->mGroundAngleZ = cM_atan2s(vec1.y - vec2.y, vec1.x - vec2.x);
     }
 }
 
-/* 80BF09A4-80BF0AD0 000384 012C+00 1/1 0/0 0/0 .text            food_carry__FP14obj_food_class */
 
 static void food_carry(obj_food_class* i_this) {
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -111,8 +105,6 @@ static void food_carry(obj_food_class* i_this) {
     cLib_addCalcAngleS2(&i_this->mGroundAngleZ, 0, 1, 0x800);
 }
 
-/* 80BF0AD0-80BF0C74 0004B0 01A4+00 2/2 0/0 0/0 .text            wall_angle_get__FP14obj_food_class
- */
 static s16 wall_angle_get(obj_food_class* i_this) {
     fopAc_ac_c* _this = static_cast<fopAc_ac_c*>(i_this);
     dBgS_LinChk lin_chk;
@@ -146,12 +138,11 @@ static s16 wall_angle_get(obj_food_class* i_this) {
     return cM_atan2s(vec2.x, vec2.z) + 0x4000;
 }
 
-/* 80BF0C74-80BF0FC0 000654 034C+00 1/1 0/0 0/0 .text            food_normal__FP14obj_food_class */
 static void food_normal(obj_food_class* i_this) {
     if (i_this->mAcch.ChkGroundHit()) {
         fopAcM_SetFoodStatus(i_this, fopAcM_FOOD_0);
         if (i_this->mBounces >= 3) {
-            cLib_onBit<u32>(i_this->attention_info.flags, 0x10);
+            cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
             i_this->speedF = 0.0f;
 
             if (fopAcM_checkCarryNow(i_this)) {
@@ -217,7 +208,6 @@ static void food_normal(obj_food_class* i_this) {
     }
 }
 
-/* 80BF0FC0-80BF1168 0009A0 01A8+00 1/1 0/0 0/0 .text            ball_move__FP14obj_food_class */
 static void ball_move(obj_food_class* i_this) {
     if (i_this->mTimer[0] == 0 && (i_this->mCcSph.ChkTgHit() || i_this->mCcSph.ChkCoHit())) {
         cCcD_Obj* hit_obj;
@@ -253,7 +243,6 @@ static void ball_move(obj_food_class* i_this) {
     }
 }
 
-/* 80BF1168-80BF1700 000B48 0598+00 1/1 0/0 0/0 .text            action__FP14obj_food_class */
 static void action(obj_food_class* i_this) {
     cXyz vec1, vec2;
 
@@ -263,14 +252,14 @@ static void action(obj_food_class* i_this) {
         break;
     case fopAcM_FOOD_1:
         food_normal(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_2:
         food_carry(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_3:
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         break;
     case fopAcM_FOOD_4:
         fopAcM_SetFoodStatus(i_this, fopAcM_FOOD_0);
@@ -381,7 +370,6 @@ static void action(obj_food_class* i_this) {
     i_this->attention_info.position = i_this->eyePos = i_this->current.pos;
 }
 
-/* 80BF1700-80BF1794 0010E0 0094+00 2/1 0/0 0/0 .text daObj_Food_Execute__FP14obj_food_class */
 static int daObj_Food_Execute(obj_food_class* i_this) {
     i_this->mCounter++;
     for (int i = 0; i < 4; i++) {
@@ -394,16 +382,14 @@ static int daObj_Food_Execute(obj_food_class* i_this) {
     return 1;
 }
 
-/* 80BF1794-80BF179C 001174 0008+00 1/0 0/0 0/0 .text daObj_Food_IsDelete__FP14obj_food_class */
 static int daObj_Food_IsDelete(obj_food_class* i_this) {
     return 1;
 }
 
-/* 80BF179C-80BF1804 00117C 0068+00 1/0 0/0 0/0 .text daObj_Food_Delete__FP14obj_food_class */
 static int daObj_Food_Delete(obj_food_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "Obj_fd");
     if (i_this->mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
     if (i_this->heap != NULL) {
         i_this->mSound.deleteObject();
@@ -411,7 +397,6 @@ static int daObj_Food_Delete(obj_food_class* i_this) {
     return 1;
 }
 
-/* 80BF1804-80BF18CC 0011E4 00C8+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     obj_food_class* _this = static_cast<obj_food_class*>(i_this);
 
@@ -431,11 +416,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80BF18CC-80BF1BE8 0012AC 031C+00 1/0 0/0 0/0 .text            daObj_Food_Create__FP10fopAc_ac_c
- */
 static cPhs__Step daObj_Food_Create(fopAc_ac_c* i_this) {
     obj_food_class* _this = static_cast<obj_food_class*>(i_this);
-    fopAcM_SetupActor(i_this, obj_food_class);
+    fopAcM_ct(i_this, obj_food_class);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhase, "Obj_fd");
     if (step == cPhs_COMPLEATE_e) {
@@ -450,9 +433,9 @@ static cPhs__Step daObj_Food_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
+        if (!hio_set) {
             _this->mHIOInit = true;
-            hioInit = true;
+            hio_set = true;
             l_HIO.field_0x4 = -1;
         }
 
@@ -511,7 +494,6 @@ static cPhs__Step daObj_Food_Create(fopAc_ac_c* i_this) {
     return step;
 }
 
-/* 80BF1EA0-80BF1EC0 -00001 0020+00 1/0 0/0 0/0 .data            l_daObj_Food_Method */
 static actor_method_class l_daObj_Food_Method = {
     (process_method_func)daObj_Food_Create,
     (process_method_func)daObj_Food_Delete,
@@ -520,7 +502,6 @@ static actor_method_class l_daObj_Food_Method = {
     (process_method_func)daObj_Food_Draw,
 };
 
-/* 80BF1EC0-80BF1EF0 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_OBJ_FOOD */
 extern actor_process_profile_definition g_profile_OBJ_FOOD = {
     fpcLy_CURRENT_e,
     7,

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/os.h>
 
 #include "__os.h"
@@ -69,12 +69,12 @@ static void __fini_cpp(void) {
     }
 }
 
-__declspec(weak)
+DECL_WEAK
 void abort(void) {
     _ExitProcess();
 }
 
-__declspec(weak)
+DECL_WEAK
 void exit(int status) {
     __fini_cpp();
     _ExitProcess();

@@ -3,204 +3,16 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_bg_obj.h"
 #include "JSystem/J3DGraphBase/J3DMaterial.h"
 #include "stdio.h"
-#include "dol2asm.h"
 #include "dolphin/os.h"
 #include "d/actor/d_a_set_bgobj.h"
+#include "d/d_s_play.h"
 #include "SSystem/SComponent/c_math.h"
 
-SECTION_DATA extern void* __vt__10cCcD_GStts[3];
-SECTION_DATA extern void* __vt__10dCcD_GStts[3];
-SECTION_DATA extern void* __vt__8cM3dGPla[3];
-SECTION_DATA extern void* __vt__8cM3dGTri[3];
-SECTION_DATA extern void* __vt__8cM3dGCyl[3];
-SECTION_DATA extern void* __vt__8cM3dGAab[3];
-SECTION_DATA extern void* __vt__9daBgObj_c[10];
-SECTION_DATA extern void* __vt__12J3DFrameCtrl[3];
-
-//
-// Forward References:
-//
-
-extern "C" static void getBmdName__Fii();
-extern "C" static void getBtkName__Fii();
-extern "C" static void getBrkName__Fii();
-extern "C" static void getDzbName__Fi();
-extern "C" void initParticleBlock__Q29daBgObj_c11spec_data_cFPUc();
-extern "C" void initSoundBlock__Q29daBgObj_c11spec_data_cFPUc();
-extern "C" void initTexShareBlock__Q29daBgObj_c11spec_data_cFPUc();
-extern "C" void initFarInfoBlock__Q29daBgObj_c11spec_data_cFPUc();
-extern "C" void Set__Q29daBgObj_c11spec_data_cFPv();
-extern "C" void release__9daBgObj_cFP4dBgW();
-extern "C" void regist__9daBgObj_cFP4dBgW();
-extern "C" void initAtt__9daBgObj_cFv();
-extern "C" void setAttentionInfo__9daBgObj_cFP10fopAc_ac_c();
-extern "C" void initBaseMtx__9daBgObj_cFv();
-extern "C" void setBaseMtx__9daBgObj_cFv();
-extern "C" void settingCullSizeBoxForCo__9daBgObj_cFi();
-extern "C" void settingCullSizeBoxForCull__9daBgObj_cFi();
-extern "C" void CreateInitType0__9daBgObj_cFv();
-extern "C" void CreateInitType1__9daBgObj_cFv();
-extern "C" void Create__9daBgObj_cFv();
-extern "C" void CreateHeapType0__9daBgObj_cFv();
-extern "C" void __dt__12J3DFrameCtrlFv();
-extern "C" void CreateHeapType1__9daBgObj_cFv();
-extern "C" void doShareTexture__9daBgObj_cFv();
-extern "C" void CreateHeap__9daBgObj_cFv();
-extern "C" void create1st__9daBgObj_cFv();
-extern "C" void setColCommon__9daBgObj_cFv();
-extern "C" void set_tri_0__9daBgObj_cFv();
-extern "C" void set_tri_1__9daBgObj_cFv();
-extern "C" void set_cyl_0__9daBgObj_cFv();
-extern "C" void set_tri_2__9daBgObj_cFv();
-extern "C" void set_tri_3__9daBgObj_cFv();
-extern "C" void setParticle__9daBgObj_cFv();
-extern "C" void setSe__9daBgObj_cFv();
-extern "C" void checkDestroy__9daBgObj_cFv();
-extern "C" void checkHitAt__9daBgObj_cFP8cCcD_Obj();
-extern "C" void orderWait_tri__9daBgObj_cFv();
-extern "C" void orderWait_cyl__9daBgObj_cFv();
-extern "C" void orderWait_spec__9daBgObj_cFv();
-extern "C" void actionOrderWait__9daBgObj_cFv();
-extern "C" void actionOrder__9daBgObj_cFv();
-extern "C" void actionEvent__9daBgObj_cFv();
-extern "C" bool actionWait__9daBgObj_cFv();
-extern "C" void ExecuteType0__9daBgObj_cFv();
-extern "C" void ExecuteType1__9daBgObj_cFv();
-extern "C" void Execute__9daBgObj_cFPPA3_A4_f();
-extern "C" void Draw__9daBgObj_cFv();
-extern "C" void indirectProc__9daBgObj_cFP8J3DModel();
-extern "C" void Delete__9daBgObj_cFv();
-extern "C" static void daBgObj_create1st__FP9daBgObj_c();
-extern "C" void __dt__8cM3dGCylFv();
-extern "C" void __dt__8cM3dGAabFv();
-extern "C" void __dt__8dCcD_TriFv();
-extern "C" void __ct__8dCcD_TriFv();
-extern "C" void __dt__8cM3dGTriFv();
-extern "C" void __dt__8cM3dGPlaFv();
-extern "C" void __dt__10dCcD_GSttsFv();
-extern "C" static void daBgObj_MoveBGDelete__FP9daBgObj_c();
-extern "C" static void daBgObj_MoveBGExecute__FP9daBgObj_c();
-extern "C" static void daBgObj_MoveBGDraw__FP9daBgObj_c();
-extern "C" void __dt__10cCcD_GSttsFv();
-extern "C" void __sinit_d_a_bg_obj_cpp();
-extern "C" extern char const* const d_a_bg_obj__stringBase0;
-extern "C" u8 mCreateHeapFunc__9daBgObj_c[48];
-extern "C" u8 mCreateInitFunc__9daBgObj_c[48];
-extern "C" u8 mExecuteFunc__9daBgObj_c[48];
-extern "C" u8 mTgSetFunc__9daBgObj_c[60];
-
-//
-// External References:
-//
-
-extern "C" void mDoMtx_YrotS__FPA4_fs();
-extern "C" void mDoMtx_YrotM__FPA4_fs();
-extern "C" void transS__14mDoMtx_stack_cFRC4cXyz();
-extern "C" void play__14mDoExt_baseAnmFv();
-extern "C" void init__13mDoExt_btkAnmFP16J3DMaterialTableP19J3DAnmTextureSRTKeyiifss();
-extern "C" void entry__13mDoExt_btkAnmFP16J3DMaterialTablef();
-extern "C" void init__13mDoExt_brkAnmFP16J3DMaterialTableP15J3DAnmTevRegKeyiifss();
-extern "C" void entry__13mDoExt_brkAnmFP16J3DMaterialTablef();
-extern "C" void mDoExt_modelUpdateDL__FP8J3DModel();
-extern "C" void mDoExt_setupShareTexture__FP12J3DModelDataP12J3DModelData();
-extern "C" void mDoExt_setupStageTexture__FP12J3DModelData();
-extern "C" void mDoExt_J3DModel__create__FP12J3DModelDataUlUl();
-extern "C" void fopAcIt_Judge__FPFPvPv_PvPv();
-extern "C" void fopAcM_fastCreate__FsUlPC4cXyziPC5csXyzPC4cXyzScPFPv_iPv();
-extern "C" void fopAcM_setCullSizeBox__FP10fopAc_ac_cffffff();
-extern "C" void fopAcM_orderOtherEventId__FP10fopAc_ac_csUcUsUsUs();
-extern "C" void fpcM_Execute__FPv();
-extern "C" void fpcSch_JudgeByID__FPvPv();
-extern "C" void dComIfG_resLoad__FP30request_of_phase_process_classPCc();
-extern "C" void dComIfG_resDelete__FP30request_of_phase_process_classPCc();
-extern "C" void dComIfGp_getReverb__Fi();
-extern "C" void getArcName__12daSetBgObj_cFP10fopAc_ac_c();
-extern "C" void onSwitch__10dSv_info_cFii();
-extern "C" void isSwitch__10dSv_info_cCFii();
-extern "C" void getRes__14dRes_control_cFPCcPCcP11dRes_info_ci();
-extern "C" void getObjectResName2Index__14dRes_control_cFPCcPCc();
-extern "C" void reset__14dEvt_control_cFv();
-extern "C" void getEventIdx__16dEvent_manager_cFP10fopAc_ac_cUc();
-extern "C" void endCheck__16dEvent_manager_cFs();
-extern "C" void
-setModel__18dPa_modelEcallBackFP14JPABaseEmitterP12J3DModelDataRC12dKy_tevstr_cUcPvUcUc();
-extern "C" void
-set__13dPa_control_cFUcUsPC4cXyzPC12dKy_tevstr_cPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyzf();
-extern "C" void StartShock__12dVibration_cFii4cXyz();
-extern "C" void Release__4cBgSFP9dBgW_Base();
-extern "C" void Regist__4dBgSFP9dBgW_BaseP10fopAc_ac_c();
-extern "C" void __ct__16dBgS_MoveBgActorFv();
-extern "C" bool IsDelete__16dBgS_MoveBgActorFv();
-extern "C" bool ToFore__16dBgS_MoveBgActorFv();
-extern "C" bool ToBack__16dBgS_MoveBgActorFv();
-extern "C" void
-MoveBGCreate__16dBgS_MoveBgActorFPCciPFP4dBgWPvRC13cBgS_PolyInfobP4cXyzP5csXyzP5csXyz_vUlPA3_A4_f();
-extern "C" void MoveBGDelete__16dBgS_MoveBgActorFv();
-extern "C" void MoveBGExecute__16dBgS_MoveBgActorFv();
-extern "C" void Set__4cBgWFP6cBgD_tUlPA3_A4_f();
-extern "C" void __ct__4dBgWFv();
-extern "C" void Move__4dBgWFv();
-extern "C" void GetAc__22dCcD_GAtTgCoCommonBaseFv();
-extern "C" void __ct__10dCcD_GSttsFv();
-extern "C" void Init__9dCcD_SttsFiiP10fopAc_ac_c();
-extern "C" void __ct__12dCcD_GObjInfFv();
-extern "C" void __dt__12dCcD_GObjInfFv();
-extern "C" void ChkTgHit__12dCcD_GObjInfFv();
-extern "C" void GetTgHitObj__12dCcD_GObjInfFv();
-extern "C" void Set__8dCcD_TriFRC11dCcD_SrcTri();
-extern "C" void Set__8dCcD_CylFRC11dCcD_SrcCyl();
-extern "C" void settingTevStruct__18dScnKy_env_light_cFiP4cXyzP12dKy_tevstr_c();
-extern "C" void setLightTevColorType_MAJI__18dScnKy_env_light_cFP12J3DModelDataP12dKy_tevstr_c();
-extern "C" void dKy_bg_MAxx_proc__FPv();
-extern "C" void Set__4cCcSFP8cCcD_Obj();
-extern "C" void __mi__4cXyzCFRC3Vec();
-extern "C" void cM_atan2s__Fff();
-extern "C" void ChkUsed__9cBgW_BgIdCFv();
-extern "C" void SetC__8cM3dGCylFRC4cXyz();
-extern "C" void SetH__8cM3dGCylFf();
-extern "C" void SetR__8cM3dGCylFf();
-extern "C" void setPos__8cM3dGTriFPC3VecPC3VecPC3Vec();
-extern "C" void seStart__7Z2SeMgrF10JAISoundIDPC3VecUlScffffUc();
-extern "C" void* __nw__FUl();
-extern "C" void __dl__FPv();
-extern "C" void J3DGetTranslateRotateMtx__FRC16J3DTransformInfoPA4_f();
-extern "C" void init__12J3DFrameCtrlFs();
-extern "C" void __construct_array();
-extern "C" void __ptmf_scall();
-extern "C" void _savegpr_21();
-extern "C" void _savegpr_23();
-extern "C" void _savegpr_24();
-extern "C" void _savegpr_25();
-extern "C" void _savegpr_27();
-extern "C" void _savegpr_28();
-extern "C" void _savegpr_29();
-extern "C" void _restgpr_21();
-extern "C" void _restgpr_23();
-extern "C" void _restgpr_24();
-extern "C" void _restgpr_25();
-extern "C" void _restgpr_27();
-extern "C" void _restgpr_28();
-extern "C" void _restgpr_29();
-extern "C" extern void* __vt__8dCcD_Cyl[36];
-extern "C" extern void* __vt__8dCcD_Tri[36];
-extern "C" extern void* __vt__9dCcD_Stts[11];
-extern "C" extern void* __vt__12cCcD_CylAttr[25];
-extern "C" extern void* __vt__12cCcD_TriAttr[25];
-extern "C" extern void* __vt__14cCcD_ShapeAttr[22];
-extern "C" extern void* __vt__9cCcD_Stts[8];
-extern "C" u8 now__14mDoMtx_stack_c[48];
-extern "C" u8 mStatus__20dStage_roomControl_c[65792];
-extern "C" u8 mEcallback__18dPa_modelEcallBack[4];
-extern "C" u8 mAudioMgrPtr__10Z2AudioMgr[4 + 4 /* padding */];
-
-//
-// Declarations:
-//
-
-/* 80459658-804596C4 000078 006C+00 2/2 0/0 0/0 .text            getBmdName__Fii */
 static const char* getBmdName(int param_0, int param_1) {
     static char l_bmdName[16];
 
@@ -231,7 +43,6 @@ static const char* getBtkName(int param_0, int param_1) {
     return l_btkName;
 }
 
-/* 80459734-804597A4 000154 0070+00 2/2 0/0 0/0 .text            getBrkName__Fii */
 static const char* getBrkName(int param_0, int param_1) {
     static char l_brkName[16];
 
@@ -247,7 +58,6 @@ static const char* getBrkName(int param_0, int param_1) {
     return l_brkName;
 }
 
-/* 804597A4-804597E8 0001C4 0044+00 2/2 0/0 0/0 .text            getDzbName__Fi */
 static const char* getDzbName(int param_0) {
     static char l_dzbName[16];
 
@@ -255,8 +65,10 @@ static const char* getDzbName(int param_0) {
     return l_dzbName;
 }
 
-/* 804597E8-80459814 000208 002C+00 1/1 0/0 0/0 .text
- * initParticleBlock__Q29daBgObj_c11spec_data_cFPUc             */
+static const char* dummy() {
+    return "spec.dat";
+}
+
 u8* daBgObj_c::spec_data_c::initParticleBlock(u8* i_dataPtr) {
     mpParticleBlock = i_dataPtr;
     mParticleNum = *(u32*)mpParticleBlock >> 4 & 0xFFFFF;
@@ -264,8 +76,6 @@ u8* daBgObj_c::spec_data_c::initParticleBlock(u8* i_dataPtr) {
     return i_dataPtr + ((*(u32*)mpParticleBlock & 0xFFFFFF) + 4);
 }
 
-/* 80459814-80459840 000234 002C+00 1/1 0/0 0/0 .text
- * initSoundBlock__Q29daBgObj_c11spec_data_cFPUc                */
 u8* daBgObj_c::spec_data_c::initSoundBlock(u8* i_dataPtr) {
     mpSoundBlock = i_dataPtr;
     mSoundNum = *(u32*)mpSoundBlock >> 2 & 0x3FFFFF;
@@ -273,8 +83,6 @@ u8* daBgObj_c::spec_data_c::initSoundBlock(u8* i_dataPtr) {
     return i_dataPtr + ((*(u32*)mpSoundBlock & 0xFFFFFF) + 4);
 }
 
-/* 80459840-804598F4 000260 00B4+00 1/1 0/0 0/0 .text
- * initTexShareBlock__Q29daBgObj_c11spec_data_cFPUc             */
 u8* daBgObj_c::spec_data_c::initTexShareBlock(u8* i_dataPtr) {
     char sp48[64];
     char sp8[64];
@@ -301,120 +109,122 @@ u8* daBgObj_c::spec_data_c::initTexShareBlock(u8* i_dataPtr) {
     return dataPos;
 }
 
-/* 804598F4-80459904 000314 0010+00 1/1 0/0 0/0 .text
- * initFarInfoBlock__Q29daBgObj_c11spec_data_cFPUc              */
 u8* daBgObj_c::spec_data_c::initFarInfoBlock(u8* i_dataPtr) {
     mpFarInfoBlock = *(f32*)(i_dataPtr + 4);
     return i_dataPtr + 8;
 }
 
-/* ############################################################################################## */
-/* 8045CA20-8045CA20 000068 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
-#pragma push
-#pragma force_active on
-SECTION_DEAD static char const* const stringBase_8045CA7D = "spec.dat";
-#pragma pop
-
-/* 80459904-80459B64 000324 0260+00 1/1 0/0 1/1 .text            Set__Q29daBgObj_c11spec_data_cFPv
- */
-// NONMATCHING - close-ish
 bool daBgObj_c::spec_data_c::Set(void* i_ptr) {
-    spec_dat* data = (spec_dat*)i_ptr;
+    JUT_ASSERT(496, i_ptr != NULL);
 
-    mSpecType = data->field_0x0;
+    u8* data = (u8*)i_ptr;
+
+    mSpecType = *(u16*)i_ptr;
+
+    u8 block_type;
+    u16 temp_r3;
 
     switch (mSpecType) {
     case 0: {
-        u8 block_type = data->field_0x4;
-        u8* block_p = (u8*)data + 4;
+        block_type = data[4];
+        data += 4;
 
         do {
             switch (block_type) {
             case 0:
                 break;
             case 3:
-                block_p = initTexShareBlock(block_p);
+                data = initTexShareBlock(data);
                 break;
             case 4:
-                block_p = initFarInfoBlock(block_p);
+                data = initFarInfoBlock(data);
                 break;
+            default:
+                // Invalid data block type
+                OS_REPORT_ERROR("データブロックタイプが不正です<%d>\n", block_type);
+                JUT_ASSERT(527, FALSE);
             }
 
             if (block_type == 0) {
                 break;
             }
 
-            block_type = *block_p;
+            block_type = *data;
         } while (1);
         break;
     }
     case 1: {
-        u16 temp_r3 = data->field_0x2;
+        temp_r3 = *(u16*)(data + 2);
         field_0x02 = temp_r3 & 0xF;
         field_0x03 = (temp_r3 >> 0xE) & 3;
         field_0x15 = (temp_r3 >> 0xC) & 3;
         field_0x14 = (temp_r3 >> 9) & 7;
         field_0x16 = (temp_r3 >> 8) & 1;
 
-        u8 block_type = data->field_0x4;
-        u8* block_p = (u8*)i_ptr + 4;
+        block_type = data[4];
+        data += 4;
 
         do {
             switch (block_type) {
             case 0:
                 break;
             case 3:
-                block_p = initTexShareBlock(block_p);
+                data = initTexShareBlock(data);
                 break;
             case 1:
-                block_p = initParticleBlock(block_p);
+                data = initParticleBlock(data);
                 break;
             case 2:
-                block_p = initSoundBlock(block_p);
+                data = initSoundBlock(data);
                 break;
             case 4:
-                block_p = initFarInfoBlock(block_p);
+                data = initFarInfoBlock(data);
                 break;
+            default:
+                // Invalid data block type
+                OS_REPORT_ERROR("データブロックタイプが不正です<%d>\n", block_type);
+                JUT_ASSERT(570, FALSE);
             }
 
             if (block_type == 0) {
                 break;
             }
 
-            block_type = *block_p;
+            block_type = *data;
         } while (1);
         break;
     }
     case 2: {
-        u16 temp_r3_2 = data->field_0x2;
-        field_0x02 = temp_r3_2 & 0xF;
-        field_0x03 = (temp_r3_2 >> 0xE) & 3;
-        field_0x15 = (temp_r3_2 >> 0xC) & 3;
-        field_0x14 = (temp_r3_2 >> 9) & 7;
-        field_0x16 = (temp_r3_2 >> 8) & 1;
+        temp_r3 = *(u16*)(data + 2);
+        field_0x02 = temp_r3 & 0xF;
+        field_0x03 = (temp_r3 >> 0xE) & 3;
+        field_0x15 = (temp_r3 >> 0xC) & 3;
+        field_0x14 = (temp_r3 >> 9) & 7;
+        field_0x16 = (temp_r3 >> 8) & 1;
 
-        u8 block_type = data->field_0x4;
-        u8* block_p = (u8*)i_ptr + 4;
+        block_type = data[4];
+        data += 4;
 
         do {
             switch (block_type) {
             case 0:
                 break;
             case 3:
-                block_p = initTexShareBlock(block_p);
+                data = initTexShareBlock(data);
                 break;
             case 1:
-                block_p = initParticleBlock(block_p);
+                data = initParticleBlock(data);
                 break;
             case 2:
-                block_p = initSoundBlock(block_p);
+                data = initSoundBlock(data);
                 break;
             case 4:
-                block_p = initFarInfoBlock(block_p);
+                data = initFarInfoBlock(data);
                 break;
             default:
                 // "Data Block type invalid<%d>\n"
                 OSReport_Error("データブロックタイプが不正です<%d>\n", block_type);
+                JUT_ASSERT(619, FALSE);
                 break;
             }
 
@@ -422,33 +232,31 @@ bool daBgObj_c::spec_data_c::Set(void* i_ptr) {
                 break;
             }
 
-            block_type = *block_p;
+            block_type = *data;
         } while (1);
         break;
     }
     default:
+        // Terrain unit MoveBG: performance undefined error<%d>!!!
+        OS_REPORT_ERROR("地形ユニットMoveBG : 性能未定義エラー！！！<%d>\n\n", mSpecType);
         return 0;
     }
 
     return 1;
 }
 
-/* 80459B64-80459BB4 000584 0050+00 4/4 0/0 0/0 .text            release__9daBgObj_cFP4dBgW */
 void daBgObj_c::release(dBgW* param_0) {
     if (param_0 != NULL && param_0->ChkUsed()) {
         dComIfG_Bgsp().Release(param_0);
     }
 }
 
-/* 80459BB4-80459BEC 0005D4 0038+00 3/3 0/0 3/3 .text            regist__9daBgObj_cFP4dBgW */
 void daBgObj_c::regist(dBgW* param_0) {
     if (param_0 != NULL) {
         dComIfG_Bgsp().Regist(param_0, this);
     }
 }
 
-/* ############################################################################################## */
-/* 8045C9B8-8045C9FC 000000 0044+00 6/6 0/0 0/0 .rodata          l_cyl_src */
 static const dCcD_SrcCyl l_cyl_src = {
     {
         {0, {{0, 0, 0}, {0xD8400422, 0x11}, 0}},
@@ -463,18 +271,44 @@ static const dCcD_SrcCyl l_cyl_src = {
     },
 };
 
-/* 80459BEC-80459D0C 00060C 0120+00 1/1 0/0 0/1 .text            initAtt__9daBgObj_cFv */
-// NONMATCHING - missing nop instruction
 void daBgObj_c::initAtt() {
-    u32 cd3_val = mSpecData.field_0x03 == 0 ? 3 : mSpecData.field_0x03 - 1;
-    u32 ce5_val = mSpecData.field_0x15 == 0 ? 3 : mSpecData.field_0x15 - 1;
-    u32 ce4_val = mSpecData.field_0x14 == 0 ? 7 : mSpecData.field_0x14 - 1;
+    u32 actor_params = 0;
+    u32 cd3_val;
+    if (mSpecData.field_0x03 == 0) {
+        cd3_val = 3;
+    } else {
+        cd3_val = mSpecData.field_0x03 - 1;
+    }
 
-    u32 arg0 = (daBgObj_prm::getObjArg0(this) != 0) ? 1 : 0;
+    u32 ce5_val;
+    if (mSpecData.field_0x15 == 0) {
+        ce5_val = 3;
+    } else {
+        ce5_val = mSpecData.field_0x15 - 1;
+    }
 
-    u32 actor_params =
-        (daBgObj_prm::getSwBit2(this) << 24) |
-        (daBgObj_prm::getSwBit(this) << 16) |
+    u32 ce4_val;
+    if (mSpecData.field_0x14 == 0) {
+        ce4_val = 7;
+    } else {
+        ce4_val = mSpecData.field_0x14 - 1;
+    }
+
+    u32 arg0;
+    if (daBgObj_prm::getObjArg0(this) == 0) {
+        arg0 = 0;
+    } else {
+        arg0 = 1;
+    }
+
+    u32 temp = 0;
+    u32 swbit = daBgObj_prm::getSwBit(this);
+    u32 swbit2 = daBgObj_prm::getSwBit2(this);
+
+    actor_params =
+        (swbit2 << 24) |
+        (swbit << 16) |
+        (temp << 8) |
         (arg0 << 7) |
         (ce4_val << 4) |
         (ce5_val << 2) |
@@ -485,19 +319,21 @@ void daBgObj_c::initAtt() {
 
     if (actor != NULL) {
         setAttentionInfo(actor);
+    } else {
+        // Failed to generate focus actor
+        OS_REPORT_ERROR("「注目点」生成失敗！！！\n");
     }
+    
     mAttnActorID = fopAcM_GetID(actor);
-    eyePos.y += 0.5f * fopAcM_getCullSizeBoxMax(this)->y;
+    const Vec* box = fopAcM_getCullSizeBoxMax(this);
+    eyePos.y += 0.5f * box->y;
 }
 
-/* 80459D0C-80459D3C 00072C 0030+00 2/2 0/0 0/0 .text setAttentionInfo__9daBgObj_cFP10fopAc_ac_c
- */
 void daBgObj_c::setAttentionInfo(fopAc_ac_c* param_0) {
     param_0->eyePos.y += 0.5f * fopAcM_getCullSizeBoxMax(this)->y;
     param_0->attention_info.position.y += fopAcM_getCullSizeBoxMax(this)->y;
 }
 
-/* 80459D3C-80459D94 00075C 0058+00 2/2 0/0 0/0 .text            initBaseMtx__9daBgObj_cFv */
 void daBgObj_c::initBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(shape_angle.y);
@@ -505,7 +341,6 @@ void daBgObj_c::initBaseMtx() {
     setBaseMtx();
 }
 
-/* 80459D94-80459E04 0007B4 0070+00 2/2 0/0 0/0 .text            setBaseMtx__9daBgObj_cFv */
 void daBgObj_c::setBaseMtx() {
     for (int i = 0; i < 2; i++) {
         if (field_0x5a8[field_0xcc8][i] != NULL) {
@@ -514,7 +349,6 @@ void daBgObj_c::setBaseMtx() {
     }
 }
 
-/* 80459E04-80459F14 000824 0110+00 1/1 0/0 0/0 .text settingCullSizeBoxForCo__9daBgObj_cFi */
 void daBgObj_c::settingCullSizeBoxForCo(int param_0) {
     J3DModel* cur_model = field_0x5a8[param_0][0];
     if (cur_model != NULL) {
@@ -542,10 +376,9 @@ void daBgObj_c::settingCullSizeBoxForCo(int param_0) {
     }
 }
 
-/* 80459F14-8045A0EC 000934 01D8+00 3/3 0/0 0/0 .text settingCullSizeBoxForCull__9daBgObj_cFi */
 void daBgObj_c::settingCullSizeBoxForCull(int param_0) {
-    cXyz max(1000000000.0f, 1000000000.0f, 1000000000.0f);
-    cXyz min(-1000000000.0f, -1000000000.0f, -1000000000.0f);
+    cXyz max(G_CM3D_F_INF, G_CM3D_F_INF, G_CM3D_F_INF);
+    cXyz min(-G_CM3D_F_INF, -G_CM3D_F_INF, -G_CM3D_F_INF);
 
     for (int i = 0; i < 2; i++) {
         J3DModel* cur_model = field_0x5a8[param_0][i];
@@ -586,14 +419,13 @@ void daBgObj_c::settingCullSizeBoxForCull(int param_0) {
         }
     }
 
-    if (1000000000.0f != max.x) {
+    if (G_CM3D_F_INF != max.x) {
         fopAcM_setCullSizeBox(this, max.x, max.y, max.z, min.x, min.y, min.z);
     } else {
         fopAcM_setCullSizeBox(this, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     }
 }
 
-/* 8045A0EC-8045A160 000B0C 0074+00 1/0 0/0 0/0 .text            CreateInitType0__9daBgObj_cFv */
 int daBgObj_c::CreateInitType0() {
     field_0xcc8 = 0;
     initBaseMtx();
@@ -607,7 +439,6 @@ int daBgObj_c::CreateInitType0() {
     return 1;
 }
 
-/* 8045A160-8045A2B8 000B80 0158+00 3/0 0/0 0/0 .text            CreateInitType1__9daBgObj_cFv */
 int daBgObj_c::CreateInitType1() {
     if (fopAcM_isSwitch(this, daBgObj_prm::getSwBit(this))) {
         field_0xcc8 = 1;
@@ -648,26 +479,6 @@ int daBgObj_c::CreateInitType1() {
     return 1;
 }
 
-/* ############################################################################################## */
-/* 8045CAC4-8045CAD0 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-SECTION_DATA static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 8045CAD0-8045CAE4 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 8045CAE4-8045CB38 000020 0054+00 4/4 0/0 0/0 .data            l_tri_src */
 static dCcD_SrcTri l_tri_src = {
     {
         {0, {{0, 0, 0}, {0xD8400422, 0x11}, 0}},
@@ -684,45 +495,38 @@ static dCcD_SrcTri l_tri_src = {
     },
 };
 
-/* 8045CB38-8045CB3C -00001 0004+00 1/1 0/0 0/0 .data            l_specName */
-SECTION_DATA static const char* const l_specName = "spec.dat";
+static char* l_specName = "spec.dat";
 
-/* 8045CB6C-8045CB9C 0000A8 0030+00 1/2 0/0 0/0 .data            mCreateHeapFunc__9daBgObj_c */
-SECTION_DATA createHeapFunc daBgObj_c::mCreateHeapFunc[] = {
+createHeapFunc daBgObj_c::mCreateHeapFunc[] = {
     &daBgObj_c::CreateHeapType0,
     &daBgObj_c::CreateHeapType1,
     &daBgObj_c::CreateHeapType1,
     &daBgObj_c::CreateHeapType1,
 };
 
-/* 8045CBCC-8045CBFC 000108 0030+00 1/2 0/0 0/0 .data            mCreateInitFunc__9daBgObj_c */
-SECTION_DATA createInitFunc daBgObj_c::mCreateInitFunc[] = {
+createInitFunc daBgObj_c::mCreateInitFunc[] = {
     &daBgObj_c::CreateInitType0,
     &daBgObj_c::CreateInitType1,
     &daBgObj_c::CreateInitType1,
     &daBgObj_c::CreateInitType1,
 };
 
-/* 8045A2B8-8045A2F0 000CD8 0038+00 1/0 0/0 0/0 .text            Create__9daBgObj_cFv */
 int daBgObj_c::Create() {
     return (this->*mCreateInitFunc[mSpecData.mSpecType])();
 }
 
-/* 8045CC2C-8045CC5C 000168 0030+00 1/2 0/0 0/0 .data            mExecuteFunc__9daBgObj_c */
-SECTION_DATA executeFunc daBgObj_c::mExecuteFunc[] = {
+executeFunc daBgObj_c::mExecuteFunc[] = {
     &daBgObj_c::ExecuteType0,
     &daBgObj_c::ExecuteType1,
     &daBgObj_c::ExecuteType1,
     &daBgObj_c::ExecuteType1,
 };
 
-/* 8045CC98-8045CCD4 0001D4 003C+00 1/2 0/0 0/0 .data            mTgSetFunc__9daBgObj_c */
-SECTION_DATA tgSetFunc daBgObj_c::mTgSetFunc[] = {
+tgSetFunc daBgObj_c::mTgSetFunc[] = {
     &daBgObj_c::set_tri_0, &daBgObj_c::set_tri_1, &daBgObj_c::set_cyl_0,
     &daBgObj_c::set_tri_2, &daBgObj_c::set_tri_3,
 };
 
-/* 8045A2F0-8045A52C 000D10 023C+00 1/0 0/0 0/0 .text            CreateHeapType0__9daBgObj_cFv */
 int daBgObj_c::CreateHeapType0() {
     for (int i = 0; i < 2; i++) {
         J3DModelData* modelData =
@@ -772,7 +576,6 @@ int daBgObj_c::CreateHeapType0() {
     return 1;
 }
 
-/* 8045A574-8045A83C 000F94 02C8+00 3/0 0/0 0/0 .text            CreateHeapType1__9daBgObj_cFv */
 int daBgObj_c::CreateHeapType1() {
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
@@ -833,7 +636,6 @@ int daBgObj_c::CreateHeapType1() {
     return 1;
 }
 
-/* 8045A83C-8045A940 00125C 0104+00 2/2 0/0 0/0 .text            doShareTexture__9daBgObj_cFv */
 void daBgObj_c::doShareTexture() {
     char res_name[64];
     char share_res_name[64];
@@ -861,7 +663,6 @@ void daBgObj_c::doShareTexture() {
     }
 }
 
-/* 8045A940-8045A9E8 001360 00A8+00 1/0 0/0 0/0 .text            CreateHeap__9daBgObj_cFv */
 int daBgObj_c::CreateHeap() {
     const char* const specName = l_specName;
     void* spec_data_p = dComIfG_getObjectRes(daSetBgObj_c::getArcName(this), specName);
@@ -875,7 +676,6 @@ int daBgObj_c::CreateHeap() {
     return (this->*mCreateHeapFunc[mSpecData.mSpecType])();
 }
 
-/* 8045A9E8-8045AAF0 001408 0108+00 1/1 0/0 0/0 .text            create1st__9daBgObj_cFv */
 int daBgObj_c::create1st() {
     if (field_0xcc9 == 0) {
         field_0xcca = home.angle.x;
@@ -906,7 +706,6 @@ int daBgObj_c::create1st() {
     return phase;
 }
 
-/* 8045AAF0-8045AB80 001510 0090+00 1/1 0/0 0/0 .text            setColCommon__9daBgObj_cFv */
 void daBgObj_c::setColCommon() {
     if (field_0xcc8 == 0) {
         (this->*mTgSetFunc[mSpecData.field_0x02])();
@@ -923,7 +722,6 @@ void daBgObj_c::setColCommon() {
     }
 }
 
-/* 8045AB80-8045ACC0 0015A0 0140+00 1/0 0/0 0/0 .text            set_tri_0__9daBgObj_cFv */
 void daBgObj_c::set_tri_0() {
     field_0xcc4 = 2;
     for (int i = 0; i < field_0xcc4; i++) {
@@ -946,7 +744,6 @@ void daBgObj_c::set_tri_0() {
     mTris[1].setPos(&cull_params[0], &cull_params[2], &cull_params[3]);
 }
 
-/* 8045ACC0-8045AE00 0016E0 0140+00 1/0 0/0 0/0 .text            set_tri_1__9daBgObj_cFv */
 void daBgObj_c::set_tri_1() {
     field_0xcc4 = 2;
     for (int i = 0; i < field_0xcc4; i++) {
@@ -969,7 +766,6 @@ void daBgObj_c::set_tri_1() {
     mTris[1].setPos(&cull_bounds[0], &cull_bounds[2], &cull_bounds[3]);
 }
 
-/* 8045AE00-8045AE98 001820 0098+00 1/0 0/0 0/0 .text            set_cyl_0__9daBgObj_cFv */
 void daBgObj_c::set_cyl_0() {
     field_0xcc4 = 0;
     mCyl.Set(l_cyl_src);
@@ -987,7 +783,6 @@ void daBgObj_c::set_cyl_0() {
     mCyl.SetR(radius);
 }
 
-/* 8045AE98-8045AFD4 0018B8 013C+00 1/0 0/0 0/0 .text            set_tri_2__9daBgObj_cFv */
 void daBgObj_c::set_tri_2() {
     field_0xcc4 = 2;
     for (int i = 0; i < field_0xcc4; i++) {
@@ -1018,7 +813,6 @@ void daBgObj_c::set_tri_2() {
     mTris[1].setPos(&cull_bounds[0], &cull_bounds[2], &cull_bounds[3]);
 }
 
-/* 8045AFD4-8045B17C 0019F4 01A8+00 1/0 0/0 0/0 .text            set_tri_3__9daBgObj_cFv */
 void daBgObj_c::set_tri_3() {
     field_0xcc4 = 4;
     for (int i = 0; i < field_0xcc4; i++) {
@@ -1077,14 +871,14 @@ struct blockItem {
     u8 envB;
 };
 
-/* 8045B17C-8045B3A0 001B9C 0224+00 3/3 0/0 0/0 .text            setParticle__9daBgObj_cFv */
-// NONMATCHING - out-of-place addi insn
 void daBgObj_c::setParticle() {
     u32 partNum = mSpecData.mParticleNum;
-    u8* partBlockItems = mSpecData.mpParticleBlock + 4;
+    u32* partBlockItems = (u32*)mSpecData.mpParticleBlock;
+    partBlockItems++;
     for (; partNum != 0; partNum--) {
-        u32 flags = *(u32*)partBlockItems;
-        u16 res_id = *(u32*)(partBlockItems + 4);
+        u32 flags = *partBlockItems++;
+        u16 res_id = *partBlockItems;
+        *partBlockItems++;
 
         GXColor prmColor = { 0xFF, 0xFF, 0xFF, 0xFF };
         GXColor envColor = { 0xFF, 0xFF, 0xFF, 0xFF };
@@ -1095,20 +889,22 @@ void daBgObj_c::setParticle() {
 
         u8 hasColor = 0;
 
+        u8* pColors = (u8*)partBlockItems;
         if ((flags & 0x80000000) != 0) {
-            prmColor.r = partBlockItems[9];
-            prmColor.g = partBlockItems[10];
-            prmColor.b = partBlockItems[11];
+            prmColor.r = pColors[1];
+            prmColor.g = pColors[2];
+            prmColor.b = pColors[3];
             hasColor = 1;
         }
         if ((flags & 0x40000000) != 0) {
-            alpha = partBlockItems[8];
+            alpha = pColors[0];
         }
+        pColors += 4;
         if ((flags & 0x20000000) != 0) {
-            envColor.a = partBlockItems[12];
-            envColor.r = partBlockItems[13];
-            envColor.g = partBlockItems[14];
-            envColor.b = partBlockItems[15];
+            envColor.a = pColors[0];
+            envColor.r = pColors[1];
+            envColor.g = pColors[2];
+            envColor.b = pColors[3];
             hasColor = 1;
         }
         f32 fVar2 = 0.0f;
@@ -1119,40 +915,43 @@ void daBgObj_c::setParticle() {
         }
 
         dKy_tevstr_c* status;
-        s32 someFlag = (flags >> 0x14 & 0xf);
-        if (someFlag != 0) {
-            J3DModelData* res_ptr = NULL;
+        u8 modelNumber = (flags & 0xf00000) >> 20;
+        u8 unusedFlag = (flags & 0xf0000) >> 16;
+        if (modelNumber != 0) {
+            J3DModelData* bmd = NULL;
+            int unused_sp28 = 0;
             cXyz scale(1.0f, 1.0f, 1.0f);
-            switch (someFlag) {
+            switch (modelNumber) {
                 case 1:
-                    res_ptr = (J3DModelData*)dComIfG_getObjectRes("Always", "BreakWoodBox.bmd");
-                    scale.x = 0.9f;
-                    scale.y = 0.9f;
-                    scale.z = 0.9f;
+                    bmd = (J3DModelData*)dComIfG_getObjectRes("Always", "BreakWoodBox.bmd");
+                    JUT_ASSERT(1683, bmd != NULL);
+                    scale.setall(KREG_F(29) + 0.9f);
+                    break;
+                default:
+                    // Multi MoveBG: Particle model number is invalid <%d>
+                    OS_REPORT_ERROR("マルチMoveBG：パーティクルモデル番号が不正<%d>\n", modelNumber);
+                    JUT_ASSERT(1689, FALSE);
                     break;
             }
-            status = NULL;
-            JPABaseEmitter* emitter = dComIfGp_particle_setColor(
+            JPABaseEmitter* emitter = dComIfGp_particle_set(
                 res_id,
                 &current.pos,
-                status,
-                NULL,
-                NULL,
-                1.0f,
-                0xff,
                 &mRotation,
                 NULL,
+                0xff,
                 &dPa_modelEcallBack::getEcallback(),
                 fopAcM_GetRoomNo(this),
+                NULL,
+                NULL,
                 &scale
             );
-            dPa_modelEcallBack::setModel(emitter, res_ptr, tevStr, 3, NULL, 0, 0);
+            dPa_modelEcallBack::setModel(emitter, bmd, tevStr, 3, NULL, 0, 0);
         } else {
-            status = dComIfGp_roomControl_getTevStr(fopAcM_GetRoomNo(this));
+            fopAc_ac_c* unused_player = dComIfGp_getPlayer(0);
             dComIfGp_particle_setColor(
                 res_id,
                 &current.pos,
-                status,
+                dComIfGp_roomControl_getTevStr(fopAcM_GetRoomNo(this)),
                 prmColorPtr,
                 envColorPtr,
                 fVar2,
@@ -1164,11 +963,10 @@ void daBgObj_c::setParticle() {
                 NULL
             );
         }
-        partBlockItems += 0x10;
+        partBlockItems += 2;
     }
 }
 
-/* 8045B3A0-8045B44C 001DC0 00AC+00 3/3 0/0 0/0 .text            setSe__9daBgObj_cFv */
 void daBgObj_c::setSe() {
     u32 i = mSpecData.mSoundNum;
     u32* temp = (u32*)mSpecData.mpSoundBlock;
@@ -1181,7 +979,6 @@ void daBgObj_c::setSe() {
 }
 
 
-/* 8045B44C-8045B534 001E6C 00E8+00 1/1 0/0 0/0 .text            checkDestroy__9daBgObj_cFv */
 BOOL daBgObj_c::checkDestroy() {
     if (mSpecData.mSpecType != 1 && mSpecData.mSpecType != 2) {
         return false;
@@ -1201,8 +998,6 @@ BOOL daBgObj_c::checkDestroy() {
     return false;
 }
 
-/* 8045B534-8045B5E0 001F54 00AC+00 2/2 0/0 0/0 .text            checkHitAt__9daBgObj_cFP8cCcD_Obj
- */
 BOOL daBgObj_c::checkHitAt(cCcD_Obj* i_hitObj) {
     u32 hit_flags = 0;
     u32 var_r8 = 0;
@@ -1230,7 +1025,6 @@ BOOL daBgObj_c::checkHitAt(cCcD_Obj* i_hitObj) {
     return hit_flags != 0;
 }
 
-/* 8045B5E0-8045B7FC 002000 021C+00 1/1 0/0 0/0 .text            orderWait_tri__9daBgObj_cFv */
 void daBgObj_c::orderWait_tri() {
     for (int i = 0; i < field_0xcc4; i++) {
         if (mTris[i].ChkTgHit()) {
@@ -1275,11 +1069,10 @@ void daBgObj_c::orderWait_tri() {
 }
 
 
-/* 8045B7FC-8045B9C4 00221C 01C8+00 1/1 0/0 0/0 .text            orderWait_cyl__9daBgObj_cFv */
-// NONMATCHING - r30/r31 swap
 void daBgObj_c::orderWait_cyl() {
     if (mCyl.ChkTgHit()) {
-        if (checkHitAt(mCyl.GetTgHitObj())) {
+        cCcD_Obj* hitObj = mCyl.GetTgHitObj();
+        if (checkHitAt(hitObj)) {
             setSe();
 
             fopAc_ac_c* hit_ac = mCyl.GetTgHitAc();
@@ -1289,10 +1082,10 @@ void daBgObj_c::orderWait_cyl() {
 
                 mDoMtx_stack_c::YrotS(-shape_angle.y);
                 mDoMtx_stack_c::multVec(&sp1C, &sp1C);
+                cXyz sp28;
                 mDoMtx_stack_c::transS(current.pos);
                 mDoMtx_stack_c::YrotM(shape_angle.y);
 
-                cXyz sp28;
                 if (sp1C.z > 0.0f) {
                     sp28 = cXyz(0.0f, 0.0f, 1.0f);
                 } else {
@@ -1315,7 +1108,6 @@ void daBgObj_c::orderWait_cyl() {
     dComIfG_Ccsp()->Set(&mCyl);
 }
 
-/* 8045B9C4-8045BB38 0023E4 0174+00 1/1 0/0 0/0 .text            orderWait_spec__9daBgObj_cFv */
 void daBgObj_c::orderWait_spec() {
     setSe();
 
@@ -1347,7 +1139,6 @@ void daBgObj_c::orderWait_spec() {
 }
 
 
-/* 8045BB38-8045BBE0 002558 00A8+00 1/0 0/0 0/0 .text            actionOrderWait__9daBgObj_cFv */
 int daBgObj_c::actionOrderWait() {
     if (checkDestroy()) {
         switch (mSpecData.field_0x02) {
@@ -1369,7 +1160,6 @@ int daBgObj_c::actionOrderWait() {
     return 1;
 }
 
-/* 8045BBE0-8045BD50 002600 0170+00 1/0 0/0 0/0 .text            actionOrder__9daBgObj_cFv */
 int daBgObj_c::actionOrder() {
     if (eventInfo.checkCommandDemoAccrpt()) {
         setAction(2);
@@ -1407,7 +1197,6 @@ int daBgObj_c::actionOrder() {
 }
 
 
-/* 8045BD50-8045BDB0 002770 0060+00 1/0 0/0 0/0 .text            actionEvent__9daBgObj_cFv */
 int daBgObj_c::actionEvent() {
     if (dComIfGp_evmng_endCheck(mEventIdx)) {
         setAction(3);
@@ -1417,12 +1206,10 @@ int daBgObj_c::actionEvent() {
     return 1;
 }
 
-/* 8045BDB0-8045BDB8 0027D0 0008+00 1/0 0/0 0/0 .text            actionWait__9daBgObj_cFv */
 int daBgObj_c::actionWait() {
     return 1;
 }
 
-/* 8045BDB8-8045BED0 0027D8 0118+00 1/0 0/0 0/0 .text            ExecuteType0__9daBgObj_cFv */
 int daBgObj_c::ExecuteType0() {
     u8 swBit = daBgObj_prm::getSwBit(this);
     u8 arg0 = daBgObj_prm::getObjArg0(this);
@@ -1454,7 +1241,6 @@ int daBgObj_c::ExecuteType0() {
     return 1;
 }
 
-/* 8045BED0-8045BFBC 0028F0 00EC+00 3/0 0/0 0/0 .text            ExecuteType1__9daBgObj_cFv */
 int daBgObj_c::ExecuteType1() {
     static actionFunc l_func[] = {&daBgObj_c::actionOrderWait, &daBgObj_c::actionOrder,
                                   &daBgObj_c::actionEvent, &daBgObj_c::actionWait};
@@ -1468,8 +1254,7 @@ int daBgObj_c::ExecuteType1() {
     return 1;
 }
 
-/* 8045BFBC-8045C078 0029DC 00BC+00 1/0 0/0 0/0 .text            Execute__9daBgObj_cFPPA3_A4_f */
-int daBgObj_c::Execute(f32 (**param_0)[3][4]) {
+int daBgObj_c::Execute(Mtx** param_0) {
     (this->*mExecuteFunc[mSpecData.mSpecType])();
 
     for (int i = 0; i < 2; i++) {
@@ -1487,7 +1272,6 @@ int daBgObj_c::Execute(f32 (**param_0)[3][4]) {
     return 1;
 }
 
-/* 8045C078-8045C25C 002A98 01E4+00 1/0 0/0 0/0 .text            Draw__9daBgObj_cFv */
 int daBgObj_c::Draw() {
     bool bvar = true;
     for (int i = 0; i < 2; i++) {
@@ -1531,8 +1315,6 @@ int daBgObj_c::Draw() {
     return 1;
 }
 
-/* 8045C25C-8045C2E8 002C7C 008C+00 1/1 0/0 0/0 .text            indirectProc__9daBgObj_cFP8J3DModel
- */
 void daBgObj_c::indirectProc(J3DModel* i_model) {
     if (i_model != NULL) {
         J3DModelData* modelData = i_model->getModelData();
@@ -1545,38 +1327,30 @@ void daBgObj_c::indirectProc(J3DModel* i_model) {
     }
 }
 
-/* 8045C2E8-8045C330 002D08 0048+00 1/0 0/0 0/0 .text            Delete__9daBgObj_cFv */
 int daBgObj_c::Delete() {
     release(mpBgW2);
     dComIfG_resDelete(&mPhase, daSetBgObj_c::getArcName(this));
     return 1;
 }
 
-/* 8045C330-8045C444 002D50 0114+00 1/0 0/0 0/0 .text            daBgObj_create1st__FP9daBgObj_c */
 static int daBgObj_create1st(daBgObj_c* i_this) {
-    fopAcM_SetupActor(i_this, daBgObj_c);
+    fopAcM_ct(i_this, daBgObj_c);
 
     return i_this->create1st();
 }
 
-/* 8045C744-8045C764 003164 0020+00 1/0 0/0 0/0 .text            daBgObj_MoveBGDelete__FP9daBgObj_c
- */
 static int daBgObj_MoveBGDelete(daBgObj_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 8045C764-8045C784 003184 0020+00 1/0 0/0 0/0 .text            daBgObj_MoveBGExecute__FP9daBgObj_c
- */
 static int daBgObj_MoveBGExecute(daBgObj_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 8045C784-8045C7B0 0031A4 002C+00 1/0 0/0 0/0 .text            daBgObj_MoveBGDraw__FP9daBgObj_c */
 static int daBgObj_MoveBGDraw(daBgObj_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 8045CD34-8045CD54 -00001 0020+00 1/0 0/0 0/0 .data            daBgObj_METHODS */
 static actor_method_class daBgObj_METHODS = {
     (process_method_func)daBgObj_create1st,
     (process_method_func)daBgObj_MoveBGDelete,
@@ -1585,7 +1359,6 @@ static actor_method_class daBgObj_METHODS = {
     (process_method_func)daBgObj_MoveBGDraw,
 };
 
-/* 8045CD54-8045CD84 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_BG_OBJ */
 extern actor_process_profile_definition g_profile_BG_OBJ = {
     fpcLy_CURRENT_e,
     7,

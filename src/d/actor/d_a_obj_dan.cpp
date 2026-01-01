@@ -3,27 +3,26 @@
  * Insect - Pillbug
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_dan.h"
 #include "SSystem/SComponent/c_math.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_com_inf_game.h"
 #include "d/d_menu_insect.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
-/* 80BDC568-80BDC56C 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool hioInit;
+static bool hio_set;
 
-/* 80BDC578-80BDC588 000018 0010+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_DanHIO_c l_HIO;
 
-/* 80BDA58C-80BDA5B4 0000EC 0028+00 1/1 0/0 0/0 .text            __ct__14daObj_DanHIO_cFv */
 daObj_DanHIO_c::daObj_DanHIO_c() {
     field_0x4 = -1;
     mScaleMale = 1.0f;
     mScaleFemale = 1.0f;
 }
 
-/* 80BDA5B4-80BDA620 000114 006C+00 1/1 0/0 0/0 .text            InitCcSph__10daObjDAN_cFv */
 void daObjDAN_c::InitCcSph() {
     const static dCcD_SrcSph ccSphSrc = {
         {
@@ -44,19 +43,16 @@ void daObjDAN_c::InitCcSph() {
     mCcSph.OnTgNoHitMark();
 }
 
-/* 80BDA620-80BDA678 000180 0058+00 1/1 0/0 0/0 .text            SetCcSph__10daObjDAN_cFv */
 void daObjDAN_c::SetCcSph() {
     mCcSph.SetC(current.pos);
     mCcSph.SetR(20.0f);
     dComIfG_Ccsp()->Set(&mCcSph);
 }
 
-/* 80BDA678-80BDA698 0001D8 0020+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     return static_cast<daObjDAN_c*>(i_this)->CreateHeap();
 }
 
-/* 80BDA698-80BDA9B0 0001F8 0318+00 1/1 0/0 0/0 .text            CreateHeap__10daObjDAN_cFv */
 int daObjDAN_c::CreateHeap() {
     J3DModelData* model_data = (J3DModelData*)dComIfG_getObjectRes("I_Dan", 11);
     mpMorf = new mDoExt_McaMorfSO(model_data, NULL, NULL,
@@ -110,25 +106,21 @@ int daObjDAN_c::CreateHeap() {
     return 1;
 }
 
-/* 80BDA9F8-80BDAA18 000558 0020+00 1/0 0/0 0/0 .text            daObjDAN_Create__FP10fopAc_ac_c */
 static cPhs__Step daObjDAN_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjDAN_c*>(i_this)->create();
 }
 
-/* 80BDAA18-80BDAA3C 000578 0024+00 1/0 0/0 0/0 .text            daObjDAN_Delete__FP10daObjDAN_c */
 static int daObjDAN_Delete(daObjDAN_c* i_this) {
     i_this->Delete();
     return 1;
 }
 
-/* 80BDAA3C-80BDAA9C 00059C 0060+00 2/2 0/0 0/0 .text            SpeedSet__10daObjDAN_cFv */
 void daObjDAN_c::SpeedSet() {
     cLib_addCalc2(&speedF, mTargetSpeed, 0.1f, 10.0f);
     cLib_addCalcAngleS2(&current.angle.y, mTargetAngleY, 0xa0, 0x100);
     shape_angle.y = current.angle.y;
 }
 
-/* 80BDAA9C-80BDAB14 0005FC 0078+00 1/1 0/0 0/0 .text            LinkChk__10daObjDAN_cFv */
 void daObjDAN_c::LinkChk() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     if (fopAcM_searchPlayerDistanceXZ(this) < 50.0f && player->speedF > 0.0f) {
@@ -137,7 +129,6 @@ void daObjDAN_c::LinkChk() {
     }
 }
 
-/* 80BDAB14-80BDAC10 000674 00FC+00 2/2 0/0 0/0 .text            MoveAction__10daObjDAN_cFv */
 void daObjDAN_c::MoveAction() {
     if (mTimer[0] == 0) {
         cXyz delta = home.pos - current.pos;
@@ -152,7 +143,6 @@ void daObjDAN_c::MoveAction() {
     mCreatureSound.startCreatureSoundLevel(Z2SE_INSCT_KSKS, 0, -1);
 }
 
-/* 80BDAC10-80BDAFDC 000770 03CC+00 2/2 0/0 0/0 .text            DamageAction__10daObjDAN_cFv */
 void daObjDAN_c::DamageAction() {
     daPy_py_c* player = daPy_getPlayerActorClass();
 
@@ -239,7 +229,6 @@ void daObjDAN_c::DamageAction() {
     SpeedSet();
 }
 
-/* 80BDAFDC-80BDB074 000B3C 0098+00 1/1 0/0 0/0 .text            Action__10daObjDAN_cFv */
 void daObjDAN_c::Action() {
     for (int i = 0; i < 3; i++) {
         mTimer[i]--;
@@ -260,23 +249,19 @@ void daObjDAN_c::Action() {
     Insect_GetDemoMain();
 }
 
-/* 80BDB074-80BDB0D8 000BD4 0064+00 1/1 0/0 0/0 .text            checkGroundPos__10daObjDAN_cFv */
 void daObjDAN_c::checkGroundPos() {
     cXyz pos = current.pos;
     mGndChk.SetPos(&pos);
     mGroundH = dComIfG_Bgsp().GroundCross(&mGndChk);
 }
 
-/* 80BDB0D8-80BDB0E8 000C38 0010+00 1/0 0/0 0/0 .text            Insect_Release__10daObjDAN_cFv */
 void daObjDAN_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     mAction = ACT_MOVE;
 }
 
-/* 80BDC42C-80BDC430 00007C 0002+02 1/2 0/0 0/0 .rodata          l_dan_itemno */
-static u8 const l_dan_itemno[2] = {0xCA, 0xCB};
+static u8 const l_dan_itemno[2] = {fpcNm_ITEM_M_DANGOMUSHI, fpcNm_ITEM_F_DANGOMUSHI};
 
-/* 80BDB0E8-80BDB264 000C48 017C+00 1/1 0/0 0/0 .text            Z_BufferChk__10daObjDAN_cFv */
 void daObjDAN_c::Z_BufferChk() {
     cXyz vec2, vec1;
     vec1 = current.pos;
@@ -289,7 +274,7 @@ void daObjDAN_c::Z_BufferChk() {
     } else {
         trim_height = 0.0f;
     }
-    if (vec2.x > 0.0f && vec2.x < 608.0f && vec2.y > trim_height && vec2.y < 448.0f - trim_height) {
+    if (vec2.x > 0.0f && vec2.x < FB_WIDTH && vec2.y > trim_height && vec2.y < FB_HEIGHT - trim_height) {
         dComIfGd_peekZ(vec2.x, vec2.y, &mBufferZ);
     }
 
@@ -303,7 +288,6 @@ void daObjDAN_c::Z_BufferChk() {
     mScreenZ = ((near + far * near / vec2.z) / (far - near) + 1.0f) * 0xffffff;
 }
 
-/* 80BDB264-80BDB388 000DC4 0124+00 1/1 0/0 0/0 .text            ParticleSet__10daObjDAN_cFv */
 void daObjDAN_c::ParticleSet() {
     if (mScreenZ > mBufferZ) {
         cLib_addCalc2(&mParticleScale, 0.0f, 1.0f, 1.0f);
@@ -319,7 +303,6 @@ void daObjDAN_c::ParticleSet() {
     }
 }
 
-/* 80BDB388-80BDB4E0 000EE8 0158+00 1/1 0/0 0/0 .text            ObjHit__10daObjDAN_cFv */
 void daObjDAN_c::ObjHit() {
     if (mCcSph.ChkTgHit()) {
         cCcD_Obj* hit_obj = mCcSph.GetTgHitObj();
@@ -348,7 +331,6 @@ static f32 dummy() {
     return 100.0f;
 }
 
-/* 80BDB4E0-80BDB62C 001040 014C+00 1/1 0/0 0/0 .text            BoomChk__10daObjDAN_cFv */
 void daObjDAN_c::BoomChk() {
     daPy_py_c* player = daPy_getPlayerActorClass();
     
@@ -374,7 +356,6 @@ void daObjDAN_c::BoomChk() {
     }
 }
 
-/* 80BDB62C-80BDB928 00118C 02FC+00 1/1 0/0 0/0 .text            Execute__10daObjDAN_cFv */
 int daObjDAN_c::Execute() {
     if (ChkGetDemo()) {
         mScreenZ = mBufferZ + 10000.0f;
@@ -440,11 +421,10 @@ int daObjDAN_c::Execute() {
     return 1;
 }
 
-/* 80BDB928-80BDB990 001488 0068+00 1/1 0/0 0/0 .text            Delete__10daObjDAN_cFv */
 int daObjDAN_c::Delete() {
     dComIfG_resDelete(&mPhase, "I_Dan");
     if (mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
     if (heap != NULL) {
         mpMorf->stopZelAnime();
@@ -452,7 +432,6 @@ int daObjDAN_c::Delete() {
     return 1;
 }
 
-/* 80BDB990-80BDBA0C 0014F0 007C+00 1/1 0/0 0/0 .text            setBaseMtx__10daObjDAN_cFv */
 void daObjDAN_c::setBaseMtx() {
     cXyz vec(0.0f, -4.0f, 0.0f);
     mDoMtx_stack_c::transS(current.pos);
@@ -479,20 +458,19 @@ int daObjDAN_c::Draw() {
     return 1;
 }
 
-/* 80BDBA0C-80BDBAEC 00156C 00E0+00 1/0 0/0 0/0 .text            daObjDAN_Draw__FP10daObjDAN_c */
 static int daObjDAN_Draw(daObjDAN_c* i_this) {
     return i_this->Draw();
 }
 
-/* 80BDBAEC-80BDBB0C 00164C 0020+00 2/1 0/0 0/0 .text            daObjDAN_Execute__FP10daObjDAN_c */
 static int daObjDAN_Execute(daObjDAN_c* i_this) {
     return i_this->Execute();
 }
 
-/* 80BDC460-80BDC464 0000B0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = {0x019B, 0x019C};
+static u16 const l_musiya_num[2] = {
+    0x019B, /* dSv_event_flag_c::F_0411 - Misc. - Pill bug (M) */
+    0x019C, /* dSv_event_flag_c::F_0412 - Misc. - Pill bug (F) */
+};
 
-/* 80BDBB0C-80BDBCB8 00166C 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjDAN_cFv */
 bool daObjDAN_c::CreateChk() {
     u8 param = (fopAcM_GetParam(this) >> 8) & 0xf;
     if (param == 0xf) {
@@ -527,15 +505,14 @@ bool daObjDAN_c::CreateChk() {
     return true;
 }
 
-/* 80BDBCB8-80BDC170 001818 04B8+00 1/1 0/0 0/0 .text            create__10daObjDAN_cFv */
 cPhs__Step daObjDAN_c::create() {
-    fopAcM_SetupActor(this, daObjDAN_c);
+    fopAcM_ct(this, daObjDAN_c);
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&mPhase, "I_Dan");
 
     if (step == cPhs_COMPLEATE_e) {
         mLocation = fopAcM_GetParam(this) & 0xf;
         if (mLocation == LOC_UNK_2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
             fopAcM_OnStatus(this, 0x4000);
         } else {
@@ -561,8 +538,8 @@ cPhs__Step daObjDAN_c::create() {
             return cPhs_ERROR_e;
         }
 
-        if (!hioInit) {
-            hioInit = true;
+        if (!hio_set) {
+            hio_set = true;
             mHIOInit = true;
             l_HIO.field_0x4 = -1;
         }
@@ -596,7 +573,7 @@ cPhs__Step daObjDAN_c::create() {
         pos.y += 100.0f;
         gnd_chk.SetPos(&pos);
         f32 cross = dComIfG_Bgsp().GroundCross(&gnd_chk);
-        if (cross != -1e9f) {
+        if (cross != -G_CM3D_F_INF) {
             current.pos.y = cross;
         }
 
@@ -612,13 +589,10 @@ cPhs__Step daObjDAN_c::create() {
     return step;
 }
 
-/* 80BDC2E8-80BDC2F0 001E48 0008+00 1/0 0/0 0/0 .text            daObjDAN_IsDelete__FP10daObjDAN_c
- */
 static int daObjDAN_IsDelete(daObjDAN_c* i_this) {
     return 1;
 }
 
-/* 80BDC47C-80BDC49C -00001 0020+00 1/0 0/0 0/0 .data            l_daObjDAN_Method */
 static actor_method_class l_daObjDAN_Method = {
     (process_method_func)daObjDAN_Create,
     (process_method_func)daObjDAN_Delete,
@@ -627,7 +601,6 @@ static actor_method_class l_daObjDAN_Method = {
     (process_method_func)daObjDAN_Draw,
 };
 
-/* 80BDC49C-80BDC4CC -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Dan */
 extern actor_process_profile_definition g_profile_Obj_Dan = {
     fpcLy_CURRENT_e,
     7,

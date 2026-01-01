@@ -3,6 +3,8 @@
  * Menu - Hidden Skills
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_menu_skill.h"
 #include "JSystem/J2DGraph/J2DTextBox.h"
 #include "JSystem/JKernel/JKRMemArchive.h"
@@ -14,11 +16,6 @@
 #include "d/d_msg_string.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
-
-/* 803BE7D8-803BE7E4 01B8F8 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
 
 typedef void (dMenu_Skill_c::*initFunc)();
 static initFunc map_init_process[] = {
@@ -36,8 +33,6 @@ static moveFunc map_move_process[] = {
     &dMenu_Skill_c::read_close_move,
 };
 
-/* 801F7224-801F7348 1F1B64 0124+00 0/0 2/2 0/0 .text
- * __ct__13dMenu_Skill_cFP10JKRExpHeapP9STControlP10CSTControl  */
 dMenu_Skill_c::dMenu_Skill_c(JKRExpHeap* i_heap, STControl* i_stcontrol, CSTControl* i_cstcontrol) {
     mpHeap = i_heap;
     mpArchive = NULL;
@@ -58,7 +53,6 @@ dMenu_Skill_c::dMenu_Skill_c(JKRExpHeap* i_heap, STControl* i_stcontrol, CSTCont
     mBarScale[0] = 1.0f;
 }
 
-/* 801F7348-801F763C 1F1C88 02F4+00 1/0 0/0 0/0 .text            __dt__13dMenu_Skill_cFv */
 dMenu_Skill_c::~dMenu_Skill_c() {
     delete mpDrawCursor;
     mpDrawCursor = NULL;
@@ -118,7 +112,6 @@ dMenu_Skill_c::~dMenu_Skill_c() {
     }
 }
 
-/* 801F763C-801F7718 1F1F7C 00DC+00 1/1 0/0 0/0 .text            _create__13dMenu_Skill_cFv */
 void dMenu_Skill_c::_create() {
     mpDrawCursor = new dSelect_cursor_c(2, 1.0f, NULL);
     mpDrawCursor->setParam(1.01f, 0.85f, 0.02f, 0.5f, 0.5f);
@@ -133,7 +126,6 @@ void dMenu_Skill_c::_create() {
     init();
 }
 
-/* 801F7718-801F77B0 1F2058 0098+00 0/0 2/2 0/0 .text            _move__13dMenu_Skill_cFv */
 void dMenu_Skill_c::_move() {
     JKRHeap* heap = mDoExt_setCurrentHeap((JKRHeap*)mpHeap);
     u8 process = mProcess;
@@ -145,18 +137,17 @@ void dMenu_Skill_c::_move() {
     mDoExt_setCurrentHeap(heap);
 }
 
-/* 801F77B0-801F7950 1F20F0 01A0+00 1/1 1/1 0/0 .text            _draw__13dMenu_Skill_cFv */
 void dMenu_Skill_c::_draw() {
     if (mpArchive != NULL) {
         J2DGrafContext* context = dComIfGp_getCurrentGrafPort();
         u8 alpha = mpBlackTex->mAlpha;
         mpBlackTex->setAlpha(0xff);
-        mpBlackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, 0, 0, 0);
+        mpBlackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0, 0, 0);
         mpBlackTex->setAlpha(alpha);
         mpMenuScreen->draw(mPosX, 0.0f, context);
         mpDrawCursor->draw();
         if (mProcess == 1 || mProcess == 2 || mProcess == 3) {
-            mpBlackTex->draw(0.0f, 0.0f, 608.0f, 448.0f, 0, 0, 0);
+            mpBlackTex->draw(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0, 0, 0);
             mpLetterScreen->draw(0.0f, 0.0f, context);
             if (mStringID != 0) {
                 mpString->getString(mStringID, (J2DTextBox*)mpTextPane->getPanePtr(), NULL, NULL,
@@ -168,7 +159,6 @@ void dMenu_Skill_c::_draw() {
     }
 }
 
-/* 801F7950-801F7978 1F2290 0028+00 0/0 2/2 0/0 .text            isSync__13dMenu_Skill_cFv */
 bool dMenu_Skill_c::isSync() {
     if (mpMount != NULL && mpMount->sync() == false) {
         return 0;
@@ -176,8 +166,6 @@ bool dMenu_Skill_c::isSync() {
     return 1;
 }
 
-/* 801F7978-801F79EC 1F22B8 0074+00 1/1 0/0 0/0 .text            skill_init_calc__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::skill_init_calc() {
     mTotalSkillNum = getSkillNum();
     if (mTotalSkillNum < 7) {
@@ -193,14 +181,12 @@ void dMenu_Skill_c::skill_init_calc() {
     }
 }
 
-/* 801F79EC-801F7A40 1F232C 0054+00 1/1 0/0 0/0 .text            init__13dMenu_Skill_cFv */
 void dMenu_Skill_c::init() {
     setPageText();
     changeActiveColor();
     (this->*map_init_process[mProcess])();
 }
 
-/* 801F7A40-801F7C1C 1F2380 01DC+00 0/0 2/2 0/0 .text            _open__13dMenu_Skill_cFv */
 int dMenu_Skill_c::_open() {
     if (!mpMount) {
         mpMount = mDoDvdThd_mountArchive_c::create("/res/Layout/skillres.arc", 0, NULL);
@@ -242,7 +228,6 @@ int dMenu_Skill_c::_open() {
     }
 }
 
-/* 801F7C1C-801F7D58 1F255C 013C+00 0/0 1/1 0/0 .text            _close__13dMenu_Skill_cFv */
 int dMenu_Skill_c::_close() {
     s16 closeFrame = g_drawHIO.mSkillListScreen.mCloseFrame[0];
     mFrame = 0;
@@ -267,13 +252,11 @@ int dMenu_Skill_c::_close() {
     return mFrame <= 0;
 }
 
-/* 801F7D58-801F7D94 1F2698 003C+00 1/0 0/0 0/0 .text            wait_init__13dMenu_Skill_cFv */
 void dMenu_Skill_c::wait_init() {
     setAButtonString(0x40C);
     setBButtonString(0x3f9);
 }
 
-/* 801F7D94-801F7F24 1F26D4 0190+00 1/0 0/0 0/0 .text            wait_move__13dMenu_Skill_cFv */
 void dMenu_Skill_c::wait_move() {
     u8 oldIndex = mIndex;
     if (mDoGph_gInf_c::getFader()->getStatus() == 1) {
@@ -301,8 +284,6 @@ void dMenu_Skill_c::wait_move() {
     }
 }
 
-/* 801F7F24-801F7FF8 1F2864 00D4+00 1/0 0/0 0/0 .text            read_open_init__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_open_init() {
     static const u32 i_id[7] = {
         1716, 1715, 1717, 1718, 1719, 1720, 1721,
@@ -322,8 +303,6 @@ void dMenu_Skill_c::read_open_init() {
     mpBlackTex->setAlpha(0);
 }
 
-/* 801F7FF8-801F8114 1F2938 011C+00 1/0 0/0 0/0 .text            read_open_move__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_open_move() {
     s16 openSkillDescFrame =
         g_drawHIO.mSkillListScreen.mOpenFrame[dMeter_drawSkillHIO_c::SKILL_DESC];
@@ -339,15 +318,11 @@ void dMenu_Skill_c::read_open_move() {
     }
 }
 
-/* 801F8114-801F8150 1F2A54 003C+00 1/0 0/0 0/0 .text            read_move_init__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_move_init() {
     setAButtonString(0);
     setBButtonString(0x3f9);
 }
 
-/* 801F8150-801F8218 1F2A90 00C8+00 1/0 0/0 0/0 .text            read_move_move__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_move_move() {
     if (mDoCPd_c::getTrigA(PAD_1) != 0) {
         Z2GetAudioMgr()->seStart(Z2SE_SY_EXP_WIN_CLOSE, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
@@ -361,8 +336,6 @@ void dMenu_Skill_c::read_move_move() {
     }
 }
 
-/* 801F8218-801F826C 1F2B58 0054+00 1/0 0/0 0/0 .text            read_close_init__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_close_init() {
     mProcFrame = g_drawHIO.mSkillListScreen.mCloseFrame[dMeter_drawSkillHIO_c::SKILL_DESC];
     mStringID = 0;
@@ -370,8 +343,6 @@ void dMenu_Skill_c::read_close_init() {
     setBButtonString(0);
 }
 
-/* 801F826C-801F8388 1F2BAC 011C+00 1/0 0/0 0/0 .text            read_close_move__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::read_close_move() {
     s16 closeSkillDescFrame =
         g_drawHIO.mSkillListScreen.mCloseFrame[dMeter_drawSkillHIO_c::SKILL_DESC];
@@ -387,7 +358,6 @@ void dMenu_Skill_c::read_close_move() {
     }
 }
 
-/* 801F8388-801F8A18 1F2CC8 0690+00 1/1 0/0 0/0 .text            screenSetMenu__13dMenu_Skill_cFv */
 void dMenu_Skill_c::screenSetMenu() {
     static const u64 tag_sub0[7] = {
         'menu_t0s', 'menu_t1s', 'menu_t2s', 'menu_t3s', 'menu_t4s', 'menu_t5s', 'menu_t51',
@@ -443,6 +413,16 @@ void dMenu_Skill_c::screenSetMenu() {
     mpParent = new CPaneMgr(mpMenuScreen, 'n_all', 2, NULL);
     mpParent->setAlphaRate(0.0f);
     for (int i = 0; i < 7; i++) {
+#if VERSION == VERSION_GCN_JPN
+        mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(tag_sub0[i]);
+        mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(tag_sub1[i]);
+        mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(tag_name0[i]);
+        mpFTagPicture[i][3] = (J2DTextBox*)mpMenuScreen->search(tag_name1[i]);
+        mpMenuScreen->search(ftag_sub0[i])->hide();
+        mpMenuScreen->search(ftag_sub1[i])->hide();
+        mpMenuScreen->search(ftag_name0[i])->hide();
+        mpMenuScreen->search(ftag_name1[i])->hide();
+#else
         mpFTagPicture[i][0] = (J2DTextBox*)mpMenuScreen->search(ftag_sub0[i]);
         mpFTagPicture[i][1] = (J2DTextBox*)mpMenuScreen->search(ftag_sub1[i]);
         mpFTagPicture[i][2] = (J2DTextBox*)mpMenuScreen->search(ftag_name0[i]);
@@ -451,6 +431,7 @@ void dMenu_Skill_c::screenSetMenu() {
         mpMenuScreen->search(tag_sub1[i])->hide();
         mpMenuScreen->search(tag_name0[i])->hide();
         mpMenuScreen->search(tag_name1[i])->hide();
+#endif
         for (int j = 0; j < 4; j++) {
             mpFTagPicture[i][j]->setFont(mDoExt_getMesgFont());
             mpFTagPicture[i][j]->setString(0x40, "");
@@ -487,15 +468,18 @@ void dMenu_Skill_c::screenSetMenu() {
             mSelectWhite[i] = mpFTagPicture[1][i]->getWhite();
         }
     }
+#if VERSION == VERSION_GCN_JPN
+    J2DTextBox* textBox = (J2DTextBox*)mpMenuScreen->search('t_t00');
+    mpMenuScreen->search('f_t00')->hide();
+#else
     J2DTextBox* textBox = (J2DTextBox*)mpMenuScreen->search('f_t00');
     mpMenuScreen->search('t_t00')->hide();
+#endif
     textBox->setFont(mDoExt_getSubFont());
     textBox->setString(0x200, "");
     mpString->getString(0x6a4, textBox, NULL, NULL, NULL, 0);
 }
 
-/* 801F8A18-801F8D20 1F3358 0308+00 1/1 0/0 0/0 .text            screenSetLetter__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::screenSetLetter() {
     static const u64 name_tag[4] = {
         'item_n04',
@@ -513,16 +497,26 @@ void dMenu_Skill_c::screenSetLetter() {
     mpLetterScreen = new J2DScreen();
     mpLetterScreen->setPriority("zelda_ougi_info.blo", 0x20000, mpArchive);
     dPaneClass_showNullPane(mpLetterScreen);
+#if VERSION == VERSION_GCN_JPN
+    mpTextPane = new CPaneMgr(mpLetterScreen, 'mg_3line', 0, NULL);
+    mpLetterScreen->search('n_e4line')->hide();
+#else
     mpTextPane = new CPaneMgr(mpLetterScreen, 'mg_e4lin', 0, NULL);
     mpLetterScreen->search('n_3line')->hide();
+#endif
     mpExpName = new CPaneMgr(mpLetterScreen, 'label_n', 0, NULL);
     J2DTextBox* paneFont = (J2DTextBox*)mpTextPane->getPanePtr();
     paneFont->setFont(mDoExt_getMesgFont());
     J2DTextBox* paneString = (J2DTextBox*)mpTextPane->getPanePtr();
     paneString->setString(0x200, "");
     for (int i = 0; i < 4; i++) {
+#if VERSION == VERSION_GCN_JPN
+        mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(name_tag[i]);
+        mpLetterScreen->search(fame_tag[i])->hide();
+#else
         mpNameString[i] = (J2DTextBox*)mpLetterScreen->search(fame_tag[i]);
         mpLetterScreen->search(name_tag[i])->hide();
+#endif
         mpNameString[i]->setFont(mDoExt_getMesgFont());
         mpNameString[i]->setString(0x40, "");
     }
@@ -534,8 +528,6 @@ void dMenu_Skill_c::screenSetLetter() {
     mpBlackTex->setAlpha(0);
 }
 
-/* 801F8D20-801F8E9C 1F3660 017C+00 1/1 0/0 0/0 .text            screenSetDoIcon__13dMenu_Skill_cFv
- */
 void dMenu_Skill_c::screenSetDoIcon() {
     static const u64 text_a_tag[5] = {
         'atext1_1', 'atext1_2', 'atext1_3', 'atext1_4', 'atext1_5',
@@ -560,13 +552,11 @@ void dMenu_Skill_c::screenSetDoIcon() {
     }
 }
 
-/* 801F8E9C-801F8F28 1F37DC 008C+00 3/3 0/0 0/0 .text            setCursorPos__13dMenu_Skill_cFv */
 void dMenu_Skill_c::setCursorPos() {
     Vec pos = mpLetterParent[mIndex]->getGlobalVtxCenter(mpLetterParent[mIndex]->mPane, false, 0);
     mpDrawCursor->setPos(pos.x, pos.y, mpLetterParent[mIndex]->getPanePtr(), false);
 }
 
-/* 801F8F28-801F9144 1F3868 021C+00 2/2 0/0 0/0 .text changeActiveColor__13dMenu_Skill_cFv */
 void dMenu_Skill_c::changeActiveColor() {
     setCursorPos();
     for (int i = 0; i < 7; i++) {
@@ -586,7 +576,6 @@ void dMenu_Skill_c::changeActiveColor() {
     }
 }
 
-/* 801F9144-801F9260 1F3A84 011C+00 1/1 0/0 0/0 .text            setPageText__13dMenu_Skill_cFv */
 void dMenu_Skill_c::setPageText() {
     static const u32 i_id0[7] = {
         1701, 1702, 1703, 1704, 1705, 1706, 1707,
@@ -603,7 +592,6 @@ void dMenu_Skill_c::setPageText() {
     }
 }
 
-/* 801F9260-801F9310 1F3BA0 00B0+00 4/4 0/0 0/0 .text setAButtonString__13dMenu_Skill_cFUs */
 void dMenu_Skill_c::setAButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
@@ -616,7 +604,6 @@ void dMenu_Skill_c::setAButtonString(u16 i_stringID) {
     }
 }
 
-/* 801F9310-801F93C0 1F3C50 00B0+00 4/4 0/0 0/0 .text setBButtonString__13dMenu_Skill_cFUs */
 void dMenu_Skill_c::setBButtonString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 5; i++) {
@@ -629,8 +616,6 @@ void dMenu_Skill_c::setBButtonString(u16 i_stringID) {
     }
 }
 
-/* 801F93C0-801F9470 1F3D00 00B0+00 1/1 0/0 0/0 .text            setNameString__13dMenu_Skill_cFUs
- */
 void dMenu_Skill_c::setNameString(u16 i_stringID) {
     if (i_stringID == 0) {
         for (int i = 0; i < 4; i++) {
@@ -643,10 +628,15 @@ void dMenu_Skill_c::setNameString(u16 i_stringID) {
     }
 }
 
-/* 801F9470-801F9500 1F3DB0 0090+00 1/1 0/0 0/0 .text            getSkillNum__13dMenu_Skill_cFv */
 u8 dMenu_Skill_c::getSkillNum() {
     static u32 evt_id[7] = {
-        339, 338, 340, 341, 342, 343, 344,
+        339, /* dSv_event_flag_c::F_0339 - Secret techniques - Obtained 2 secret techinques */
+        338, /* dSv_event_flag_c::F_0338 - Secret techniques - Obtained 1 secret techinques - Shield attack */
+        340, /* dSv_event_flag_c::F_0340 - Secret techniques - Obtained 3 secret techinques */
+        341, /* dSv_event_flag_c::F_0341 - Secret techniques - Obtained 4 secret techinques */
+        342, /* dSv_event_flag_c::F_0342 - Secret techniques - Obtained 5 secret techinques */
+        343, /* dSv_event_flag_c::F_0343 - Secret techniques - Obtained 6 secret techinques */
+        344, /* dSv_event_flag_c::F_0344 - Secret techniques - Obtained 7 secret techinques */
     };
 
     u8 skillNum = 0;
@@ -658,7 +648,6 @@ u8 dMenu_Skill_c::getSkillNum() {
     return skillNum;
 }
 
-/* 801F9500-801F9A08 1F3E40 0508+00 2/2 0/0 0/0 .text            setHIO__13dMenu_Skill_cFb */
 void dMenu_Skill_c::setHIO(bool i_useHIO) {
     if (i_useHIO || g_drawHIO.mSkillListScreen.mDebug) {
         mSelectBlack[0].set(g_drawHIO.mSkillListScreen.mSelectBarBlack);

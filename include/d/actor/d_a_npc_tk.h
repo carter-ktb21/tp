@@ -4,6 +4,7 @@
 #include "d/actor/d_a_npc.h"
 #include "d/d_cc_uty.h"
 #include "d/d_path.h"
+#include "d/d_spline_path.h"
 
 struct cXyz;
 class daNpc_Hanjo_c;
@@ -14,76 +15,76 @@ class J3DModel;
 /**
  * @ingroup actors-npcs
  * @class daNPC_TK_c
- * @brief Hawk
+ * @brief Hawk (Taka)
  *
  * @details
  *
  */
 class daNPC_TK_c : public fopAc_ac_c {
 public:
-    /* 80B01498 */ void setBck(int, u8, f32, f32);
-    /* 80B0153C */ bool checkBck(int);
-    /* 80B01598 */ int draw();
-    /* 80B016D4 */ int checkBeforeBg();
-    /* 80B01878 */ void setActionMode(int);
-    /* 80B018F4 */ f32 setAddCalcSpeedXZ(cXyz&, cXyz const&, f32, f32, f32);
-    /* 80B01C84 */ cXyz chaseTargetPos(cXyz, f32, f32, s16);
+    void setBck(int, u8, f32, f32);
+    bool checkBck(int);
+    int draw();
+    int checkBeforeBg();
+    void setActionMode(int);
+    f32 setAddCalcSpeedXZ(cXyz&, cXyz const&, f32, f32, f32);
+    cXyz chaseTargetPos(cXyz, f32, f32, s16);
     /* 80B01D84 */
     fopAc_ac_c* getMasterPointer();
-    /* 80B01DA0 */ void setMasterShoulder(cXyz*);
-    /* 80B01E48 */ void setAwayAction(int);
-    /* 80B01EF4 */ void setFlySE();
-    /* 80B02254 */ void executeFly();
-    /* 80B026F8 */ void initPerchDemo(int);
+    void setMasterShoulder(cXyz*);
+    void setAwayAction(int);
+    void setFlySE();
+    void executeFly();
+    void initPerchDemo(int);
     /* 80B02B5C */
     bool executePerchDemo(int);
-    /* 80B03658 */ void executePerch();
-    /* 80B03754 */ void executeHandOn();
+    void executePerch();
+    void executeHandOn();
     /* 80B039A8 */
     bool checkWaterSurface(f32);
-    /* 80B03A70 */ void executeAttack();
-    /* 80B048BC */ void executeAway();
-    /* 80B04BF8 */ void setCarryActorMtx();
+    void executeAttack();
+    void executeAway();
+    void setCarryActorMtx();
     /* 80B04F64 */
     f32 getTakePosY();
     /* 80B04FA8 */
     f32 getTakeOffPosY();
-    /* 80B04FEC */ void executeBack();
+    void executeBack();
     /* 80B05BD0 */
     cXyz getHanjoHandPos();
-    /* 80B05C7C */ void executeStayHanjo();
-    /* 80B05EC8 */ void executeAttackLink();
-    /* 80B0686C */ void executeBackHanjo();
+    void executeStayHanjo();
+    void executeAttackLink();
+    void executeBackHanjo();
     /* 80B07114 */
     bool checkAttackDemo();
-    /* 80B072CC */ void executeAttackDemo();
-    /* 80B07610 */ void executeBackHanjoDemo();
-    /* 80B08168 */ void executeWolfEvent();
-    /* 80B08208 */ void calcWolfDemoCam();
-    /* 80B082A4 */ void calcWolfDemoCam2();
-    /* 80B0839C */ void executeWolfPerch();
-    /* 80B09A3C */ void executeResistanceDemo();
-    /* 80B0A444 */ void setHawkSideCamera(cXyz);
-    /* 80B0A500 */ void setHawkCamera(fopAc_ac_c*);
-    /* 80B0A568 */ void endHawkCamera();
-    /* 80B0A614 */ void calcDemoCamera();
-    /* 80B0B004 */ void checkActionSet();
-    /* 80B0B284 */ void action();
-    /* 80B0B5CC */ void mtx_set();
-    /* 80B0B6DC */ void cc_set();
-    /* 80B0B7CC */ int execute();
-    /* 80B0B918 */ int _delete();
+    void executeAttackDemo();
+    void executeBackHanjoDemo();
+    void executeWolfEvent();
+    void calcWolfDemoCam();
+    void calcWolfDemoCam2();
+    void executeWolfPerch();
+    void executeResistanceDemo();
+    void setHawkSideCamera(cXyz);
+    void setHawkCamera(fopAc_ac_c*);
+    void endHawkCamera();
+    void calcDemoCamera();
+    void checkActionSet();
+    void action();
+    void mtx_set();
+    void cc_set();
+    int execute();
+    int _delete();
     /* 80B0B9AC */
     int ctrlJoint(J3DJoint*, J3DModel*);
-    /* 80B0BB7C */ static int JointCallBack(J3DJoint*, int);
-    /* 80B0BBC8 */ int CreateHeap();
-    /* 80B0BD24 */ int create();
+    static int JointCallBack(J3DJoint*, int);
+    int CreateHeap();
+    int create();
 
-    void setBump() { mFlags |= 4; }
-    void setEventWolf() { mFlags |= 0x80; }
-    void setEvent() { mFlags |= 0x8; }
-    void setAway() { mFlags |= 2; }
-    void setAttack() { mFlags |= 1; }
+    void setBump() { mFlags |= (u16)4; }
+    void setEventWolf() { mFlags |= (u16)0x80; }
+    void setEvent() { mFlags |= (u16)0x8; }
+    void setAway() { mFlags |= (u16)2; }
+    void setAttack() { mFlags |= (u16)1; }
 
     void setHawkPath(u8 i_pathNo) {
         if (i_pathNo != 0xFF) {
@@ -92,13 +93,14 @@ public:
     }
 
     BOOL isAttackLink() { return field_0x71a != 0; }
-    void setAttackLink() { mFlags |= 0x10; }
-    void setBackHanjo() { mFlags |= 0x20; }
-    void setHanjoHand() { mFlags |= 0x40; }
-    void setQuickHanjoHand() { mFlags |= 0x200; }
+    void setAttackLink() { mFlags |= (u16)0x10; }
+    void setBackHanjo() { mFlags |= (u16)0x20; }
+    void setHanjoHand() { mFlags |= (u16)0x40; }
+    void setQuickHanjoHand() { mFlags |= (u16)0x200; }
     BOOL isHanjoHand() { return mIsHanjoHand != 0; }
 
-private:
+    void setResistanceDemo() { mFlags |= (u16)0x100; }
+
     /* 0x568 */ request_of_phase_process_class mPhase;
     /* 0x570 */ mDoExt_McaMorfSO* mpMorf;
     /* 0x574 */ Z2Creature mSound;
@@ -179,30 +181,5 @@ private:
 };
 
 STATIC_ASSERT(sizeof(daNPC_TK_c) == 0xB44);
-
-class daNPC_TK_HIO_c : public JORReflexible {
-public:
-    daNPC_TK_HIO_c();
-    virtual ~daNPC_TK_HIO_c() {}
-
-    void genMessage(JORMContext*) {}
-
-    s8 field_0x4;
-    f32 field_0x8;
-    f32 field_0xc;
-    f32 field_0x10;
-    f32 field_0x14;
-    f32 field_0x18;
-    f32 field_0x1c;
-    f32 field_0x20;
-    f32 field_0x24;
-    f32 field_0x28;
-    f32 mFlySpeed;
-    f32 field_0x30;
-    f32 field_0x34;
-    f32 field_0x38;
-    u8 field_0x3c;
-};
-
 
 #endif /* D_A_NPC_TK_H */

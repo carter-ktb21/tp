@@ -3,27 +3,32 @@
  *
  */
 
-#include "d/d_map_path.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
+#include "JSystem/JHostIO/JORFile.h"
 #include "JSystem/J2DGraph/J2DGrafContext.h"
+#include "JSystem/JHostIO/JORFile.h"
 #include "JSystem/JUtility/JUTTexture.h"
 #include "d/d_com_inf_game.h"
+#include "d/d_map_path.h"
 #include "m_Do/m_Do_lib.h"
 
-/* 8003C85C-8003C8F4 03719C 0098+00 0/0 1/1 0/0 .text create__Q28dMpath_n18dTexObjAggregate_cFv */
 void dMpath_n::dTexObjAggregate_c::create() {
     static int const data[7] = {
         79, 80, 77, 78, 76, 81, 82,
     };
 
-    for (int i = 0; i < 7; i++) {
-        mp_texObj[i] = new GXTexObj();
-
-        ResTIMG* image = (ResTIMG*)dComIfG_getObjectRes("Always", data[i]);
-        mDoLib_setResTimgObj(image, mp_texObj[i], 0, NULL);
+    for (int lp1 = 0; lp1 < 7; lp1++) {
+        mp_texObj[lp1] = new GXTexObj();
+        JUT_ASSERT(70, mp_texObj[lp1] != NULL);
+        ResTIMG* image = (ResTIMG*)dComIfG_getObjectRes("Always", data[lp1]);
+        JUT_ASSERT(72, image != NULL);
+        JUT_ASSERT(73, image->minFilter == GX_NEAR);
+        JUT_ASSERT(74, image->magFilter == GX_NEAR);
+        mDoLib_setResTimgObj(image, mp_texObj[lp1], 0, NULL);
     }
 }
 
-/* 8003C8F4-8003C94C 037234 0058+00 1/1 1/1 0/0 .text remove__Q28dMpath_n18dTexObjAggregate_cFv */
 void dMpath_n::dTexObjAggregate_c::remove() {
     for (int i = 0; i < 7; i++) {
         delete mp_texObj[i];
@@ -31,8 +36,159 @@ void dMpath_n::dTexObjAggregate_c::remove() {
     }
 }
 
-/* 8003C94C-8003CA40 03728C 00F4+00 2/0 9/2 0/0 .text
- * rendering__11dDrawPath_cFPCQ211dDrawPath_c10line_class       */
+#if DEBUG
+void dMpath_HIO_n::hioList_c::gen(JORMContext* mctx) {
+    static const char* number[] = {
+        "00", "01", "02", "03", "04", "05", "06", "07",
+        "08", "09", "10", "11", "12", "13", "14", "15",
+        "16", "17", "18", "19", "20", "21", "22", "23",
+        "24", "25", "26", "27", "28", "29", "30", "31",
+        "32", "33", "34", "35", "36", "37", "38", "39",
+        "40", "41", "42", "43", "44", "45", "46", "47",
+        "48", "49", "50", "51", "52", "53", "54", "55",
+        "56", "57", "58", "59", "60", "61", "62", "63",
+    };
+    // DEBUG NONMATCHING
+}
+
+void dMpath_HIO_n::hioList_c::update(JORMContext* mctx) {
+    // DEBUG NONMATCHING
+}
+
+u32 dMpath_HIO_n::hioList_c::addString(char* param_1, u32 param_2, u32 param_3) const {
+    // DEBUG NONMATCHING
+}
+
+u32 dMpath_HIO_n::hioList_c::addStringBinary(char* param_1, u32 param_2, u32 param_3) const {
+    // DEBUG NONMATCHING
+}
+
+BOOL dMpath_HIO_file_base_c::writeHostioTextFile(const char* param_1) {
+    JORFile file;
+    BOOL result = 0;
+    const char* r27 = "すべてのファイル(*.*)\0*.*\0";
+    if (param_1) {
+        r27 = param_1;
+    }
+    if (file.open(JORFile::EFlags_WRITE | JORFile::EFlags_UNK_0x4, r27, NULL, NULL, NULL)) {
+        const u32 bufSize = 4000;
+        u32 size = 0;
+        char buffer[bufSize];
+        memset(buffer, 0, bufSize);
+        size = addString(buffer, size, bufSize);
+        JUT_ASSERT(732, size < bufSize);
+        file.writeData(buffer, s16(size));
+        file.close();
+        OSReport("write append success!::%6d\n", size);
+        result = 1;
+    } else {
+        OSReport("write append failure!\n");
+        result = 0;
+    }
+    return result;
+}
+
+BOOL dMpath_HIO_file_base_c::writeBinaryTextFile(const char* param_1) {
+    JORFile file;
+    BOOL result = 0;
+    const char* r27 = "すべてのファイル(*.*)\0*.*\0";
+    if (param_1) {
+        r27 = param_1;
+    }
+    if (file.open(JORFile::EFlags_WRITE | JORFile::EFlags_UNK_0x4, r27, NULL, NULL, NULL)) {
+        const u32 bufSize = 10000;
+        u32 size = 0;
+        char buffer[bufSize];
+        memset(buffer, 0, bufSize);
+        size = addStringBinary(buffer, size, bufSize);
+        JUT_ASSERT(762, size < bufSize);
+        file.writeData(buffer, s16(size));
+        file.close();
+        OSReport("write append success!::%6d\n", size);
+        result = 1;
+    } else {
+        OSReport("write append failure!\n");
+        result = 0;
+    }
+    return result;
+}
+
+BOOL dMpath_HIO_file_base_c::writeBinaryFile(const char* param_1) {
+    JORFile file;
+    BOOL result = 0;
+    const char* r27 = "すべてのファイル(*.*)\0*.*\0";
+    if (param_1) {
+        r27 = param_1;
+    }
+    if (file.open(JORFile::EFlags_WRITE | JORFile::EFlags_UNK_0x4, r27, NULL, NULL, NULL)) {
+        const u32 bufSize = 2000;
+        u32 size = 0;
+        char buffer[bufSize];
+        memset(buffer, 0, bufSize);
+        size = addData(buffer, size, bufSize);
+        JUT_ASSERT(794, size < bufSize);
+        file.writeData(buffer, s16(size));
+        file.close();
+        OSReport("write append success!::%6d\n", size);
+        result = 1;
+    } else {
+        OSReport("write append failure!\n");
+        result = 0;
+    }
+    return result;
+}
+
+void dMpath_HIO_file_base_c::binaryDump(const void* param_1, u32 param_2) {
+    int r26 = 0;
+    u8* r30 = (u8*)param_1;
+    u8* r25 = r30;
+    int r28;
+    for (int i = 0; i < param_2; i++, r30++) {
+        r28 = i % 8;
+        if (r28 == 0) {
+            OSReport("%04x : ",i);
+        }
+        OSReport("%02x", u8(*r30));
+        if (r28 == 3) {
+            OSReport(" - ");
+        } else if (r28 == 7) {
+            OSReport("\n");
+        } else {
+            OSReport(" ");
+        }
+    }
+    if (r28 != 7) {
+        OSReport("\n");
+    }
+    OSReport("startAdr<%08x>dataSize<%d><0x%04x>\n", param_1, param_2, param_2);
+}
+
+bool dMpath_HIO_file_base_c::readBinaryFile(const char* param_1)  {
+    JORFile file;
+    bool result = false;
+    const char* r26 = "すべてのファイル(*.*)\0*.*\0";
+    if (param_1) {
+        r26 = param_1;
+    }
+    if (file.open(JORFile::EFlags_READ, r26, NULL, NULL, NULL)) {
+        s32 r28 = file.getFileSize();
+        char* buf = new char[r28];
+        JUT_ASSERT(855, buf != 0);
+        file.readData(buf, r28);
+        copyReadBufToData(buf, r28);
+        OSReport("write read success!::%6d\n", r28);
+        result = true;
+        delete[] buf;
+        buf = NULL;
+        file.close();
+    } else {
+        OSReport("write append failure!\n");
+        result = false;
+    }
+    return result;
+}
+#endif
+
 void dDrawPath_c::rendering(dDrawPath_c::line_class const* p_line) {
     if (isDrawType(p_line->field_0x0)) {
         int width = getLineWidth(p_line->field_0x1);
@@ -52,8 +208,6 @@ void dDrawPath_c::rendering(dDrawPath_c::line_class const* p_line) {
     }
 }
 
-/* 8003CA40-8003CB00 037380 00C0+00 2/0 9/1 0/0 .text
- * rendering__11dDrawPath_cFPCQ211dDrawPath_c10poly_class       */
 void dDrawPath_c::rendering(dDrawPath_c::poly_class const* p_poly) {
     if (isDrawType(p_poly->field_0x0)) {
         GXSetTevColor(GX_TEVREG0, *getColor(p_poly->field_0x0 & 0x3F));
@@ -71,8 +225,6 @@ void dDrawPath_c::rendering(dDrawPath_c::poly_class const* p_poly) {
     }
 }
 
-/* 8003CB00-8003CBBC 037440 00BC+00 1/1 0/0 0/0 .text
- * rendering__11dDrawPath_cFPCQ211dDrawPath_c11group_class      */
 void dDrawPath_c::rendering(dDrawPath_c::group_class const* p_group) {
     if (isSwitch(p_group)) {
         poly_class* poly = p_group->mpPoly;
@@ -89,8 +241,6 @@ void dDrawPath_c::rendering(dDrawPath_c::group_class const* p_group) {
     }
 }
 
-/* 8003CBBC-8003CC24 0374FC 0068+00 1/1 0/0 0/0 .text
- * rendering__11dDrawPath_cFPCQ211dDrawPath_c11floor_class      */
 void dDrawPath_c::rendering(dDrawPath_c::floor_class const* p_floor) {
     if (p_floor->mpGroup != NULL) {
         group_class* group = p_floor->mpGroup;
@@ -102,15 +252,14 @@ void dDrawPath_c::rendering(dDrawPath_c::floor_class const* p_floor) {
     }
 }
 
-/* 8003CC24-8003CCC4 037564 00A0+00 2/0 9/1 0/0 .text
- * rendering__11dDrawPath_cFPCQ211dDrawPath_c10room_class       */
-void dDrawPath_c::rendering(dDrawPath_c::room_class const* p_room) {
-    if (p_room != NULL) {
-        GXSetArray(GX_VA_POS, p_room->mpFloatData, 8);
-        floor_class* floor = p_room->mpFloor;
+void dDrawPath_c::rendering(dDrawPath_c::room_class const* room) {
+    JUT_ASSERT(1043, room != NULL);
+    if (room != NULL) {
+        GXSetArray(GX_VA_POS, room->mpFloatData, 8);
+        floor_class* floor = room->mpFloor;
 
         if (floor != NULL) {
-            for (int i = 0; i < p_room->mFloorNum; i++) {
+            for (int i = 0; i < room->mFloorNum; i++) {
                 if (isRenderingFloor(floor->mFloorNo)) {
                     rendering(floor);
                 }
@@ -120,7 +269,6 @@ void dDrawPath_c::rendering(dDrawPath_c::room_class const* p_room) {
     }
 }
 
-/* 8003CCC4-8003CD38 037604 0074+00 2/0 9/1 0/0 .text            drawPath__11dDrawPath_cFv */
 void dDrawPath_c::drawPath() {
     room_class* room = getFirstRoomPointer();
     while (room != NULL) {
@@ -129,8 +277,6 @@ void dDrawPath_c::drawPath() {
     }
 }
 
-/* 8003CD38-8003CDAC 037678 0074+00 0/0 3/3 0/0 .text
- * makeResTIMG__15dRenderingMap_cCFP7ResTIMGUsUsPUcPUcUs        */
 void dRenderingMap_c::makeResTIMG(ResTIMG* p_image, u16 width, u16 height, u8* p_data,
                                   u8* p_palette, u16 param_5) const {
     p_image->format = GX_TF_C8;
@@ -156,8 +302,6 @@ void dRenderingMap_c::makeResTIMG(ResTIMG* p_image, u16 width, u16 height, u8* p
     p_image->imageOffset = p_data - (u8*)p_image;
 }
 
-/* 8003CDAC-8003CE78 0376EC 00CC+00 0/0 2/2 0/0 .text            renderingMap__15dRenderingMap_cFv
- */
 void dRenderingMap_c::renderingMap() {
     preRenderingMap();
     if (isDrawPath()) {
@@ -170,8 +314,6 @@ void dRenderingMap_c::renderingMap() {
     postRenderingMap();
 }
 
-/* 8003CE78-8003CF40 0377B8 00C8+00 2/2 3/3 0/0 .text
- * setTevSettingNonTextureDirectColor__18dRenderingFDAmap_cCFv  */
 void dRenderingFDAmap_c::setTevSettingNonTextureDirectColor() const {
     GXSetNumTevStages(1);
     GXSetNumChans(1);
@@ -184,13 +326,11 @@ void dRenderingFDAmap_c::setTevSettingNonTextureDirectColor() const {
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
 }
 
-/* 8003CF40-8003D0AC 037880 016C+00 1/1 3/3 0/0 .text
- * setTevSettingIntensityTextureToCI__18dRenderingFDAmap_cCFv   */
 void dRenderingFDAmap_c::setTevSettingIntensityTextureToCI() const {
     GXSetNumTevStages(2);
     GXSetNumChans(1);
     GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, 125);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 60);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_KONST, GX_CC_TEXC, GX_CC_C1);
@@ -206,8 +346,6 @@ void dRenderingFDAmap_c::setTevSettingIntensityTextureToCI() const {
     GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_1_4);
 }
 
-/* 8003D0AC-8003D188 0379EC 00DC+00 1/1 0/0 0/0 .text            drawBack__18dRenderingFDAmap_cCFv
- */
 void dRenderingFDAmap_c::drawBack() const {
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -221,7 +359,6 @@ void dRenderingFDAmap_c::drawBack() const {
     GXEnd();
 }
 
-/* 8003D188-8003D320 037AC8 0198+00 1/0 8/0 0/0 .text preRenderingMap__18dRenderingFDAmap_cFv */
 void dRenderingFDAmap_c::preRenderingMap() {
     GXSetViewport(0.0f, 0.0f, mTexWidth, mTexHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, mTexWidth, mTexHeight);
@@ -249,7 +386,6 @@ void dRenderingFDAmap_c::preRenderingMap() {
     drawBack();
 }
 
-/* 8003D320-8003D3C0 037C60 00A0+00 1/0 7/1 0/0 .text postRenderingMap__18dRenderingFDAmap_cFv */
 void dRenderingFDAmap_c::postRenderingMap() {
     GXSetCopyFilter(GX_FALSE, NULL, GX_FALSE, NULL);
     GXSetTexCopySrc(0, 0, mTexWidth, mTexHeight);
@@ -261,17 +397,14 @@ void dRenderingFDAmap_c::postRenderingMap() {
     dComIfGp_getCurrentGrafPort()->setup2D();
 }
 
-/* 80424684-804246A0 0513A4 001C+00 2/2 5/5 0/0 .bss             m_texObjAgg__8dMpath_n */
 dMpath_n::dTexObjAggregate_c dMpath_n::m_texObjAgg;
 
 /* Enabling the following definition will modify the following function to
  * make the map look worse for extra speed in the emulator, especially in large
  * areas such as hyrule field.
  */
-// #define HYRULE_FIELD_SPEEDHACK
+#define HYRULE_FIELD_SPEEDHACK
 
-/* 8003D3C0-8003D68C 037D00 02CC+00 0/0 2/2 0/0 .text
- * renderingDecoration__18dRenderingFDAmap_cFPCQ211dDrawPath_c10line_class */
 void dRenderingFDAmap_c::renderingDecoration(dDrawPath_c::line_class const* p_line) {
     s32 width = getDecorationLineWidth(p_line->field_0x1);
     if (width <= 0) {
@@ -328,13 +461,10 @@ void dRenderingFDAmap_c::renderingDecoration(dDrawPath_c::line_class const* p_li
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_CLR_RGB, GX_F32, 0);
 }
 
-/* 8003D68C-8003D6B8 037FCC 002C+00 1/0 6/0 0/0 .text getDecoLineColor__18dRenderingFDAmap_cFii */
 const GXColor* dRenderingFDAmap_c::getDecoLineColor(int param_0, int param_1) {
     return getLineColor(param_0, param_1);
 }
 
-/* 8003D6B8-8003D6E4 037FF8 002C+00 1/0 6/0 0/0 .text
- * getDecorationLineWidth__18dRenderingFDAmap_cFi               */
 s32 dRenderingFDAmap_c::getDecorationLineWidth(int param_0) {
     return getLineWidth(param_0);
 }

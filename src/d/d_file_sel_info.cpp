@@ -3,7 +3,7 @@
  * File Select Screen File Info
  */
 
-#define NO_INLINE_DLSTBASE_DRAW
+#include "d/dolzel.h" // IWYU pragma: keep
 
 #include "d/d_file_sel_info.h"
 #include "JSystem/J2DGraph/J2DScreen.h"
@@ -13,27 +13,6 @@
 #include "d/d_pane_class_alpha.h"
 #include "stdio.h"
 
-// Need 0xC bytes of padding with no symbol between dFile_info_c::__vtable and the end of .data
-// This is likely caused by the vtable of an abstract base class getting put there and then stripped out.
-// Not sure which abstract base class could go there though, so we simulate it with some dummy classes for now.
-class dummy_abstract_class {
-public:
-    virtual void virt_func_0() = 0;
-};
-class dummy_child_class : dummy_abstract_class {
-    virtual void virt_func_0();
-};
-static dummy_child_class dummy() {
-    dummy_child_class temp;
-    return temp;
-}
-
-/* 803BB498-803BB4A8 0185B8 000C+04 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80192434-801924A0 18CD74 006C+00 0/0 3/3 0/0 .text __ct__12dFile_info_cFP10JKRArchiveUc */
 dFile_info_c::dFile_info_c(JKRArchive* i_archive, u8 param_1) {
     mArchive = i_archive;
     field_0x22 = param_1;
@@ -42,7 +21,6 @@ dFile_info_c::dFile_info_c(JKRArchive* i_archive, u8 param_1) {
     field_0x20 = 0;
 }
 
-/* 801924A0-80192570 18CDE0 00D0+00 1/0 0/0 0/0 .text            __dt__12dFile_info_cFv */
 dFile_info_c::~dFile_info_c() {
     delete mFileInfo.Scr;
     delete mDatBase;
@@ -51,10 +29,9 @@ dFile_info_c::~dFile_info_c() {
     mDoExt_removeMesgFont();
 }
 
-/* 80192570-80192954 18CEB0 03E4+00 1/1 0/0 0/0 .text            screenSet__12dFile_info_cFv */
 void dFile_info_c::screenSet() {
     mFileInfo.Scr = new J2DScreen();
-    JUT_ASSERT(0, mFileInfo.Scr != 0);
+    JUT_ASSERT(0, mFileInfo.Scr != NULL);
 
     mFileInfo.Scr->setPriority("zelda_file_select_info_text.blo", 0x1100000, mArchive);
     mFileInfo.mFont = mDoExt_getMesgFont();
@@ -110,8 +87,6 @@ void dFile_info_c::screenSet() {
     mPlayTime = info_text[3]->getStringPtr();
 }
 
-/* 80192954-80192AA0 18D294 014C+00 0/0 3/3 0/0 .text setSaveData__12dFile_info_cFP10dSv_save_ciUc
- */
 int dFile_info_c::setSaveData(dSv_save_c* i_savedata, BOOL i_validChksum, u8 i_dataNo) {
     if (i_validChksum) {
         char* player_name = i_savedata->getPlayer().getPlayerInfo().getLinkName();
@@ -142,7 +117,6 @@ int dFile_info_c::setSaveData(dSv_save_c* i_savedata, BOOL i_validChksum, u8 i_d
     }
 }
 
-/* 80192AA0-80192C08 18D3E0 0168+00 1/1 0/0 0/0 .text setHeartCnt__12dFile_info_cFP10dSv_save_c */
 void dFile_info_c::setHeartCnt(dSv_save_c* i_savedata) {
     static u64 l_htag[] = {
         'hear_20', 'hear_21', 'hear_22', 'hear_23', 'hear_24', 'hear_25', 'hear_26',
@@ -185,11 +159,9 @@ void dFile_info_c::setHeartCnt(dSv_save_c* i_savedata) {
     }
 }
 
-/* 803BB570-803BB588 018690 0018+00 0/1 0/0 0/0 .data            fileWarningProc */
 typedef void (dFile_info_c::*procFunc)();
 static procFunc fileWarningProc[] = {&dFile_info_c::modeWait, &dFile_info_c::modeMove};
 
-/* 80192C08-80192C70 18D548 0068+00 1/1 0/0 0/0 .text setSaveDate__12dFile_info_cFP10dSv_save_c */
 void dFile_info_c::setSaveDate(dSv_save_c* i_savedata) {
     OSCalendarTime time;
     OSTicksToCalendarTime(i_savedata->getPlayer().getPlayerStatusB().getDateIpl(), &time);
@@ -197,13 +169,20 @@ void dFile_info_c::setSaveDate(dSv_save_c* i_savedata) {
     #if (VERSION == VERSION_GCN_JPN) || (VERSION == VERSION_WII_JPN)
     sprintf(mSaveDate, "%d.%02d.%02d %02d:%02d", time.year, time.mon + 1, time.mday,
             time.hour, time.min);
-    #else
+    #elif VERSION == VERSION_GCN_PAL
+    if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_ENGLISH) {
+        sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mon + 1, time.mday, time.year, time.hour,
+                time.min);
+    } else {
+        sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mday, time.mon + 1, time.year, time.hour,
+                time.min);
+    }
+#else
     sprintf(mSaveDate, "%02d/%02d/%d %02d:%02d", time.mon + 1, time.mday, time.year,
             time.hour, time.min);
     #endif
 }
 
-/* 80192C70-80192D58 18D5B0 00E8+00 1/1 0/0 0/0 .text setPlayTime__12dFile_info_cFP10dSv_save_c */
 void dFile_info_c::setPlayTime(dSv_save_c* i_savedata) {
     s64 time = i_savedata->getPlayer().getPlayerInfo().getTotalTime() / (OS_BUS_CLOCK / 4);
 
@@ -217,18 +196,14 @@ void dFile_info_c::setPlayTime(dSv_save_c* i_savedata) {
     }
 }
 
-/* 80192D58-80192D5C 18D698 0004+00 1/0 0/0 0/0 .text            modeWait__12dFile_info_cFv */
 void dFile_info_c::modeWait() {}
 
-/* 80192D5C-80192D60 18D69C 0004+00 1/0 0/0 0/0 .text            modeMove__12dFile_info_cFv */
 void dFile_info_c::modeMove() {}
 
-/* 80192D60-80192D9C 18D6A0 003C+00 0/0 2/2 0/0 .text            _draw__12dFile_info_cFv */
 void dFile_info_c::_draw() {
     dComIfGd_set2DOpa(&mFileInfo);
 }
 
-/* 80192D9C-80192E88 18D6DC 00EC+00 1/0 0/0 0/0 .text            draw__16dDlst_FileInfo_cFv */
 void dDlst_FileInfo_c::draw() {
     Mtx m;
     J2DGrafContext* graf_ctx = dComIfGp_getCurrentGrafPort();

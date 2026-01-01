@@ -5,11 +5,11 @@
 
 class daObj_SSBase_c : public fopAc_ac_c {
 public:
-    /* 8015E3F8 */ daObj_SSBase_c();
+    daObj_SSBase_c();
 
-    /* 8015E450 */ virtual ~daObj_SSBase_c();
-    /* 8015E4C8 */ virtual void setSoldOut();
-    /* 8015E4B0 */ virtual u32 getProcessID();
+    virtual ~daObj_SSBase_c();
+    virtual void setSoldOut();
+    virtual u32 getProcessID();
 
     void* getParentPtr() { return mpParentPtr; }
     void setParentPtr(void* parentPtr) { mpParentPtr = parentPtr; }
@@ -24,5 +24,7 @@ private:
     /* 0x572 */ u16 mFlowNodeNum;
     /* 0x574 */ u16 mValueNum;
 };
+
+STATIC_ASSERT(sizeof(daObj_SSBase_c) == 0x578);
 
 #endif /* A_OBJ_D_A_OBJ_SS_BASE_H */

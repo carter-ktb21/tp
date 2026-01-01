@@ -3,17 +3,17 @@
  * Treasure Chest (Opened state not saved)
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_tbox2.h"
 #include "d/d_bg_w.h"
 #include "d/actor/d_a_midna.h"
 
-/* 80496A18-80496A54 000078 003C+00 1/1 0/0 0/0 .text            initBaseMtx__9daTbox2_cFv */
 void daTbox2_c::initBaseMtx() {
     mpModel->setBaseScale(scale);
     setBaseMtx();
 }
 
-/* 80496A54-80496AB8 0000B4 0064+00 2/2 0/0 0/0 .text            setBaseMtx__9daTbox2_cFv */
 void daTbox2_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(shape_angle.y);
@@ -22,13 +22,11 @@ void daTbox2_c::setBaseMtx() {
 }
 
 
-/* 80498160-80498180 000000 0020+00 4/4 0/0 0/0 .rodata          l_resInfo */
 static const res_info l_resInfo[] = {
     {9, 5, 13, 14},   // Small Chest
     {10, 6, 15, 16},  // Big Chest
 };
 
-/* 80498180-804981BC 000020 003C+00 1/2 0/0 0/0 .rodata          l_cyl_info */
 static const cM3dGCylS l_cyl_info[] = {
     {
         {0.0f, 0.0f, -40.0f},  // center
@@ -47,31 +45,10 @@ static const cM3dGCylS l_cyl_info[] = {
     },
 };
 
-/* 8049825C-80498268 000000 000C+00 2/2 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80498268-8049827C 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-#pragma push
-#pragma force_active on
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-#pragma pop
-
-/* 8049827C-80498280 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "Tbox2";
 
-/* 80498280-80498284 -00001 0004+00 1/1 0/0 0/0 .data            l_staff_name */
 static char* l_staff_name = "TREASURE";
 
-/* 80498284-804982C8 000028 0044+00 1/1 0/0 0/0 .data            l_cyl_src */
 static dCcD_SrcCyl l_cyl_src = {
     {
         {0x0, {{0x0, 0x0, 0x1e}, {0x0, 0x0}, 0x79}},  // mObj
@@ -86,15 +63,14 @@ static dCcD_SrcCyl l_cyl_src = {
     }                        // mCyl
 };
 
-/* 80496AB8-80496C20 000118 0168+00 1/0 0/0 0/0 .text            Create__9daTbox2_cFv */
 int daTbox2_c::Create() {
     init_actionOpenWait();
     initBaseMtx();
     fopAcM_SetMtx(this, mpModel->getBaseTRMtx());
     fopAcM_setCullSizeBox2(this, mpModel->getModelData());
 
-    attention_info.flags = 0x40;
-    attention_info.flags |= 0x400000;
+    attention_info.flags = fopAc_AttnFlag_JUEL_e;
+    attention_info.flags |= fopAc_AttnFlag_UNK_0x400000;
 
     mAcchCir.SetWall(50.0f, 0.0f);
     mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, &mAcchCir,
@@ -124,11 +100,10 @@ int daTbox2_c::Create() {
     return 1;
 }
 
-/* 80496C20-80496DF4 000280 01D4+00 1/0 0/0 0/0 .text            CreateHeap__9daTbox2_cFv */
 int daTbox2_c::CreateHeap() {
     J3DModelData* modelData =
         (J3DModelData*)dComIfG_getObjectRes(l_arcName, l_resInfo[mModelType].bmd_no);
-    JUT_ASSERT(0, modelData != 0);
+    JUT_ASSERT(0, modelData != NULL);
     mpModel = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000084);
     if (mpModel == NULL) {
         return false;
@@ -136,7 +111,7 @@ int daTbox2_c::CreateHeap() {
 
     J3DAnmTransform* pbck =
         (J3DAnmTransform*)dComIfG_getObjectRes(l_arcName, l_resInfo[mModelType].bck_no);
-    JUT_ASSERT(0, pbck != 0);
+    JUT_ASSERT(0, pbck != NULL);
     mpBck = new mDoExt_bckAnm();
     if (mpBck == NULL || !mpBck->init(pbck, TRUE, J3DFrameCtrl::EMode_NONE, 1.0f, 0, -1, false)) {
         return false;
@@ -156,9 +131,8 @@ int daTbox2_c::CreateHeap() {
     return true;
 }
 
-/* 80496E3C-80497080 00049C 0244+00 1/1 0/0 0/0 .text            create1st__9daTbox2_cFv */
 int daTbox2_c::create1st() {
-    fopAcM_SetupActor(this, daTbox2_c);
+    fopAcM_ct(this, daTbox2_c);
     mModelType = getModelType();
 
     int phase_state = dComIfG_resLoad(&mPhase, l_arcName);
@@ -180,11 +154,10 @@ int daTbox2_c::create1st() {
     return phase_state;
 }
 
-/* 8049724C-80497478 0008AC 022C+00 3/3 0/0 0/0 .text            demoProc__9daTbox2_cFv */
 int daTbox2_c::demoProc() {
     static char* action_table[] = {"WAIT", "OPEN", "APPEAR", "OPEN_SHORT"};
     int act_idx =
-        dComIfGp_evmng_getMyActIdx(mStaffIdx, action_table, ARRAY_SIZE(action_table), 0, 0);
+        dComIfGp_evmng_getMyActIdx(mStaffIdx, action_table, ARRAY_SIZEU(action_table), 0, 0);
 
     if (dComIfGp_evmng_getIsAddvance(mStaffIdx)) {
         switch (act_idx) {
@@ -225,7 +198,6 @@ int daTbox2_c::demoProc() {
     return 0;
 }
 
-/* 80497478-80497500 000AD8 0088+00 1/1 0/0 0/0 .text            openInit__9daTbox2_cFv */
 void daTbox2_c::openInit() {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
 
@@ -243,7 +215,6 @@ void daTbox2_c::openInit() {
     mpBck->setPlaySpeed(1.0f);
 }
 
-/* 80497500-804975EC 000B60 00EC+00 1/0 0/0 0/0 .text            Execute__9daTbox2_cFPPA3_A4_f */
 int daTbox2_c::Execute(Mtx** param_0) {
     mode_proc_call();
     *param_0 = &mBgMtx;
@@ -263,7 +234,6 @@ int daTbox2_c::Execute(Mtx** param_0) {
     return 1;
 }
 
-/* 804975EC-80497678 000C4C 008C+00 1/1 0/0 0/0 .text            mode_proc_call__9daTbox2_cFv */
 void daTbox2_c::mode_proc_call() {
     typedef void (daTbox2_c::*mode_func)();
     static mode_func l_func[] = {
@@ -274,7 +244,6 @@ void daTbox2_c::mode_proc_call() {
     (this->*l_func[mMode])();
 }
 
-/* 80497678-80497790 000CD8 0118+00 1/0 0/0 0/0 .text            mode_exec_wait__9daTbox2_cFv */
 void daTbox2_c::mode_exec_wait() {
     bool start_exec = false;
     mNoDraw = true;
@@ -297,7 +266,6 @@ void daTbox2_c::mode_exec_wait() {
     }
 }
 
-/* 80497790-8049780C 000DF0 007C+00 2/1 0/0 0/0 .text            mode_exec__9daTbox2_cFv */
 void daTbox2_c::mode_exec() {
     action();
     fopAcM_posMoveF(this, NULL);
@@ -307,7 +275,6 @@ void daTbox2_c::mode_exec() {
     eyePos = current.pos;
 }
 
-/* 8049780C-804978C8 000E6C 00BC+00 1/1 0/0 0/0 .text            action__9daTbox2_cFv */
 void daTbox2_c::action() {
     typedef void (daTbox2_c::*action_func)();
     static action_func l_func[] = {
@@ -320,20 +287,16 @@ void daTbox2_c::action() {
     (this->*l_func[mAction])();
 }
 
-/* 804978C8-804978D4 000F28 000C+00 1/1 0/0 0/0 .text            init_actionWait__9daTbox2_cFv */
 void daTbox2_c::init_actionWait() {
     mAction = ACTION_WAIT_e;
 }
 
-/* 804978D4-804978D8 000F34 0004+00 1/0 0/0 0/0 .text            actionWait__9daTbox2_cFv */
 void daTbox2_c::actionWait() {}
 
-/* 804978D8-804978E4 000F38 000C+00 1/1 0/0 0/0 .text init_actionNotOpenDemo__9daTbox2_cFv */
 void daTbox2_c::init_actionNotOpenDemo() {
     mAction = ACTION_NOT_OPEN_DEMO_e;
 }
 
-/* 804978E4-8049794C 000F44 0068+00 1/0 0/0 0/0 .text            actionNotOpenDemo__9daTbox2_cFv */
 void daTbox2_c::actionNotOpenDemo() {
     if (dComIfGp_evmng_endCheck(eventInfo.getEventId())) {
         dComIfGp_event_reset();
@@ -343,13 +306,10 @@ void daTbox2_c::actionNotOpenDemo() {
     }
 }
 
-/* 8049794C-80497958 000FAC 000C+00 1/1 0/0 0/0 .text            init_actionOpenDemo__9daTbox2_cFv
- */
 void daTbox2_c::init_actionOpenDemo() {
     mAction = ACTION_OPEN_DEMO_e;
 }
 
-/* 80497958-80497A0C 000FB8 00B4+00 1/0 0/0 0/0 .text            actionOpenDemo__9daTbox2_cFv */
 void daTbox2_c::actionOpenDemo() {
     if (dComIfGp_evmng_endCheck(eventInfo.getEventId())) {
         dComIfGp_event_reset();
@@ -368,13 +328,10 @@ void daTbox2_c::actionOpenDemo() {
     }
 }
 
-/* 80497A0C-80497A18 00106C 000C+00 3/3 0/0 0/0 .text            init_actionOpenWait__9daTbox2_cFv
- */
 void daTbox2_c::init_actionOpenWait() {
     mAction = ACTION_OPEN_WAIT_e;
 }
 
-/* 80497A18-80497BD0 001078 01B8+00 1/0 0/0 0/0 .text            actionOpenWait__9daTbox2_cFv */
 void daTbox2_c::actionOpenWait() {
     daMidna_c* midna_p = (daMidna_c*)daPy_py_c::getMidnaActor();  // cast needed for reg alloc
     daPy_py_c* player_p = daPy_getPlayerActorClass();
@@ -408,7 +365,6 @@ void daTbox2_c::actionOpenWait() {
     }
 }
 
-/* 80497BD0-80497C60 001230 0090+00 1/1 0/0 0/0 .text            setGetDemoItem__9daTbox2_cFv */
 int daTbox2_c::setGetDemoItem() {
     u8 item_no = getItemNo();
 
@@ -426,7 +382,6 @@ int daTbox2_c::setGetDemoItem() {
     return 1;
 }
 
-/* 80497C60-80497DA0 0012C0 0140+00 1/1 0/0 0/0 .text            boxCheck__9daTbox2_cFv */
 BOOL daTbox2_c::boxCheck() {
     daPy_py_c* player_p = (daPy_py_c*)dComIfGp_getPlayer(0);
 
@@ -450,7 +405,6 @@ BOOL daTbox2_c::boxCheck() {
     return false;
 }
 
-/* 80497DA0-80497E6C 001400 00CC+00 1/0 0/0 0/0 .text            Draw__9daTbox2_cFv */
 int daTbox2_c::Draw() {
     if (mNoDraw) {
         return 1;
@@ -466,7 +420,6 @@ int daTbox2_c::Draw() {
     return 1;
 }
 
-/* 80497E6C-80497ED8 0014CC 006C+00 1/0 0/0 0/0 .text            Delete__9daTbox2_cFv */
 int daTbox2_c::Delete() {
     if (mBoxBgW != NULL && mBoxBgW->ChkUsed()) {
         dComIfG_Bgsp().Release(mBoxBgW);
@@ -476,37 +429,29 @@ int daTbox2_c::Delete() {
     return 1;
 }
 
-/* 80497ED8-8049808C 001538 01B4+00 1/0 0/0 0/0 .text            daTbox2_create1st__FP9daTbox2_c */
 static int daTbox2_create1st(daTbox2_c* i_this) {
-    fopAcM_SetupActor(i_this, daTbox2_c);
+    fopAcM_ct(i_this, daTbox2_c);
     return i_this->create1st();
 }
 
-/* 8049808C-804980AC 0016EC 0020+00 1/0 0/0 0/0 .text            daTbox2_MoveBGDelete__FP9daTbox2_c
- */
 static int daTbox2_MoveBGDelete(daTbox2_c* i_this) {
     return i_this->MoveBGDelete();
 }
 
-/* 804980AC-804980CC 00170C 0020+00 1/0 0/0 0/0 .text            daTbox2_MoveBGExecute__FP9daTbox2_c
- */
 static int daTbox2_MoveBGExecute(daTbox2_c* i_this) {
     return i_this->MoveBGExecute();
 }
 
-/* 804980CC-804980F8 00172C 002C+00 1/0 0/0 0/0 .text            daTbox2_MoveBGDraw__FP9daTbox2_c */
 static int daTbox2_MoveBGDraw(daTbox2_c* i_this) {
     return i_this->MoveBGDraw();
 }
 
-/* 80498368-80498388 -00001 0020+00 1/0 0/0 0/0 .data            daTbox2_METHODS */
 static actor_method_class daTbox2_METHODS = {
     (process_method_func)daTbox2_create1st,     (process_method_func)daTbox2_MoveBGDelete,
     (process_method_func)daTbox2_MoveBGExecute, (process_method_func)NULL,
     (process_method_func)daTbox2_MoveBGDraw,
 };
 
-/* 80498388-804983B8 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_TBOX2 */
 extern actor_process_profile_definition g_profile_TBOX2 = {
     fpcLy_CURRENT_e,
     4,

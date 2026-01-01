@@ -3,31 +3,30 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_ten.h"
 #include "d/actor/d_a_player.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
-#include "f_op//f_op_actor_mng.h"
+#include "f_op/f_op_actor_mng.h"
+#include "f_op/f_op_camera_mng.h"
 #include "d/d_cc_d.h"
 #include "SSystem/SComponent/c_lib.h"
 #include "m_Do/m_Do_lib.h"
 #include "d/d_menu_insect.h"
 
-/* 80D087CC-80D087F4 0000EC 0028+00 1/1 0/0 0/0 .text            __ct__14daObj_TenHIO_cFv */
 daObj_TenHIO_c::daObj_TenHIO_c() {
     field_0x4 = -1;
     field_0xc = 1.0f;
     field_0x8 = 1.0f;
 }
 
-/* ############################################################################################## */
-/* 80D0B8F4-80D0B8F8 000004 0002+02 1/2 0/0 0/0 .rodata          l_ten_itemno */
 static u8 const l_ten_itemno[2] = {
     0xCE,
     0xCF,
 };
 
-/* 80D0B8F8-80D0B938 000008 0040+00 1/1 0/0 0/0 .rodata          ccSphSrc$3779 */
 const static dCcD_SrcSph ccSphSrc = {
     {
         {0x0, {{0x0, 0x0, 0x0}, {0x14002, 0x11}, 0x0}}, // mObj
@@ -40,7 +39,6 @@ const static dCcD_SrcSph ccSphSrc = {
     } // mSphAttr
 };
 
-/* 80D087F4-80D08860 000114 006C+00 1/1 0/0 0/0 .text            InitCcSph__10daObjTEN_cFv */
 void daObjTEN_c::InitCcSph() {
     mStts.Init(1, 0, this);
     mSph.Set(ccSphSrc);
@@ -49,18 +47,16 @@ void daObjTEN_c::InitCcSph() {
     mSph.OnTgNoHitMark();
 }
 
-/* 80D08860-80D088B8 000180 0058+00 1/1 0/0 0/0 .text            SetCcSph__10daObjTEN_cFv */
 void daObjTEN_c::SetCcSph() {
     mSph.SetC(current.pos);
     mSph.SetR(20.0f);
     dComIfG_Ccsp()->Set(&mSph);
 }
 
-/* 80D088B8-80D08B84 0001D8 02CC+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* actor) {
     daObjTEN_c* i_this = static_cast<daObjTEN_c*>(actor);
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes("I_Ten", 10);
-    JUT_ASSERT(246, modelData != 0);
+    JUT_ASSERT(246, modelData != NULL);
     i_this->mMorf = new mDoExt_McaMorfSO(modelData, NULL, NULL, NULL, 2, 1.0f, 0, -1,
                                          &i_this->mCreature, 0, 0x11000284);
     if (i_this->mMorf == NULL || i_this->mMorf->getModel() == NULL) {
@@ -101,28 +97,25 @@ static int useHeapInit(fopAc_ac_c* actor) {
     return 1;
 }
 
-/* 80D08BCC-80D08BEC 0004EC 0020+00 1/0 0/0 0/0 .text            daObjTEN_Create__FP10fopAc_ac_c */
 static int daObjTEN_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjTEN_c*>(i_this)->create();
 }
 
-/* 80D08BEC-80D08C10 00050C 0024+00 1/0 0/0 0/0 .text            daObjTEN_Delete__FP10daObjTEN_c */
 static int daObjTEN_Delete(daObjTEN_c* i_this) {
     static_cast<daObjTEN_c*>(i_this)->Delete();
     return 1;
 }
 
-/* 80D08C10-80D08D94 000530 0184+00 2/2 0/0 0/0 .text            WaitAction__10daObjTEN_cFv */
 void daObjTEN_c::WaitAction() {
     switch (field_0x5e9) {
-    case 0:
+    case 0: {
         speedF = 0.0f;
         J3DAnmTransform* anmTransform = (J3DAnmTransform*)dComIfG_getObjectRes("I_Ten", 7);
-        mMorf->setAnm(anmTransform, 2, 5.0f, 0.0f, 0.0f,
-                                 -1.0f);
+        mMorf->setAnm(anmTransform, 2, 5.0f, 0.0f, 0.0f, -1.0f);
         field_0x5e9++;
         field_0x5ea[0] = cM_rndF(50.0f) + 50.0f;
         break;
+    }
     case 1:
         if (fopAcM_searchPlayerDistance(this) < 1500.0f) {
             field_0x5ea[0]--;
@@ -146,7 +139,6 @@ void daObjTEN_c::WaitAction() {
     }
 }
 
-/* 80D08D94-80D08FC0 0006B4 022C+00 1/1 0/0 0/0 .text            WallCheck__10daObjTEN_cFv */
 BOOL daObjTEN_c::WallCheck() {
     dBgS_LinChk linChk;
     linChk.SetObj();
@@ -166,7 +158,6 @@ BOOL daObjTEN_c::WallCheck() {
     return 0;
 }
 
-/* 80D09008-80D09114 000928 010C+00 1/1 0/0 0/0 .text            SpeedSet__10daObjTEN_cFv */
 void daObjTEN_c::SpeedSet() {
     speed.y += gravity;
     cXyz speedAmp(0.0f, speed.y, speedF);
@@ -183,7 +174,6 @@ void daObjTEN_c::SpeedSet() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80D09114-80D09548 000A34 0434+00 1/1 0/0 0/0 .text            WallWalk__10daObjTEN_cFv */
 void daObjTEN_c::WallWalk() {
     cXyz cStack_138(0.0f, -100.0f, 3.0f * speedF);
     cXyz cStack_144(0.0f, 40.0f, 0.0f);
@@ -224,7 +214,6 @@ void daObjTEN_c::WallWalk() {
     shape_angle.y = current.angle.y;
 }
 
-/* 80D09548-80D09748 000E68 0200+00 2/2 0/0 0/0 .text            WalkAction__10daObjTEN_cFv */
 void daObjTEN_c::WalkAction() {
     for (int i = 0; i < 3; i++) {
         field_0x5ea[i]--;
@@ -266,7 +255,6 @@ void daObjTEN_c::WalkAction() {
     WallWalk();
 }
 
-/* 80D09748-80D09F58 001068 0810+00 2/2 0/0 0/0 .text            MoveAction__10daObjTEN_cFv */
 void daObjTEN_c::MoveAction() {
     for (int i = 0; i < 3; i++) {
         field_0x5ea[i]--;
@@ -409,7 +397,6 @@ void daObjTEN_c::MoveAction() {
     }
 }
 
-/* 80D09F58-80D0A01C 001878 00C4+00 1/1 0/0 0/0 .text            Action__10daObjTEN_cFv */
 void daObjTEN_c::Action() {
     switch (mAction) {
     case ACTION_WAIT:
@@ -427,7 +414,6 @@ void daObjTEN_c::Action() {
     mCreature.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
 }
 
-/* 80D0A01C-80D0A0D8 00193C 00BC+00 1/1 0/0 0/0 .text            ShopAction__10daObjTEN_cFv */
 void daObjTEN_c::ShopAction() {
     switch (mAction) {
     case ACTION_WAIT:
@@ -444,23 +430,20 @@ void daObjTEN_c::ShopAction() {
     mCreature.startCreatureSoundLevel(Z2SE_INSCT_KIRA, 0, -1);
 }
 
-/* 80D0A0D8-80D0A13C 0019F8 0064+00 1/1 0/0 0/0 .text            checkGroundPos__10daObjTEN_cFv */
 void daObjTEN_c::checkGroundPos() {
     cXyz acStack_28(current.pos);
     mGndChk.SetPos(&acStack_28);
     field_0x5e4 = dComIfG_Bgsp().GroundCross(&mGndChk);
 }
 
-/* 80D0A13C-80D0A154 001A5C 0018+00 1/0 0/0 0/0 .text            Insect_Release__10daObjTEN_cFv */
 void daObjTEN_c::Insect_Release() {
-    field_0x56C = 1;
+    field_0x56c = 1;
     field_0x624 = 2;
     mAction = ACTION_MOVE;
 }
 
 static f32 dummyLiteral() { return -9.0f; }
 
-/* 80D0A154-80D0A278 001A74 0124+00 1/1 0/0 0/0 .text            ParticleSet__10daObjTEN_cFv */
 void daObjTEN_c::ParticleSet() {
     if (field_0x618 > field_0x61c) {
         cLib_addCalc2(&mParticleScale, 0.0f, 1.0f, 1.0f);
@@ -476,7 +459,6 @@ void daObjTEN_c::ParticleSet() {
     }
 }
 
-/* 80D0A278-80D0A644 001B98 03CC+00 1/1 0/0 0/0 .text            BoomChk__10daObjTEN_cFv */
 void daObjTEN_c::BoomChk() {
     if (field_0x7a8 != 0) {
         cXyz* playerPos = &fopAcM_GetPosition(daPy_getPlayerActorClass());
@@ -526,7 +508,6 @@ void daObjTEN_c::BoomChk() {
     }
 }
 
-/* 80D0A644-80D0A8C8 001F64 0284+00 1/1 0/0 0/0 .text            Execute__10daObjTEN_cFv */
 int daObjTEN_c::Execute() {
     if (ChkGetDemo()) {
         field_0x618 = field_0x61c + 10000.0f;
@@ -578,7 +559,6 @@ int daObjTEN_c::Execute() {
     return 1;
 }
 
-/* 80D0A8C8-80D0AA50 0021E8 0188+00 1/1 0/0 0/0 .text            ObjHit__10daObjTEN_cFv */
 void daObjTEN_c::ObjHit() {
     if (mSph.ChkTgHit()) {
         cCcD_Obj* hitObj = mSph.GetTgHitObj();
@@ -607,7 +587,6 @@ void daObjTEN_c::ObjHit() {
     }
 }
 
-/* 80D0AA50-80D0ABCC 002370 017C+00 1/1 0/0 0/0 .text            Z_BufferChk__10daObjTEN_cFv */
 void daObjTEN_c::Z_BufferChk() {
     cXyz local_5c;
     cXyz cStack_68;
@@ -621,8 +600,8 @@ void daObjTEN_c::Z_BufferChk() {
     } else {
         trimHeight = 0.0f;
     }
-    if (local_5c.x > 0.0f && local_5c.x < 608.0f && local_5c.y > trimHeight &&
-        local_5c.y < 448.0f - trimHeight)
+    if (local_5c.x > 0.0f && local_5c.x < FB_WIDTH && local_5c.y > trimHeight &&
+        local_5c.y < FB_HEIGHT - trimHeight)
     {
         dComIfGd_peekZ(local_5c.x, local_5c.y, &field_0x61c);
     }
@@ -636,21 +615,17 @@ void daObjTEN_c::Z_BufferChk() {
     field_0x618 = ((near + ((far * near) / local_5c.z)) / (far - near) + 1.0f) * 16777215.0f;
 }
 
-/* ############################################################################################## */
-/* 80D0BAB8-80D0BABC 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static u8 data_80D0BAB8;
+static u8 hio_set;
 
-/* 80D0ABCC-80D0AC34 0024EC 0068+00 1/1 0/0 0/0 .text            Delete__10daObjTEN_cFv */
 int daObjTEN_c::Delete() {
     dComIfG_resDelete(&mPhase, "I_Ten");
     if (field_0xa64 != 0) {
-        data_80D0BAB8 = 0;
+        hio_set = 0;
     }
     mCreature.deleteObject();
     return 1;
 }
 
-/* 80D0AC34-80D0AC9C 002554 0068+00 1/1 0/0 0/0 .text            setBaseMtx__10daObjTEN_cFv */
 void daObjTEN_c::setBaseMtx() {
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::ZXYrotM(field_0x602);
@@ -660,7 +635,6 @@ void daObjTEN_c::setBaseMtx() {
     mMorf->modelCalc();
 }
 
-/* 80D0AC9C-80D0AD7C 0025BC 00E0+00 1/0 0/0 0/0 .text            daObjTEN_Draw__FP10daObjTEN_c */
 static int daObjTEN_Draw(daObjTEN_c* i_this) {
     if (i_this->mDraw) {
         i_this->Z_BufferChk();
@@ -679,16 +653,15 @@ static int daObjTEN_Draw(daObjTEN_c* i_this) {
     return 1;
 }
 
-/* 80D0AD7C-80D0AD9C 00269C 0020+00 2/1 0/0 0/0 .text            daObjTEN_Execute__FP10daObjTEN_c */
 static int daObjTEN_Execute(daObjTEN_c* i_this) {
     return i_this->Execute();
 }
 
-/* ############################################################################################## */
-/* 80D0B9D0-80D0B9D4 0000E0 0004+00 1/2 0/0 0/0 .rodata          l_musiya_num */
-static u16 const l_musiya_num[2] = { 0x19F, 0x1A0};
+static u16 const l_musiya_num[2] = {
+    0x19F, /* dSv_event_flag_c::F_0415 - Misc. - Ladybug (M) */
+    0x1A0, /* dSv_event_flag_c::F_0416 - Misc. - Ladybug (F) */
+};
 
-/* 80D0AD9C-80D0AF48 0026BC 01AC+00 1/1 0/0 0/0 .text            CreateChk__10daObjTEN_cFv */
 bool daObjTEN_c::CreateChk() {
     u8 uVar1 = (fopAcM_GetParam(this) & 0xf00) >> 8;
     if (uVar1 == 15) {
@@ -719,19 +692,17 @@ bool daObjTEN_c::CreateChk() {
     return 1;
 }
 
-/* 80D0BAC8-80D0BAD8 000018 0010+00 2/2 0/0 0/0 .bss             l_HIO */
 static daObj_TenHIO_c l_HIO;
 
-/* 80D0AF48-80D0B740 002868 07F8+00 1/1 0/0 0/0 .text            create__10daObjTEN_cFv */
 int daObjTEN_c::create() {
-    fopAcM_SetupActor(this, daObjTEN_c);
+    fopAcM_ct(this, daObjTEN_c);
     int rv = dComIfG_resLoad(&mPhase, "I_Ten");
     if (rv == cPhs_COMPLEATE_e) {
         field_0x624 = fopAcM_GetParam(this) & 0xf;
         if (field_0x624 == 2) {
-            field_0x56C = 0;
+            field_0x56c = 0;
             shape_angle.x -= 0x2000;
-            fopAcM_OnStatus(this, fopAcM_STATUS_UNK_004000);
+            fopAcM_OnStatus(this, fopAcM_STATUS_UNK_0x4000);
         } else {
             mDraw = true;
         }
@@ -751,8 +722,8 @@ int daObjTEN_c::create() {
         if (fopAcM_entrySolidHeap(this, useHeapInit, 0xbc0) == 0) {
             return cPhs_ERROR_e;
         }
-        if (data_80D0BAB8 == 0) {
-            data_80D0BAB8 = 1;
+        if (hio_set == 0) {
+            hio_set = 1;
             field_0xa64 = 1;
             l_HIO.field_0x4 = -1;
         }
@@ -825,13 +796,10 @@ int daObjTEN_c::create() {
     return rv;
 }
 
-/* 80D0B840-80D0B848 003160 0008+00 1/0 0/0 0/0 .text            daObjTEN_IsDelete__FP10daObjTEN_c
- */
 static int daObjTEN_IsDelete(daObjTEN_c* param_0) {
     return 1;
 }
 
-/* 80D0B9F4-80D0BA14 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjTEN_Method */
 static actor_method_class l_daObjTEN_Method = {
     (process_method_func)daObjTEN_Create,
     (process_method_func)daObjTEN_Delete,
@@ -840,7 +808,6 @@ static actor_method_class l_daObjTEN_Method = {
     (process_method_func)daObjTEN_Draw,
 };
 
-/* 80D0BA14-80D0BA44 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Ten */
 extern actor_process_profile_definition g_profile_Obj_Ten = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -857,5 +824,3 @@ extern actor_process_profile_definition g_profile_Obj_Ten = {
   fopAc_ENV_e,            // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-/* 80D0B9E4-80D0B9E4 0000F4 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

@@ -1,4 +1,4 @@
-#ifdef DEBUG
+#if DEBUG
 
 #include "f_pc/f_pc_base.h"
 #include "f_pc/f_pc_debug_sv.h"
@@ -849,7 +849,6 @@ char* fpcDbSv_getNameString(s16 i_name) {
         "METER2",
         "GAMEOVER",
         "DUMMY",
-        NULL,
     };
 
     return namelist[i_name];

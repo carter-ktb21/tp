@@ -2,6 +2,7 @@
 #define JUTTEXTURE_H
 
 #include <dolphin/gx.h>
+#include <stdint.h>
 
 class JUTPalette;
 
@@ -24,7 +25,7 @@ struct ResTIMG {
     /* 0x08 */ u8 indexTexture;
     /* 0x09 */ u8 colorFormat;
     /* 0x0A */ u16 numColors;
-    /* 0x0C */ u32 paletteOffset;
+    /* 0x0C */ uintptr_t paletteOffset;
     /* 0x10 */ u8 mipmapEnabled;
     /* 0x11 */ u8 doEdgeLOD;
     /* 0x12 */ u8 biasClamp;
@@ -36,7 +37,7 @@ struct ResTIMG {
     /* 0x18 */ u8 mipmapCount;
     /* 0x19 */ u8 unknown;
     /* 0x1A */ s16 LODBias;
-    /* 0x1C */ u32 imageOffset;
+    /* 0x1C */ uintptr_t imageOffset;
 };  // Size: 0x20
 
 /**
@@ -69,14 +70,14 @@ public:
 
     const ResTIMG* getTexInfo() const { return mTexInfo; }
     s32 getFormat() const { return mTexInfo->format; }
-    s32 getTransparency() { return mTexInfo->alphaEnabled; }
+    s32 getTransparency() const { return mTexInfo->alphaEnabled; }
     s32 getWidth() const { return mTexInfo->width; }
     s32 getHeight() const { return mTexInfo->height; }
     void setCaptureFlag(bool flag) { mFlags &= 2 | flag; }
     u8 getCaptureFlag() const { return mFlags & 1; }
     u8 getEmbPaletteDelFlag() const { return mFlags & 2; }
     void setEmbPaletteDelFlag(bool flag) { mFlags = (mFlags & 1) | (flag << 1);}
-    u8 getTlutName() const { return mTlutName; }
+    int getTlutName() const { return mTlutName; }
     bool operator==(const JUTTexture& other) {
         return mTexInfo == other.mTexInfo
             && field_0x2c == other.field_0x2c

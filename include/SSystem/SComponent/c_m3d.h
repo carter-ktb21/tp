@@ -19,6 +19,7 @@ struct cM3d_Range {
     /* 0x4 */ f32 mMax;
 };
 
+#define G_CM3D_F_INF (1000000000.0f)
 extern const f32 G_CM3D_F_ABS_MIN;
 
 static void cM3d_InDivPos1(const Vec*, const Vec*, f32, Vec*);
@@ -91,10 +92,6 @@ void cM3d_CrawVec(const Vec&, const Vec&, Vec*);
 
 inline bool cM3d_IsZero(f32 f) {
     return fabsf(f) < G_CM3D_F_ABS_MIN;
-}
-// this is the inline cM3d_IsZero but inverted. Sometimes this will get a match where the regular cM3d_IsZero inline won't
-inline bool cM3d_IsZero_inverted(f32 param_0) {
-    return !(fabsf(param_0) < G_CM3D_F_ABS_MIN);
 }
 
 inline f32 cM3d_LenSq(const Vec* a, const Vec* b) {

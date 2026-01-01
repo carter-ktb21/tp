@@ -3,6 +3,9 @@
  * Enemy - Beehive
  */
 
+ #include "d/dolzel_rel.h" // IWYU pragma: keep
+ 
+#include "d/d_s_play.h"
 #include "d/actor/d_a_e_nest.h"
 #include "d/actor/d_a_npc_tk.h"
 #include "SSystem/SComponent/c_math.h"
@@ -10,20 +13,17 @@
 #include "d/actor/d_a_player.h"
 #include "d/d_bomb.h"
 #include "d/d_procname.h"
+#include "f_op/f_op_camera_mng.h"
 
-/* 80504950-80504954 000008 0004+00 2/2 0/0 0/0 .bss             None */
-static bool l_hioInit;
+static bool hio_set;
 
-/* 80504960-8050496C 000018 000C+00 7/7 0/0 0/0 .bss             l_HIO */
 static daE_Nest_HIO_c l_HIO;
 
-/* 80500F8C-80500FB0 0000EC 0024+00 1/1 0/0 0/0 .text            __ct__14daE_Nest_HIO_cFv */
 daE_Nest_HIO_c::daE_Nest_HIO_c() {
     field_0x4 = -1;
     mScale = 1.0f;
 }
 
-/* 80500FB0-80501040 000110 0090+00 1/1 0/0 0/0 .text            hahen_draw__FP12e_nest_class */
 static void hahen_draw(e_nest_class* i_this) {
     nest_hahen_s* debris = i_this->mDebris;
     g_env_light.settingTevStruct(0, &i_this->current.pos, &i_this->tevStr);
@@ -35,7 +35,6 @@ static void hahen_draw(e_nest_class* i_this) {
     }
 }
 
-/* 80501040-805011CC 0001A0 018C+00 1/1 0/0 0/0 .text            s_bomb_sub__FPvPv */
 static void* s_bomb_sub(void* i_actor, void* i_debris) {
     if (fopAcM_IsActor(i_actor)) {
         fopAc_ac_c* actor = static_cast<fopAc_ac_c*>(i_actor);
@@ -53,8 +52,6 @@ static void* s_bomb_sub(void* i_actor, void* i_debris) {
     return NULL;
 }
 
-/* 805011CC-805017FC 00032C 0630+00 1/1 0/0 0/0 .text
- * hahen_normal__FP12e_nest_classP12nest_hahen_s                */
 static void hahen_normal(e_nest_class* i_this, nest_hahen_s* i_debris) {
     fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     dBgS_LinChk lin_chk;
@@ -155,7 +152,6 @@ static void hahen_normal(e_nest_class* i_this, nest_hahen_s* i_debris) {
     }
 }
 
-/* 805017FC-80501930 00095C 0134+00 1/1 0/0 0/0 .text            hahen_move__FP12e_nest_class */
 static void hahen_move(e_nest_class* i_this) {
     nest_hahen_s* debris = i_this->mDebris;
     dBgS_LinChk lin_chk;
@@ -180,7 +176,6 @@ static void hahen_move(e_nest_class* i_this) {
     }
 }
 
-/* 80501930-80501A40 000A90 0110+00 1/0 0/0 0/0 .text            daE_Nest_Draw__FP12e_nest_class */
 static int daE_Nest_Draw(e_nest_class* i_this) {
     g_env_light.settingTevStruct(0, &i_this->current.pos, &i_this->tevStr);
     if (i_this->mBreakStage != 0) {
@@ -203,7 +198,6 @@ static int daE_Nest_Draw(e_nest_class* i_this) {
     }
 }
 
-/* 80501A40-80501BDC 000BA0 019C+00 2/2 0/0 0/0 .text            mtx_cc_set__FP12e_nest_class */
 static void mtx_cc_set(e_nest_class* i_this) {
     mDoMtx_stack_c::transS(i_this->current.pos.x, i_this->current.pos.y, i_this->current.pos.z);
     mDoMtx_stack_c::YrotM(i_this->mRotation.y);
@@ -234,7 +228,6 @@ static void mtx_cc_set(e_nest_class* i_this) {
     }
 }
 
-/* 80501BDC-805020D0 000D3C 04F4+00 1/1 0/0 0/0 .text            e_nest_normal__FP12e_nest_class */
 static void e_nest_normal(e_nest_class* i_this) {
     fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     if (i_this->mHitTimer != 0) {
@@ -309,6 +302,7 @@ static void e_nest_normal(e_nest_class* i_this) {
                             i_this->mHitActorID = fopAcM_GetID(daPy_getPlayerActorClass());
                             if (!strcmp(dComIfGp_getStartStageName(), "F_SP103")) {
                                 i_this->mDemoStage = 1;
+                                /* dSv_event_flag_c::F_0084 - Ordon Village - Opening days 2&3: knocked down a beehive with slingshot */
                                 dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[183]);
                             }
                         }
@@ -318,12 +312,14 @@ static void e_nest_normal(e_nest_class* i_this) {
                             || i_this->mAtInfo.mHitType == HIT_TYPE_BOOMERANG
                             || i_this->mAtInfo.mHitType == HIT_TYPE_STUN) {
                         i_this->mHitActorID = fopAcM_GetID(daPy_getPlayerActorClass());
+                        /* dSv_event_flag_c::F_0073 - Ordon Village - Attacked after charging at large beehive */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[172]);
                     } else if (fopAcM_GetName(actor) == PROC_NPC_TK) {
                         daNPC_TK_c* hawk = static_cast<daNPC_TK_c*>(actor);
                         hawk->setBump();
                         i_this->mHitActorID = fopAcM_GetID(hawk);
                         i_this->mKnockDown = 1;
+                        /* dSv_event_flag_c::F_0072 - Ordon Village - Knocked down large beehive with hawk */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[171]);
                         i_this->mHitTimer = 20;
                         i_this->mHawkHit = true;
@@ -339,7 +335,6 @@ static void e_nest_normal(e_nest_class* i_this) {
     }
 }
 
-/* 805020D0-80502280 001230 01B0+00 1/1 0/0 0/0 .text            wall_angle_get__FP12e_nest_class */
 static s16 wall_angle_get(e_nest_class* i_this) {
     fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     dBgS_LinChk lin_chk;
@@ -368,7 +363,6 @@ static s16 wall_angle_get(e_nest_class* i_this) {
     return cM_atan2s(vec1.x, vec1.z) + 0x4000;
 }
 
-/* 80502280-805025C4 0013E0 0344+00 1/1 0/0 0/0 .text            e_nest_drop__FP12e_nest_class */
 static void e_nest_drop(e_nest_class* i_this) {
     if (i_this->mAcch.ChkGroundHit()) {
         if (i_this->mKnockDown != 0) {
@@ -437,15 +431,15 @@ static void e_nest_drop(e_nest_class* i_this) {
     cLib_addCalcAngleS2(&i_this->mSpin, 0, 1, 100);
 }
 
-/* 805025C4-80502730 001724 016C+00 1/1 0/0 0/0 .text            e_nest_carry__FP12e_nest_class */
 static s8 e_nest_carry(e_nest_class* i_this) {
+    fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    i_this->speed.y = 0.0f;
+    a_this->speed.y = 0.0f;
     s8 ret = true;
-
+    
     switch (i_this->mMode) {
-    case 0:
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+    case 0: {
+        cLib_offBit<u32>(a_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->mMode = 1;
         s16 angle_delta_y = i_this->mRotation.y - player->shape_angle.y;
         if (angle_delta_y > 0x4000 || angle_delta_y < -0x4000) {
@@ -455,21 +449,22 @@ static s8 e_nest_carry(e_nest_class* i_this) {
         }
         i_this->mTimers[0] = 20;
         break;
+    }
 
     case 1:
-        if (!fopAcM_checkCarryNow(i_this)) {
+        if (!fopAcM_checkCarryNow(a_this)) {
             i_this->mTimers[0] = 0;
             i_this->mCcSph.OnCoSetBit();
             i_this->mAction = e_nest_class::ACT_DROP;
-            if (i_this->speedF >= 1.0f) {
-                i_this->speedF = 30.0f;
-                i_this->speed.y = 30.0f;
-                i_this->current.angle.y = player->shape_angle.y;
+            if (fopAcM_GetSpeedF(a_this) >= 1.0f) {
+                a_this->speedF = 30.0f + NREG_F(7);
+                a_this->speed.y = 30.0f + NREG_F(8);
+                a_this->current.angle.y = player->shape_angle.y;
                 i_this->mMode = 0;
             } else {
-                i_this->speedF = 0.0f;
+                a_this->speedF = 0.0f;
                 i_this->mMode = 3;
-                i_this->mWobble = 500.0f;
+                i_this->mWobble = 500.0f + NREG_F(0);
             }
         } else {
             ret = false;
@@ -483,7 +478,6 @@ static s8 e_nest_carry(e_nest_class* i_this) {
     return ret;
 }
 
-/* 80502730-8050284C 001890 011C+00 1/1 0/0 0/0 .text            water_check__FP12e_nest_class */
 static int water_check(e_nest_class* i_this) {
     dBgS_LinChk lin_chk;
     cXyz vec;
@@ -504,8 +498,6 @@ static int water_check(e_nest_class* i_this) {
     }
 }
 
-/* 8050284C-80502AD4 0019AC 0288+00 1/1 0/0 0/0 .text            simple_bg_check__FP12e_nest_class
- */
 static int simple_bg_check(e_nest_class* i_this) {
     fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     cXyz vec2, vec3, vec1;
@@ -534,7 +526,6 @@ static int simple_bg_check(e_nest_class* i_this) {
     return false;
 }
 
-/* 80502AD4-80502D30 001C34 025C+00 1/1 0/0 0/0 .text            e_nest_float__FP12e_nest_class */
 static void e_nest_float(e_nest_class* i_this) {
     cLib_addCalc0(&i_this->speed.y, 1.0f, 0.25f);
     i_this->current.pos += i_this->speed;
@@ -580,7 +571,6 @@ static void e_nest_float(e_nest_class* i_this) {
     }
 }
 
-/* 80502D30-80503120 001E90 03F0+00 1/1 0/0 0/0 .text            e_nest_hahen__FP12e_nest_class */
 static void e_nest_hahen(e_nest_class* i_this) {
     fopAc_ac_c* a_this = static_cast<fopAc_ac_c*>(i_this);
     daPy_py_c* player = static_cast<daPy_py_c*>(dComIfGp_getPlayer(0));
@@ -647,7 +637,6 @@ static void e_nest_hahen(e_nest_class* i_this) {
     }
 }
 
-/* 80503120-805031CC 002280 00AC+00 1/1 0/0 0/0 .text            e_nest_hook__FP12e_nest_class */
 static void e_nest_hook(e_nest_class* i_this) {
     i_this->mIframes = 10;
 
@@ -671,8 +660,6 @@ static void e_nest_hook(e_nest_class* i_this) {
     }
 }
 
-/* 805031CC-80503668 00232C 049C+00 1/1 0/0 0/0 .text            bee_nest_action__FP12e_nest_class
- */
 static void bee_nest_action(e_nest_class* i_this) {
     i_this->attention_info.position = i_this->eyePos = i_this->current.pos;
     i_this->eyePos.y += i_this->scale.x * -80.0f;
@@ -714,7 +701,7 @@ static void bee_nest_action(e_nest_class* i_this) {
         break;
     case e_nest_class::ACT_DEBRIS:
         e_nest_hahen(i_this);
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         return;
     }
 
@@ -725,7 +712,7 @@ static void bee_nest_action(e_nest_class* i_this) {
     }
 
     if (carry_check) {
-        cLib_onBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
         i_this->attention_info.distances[fopAc_attn_CARRY_e] = 0x2c;
         if (fopAcM_checkCarryNow(i_this)) {
             i_this->mAction = e_nest_class::ACT_CARRY;
@@ -733,7 +720,7 @@ static void bee_nest_action(e_nest_class* i_this) {
             i_this->mCcSph.OffCoSetBit();
         }
     } else {
-        cLib_offBit<u32>(i_this->attention_info.flags, 0x10);
+        cLib_offBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_CARRY_e);
     }
 
     if (float_check && water_check(i_this)) {
@@ -786,7 +773,6 @@ static void bee_nest_action(e_nest_class* i_this) {
     mtx_cc_set(i_this);
 }
 
-/* 80503668-805036E0 0027C8 0078+00 1/1 0/0 0/0 .text            shot_b_sub__FPvPv */
 static void* shot_b_sub(void* i_actor, void* i_data) {
     daPy_py_c* player = static_cast<daPy_py_c*>(dComIfGp_getPlayer(0));
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_BOOMERANG
@@ -797,7 +783,6 @@ static void* shot_b_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805036E0-80503984 002840 02A4+00 1/1 0/0 0/0 .text            demo_camera__FP12e_nest_class */
 static void demo_camera(e_nest_class* i_this) {
     camera_class* camera = dComIfGp_getCamera(dComIfGp_getPlayerCameraID(0));
     s8 end_demo = false;
@@ -854,8 +839,6 @@ static void demo_camera(e_nest_class* i_this) {
     }
 }
 
-/* 80503984-80503E24 002AE4 04A0+00 1/0 0/0 0/0 .text            daE_Nest_Execute__FP12e_nest_class
- */
 static int daE_Nest_Execute(e_nest_class* i_this) {
     cXyz vec1, vec2;
 
@@ -933,19 +916,15 @@ static int daE_Nest_Execute(e_nest_class* i_this) {
     return 1;
 }
 
-/* 80503E24-80503E2C 002F84 0008+00 1/0 0/0 0/0 .text            daE_Nest_IsDelete__FP12e_nest_class
- */
 static int daE_Nest_IsDelete(e_nest_class* param_0) {
     return 1;
 }
 
-/* 80503E2C-80503EA0 002F8C 0074+00 1/0 0/0 0/0 .text            daE_Nest_Delete__FP12e_nest_class
- */
 static int daE_Nest_Delete(e_nest_class* i_this) {
     dComIfG_resDelete(&i_this->mPhase, "E_nest");
     
     if (i_this->mHIOInit) {
-        l_hioInit = false;
+        hio_set = false;
     }
 
     if (i_this->heap != NULL) {
@@ -956,7 +935,6 @@ static int daE_Nest_Delete(e_nest_class* i_this) {
     return 1;
 }
 
-/* 80503EA0-80503FCC 003000 012C+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     e_nest_class* _this = static_cast<e_nest_class*>(i_this);
 
@@ -981,9 +959,8 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 80503FCC-805044AC 00312C 04E0+00 1/0 0/0 0/0 .text            daE_Nest_Create__FP10fopAc_ac_c */
 static cPhs__Step daE_Nest_Create(fopAc_ac_c* i_this) {
-    fopAcM_SetupActor(i_this, e_nest_class);
+    fopAcM_ct(i_this, e_nest_class);
     e_nest_class* _this = static_cast<e_nest_class*>(i_this);
 
     cPhs__Step step = (cPhs__Step)dComIfG_resLoad(&_this->mPhase, "E_nest");
@@ -1003,9 +980,9 @@ static cPhs__Step daE_Nest_Create(fopAc_ac_c* i_this) {
             return cPhs_ERROR_e;
         }
 
-        if (!l_hioInit) {
+        if (!hio_set) {
             _this->mHIOInit = true;
-            l_hioInit = true;
+            hio_set = true;
             l_HIO.field_0x4 = -1;
         }
 
@@ -1086,7 +1063,6 @@ static cPhs__Step daE_Nest_Create(fopAc_ac_c* i_this) {
     return step;
 }
 
-/* 805048A4-805048C4 -00001 0020+00 1/0 0/0 0/0 .data            l_daE_Nest_Method */
 static actor_method_class l_daE_Nest_Method = {
     (process_method_func)daE_Nest_Create,
     (process_method_func)daE_Nest_Delete,
@@ -1095,7 +1071,6 @@ static actor_method_class l_daE_Nest_Method = {
     (process_method_func)daE_Nest_Draw,
 };
 
-/* 805048C4-805048F4 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_E_NEST */
 extern actor_process_profile_definition g_profile_E_NEST = {
     fpcLy_CURRENT_e,
     7,

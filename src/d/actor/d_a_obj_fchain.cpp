@@ -3,35 +3,31 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_fchain.h"
 #include "d/actor/d_a_player.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/d_com_inf_game.h"
 
-/* 80BE7438-80BE7440 000000 0007+01 6/6 0/0 0/0 .rodata          l_arcName */
 static char const l_arcName[] = "Fchain";
 
-/* 80BE5FF8-80BE6054 000078 005C+00 1/1 0/0 0/0 .text            createHeap__13daObjFchain_cFv */
 int daObjFchain_c::createHeap() {
     mModelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 3);
     return mModelData != NULL ? 1 : 0;
 }
 
-/* 80BE6054-80BE6074 0000D4 0020+00 1/1 0/0 0/0 .text daObjFchain_createHeap__FP10fopAc_ac_c */
 static int daObjFchain_createHeap(fopAc_ac_c* i_this) {
     return static_cast<daObjFchain_c*>(i_this)->createHeap();
 }
 
-/* ############################################################################################## */
-/* 80BE7440-80BE744C 000008 000C+00 0/1 0/0 0/0 .rodata          localVec$3662 */
 static Vec const localVec = {
     0.0f, 0.0f, -9.0f,
 };
 
-/* 80BE6074-80BE6328 0000F4 02B4+00 1/1 0/0 0/0 .text            create__13daObjFchain_cFv */
 int daObjFchain_c::create() {
-    fopAcM_SetupActor(this, daObjFchain_c);
+    fopAcM_ct(this, daObjFchain_c);
     int rv = dComIfG_resLoad(&mPhase, l_arcName);
     switch (rv) {
     case cPhs_COMPLEATE_e:
@@ -40,7 +36,7 @@ int daObjFchain_c::create() {
             return cPhs_ERROR_e;
         }
         tevStr.room_no = dComIfGp_roomControl_getStayNo();
-        mShape.setUserArea((u32)this);
+        mShape.setUserArea((uintptr_t)this);
         current.pos.y += 3.0f;
         s16 local_58 = shape_angle.y;
         cXyz* local_44 = &current.pos;
@@ -73,25 +69,19 @@ int daObjFchain_c::create() {
     return rv;
 }
 
-/* 80BE63A8-80BE63C8 000428 0020+00 1/0 0/0 0/0 .text            daObjFchain_Create__FP10fopAc_ac_c
- */
 static int daObjFchain_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjFchain_c*>(i_this)->create();
 }
 
-/* 80BE63C8-80BE64B8 000448 00F0+00 1/1 0/0 0/0 .text            __dt__13daObjFchain_cFv */
 daObjFchain_c::~daObjFchain_c() {
     dComIfG_resDelete(&mPhase,l_arcName);
 }
 
-/* 80BE64B8-80BE64E0 000538 0028+00 1/0 0/0 0/0 .text daObjFchain_Delete__FP13daObjFchain_c */
 static int daObjFchain_Delete(daObjFchain_c* i_this) {
     i_this->~daObjFchain_c();
     return 1;
 }
 
-/* 80BE64E0-80BE66B4 000560 01D4+00 1/1 0/0 0/0 .text
- * checkPlayerFoot__13daObjFchain_cFPC4cXyzPC4cXyzP4cXyz        */
 void daObjFchain_c::checkPlayerFoot(cXyz const* param_1, cXyz const* param_2, cXyz* param_3) {
     cXyz local_24 = *param_1 - *param_2;
     f32 dVar4 = local_24.absXZ();
@@ -104,7 +94,6 @@ void daObjFchain_c::checkPlayerFoot(cXyz const* param_1, cXyz const* param_2, cX
     }
 }
 
-/* 80BE66B4-80BE6868 000734 01B4+00 1/1 0/0 0/0 .text setGroundVec__13daObjFchain_cFP4cXyzf */
 void daObjFchain_c::setGroundVec(cXyz* param_1, f32 param_2) {
     f32 dVar6 = param_1->absXZ();
     param_1->y += param_2;
@@ -118,13 +107,10 @@ void daObjFchain_c::setGroundVec(cXyz* param_1, f32 param_2) {
     param_1->normalizeZP();
 }
 
-/* 80BE74A4-80BE74B0 00006C 000C+00 0/1 0/0 0/0 .rodata          wolfChainBaseOffset$3862 */
 static Vec const wolfChainBaseOffset = {
     22.0f, 0.0f, -12.0f,
 };
 
-/* 80BE6868-80BE7174 0008E8 090C+00 1/1 0/0 0/0 .text            execute__13daObjFchain_cFv */
-// NONMATCHING - regalloc, stack
 int daObjFchain_c::execute() {
     if (dComIfGp_event_runCheck()) {
         if (dComIfGp_getEventManager().getRunEventName() != NULL) {
@@ -140,135 +126,125 @@ int daObjFchain_c::execute() {
     } else {
         field_0x588 = 0;
     }
-    cXyz* local_148 = &current.pos;
-    cXyz local_54;
-    cXyz cStack_60;
+    cXyz* sp_38 = &current.pos;
+    cXyz sp_12c;
+    cXyz sp_120;
     if (field_0x586 != 0) {
         field_0x586--;
     }
-    cXyz* pcVar12 = field_0x694;
-    cXyz* local_150 = field_0x79c;
+    int i;
+    cXyz* var_r28 = field_0x694;
+    cXyz* sp_30 = field_0x79c;
     u32 isWolf = daPy_py_c::checkNowWolf();
     daPy_py_c* player = daPy_getLinkPlayerActorClass();
-    for (int i = 0; i < 22; i++) {
-        local_54 = (*pcVar12 - *local_148) + *local_150;
-        local_54.y += -1.5f;
+    for (i = 0; i < 22; i++, var_r28++, sp_30++) {
+        sp_12c = (*var_r28 - *sp_38) + *sp_30;
+        sp_12c.y += -1.5f;
+            /* dSv_event_flag_c::M_011 - Inside Hyrule Castle - Midna removes wolf's chains in prison */
         if (dComIfGs_isEventBit(0x510)) {
             if (isWolf) {
-                checkPlayerFoot(pcVar12, player->getLeftHandPosP(), &local_54);
-                checkPlayerFoot(pcVar12, player->getRightHandPosP(), &local_54);
+                checkPlayerFoot(var_r28, player->getLeftHandPosP(), &sp_12c);
+                checkPlayerFoot(var_r28, player->getRightHandPosP(), &sp_12c);
             }
-            checkPlayerFoot(pcVar12, player->getLeftFootPosP(), &local_54);
-            checkPlayerFoot(pcVar12, player->getRightFootPosP(), &local_54);
+            checkPlayerFoot(var_r28, player->getLeftFootPosP(), &sp_12c);
+            checkPlayerFoot(var_r28, player->getRightFootPosP(), &sp_12c);
         }
-        cStack_60 = local_54;
-        local_54.normalizeZP();
-        *pcVar12 = *local_148 + (local_54 * 9.0f);
-        if (pcVar12->y < current.pos.y) {
-            setGroundVec(&cStack_60, current.pos.y - pcVar12->y);
-            *pcVar12 = *local_148 + (cStack_60 * 9.0f);
+        sp_120 = sp_12c;
+        sp_12c.normalizeZP();
+        *var_r28 = *sp_38 + (sp_12c * 9.0f);
+        if (var_r28->y < current.pos.y) {
+            setGroundVec(&sp_120, current.pos.y - var_r28->y);
+            *var_r28 = *sp_38 + (sp_120 * 9.0f);
         }
-        local_150++;
-        local_148 = pcVar12;
-        pcVar12++;
+        sp_38 = var_r28;
     }
+                   /* dSv_event_flag_c::M_011 - Inside Hyrule Castle - Midna removes wolf's chains in prison */
     if (isWolf && !dComIfGs_isEventBit(0x510)) {
         mDoMtx_multVec(
             player->getModelJointMtx(17), &wolfChainBaseOffset,
             &field_0x694[21]);
-        cXyz diff = (field_0x694[21] - current.pos);
-        f32 dVar13 = diff.abs();
+        sp_12c = (field_0x694[21] - current.pos);
+        f32 dVar13 = sp_12c.abs();
         if (dVar13 > 198.0f) {
-            s16 sVar10 = cM_atan2s(-local_54.x, -local_54.z);
-            player->setOutPower(dVar13 - 198.0f, sVar10, 0);
+            player->setOutPower(dVar13 - 198.0f, cM_atan2s(-sp_12c.x, -sp_12c.z), 0);
             player->onWolfFchainPull();
-            cXyz* pcVar8 = field_0x694;
-            local_148 = &current.pos;
-            local_54 *= 9.0f / dVar13;
-            for (int i = 0; pcVar12 = pcVar8, i < 22; i++) {
-                *pcVar8 = *local_148 + local_54;
-                local_148 = pcVar8;
-                pcVar8++;
+            var_r28 = field_0x694;
+            sp_38 = &current.pos;
+            sp_12c *= 9.0f / dVar13;
+            for (i = 0; i < 22; i++, var_r28++) {
+                *var_r28 = *sp_38 + sp_12c;
+                sp_38 = var_r28;
             }
             field_0x584 = 0;
         } else {
-            cXyz* pcVar8 = &field_0x694[20];
-            local_150 = &field_0x79c[20];
-            local_148 = pcVar8 + 1;
-            for (int i = 20; i >= 0; i--) {
-                local_54 = (*pcVar8 - *local_148) + *local_150;
-                local_54.y += -1.5f;
-                cStack_60 = local_54;
-                local_54.normalizeZP();
-                *pcVar8 = *local_148 + (local_54 * 9.0f);
-                if (pcVar8->y < current.pos.y) {
-                    setGroundVec(&cStack_60, current.pos.y - pcVar8->y);
-                    *pcVar8 = *local_148 + (cStack_60 * 9.0f);
+            var_r28 = &field_0x694[20];
+            sp_30 = &field_0x79c[20];
+            sp_38 = var_r28 + 1;
+            for (i = 20; i >= 0; i--, var_r28--, sp_30--) {
+                sp_12c = (*var_r28 - *sp_38) + *sp_30;
+                sp_12c.y += -1.5f;
+                sp_120 = sp_12c;
+                sp_12c.normalizeZP();
+                *var_r28 = *sp_38 + (sp_12c * 9.0f);
+                if (var_r28->y < current.pos.y) {
+                    setGroundVec(&sp_120, current.pos.y - var_r28->y);
+                    *var_r28 = *sp_38 + (sp_120 * 9.0f);
                 }
-                local_150--;
-                local_148 = pcVar8;
-                pcVar8--;
+                sp_38 = var_r28;
             }
         }
     }
-    local_148 = &current.pos;
-    local_150 = field_0x694;
-    cXyz* pcVar8 = field_0x79c;
-    csXyz* local_15c = field_0x8a4;
-    cXyz* local_160 = field_0x58c;
-    s16 local_178 = 0;
-    for (int i = 0; i < 22; i++) {
-        *local_150 = (*pcVar8 - *local_160) * 0.3f;
-        *local_160 = *pcVar8;
-        local_54 = *local_148 - *pcVar8;
-        local_15c->x = local_54.atan2sY_XZ();
-        if (!(local_54.absXZ() < 3.5f)) {
-            local_15c->y = local_54.atan2sX_Z();
+    sp_38 = &current.pos;
+    var_r28 = field_0x694;
+    sp_30 = field_0x79c;
+    csXyz* sp_24 = field_0x8a4;
+    cXyz* sp_20 = field_0x58c;
+    s16 sp_08 = 0;
+    for (i = 0; i < 22; i++, var_r28++, sp_30++, sp_24++, sp_20++) {
+        *sp_30 = (*var_r28 - *sp_20) * 0.3f;
+        *sp_20 = *var_r28;
+        sp_12c = *sp_38 - *var_r28;
+        sp_24->x = sp_12c.atan2sY_XZ();
+        if (!(sp_12c.absXZ() < 3.5f)) {
+            sp_24->y = sp_12c.atan2sX_Z();
         }
-        if (local_150->abs2() > 3.0f && field_0x586 == 0) {
+        if (sp_30->abs2() > 3.0f && field_0x586 == 0) {
             f32 fVar1;
             if (cM_rnd() < 0.5f) {
                 fVar1 = 1.0f;
             } else {
                 fVar1 = -1.0f;
             }
-            local_15c->z = local_178 + 0x4000 + 
+            sp_24->z = sp_08 + 0x4000 +
                           (fVar1 * (cM_rndF(4096.0f) + 1536.0f));
-            if (pcVar8->y <= current.pos.y + 2.0f) {
-                if ((local_15c->z >= 0 && local_15c->z < 0x4000) ||
-                    (local_15c->z > -0x7fff && local_15c->z < -0x4000))
+            if (var_r28->y <= current.pos.y + 2.0f) {
+                if ((sp_24->z >= 0 && sp_24->z < 0x4000) ||
+                    (sp_24->z > -0x7fff && sp_24->z < -0x4000))
                 {
-                    local_15c->z = cM_rndFX(2048.0f) + 4096.0f;
+                    sp_24->z = cM_rndFX(2048.0f) + 4096.0f;
                 } else {
-                    local_15c->z = cM_rndFX(2048.0f) + -4096.0f;
+                    sp_24->z = cM_rndFX(2048.0f) + -4096.0f;
                 }
             }
         }
-        local_178 = local_15c->z;
-        local_150++;
-        local_15c++;
-        local_160++;
-        local_148 = pcVar8;
-        pcVar8++;
+        sp_08 = sp_24->z;
+        sp_38 = var_r28;
     }
     if (field_0x584 == 0) {
         field_0x584 = 1;
-        local_150 = field_0x79c;
-        for (int i = 0; i < 22; i++) {
-            *local_150 = cXyz::Zero;
-            local_150++;
+        sp_30 = field_0x79c;
+        for (i = 0; i < 22; i++, sp_30++) {
+            *sp_30 = cXyz::Zero;
         }
         field_0x586 = 5;
     }
     return 1;
 }
 
-/* 80BE7174-80BE7194 0011F4 0020+00 1/0 0/0 0/0 .text daObjFchain_Execute__FP13daObjFchain_c */
 static int daObjFchain_Execute(daObjFchain_c* i_this) {
     return static_cast<daObjFchain_c*>(i_this)->execute();
 }
 
-/* 80BE7194-80BE7324 001214 0190+00 1/0 0/0 0/0 .text            draw__19daObjFchain_shape_cFv */
 void daObjFchain_shape_c::draw() {
     daObjFchain_c* i_this = (daObjFchain_c*)getUserArea();
     cXyz* pPos = i_this->getPos();
@@ -293,6 +269,7 @@ void daObjFchain_shape_c::draw() {
     dKy_GxFog_tevstr_set(tevStr);
     GXLoadLightObjImm(&tevStr->mLightObj.mLightObj, GX_LIGHT0);
     int local_30;
+        /* dSv_event_flag_c::M_011 - Inside Hyrule Castle - Midna removes wolf's chains in prison */
     if (dComIfGs_isEventBit(0x510)) {
         local_30 = 17;
     } else {
@@ -308,7 +285,6 @@ void daObjFchain_shape_c::draw() {
     }
 }
 
-/* 80BE7324-80BE73B4 0013A4 0090+00 1/1 0/0 0/0 .text            draw__13daObjFchain_cFv */
 int daObjFchain_c::draw() {
     if (field_0x584 != 0) {
         g_env_light.settingTevStruct(0, &current.pos, &tevStr);
@@ -321,13 +297,10 @@ int daObjFchain_c::draw() {
     return 1;
 }
 
-/* 80BE73B4-80BE73D4 001434 0020+00 1/0 0/0 0/0 .text            daObjFchain_Draw__FP13daObjFchain_c
- */
 static int daObjFchain_Draw(daObjFchain_c* i_this) {
     return static_cast<daObjFchain_c*>(i_this)->draw();
 }
 
-/* 80BE74D8-80BE74F8 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjFchain_Method */
 static actor_method_class l_daObjFchain_Method = {
     (process_method_func)daObjFchain_Create,
     (process_method_func)daObjFchain_Delete,
@@ -336,7 +309,6 @@ static actor_method_class l_daObjFchain_Method = {
     (process_method_func)daObjFchain_Draw,
 };
 
-/* 80BE74F8-80BE7528 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_Fchain */
 extern actor_process_profile_definition g_profile_Obj_Fchain = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID
@@ -353,5 +325,3 @@ extern actor_process_profile_definition g_profile_Obj_Fchain = {
   fopAc_ENV_e,            // mActorType
   fopAc_CULLBOX_CUSTOM_e, // cullType
 };
-
-/* 80BE74CC-80BE74CC 000094 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */

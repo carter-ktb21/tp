@@ -3,6 +3,8 @@
  *
  */
 
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_a_obj.h"
 #include "SSystem/SComponent/c_math.h"
 #include "d/actor/d_a_player.h"
@@ -11,64 +13,50 @@
 
 namespace daObj {
 
-/* 80037038-80037180 031978 0148+00 4/4 0/0 0/0 .text eff_break_tsubo__5daObjFP10fopAc_ac_c4cXyzi
- */
 void eff_break_tsubo(fopAc_ac_c* i_actor, cXyz i_scale, int i_type) {
     J3DModelData* tubo_bmd = (J3DModelData*)dComIfG_getObjectRes("Always", 0x20);
     J3DAnmTexPattern* tubo_btp = (J3DAnmTexPattern*)dComIfG_getObjectRes("Always", 0x42);
 
     JPABaseEmitter* emitter = dComIfGp_particle_set(
-        dPa_name::ZI_J_M_tuboHahen_e, &i_actor->current.pos, NULL, NULL, 0xFF,
+        ID_ZI_J_M_TUBOHAHEN, &i_actor->current.pos, NULL, NULL, 0xFF,
         &dPa_modelEcallBack::mEcallback, fopAcM_GetRoomNo(i_actor), NULL, NULL, &i_scale);
 
     dPa_modelEcallBack::setModel(emitter, tubo_bmd, i_actor->tevStr, 3, tubo_btp, 0, i_type);
 
-    dComIfGp_particle_set(dPa_name::ZI_J_tuboHahen_e, &i_actor->current.pos, NULL, NULL, 0xFF,
+    dComIfGp_particle_set(ID_ZI_J_TUBOHAHEN, &i_actor->current.pos, NULL, NULL, 0xFF,
                           dPa_control_c::getTsuboSelectTexEcallBack(i_type),
                           fopAcM_GetRoomNo(i_actor), NULL, NULL, &i_scale);
 }
 
-/* 80037180-80037210 031AC0 0090+00 0/0 0/0 2/2 .text make_eff_break_kotubo__5daObjFP10fopAc_ac_c
- */
 void make_eff_break_kotubo(fopAc_ac_c* i_actor) {
     static cXyz scale(1.0f, 1.0f, 1.0f);
 
     eff_break_tsubo(i_actor, scale, 0);
 }
 
-/* 80037210-800372A0 031B50 0090+00 0/0 0/0 2/2 .text make_eff_break_kotubo2__5daObjFP10fopAc_ac_c
- */
 void make_eff_break_kotubo2(fopAc_ac_c* i_actor) {
     static cXyz scale(1.0f, 1.0f, 1.0f);
 
     eff_break_tsubo(i_actor, scale, 1);
 }
 
-/* 800372A0-80037330 031BE0 0090+00 0/0 0/0 1/1 .text
- * make_eff_break_gm_kotubo__5daObjFP10fopAc_ac_c               */
 void make_eff_break_gm_kotubo(fopAc_ac_c* i_actor) {
     static cXyz scale(1.0f, 1.0f, 1.0f);
 
     eff_break_tsubo(i_actor, scale, 3);
 }
 
-/* 80037330-800373C0 031C70 0090+00 0/0 0/0 1/1 .text
- * make_eff_break_gm_ootubo__5daObjFP10fopAc_ac_c               */
 void make_eff_break_gm_ootubo(fopAc_ac_c* i_actor) {
     static cXyz scale(2.0f, 2.0f, 2.0f);
 
     eff_break_tsubo(i_actor, scale, 4);
 }
 
-/* 800373C0-800373F0 031D00 0030+00 0/0 0/0 4/4 .text
- * posMoveF_stream__5daObjFP10fopAc_ac_cPC4cXyzPC4cXyzff        */
 void posMoveF_stream(fopAc_ac_c* i_actor, cXyz const* param_1, cXyz const* param_2, f32 param_3,
                      f32 param_4) {
     posMoveF_grade(i_actor, param_1, param_2, param_3, param_4, NULL, 0.0f, 0.0f, NULL);
 }
 
-/* 800373F0-800374EC 031D30 00FC+00 1/1 0/0 0/0 .text
- * posMoveF_resist_acc__Q25daObj21@unnamed@d_a_obj_cpp@FP4cXyzPC10fopAc_ac_cPC4cXyzff */
 
 namespace {
 void posMoveF_resist_acc(cXyz* pos, const fopAc_ac_c* i_actor, cXyz const* stream_spd, f32 param_3,
@@ -114,12 +102,10 @@ void posMoveF_grade_acc(cXyz* pos, const fopAc_ac_c* i_actor, cXyz const* param_
 }
 }  // namespace
 
-/* 80037620-80037788 031F60 0168+00 1/1 0/0 0/0 .text
- * posMoveF_grade__5daObjFP10fopAc_ac_cPC4cXyzPC4cXyzffPC4cXyzffPC4cXyz */
 void posMoveF_grade(fopAc_ac_c* i_actor, cXyz const* param_1, cXyz const* stream_spd, f32 param_3,
                     f32 param_4, cXyz const* param_5, f32 friction, f32 no_grade_cos,
                     cXyz const* param_8) {
-    JUT_ASSERT(0, stream_spd != 0);
+    JUT_ASSERT(0, stream_spd != NULL);
 
     cXyz spAC;
     posMoveF_resist_acc(&spAC, i_actor, stream_spd, param_3, param_4);
@@ -154,8 +140,6 @@ void posMoveF_grade(fopAc_ac_c* i_actor, cXyz const* param_1, cXyz const* stream
     fopAcM_posMove(i_actor, param_1);
 }
 
-/* 80037788-80037900 0320C8 0178+00 0/0 0/0 1/1 .text quat_rotBaseY__5daObjFP10QuaternionRC4cXyz
- */
 void quat_rotBaseY(Quaternion* quat, cXyz const& param_1) {
     static const Quaternion zero_quat = {0.0f, 0.0f, 0.0f, 1.0f};
 
@@ -177,8 +161,6 @@ void quat_rotBaseY(Quaternion* quat, cXyz const& param_1) {
     }
 }
 
-/* 80037900-80037A4C 032240 014C+00 0/0 0/0 3/3 .text
- * HitSeStart__5daObjFPC4cXyziPC12dCcD_GObjInfUl                */
 void HitSeStart(cXyz const* i_sePos, int i_roomNo, dCcD_GObjInf const* i_CcObj, u32 param_3) {
     int hit_se = const_cast<dCcD_GObjInf*>(i_CcObj)->GetTgHitObjSe();
     fopAc_ac_c* hit_actor = const_cast<dCcD_GObjInf*>(i_CcObj)->GetTgHitAc();

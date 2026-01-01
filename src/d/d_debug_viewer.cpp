@@ -1,16 +1,12 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "d/d_debug_viewer.h"
+#include "d/d_debug_pad.h"
 #include "d/d_com_inf_game.h"
 #include "f_ap/f_ap_game.h"
 #include "JSystem/J3DGraphBase/J3DDrawBuffer.h"
 #include "JSystem/JUtility/JUTDbPrint.h"
 #include "JSystem/JUtility/JUTReport.h"
-
-class dDebugPad_c {
-public:
-    bool Active();
-};
-
-extern dDebugPad_c dDebugPad;
 
 J3DPacket* l_drawPacketList[1000];
 int l_drawPacketListNum;
@@ -125,8 +121,8 @@ static bool reportOK() {
 static JUtility::TColor ShadowDarkColor(0, 0, 0, 0x80);
 static JUtility::TColor ShadowLightColor(0xFF, 0xFF, 0xFF, 0x80);
 
-// NONMATCHING - string being put in stack instead of register
 int dDbVw_Report(int x, int y, char const* string, ...) {
+    string;
     char buffer[256];
 
     if (reportOK()) {

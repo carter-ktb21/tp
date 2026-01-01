@@ -3,6 +3,7 @@
 
 #include "JSystem/JKernel/JKRDisposer.h"
 #include <dolphin/os.h>
+#include "global.h"
 
 class JKRHeap;
 typedef void (*JKRErrorHandler)(void*, u32, int);
@@ -89,8 +90,8 @@ public:
 
     void setDebugFill(bool debugFill) { mDebugFill = debugFill; }
     bool getDebugFill() const { return mDebugFill; }
-    void* getStartAddr() const { return (void*)mStart; }
-    void* getEndAddr() const { return (void*)mEnd; }
+    void* getStartAddr() { return (void*)mStart; }
+    void* getEndAddr() { return (void*)mEnd; }
     u32 getSize() const { return mSize; }
     bool getErrorFlag() const { return mErrorFlag; }
     void callErrorHandler(JKRHeap* heap, u32 size, int alignment) {
@@ -126,7 +127,6 @@ protected:
     /* 0x5C */ JSUList<JKRDisposer> mDisposerList;
     /* 0x68 */ bool mErrorFlag;
     /* 0x69 */ bool mInitFlag;
-    /* 0x6A */ u8 padding_0x6a[2];
 
 public:
     static bool initArena(char** memory, u32* size, int maxHeaps);
@@ -149,7 +149,8 @@ public:
     static void* getUserRamEnd(void) { return mUserRamEnd; }
     static u32 getMemorySize(void) { return mMemorySize; }
     static JKRHeap* getRootHeap() { return sRootHeap; }
-#ifdef DEBUG
+
+#if PLATFORM_WII || PLATFORM_SHIELD
     static JKRHeap* getRootHeap2() { return sRootHeap2; }
 #endif
 
@@ -173,7 +174,8 @@ public:
     static u32 mMemorySize;
 
     static JKRHeap* sRootHeap;
-#ifdef DEBUG
+
+#if PLATFORM_WII || PLATFORM_SHIELD
     static JKRHeap* sRootHeap2;
 #endif
 
@@ -250,7 +252,21 @@ inline JKRHeap* JKRGetRootHeap() {
     return JKRHeap::getRootHeap();
 }
 
-#ifdef DEBUG
+inline JKRErrorHandler JKRSetErrorHandler(JKRErrorHandler errorHandler) {
+    return JKRHeap::setErrorHandler(errorHandler);
+}
+
+inline bool JKRSetErrorFlag(JKRHeap* heap, bool flag) {
+    return heap->setErrorFlag(flag);
+}
+
+#if PLATFORM_WII || PLATFORM_SHIELD
+inline JKRHeap* JKRGetRootHeap2() {
+    return JKRHeap::getRootHeap2();
+}
+#endif
+
+#if DEBUG
 inline void JKRSetDebugFillNotuse(u8 status) { data_804508B1 = status; }
 inline void JKRSetDebugFillNew(u8 status) { data_804508B2 = status; }
 inline void JKRSetDebugFillDelete(u8 status) { data_804508B3 = status; }

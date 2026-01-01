@@ -3,13 +3,17 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_gm.h"
 #include "d/actor/d_a_e_gm.h"
 #include "d/actor/d_a_player.h"
 #include "d/actor/d_a_obj_ystone.h"
+#include "d/d_s_play.h"
 #include "d/d_com_inf_game.h"
 #include "c/c_damagereaction.h"
 #include "SSystem/SComponent/c_math.h"
+#include "f_op/f_op_camera_mng.h"
 #include "f_op/f_op_msg_mng.h"
 #include "Z2AudioLib/Z2Instances.h"
 
@@ -39,8 +43,6 @@
 #define ANM_GOMA_UP_02          29
 #define ANM_GOMA_WAIT           30
 
-UNK_REL_DATA;
-
 enum daB_GM_ACTION {
     ACTION_WAIT,
     ACTION_MOVE,
@@ -52,7 +54,36 @@ enum daB_GM_ACTION {
     ACTION_DROP,
 };
 
-/* 805ED94C-805ED9FC 0000EC 00B0+00 1/1 0/0 0/0 .text            __ct__12daB_GM_HIO_cFv */
+class daB_GM_HIO_c {
+public:
+    daB_GM_HIO_c();
+    virtual ~daB_GM_HIO_c() {}
+
+    /* 0x04 */ s8 field_0x4;
+    /* 0x08 */ f32 model_size;
+    /* 0x0C */ f32 check_size;
+    /* 0x10 */ f32 dash_speed;
+    /* 0x14 */ f32 dash_anm_speed;
+    /* 0x18 */ f32 move_speed;
+    /* 0x1C */ f32 move_anm_speed;
+    /* 0x20 */ f32 wait_anm_speed;
+    /* 0x24 */ f32 range;
+    /* 0x28 */ s16 smoke_prim_R;
+    /* 0x2A */ s16 smoke_prim_G;
+    /* 0x2C */ s16 smoke_prim_B;
+    /* 0x2E */ s16 smoke_env_R;
+    /* 0x30 */ s16 smoke_env_G;
+    /* 0x32 */ s16 smoke_env_B;
+    /* 0x34 */ s16 smoke_alpha;
+    /* 0x36 */ s16 field_0x36;
+    /* 0x38 */ f32 smoke_blend;
+    /* 0x3C */ f32 bend_degree_1;
+    /* 0x40 */ f32 bend_degree_2;
+    /* 0x44 */ f32 bend_degree_3;
+    /* 0x48 */ u8 foot_pos_check;
+    /* 0x49 */ u8 eye_check;
+};
+
 daB_GM_HIO_c::daB_GM_HIO_c() {
     field_0x4 = 0xFF;
     model_size = 1.0f;
@@ -82,13 +113,11 @@ daB_GM_HIO_c::daB_GM_HIO_c() {
     eye_check = false;
 }
 
-/* 805ED9FC-805EDAA8 00019C 00AC+00 6/6 0/0 0/0 .text            anm_init__FP10b_gm_classifUcf */
 static void anm_init(b_gm_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, f32 i_speed) {
     i_this->mpModelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("B_gm", i_anmID), i_attr, i_morf, i_speed, 0.0f, -1.0f);
     i_this->mAnmID = i_anmID;
 }
 
-/* 805EDAA8-805EDDA8 000248 0300+00 1/1 0/0 0/0 .text            nodeCallBack__FP8J3DJointi */
 static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     if (param_1 == 0) {
         int jnt_no = i_joint->getJntNo();
@@ -135,33 +164,16 @@ static int nodeCallBack(J3DJoint* i_joint, int param_1) {
     return 1;
 }
 
-UNK_BSS(1109)
-UNK_BSS(1107)
-UNK_BSS(1105)
-UNK_BSS(1104)
-UNK_BSS(1099)
-UNK_BSS(1097)
-UNK_BSS(1095)
-UNK_BSS(1094)
-UNK_BSS(1057)
-UNK_BSS(1055)
-UNK_BSS(1053)
-UNK_BSS(1052)
-UNK_BSS(1014)
-UNK_BSS(1012)
-UNK_BSS(1010)
+static u8 hio_set;
 
-static u8 lit_1009[1];
-static u8 l_initHIO;
-
-/* 805F47DC-805F4828 000054 004C+00 11/12 0/0 0/0 .bss             l_HIO */
 static daB_GM_HIO_c l_HIO;
 
-/* 805EDDA8-805EE020 000548 0278+00 1/0 0/0 0/0 .text            daB_GM_Draw__FP10b_gm_class */
 static int daB_GM_Draw(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
+    #if !DEBUG
     g_env_light.settingTevStruct(0, &a_this->current.pos, &a_this->tevStr);
+    #endif
 
     for (int i = 0; i < 4; i++) {
         g_env_light.setLightTevColorType_MAJI(i_this->mpSpotLightModel[i], &a_this->tevStr);
@@ -174,6 +186,9 @@ static int daB_GM_Draw(b_gm_class* i_this) {
     }
 
     J3DModel* model = i_this->mpModelMorf->getModel();
+    #if DEBUG
+    g_env_light.settingTevStruct(0, &a_this->current.pos, &a_this->tevStr);
+    #endif
     g_env_light.setLightTevColorType_MAJI(model, &a_this->tevStr);
     
     i_this->mpZoomBtk->entry(model->getModelData());
@@ -192,8 +207,8 @@ static int daB_GM_Draw(b_gm_class* i_this) {
     i_this->mpModelMorf->entryDL();
 
     cXyz shadow_pos;
-    shadow_pos.set(a_this->current.pos.x, a_this->current.pos.y + l_HIO.model_size * 400.0f, a_this->current.pos.z);
-    i_this->mShadowID = dComIfGd_setShadow(i_this->mShadowID, 1, model, &shadow_pos, l_HIO.model_size * 3000.0f, 0.0f, a_this->current.pos.y, i_this->mAcch.GetGroundH(), i_this->mAcch.m_gnd, &a_this->tevStr, 0, 1.0f, dDlst_shadowControl_c::getSimpleTex());
+    shadow_pos.set(a_this->current.pos.x, BREG_F(18) + (a_this->current.pos.y + l_HIO.model_size * 400.0f), a_this->current.pos.z);
+    i_this->mShadowID = dComIfGd_setShadow(i_this->mShadowID, 1, model, &shadow_pos, (l_HIO.model_size * 3000.0f) + BREG_F(19), 0.0f, a_this->current.pos.y, i_this->mAcch.GetGroundH(), i_this->mAcch.m_gnd, &a_this->tevStr, 0, 1.0f, dDlst_shadowControl_c::getSimpleTex());
 
     if (i_this->field_0x6c0 > 0.1f) {
         J3DModel* model = i_this->mpBeamModelMorf->getModel();
@@ -205,7 +220,6 @@ static int daB_GM_Draw(b_gm_class* i_this) {
     return 1;
 }
 
-/* 805EE05C-805EE0B4 0007FC 0058+00 1/1 0/0 0/0 .text            s_ko_del__FPvPv */
 static void* s_ko_del(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_GM && fopAcM_GetParam(i_actor) == 0) {
         ((daE_GM_c*)i_actor)->InstantKill();
@@ -214,7 +228,6 @@ static void* s_ko_del(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805EE0B4-805EE438 000854 0384+00 1/1 0/0 0/0 .text            damage_check__FP10b_gm_class */
 static void damage_check(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -285,7 +298,6 @@ static void damage_check(b_gm_class* i_this) {
     }
 }
 
-/* 805EE438-805EE5D8 000BD8 01A0+00 1/1 0/0 0/0 .text            bg_check__FP10b_gm_class */
 static BOOL bg_check(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -326,10 +338,8 @@ static BOOL bg_check(b_gm_class* i_this) {
     return FALSE;
 }
 
-/* 805F4828-805F482C 0000A0 0004+00 2/2 0/0 0/0 .bss             ko_ct */
 static int ko_ct;
 
-/* 805EE620-805EE678 000DC0 0058+00 1/1 0/0 0/0 .text            s_ko_sub__FPvPv */
 static void* s_ko_sub(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_GM) {
         ko_ct++;
@@ -338,7 +348,6 @@ static void* s_ko_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805EE678-805EE6E0 000E18 0068+00 1/1 0/0 0/0 .text            s_ko2_move__FPvPv */
 static void* s_ko2_move(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_GM && fopAcM_GetParam(i_actor) == 3) {
         ((daE_GM_c*)i_actor)->MoveStart(0);
@@ -348,7 +357,6 @@ static void* s_ko2_move(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805EE6E0-805EE738 000E80 0058+00 1/1 0/0 0/0 .text            s_ko2_get__FPvPv */
 static void* s_ko2_get(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_GM && fopAcM_GetParam(i_actor) == 3) {
         return i_actor;
@@ -357,7 +365,6 @@ static void* s_ko2_get(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805EE738-805EE7B0 000ED8 0078+00 1/1 0/0 0/0 .text            s_ko_move__FPvPv */
 static void* s_ko_move(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && fopAcM_GetName(i_actor) == PROC_E_GM && fopAcM_GetParam(i_actor) == 1) {
         ((daE_GM_c*)i_actor)->MoveStart(cM_rndF(15.0f));
@@ -366,7 +373,6 @@ static void* s_ko_move(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805EE7B0-805EE888 000F50 00D8+00 1/1 0/0 0/0 .text            b_gm_wait__FP10b_gm_class */
 static void b_gm_wait(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -388,7 +394,6 @@ static void b_gm_wait(b_gm_class* i_this) {
     i_this->mAcch.CrrPos(dComIfG_Bgsp());
 }
 
-/* 805F485C-805F488C 0000D4 0030+00 2/3 0/0 0/0 .bss             target_pos */
 static cXyz target_pos[] = {
     cXyz(-1350.0f, 0.0f, -1350.0f),
     cXyz(-1350.0f, 0.0f, 1350.0f),
@@ -396,7 +401,6 @@ static cXyz target_pos[] = {
     cXyz(1350.0f, 0.0f, 1350.0f),
 };
 
-/* 805EE888-805EEE50 001028 05C8+00 2/2 0/0 0/0 .text            b_gm_move__FP10b_gm_class */
 static void b_gm_move(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -520,7 +524,6 @@ static void b_gm_move(b_gm_class* i_this) {
     }
 }
 
-/* 805EEE50-805EF010 0015F0 01C0+00 1/1 0/0 0/0 .text            b_gm_beam__FP10b_gm_class */
 static void b_gm_beam(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -563,7 +566,6 @@ static void b_gm_beam(b_gm_class* i_this) {
     cLib_addCalc2(&i_this->speedF, move_speed, 1.0f, 1.0f + (0.5f * l_HIO.dash_speed));
 }
 
-/* 805EF010-805EF504 0017B0 04F4+00 1/2 0/0 0/0 .text            b_gm_kogoma__FP10b_gm_class */
 static void b_gm_kogoma(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -629,7 +631,6 @@ static void b_gm_kogoma(b_gm_class* i_this) {
     cLib_addCalc2(&a_this->speedF, move_speed, 1.0f, 1.0f + (0.5f * l_HIO.dash_speed));
 }
 
-/* 805EF504-805EF630 001CA4 012C+00 1/1 0/0 0/0 .text            b_gm_damage__FP10b_gm_class */
 static void b_gm_damage(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     int anm_frame = i_this->mpModelMorf->getFrame();
@@ -661,7 +662,6 @@ static void b_gm_damage(b_gm_class* i_this) {
     cLib_addCalc0(&a_this->speedF, 1.0f, 5.0f);
 }
 
-/* 805EF630-805EF9BC 001DD0 038C+00 2/1 0/0 0/0 .text            b_gm_drop__FP10b_gm_class */
 static void b_gm_drop(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz sp20;
@@ -749,7 +749,6 @@ static void b_gm_drop(b_gm_class* i_this) {
     }
 }
 
-/* 805EF9BC-805EFB28 00215C 016C+00 2/1 0/0 0/0 .text            action__FP10b_gm_class */
 static void action(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz local_move;
@@ -799,8 +798,6 @@ static void action(b_gm_class* i_this) {
     }
 }
 
-/* 805EFB28-805EFDD4 0022C8 02AC+00 1/1 0/0 0/0 .text            foot_IK__FP10b_gm_classP9b_gm_foot
- */
 static int foot_IK(b_gm_class* i_this, b_gm_foot* i_foot) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     int var_r28 = 0;
@@ -838,7 +835,6 @@ static int foot_IK(b_gm_class* i_this, b_gm_foot* i_foot) {
     return var_r28;
 }
 
-/* 805F48BC-805F48EC 000134 0030+00 1/2 0/0 0/0 .bss             top_pos_data */
 static cXyz top_pos_data[] = {
     cXyz(260.0f, 0.0f, 0.0f),
     cXyz(280.0f, 0.0f, 0.0f),
@@ -846,7 +842,6 @@ static cXyz top_pos_data[] = {
     cXyz(280.0f, 0.0f, 0.0f),
 };
 
-/* 805F4474-805F449C 0000E4 0028+00 2/2 0/0 0/0 .data            top_j */
 static int top_j[] = {
     0x1B,
     0x1F,
@@ -860,7 +855,6 @@ static int top_j[] = {
     0x41,
 };
 
-/* 805EFDD4-805EFF50 002574 017C+00 1/1 0/0 0/0 .text            foot_IK_main__FP10b_gm_class */
 static void foot_IK_main(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     cXyz spC;
@@ -899,7 +893,6 @@ static void foot_IK_main(b_gm_class* i_this) {
     }
 }
 
-/* 805EFF50-805F053C 0026F0 05EC+00 1/1 0/0 0/0 .text            anm_se_set__FP10b_gm_class */
 static void anm_se_set(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -992,7 +985,6 @@ static void anm_se_set(b_gm_class* i_this) {
     }
 }
 
-/* 805F053C-805F0620 002CDC 00E4+00 1/1 0/0 0/0 .text            cam_3d_morf__FP10b_gm_classf */
 static void cam_3d_morf(b_gm_class* i_this, f32 i_scale) {
     cLib_addCalc2(&i_this->mDemoCamCenter.x, i_this->mDemoCamCenterTarget.x, i_scale, i_this->mDemoCamCenterSpeed.x * i_this->field_0x1cdc);
     cLib_addCalc2(&i_this->mDemoCamCenter.y, i_this->mDemoCamCenterTarget.y, i_scale, i_this->mDemoCamCenterSpeed.y * i_this->field_0x1cdc);
@@ -1003,7 +995,6 @@ static void cam_3d_morf(b_gm_class* i_this, f32 i_scale) {
     cLib_addCalc2(&i_this->mDemoCamEye.z, i_this->mDemoCamEyeTarget.z, i_scale, i_this->mDemoCamEyeSpeed.z * i_this->field_0x1cdc);
 }
 
-/* 805F0620-805F06C0 002DC0 00A0+00 1/1 0/0 0/0 .text            cam_spd_set__FP10b_gm_class */
 static void cam_spd_set(b_gm_class* i_this) {
     i_this->mDemoCamEyeSpeed.x = fabsf(i_this->mDemoCamEyeTarget.x - i_this->mDemoCamEye.x);
     i_this->mDemoCamEyeSpeed.y = fabsf(i_this->mDemoCamEyeTarget.y - i_this->mDemoCamEye.y);
@@ -1016,7 +1007,6 @@ static void cam_spd_set(b_gm_class* i_this) {
     i_this->field_0x1cdc = 0.0f;
 }
 
-/* 805F06C0-805F1F58 002E60 1898+00 2/1 0/0 0/0 .text            demo_camera__FP10b_gm_class */
 static void demo_camera(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
@@ -1467,7 +1457,7 @@ static void demo_camera(b_gm_class* i_this) {
             i_this->mDemoModeTimer = 0;
         }
         break;
-    case 42:
+    case 42: {
         if (i_this->mDemoModeTimer == 30) {
             daPy_getPlayerActorClass()->changeDemoMode(daPy_demo_c::DEMO_UNEQUIP_e, 0, 0, 0);
         }
@@ -1488,7 +1478,7 @@ static void demo_camera(b_gm_class* i_this) {
         if (i_this->mDemoModeTimer > 200) {
             cLib_addCalc2(&i_this->field_0x1cec.y, 100.0f, 0.05f, 0.7f);
         }
-        
+
         obj_ystone_class* ystone = (obj_ystone_class*)fopAcM_SearchByName(PROC_OBJ_YSTONE);
         if (ystone != NULL) {
             if (i_this->mDemoModeTimer > 200) {
@@ -1509,6 +1499,7 @@ static void demo_camera(b_gm_class* i_this) {
             sp10 = 2;
         }
         break;
+    }
     case 50:
         if (!a_this->eventInfo.checkCommandDemoAccrpt()) {
             fopAcM_orderPotentialEvent(a_this, 2, 0xFFFF, 0);
@@ -1617,8 +1608,6 @@ static void demo_camera(b_gm_class* i_this) {
     }
 }
 
-/* 805F1F58-805F30A0 0046F8 1148+00 2/1 0/0 0/0 .text            daB_GM_Execute__FP10b_gm_class */
-// NONMATCHING - regalloc, equivalent?
 static int daB_GM_Execute(b_gm_class* i_this) {
     if (cDmrNowMidnaTalk()) {
         return 1;
@@ -1626,8 +1615,17 @@ static int daB_GM_Execute(b_gm_class* i_this) {
 
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
-    cXyz spD4;
-    cXyz spC8;
+    cXyz spD4, spC8;
+
+    #if DEBUG
+    if (mDoCPd_c::getTrigA(2) && i_this->mDemoMode == 0 && !i_this->mIsDisappear) {
+        i_this->mAction = 0xB;
+        i_this->mMode = 0x14;
+        i_this->mDemoMode = 0x1E;
+        a_this->current.pos.y = VREG_F(18);
+        a_this->speedF = 0.0f;
+    }
+    #endif
 
     for (int i = 0; i < 4; i++) {
         mDoMtx_stack_c::transS(target_pos[i].x, target_pos[i].y, target_pos[i].z);
@@ -1636,7 +1634,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
         if (!i_this->mIsDisappear && a_this->current.pos.y > 1000.0f) {
             spD4.x = a_this->eyePos.x - target_pos[i].x;
             spD4.z = a_this->eyePos.z - target_pos[i].z;
-            if (JMAFastSqrt((spD4.x * spD4.x) + (spD4.z * spD4.z)) < 500.0f) {
+            if (JMAFastSqrt((spD4.x * spD4.x) + (spD4.z * spD4.z)) < NREG_F(18) + 500.0f) {
                 target_size = 0.0f;
             }
         }
@@ -1664,7 +1662,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
 
     if (i_this->mIsDisappear) {
         if (i_this->mDemoMode == 0) {
-            daE_GM_c* kogoma = (daE_GM_c*)fpcM_Search(s_ko2_get, i_this);
+            daE_GM_c* kogoma = (daE_GM_c*)fpcM_Search(s_ko2_get, a_this);
             if (kogoma != NULL) {
                 fopAc_ac_c* ko_actor = kogoma;
                 i_this->field_0x1cec = ko_actor->current.pos;
@@ -1708,7 +1706,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     mDoMtx_stack_c::ZrotM(a_this->shape_angle.z);
     mDoMtx_stack_c::XrotM(a_this->shape_angle.x);
     mDoMtx_stack_c::scaleM(l_HIO.model_size, l_HIO.model_size, l_HIO.model_size);
-    mDoMtx_stack_c::transM(0.0f, 0.0f, 200.0f);
+    mDoMtx_stack_c::transM(0.0f, 0.0f, KREG_F(8) + 200.0f);
 
     J3DModel* model = i_this->mpModelMorf->getModel();
     model->setBaseTRMtx(mDoMtx_stack_c::get());
@@ -1727,7 +1725,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     f32 sph_base_size = l_HIO.check_size * l_HIO.model_size;
     MTXCopy(model->getAnmMtx(0x15), *calc_mtx);
     MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-    spD4.set(-20.0f, 0.0f, 0.0f);
+    spD4.set(JREG_F(8) + -20.0f, JREG_F(9) + 0.0f, JREG_F(10) + 0.0f);
     MtxPosition(&spD4, &spC8);
 
     if (i_this->mInvincibilityTimer != 0 || i_this->field_0x1ad6 == 0) {
@@ -1735,18 +1733,18 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     }
 
     i_this->mCoreSph.SetC(spC8);
-    i_this->mCoreSph.SetR(160.0f * sph_base_size);
+    i_this->mCoreSph.SetR((JREG_F(11) + 160.0f) * sph_base_size);
     dComIfG_Ccsp()->Set(&i_this->mCoreSph);
 
-    spD4.set(50.0f, -20.0f, 0.0f);
+    spD4.set(JREG_F(12) + 50.0f, JREG_F(13) + -20.0f, JREG_F(14) + 0.0f);
     MtxPosition(&spD4, &a_this->eyePos);
     a_this->attention_info.position = a_this->eyePos;
-    a_this->attention_info.position.y += 70.0f;
+    a_this->attention_info.position.y += JREG_F(15) + 70.0f;
 
     if (i_this->field_0x1ad6 == 0) {
         MTXCopy(model->getAnmMtx(6), *calc_mtx);
         MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-        spD4.set(170.0f, 0.0f, 0.0f);
+        spD4.set(JREG_F(0) + 170.0f, JREG_F(1) + 0.0f, JREG_F(2) + 0.0f);
         MtxPosition(&spD4, &spC8);
 
         if (i_this->mInvincibilityTimer != 0) {
@@ -1754,19 +1752,19 @@ static int daB_GM_Execute(b_gm_class* i_this) {
         }
 
         i_this->mBodySph[0].SetC(spC8);
-        i_this->mBodySph[0].SetR(190.0f * sph_base_size);
+        i_this->mBodySph[0].SetR((JREG_F(3) + 190.0f) * sph_base_size);
     }
 
     MTXCopy(model->getAnmMtx(2), *calc_mtx);
     MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-    spD4.set(100.0f, 0.0f, 0.0f);
+    spD4.set(JREG_F(4) + 100.0f, JREG_F(5) + 0.0f, JREG_F(6) + 0.0f);
     MtxPosition(&spD4, &spC8);
 
     if (i_this->mInvincibilityTimer != 0) {
         spC8.y += 20000.0f;
     }
     i_this->mBodySph[1].SetC(spC8);
-    i_this->mBodySph[1].SetR(180.0f * sph_base_size);
+    i_this->mBodySph[1].SetR((JREG_F(7) + 180.0f) * sph_base_size);
 
     for (int i = 0; i < 2; i++) {
         dComIfG_Ccsp()->Set(&i_this->mBodySph[i]);
@@ -1775,10 +1773,10 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     for (int i = 0; i < 8; i++) {
         MTXCopy(model->getAnmMtx(top_j[i]), *calc_mtx);
         MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-        spD4.set(150.0f, 0.0f, 0.0f);
+        spD4.set(AREG_F(10) + 150.0f, AREG_F(11) + 0.0f, AREG_F(12) + 0.0f);
         MtxPosition(&spD4, &spC8);
 
-        i_this->mFootSph[i].SetR(50.0f * sph_base_size);
+        i_this->mFootSph[i].SetR((TREG_F(13) + 50.0f) * sph_base_size);
         i_this->mFootSph[i].SetC(spC8);
 
         if (i_this->mAnmID == ANM_GOMA_DASH && a_this->current.angle.x < 0x1000 && a_this->current.angle.x > -0x1000) {
@@ -1797,17 +1795,17 @@ static int daB_GM_Execute(b_gm_class* i_this) {
 
     MTXCopy(model->getAnmMtx(0x3B), *calc_mtx);
     MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-    spD4.set(80.0f, 0.0f, 0.0f);
+    spD4.set(XREG_F(0) + 80.0f, XREG_F(1), XREG_F(2));
     MtxPosition(&spD4, &spC8);
     i_this->mHandSph[0].SetC(spC8 + spBC);
-    i_this->mHandSph[0].SetR(80.0f * sph_base_size);
+    i_this->mHandSph[0].SetR((XREG_F(3) + 80.0f) * sph_base_size);
 
     MTXCopy(model->getAnmMtx(0x40), *calc_mtx);
     MtxScale(l_HIO.check_size, l_HIO.check_size, l_HIO.check_size, 1);
-    spD4.set(0.0f, 0.0f, 0.0f);
+    spD4.set(XREG_F(0), XREG_F(1), XREG_F(2));
     MtxPosition(&spD4, &spC8);
     i_this->mHandSph[1].SetC(spC8 + spBC);
-    i_this->mHandSph[1].SetR(60.0f * sph_base_size);
+    i_this->mHandSph[1].SetR((XREG_F(3) + 60.0f) * sph_base_size);
 
     dComIfG_Ccsp()->Set(&i_this->mHandSph[0]);
     dComIfG_Ccsp()->Set(&i_this->mHandSph[1]);
@@ -1833,8 +1831,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
         sp14 = -0x1400;
     }
 
-    s16 sp10;
-    s16 spE;
+    s16 sp10, spE;
     if (i_this->field_0x1ade != 0) {
         i_this->field_0x1ade--;
 
@@ -1851,7 +1848,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     if (i_this->field_0x6c0 > 0.1f) {
         dBgS_LinChk line_chk;
         MTXCopy(model->getAnmMtx(0x15), *calc_mtx);
-        spD4.set(120.0f, 0.0f, 0.0f);
+        spD4.set(XREG_F(8) + 120.0f, XREG_F(9), XREG_F(10));
         MtxPosition(&spD4, &spC8);
 
         if (i_this->field_0x6f4 == 0) {
@@ -1861,7 +1858,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
         }
 
         cXyz spB0;
-        cLib_addCalc2(&i_this->field_0x6c4, 40.0f, 1.0f, 1.0f);
+        cLib_addCalc2(&i_this->field_0x6c4, AREG_F(17) + 40.0f, 1.0f, 1.0f);
         spD4 = player->current.pos - i_this->field_0x6cc;
 
         if (i_this->field_0x6f4 == 0) {
@@ -1878,7 +1875,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
             }
 
             s16 spC = var_f30 * cM_ssin(i_this->mCounter * 1000);
-            cLib_addCalcAngleS2(&i_this->field_0x6c8, spC + cM_atan2s(spD4.x, spD4.z), 8, 0x400);
+            cLib_addCalcAngleS2(&i_this->field_0x6c8, spC + cM_atan2s(spD4.x, spD4.z), 8, AREG_S(7) + 0x400);
         }
 
         i_this->field_0x6f4 = 1;
@@ -1900,12 +1897,11 @@ static int daB_GM_Execute(b_gm_class* i_this) {
         mDoMtx_stack_c::XrotM(spA);
         mDoMtx_stack_c::YrotM(sp8);
 
-        f32 sp24 = 5.0f;
-        mDoMtx_stack_c::scaleM(1.0f, 1.0f, sp24 * i_this->field_0x6c0);
+        f32 sp24 = XREG_F(12) + 5.0f;
+        mDoMtx_stack_c::scaleM(XREG_F(11) + 1.0f, XREG_F(11) + 1.0f, sp24 * i_this->field_0x6c0);
 
-        MtxP now_mtx = mDoMtx_stack_c::get();
-        i_this->mpBeamModelMorf->getModel()->setBaseTRMtx(now_mtx);
-        mDoMtx_stack_c::transM(0.0f, 0.0f, i_this->field_0x6c0 * 2400.0f);
+        i_this->mpBeamModelMorf->getModel()->setBaseTRMtx(mDoMtx_stack_c::get());
+        mDoMtx_stack_c::transM(0.0f, 0.0f, i_this->field_0x6c0 * (XREG_F(6) + 2400.0f));
         mDoMtx_stack_c::multVecZero(&spD4);
     
         line_chk.Set(&spC8, &spD4, i_this);
@@ -1920,7 +1916,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
             csXyz sp48;
             dComIfG_Bgsp().GetTriPla(line_chk, &spE0);
 
-            sp48.y = cM_atan2s(spE0.mNormal.x, spE0.mNormal.z);
+            sp48.y = (s16)cM_atan2s(spE0.mNormal.x, spE0.mNormal.z);
             sp48.x = -cM_atan2s(spE0.mNormal.y, JMAFastSqrt((spE0.mNormal.x * spE0.mNormal.x) + (spE0.mNormal.z * spE0.mNormal.z)));
             sp48.x += 0x4000;
             sp48.z = 0;
@@ -1931,7 +1927,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
             }
 
             f32 sp1C = 0.013f * (i_this->mCounter & 3);
-            spD4 = spD4 + ((spC8 - spD4) * sp1C);
+            spD4 = spD4 + ((spC8 - spD4) * (sp1C));
 
             i_this->mBeamSph.SetC(spD4);
             dComIfG_Ccsp()->Set(&i_this->mBeamSph);
@@ -1952,7 +1948,7 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     if (i_this->field_0x1ad6 != 0) {
         cLib_addCalcAngleS2(&i_this->field_0x1ad8, 6000, 4, 800);
     } else {
-        cLib_addCalcAngleS2(&i_this->field_0x1ad8, -3900, 1, 800);
+        cLib_addCalcAngleS2(&i_this->field_0x1ad8, BREG_S(7) + -3900, 1, 800);
     }
 
     f32 target_blend = 1.0f;
@@ -1993,19 +1989,17 @@ static int daB_GM_Execute(b_gm_class* i_this) {
     return 1;
 }
 
-/* 805F30A0-805F30A8 005840 0008+00 1/0 0/0 0/0 .text            daB_GM_IsDelete__FP10b_gm_class */
 static int daB_GM_IsDelete(b_gm_class* i_this) {
     return 1;
 }
 
-/* 805F30A8-805F3118 005848 0070+00 1/0 0/0 0/0 .text            daB_GM_Delete__FP10b_gm_class */
 static int daB_GM_Delete(b_gm_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
     dComIfG_resDelete(&i_this->mPhase, "B_gm");
 
     if (i_this->mInitHIO) {
-        l_initHIO = false;
+        hio_set = false;
     }
 
     if (a_this->heap != NULL) {
@@ -2016,7 +2010,6 @@ static int daB_GM_Delete(b_gm_class* i_this) {
     return 1;
 }
 
-/* 805F3118-805F3560 0058B8 0448+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     b_gm_class* a_this = (b_gm_class*)i_this;
 
@@ -2026,7 +2019,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     }
 
     J3DModel* model = a_this->mpModelMorf->getModel();
-    model->setUserArea((u32)a_this);
+    model->setUserArea((uintptr_t)a_this);
 
     for (u16 i = 0; i < model->getModelData()->getJointNum(); i++) {
         model->getModelData()->getJointNodePointer(i)->setCallBack(nodeCallBack);
@@ -2059,7 +2052,7 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     J3DModelData* modelData;
     for (int i = 0; i < 4; i++) {
         modelData = (J3DModelData*)dComIfG_getObjectRes("B_gm", 0x22);
-        JUT_ASSERT(0xCE9, modelData != 0);
+        JUT_ASSERT(0xCE9, modelData != NULL);
         a_this->mpSpotLightModel[i] = mDoExt_J3DModel__create(modelData, 0x80000, 0x11000284);
         if (a_this->mpSpotLightModel[i] == NULL) {
             return 0;
@@ -2080,10 +2073,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 805F35A8-805F38E4 005D48 033C+00 1/0 0/0 0/0 .text            daB_GM_Create__FP10fopAc_ac_c */
 static int daB_GM_Create(fopAc_ac_c* i_this) {
     b_gm_class* a_this = (b_gm_class*)i_this;
-    fopAcM_SetupActor(a_this, b_gm_class);
+    fopAcM_ct(a_this, b_gm_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "B_gm");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -2096,9 +2088,9 @@ static int daB_GM_Create(fopAc_ac_c* i_this) {
         }
 
         OS_REPORT("//////////////B_GM SET 2 !!\n");
-        if (!l_initHIO) {
+        if (!hio_set) {
             a_this->mInitHIO = true;
-            l_initHIO = true;
+            hio_set = true;
             l_HIO.field_0x4 = -1;
         }
 
@@ -2231,7 +2223,6 @@ static int daB_GM_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 805F46B4-805F46D4 -00001 0020+00 1/0 0/0 0/0 .data            l_daB_GM_Method */
 static actor_method_class l_daB_GM_Method = {
     (process_method_func)daB_GM_Create,
     (process_method_func)daB_GM_Delete,
@@ -2240,7 +2231,6 @@ static actor_method_class l_daB_GM_Method = {
     (process_method_func)daB_GM_Draw,
 };
 
-/* 805F46D4-805F4704 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_B_GM */
 extern actor_process_profile_definition g_profile_B_GM = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

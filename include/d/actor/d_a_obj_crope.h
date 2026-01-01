@@ -14,13 +14,13 @@
  */
 class daObjCrope_c : public fopAc_ac_c {
 public:
-    /* 80BCCCD8 */ int createHeap();
-    /* 80BCCD64 */ int create();
-    /* 80BCD524 */ ~daObjCrope_c();
-    /* 80BCD6C4 */ void setNormalRopePos();
-    /* 80BCD9EC */ void setRideRopePos();
-    /* 80BCE4FC */ int execute();
-    /* 80BCE9BC */ int draw();
+    int createHeap();
+    int create();
+    ~daObjCrope_c();
+    void setNormalRopePos();
+    void setRideRopePos();
+    int execute();
+    int draw();
 
     cXyz* getRopeStartPos() { return mLineMat.getPos(0); }
     cXyz* getRopeEndPos() { return &mLineMat.getPos(0)[99]; }
@@ -29,10 +29,13 @@ public:
     void onOutFlg() { mOutFlg = true; }
     void setFrontJoint(int i_jointNo) { mFrontJoint = i_jointNo; }
     void setBackJoint(int i_jointNo) { mBackJoint = i_jointNo; }
-    
+
     f32 getStartRate(const cXyz* param_0) {
-        return field_0x714 ? field_0x724 * (param_0->x - getRopeStartPos()->x) :
-                             field_0x724 * (param_0->z - getRopeStartPos()->z);
+        if (field_0x714) {
+            return field_0x724 * (param_0->x - getRopeStartPos()->x);
+        } else {
+             return field_0x724 * (param_0->z - getRopeStartPos()->z);
+         }
     }
 
     void rideKeep() {

@@ -10,7 +10,6 @@
 #include "d/actor/d_a_npc_tk.h"
 #include "d/actor/d_a_obj_yobikusa.h"
 
-/* 8011174C-80111770 10C08C 0024+00 1/1 0/0 0/0 .text daAlink_searchWhistle__FP10fopAc_ac_cPv */
 static fopAc_ac_c* daAlink_searchWhistle(fopAc_ac_c* i_actor, void* i_data) {
     if (daAlink_getAlinkActorClass()->getGrassHowlEventActor() == fopAcM_GetName(i_actor)) {
         return i_actor;
@@ -19,7 +18,6 @@ static fopAc_ac_c* daAlink_searchWhistle(fopAc_ac_c* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 80111770-80111784 10C0B0 0014+00 1/1 0/0 0/0 .text daAlink_searchHawk__FP10fopAc_ac_cPv */
 static fopAc_ac_c* daAlink_searchHawk(fopAc_ac_c* i_actor, void* i_data) {
     if (fopAcM_GetName(i_actor) == PROC_NPC_TK) {
         return i_actor;
@@ -28,18 +26,14 @@ static fopAc_ac_c* daAlink_searchHawk(fopAc_ac_c* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 80453020-80453024 001620 0004+00 1/1 0/0 0/0 .sdata2          grassWhistleIdx$33097 */
-static const u16 grassWhistleIdx[2] = {
-    3,
-    3,
-};
-
-/* 80111784-8011181C 10C0C4 0098+00 1/1 0/0 0/0 .text            setGrassWhistleModel__9daAlink_cFi
- */
 void daAlink_c::setGrassWhistleModel(int modelType) {
     static const char* grassWhistleArcName[] = {
         "J_Tobi",
         "J_Umak",
+    };
+    static const u16 grassWhistleIdx[2] = {
+        3,
+        3,
     };
 
     JKRHeap* prev_heap = setItemHeap();
@@ -53,8 +47,6 @@ void daAlink_c::setGrassWhistleModel(int modelType) {
     field_0x2f94 = 2;
 }
 
-/* 8011181C-80111894 10C15C 0078+00 1/1 0/0 0/0 .text            setHorseWhistleModel__9daAlink_cFv
- */
 void daAlink_c::setHorseWhistleModel() {
     JKRHeap* prev_heap = setItemHeap();
 
@@ -65,7 +57,6 @@ void daAlink_c::setHorseWhistleModel() {
     field_0x2f94 = 2;
 }
 
-/* 80111894-801119D8 10C1D4 0144+00 2/2 0/0 0/0 .text procGrassWhistleGetInit__9daAlink_cFv */
 int daAlink_c::procGrassWhistleGetInit() {
     if (mEquipItem != fpcNm_ITEM_NONE) {
         return procPreActionUnequipInit(PROC_GRASS_WHISTLE_GET, field_0x27f4);
@@ -76,7 +67,7 @@ int daAlink_c::procGrassWhistleGetInit() {
     current.angle.y = shape_angle.y;
     field_0x2f98 = 4;
 
-    setSingleAnimeParam(ANM_BOTTLE_SWING_DOWN, &daAlinkHIO_bottle_c0::m.mSwingDownAnm);
+    setSingleAnimeParam(ANM_BOTTLE_SWING_DOWN, &mpHIO->mItem.mBottle.m.mSwingDownAnm);
     field_0x2f92 = 0xFE;
     field_0x280c.setData(field_0x27f4);
 
@@ -93,8 +84,6 @@ int daAlink_c::procGrassWhistleGetInit() {
 }
 
 
-/* 801119D8-80111A9C 10C318 00C4+00 1/0 0/0 0/0 .text            procGrassWhistleGet__9daAlink_cFv
- */
 int daAlink_c::procGrassWhistleGet() {
     daPy_frameCtrl_c* frameCtrl_p = mUnderFrameCtrl;
 
@@ -113,8 +102,6 @@ int daAlink_c::procGrassWhistleGet() {
     return 1;
 }
 
-/* 80111A9C-80111CA4 10C3DC 0208+00 2/2 0/0 0/0 .text
- * procGrassWhistleWaitInit__9daAlink_cFiiisP4cXyz              */
 int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s16 param_3,
                                         cXyz* param_4) {
     u16 var_r6;
@@ -159,7 +146,7 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
     mProcVar0.field_0x3008 = 0;
     mProcVar4.field_0x3010 = 0;
     mProcVar5.field_0x3012 = 0;
-    mMsgClassID = -1;
+    mMsgClassID = fpcM_ERROR_PROCESS_ID_e;
     mNormalSpeed = 0.0f;
     current.angle.y = shape_angle.y;
     field_0x2f98 = 4;
@@ -168,7 +155,7 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
         mLinkGndChk.SetPos(param_4);
 
         f32 gnd_cross = dComIfG_Bgsp().GroundCross(&mLinkGndChk);
-        if (gnd_cross != -1000000000.0f) {
+        if (gnd_cross != -G_CM3D_F_INF) {
             current.pos.set(param_4->x, gnd_cross, param_4->z);
         }
 
@@ -181,9 +168,6 @@ int daAlink_c::procGrassWhistleWaitInit(int param_0, int param_1, int param_2, s
 }
 
 
-/* 80111CA4-80111FF0 10C5E4 034C+00 1/0 0/0 0/0 .text            procGrassWhistleWait__9daAlink_cFv
- */
-// NONMATCHING - small regalloc
 int daAlink_c::procGrassWhistleWait() {
     if (mProcVar5.field_0x3012 != 0) {
         if (checkEndMessage(field_0x32cc)) {
@@ -204,7 +188,7 @@ int daAlink_c::procGrassWhistleWait() {
         mProcVar0.field_0x3008--;
 
         if (mProcVar0.field_0x3008 == 0) {
-            daHorse_c* horse_p = dComIfGp_getHorseActor();
+            daHorse_c* horse_p = (daHorse_c*)dComIfGp_getHorseActor();
             daNPC_TK_c* tk_p = (daNPC_TK_c*)fopAcIt_Judge((fopAcIt_JudgeFunc)daAlink_searchWhistle, NULL);
 
             if (tk_p != NULL) {
@@ -250,7 +234,7 @@ int daAlink_c::procGrassWhistleWait() {
 
             if (mProcVar2.field_0x300c == 0) {
                 voiceStart(Z2SE_PLAY_REED_TOBIKUSA);
-                mProcVar0.field_0x3008 = 100;
+                mProcVar0.field_0x3008 = (s16)(100 / DELTA_TIME + 0.5f);
 
                 if (dComIfGs_isEventBit(dSv_event_flag_c::F_0700) &&
                     dComIfGs_isEventBit(dSv_event_flag_c::F_0037))
@@ -259,7 +243,7 @@ int daAlink_c::procGrassWhistleWait() {
                 }
             } else {
                 voiceStart(Z2SE_PLAY_REED_UMAKUSA);
-                mProcVar0.field_0x3008 = 140;
+                mProcVar0.field_0x3008 = (s16)(140 / DELTA_TIME + 0.5f);
 
                 if (mProcVar2.field_0x300c == 1) {
                     dComIfGs_onEventBit(dSv_event_flag_c::F_0580);
@@ -271,28 +255,29 @@ int daAlink_c::procGrassWhistleWait() {
             procWaitInit();
         }
     } else {
+        #if VERSION != VERSION_SHIELD_DEBUG
         setGrassCancelStatus(0);
+        #endif
     }
 
     return 1;
 }
 
-/* 80111FF0-801120C8 10C930 00D8+00 2/2 0/0 0/0 .text procCoHorseCallWaitInit__9daAlink_cFi */
 int daAlink_c::procCoHorseCallWaitInit(int param_0) {
     commonProcInit(PROC_HORSE_CALL_WAIT);
 
     if (param_0 == 4) {
-        mProcVar4.field_0x3010 = 2;
+        mProcVar4.field_0x3010 = (s16)(2 / DELTA_TIME + 0.5f);
     } else if (param_0 == 1) {
-        mProcVar4.field_0x3010 = 0x3D;
+        mProcVar4.field_0x3010 = (s16)(0x3D / DELTA_TIME + 0.5f);
     } else {
-        mProcVar4.field_0x3010 = 0x10;
+        mProcVar4.field_0x3010 = (s16)(0x10 / DELTA_TIME + 0.5f);
     }
 
     if (checkWolf()) {
-        setSingleAnimeWolfBaseSpeed(WANM_WAIT, daAlinkHIO_wlMove_c0::m.field_0x70, 3.0f);
+        setSingleAnimeWolfBaseSpeed(WANM_WAIT, mpHIO->mWolf.mWlMove.m.mIdleAnmSpeed, 3.0f);
     } else {
-        setSingleAnimeBaseSpeed(ANM_WAIT, daAlinkHIO_move_c0::m.mWaitAnmSpeed, 3.0f);
+        setSingleAnimeBaseSpeed(ANM_WAIT, mpHIO->mMove.m.mWaitAnmSpeed, 3.0f);
     }
 
     setGrassCancelStatus(0);
@@ -300,20 +285,23 @@ int daAlink_c::procCoHorseCallWaitInit(int param_0) {
     return 1;
 }
 
-/* 801120C8-801121B4 10CA08 00EC+00 1/0 0/0 0/0 .text            procCoHorseCallWait__9daAlink_cFv
- */
 int daAlink_c::procCoHorseCallWait() {
     setGrassCancelStatus(0);
 
     mProcVar4.field_0x3010--;
-    if (mProcVar4.field_0x3010 > 2 && dComIfGp_getHorseActor() != NULL) {
-        cLib_addCalcAngleS(&shape_angle.y, fopAcM_searchActorAngleY(this, dComIfGp_getHorseActor()), 2, 0x2000, 0x800);
+
+    s16 scaledThreshold2 = (s16)(2 / DELTA_TIME + 0.5f);
+    if (mProcVar4.field_0x3010 > scaledThreshold2 && dComIfGp_getHorseActor() != NULL) {
+        cLib_addCalcAngleS(&shape_angle.y, fopAcM_searchActorAngleY(this, dComIfGp_getHorseActor()), 2, 0x2000 * DELTA_TIME, 0x800);
         current.angle.y = shape_angle.y;
     }
 
-    if (mProcVar4.field_0x3010 == 60) {
+    s16 cameraEvent2Frame = (s16)(60 / DELTA_TIME + 0.5f);
+    s16 cameraEvent3Frame = (s16)(15 / DELTA_TIME + 0.5f);
+
+    if (mProcVar4.field_0x3010 == cameraEvent2Frame) {
         dCam_getBody()->EventFlag(2);
-    } else if (mProcVar4.field_0x3010 == 15) {
+    } else if (mProcVar4.field_0x3010 == cameraEvent3Frame) {
         dCam_getBody()->EventFlag(3);
     } else if (mProcVar4.field_0x3010 == 0) {
         resetSpecialEvent();
@@ -328,7 +316,6 @@ int daAlink_c::procCoHorseCallWait() {
     return 1;
 }
 
-/* 801121B4-80112220 10CAF4 006C+00 1/0 0/0 0/0 .text            procHawkCatchInit__9daAlink_cFv */
 int daAlink_c::procHawkCatchInit() {
     if (mProcID == PROC_HAWK_SUBJECT || !commonProcInitNotSameProc(PROC_HAWK_CATCH)) {
         return 0;
@@ -339,18 +326,15 @@ int daAlink_c::procHawkCatchInit() {
     return 1;
 }
 
-/* 80112220-80112278 10CB60 0058+00 1/0 0/0 0/0 .text            procHawkCatch__9daAlink_cFv */
 int daAlink_c::procHawkCatch() {
     if (mUnderFrameCtrl[0].checkAnmEnd()) {
-        dComIfGp_evmng_cutEnd(field_0x3184);
+        dComIfGp_evmng_cutEnd(mAlinkStaffId);
         procHawkSubjectInit();
     }
 
     return 1;
 }
 
-/* 80112278-80112304 10CBB8 008C+00 2/2 0/0 0/0 .text            procHawkSubjectInit__9daAlink_cFv
- */
 int daAlink_c::procHawkSubjectInit() {
     if (!commonProcInitNotSameProc(PROC_HAWK_SUBJECT)) {
         return 0;
@@ -369,7 +353,6 @@ int daAlink_c::procHawkSubjectInit() {
     return 1;
 }
 
-/* 80112304-8011243C 10CC44 0138+00 1/0 0/0 0/0 .text            procHawkSubject__9daAlink_cFv */
 int daAlink_c::procHawkSubject() {
     if (mProcVar2.field_0x300c != 0) {
         if (mProcVar2.field_0x300c != 0) {
@@ -379,7 +362,7 @@ int daAlink_c::procHawkSubject() {
             }
         }
     } else if (checkEventRun()) {
-        dComIfGp_evmng_cutEnd(field_0x3184);
+        dComIfGp_evmng_cutEnd(mAlinkStaffId);
     } else {
         fopAc_ac_c* temp_r29 = field_0x280c.getActor();
         setGrassCancelStatus(0x12);

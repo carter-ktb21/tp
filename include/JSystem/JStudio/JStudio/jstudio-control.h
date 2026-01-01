@@ -11,7 +11,7 @@ namespace JStudio {
 struct TObject;
 struct TCreateObject {
     TCreateObject() {}
-    /* 80285488 */ virtual ~TCreateObject() = 0;
+    virtual ~TCreateObject() = 0;
     virtual bool create(TObject**, JStudio::stb::data::TParse_TBlock_object const&) = 0;
 
     template<class AdaptorT>
@@ -30,10 +30,10 @@ struct TCreateObject {
 struct TFactory : public stb::TFactory {
     TFactory() {}
 
-    /* 802854D0 */ virtual ~TFactory();
-    /* 802855AC */ virtual TObject* create(JStudio::stb::data::TParse_TBlock_object const&);
+    virtual ~TFactory();
+    virtual TObject* create(JStudio::stb::data::TParse_TBlock_object const&);
 
-    /* 80285560 */ void appendCreateObject(JStudio::TCreateObject*);
+    void appendCreateObject(JStudio::TCreateObject*);
 
     /* 0x04 */ JGadget::TLinkList<TCreateObject, -4> mList;
     /* 0x10 */ fvb::TFactory fvb_Factory;
@@ -53,13 +53,13 @@ public:
         Vec direction;
     };
 
-    /* 80285114 */ TControl();
-    /* 802851AC */ virtual ~TControl();
-    /* 80285228 */ void setFactory(JStudio::TFactory*);
-    /* 80285250 */ int transformOnSet_setOrigin_TxyzRy(Vec const&, f32);
-    /* 802852D0 */ int transformOnGet_setOrigin_TxyzRy(Vec const&, f32);
-    /* 80285368 */ int transform_setOrigin_ctb(JStudio::ctb::TObject const&);
-    /* 8028543C */ bool transform_setOrigin_ctb_index(u32);
+    TControl();
+    virtual ~TControl();
+    void setFactory(JStudio::TFactory*);
+    int transformOnSet_setOrigin_TxyzRy(Vec const&, f32);
+    int transformOnGet_setOrigin_TxyzRy(Vec const&, f32);
+    int transform_setOrigin_ctb(JStudio::ctb::TObject const&);
+    bool transform_setOrigin_ctb_index(u32);
 
     void stb_destroyObject_all() { stb::TControl::destroyObject_all(); }
     void fvb_destroyObject_all() { fvb_Control.destroyObject_all(); }
@@ -123,13 +123,13 @@ public:
     CMtxP transformOnSet_getMatrix() const { return mTransformOnSet_Matrix; }
 
     void transformOnSet_transformTranslation(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(226, pDst!=0);
+        JUT_ASSERT(226, pDst!=NULL);
         JUT_ASSERT(227, &rSrc!=pDst);
         MTXMultVec(transformOnSet_getMatrix(), &rSrc, pDst);
     }
 
     void transformOnSet_transformRotation(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(232, pDst!=0);
+        JUT_ASSERT(232, pDst!=NULL);
         JUT_ASSERT(233, &rSrc!=pDst);
         pDst->x = rSrc.x;
         pDst->y = rSrc.y + mTransformOnSet_RotationY;
@@ -137,36 +137,36 @@ public:
     }
 
     void transformOnSet_transformScaling(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(240, pDst!=0);
+        JUT_ASSERT(240, pDst!=NULL);
         JUT_ASSERT(241, &rSrc!=pDst);
         *pDst = rSrc;
     }
 
-    void transformOnSet_transform(TTransform_position* param_1, TTransform_position* param_2) const {
-        transformOnSet_transformTranslation(*param_1, param_2);
+    void transformOnSet_transform(const TTransform_position &param_1, TTransform_position* param_2) const {
+        transformOnSet_transformTranslation(param_1, param_2);
     }
 
-    void transformOnSet_transform(TTransform_translation_rotation_scaling* param_1,
+    void transformOnSet_transform(const TTransform_translation_rotation_scaling& param_1,
                                   TTransform_translation_rotation_scaling* param_2) const {
-        transformOnSet_transformTranslation(param_1->translation, &param_2->translation);
-        transformOnSet_transformRotation(param_1->rotation, &param_2->rotation);
-        transformOnSet_transformScaling(param_1->scaling, &param_2->scaling);
+        transformOnSet_transformTranslation(param_1.translation, &param_2->translation);
+        transformOnSet_transformRotation(param_1.rotation, &param_2->rotation);
+        transformOnSet_transformScaling(param_1.scaling, &param_2->scaling);
     }
 
-    TTransform_position* transformOnSet_transform_ifEnabled(TTransform_position* param_1,
+    const TTransform_position* transformOnSet_transform_ifEnabled(const TTransform_position& param_1,
                                                             TTransform_position* param_2) const {
         if (!transformOnSet_isEnabled()) {
-            return param_1;
+            return &param_1;
         }
         transformOnSet_transform(param_1, param_2);
         return param_2;
     }
 
-    TTransform_translation_rotation_scaling*
-    transformOnSet_transform_ifEnabled(TTransform_translation_rotation_scaling* param_1,
+    const TTransform_translation_rotation_scaling*
+    transformOnSet_transform_ifEnabled(const TTransform_translation_rotation_scaling& param_1,
                                        TTransform_translation_rotation_scaling* param_2) const {
         if (!transformOnSet_isEnabled()) {
-            return param_1;
+            return &param_1;
         }
         transformOnSet_transform(param_1, param_2);
         return param_2;
@@ -176,51 +176,51 @@ public:
     CMtxP transformOnGet_getMatrix() const { return mTransformOnGet_Matrix; }
 
     void transformOnGet_transformTranslation(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(296, pDst!=0);
+        JUT_ASSERT(296, pDst!=NULL);
         JUT_ASSERT(297, &rSrc!=pDst);
         MTXMultVec(transformOnGet_getMatrix(), &rSrc, pDst);
     }
 
     void transformOnGet_transformDirection(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(316, pDst!=0);
+        JUT_ASSERT(316, pDst!=NULL);
         JUT_ASSERT(317, &rSrc!=pDst);
         MTXMultVecSR(transformOnGet_getMatrix(), &rSrc, pDst);
     }
 
-    void transformOnGet_transform(TTransform_position_direction* param_1,
+    void transformOnGet_transform(const TTransform_position_direction& param_1,
                                   TTransform_position_direction* pDst) const {
-        JUT_ASSERT(289, pDst!=0);
-        transformOnGet_transformTranslation(param_1->position, &pDst->position);
-        transformOnGet_transformDirection(param_1->direction, &pDst->direction);
+        JUT_ASSERT(289, pDst!=NULL);
+        transformOnGet_transformTranslation(param_1.position, &pDst->position);
+        transformOnGet_transformDirection(param_1.direction, &pDst->direction);
     }
 
-    TTransform_position_direction*
-    transformOnGet_transform_ifEnabled(TTransform_position_direction& param_1,
+    const TTransform_position_direction*
+    transformOnGet_transform_ifEnabled(const TTransform_position_direction& param_1,
                                        TTransform_position_direction* param_2) const {
         if (!transformOnGet_isEnabled()) {
             return &param_1;
         }
-        transformOnGet_transform(&param_1, param_2);
+        transformOnGet_transform(param_1, param_2);
         return param_2;
     }
 
-    void transformOnGet_transform(TTransform_position* param_1,
+    void transformOnGet_transform(const TTransform_position& param_1,
                                   TTransform_position* pDst) const {
-        transformOnGet_transformTranslation(*param_1, pDst);
+        transformOnGet_transformTranslation(param_1, pDst);
     }
 
-    TTransform_position*
-    transformOnGet_transform_ifEnabled(TTransform_position* param_1,
+    const TTransform_position*
+    transformOnGet_transform_ifEnabled(const TTransform_position& param_1,
                                        TTransform_position* param_2) const {
         if (!transformOnGet_isEnabled()) {
-            return param_1;
+            return &param_1;
         }
         transformOnGet_transform(param_1, param_2);
         return param_2;
     }
 
     void transformOnGet_transformRotation(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(302, pDst!=0);
+        JUT_ASSERT(302, pDst!=NULL);
         JUT_ASSERT(303, &rSrc!=pDst);
         pDst->x = rSrc.x;
         pDst->y = rSrc.y + mTransformOnGet_RotationY;
@@ -228,14 +228,14 @@ public:
     }
 
     void transformOnGet_transformScaling(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(310, pDst!=0);
+        JUT_ASSERT(310, pDst!=NULL);
         JUT_ASSERT(311, &rSrc!=pDst);
         *pDst = rSrc;
     }
 
     void transformOnGet_transform(TTransform_translation_rotation_scaling* param_1,
                                   TTransform_translation_rotation_scaling* pDst) const {
-        JUT_ASSERT(263, pDst!=0);
+        JUT_ASSERT(263, pDst!=NULL);
         transformOnGet_transformTranslation(param_1->translation, &pDst->translation);
         transformOnGet_transformRotation(param_1->rotation, &pDst->rotation);
         transformOnGet_transformScaling(param_1->scaling, &pDst->scaling);
@@ -252,23 +252,23 @@ public:
     }
 
     void transformOnSet_transformDirection(const Vec& rSrc, Vec* pDst) const {
-        JUT_ASSERT(246, pDst!=0);
+        JUT_ASSERT(246, pDst!=NULL);
         JUT_ASSERT(247, &rSrc!=pDst);
         MTXMultVecSR(transformOnSet_getMatrix(), &rSrc, pDst);
     }
 
-    void transformOnSet_transform(TTransform_position_direction* param_1,
+    void transformOnSet_transform(const TTransform_position_direction& param_1,
                                   TTransform_position_direction* pDst) const {
-        JUT_ASSERT(219, pDst!=0);
-        transformOnSet_transformTranslation(param_1->position, &pDst->position);
-        transformOnSet_transformDirection(param_1->direction, &pDst->direction);
+        JUT_ASSERT(219, pDst!=NULL);
+        transformOnSet_transformTranslation(param_1.position, &pDst->position);
+        transformOnSet_transformDirection(param_1.direction, &pDst->direction);
     }
 
-    TTransform_position_direction*
-    transformOnSet_transform_ifEnabled(TTransform_position_direction* param_1,
+    const TTransform_position_direction*
+    transformOnSet_transform_ifEnabled(const TTransform_position_direction& param_1,
                                        TTransform_position_direction* param_2) const {
         if (!transformOnSet_isEnabled()) {
-            return param_1;
+            return &param_1;
         }
         transformOnSet_transform(param_1, param_2);
         return param_2;
@@ -288,13 +288,13 @@ public:
 };
 
 struct TParse : public stb::TParse {
-    /* 8028566C */ TParse(JStudio::TControl*);
-    /* 80285844 */ bool parseBlock_block_fvb_(JStudio::stb::data::TParse_TBlock const&, u32);
-    /* 802858F0 */ bool parseBlock_block_ctb_(JStudio::stb::data::TParse_TBlock const&, u32);
+    TParse(JStudio::TControl*);
+    bool parseBlock_block_fvb_(JStudio::stb::data::TParse_TBlock const&, u32);
+    bool parseBlock_block_ctb_(JStudio::stb::data::TParse_TBlock const&, u32);
 
-    /* 802856A8 */ virtual ~TParse();
-    /* 80285708 */ virtual bool parseHeader(JStudio::stb::data::TParse_THeader const&, u32);
-    /* 802857E4 */ virtual bool parseBlock_block(JStudio::stb::data::TParse_TBlock const&, u32);
+    virtual ~TParse();
+    virtual bool parseHeader(JStudio::stb::data::TParse_THeader const&, u32);
+    virtual bool parseBlock_block(JStudio::stb::data::TParse_TBlock const&, u32);
 
     TControl* getControl() { return (TControl*)stb::TParse::getControl(); }
 };

@@ -22,8 +22,14 @@ struct TAllocator {
         delete mem;
     }
 
+    void construct(T* p, const T& other) {
+        JUT_ASSERT(67, p!=NULL);
+        new(p) T(other);
+    }
+
     void destroy(T* p) {
-        JUT_ASSERT(68, p!=0);
+        (void)p;
+        JUT_ASSERT(68, p!=NULL);
     }
 
     /* 0x0 */ u8 mAllocator;

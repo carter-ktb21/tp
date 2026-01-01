@@ -18,16 +18,16 @@ public:
         mShapeName = NULL;
     }
 
-    /* 803258A0 */ void hide();
-    /* 803258D8 */ void show();
-    /* 80325910 */ void initShapeNodes(J3DDrawMtxData*, J3DVertexData*);
-    /* 8032597C */ void sortVcdVatCmd();
+    void hide();
+    void show();
+    void initShapeNodes(J3DDrawMtxData*, J3DVertexData*);
+    void sortVcdVatCmd();
 
     virtual ~J3DShapeTable() {}
 
     u16 getShapeNum() const { return mShapeNum; }
     J3DShape* getShapeNodePointer(u16 idx) const {
-        J3D_ASSERT(85, idx < mShapeNum, "Error : range over.");
+        J3D_ASSERT_RANGE(85, idx < mShapeNum);
         return mShapeNodePointer[idx];
     }
 

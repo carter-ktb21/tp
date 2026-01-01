@@ -4,21 +4,41 @@
 #include "f_op/f_op_actor.h"
 
 
-struct ShopCam_action_c {
+class ShopCam_action_c {
+public:
     typedef int (ShopCam_action_c::*ShopCamFunc)();
 
-    /* 80195C9C */ int shop_cam_action_init();
-    /* 80195E18 */ int shop_cam_action();
-    /* 8019630C */ void Save();
-    /* 8019635C */ void EventRecoverNotime();
-    /* 801963B4 */ void Reset();
-    /* 801964C8 */ void move();
-    /* 80196544 */ void setCamDataIdx(fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, cXyz*,
+    ShopCam_action_c() {
+        setCameraSpeed(0.25f, 20.0f, 0.25f, 5.0f);
+        field_0xda = true;
+        field_0xd0 = 0;
+        field_0xd2 = 0;
+        field_0xd4 = -1;
+        setCamDataIdx(0);
+        field_0x7c.set(0.0f, 0.0f, 0.0f);
+        field_0x88.set(0.0f, 0.0f, 100.0f);
+        field_0x94 = 60.0f;
+        field_0xb0.set(0.0f, 0.0f, 0.0f);
+        field_0xd8 = 0;
+        field_0x18 = NULL;
+        field_0x1c = field_0x20 = field_0x24 = NULL;
+        field_0x28 = field_0x2c = field_0x30 = NULL;
+        field_0x34 = NULL;
+        setCamAction(NULL);
+    }
+
+    int shop_cam_action_init();
+    int shop_cam_action();
+    void Save();
+    void EventRecoverNotime();
+    void Reset();
+    void move();
+    void setCamDataIdx(fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, cXyz*,
                                       cXyz*);
-    /* 80196608 */ void setCamDataIdx2(fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*,
+    void setCamDataIdx2(fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*,
                                        fopAc_ac_c*, fopAc_ac_c*, fopAc_ac_c*, cXyz*, cXyz*);
-    /* 801966D4 */ void _debugSetCamera();
-    /* 801968B8 */ void setMasterCamCtrPos(cXyz*);
+    void _debugSetCamera();
+    void setMasterCamCtrPos(cXyz*);
 
     void setCamAction(ShopCamFunc func) {
         mCamAction = func;
@@ -37,6 +57,8 @@ struct ShopCam_action_c {
     }
 
     void setCamDataIdx(int data_idx) { mCamDataIdx = data_idx; }
+
+    bool isCameraStopFlag() { return field_0xda; }
 
     /* 0x00 */ ShopCamFunc mCamAction;
     /* 0x0c */ u8 field_0xc[0x18 - 0xc];

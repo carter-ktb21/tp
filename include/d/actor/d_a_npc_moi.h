@@ -3,6 +3,48 @@
 
 #include "d/actor/d_a_npc.h"
 
+struct daNpc_Moi_HIOParam {
+    /* 0x00 */ daNpcT_HIOParam common;
+    /* 0x8C */ f32 field_0x8c;
+    /* 0x90 */ f32 field_0x90;
+    /* 0x94 */ f32 field_0x94;
+    /* 0x98 */ s16 field_0x98;
+    /* 0x9A */ s16 field_0x9a;
+    /* 0x9C */ s16 field_0x9c;
+    /* 0x9E */ s16 field_0x9e;
+    /* 0xA0 */ s16 field_0xa0;
+    /* 0xA2 */ s16 field_0xa2;
+    /* 0xA4 */ f32 field_0xa4;
+    /* 0xA8 */ f32 field_0xa8;
+    /* 0xAC */ f32 field_0xac;
+    /* 0xB0 */ f32 field_0xb0;
+    /* 0xB4 */ f32 field_0xb4;
+    /* 0xB8 */ f32 field_0xb8;
+};
+
+class daNpc_Moi_Param_c {
+public:
+    virtual ~daNpc_Moi_Param_c() {};
+
+    static const daNpc_Moi_HIOParam m;
+};
+
+#if DEBUG
+class daNpc_Moi_HIO_c : public mDoHIO_entry_c {
+public:
+    daNpc_Moi_HIO_c();
+
+    void listenPropertyEvent(const JORPropertyEvent*);
+    void genMessage(JORMContext*);
+
+    daNpc_Moi_HIOParam m;
+};
+
+#define NPC_MOI_HIO_CLASS daNpc_Moi_HIO_c
+#else
+#define NPC_MOI_HIO_CLASS daNpc_Moi_Param_c
+#endif
+
 /**
  * @ingroup actors-npcs
  * @class daNpc_Moi_c
@@ -11,62 +53,6 @@
  * @details
  *
  */
-
-struct daNpc_Moi_HIOParam {
-    /* 0x00 */ f32 field_0x00;
-    /* 0x04 */ f32 field_0x04;
-    /* 0x08 */ f32 field_0x08;
-    /* 0x0C */ f32 field_0x0c;
-    /* 0x10 */ f32 field_0x10;
-    /* 0x14 */ f32 field_0x14;
-    /* 0x18 */ f32 field_0x18;
-    /* 0x1C */ f32 field_0x1c;
-    /* 0x20 */ f32 field_0x20;
-    /* 0x24 */ f32 field_0x24;
-    /* 0x28 */ f32 field_0x28;
-    /* 0x2C */ f32 field_0x2c;
-    /* 0x30 */ f32 field_0x30;
-    /* 0x34 */ f32 field_0x34;
-    /* 0x38 */ f32 field_0x38;
-    /* 0x3C */ f32 field_0x3c;
-    /* 0x40 */ f32 field_0x40;
-    /* 0x44 */ f32 field_0x44;
-    /* 0x48 */ s16 field_0x48;
-    /* 0x4A */ s16 field_0x4a;
-    /* 0x4C */ s16 field_0x4c;
-    /* 0x4E */ s16 field_0x4e;
-    /* 0x50 */ f32 field_0x50;
-    /* 0x54 */ u8 field_0x54[24];
-    /* 0x6C */ f32 field_0x6c;
-    /* 0x70 */ u8 field_0x70[40];
-    /* 0x98 */ s16 field_0x98;
-    /* 0x9A */ s16 field_0x9a;
-    /* 0x9C */ s16 field_0x9c;
-    /* 0x9E */ s16 field_0x9e;
-    /* 0xA0 */ s16 field_0xa0;
-    /* 0xA2 */ s16 field_0xa2;
-    /* 0xA4 */ f32 field_0xa4;
-    /* 0xA8 */ u8 field_0xa8[12];
-    /* 0xB4 */ f32 field_0xb4;
-    /* 0xB8 */ f32 field_0xb8;
-};
-
-class daNpc_Moi_Param_c {
-public:
-    /* 80A7AE84 */ virtual ~daNpc_Moi_Param_c() {};
-
-    static daNpc_Moi_HIOParam const m;
-};
-
-class daNpc_Moi_HIO_c
-#ifdef DEBUG
-    : public mDoHIO_entry_c
-#endif
-{
-public:
-    void genMessage(JORMContext*);
-};
-
 class daNpc_Moi_c : public daNpcT_c {
 public:
     typedef int (daNpc_Moi_c::*cutFunc)(int);
@@ -82,61 +68,61 @@ public:
         TYPE_6,
     };
 
-    /* 80A73F4C */ ~daNpc_Moi_c();
-    /* 80A74150 */ int create();
-    /* 80A74474 */ int CreateHeap();
-    /* 80A749F8 */ int Delete();
-    /* 80A74A2C */ int Execute();
-    /* 80A74A4C */ int Draw();
-    /* 80A74B80 */ static int createHeapCallBack(fopAc_ac_c*);
-    /* 80A74BA0 */ static int ctrlJointCallBack(J3DJoint*, int);
-    /* 80A74BF8 */ u8 getType();
-    /* 80A74C6C */ BOOL isDelete();
-    /* 80A74D8C */ void reset();
-    /* 80A7513C */ BOOL chkMoiN();
-    /* 80A75160 */ void afterJntAnm(int);
-    /* 80A751E4 */ void setParam();
-    /* 80A75460 */ BOOL checkChangeEvt();
-    /* 80A75514 */ void setAfterTalkMotion();
-    /* 80A755C8 */ void srchActors();
-    /* 80A75664 */ BOOL evtTalk();
-    /* 80A75704 */ BOOL evtCutProc();
-    /* 80A757CC */ void action();
-    /* 80A759F4 */ void beforeMove();
-    /* 80A75AB8 */ void setAttnPos();
-    /* 80A75E68 */ void setCollision();
-    /* 80A760E0 */ int drawDbgInfo();
-    /* 80A760E8 */ void drawOtherMdl();
-    /* 80A762A8 */ bool afterSetMotionAnm(int, int, f32, int);
-    /* 80A762CC */ void changeAnm(int*, int*);
-    /* 80A7633C */ void changeBck(int*, int*);
-    /* 80A76384 */ void changeBtp(int*, int*);
-    /* 80A7643C */ void changeBtk(int*, int*);
-    /* 80A764B0 */ int selectAction();
-    /* 80A765CC */ BOOL chkAction(int (daNpc_Moi_c::*)(void*));
-    /* 80A765F8 */ int setAction(int (daNpc_Moi_c::*)(void*));
-    /* 80A766A0 */ BOOL chkPlayerGetWoodShield();
-    /* 80A766DC */ void setSSlash(int);
-    /* 80A76888 */ BOOL chkPullOutSw();
-    /* 80A768FC */ void pullOutSw();
-    /* 80A76954 */ BOOL chkSetInSw();
-    /* 80A769C8 */ void setInSw();
-    /* 80A76A20 */ void setSwAT();
-    /* 80A76AFC */ void torch();
-    /* 80A76C7C */ int injuryCheck();
-    /* 80A76E10 */ int injuryTurn(cXyz);
-    /* 80A76F3C */ int injuryWalk();
-    /* 80A770FC */ int poise();
-    /* 80A77740 */ int cutDeliveredSw(int);
-    /* 80A77BA0 */ int cutAppearanceMoi(int);
-    /* 80A7838C */ int cutConversationWithUri(int);
-    /* 80A785FC */ int cutFindWolf(int);
-    /* 80A789D8 */ int wait(void*);
-    /* 80A78E0C */ int walk(void*);
-    /* 80A78FF4 */ int walkOnEggshell(void*);
-    /* 80A794C0 */ int rest(void*);
-    /* 80A79608 */ int talk(void*);
-    /* 80A7AC88 */ daNpc_Moi_c(
+    ~daNpc_Moi_c();
+    int create();
+    int CreateHeap();
+    int Delete();
+    int Execute();
+    int Draw();
+    static int createHeapCallBack(fopAc_ac_c*);
+    static int ctrlJointCallBack(J3DJoint*, int);
+    u8 getType();
+    BOOL isDelete();
+    void reset();
+    BOOL chkMoiN();
+    void afterJntAnm(int);
+    void setParam();
+    BOOL checkChangeEvt();
+    void setAfterTalkMotion();
+    void srchActors();
+    BOOL evtTalk();
+    BOOL evtCutProc();
+    void action();
+    void beforeMove();
+    void setAttnPos();
+    void setCollision();
+    int drawDbgInfo();
+    void drawOtherMdl();
+    bool afterSetMotionAnm(int, int, f32, int);
+    void changeAnm(int*, int*);
+    void changeBck(int*, int*);
+    void changeBtp(int*, int*);
+    void changeBtk(int*, int*);
+    int selectAction();
+    BOOL chkAction(int (daNpc_Moi_c::*)(void*));
+    int setAction(int (daNpc_Moi_c::*)(void*));
+    BOOL chkPlayerGetWoodShield();
+    void setSSlash(int);
+    BOOL chkPullOutSw();
+    void pullOutSw();
+    BOOL chkSetInSw();
+    void setInSw();
+    void setSwAT();
+    void torch();
+    int injuryCheck();
+    int injuryTurn(cXyz);
+    int injuryWalk();
+    int poise();
+    int cutDeliveredSw(int);
+    int cutAppearanceMoi(int);
+    int cutConversationWithUri(int);
+    int cutFindWolf(int);
+    int wait(void*);
+    int walk(void*);
+    int walkOnEggshell(void*);
+    int rest(void*);
+    int talk(void*);
+    daNpc_Moi_c(
         daNpcT_faceMotionAnmData_c const* i_faceMotionAnmData,
         daNpcT_motionAnmData_c const* i_motionAnmData,
         daNpcT_MotionSeqMngr_c::sequenceStepData_c const* i_faceMotionSequenceData,
@@ -146,14 +132,20 @@ public:
         : daNpcT_c(i_faceMotionAnmData, i_motionAnmData, i_faceMotionSequenceData,
                    i_faceMotionStepNum, i_motionSequenceData, i_motionStepNum, i_evtData,
                    i_arcNames) {}
-    /* 80A7AE0C */ s32 getEyeballMaterialNo() { return chkMoiN() ? 4 : 2; }
-    /* 80A7AE3C */ s32 getHeadJointNo() { return 4; }
-    /* 80A7AE44 */ s32 getNeckJointNo() { return 3; }
-    /* 80A7AE4C */ s32 getBackboneJointNo() { return 1; }
-    /* 80A7AE54 */ BOOL checkChangeJoint(int param_0) { return param_0 == 4; }
-    /* 80A7AE64 */ BOOL checkRemoveJoint(int param_0) { return param_0 == 8; }
-    /* 80A7AE74 */ s32 getFootLJointNo() { return 22; }
-    /* 80A7AE7C */ s32 getFootRJointNo() { return 25; }
+    u16 getEyeballMaterialNo() {
+        if (chkMoiN()) {
+            return 4;
+        } else {
+            return 2;
+        }
+    }
+    s32 getHeadJointNo() { return 4; }
+    s32 getNeckJointNo() { return 3; }
+    s32 getBackboneJointNo() { return 1; }
+    BOOL checkChangeJoint(int param_0) { return param_0 == 4; }
+    BOOL checkRemoveJoint(int param_0) { return param_0 == 8; }
+    s32 getFootLJointNo() { return 22; }
+    s32 getFootRJointNo() { return 25; }
 
     int getFlowNodeNo() {
         u16 nodeNo = home.angle.x;
@@ -166,11 +158,11 @@ public:
     bool chkSFight() { return field_0x166b == 1; }
     u8 getPathID() { return (fopAcM_GetParam(this) & 0xff00) >> 8; }
 
-    static const char* mCutNameList[5];
+    static char* mCutNameList[5];
     static cutFunc mCutList[5];
 
 private:
-    /* 0x0E40 */ daNpc_Moi_HIO_c* field_0xe40;
+    /* 0x0E40 */ NPC_MOI_HIO_CLASS* mpHIO;
     /* 0x0E44 */ J3DModel* mpModel[6];
     /* 0x0E5C */ dCcD_Cyl mCyl[4];
     /* 0x134C */ dCcD_Cyl mCyl2;

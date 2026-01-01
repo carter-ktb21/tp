@@ -65,76 +65,76 @@ public:
         DMGTYPE_HOOK_OI,
     };
 
-    /* 8063E19C */ int ctrlJoint(J3DJoint*, J3DModel*);
-    /* 8063E264 */ static int JointCallBack(J3DJoint*, int);
-    /* 8063E2B0 */ int draw();
-    /* 8063E5C4 */ void setBck(int, u8, f32, f32);
-    /* 8063E668 */ bool checkBck(int);
-    /* 8063E6C4 */ void setActionMode(int, int);
-    /* 8063E6F8 */ bool checkBigDamage();
-    /* 8063E79C */ int checkDamageType();
-    /* 8063E810 */ void setDamageSe(dCcD_Sph*, int);
-    /* 8063E938 */ void damage_check();
-    /* 8063F524 */ void ice_damage_check();
-    /* 8063F84C */ bool setNextDamageMode(int);
-    /* 8063FAB4 */ bool checkAvoidWeapon(int);
-    /* 8063FF6C */ void setTgHitBit(int);
-    /* 8063FFAC */ void setCoHitBit(int);
-    /* 8063FFEC */ void setTgShield(int);
-    /* 806400BC */ void setTgType(u32);
-    /* 806400C8 */ void setZantMessage(int);
-    /* 80640104 */ int doZantMessage();
-    /* 80640180 */ void setIceLandingEffect(int);
-    /* 80640310 */ void setWaterBubble();
-    /* 806403D4 */ void setMonkeyFallEffect();
-    /* 80640478 */ void setLastRollEffect();
-    /* 80640654 */ f32 getMagicSpeed();
-    /* 80640664 */ f32 getMagicWaterSpeed();
-    /* 80640674 */ void executeSmallAttack();
-    /* 80640C20 */ bool calcScale(int);
-    /* 80640D14 */ void executeWarp();
-    /* 806412A8 */ void executeDamage();
-    /* 806414E4 */ void executeConfuse();
-    /* 80641640 */ void executeOpening();
-    /* 806427EC */ void executeFly();
-    /* 80642EC8 */ void executeFlyGround();
-    /* 806430E0 */ bool checkSwimLinkNearMouth();
-    /* 806432F8 */ bool checkSwimLinkNear();
-    /* 8064350C */ void executeHook();
-    /* 80643690 */ void executeWater();
-    /* 80644074 */ void executeSwim();
-    /* 80644A3C */ void executeSimaJump();
-    /* 80645014 */ void executeIceDemo();
-    /* 8064524C */ void executeIceJump();
-    /* 80645DA4 */ void executeIceStep();
-    /* 8064687C */ void executeIceDamage();
-    /* 806471CC */ void setFarPillarPos();
-    /* 806473E4 */ void setNearPillarPos();
-    /* 80647468 */ void setNextPillarInfo(int);
-    /* 806474F4 */ void setNextPillarPos();
-    /* 80647A34 */ void checkPillarSwing();
-    /* 80647AC8 */ void executeMonkey();
-    /* 806481F4 */ void executeMonkeyFall();
-    /* 80648544 */ void executeMonkeyDamage();
-    /* 80648778 */ void setLastWarp(int, int);
-    /* 80648F64 */ void executeLastStartDemo();
-    /* 806494A8 */ void executeLastAttack();
-    /* 8064A58C */ void executeLastTired();
-    /* 8064A688 */ void executeLastDamage();
-    /* 8064AC8C */ void executeLastEndDemo();
-    /* 8064B270 */ void calcMahojinAnime();
-    /* 8064B49C */ void calcRoomChangeCamera(int);
-    /* 8064B69C */ void initNextRoom();
-    /* 8064B868 */ void executeRoomChange();
-    /* 8064C1C0 */ void setBaseActionMode(int);
-    /* 8064C5A8 */ void action();
-    /* 8064CB1C */ void mtx_set();
-    /* 8064CD0C */ void cc_set();
-    /* 8064CFA8 */ void cc_ice_set();
-    /* 8064DA48 */ int execute();
-    /* 8064DB70 */ int _delete();
-    /* 8064DC04 */ int CreateHeap();
-    /* 8064E190 */ int create();
+    int ctrlJoint(J3DJoint*, J3DModel*);
+    static int JointCallBack(J3DJoint*, int);
+    int draw();
+    void setBck(int, u8, f32, f32);
+    bool checkBck(int);
+    void setActionMode(int, int);
+    bool checkBigDamage();
+    int checkDamageType();
+    void setDamageSe(dCcD_Sph*, int);
+    void damage_check();
+    void ice_damage_check();
+    bool setNextDamageMode(int);
+    bool checkAvoidWeapon(int);
+    void setTgHitBit(int);
+    void setCoHitBit(int);
+    void setTgShield(int);
+    void setTgType(u32);
+    void setZantMessage(int);
+    int doZantMessage();
+    void setIceLandingEffect(int);
+    void setWaterBubble();
+    void setMonkeyFallEffect();
+    void setLastRollEffect();
+    f32 getMagicSpeed();
+    f32 getMagicWaterSpeed();
+    void executeSmallAttack();
+    bool calcScale(int);
+    void executeWarp();
+    void executeDamage();
+    void executeConfuse();
+    void executeOpening();
+    void executeFly();
+    void executeFlyGround();
+    bool checkSwimLinkNearMouth();
+    bool checkSwimLinkNear();
+    void executeHook();
+    void executeWater();
+    void executeSwim();
+    void executeSimaJump();
+    void executeIceDemo();
+    void executeIceJump();
+    void executeIceStep();
+    void executeIceDamage();
+    void setFarPillarPos();
+    void setNearPillarPos();
+    void setNextPillarInfo(int);
+    void setNextPillarPos();
+    void checkPillarSwing();
+    void executeMonkey();
+    void executeMonkeyFall();
+    void executeMonkeyDamage();
+    void setLastWarp(int, int);
+    void executeLastStartDemo();
+    void executeLastAttack();
+    void executeLastTired();
+    void executeLastDamage();
+    void executeLastEndDemo();
+    void calcMahojinAnime();
+    void calcRoomChangeCamera(int);
+    void initNextRoom();
+    void executeRoomChange();
+    void setBaseActionMode(int);
+    void action();
+    void mtx_set();
+    void cc_set();
+    void cc_ice_set();
+    int execute();
+    int _delete();
+    int CreateHeap();
+    int create();
 
     /* 0x05AC */ request_of_phase_process_class mPhase;
     /* 0x05B4 */ mDoExt_McaMorfSO* mpModelMorf;
@@ -142,7 +142,7 @@ public:
     /* 0x05BC */ J3DModel* mpSwordRModel;
     /* 0x05C0 */ J3DModel* mpMahojinModel;
     /* 0x05C4 */ J3DModel* mpMahojinModel2;
-    /* 0x05C8 */ mDoExt_brkAnm* mpMahojinBrk;
+    /* 0x05C8 */ mDoExt_brkAnm* mpMahojinEndBrk;
     /* 0x05CC */ mDoExt_btkAnm* mpMahojinBtk;
     /* 0x05D0 */ mDoExt_btkAnm* mpMahojinStartBtk;
     /* 0x05D4 */ mDoExt_brkAnm* mpMahojinBrk2;
@@ -240,14 +240,99 @@ public:
     /* 0x38AC */ u32 field_0x38ac[2];
     /* 0x38B4 */ u32 field_0x38b4;
     /* 0x38B8 */ u8 mInitHIO;
+
+    enum B_ZAN_RES_FILE_ID {
+        /* BCK */
+        /* 0x07 */ BCK_ZAN_DAMAGEL_A = 7,
+        /* 0x08 */ BCK_ZAN_DAMAGER_A,
+        /* 0x09 */ BCK_ZAN_DIE_DEMO,
+        /* 0x0A */ BCK_ZAN_FAINT,
+        /* 0x0B */ BCK_ZAN_FALL,
+        /* 0x0C */ BCK_ZAN_FLOAT_APPEAR,
+        /* 0x0D */ BCK_ZAN_FLOAT_APPEARSHORT,
+        /* 0x0E */ BCK_ZAN_FLOAT_APPEARWAIT,
+        /* 0x0F */ BCK_ZAN_FLOAT_DAMAGEL,
+        /* 0x10 */ BCK_ZAN_FLOAT_DAMAGER,
+        /* 0x11 */ BCK_ZAN_FLOAT_REACTION,
+        /* 0x12 */ BCK_ZAN_FLOAT_WAIT,
+        /* 0x13 */ BCK_ZAN_FLOAT_WAITRETURN,
+        /* 0x14 */ BCK_ZAN_GROUND_REACTION,
+        /* 0x15 */ BCK_ZAN_HOOK_HIT,
+        /* 0x16 */ BCK_ZAN_HOOK_RELEASE,
+        /* 0x17 */ BCK_ZAN_HOOK_WAIT,
+        /* 0x18 */ BCK_ZAN_HUGE,
+        /* 0x19 */ BCK_ZAN_HUGE_LANDING,
+        /* 0x1A */ BCK_ZAN_JUMP_A,
+        /* 0x1B */ BCK_ZAN_JUMP_B,
+        /* 0x1C */ BCK_ZAN_LANDING,
+        /* 0x1D */ BCK_ZAN_LANDING_DAMAGE,
+        /* 0x1E */ BCK_ZAN_LANDING_WAIT,
+        /* 0x1F */ BCK_ZAN_LAST_DEMO,
+        /* 0x20 */ BCK_ZAN_LV1_FATIGUE,
+        /* 0x21 */ BCK_ZAN_LV1_JUMP_A,
+        /* 0x22 */ BCK_ZAN_LV1_JUMP_B,
+        /* 0x23 */ BCK_ZAN_MAGICSHOOTA_A,
+        /* 0x24 */ BCK_ZAN_MAGICSHOOTA_B,
+        /* 0x25 */ BCK_ZAN_MAGICSHOOTA_B_A,
+        /* 0x26 */ BCK_ZAN_MAGICSHOOTA_B_B,
+        /* 0x27 */ BCK_ZAN_MAGICSHOOTA_B_C,
+        /* 0x28 */ BCK_ZAN_MAGICSHOOTA_C,
+        /* 0x29 */ BCK_ZAN_MAGICSHOOTA_D,
+        /* 0x2A */ BCK_ZAN_OP_1,
+        /* 0x2B */ BCK_ZAN_OP_2,
+        /* 0x2C */ BCK_ZAN_OP_3,
+        /* 0x2D */ BCK_ZAN_OP_RISE,
+        /* 0x2E */ BCK_ZAN_SHIND_L,
+        /* 0x2F */ BCK_ZAN_SHIND_R,
+        /* 0x30 */ BCK_ZAN_SPIN,
+        /* 0x31 */ BCK_ZAN_SWAMP_FALL_A,
+        /* 0x32 */ BCK_ZAN_SWAMP_FALL_B,
+        /* 0x33 */ BCK_ZAN_SWAMP_FALL_LOOP,
+        /* 0x34 */ BCK_ZAN_SWAMP_LANDING,
+        /* 0x35 */ BCK_ZAN_SWIM,
+        /* 0x36 */ BCK_ZAN_SW_ATTACK,
+        /* 0x37 */ BCK_ZAN_SW_ATTACKB,
+        /* 0x38 */ BCK_ZAN_SW_DAMAGEL,
+        /* 0x39 */ BCK_ZAN_SW_DAMAGER,
+        /* 0x3A */ BCK_ZAN_SW_FATIGUE,
+        /* 0x3B */ BCK_ZAN_SW_WAIT,
+        /* 0x3C */ BCK_ZAN_SW_WALK,
+        /* 0x3D */ BCK_ZAN_TRAMPLEA,
+        /* 0x3E */ BCK_ZAN_TRAMPLEB,
+        /* 0x3F */ BCK_ZAN_TRAMPLEC,
+        /* 0x40 */ BCK_ZAN_TRAMPLED,
+        /* 0x41 */ BCK_ZAN_WAIT,
+        /* 0x42 */ BCK_ZZ_APPEARANCE,
+        /* 0x43 */ BCK_ZZ_CLOSE,
+        /* 0x44 */ BCK_ZZ_OPEN,
+
+        /* BMDR */
+        /* 0x47 */ BMDR_EF_TK2BALL = 0x47,
+        /* 0x48 */ BMDR_ZAN,
+        /* 0x49 */ BMDR_ZAN_MAHOJIN,
+        /* 0x4A */ BMDR_ZAN_SWORD_L,
+        /* 0x4B */ BMDR_ZAN_SWORD_R,
+        /* 0x4C */ BMDR_ZZ,
+
+        /* BRK */
+        /* 0x4F */ BRK_ZAN_MAHOJIN_END = 0x4F,
+        /* 0x50 */ BRK_ZZ,
+
+        /* BTK */
+        /* 0x53 */ BTK_ZAN_MAHOJIN = 0x53,
+        /* 0x54 */ BTK_ZAN_MAHOJIN_START,
+
+        /* DZB */
+        /* 0x57 */ DZB_ZZ = 0x57,
+    };
 };
 
 STATIC_ASSERT(sizeof(daB_ZANT_c) == 0x38BC);
 
 class daB_ZANT_HIO_c {
 public:
-    /* 8063E10C */ daB_ZANT_HIO_c();
-    /* 8064E994 */ virtual ~daB_ZANT_HIO_c() {}
+    daB_ZANT_HIO_c();
+    virtual ~daB_ZANT_HIO_c() {}
 
     /* 0x04 */ s8 field_0x4;
     /* 0x08 */ f32 mModelSize;

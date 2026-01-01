@@ -10,11 +10,11 @@ struct ResTIMG;
 class daPy_sightPacket_c : public dDlst_base_c {
 public:
     daPy_sightPacket_c() {}
-    /* 8015F1A0 */ virtual void draw();
-    /* 80140CDC */ virtual ~daPy_sightPacket_c() {}
+    virtual void draw();
+    virtual ~daPy_sightPacket_c() {}
 
-    /* 8015F2FC */ void setSight();
-    /* 8015F384 */ void setSightImage(ResTIMG*);
+    void setSight();
+    void setSightImage(ResTIMG*);
 
     bool getDrawFlg() { return mDrawFlag; }
     void onDrawFlg() { mDrawFlag = true; }
@@ -32,9 +32,10 @@ public:
 
 class daPy_boomerangMove_c {
 public:
-    /* 8015E5B0 */ void initOffset(cXyz const*);
-    /* 8015E654 */ int posMove(cXyz*, s16*, fopAc_ac_c*, s16);
-    /* 8015E87C */ void bgCheckAfterOffset(cXyz const*);
+    void initOffset(cXyz const*);
+    void initOffset(cXyz const* xyz, dCcD_GObjInf const*) { initOffset(xyz); }
+    int posMove(cXyz*, s16*, fopAc_ac_c*, s16);
+    void bgCheckAfterOffset(cXyz const*);
 
     static void initDropAngleY() { m_dropAngleY = 0x4000; }
     static void offEventKeepFlg() { m_eventKeepFlg = 0; }
@@ -115,8 +116,8 @@ private:
 
 class daPy_frameCtrl_c : public J3DFrameCtrl {
 public:
-    /* 80140D24 */ virtual ~daPy_frameCtrl_c() {}
-    /* 80140D80 */ daPy_frameCtrl_c() {}
+    virtual ~daPy_frameCtrl_c() {}
+    daPy_frameCtrl_c() {}
     bool checkAnmEnd();
     void updateFrame();
     void setFrameCtrl(u8, short, short, f32, f32);
@@ -242,15 +243,23 @@ public:
         DEMO_NEW_ANM0_e = 0x200,
     };
 
+    enum {
+        DEMO_TYPE_TOOL_e = 1,
+        DEMO_TYPE_SYSTEM_e,
+        DEMO_TYPE_ORIGINAL_e,
+        DEMO_TYPE_START_e,
+        DEMO_TYPE_SPECIAL_e,
+    };
+
     void setDemoType(u16 pType) { mDemoType = pType; }
     int getDemoType() const { return mDemoType; }
     void setDemoMode(u32 mode) { mDemoMode = mode; }
     u32 getDemoMode() const { return mDemoMode; }
     int getParam1() const { return mParam1; }
     s16 getParam2() const { return mParam2; }
-    void setOriginalDemoType() { setDemoType(3); }
-    void setSpecialDemoType() { setDemoType(5); }
-    void setSystemDemoType() { setDemoType(2); }
+    void setOriginalDemoType() { setDemoType(DEMO_TYPE_ORIGINAL_e); }
+    void setSpecialDemoType() { setDemoType(DEMO_TYPE_SPECIAL_e); }
+    void setSystemDemoType() { setDemoType(DEMO_TYPE_SYSTEM_e); }
     void setStick(f32 stick) { mStick = stick; }
     void setMoveAngle(s16 angle) { mDemoMoveAngle = angle; }
     s16 getMoveAngle() const { return mDemoMoveAngle; }
@@ -260,13 +269,13 @@ public:
     void setParam1(int value) { mParam1 = value; }
     void setParam2(int value) { mParam2 = value; }
     void setPos0(const cXyz* pos) { mDemoPos0 = *pos; }
-    void setToolDemoType() { setDemoType(1); }
+    void setToolDemoType() { setDemoType(DEMO_TYPE_TOOL_e); }
     s16 getTimer() const { return mTimer; }
     void decTimer() { mTimer--; }
     void setTimer(s16 i_timer) { mTimer = i_timer; }
     cXyz* getPos0() { return &mDemoPos0; }
     void resetDemoType() { setDemoType(0); }
-    void setStartDemoType() { setDemoType(4); }
+    void setStartDemoType() { setDemoType(DEMO_TYPE_START_e); }
 
 private:
     /* 0x00 */ u16 mDemoType;
@@ -436,7 +445,7 @@ public:
         FLG3_COPY_ROD_ATN_KEEP = 0x10000000,
         FLG3_BOOMERANG_ATN_KEEP = 0x8000000,
         FLG3_UNK_4000000 = 0x4000000,
-        FLG3_UNK_2000000 = 0x2000000,
+        FLG3_WARP_OBJ_DEMO = 0x2000000,
         FLG3_UNK_1000000 = 0x1000000,
         FLG3_UNK_800000 = 0x800000,
         FLG3_UNK_400000 = 0x400000,
@@ -475,7 +484,7 @@ public:
         ERFLG0_BEE_FOLLOW = 0x400000,
         ERFLG0_UNK_200000 = 0x200000,
         ERFLG0_UNK_100000 = 0x100000,
-        ERFLG0_UNK_80000 = 0x80000,
+        ERFLG0_SINGLE_BOAR_AVOID = 0x80000,
         ERFLG0_FISHING_ROD_GET_FISH = 0x40000,
         ERFLG0_UNK_20000 = 0x20000,
         ERFLG0_UNK_10000 = 0x10000,
@@ -598,7 +607,8 @@ public:
     };
 
     enum CutType {
-        /* 0x01 */ CUT_TYPE_NM_VERTICAL = 1,
+        /* 0x00 */ CUT_TYPE_NONE,
+        /* 0x01 */ CUT_TYPE_NM_VERTICAL,
         /* 0x02 */ CUT_TYPE_NM_STAB,
         /* 0x03 */ CUT_TYPE_NM_RIGHT,
         /* 0x04 */ CUT_TYPE_NM_LEFT,
@@ -685,7 +695,7 @@ public:
     f32 getSpinnerRideSpeed() const;
     bool checkSpinnerReflectEffect();
     static bool checkBoomerangCharge();
-    static u8 checkBoomerangChargeTime();
+    static bool checkBoomerangChargeTime();
     static daBoomerang_c* getThrowBoomerangActor();
     static void cancelBoomerangLockActor(fopAc_ac_c*);
     static void setPlayerDamage(int, int);
@@ -699,183 +709,186 @@ public:
     bool checkGoronSideMove() const { return mSpecialMode == 0x2B; }
     cXyz* getRightFootPosP() { return &mRightFootPos; }
     cXyz* getLeftFootPosP() { return &mLeftFootPos; }
-    BOOL checkCopyRodThrowAfter() const { return checkNoResetFlg3(FLG3_COPY_ROD_THROW_AFTER); }
+    cXyz getLeftFootPos() const { return mLeftFootPos; }
+    cXyz getRightFootPos() const { return mRightFootPos; }
+    u32 checkCopyRodThrowAfter() const { return checkNoResetFlg3(FLG3_COPY_ROD_THROW_AFTER); }
     u32 checkRide() const { return checkHorseRide() || checkBoarRide() || checkSpinnerRide() || checkCanoeRide() || checkBoardRide(); }
     cXyz getRightHandPos() const { return mRightHandPos; }
     const cXyz getLeftHandPos() const { return mLeftHandPos; }
     const cXyz getItemPos() const { return mItemPos; }
-    bool getDkCaught() const { return checkNoResetFlg1(FLG1_DK_CAUGHT); }
-    bool getStCaught() const { return checkNoResetFlg1(FLG1_UNK_80000000); }
+    BOOL getDkCaught() const { return checkNoResetFlg1(FLG1_DK_CAUGHT); }
+    BOOL getDkCaught2() const { return checkNoResetFlg0(FLG0_DK_CAUGHT); }
+    BOOL getStCaught() const { return checkNoResetFlg1(FLG1_UNK_80000000); }
 
-    virtual cXyz* getMidnaAtnPos() const { return NULL; }
-    virtual void setMidnaMsgNum(fopAc_ac_c*, u16) {}
-    virtual MtxP getModelMtx() { return cullMtx; }
-    virtual MtxP getInvMtx() { return cullMtx; }
-    virtual cXyz* getShadowTalkAtnPos() { return &current.pos; }
-    virtual f32 getGroundY() = 0;
-    virtual MtxP getLeftItemMatrix() { return cullMtx; }
-    virtual MtxP getRightItemMatrix() { return cullMtx; }
-    virtual MtxP getLeftHandMatrix() { return cullMtx; }
-    virtual MtxP getRightHandMatrix() { return cullMtx; }
-    virtual MtxP getLinkBackBone1Matrix() { return cullMtx; }
-    virtual MtxP getWolfMouthMatrix() { return cullMtx; }
-    virtual MtxP getWolfBackbone2Matrix() { return cullMtx; }
-    virtual MtxP getBottleMtx() { return NULL; }
-    virtual BOOL checkPlayerGuard() const { return FALSE; }
-    virtual u32 checkPlayerFly() const { return 0; }
-    virtual BOOL checkFrontRoll() const { return FALSE; }
-    virtual BOOL checkWolfDash() const { return FALSE; }
-    virtual BOOL checkAutoJump() const { return FALSE; }
-    virtual bool checkSideStep() const { return FALSE; }
-    virtual bool checkWolfTriggerJump() const { return FALSE; }
-    virtual BOOL checkGuardBreakMode() const { return FALSE; }
-    virtual bool checkLv3Slide() const { return FALSE; }
-    virtual bool checkWolfHowlDemoMode() const { return FALSE; }
-    virtual bool checkChainBlockPushPull() { return FALSE; }
-    virtual BOOL checkElecDamage() const { return FALSE; }
-    virtual BOOL checkEmptyBottleSwing() const { return FALSE; }
-    virtual BOOL checkBottleSwingMode() const { return FALSE; }
-    virtual BOOL checkHawkWait() const { return FALSE; }
-    virtual BOOL checkGoatThrow() const { return FALSE; }
-    virtual BOOL checkGoatThrowAfter() const { return FALSE; }
-    virtual BOOL checkWolfTagLockJump() const { return FALSE; }
-    virtual BOOL checkWolfTagLockJumpLand() const { return FALSE; }
-    virtual BOOL checkWolfRope() { return FALSE; }
-    virtual BOOL checkWolfRopeHang() const { return FALSE; }
-    virtual BOOL checkRollJump() const { return FALSE; }
-    virtual BOOL checkGoronRideWait() const { return FALSE; }
-    virtual BOOL checkWolfChain() const { return FALSE; }
-    virtual BOOL checkWolfWait() const { return FALSE; }
-    virtual BOOL checkWolfJumpAttack() const { return FALSE; }
-    virtual BOOL checkWolfRSit() const { return FALSE; }
-    virtual bool checkBubbleFly() const { return FALSE; }
-    virtual BOOL checkBottleDrinkEnd() const { return FALSE; }
-    virtual BOOL checkWolfDig() const { return FALSE; }
-    virtual BOOL checkCutCharge() const { return FALSE; }
-    virtual BOOL checkCutTurnCharge() const { return FALSE; }
-    virtual BOOL checkCutLargeJumpCharge() const { return FALSE; }
-    virtual bool getBokoFlamePos(cXyz*) { return FALSE; }
-    virtual BOOL checkComboCutTurn() const { return FALSE; }
-    virtual BOOL checkClimbMove() const { return FALSE; }
-    virtual BOOL checkGrassWhistle() const { return FALSE; }
-    virtual BOOL checkBoarRun() const { return FALSE; }
-    virtual bool checkFmChainPut() const { return FALSE; }
-    virtual BOOL checkHorseElecDamage() const { return FALSE; }
-    virtual f32 getBaseAnimeFrameRate() const { return 1.0f; }
-    virtual f32 getBaseAnimeFrame() const { return 0.0f; }
-    virtual void setAnimeFrame(f32) {}
-    virtual BOOL checkWolfLock(fopAc_ac_c*) const { return FALSE; }
-    virtual bool cancelWolfLock(fopAc_ac_c*) { return FALSE; }
-    virtual s32 getAtnActorID() const { return fpcM_ERROR_PROCESS_ID_e; }
-    virtual s32 getItemID() const { return fpcM_ERROR_PROCESS_ID_e; }
-    virtual u32 getGrabActorID() const { return fpcM_ERROR_PROCESS_ID_e; }
-    virtual BOOL exchangeGrabActor(fopAc_ac_c*) { return FALSE; }
-    virtual BOOL setForceGrab(fopAc_ac_c*, int, int) { return FALSE; }
-    virtual void setForcePutPos(cXyz const&) {}
-    virtual u32 checkPlayerNoDraw() { return FALSE; }
-    virtual bool checkRopeTag() { return FALSE; }
-    virtual void voiceStart(u32) {}
-    virtual void seStartOnlyReverb(u32) {}
-    virtual void seStartOnlyReverbLevel(u32) {}
-    virtual void setOutPower(f32, short, int) {}
-    virtual void setGrabCollisionOffset(f32, f32, cBgS_PolyInfo*) {}
-    virtual void onMagneGrab(f32, f32) {}
-    virtual void onFrollCrashFlg(u8, int) {}
-    virtual MtxP getModelJointMtx(u16) { return NULL; }
-    virtual MtxP getHeadMtx() { return NULL; }
-    virtual bool setHookshotCarryOffset(fpc_ProcID, cXyz const*) { return FALSE; }
-    virtual BOOL checkCutJumpCancelTurn() const { return FALSE; }
-    virtual bool checkIronBallReturn() const { return FALSE; }
-    virtual bool checkIronBallGroundStop() const { return FALSE; }
-    virtual BOOL checkSingleBoarBattleSecondBowReady() const { return FALSE; }
-    virtual bool checkPointSubWindowMode() const { return FALSE; }
-    virtual void setClothesChange(int) {}
-    virtual void setPlayerPosAndAngle(cXyz const*, short, int) {}
-    virtual void setPlayerPosAndAngle(cXyz const*, csXyz const*) {}
-    virtual void setPlayerPosAndAngle(f32 (*)[4]) {}
-    virtual bool setThrowDamage(short, f32, f32, int, int, int) { return FALSE; }
-    virtual bool checkSetNpcTks(cXyz*, int, int) { return FALSE; }
-    virtual int setRollJump(f32, f32, short) { return FALSE; }
-    virtual void playerStartCollisionSE(u32, u32) {}
-    virtual void changeTextureAnime(u16, u16, int) {}
-    virtual void cancelChangeTextureAnime() {}
-    virtual void cancelDungeonWarpReadyNeck() {}
-    virtual void onSceneChangeArea(u8, u8, fopAc_ac_c*) {}
-    virtual void onSceneChangeAreaJump(u8, u8, fopAc_ac_c*) {}
-    virtual void onSceneChangeDead(u8, int) {}
-    virtual u32 checkHorseRide() const { return false; }
-    virtual u32 checkBoarRide() const { return 0; }
-    virtual u32 checkCanoeRide() const { return 0; }
-    virtual u32 checkBoardRide() const { return 0; }
-    virtual u32 checkSpinnerRide() const { return 0; }
-    virtual daSpinner_c* getSpinnerActor() { return NULL; }
-    virtual BOOL checkHorseRideNotReady() const { return FALSE; }
-    virtual bool checkArrowChargeEnd() const { return FALSE; }
-    virtual f32 getSearchBallScale() const { return 0.0f; }
-    virtual int checkFastShotTime() { return FALSE; }
-    virtual bool checkNoEquipItem() const { return TRUE; }
-    virtual bool checkFireMaterial() const { return FALSE; }
-    virtual bool checkKandelaarSwing(int) const { return FALSE; }
-    virtual s16 getBoardCutTurnOffsetAngleY() const { return 0; }
-    virtual cXyz* getMagneHitPos() { return &mSwordTopPos; }
-    virtual cXyz* getMagneBootsTopVec() { return &current.pos; }
-    virtual cXyz* getKandelaarFlamePos() { return NULL; }
-    virtual bool checkUseKandelaar(int) { return FALSE; }
-    virtual void setDkCaught(fopAc_ac_c*) {}
-    virtual void onPressedDamage(cXyz const&, short) {}
-    virtual bool checkPriActorOwn(fopAc_ac_c const*) const { return FALSE; }
-    virtual bool onWolfEnemyBiteAll(fopAc_ac_c*, daPy_FLG2) { return FALSE; }
-    virtual bool checkWolfEnemyBiteAllOwn(fopAc_ac_c const*) const { return FALSE; }
-    virtual void setWolfEnemyHangBiteAngle(short) {}
-    virtual void setKandelaarMtx(f32 (*)[4], int, int) {}
-    virtual bool getStickAngleFromPlayerShape(short*) const { return FALSE; }
-    virtual bool checkSpinnerPathMove() { return FALSE; }
-    virtual bool checkSpinnerTriggerAttack() { return FALSE; }
-    virtual void onSpinnerPathForceRemove() {}
-    virtual int getIronBallBgHit() const { return FALSE; }
-    virtual cXyz* getIronBallCenterPos() { return NULL; }
-    virtual bool checkCanoeFishingGetLeft() const { return FALSE; }
-    virtual bool checkCanoeFishingGetRight() const { return FALSE; }
-    virtual u8 checkBeeChildDrink() const { return FALSE; }
-    virtual void skipPortalObjWarp() {}
-    virtual BOOL checkTreasureRupeeReturn(int) const { return FALSE; }
-    virtual void setSumouReady(fopAc_ac_c*) {}
-    virtual bool checkAcceptDungeonWarpAlink(int) { return FALSE; }
-    virtual s16 getSumouCounter() const { return 0; }
-    virtual s16 checkSumouWithstand() const { return 0; }
-    virtual void cancelGoronThrowEvent() {}
-    virtual void setSumouGraspCancelCount(int) {}
-    virtual void setSumouPushBackDirection(short) {}
-    virtual void setSumouLoseHeadUp() {}
-    virtual s16 getGiantPuzzleAimAngle() const { return shape_angle.y; }
-    virtual void setGoronSideMove(fopAc_ac_c*) {}
-    virtual void setCargoCarry(fopAc_ac_c*) {}
-    virtual bool getDpdFarFlg() const { return 0; }
-    virtual cXyz* getHookshotTopPos() { return NULL; }
-    virtual bool checkHookshotReturnMode() const { return FALSE; }
-    virtual bool checkHookshotShootReturnMode() const { return FALSE; }
-    virtual bool checkOctaIealHang() const { return FALSE; }
-    virtual void cancelOctaIealHang() {}
-    virtual void cancelDragonHangBackJump() {}
-    virtual void setOctaIealWildHang() {}
-    virtual bool checkDragonHangRide() const { return FALSE; }
-    virtual void changeDragonActor(fopAc_ac_c*) {}
-    virtual u8 getClothesChangeWaitTimer() const { return 0; }
-    virtual u8 getShieldChangeWaitTimer() const { return 0; }
-    virtual u8 getSwordChangeWaitTimer() const { return 0; }
-    virtual BOOL checkMetamorphose() const { return FALSE; }
-    virtual BOOL checkWolfDownAttackPullOut() const { return FALSE; }
-    virtual BOOL checkBootsOrArmorHeavy() const { return FALSE; }
-    virtual s32 getBottleOpenAppearItem() const { return fpcM_ERROR_PROCESS_ID_e; }
-    virtual bool checkItemSwordEquip() const { return FALSE; }
-    virtual f32 getSinkShapeOffset() const { return 0.0f; }
-    virtual BOOL checkSinkDead() const { return FALSE; }
-    virtual BOOL checkHorseStart() { return FALSE; }
-    virtual Z2WolfHowlMgr* getWolfHowlMgrP() { return NULL; }
-    virtual BOOL checkWolfHowlSuccessAnime() const { return FALSE; }
-    virtual BOOL checkCopyRodTopUse() { return FALSE; }
-    virtual bool checkCopyRodEquip() const { return FALSE; }
-    virtual BOOL checkCutJumpMode() const { return FALSE; }
+    /* vt 0X008 */ virtual cXyz* getMidnaAtnPos() const { return NULL; }
+    /* vt 0X00C */ virtual void setMidnaMsgNum(fopAc_ac_c*, u16) {}
+    /* vt 0X010 */ virtual MtxP getModelMtx() { return cullMtx; }
+    /* vt 0X014 */ virtual MtxP getInvMtx() { return cullMtx; }
+    /* vt 0X018 */ virtual cXyz* getShadowTalkAtnPos() { return &current.pos; }
+    /* vt 0X01C */ virtual f32 getGroundY() = 0;
+    /* vt 0X020 */ virtual MtxP getLeftItemMatrix() { return cullMtx; }
+    /* vt 0X024 */ virtual MtxP getRightItemMatrix() { return cullMtx; }
+    /* vt 0X028 */ virtual MtxP getLeftHandMatrix() { return cullMtx; }
+    /* vt 0X02C */ virtual MtxP getRightHandMatrix() { return cullMtx; }
+    /* vt 0X030 */ virtual MtxP getLinkBackBone1Matrix() { return cullMtx; }
+    /* vt 0X034 */ virtual MtxP getWolfMouthMatrix() { return cullMtx; }
+    /* vt 0X038 */ virtual MtxP getWolfBackbone2Matrix() { return cullMtx; }
+    /* vt 0X03C */ virtual MtxP getBottleMtx() { return NULL; }
+    /* vt 0X040 */ virtual BOOL checkPlayerGuard() const { return FALSE; }
+    /* vt 0X044 */ virtual u32 checkPlayerFly() const { return 0; }
+    /* vt 0X048 */ virtual BOOL checkFrontRoll() const { return FALSE; }
+    /* vt 0X04C */ virtual BOOL checkWolfDash() const { return FALSE; }
+    /* vt 0X050 */ virtual BOOL checkAutoJump() const { return FALSE; }
+    /* vt 0X054 */ virtual bool checkSideStep() const { return FALSE; }
+    /* vt 0X058 */ virtual bool checkWolfTriggerJump() const { return FALSE; }
+    /* vt 0X05C */ virtual BOOL checkGuardBreakMode() const { return FALSE; }
+    /* vt 0X060 */ virtual bool checkLv3Slide() const { return FALSE; }
+    /* vt 0X064 */ virtual bool checkWolfHowlDemoMode() const { return FALSE; }
+    /* vt 0X068 */ virtual bool checkChainBlockPushPull() { return FALSE; }
+    /* vt 0X06C */ virtual BOOL checkElecDamage() const { return FALSE; }
+    /* vt 0X070 */ virtual BOOL checkEmptyBottleSwing() const { return FALSE; }
+    /* vt 0X074 */ virtual BOOL checkBottleSwingMode() const { return FALSE; }
+    /* vt 0X078 */ virtual BOOL checkHawkWait() const { return FALSE; }
+    /* vt 0X07C */ virtual BOOL checkGoatThrow() const { return FALSE; }
+    /* vt 0X080 */ virtual BOOL checkGoatThrowAfter() const { return FALSE; }
+    /* vt 0X084 */ virtual BOOL checkWolfTagLockJump() const { return FALSE; }
+    /* vt 0X088 */ virtual BOOL checkWolfTagLockJumpLand() const { return FALSE; }
+    /* vt 0X08C */ virtual BOOL checkWolfRope() { return FALSE; }
+    /* vt 0X090 */ virtual BOOL checkWolfRopeHang() const { return FALSE; }
+    /* vt 0X094 */ virtual BOOL checkRollJump() const { return FALSE; }
+    /* vt 0X098 */ virtual BOOL checkGoronRideWait() const { return FALSE; }
+    /* vt 0X09C */ virtual BOOL checkWolfChain() const { return FALSE; }
+    /* vt 0X0A0 */ virtual BOOL checkWolfWait() const { return FALSE; }
+    /* vt 0X0A4 */ virtual BOOL checkWolfJumpAttack() const { return FALSE; }
+    /* vt 0X0A8 */ virtual BOOL checkWolfRSit() const { return FALSE; }
+    /* vt 0X0AC */ virtual bool checkBubbleFly() const { return FALSE; }
+    /* vt 0X0B0 */ virtual BOOL checkBottleDrinkEnd() const { return FALSE; }
+    /* vt 0X0B4 */ virtual BOOL checkWolfDig() const { return FALSE; }
+    /* vt 0X0B8 */ virtual BOOL checkCutCharge() const { return FALSE; }
+    /* vt 0X0BC */ virtual BOOL checkCutTurnCharge() const { return FALSE; }
+    /* vt 0X0C0 */ virtual BOOL checkCutLargeJumpCharge() const { return FALSE; }
+    /* vt 0X0C4 */ virtual BOOL getBokoFlamePos(cXyz*) { return FALSE; }
+    /* vt 0X0C8 */ virtual BOOL checkComboCutTurn() const { return FALSE; }
+    /* vt 0X0CC */ virtual BOOL checkClimbMove() const { return FALSE; }
+    /* vt 0X0D0 */ virtual BOOL checkGrassWhistle() const { return FALSE; }
+    /* vt 0X0D4 */ virtual BOOL checkBoarRun() const { return FALSE; }
+    /* vt 0X0D8 */ virtual bool checkFmChainPut() const { return FALSE; }
+    /* vt 0X0DC */ virtual BOOL checkHorseElecDamage() const { return FALSE; }
+    /* vt 0X0E0 */ virtual f32 getBaseAnimeFrameRate() const { return 1.0f; }
+    /* vt 0X0E4 */ virtual f32 getBaseAnimeFrame() const { return 0.0f; }
+    /* vt 0X0E8 */ virtual void setAnimeFrame(f32) {}
+    /* vt 0X0EC */ virtual BOOL checkWolfLock(fopAc_ac_c*) const { return FALSE; }
+    /* vt 0X0F0 */ virtual bool cancelWolfLock(fopAc_ac_c*) { return FALSE; }
+    /* vt 0X0F4 */ virtual fpc_ProcID getAtnActorID() const { return fpcM_ERROR_PROCESS_ID_e; }
+    /* vt 0X0F8 */ virtual fpc_ProcID getItemID() const { return fpcM_ERROR_PROCESS_ID_e; }
+    /* vt 0X0FC */ virtual fpc_ProcID getGrabActorID() const { return fpcM_ERROR_PROCESS_ID_e; }
+    /* vt 0X100 */ virtual BOOL exchangeGrabActor(fopAc_ac_c*) { return FALSE; }
+    /* vt 0X104 */ virtual BOOL setForceGrab(fopAc_ac_c*, int, int) { return FALSE; }
+    /* vt 0X108 */ virtual void setForcePutPos(cXyz const&) {}
+    /* vt 0X10C */ virtual u32 checkPlayerNoDraw() { return FALSE; }
+    /* vt 0X110 */ virtual bool checkRopeTag() { return FALSE; }
+    /* vt 0X114 */ virtual void voiceStart(u32) {}
+    /* vt 0X118 */ virtual void seStartOnlyReverb(u32) {}
+    /* vt 0X11C */ virtual void seStartOnlyReverbLevel(u32) {}
+    /* vt 0X120 */ virtual void setOutPower(f32, short, int) {}
+    /* vt 0X124 */ virtual void setGrabCollisionOffset(f32, f32, cBgS_PolyInfo*) {}
+    /* vt 0X128 */ virtual void onMagneGrab(f32, f32) {}
+    /* vt 0X12C */ virtual void onFrollCrashFlg(u8, int) {}
+    /* vt 0X130 */ virtual MtxP getModelJointMtx(u16) { return NULL; }
+    /* vt 0X134 */ virtual MtxP getHeadMtx() { return NULL; }
+    /* vt 0X138 */ virtual bool setHookshotCarryOffset(fpc_ProcID, cXyz const*) { return FALSE; }
+    /* vt 0X13C */ virtual BOOL checkCutJumpCancelTurn() const { return FALSE; }
+    /* vt 0X140 */ virtual bool checkIronBallReturn() const { return FALSE; }
+    /* vt 0X144 */ virtual bool checkIronBallGroundStop() const { return FALSE; }
+    /* vt 0X148 */ virtual BOOL checkSingleBoarBattleSecondBowReady() const { return FALSE; }
+    /* vt 0X14C */ virtual bool checkPointSubWindowMode() const { return FALSE; }
+    /* vt 0X150 */ virtual void setClothesChange(int) {}
+    /* vt 0X154 */ virtual void setPlayerPosAndAngle(cXyz const*, short, int) {}
+    /* vt 0X158 */ virtual void setPlayerPosAndAngle(cXyz const*, csXyz const*) {}
+    /* vt 0X15C */ virtual void setPlayerPosAndAngle(f32 (*)[4]) {}
+    /* vt 0X160 */ virtual bool setThrowDamage(short, f32, f32, int, int, int) { return FALSE; }
+    /* vt 0X164 */ virtual bool checkSetNpcTks(cXyz*, int, int) { return FALSE; }
+    /* vt 0X168 */ virtual int setRollJump(f32, f32, short) { return FALSE; }
+    /* vt 0X16C */ virtual void playerStartCollisionSE(u32, u32) {}
+    /* vt 0X170 */ virtual void changeTextureAnime(u16, u16, int) {}
+    /* vt 0X174 */ virtual void cancelChangeTextureAnime() {}
+    /* vt 0X178 */ virtual void cancelDungeonWarpReadyNeck() {}
+    /* vt 0X17C */ virtual void onSceneChangeArea(u8, u8, fopAc_ac_c*) {}
+    /* vt 0X180 */ virtual void onSceneChangeAreaJump(u8, u8, fopAc_ac_c*) {}
+    /* vt 0X184 */ virtual void onSceneChangeDead(u8, int) {}
+    /* vt 0X188 */ virtual u32 checkHorseRide() const { return false; }
+    /* vt 0X18C */ virtual u32 checkBoarRide() const { return 0; }
+    /* vt 0X190 */ virtual u32 checkCanoeRide() const { return 0; }
+    /* vt 0X194 */ virtual u32 checkBoardRide() const { return 0; }
+    /* vt 0X198 */ virtual u32 checkSpinnerRide() const { return 0; }
+    /* vt 0X19C */ virtual daSpinner_c* getSpinnerActor() { return NULL; }
+    /* vt 0X1A0 */ virtual BOOL checkHorseRideNotReady() const { return FALSE; }
+    /* vt 0X1A4 */ virtual bool checkArrowChargeEnd() const { return FALSE; }
+    /* vt 0X1A8 */ virtual f32 getSearchBallScale() const { return 0.0f; }
+    /* vt 0X1AC */ virtual int checkFastShotTime() { return FALSE; }
+    /* vt 0X1B0 */ virtual bool checkNoEquipItem() const { return TRUE; }
+    /* vt 0X1B4 */ virtual bool checkFireMaterial() const { return FALSE; }
+    /* vt 0X1B8 */ virtual bool checkKandelaarSwing(int) const { return FALSE; }
+    /* vt 0X1BC */ virtual s16 getBoardCutTurnOffsetAngleY() const { return 0; }
+    /* vt 0X1C0 */ virtual cXyz* getMagneHitPos() { return &mSwordTopPos; }
+    /* vt 0X1C4 */ virtual cXyz* getMagneBootsTopVec() { return &current.pos; }
+    /* vt 0X1C8 */ virtual cXyz* getKandelaarFlamePos() { return NULL; }
+    /* vt 0X1CC */ virtual bool checkUseKandelaar(int) { return FALSE; }
+    /* vt 0X1D0 */ virtual void setDkCaught(fopAc_ac_c*) {}
+    /* vt 0X1D4 */ virtual void onPressedDamage(cXyz const&, short) {}
+    /* vt 0X1D8 */ virtual bool checkPriActorOwn(fopAc_ac_c const*) const { return FALSE; }
+    /* vt 0X1DC */ virtual bool onWolfEnemyBiteAll(fopAc_ac_c*, daPy_FLG2) { return FALSE; }
+    /* vt 0X1E0 */ virtual bool checkWolfEnemyBiteAllOwn(fopAc_ac_c const*) const { return FALSE; }
+    /* vt 0X1E4 */ virtual void setWolfEnemyHangBiteAngle(short) {}
+    /* vt 0X1E8 */ virtual void setKandelaarMtx(f32 (*)[4], int, int) {}
+    /* vt 0X1EC */ virtual bool getStickAngleFromPlayerShape(short*) const { return FALSE; }
+    /* vt 0X1F0 */ virtual bool checkSpinnerPathMove() { return FALSE; }
+    /* vt 0X1F4 */ virtual bool checkSpinnerTriggerAttack() { return FALSE; }
+    /* vt 0X1F8 */ virtual void onSpinnerPathForceRemove() {}
+    /* vt 0X1FC */ virtual int getIronBallBgHit() const { return FALSE; }
+    /* vt 0X200 */ virtual cXyz* getIronBallCenterPos() { return NULL; }
+    /* vt 0X204 */ virtual bool checkCanoeFishingGetLeft() const { return FALSE; }
+    /* vt 0X208 */ virtual bool checkCanoeFishingGetRight() const { return FALSE; }
+    /* vt 0X20C */ virtual u8 checkBeeChildDrink() const { return FALSE; }
+    /* vt 0X210 */ virtual void skipPortalObjWarp() {}
+    /* vt 0X214 */ virtual BOOL checkTreasureRupeeReturn(int) const { return FALSE; }
+    /* vt 0X218 */ virtual void setSumouReady(fopAc_ac_c*) {}
+    /* vt 0X21C */ virtual bool checkAcceptDungeonWarpAlink(int) { return FALSE; }
+    /* vt 0X220 */ virtual s16 getSumouCounter() const { return 0; }
+    /* vt 0X224 */ virtual s16 checkSumouWithstand() const { return 0; }
+    /* vt 0X228 */ virtual void cancelGoronThrowEvent() {}
+    /* vt 0X22C */ virtual void setSumouGraspCancelCount(int) {}
+    /* vt 0X230 */ virtual void setSumouPushBackDirection(short) {}
+    /* vt 0X234 */ virtual void setSumouLoseHeadUp() {}
+    /* vt 0X238 */ virtual s16 getGiantPuzzleAimAngle() const { return shape_angle.y; }
+    /* vt 0X23C */ virtual void setGoronSideMove(fopAc_ac_c*) {}
+    /* vt 0X240 */ virtual void setCargoCarry(fopAc_ac_c*) {}
+    /* vt 0X244 */ virtual bool getDpdFarFlg() const { return 0; }
+    /* vt 0X248 */ virtual cXyz* getHookshotTopPos() { return NULL; }
+    /* vt 0X24C */ virtual bool checkHookshotReturnMode() const { return FALSE; }
+    /* vt 0X250 */ virtual bool checkHookshotShootReturnMode() const { return FALSE; }
+    /* vt 0X254 */ virtual bool checkOctaIealHang() const { return FALSE; }
+    /* vt 0X258 */ virtual void cancelOctaIealHang() {}
+    /* vt 0X25C */ virtual void cancelDragonHangBackJump() {}
+    /* vt 0X260 */ virtual void setOctaIealWildHang() {}
+    /* vt 0X264 */ virtual bool checkDragonHangRide() const { return FALSE; }
+    /* vt 0X268 */ virtual void changeDragonActor(fopAc_ac_c*) {}
+    /* vt 0X26C */ virtual u8 getClothesChangeWaitTimer() const { return 0; }
+    /* vt 0X270 */ virtual u8 getShieldChangeWaitTimer() const { return 0; }
+    /* vt 0X274 */ virtual u8 getSwordChangeWaitTimer() const { return 0; }
+    /* vt 0X278 */ virtual BOOL checkMetamorphose() const { return FALSE; }
+    /* vt 0X27C */ virtual BOOL checkWolfDownAttackPullOut() const { return FALSE; }
+    /* vt 0X280 */ virtual BOOL checkBootsOrArmorHeavy() const { return FALSE; }
+    /* vt 0X284 */ virtual fpc_ProcID getBottleOpenAppearItem() const { return fpcM_ERROR_PROCESS_ID_e; }
+    /* vt 0X288 */ virtual bool checkItemSwordEquip() const { return FALSE; }
+    /* vt 0X28C */ virtual f32 getSinkShapeOffset() const { return 0.0f; }
+    /* vt 0X290 */ virtual BOOL checkSinkDead() const { return FALSE; }
+    /* vt 0X294 */ virtual BOOL checkHorseStart() { return FALSE; }
+    /* vt 0X298 */ virtual Z2WolfHowlMgr* getWolfHowlMgrP() { return NULL; }
+    /* vt 0X29C */ virtual BOOL checkWolfHowlSuccessAnime() const { return FALSE; }
+    /* vt 0X2A0 */ virtual BOOL checkCopyRodTopUse() { return FALSE; }
+    /* vt 0X2A4 */ virtual bool checkCopyRodEquip() const { return FALSE; }
+    /* vt 0X2A8 */ virtual BOOL checkCutJumpMode() const { return FALSE; }
 
     f32 getSpeedF() const { return speedF; }
 
@@ -897,51 +910,67 @@ public:
 
     u8 getCutCount() const { return mComboCutCount; }
 
-    bool checkStatusWindowDraw() { return checkNoResetFlg2(FLG2_STATUS_WINDOW_DRAW); }
+    BOOL checkStatusWindowDraw() const { return checkNoResetFlg2(FLG2_STATUS_WINDOW_DRAW); }
     bool checkCargoCarry() const { return mSpecialMode == SMODE_CARGO_CARRY; }
-    bool getHeavyStateAndBoots() { return checkNoResetFlg0(FLG0_HVY_STATE); }
-    bool checkEnemyAttentionLock() const { return checkResetFlg0(RFLG0_ENEMY_ATTN_LOCK); }
-    bool getGrabUpStart() const { return checkResetFlg0(RFLG0_UNK_8000); }
+    BOOL getHeavyStateAndBoots() { return checkNoResetFlg0(FLG0_HVY_STATE); }
+    BOOL checkEnemyAttentionLock() const { return checkResetFlg0(RFLG0_ENEMY_ATTN_LOCK); }
+    BOOL getGrabUpStart() const { return checkResetFlg0(RFLG0_UNK_8000); }
     bool checkCanoeSlider() const { return mSpecialMode == 0x2D; }
     bool checkGoatStopGame() const { return mSpecialMode == 0x2A; }
-    bool onGoatStopGame() { return mSpecialMode = 0x2A; }
+    void onGoatStopGame() { mSpecialMode = 0x2A; }
     u8 getCutType() const { return mCutType; }
     u16 getSwordAtUpTime() const { return mSwordUpTimer; }
     s16 getDamageWaitTimer() const { return mDamageTimer; }
-    bool checkWaterInMove() const { return checkNoResetFlg0(FLG0_UNDERWATER); }
-    bool checkSceneChangeAreaStart() const { return checkNoResetFlg2(FLG2_SCN_CHG_START); }
-    bool checkFrontRollCrash() const { return checkResetFlg0(RFLG0_FRONT_ROLL_CRASH); }
-    bool checkWolfAttackReverse() const { return checkResetFlg1(RFLG1_WOLF_ATTACK_REVERSE); }
-    bool checkFreezeDamage() const { return checkNoResetFlg1(FLG1_ICE_FREEZE); }
-    bool checkWolfTagLockJumpReady() const { return checkResetFlg0(RFLG0_UNK_20000); }
-    bool checkDamageImpact() const { return checkResetFlg1(RFLG1_DAMAGE_IMPACT); }
-    bool getGrabUpEnd() const { return checkResetFlg0(RFLG0_GRAB_UP_END); }
-    bool getGrabPutStart() const { return checkResetFlg0(RFLG0_GRAB_PUT_START); }
-    bool checkSwimUp() const { return checkNoResetFlg0(FLG0_SWIM_UP); }
+    BOOL checkWaterInMove() const { return checkNoResetFlg0(FLG0_UNDERWATER); }
+    BOOL checkSceneChangeAreaStart() const { return checkNoResetFlg2(FLG2_SCN_CHG_START); }
+    BOOL checkFrontRollCrash() const { return checkResetFlg0(RFLG0_FRONT_ROLL_CRASH); }
+    BOOL checkWolfAttackReverse() const { return checkResetFlg1(RFLG1_WOLF_ATTACK_REVERSE); }
+    BOOL checkFreezeDamage() const { return checkNoResetFlg1(FLG1_ICE_FREEZE); }
+    BOOL checkWolfTagLockJumpReady() const { return checkResetFlg0(RFLG0_UNK_20000); }
+    BOOL checkDamageImpact() const { return checkResetFlg1(RFLG1_DAMAGE_IMPACT); }
+    BOOL getGrabUpEnd() const { return checkResetFlg0(RFLG0_GRAB_UP_END); }
+    BOOL getGrabPutStart() const { return checkResetFlg0(RFLG0_GRAB_PUT_START); }
+    BOOL checkSwimUp() const { return checkNoResetFlg0(FLG0_SWIM_UP); }
     BOOL checkHorseZelda() const { return checkNoResetFlg2(FLG2_HORSE_ZELDA); }
     BOOL checkSpecialHorseRide() { return checkNoResetFlg2(daPy_FLG2(FLG2_HORSE_ZELDA | FLG2_UNK_1000000 | FLG2_BOAR_SINGLE_BATTLE)); }
     BOOL checkBoardNoFootAngle() const { return checkResetFlg1(RFLG1_UNK_40); }
-    bool checkGrabThrow() const { return checkResetFlg0(RFLG0_GRAB_THROW); }
-    bool checkMidnaAtnPos() const { return checkNoResetFlg1(FLG1_MIDNA_ATN_POS); }
-    bool checkMidnaHairAtnPos() const { return checkNoResetFlg1(FLG1_MIDNA_HAIR_ATN_POS); }
-    bool checkAttentionLock() const { return checkResetFlg0(RFLG0_UNK_10000); }
+    BOOL checkGrabThrow() const { return checkResetFlg0(RFLG0_GRAB_THROW); }
+    BOOL checkMidnaAtnPos() const { return checkNoResetFlg1(FLG1_MIDNA_ATN_POS); }
+    BOOL checkMidnaHairAtnPos() const { return checkNoResetFlg1(FLG1_MIDNA_HAIR_ATN_POS); }
+    BOOL checkAttentionLock() const { return checkResetFlg0(RFLG0_UNK_10000); }
+    BOOL checkFishingRodUseStart() const { return checkResetFlg1(RFLG1_UNK_80); }
+    BOOL checkFishingRodUseAccept() const { return checkResetFlg1(RFLG1_UNK_200); }
 
     void onBossRoomWait() { onEndResetFlg0(ERFLG0_BOSS_ROOM_WAIT); }
     void onBeeFollow() { onEndResetFlg0(ERFLG0_BEE_FOLLOW); }
     void onForceAutoJump() { onEndResetFlg0(ERFLG0_FORCE_AUTO_JUMP); }
     void onNotAutoJump() { onEndResetFlg0(ERFLG0_NOT_AUTO_JUMP); }
     void onNotHang() { onEndResetFlg0(ERFLG0_NOT_HANG); }
+    void onLeafSe() { onEndResetFlg0(ERFLG0_UNK_200000); }
     void onWolfFchainPull() { onEndResetFlg0(ERFLG0_WOLF_FCHAIN_PULL); }
     void onFishingRodGetFish() { onEndResetFlg0(ERFLG0_FISHING_ROD_GET_FISH); }
+    void onSingleBoarAvoid() { onEndResetFlg0(ERFLG0_SINGLE_BOAR_AVOID); }
     void onShieldBackBone() { onEndResetFlg1(ERFLG1_GANON_FINISH); }
     void onWolfEyeKeep() { onEndResetFlg1(ERFLG1_WOLF_EYE_KEEP); }
     void onPortalWarpMidnaAtnKeep() { onEndResetFlg2(ERFLG2_PORTAL_WARP_MIDNA_ATN_KEEP); }
     void onFogFade() { onNoResetFlg2(FLG2_UNK_4000); }
+    void onDkCaught2() { onNoResetFlg0(FLG0_DK_CAUGHT); }
+    void onFishingRodCastingEnd() { onNoResetFlg1(FLG1_UNK_8000); }
+    void onFishingRodReelEnd() { onEndResetFlg0(ERFLG0_UNK_20000); }
+    void onFishingHit() { onEndResetFlg0(ERFLG0_UNK_10000); }
+    void onFishingKeep() { onEndResetFlg2(ERFLG2_UNK_1); }
+    void onTraningCutHead() { onNoResetFlg3(FLG3_UNK_40); }
+    void onTraningCutFast() { onNoResetFlg3(FLG3_UNK_80); }
+    void onTraningCutLargeJump() { onNoResetFlg3(FLG3_UNK_200); }
+    void onTraningCutLargeTurn() { onNoResetFlg3(FLG3_UNK_100); }
+    void onTraningCutDown() { onNoResetFlg3(FLG3_UNK_10); }
+    void onTraningShieldAttack() { onNoResetFlg3(FLG3_UNK_8); }
+
     BOOL checkStickArrowReset() const { return checkResetFlg0(RFLG0_UNK_1); }
-    u32 getCutAtFlg() const { return checkNoResetFlg0(FLG0_UNK_40); }
-    u32 checkBoarSingleBattleFirst() const { return checkNoResetFlg2(FLG2_BOAR_SINGLE_BATTLE); }
-    u32 checkBoarSingleBattleSecond() const { return checkNoResetFlg2(FLG2_UNK_1000000); }
-    u32 getFootOnGround() const { return checkResetFlg1(daPy_RFLG1(RFLG1_UNK_10 | RFLG1_UNK_20)); }
+    BOOL getCutAtFlg() const { return checkNoResetFlg0(FLG0_UNK_40); }
+    BOOL checkBoarSingleBattleFirst() const { return checkNoResetFlg2(FLG2_BOAR_SINGLE_BATTLE); }
+    BOOL checkBoarSingleBattleSecond() const { return checkNoResetFlg2(FLG2_UNK_1000000); }
+    BOOL getFootOnGround() const { return checkResetFlg1(daPy_RFLG1(RFLG1_UNK_10 | RFLG1_UNK_20)); }
 
     void offWolfEnemyHangBite() { offNoResetFlg2(FLG2_WOLF_ENEMY_HANG_BITE); }
     bool onWolfEnemyHangBite(fopAc_ac_c* param_0) { return onWolfEnemyBiteAll(param_0, FLG2_WOLF_ENEMY_HANG_BITE); }
@@ -949,7 +978,7 @@ public:
     void offHorseZelda() { offNoResetFlg2(FLG2_HORSE_ZELDA); }
     void onHorseZelda() { onNoResetFlg2(FLG2_HORSE_ZELDA); }
 
-    u32 checkItemSightBgHit() const { return checkResetFlg0(RFLG0_UNK_2000000); }
+    BOOL checkItemSightBgHit() const { return checkResetFlg0(RFLG0_UNK_2000000); }
 
     void setCanoeSlider() { mSpecialMode = 0x2D; }
     
@@ -959,6 +988,7 @@ public:
         }
     }
     void onMidnaTalkPolySpeed() { onNoResetFlg3(FLG3_MIDNA_TALK_POLY_SPEED); }
+    void onWarpObjDemo() { onNoResetFlg3(FLG3_WARP_OBJ_DEMO); }
 
     void offCargoCarry() {
         if (checkCargoCarry()) {
@@ -1022,7 +1052,7 @@ public:
     cXyz* getRightHandPosP() { return &mRightHandPos; }
     cXyz* getHeadTopPosP() { return &mHeadTopPos; }
 
-    const cXyz& getSwordTopPos() const { return mSwordTopPos; }
+    const cXyz getSwordTopPos() const { return mSwordTopPos; }
 
     u32 checkWolf() const { return checkNoResetFlg1(FLG1_IS_WOLF); }
     u32 checkEquipHeavyBoots() const { return checkNoResetFlg0(FLG0_EQUIP_HVY_BOOTS); }
@@ -1061,6 +1091,7 @@ public:
     void offDkCaught2() { offNoResetFlg0(FLG0_DK_CAUGHT); }
     void onWaterFallFrontHit() { onEndResetFlg1(ERFLG1_UNK_800); }
     void onCanoeItemCancel() { onEndResetFlg1(ERFLG1_UNK_20000000); }
+    void onSwordTriggerNon() { onEndResetFlg1(ERFLG1_UNK_40000000); }
 
     u32 checkBoarSingleBattle() const { return checkNoResetFlg2(daPy_FLG2(FLG2_UNK_1000000 | FLG2_BOAR_SINGLE_BATTLE)); }
     u32 checkWolfDashAutoJump() const { return checkNoResetFlg2(FLG2_WOLF_DASH_AUTO_JUMP); }
@@ -1081,7 +1112,7 @@ public:
         mDemo.setParam0(i_param1);
     }
 
-    void changeDemoParam1(s16 i_param1) {
+    void changeDemoParam1(int i_param1) {
         mDemo.setParam1(i_param1);
     }
 
@@ -1099,8 +1130,10 @@ public:
 
     static bool checkPeepEndSceneChange() { return getLastSceneMode() == 7; }
 
+    static bool checkWolfCargoCarrySceneChange() { return getLastSceneMode() == 10; }
+
     static int getLastSceneDamage() { return (dComIfGs_getLastSceneMode() >> 4) & 0x7F; }
-    static u8 getLastSceneSwordAtUpTime() { return (dComIfGs_getLastSceneMode() >> 11) & 0xFF; }
+    static u32 getLastSceneSwordAtUpTime() { return (dComIfGs_getLastSceneMode() >> 11) & 0xFF; }
 
     static BOOL checkNormalSwordEquip() { return dComIfGs_getSelectEquipSword() == fpcNm_ITEM_SWORD; }
 
@@ -1130,18 +1163,16 @@ public:
         return dComIfGs_getSelectEquipClothes() == fpcNm_ITEM_ARMOR;
     }
 
+                                               /* dSv_event_flag_c::M_067 - Main Event - Midna riding / not riding (ON == riding) */
     static BOOL checkFirstMidnaDemo() { return dComIfGs_isEventBit(0xc10); }
     static int checkNowWolfPowerUp() { return checkNowWolfEyeUp(); }
 
     static daMidna_c* getMidnaActor() { return m_midnaActor; }
     static void setMidnaActor(fopAc_ac_c* actor) { m_midnaActor = (daMidna_c*)actor; }
 
-    // not sure how to define this properly
-    // static void onWolfEnemyCatch(fopAc_ac_c* i_actorP) { onWolfEnemyBiteAll(i_actorP,8);}
-
-    bool checkWolfEnemyCatchOwn(fopAc_ac_c* i_actorP) { return checkWolfEnemyBiteAllOwn(i_actorP); }
-    bool checkWolfEnemyHangBiteOwn(fopAc_ac_c* i_actorP) const { return checkWolfEnemyBiteAllOwn(i_actorP); }
-    bool checkWolfEnemyLeftThrow() const { return checkNoResetFlg2(FLG2_WOLF_ENEMY_LEFT_THROW); }
+    BOOL checkWolfEnemyCatchOwn(fopAc_ac_c* i_actorP) { return checkWolfEnemyBiteAllOwn(i_actorP); }
+    BOOL checkWolfEnemyHangBiteOwn(const fopAc_ac_c* i_actorP) const { return checkWolfEnemyBiteAllOwn(i_actorP); }
+    BOOL checkWolfEnemyLeftThrow() const { return checkNoResetFlg2(FLG2_WOLF_ENEMY_LEFT_THROW); }
 
     void onWolfLightDropGet() {
         onEndResetFlg0(ERFLG0_UNK_20000000);
@@ -1173,8 +1204,65 @@ public:
     void onForceGrabRebound() {
         onEndResetFlg2(ERFLG2_UNK_8);
     }
+
+    void setSumouReadyAcceptButton() { mSpecialMode = 2; }
+    void setSumouForceStand() { mSpecialMode = 3; }
+    void setSumouPushFrontStop() { mSpecialMode = 9; }
+    void setSumouPunchWinEnd() { mSpecialMode = 0xB; }
+    void setSumouPunchLoseEnd() { mSpecialMode = 0xC; }
+    void setSumouMoveWinEnd() { mSpecialMode = 0xD; }
+    void setSumouMoveLoseEnd() { mSpecialMode = 0xE; }
+    void setSumouForcePunch() {
+        if (mSpecialMode == 0x1F) {
+            mSpecialMode = 0x21;
+        } else {
+            mSpecialMode = 0x1C;
+        }
+    }
+    void setSumouForceTackle() { mSpecialMode = 0x1B; }
+    void setSumouForceGraspCancel() { mSpecialMode = 0x24; }
+
+    bool checkSumouPushFront() const { return mSpecialMode == 7; }
+    bool checkSumouPushBack() const { return mSpecialMode == 8; }
+    bool checkSumouTackleSuccess() const { return mSpecialMode == 0xF; }
+    bool checkSumouTackleSuccessPunch() const { return mSpecialMode == 0x10; }
+    bool checkSumouTackleMiss() const { return mSpecialMode == 0x11; }
+    bool checkSumouTackleDraw() const { return mSpecialMode == 0x12; }
+    bool checkSumouPunchSuccess() const { return mSpecialMode == 0x13; }
+    bool checkSumouPunchMiss() const { return mSpecialMode == 0x14; }
+    bool checkSumouPunchDraw() const { return mSpecialMode == 0x15; }
+    bool checkSumouWait() const { return mSpecialMode == 0x16; }
+    bool checkSumouLeftMove() const { return mSpecialMode == 0x17; }
+    bool checkSumouRightMove() const { return mSpecialMode == 0x18; }
+    bool checkSumouSlideLeft() const { return mSpecialMode == 0x19; }
+    bool checkSumouSlideRight() const { return mSpecialMode == 0x1A; }
+    bool checkSumouPunchStagger() const { return mSpecialMode == 0x1F; }
+    bool checkSumouTackleStagger() const { return mSpecialMode == 0x20; }
+    bool checkSumouGraspRelease() const { return mSpecialMode == 0x23; }
+
+    void onHeavyState() { onNoResetFlg0(FLG0_UNK_40000000); }
+    void onHeavyStateMidnaPanic() {
+        onHeavyState();
+        onEndResetFlg1(ERFLG1_UNK_40000);
+    }
+
+    BOOL checkInsectRelease() { return checkResetFlg1(RFLG1_UNK_100); }
+
+    void onChainForcePull() { onEndResetFlg1(ERFLG1_UNK_1000000); }
+    void onChainPullEnd() { onEndResetFlg1(ERFLG1_UNK_2000000); }
+
+    void onWaterDrop() { onEndResetFlg1(ERFLG1_UNK_20000); }
+    void forceKandelaarLightOff() { onNoResetFlg2(FLG2_UNK_10000000); }
 };
 
 int daPy_addCalcShort(s16* param_0, s16 param_1, s16 param_2, s16 param_3, s16 param_4);
+
+inline daPy_py_c* daPy_getPlayerActorClass() {
+    return (daPy_py_c*)dComIfGp_getPlayer(0);
+}
+
+inline daPy_py_c* daPy_getLinkPlayerActorClass() {
+    return dComIfGp_getLinkPlayer();
+}
 
 #endif /* D_A_D_A_PLAYER_H */

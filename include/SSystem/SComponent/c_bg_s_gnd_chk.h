@@ -7,12 +7,12 @@
 
 class cBgS_GndChk : public cBgS_Chk, public cBgS_PolyInfo {
 public:
-    /* 80267C1C */ cBgS_GndChk();
-    /* 80267D28 */ void SetPos(cXyz const*);
-    /* 80267D0C */ void SetPos(Vec const*);
-    /* 80267D44 */ void PreCheck();
+    cBgS_GndChk();
+    void SetPos(cXyz const*);
+    void SetPos(Vec const*);
+    void PreCheck();
 
-    /* 80267C94 */ virtual ~cBgS_GndChk();
+    virtual ~cBgS_GndChk();
 
     f32 GetNowY() const { return mNowY; }
     void SetNowY(f32 y) { mNowY = y; }
@@ -24,6 +24,6 @@ public:
     /* 0x30 */ u32 mFlags;
     /* 0x34 */ f32 mNowY;
     /* 0x38 */ u32 mWallPrecheck;
-};
+}; // size 0x3C
 
 #endif /* C_BG_S_GND_CHK_H */

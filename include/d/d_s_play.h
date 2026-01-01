@@ -15,26 +15,30 @@ public:
     /* 0x7C */ s16 mShortReg[10];
 };
 
-class dScnPly_reg_HIO_c {
+class dScnPly_reg_HIO_c : public JORReflexible {
 public:
-    /* 8025AD78 */ virtual ~dScnPly_reg_HIO_c() {}
+    virtual ~dScnPly_reg_HIO_c() {}
 
-    /* 0x4 */ u8 field_0x4[0x8 - 0x4];
-#ifdef DEBUG
+#if ENABLE_REGHIO
+    void genMessage(JORMContext*);
+
+    /* 0x4 */ s8 id;
     /* 0x8 */ dScnPly_reg_childHIO_c mChildReg[26];
+#else
+    /* 0x4 */ u8 field_0x4[0x8 - 0x4];
 #endif
 };
 
 class dScnPly_preLoad_HIO_c : public mDoHIO_entry_c {
 public:
-    /* 8025ADC0 */ virtual ~dScnPly_preLoad_HIO_c() {}
+    virtual ~dScnPly_preLoad_HIO_c() {}
 
     void genMessage(JORMContext*);
 };
 
 class dScnPly_env_HIO_c {
 public:
-    /* 8025AD04 */ virtual ~dScnPly_env_HIO_c() {}
+    virtual ~dScnPly_env_HIO_c() {}
 
     /* 0x04 */ s8 field_0x4;
     /* 0x08 */ dScnPly_env_otherHIO_c mOther;
@@ -50,19 +54,19 @@ public:
     virtual void genMessage(JORMContext*);
     virtual ~dScnPly_preset_HIO_c() {}
 
-    /* 0x0004 */ u8 field_0x4;
+    /* 0x0004 */ s8 field_0x4;
     /* 0x0005 */ u8 field_0x5;
     /* 0x0006 */ u8 mPresetData[10000];
     /* 0x2716 */ u8 field_0x2716;
     /* 0x2717 */ u8 field_0x2717;
-    /* 0x2718 */ char mFilename[100];
+    /* 0x2718 */ u8 filename_buf[100];
 };
 
 class dScnPly_c : public scene_class {
 public:
-    /* 80259400 */ s8 calcPauseTimer();
-    /* 80259AC4 */ bool resetGame();
-    /* 80259BFC */ void offReset();
+    s8 calcPauseTimer();
+    bool resetGame();
+    void offReset();
 
     static bool isPause() { return pauseTimer == 0; }
     static void setPauseTimer(s8 time) { nextPauseTimer = time; }
@@ -79,7 +83,7 @@ public:
 extern dScnPly_env_HIO_c g_envHIO;
 extern dScnPly_reg_HIO_c g_regHIO;
 
-#ifdef DEBUG
+#if DEBUG
 extern dScnPly_preset_HIO_c g_presetHIO;
 #endif
 
@@ -91,7 +95,7 @@ extern dScnPly_preset_HIO_c g_presetHIO;
  * Float Reg(25-29) ... -1.0 - +1.0
  */
 
-#ifdef DEBUG
+#if ENABLE_REGHIO
 // Morita
 #define TREG_F(i) g_regHIO.mChildReg[0].mFloatReg[i]
 #define TREG_S(i) g_regHIO.mChildReg[0].mShortReg[i]

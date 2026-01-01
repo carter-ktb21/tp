@@ -3,6 +3,8 @@
  * 
 */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_b_bh.h"
 #include "d/actor/d_a_b_bq.h"
 #include "d/d_bomb.h"
@@ -22,18 +24,27 @@
 #define ACTION_B_DOWN     23
 #define ACTION_START      50
 
-#define ANM_ATTACK      5
-#define ANM_ATTACK_WAIT 6
-#define ANM_DAMAGE      7
-#define ANM_EAT         8
-#define ANM_EAT_WAIT    9
-#define ANM_NO_DAMAGE   10
-#define ANM_ROUT        11
-#define ANM_WAIT        12
-#define ANM_WAIT01      13
-#define ANM_WAIT02      14
+enum B_BH_RES_FILE_ID {
+    /* BCK */
+    /* 0x05 */ BCK_BH_ATTACK = 5,
+    /* 0x06 */ BCK_BH_ATTACKWAIT,
+    /* 0x07 */ BCK_BH_DAMAGE,
+    /* 0x08 */ BCK_BH_EAT,
+    /* 0x09 */ BCK_BH_EATWAIT,
+    /* 0x0A */ BCK_BH_NODAMAGE,
+    /* 0x0B */ BCK_BH_ROUT,
+    /* 0x0C */ BCK_BH_WAIT,
+    /* 0x0D */ BCK_BH_WAIT01,
+    /* 0x0E */ BCK_BH_WAIT02,
 
-/* 805AE26C-805AE2A4 0000EC 0038+00 1/1 0/0 0/0 .text            __ct__12daB_BH_HIO_cFv */
+    /* BMDR */
+    /* 0x11 */ BMDR_BH_KUKI = 0x11,
+    /* 0x12 */ BMDR_BH_LEAF,
+
+    /* BMDV */
+    /* 0x15 */ BMDV_BH = 0x15,
+};
+
 daB_BH_HIO_c::daB_BH_HIO_c() {
     no = -1;
     model_size = 1.25f;
@@ -42,7 +53,7 @@ daB_BH_HIO_c::daB_BH_HIO_c() {
     down_revive_time = 250;
 }
 
-#ifdef DEBUG
+#if DEBUG
 void daB_BH_HIO_c::genMessage(JORMContext* ctx) {
     ctx->genLabel("  ボスデグババ手", 0x80000001, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
     ctx->genSlider("本体サイズ", &model_size, 0.0f, 5.0f, 0, NULL, 0xFFFF, 0xFFFF, 512, 24);
@@ -52,13 +63,11 @@ void daB_BH_HIO_c::genMessage(JORMContext* ctx) {
 }
 #endif
 
-/* 805AE2A4-805AE350 000124 00AC+00 10/10 0/0 0/0 .text            anm_init__FP10b_bh_classifUcf */
 static void anm_init(b_bh_class* i_this, int i_anmID, f32 i_morf, u8 i_attr, f32 i_speed) {
     i_this->mpModelMorf->setAnm((J3DAnmTransform*)dComIfG_getObjectRes("B_BH", i_anmID), i_attr, i_morf, i_speed, 0.0f, -1.0f);
     i_this->mAnm = i_anmID;
 }
 
-/* 805AE350-805AE430 0001D0 00E0+00 1/0 0/0 0/0 .text            daB_BH_Draw__FP10b_bh_class */
 static int daB_BH_Draw(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -85,18 +94,13 @@ static int daB_BH_Draw(b_bh_class* i_this) {
     return 1;
 }
 
-UNK_REL_BSS;
-
 /* 805B33ED 0003+00 data_805B33ED None */
-static u8 l_initHIO;
+static u8 hio_set;
 
-/* 805B33FC-805B3414 000054 0018+00 10/11 0/0 0/0 .bss             l_HIO */
 static daB_BH_HIO_c l_HIO;
 
-/* 805B3414-805B341C 00006C 0008+00 2/3 0/0 0/0 .bss             bh */
 static b_bh_class* bh[2];
 
-/* 805AE430-805AEB04 0002B0 06D4+00 1/1 0/0 0/0 .text            b_bh_wait__FP10b_bh_class */
 static void b_bh_wait(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -122,7 +126,7 @@ static void b_bh_wait(b_bh_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_WAIT, 10.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_WAIT, 10.0f, 2, 1.0f);
         i_this->mMode = 1;
         if (a_this->health <= 1) {
             i_this->mTimers[1] = ((f32)l_HIO.attack_freq_a / 2) + cM_rndF((f32)l_HIO.attack_freq_a / 2);
@@ -198,7 +202,6 @@ static void b_bh_wait(b_bh_class* i_this) {
     fopAcM_effHamonSet(&i_this->field_0xf24, &pos, 3.5f + KREG_F(12), 0.05f);
 }
 
-/* 805AEB40-805AEF78 0009C0 0438+00 1/1 0/0 0/0 .text            b_bh_attack_1__FP10b_bh_class */
 static void b_bh_attack_1(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -209,7 +212,7 @@ static void b_bh_attack_1(b_bh_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_ATTACK_WAIT, 5.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_ATTACKWAIT, 5.0f, 2, 1.0f);
         i_this->mMode = 2;
         i_this->mTimers[0] = NREG_S(0) + 35;
 
@@ -221,7 +224,7 @@ static void b_bh_attack_1(b_bh_class* i_this) {
         break;
     case 2:
         if (i_this->mTimers[0] == NREG_S(4) + 8) {
-            anm_init(i_this, ANM_ATTACK, 3.0f, 0, 1.0f);
+            anm_init(i_this, BCK_BH_ATTACK, 3.0f, 0, 1.0f);
         }
 
         a_this->current.angle.y = i_this->field_0x684;
@@ -279,8 +282,8 @@ static void b_bh_attack_1(b_bh_class* i_this) {
         break;
     }
 
-    if (i_this->mAnm == ANM_ATTACK && i_this->mpModelMorf->isStop()) {
-        anm_init(i_this, ANM_WAIT02, 5.0f, 2, 1.0f);
+    if (i_this->mAnm == BCK_BH_ATTACK && i_this->mpModelMorf->isStop()) {
+        anm_init(i_this, BCK_BH_WAIT02, 5.0f, 2, 1.0f);
     }
 
     cLib_addCalc2(&a_this->speedF, target_speed, 1.0f, var_f30);
@@ -292,14 +295,13 @@ static void b_bh_attack_1(b_bh_class* i_this) {
     cLib_addCalcAngleS2(&a_this->shape_angle.x, a_this->current.angle.x, 8, 0x400);
 }
 
-/* 805AEF78-805AF1F8 000DF8 0280+00 1/1 0/0 0/0 .text            b_bh_bombeat__FP10b_bh_class */
 static void b_bh_bombeat(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     b_bq_class* bq_p = (b_bq_class*)fopAcM_SearchByID(a_this->parentActorID);
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_EAT, 3.0f, 0, 1.0f);
+        anm_init(i_this, BCK_BH_EAT, 3.0f, 0, 1.0f);
         i_this->mMode = 1;
         i_this->mSound.startCreatureVoice(Z2SE_EN_BH_V_EAT, -1);
 
@@ -313,7 +315,7 @@ static void b_bh_bombeat(b_bh_class* i_this) {
         break;
     case 1:
         if (i_this->mpModelMorf->isStop()) {
-            anm_init(i_this, ANM_EAT_WAIT, 1.0f, 2, 1.0f);
+            anm_init(i_this, BCK_BH_EATWAIT, 1.0f, 2, 1.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = 40;
         }
@@ -321,7 +323,7 @@ static void b_bh_bombeat(b_bh_class* i_this) {
     case 2:
         if (i_this->mTimers[0] == 0) {
             i_this->mMode = 3;
-            anm_init(i_this, ANM_DAMAGE, 1.0f, 0, 1.0f);
+            anm_init(i_this, BCK_BH_DAMAGE, 1.0f, 0, 1.0f);
             i_this->field_0x90c = 2;
             i_this->field_0xf22 = 1;
 
@@ -344,7 +346,6 @@ static void b_bh_bombeat(b_bh_class* i_this) {
     }
 }
 
-/* 805AF1F8-805AF6E0 001078 04E8+00 1/1 0/0 0/0 .text            b_bh_down__FP10b_bh_class */
 static s8 b_bh_down(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     b_bq_class* bq_p = (b_bq_class*)fopAcM_SearchByID(i_this->parentActorID);
@@ -353,10 +354,11 @@ static s8 b_bh_down(b_bh_class* i_this) {
     s8 sp8 = 0;
     cXyz sp20 = i_this->field_0x6b0 - a_this->current.pos;
     sp20.y = 0.0f;
+    f32 temp_f31;
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_ROUT, 1.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_ROUT, 1.0f, 2, 1.0f);
         i_this->field_0x690 = 0.0f;
         i_this->mMode = 1;
         i_this->mTimers[0] = 200;
@@ -370,7 +372,7 @@ static s8 b_bh_down(b_bh_class* i_this) {
             i_this->mSound.startCreatureVoiceLevel(Z2SE_EN_BH_V_ROUT, -1);
         }
 
-        f32 temp_f31 = 100.0f + JREG_F(0);
+        temp_f31 = 100.0f + JREG_F(0);
         sp2C.x = temp_f31 * cM_ssin(i_this->field_0x668 * (TREG_S(0) + 900));
         sp2C.z = temp_f31 * cM_scos(i_this->field_0x668 * (TREG_S(2) + 1000));
 
@@ -416,7 +418,7 @@ static s8 b_bh_down(b_bh_class* i_this) {
             a_this->current.pos.z = i_this->mBasePos.z;
             a_this->health = 3;
 
-            anm_init(i_this, ANM_WAIT, 10.0f, 2, 1.0f);
+            anm_init(i_this, BCK_BH_WAIT, 10.0f, 2, 1.0f);
             i_this->mAction = ACTION_B_WAIT;
             i_this->mMode = 1;
 
@@ -439,7 +441,6 @@ static s8 b_bh_down(b_bh_class* i_this) {
     return sp8;
 }
 
-/* 805AF6E0-805AFCA8 001560 05C8+00 1/1 0/0 0/0 .text            b_bh_b_wait__FP10b_bh_class */
 static void b_bh_b_wait(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     b_bq_class* bq_p = (b_bq_class*)fopAcM_SearchByID(a_this->parentActorID);
@@ -473,7 +474,7 @@ static void b_bh_b_wait(b_bh_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_WAIT, 10.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_WAIT, 10.0f, 2, 1.0f);
         i_this->mMode = 1;
         i_this->mTimers[1] = l_HIO.attack_freq_b + cM_rndF(l_HIO.attack_freq_b);
         break;
@@ -528,7 +529,6 @@ static void b_bh_b_wait(b_bh_class* i_this) {
     cLib_addCalcAngleS2(&a_this->shape_angle.x, i_this->field_0x686, 8, 0x400);
 }
 
-/* 805AFCA8-805B00A8 001B28 0400+00 1/1 0/0 0/0 .text            b_bh_b_attack_1__FP10b_bh_class */
 static void b_bh_b_attack_1(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     b_bq_class* bq_p = (b_bq_class*)fopAcM_SearchByID(a_this->parentActorID);
@@ -540,14 +540,14 @@ static void b_bh_b_attack_1(b_bh_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_ATTACK_WAIT, 5.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_ATTACKWAIT, 5.0f, 2, 1.0f);
         i_this->mMode = 2;
         i_this->mTimers[0] = NREG_S(0) + 35;
         i_this->mSound.startCreatureVoice(Z2SE_EN_BH_V_ATTACK, -1);
         break;
     case 2:
         if (i_this->mTimers[0] == NREG_S(4) + 8) {
-            anm_init(i_this, ANM_ATTACK, 3.0f, 0, 1.0f);
+            anm_init(i_this, BCK_BH_ATTACK, 3.0f, 0, 1.0f);
         }
 
         a_this->current.angle.y = i_this->field_0x684;
@@ -600,8 +600,8 @@ static void b_bh_b_attack_1(b_bh_class* i_this) {
         break;
     }
 
-    if (i_this->mAnm == ANM_ATTACK && i_this->mpModelMorf->isStop()) {
-        anm_init(i_this, ANM_WAIT02, 5.0f, 2, 1.0f);
+    if (i_this->mAnm == BCK_BH_ATTACK && i_this->mpModelMorf->isStop()) {
+        anm_init(i_this, BCK_BH_WAIT02, 5.0f, 2, 1.0f);
     }
 
     cLib_addCalc2(&a_this->speedF, target_speed, 1.0f, speed_step);
@@ -613,19 +613,18 @@ static void b_bh_b_attack_1(b_bh_class* i_this) {
     cLib_addCalcAngleS2(&a_this->shape_angle.x, a_this->current.angle.x, 8, 0x400);
 }
 
-/* 805B00A8-805B0274 001F28 01CC+00 1/1 0/0 0/0 .text            b_bh_b_bombeat__FP10b_bh_class */
 static void b_bh_b_bombeat(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_EAT, 3.0f, 0, 1.0f);
+        anm_init(i_this, BCK_BH_EAT, 3.0f, 0, 1.0f);
         i_this->mSound.startCreatureVoice(Z2SE_EN_BH_V_EAT, -1);
         i_this->mMode = 1;
         break;
     case 1:
         if (i_this->mpModelMorf->isStop()) {
-            anm_init(i_this, ANM_EAT_WAIT, 1.0f, 2, 1.0f);
+            anm_init(i_this, BCK_BH_EATWAIT, 1.0f, 2, 1.0f);
             i_this->mMode = 2;
             i_this->mTimers[0] = 60;
         }
@@ -633,7 +632,7 @@ static void b_bh_b_bombeat(b_bh_class* i_this) {
     case 2:
         if (i_this->mTimers[0] == 0) {
             i_this->mMode = 3;
-            anm_init(i_this, ANM_DAMAGE, 1.0f, 0, 1.0f);
+            anm_init(i_this, BCK_BH_DAMAGE, 1.0f, 0, 1.0f);
             i_this->field_0x90c = 2;
             i_this->field_0xf22 = 1;
             i_this->mTimers[0] = 20;
@@ -655,7 +654,6 @@ static void b_bh_b_bombeat(b_bh_class* i_this) {
     }
 }
 
-/* 805B0274-805B060C 0020F4 0398+00 1/1 0/0 0/0 .text            b_bh_b_down__FP10b_bh_class */
 static s8 b_bh_b_down(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     b_bq_class* bq_p = (b_bq_class*)fopAcM_SearchByID(i_this->parentActorID);
@@ -664,10 +662,11 @@ static s8 b_bh_b_down(b_bh_class* i_this) {
     s8 var_r27 = 0;
     cXyz spC = i_this->field_0x6b0 - i_this->current.pos;
     spC.y = 0.0f;
+    f32 temp_f31;
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_ROUT, 1.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_ROUT, 1.0f, 2, 1.0f);
         i_this->field_0x690 = 0.0f;
         i_this->mMode = 1;
         i_this->mTimers[0] = 200;
@@ -681,7 +680,7 @@ static s8 b_bh_b_down(b_bh_class* i_this) {
             i_this->mSound.startCreatureVoiceLevel(Z2SE_EN_BH_V_ROUT, -1);
         }
 
-        f32 temp_f31 = 100.0f + JREG_F(0);
+        temp_f31 = 100.0f + JREG_F(0);
         sp18.x = temp_f31 * cM_ssin(i_this->field_0x668 * (TREG_S(0) + 900));
         sp18.z = temp_f31 * cM_scos(i_this->field_0x668 * (TREG_S(2) + 1000));
 
@@ -723,7 +722,6 @@ static s8 b_bh_b_down(b_bh_class* i_this) {
     return var_r27;
 }
 
-/* 805B060C-805B0B04 00248C 04F8+00 1/1 0/0 0/0 .text            b_bh_start__FP10b_bh_class */
 static void b_bh_start(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -735,7 +733,7 @@ static void b_bh_start(b_bh_class* i_this) {
 
     switch (i_this->mMode) {
     case 0:
-        anm_init(i_this, ANM_WAIT, 10.0f, 2, 1.0f);
+        anm_init(i_this, BCK_BH_WAIT, 10.0f, 2, 1.0f);
         if (i_this->mID != 0) {
             i_this->mpModelMorf->setFrame(10.0f);
         }
@@ -818,7 +816,6 @@ static void b_bh_start(b_bh_class* i_this) {
     }
 }
 
-/* 805B0B04-805B0D6C 002984 0268+00 1/1 0/0 0/0 .text            kuki_control1__FP10b_bh_class */
 static void kuki_control1(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -875,7 +872,6 @@ static void kuki_control1(b_bh_class* i_this) {
     }
 }
 
-/* 805B0D6C-805B0EE0 002BEC 0174+00 1/1 0/0 0/0 .text            kuki_control2__FP10b_bh_class */
 static void kuki_control2(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -913,7 +909,6 @@ static void kuki_control2(b_bh_class* i_this) {
     }
 }
 
-/* 805B0EE0-805B10AC 002D60 01CC+00 1/1 0/0 0/0 .text            kuki_control3__FP10b_bh_class */
 static void kuki_control3(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -929,7 +924,6 @@ static void kuki_control3(b_bh_class* i_this) {
     i_this->field_0xa20 = sp20.abs();
 }
 
-/* 805B10AC-805B1254 002F2C 01A8+00 1/1 0/0 0/0 .text            s_b_sub__FPvPv */
 static void* s_b_sub(void* i_actor, void* i_data) {
     if (fopAcM_IsActor(i_actor) && dBomb_c::checkBombActor((fopAc_ac_c*)i_actor) && !((dBomb_c*)i_actor)->checkStateExplode() && !dComIfGp_event_runCheck()) {
         cXyz vec_bomb_to_bh = ((fopAc_ac_c*)i_actor)->current.pos - ((fopAc_ac_c*)i_data)->eyePos;
@@ -942,7 +936,6 @@ static void* s_b_sub(void* i_actor, void* i_data) {
     return NULL;
 }
 
-/* 805B1254-805B15A8 0030D4 0354+00 1/1 0/0 0/0 .text            damage_check__FP10b_bh_class */
 static void damage_check(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
@@ -959,7 +952,7 @@ static void damage_check(b_bh_class* i_this) {
         i_this->mMode = 1;
         i_this->mTimers[1] = l_HIO.attack_freq_a + cM_rndF(l_HIO.attack_freq_a);
         i_this->mTimers[0] = 0;
-        anm_init(i_this, ANM_NO_DAMAGE, 3.0f, 0, 1.0f);
+        anm_init(i_this, BCK_BH_NODAMAGE, 3.0f, 0, 1.0f);
         i_this->mSound.startCreatureVoice(Z2SE_EN_BH_V_NODAMAGE, -1);
         dComIfGp_getVibration().StartShock(VIBMODE_S_POWER8, 0x1F, cXyz(0.0f, 1.0f, 0.0f));
     } else {
@@ -969,17 +962,12 @@ static void damage_check(b_bh_class* i_this) {
         if (i_this->field_0xa24 != 0) {
             i_this->mCcSph.OffCoSetBit();
 
-            if (fpcM_Search(s_b_sub, i_this)
-#ifdef DEBUG
-                || mDoCPd_c::getTrigA(PAD_3)
-#endif
-               )
-            {
+            if (fpcM_Search(s_b_sub, i_this) || (DEBUG && mDoCPd_c::getTrigA(PAD_3))) {
                 if (i_this->field_0xa25 != 0) {
                     i_this->mAction = ACTION_B_BOMB_EAT;
                     dComIfGs_onOneZoneSwitch(14, -1);
                 } else {
-#ifdef DEBUG
+#if DEBUG
                     if (mDoCPd_c::getTrigA(PAD_3)) {
                         b_bq_class* var_r25 = (b_bq_class*)fopAcM_SearchByID(a_this->parentActorID);
                         var_r25->field_0x6fd = 1;
@@ -1015,18 +1003,17 @@ static void damage_check(b_bh_class* i_this) {
             def_se_set(&i_this->mSound, i_this->mAtInfo.mpCollider, 0x2D, NULL);
 
             if (i_this->mAction != ACTION_BOMB_EAT && i_this->mAction != ACTION_B_BOMB_EAT) {
-                anm_init(i_this, ANM_NO_DAMAGE, 3.0f, 0, 1.0f);
+                anm_init(i_this, BCK_BH_NODAMAGE, 3.0f, 0, 1.0f);
                 i_this->mSound.startCreatureVoice(Z2SE_EN_BH_V_NODAMAGE, -1);
             }
         }
 
-        if (i_this->mAnm == ANM_NO_DAMAGE && i_this->mpModelMorf->isStop()) {
-            anm_init(i_this, ANM_WAIT, 10.0f, 2, 1.0f);
+        if (i_this->mAnm == BCK_BH_NODAMAGE && i_this->mpModelMorf->isStop()) {
+            anm_init(i_this, BCK_BH_WAIT, 10.0f, 2, 1.0f);
         }
     }
 }
 
-/* 805B15A8-805B1F4C 003428 09A4+00 1/1 0/0 0/0 .text            action__FP10b_bh_class */
 static void action(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -1147,7 +1134,7 @@ static void action(b_bh_class* i_this) {
 
     if (spC != 0) {
         fopAcM_OnStatus(a_this, 0);
-        a_this->attention_info.flags = 4;
+        a_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
     } else {
         fopAcM_OffStatus(a_this, 0);
         a_this->attention_info.flags = 0;
@@ -1202,12 +1189,11 @@ static void action(b_bh_class* i_this) {
     }
 }
 
-/* 805B1F4C-805B2110 003DCC 01C4+00 1/1 0/0 0/0 .text            anm_se_set__FP10b_bh_class */
 static void anm_se_set(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
 
     f32 particle_target_size = 0.0f;
-    if (i_this->mAnm == ANM_WAIT && a_this->current.pos.y > 50.0f) {
+    if (i_this->mAnm == BCK_BH_WAIT && a_this->current.pos.y > 50.0f) {
         particle_target_size = 1.0f;
     }
 
@@ -1235,7 +1221,6 @@ static void anm_se_set(b_bh_class* i_this) {
     }
 }
 
-/* 805B2110-805B2840 003F90 0730+00 2/1 0/0 0/0 .text            daB_BH_Execute__FP10b_bh_class */
 static int daB_BH_Execute(b_bh_class* i_this) {
     if (cDmrNowMidnaTalk()) {
         return 1;
@@ -1419,19 +1404,17 @@ static int daB_BH_Execute(b_bh_class* i_this) {
     return 1;
 }
 
-/* 805B2840-805B2848 0046C0 0008+00 1/0 0/0 0/0 .text            daB_BH_IsDelete__FP10b_bh_class */
 static int daB_BH_IsDelete(b_bh_class* i_this) {
     return 1;
 }
 
-/* 805B2848-805B28B0 0046C8 0068+00 1/0 0/0 0/0 .text            daB_BH_Delete__FP10b_bh_class */
 static int daB_BH_Delete(b_bh_class* i_this) {
     fopAc_ac_c* a_this = (fopAc_ac_c*)i_this;
     fpc_ProcID id = fopAcM_GetID(a_this);
     
     dComIfG_resDelete(&i_this->mPhase, "B_BH");
     if (i_this->mInitHIO) {
-        l_initHIO = FALSE;
+        hio_set = FALSE;
         mDoHIO_DELETE_CHILD(l_HIO.no);
     }
 
@@ -1442,17 +1425,16 @@ static int daB_BH_Delete(b_bh_class* i_this) {
     return 1;
 }
 
-/* 805B28B0-805B2AF8 004730 0248+00 1/1 0/0 0/0 .text            useHeapInit__FP10fopAc_ac_c */
 static int useHeapInit(fopAc_ac_c* i_this) {
     b_bh_class* a_this = (b_bh_class*)i_this;
 
-    a_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes("B_BH", 0x15), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_BH", 12), 2, 1.0f, 0, -1, &a_this->mSound, 0, 0x11000084);
+    a_this->mpModelMorf = new mDoExt_McaMorfSO((J3DModelData*)dComIfG_getObjectRes("B_BH", BMDV_BH), NULL, NULL, (J3DAnmTransform*)dComIfG_getObjectRes("B_BH", 12), 2, 1.0f, 0, -1, &a_this->mSound, 0, 0x11000084);
     if (a_this->mpModelMorf == NULL || a_this->mpModelMorf->getModel() == NULL) {
         return 0;
     }
 
-    void* modelData = dComIfG_getObjectRes("B_BH", 0x11);
-    JUT_ASSERT(2475, modelData != 0);
+    void* modelData = dComIfG_getObjectRes("B_BH", BMDR_BH_KUKI);
+    JUT_ASSERT(2475, modelData != NULL);
 
     for (int i = 0; i < 17; i++) {
         a_this->mpStemModels[i] = mDoExt_J3DModel__create((J3DModelData*)modelData, 0x80000, 0x11000084);
@@ -1463,8 +1445,8 @@ static int useHeapInit(fopAc_ac_c* i_this) {
         a_this->field_0x88c[i] = 1.0f;
     }
 
-    modelData = dComIfG_getObjectRes("B_BH", 0x12);
-    JUT_ASSERT(2491, modelData != 0);
+    modelData = dComIfG_getObjectRes("B_BH", BMDR_BH_LEAF);
+    JUT_ASSERT(2491, modelData != NULL);
 
     for (int i = 0; i < 17; i++) {
         if ((i & 3) == 2) {
@@ -1482,10 +1464,9 @@ static int useHeapInit(fopAc_ac_c* i_this) {
     return 1;
 }
 
-/* 805B2AF8-805B2F54 004978 045C+00 1/0 0/0 0/0 .text            daB_BH_Create__FP10fopAc_ac_c */
 static int daB_BH_Create(fopAc_ac_c* i_this) {
     b_bh_class* a_this = (b_bh_class*)i_this;
-    fopAcM_SetupActor(a_this, b_bh_class);
+    fopAcM_ct(a_this, b_bh_class);
 
     int phase_state = dComIfG_resLoad(&a_this->mPhase, "B_BH");
     if (phase_state == cPhs_COMPLEATE_e) {
@@ -1508,13 +1489,13 @@ static int daB_BH_Create(fopAc_ac_c* i_this) {
 
         OS_REPORT("//////////////B_BH SET 2 !!\n");
 
-        if (!l_initHIO) {
+        if (!hio_set) {
             a_this->mInitHIO = TRUE;
-            l_initHIO = TRUE;
+            hio_set = TRUE;
             l_HIO.no = mDoHIO_CREATE_CHILD("ボスババ触手", &l_HIO);
         }
 
-        i_this->attention_info.flags = 4;
+        i_this->attention_info.flags = fopAc_AttnFlag_BATTLE_e;
         i_this->health = 1;
         i_this->field_0x560 = 1;
 
@@ -1588,7 +1569,6 @@ static int daB_BH_Create(fopAc_ac_c* i_this) {
     return phase_state;
 }
 
-/* 805B330C-805B332C -00001 0020+00 1/0 0/0 0/0 .data            l_daB_BH_Method */
 static actor_method_class l_daB_BH_Method = {
     (process_method_func)daB_BH_Create,
     (process_method_func)daB_BH_Delete,
@@ -1597,7 +1577,6 @@ static actor_method_class l_daB_BH_Method = {
     (process_method_func)daB_BH_Draw,
 };
 
-/* 805B332C-805B335C -00001 0030+00 0/0 0/0 1/0 .data            g_profile_B_BH */
 extern actor_process_profile_definition g_profile_B_BH = {
   fpcLy_CURRENT_e,        // mLayerID
   7,                      // mListID

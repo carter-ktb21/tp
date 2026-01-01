@@ -16,8 +16,6 @@ template <>
 struct SMatrix34C<f32> {
     f32 data[3][4];
 
-    void identity() { MTXIdentity(data); }
-
     typedef f32 ArrType[4];
     void set(const ArrType* src) {  
         JMath::gekko_ps_copy12(data, src);
@@ -54,7 +52,9 @@ struct SMatrix33C {
 };
 
 template <typename T>
-struct TMatrix34 : public T {};
+struct TMatrix34 : public T {
+    void identity() { MTXIdentity(this->data); }
+};
 
 template <typename T>
 struct TRotation3 : public T {};
@@ -62,24 +62,26 @@ struct TRotation3 : public T {};
 template<typename T>
 struct TRotation3<SMatrix33C<T> > : public SMatrix33C<T> {
     inline void getEulerXYZ(TVec3<T>* param_1) const {
-        if (at(2, 0) - TUtil<T>::one() >= -TUtil<T>::epsilon()) {
-            param_1->set(TUtil<T>::atan2(-at(0, 1), at(1, 1)), -TUtil<T>::halfPI(), 0.0);
+        if (this->at(2, 0) - TUtil<T>::one() >= -TUtil<T>::epsilon()) {
+            param_1->set(TUtil<T>::atan2(-this->at(0, 1), this->at(1, 1)), -TUtil<T>::halfPI(), 0.0);
         } else {
-            if (at(2, 0) + TUtil<T>::one() <= TUtil<T>::epsilon()) {
-                param_1->set(TUtil<T>::atan2(at(0, 1), at(1, 1)), TUtil<T>::halfPI(), 0.0);
+            if (this->at(2, 0) + TUtil<T>::one() <= TUtil<T>::epsilon()) {
+                param_1->set(TUtil<T>::atan2(this->at(0, 1), this->at(1, 1)), TUtil<T>::halfPI(), 0.0);
             } else {
-                param_1->x = TUtil<T>::atan2(at(2, 1), at(2, 2));
-                param_1->z = TUtil<T>::atan2(at(1, 0), at(0, 0));
-                param_1->y = TUtil<T>::asin(-at(2, 0));
+                param_1->x = TUtil<T>::atan2(this->at(2, 1), this->at(2, 2));
+                param_1->z = TUtil<T>::atan2(this->at(1, 0), this->at(0, 0));
+                param_1->y = TUtil<T>::asin(-this->at(2, 0));
             }
         }
     }
 };
 
 template <typename T>
-struct TPosition3 : public T {};
+struct TPosition3 : public T {
+    TPosition3() {}
+};
 
-typedef TPosition3<TRotation3<TMatrix34<SMatrix34C<f32> > > > TPosition3f32;
+typedef TPosition3<TMatrix34<SMatrix34C<f32> > > TPosition3f32;
 
 }  // namespace JGeometry
 

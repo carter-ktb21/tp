@@ -1,6 +1,8 @@
+#include "JSystem/JSystem.h" // IWYU pragma: keep
+
 #include "JSystem/JSupport/JSUOutputStream.h"
 #include "JSystem/JSupport/JSURandomOutputStream.h"
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <cstring.h>
 
 JSUOutputStream::~JSUOutputStream() {

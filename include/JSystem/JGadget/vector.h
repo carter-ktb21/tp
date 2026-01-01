@@ -45,13 +45,13 @@ struct TVector {
 };
 
 struct TVector_pointer_void : TVector<void*, TAllocator> {
-    /* 802DCCD0 */ TVector_pointer_void(JGadget::TAllocator<void*> const&);
-    /* 802DCCFC */ ~TVector_pointer_void();
-    /* 802DCDC4 */ void erase(void**, void**);
+    TVector_pointer_void(JGadget::TAllocator<void*> const&);
+    ~TVector_pointer_void();
+    void erase(void**, void**);
     void insert(void**, void* const&);
 
     void clear() { erase(begin(), end()); }
-    void push_back(const void*& ref) { insert(end(), (void* const&)ref); }
+    void push_back(void* const& ref) { insert(end(), ref); }
 };
 
 template <typename T>
@@ -66,7 +66,7 @@ struct TVector_pointer : TVector_pointer_void {
     T* end() { return (T*)TVector_pointer_void::end(); }
 
     void push_back(const T& ref) {
-        static_cast<TVector_pointer_void*>(this)->push_back((const void*&)ref);
+        static_cast<TVector_pointer_void*>(this)->push_back(ref);
     }
 };
 

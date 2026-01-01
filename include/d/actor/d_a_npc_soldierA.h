@@ -1,7 +1,7 @@
 #ifndef D_A_NPC_SOLDIERA_H
 #define D_A_NPC_SOLDIERA_H
 
-#include "d/actor/d_a_npc.h"
+#include "d/actor/d_a_npc4.h"
 
 /**
  * @ingroup actors-npcs
@@ -11,58 +11,98 @@
  * @details
  *
  */
-class daNpc_SoldierA_c : public fopAc_ac_c {
-public:
-    /* 80AEF58C */ daNpc_SoldierA_c();
-    /* 80AEF7A0 */ ~daNpc_SoldierA_c();
-    /* 80AEF9A0 */ void create();
-    /* 80AEFC80 */ void CreateHeap();
-    /* 80AEFE4C */ void Delete();
-    /* 80AEFE80 */ void Execute();
-    /* 80AEFEA0 */ void Draw();
-    /* 80AEFF14 */ void ctrlJoint(J3DJoint*, J3DModel*);
-    /* 80AF0110 */ void createHeapCallBack(fopAc_ac_c*);
-    /* 80AF0130 */ void ctrlJointCallBack(J3DJoint*, int);
-    /* 80AF017C */ void setParam();
-    /* 80AF02B0 */ void main();
-    /* 80AF0428 */ bool ctrlBtk();
-    /* 80AF0430 */ void setAttnPos();
-    /* 80AF0928 */ bool setMotionAnm(int, f32);
-    /* 80AF0A38 */ void setMotion(int, f32, int);
-    /* 80AF0A7C */ bool drawDbgInfo();
-    /* 80AF0A84 */ void drawOtherMdls();
-    /* 80AF0B30 */ void getTypeFromParam();
-    /* 80AF0B7C */ void isDelete();
-    /* 80AF0BB0 */ void reset();
-    /* 80AF0D34 */ void playMotion();
-    /* 80AF0F50 */ void chkAction(int (daNpc_SoldierA_c::*)(void*));
-    /* 80AF0F7C */ void setAction(int (daNpc_SoldierA_c::*)(void*));
-    /* 80AF1024 */ void selectAction();
-    /* 80AF10A4 */ void doNormalAction(int);
-    /* 80AF11B8 */ void doEvent();
-    /* 80AF1488 */ void setLookMode(int);
-    /* 80AF14AC */ void lookat();
-    /* 80AF1734 */ void wait(void*);
-    /* 80AF18B0 */ void talk(void*);
-    /* 80AF1A48 */ void ECut_talkLake(int);
-    /* 80AF1B8C */ void ECut_listenLake(int);
-    /* 80AF1CA4 */ void test(void*);
 
-    static void* mEvtCutNameList[3];
-    static u8 mEvtCutList[36];
-
-private:
-    /* 0x568 */ u8 field_0x568[0xe20 - 0x568];
+struct daNpc_SoldierA_HIOParam {
+    /* 0x00 */ daNpcF_HIOParam common;
 };
-
-STATIC_ASSERT(sizeof(daNpc_SoldierA_c) == 0xe20);
 
 class daNpc_SoldierA_Param_c {
 public:
-    /* 80AF267C */ ~daNpc_SoldierA_Param_c();
+    virtual ~daNpc_SoldierA_Param_c() {}
 
-    static u8 const m[108];
+    static daNpc_SoldierA_HIOParam const m;
 };
 
+#if DEBUG
+class daNpc_SoldierA_HIO_c : public mDoHIO_entry_c {
+public:
+    daNpc_SoldierA_HIO_c();
+    void listenPropertyEvent(const JORPropertyEvent*);
+    void genMessage(JORMContext*);
+
+    /* 0x8 */ daNpc_SoldierA_HIOParam m;
+};
+#define NPC_SOLDIERA_HIO_CLASS daNpc_SoldierA_HIO_c
+#else
+#define NPC_SOLDIERA_HIO_CLASS daNpc_SoldierA_Param_c
+#endif
+
+class daNpc_SoldierA_c : public daNpcF_c {
+public:
+    typedef int (daNpc_SoldierA_c::*actionFunc)(void*);
+    typedef int (daNpc_SoldierA_c::*cutFunc)(int);
+
+    daNpc_SoldierA_c();
+    ~daNpc_SoldierA_c();
+    cPhs__Step create();
+    int CreateHeap();
+    int Delete();
+    int Execute();
+    int Draw();
+    int ctrlJoint(J3DJoint*, J3DModel*);
+    static int createHeapCallBack(fopAc_ac_c*);
+    static int ctrlJointCallBack(J3DJoint*, int);
+    void setParam();
+    BOOL main();
+    BOOL ctrlBtk();
+    void setAttnPos();
+    void setMotionAnm(int, f32);
+    void setMotion(int, f32, int);
+    int drawDbgInfo();
+    void drawOtherMdls();
+    u8 getTypeFromParam();
+    BOOL isDelete();
+    void reset();
+    void playMotion();
+    BOOL chkAction(actionFunc);
+    BOOL setAction(actionFunc);
+    BOOL selectAction();
+    void doNormalAction(int);
+    BOOL doEvent();
+    void setLookMode(int);
+    void lookat();
+    int wait(void*);
+    int talk(void*);
+    int ECut_talkLake(int);
+    int ECut_listenLake(int);
+    int test(void*);
+
+    u8 getType() { return mType; }
+
+    static char* mEvtCutNameList[3];
+    static cutFunc mEvtCutList[3];
+
+private:
+    /* 0xB48 */ Z2Creature mSound;
+    /* 0xBD8 */ J3DModel* mSpearModel;
+    /* 0xBDC */ daNpcF_Lookat_c mLookat;
+    /* 0xC78 */ daNpcF_ActorMngr_c mActorMngrs[3];
+    /* 0xC90 */ NPC_SOLDIERA_HIO_CLASS* mHIO;
+    /* 0xC94 */ dCcD_Cyl mCyl;
+    /* 0xDD0 */ actionFunc mNextAction;
+    /* 0xDDC */ actionFunc mAction;
+    /* 0xDE8 */ request_of_phase_process_class mPhases[3];
+    /* 0xE00 */ int field_0xe00;
+    /* 0xE04 */ int field_0xe04;
+    /* 0xE08 */ int field_0xe08;
+    /* 0xE0C */ int field_0xe0c;
+    /* 0xE10 */ int mMsgNo;
+    /* 0xE14 */ s16 mLookMode;
+    /* 0xE16 */ u16 mMode;
+    /* 0xE18 */ u8 mType;
+    /* 0xE1C */ int mAnm;
+};
+
+STATIC_ASSERT(sizeof(daNpc_SoldierA_c) == 0xe20);
 
 #endif /* D_A_NPC_SOLDIERA_H */

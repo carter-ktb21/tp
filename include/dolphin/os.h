@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 
+#ifdef __REVOLUTION_SDK__
+#include <revolution/os.h>
+#else
 #include <dolphin/types.h>
 #include <dolphin/gx/GXStruct.h>
 void OSReportInit(void);
@@ -188,24 +191,24 @@ BOOL OSRestoreInterrupts(BOOL level);
 u32 OSGetSoundMode(void);
 void OSSetSoundMode(u32 mode);
 
-__declspec(weak) void OSReport(const char* msg, ...);
-__declspec(weak) void OSVReport(const char* msg, va_list list);
-__declspec(weak) void OSPanic(const char* file, int line, const char* msg, ...);
+DECL_WEAK void OSReport(const char* msg, ...);
+DECL_WEAK void OSVReport(const char* msg, va_list list);
+DECL_WEAK void OSPanic(const char* file, int line, const char* msg, ...);
 void OSFatal(GXColor fg, GXColor bg, const char* msg);
 
 // do these belong here?
-__declspec(weak) void OSAttention(const char* msg, ...);
-__declspec(weak) void OSReport_Error(const char* fmt, ...);
-__declspec(weak) void OSReport_FatalError(const char* fmt, ...);
-__declspec(weak) void OSReport_System(const char* fmt, ...);
-__declspec(weak) void OSReport_Warning(const char* fmt, ...);
-__declspec(weak) void OSReportDisable(void);
-__declspec(weak) void OSReportEnable(void);
-__declspec(weak) void OSReportForceEnableOff(void);
-__declspec(weak) void OSReportForceEnableOn(void);
-__declspec(weak) void OSVReport(const char* format, va_list list);
+DECL_WEAK void OSAttention(const char* msg, ...);
+DECL_WEAK void OSReport_Error(const char* fmt, ...);
+DECL_WEAK void OSReport_FatalError(const char* fmt, ...);
+DECL_WEAK void OSReport_System(const char* fmt, ...);
+DECL_WEAK void OSReport_Warning(const char* fmt, ...);
+DECL_WEAK void OSReportDisable(void);
+DECL_WEAK void OSReportEnable(void);
+DECL_WEAK void OSReportForceEnableOff(void);
+DECL_WEAK void OSReportForceEnableOn(void);
+DECL_WEAK void OSVReport(const char* format, va_list list);
 
-#ifdef DEBUG
+#if DEBUG
 #define OS_REPORT(...) OSReport(__VA_ARGS__)
 #define OS_WARNING(...) OSReport_Warning(__VA_ARGS__)
 #define OS_REPORT_ERROR(...) OSReport_Error(__VA_ARGS__)
@@ -244,7 +247,7 @@ void* OSUncachedToCached(void* ucaddr);
 
 // unsorted externs
 extern OSTime __OSGetSystemTime(void);
-__declspec(weak) extern int __OSIsGcam;
+DECL_WEAK extern int __OSIsGcam;
 extern OSExecParams __OSRebootParams;
 extern OSTime __OSStartTime;
 extern int __OSInIPL;
@@ -258,7 +261,7 @@ extern int __OSInIPL;
     #define LINE(l0, l1, l2) (l2)
 #endif
 
-#ifdef DEBUG
+#if DEBUG
 #define ASSERTLINE(line, cond) \
     ((cond) || (OSPanic(__FILE__, line, "Failed assertion " #cond), 0))
 
@@ -285,10 +288,10 @@ extern int __OSInIPL;
     
 #define ASSERT(cond) ASSERTLINE(__LINE__, cond)
 
-inline s16 __OSf32tos16(register f32 inF) {
-    register s16 out;
+inline s16 __OSf32tos16(__REGISTER f32 inF) {
+    __REGISTER s16 out;
     u32 tmp;
-    register u32* tmpPtr = &tmp;
+    __REGISTER u32* tmpPtr = &tmp;
     // clang-format off
 #ifdef __MWERKS__
     asm {
@@ -305,10 +308,10 @@ inline void OSf32tos16(f32* f, s16* out) {
     *out = __OSf32tos16(*f);
 }
 
-inline u8 __OSf32tou8(register f32 inF) {
-    register u8 out;
+inline u8 __OSf32tou8(__REGISTER f32 inF) {
+    __REGISTER u8 out;
     u32 tmp;
-    register u32* tmpPtr = &tmp;
+    __REGISTER u32* tmpPtr = &tmp;
     // clang-format off
 #ifdef __MWERKS__
     asm {
@@ -350,4 +353,5 @@ static inline void OSInitFastCast(void) {
 }
 #endif
 
+#endif
 #endif

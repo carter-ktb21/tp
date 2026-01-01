@@ -2,9 +2,10 @@
 #define J3DTEXTURE_H
 
 #include "JSystem/J3DGraphBase/J3DStruct.h"
-#include "JSystem/JUtility/JUTAssert.h"
+#include "JSystem/J3DAssert.h"
 #include "JSystem/JUtility/JUTTexture.h"
-#include "dolphin/types.h"
+#include "global.h"
+#include <stdint.h>
 
 /**
  * @ingroup jsystem-j3d
@@ -13,25 +14,28 @@
 class J3DTexture {
 private:
     /* 0x0 */ u16 mNum;
-    /* 0x2 */ u16 field_0x2;
+    /* 0x2 */ u16 unk_0x2;
     /* 0x4 */ ResTIMG* mpRes;
 
 public:
-    J3DTexture(u16 num, ResTIMG* res) : mNum(num), field_0x2(0), mpRes(res) {}
-    /* 8031204C */ void loadGX(u16, _GXTexMapID) const;
-    /* 803121A4 */ void entryNum(u16);
-    /* 8031221C */ void addResTIMG(u16, ResTIMG const*);
-    /* 803366A4 */ virtual ~J3DTexture() {}
+    J3DTexture(u16 num, ResTIMG* res) : mNum(num), unk_0x2(0), mpRes(res) {}
+
+    void loadGX(u16, GXTexMapID) const;
+    void entryNum(u16);
+    void addResTIMG(u16, ResTIMG const*);
+    virtual ~J3DTexture() {}
 
     u16 getNum() const { return mNum; }
-    ResTIMG* getResTIMG(u16 entry) const {
-        J3D_ASSERT(72, entry < mNum, "Error : range over.");
-        return &mpRes[entry];   
+
+    ResTIMG* getResTIMG(u16 index) const {
+        J3D_ASSERT_RANGE(72, index < mNum);
+        return &mpRes[index];   
     }
-    void setResTIMG(u16 entry, const ResTIMG& timg) {
-        mpRes[entry] = timg;
-        mpRes[entry].imageOffset = ((mpRes[entry].imageOffset + (u32)&timg - (u32)(mpRes + entry)));
-        mpRes[entry].paletteOffset = ((mpRes[entry].paletteOffset + (u32)&timg - (u32)(mpRes + entry)));
+
+    void setResTIMG(u16 index, const ResTIMG& timg) {
+        mpRes[index] = timg;
+        mpRes[index].imageOffset = ((mpRes[index].imageOffset + (uintptr_t)&timg - (uintptr_t)(mpRes + index)));
+        mpRes[index].paletteOffset = ((mpRes[index].paletteOffset + (uintptr_t)&timg - (uintptr_t)(mpRes + index)));
     }
 };
 
@@ -46,15 +50,17 @@ public:
     J3DTexMtx() {
         mTexMtxInfo = j3dDefaultTexMtxInfo;
     }
+
     J3DTexMtx(const J3DTexMtxInfo& info) {
         mTexMtxInfo = info;
     }
-    /* 803238C4 */ void load(u32) const;
-    /* 80323900 */ void calc(const Mtx);
-    /* 80323920 */ void calcTexMtx(const Mtx);
-    /* 80323C0C */ void calcPostTexMtx(const Mtx);
-    /* 80324358 */ void loadTexMtx(u32) const;
-    /* 803243BC */ void loadPostTexMtx(u32) const;
+
+    void load(u32) const;
+    void calc(const Mtx);
+    void calcTexMtx(const Mtx);
+    void calcPostTexMtx(const Mtx);
+    void loadTexMtx(u32) const;
+    void loadPostTexMtx(u32) const;
 
     J3DTexMtxInfo& getTexMtxInfo() { return mTexMtxInfo; }
     Mtx& getMtx() { return mMtx; }
@@ -65,17 +71,6 @@ private:
     /* 0x64 */ Mtx mMtx;
 };  // Size: 0x94
 
-/**
- * @ingroup jsystem-j3d
- * 
- */
-struct J3DTexCoordInfo {
-    /* 0x0 */ u8 mTexGenType;
-    /* 0x1 */ u8 mTexGenSrc;
-    /* 0x2 */ u8 mTexGenMtx;
-    /* 0x3 */ u8 pad;
-};
-
 extern J3DTexCoordInfo const j3dDefaultTexCoordInfo[8];
 
 /**
@@ -83,15 +78,15 @@ extern J3DTexCoordInfo const j3dDefaultTexCoordInfo[8];
  * 
  */
 struct J3DTexCoord : public J3DTexCoordInfo {
-    /* 8000E464 */ J3DTexCoord() {
-        setTexCoordInfo(j3dDefaultTexCoordInfo[0]);
-        resetTexMtxReg();
+    J3DTexCoord() {
+        J3DTexCoordInfo::operator=(j3dDefaultTexCoordInfo[0]);
+        mTexMtxReg = mTexGenMtx;
     }
-    J3DTexCoord(J3DTexCoordInfo const& info) {
-        setTexCoordInfo(info);
-        resetTexMtxReg();
+    J3DTexCoord(const J3DTexCoordInfo& info) {
+        J3DTexCoordInfo::operator=(info);
+        mTexMtxReg = mTexGenMtx;
     }
-    void setTexCoordInfo(J3DTexCoordInfo const& info) {
+    void setTexCoordInfo(const J3DTexCoordInfo& info) {
         __memcpy(this, &info, sizeof(J3DTexCoordInfo));
     }
 
@@ -102,8 +97,12 @@ struct J3DTexCoord : public J3DTexCoordInfo {
     void setTexGenMtx(u8 param_1) { mTexGenMtx = param_1; }
     void setTexMtxReg(u16 reg) { mTexMtxReg = reg; }
     J3DTexCoord& operator=(const J3DTexCoord& other) {
-        // Fake match (__memcpy or = doesn't match)
+#if DEBUG
+        J3DTexCoordInfo::operator=(other);
+#else
+        // Fakematch: Instruction order is wrong with __memcpy or J3DTexCoordInfo::operator=
         *(u32*)this = *(u32*)&other;
+#endif
         return *this;
     }
 

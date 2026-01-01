@@ -3,6 +3,8 @@
  * Volcano Eruption Falling Rocks
  */
 
+#include "d/dolzel_rel.h" // IWYU pragma: keep
+
 #include "d/actor/d_a_obj_volcball.h"
 #include "d/actor/d_a_obj_volcbom.h"
 #include "SSystem/SComponent/c_math.h"
@@ -11,29 +13,8 @@
 #include "d/d_event_lib.h"
 #include "f_op/f_op_actor_mng.h"
 
-//
-// Declarations:
-//
-
-/* 80D23E8C-80D23E98 000000 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 80D23E98-80D23EAC 00000C 0004+10 0/0 0/0 0/0 .data            @1787 */
-static u32 lit_1787[1 + 4 /* padding */] = {
-    0x02000201,
-    /* padding */
-    0x40080000,
-    0x00000000,
-    0x3FE00000,
-    0x00000000,
-};
-
-/* 80D23EAC-80D23EB0 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static const char* l_arcName = "M_Volcbal";
 
-/* 80D23EB0-80D23F58 000024 00A8+00 1/1 0/0 0/0 .data            l_param */
 static daObjVolcBall_c::volc_param_c l_param[] = {
     {
         -3.0f, -70.0f, 1.0f,  1700.0f, 400.0f, 1.0f, 0.5f, 5.0f,    5.0f, 50.0f, 20.0f,
@@ -45,17 +26,14 @@ static daObjVolcBall_c::volc_param_c l_param[] = {
     },
 };
 
-/* 80D21B18-80D21B30 000078 0018+00 8/8 0/0 0/0 .text            getData__15daObjVolcBall_cFv */
 daObjVolcBall_c::volc_param_c* daObjVolcBall_c::getData() {
     return &l_param[mIsBigVolc];
 }
 
-/* 80D21B30-80D21B50 000090 0020+00 1/1 0/0 0/0 .text            CheckCreateHeap__FP10fopAc_ac_c */
 static int CheckCreateHeap(fopAc_ac_c* i_this) {
     return static_cast<daObjVolcBall_c*>(i_this)->CreateHeap();
 }
 
-/* 80D21B50-80D21BA0 0000B0 0050+00 1/1 0/0 0/0 .text            search_big_volc__FPvPv */
 static void* search_big_volc(void* i_actor, void*) {
     if (i_actor != NULL && fopAcM_IsActor(i_actor) &&
         fopAcM_GetProfName(i_actor) == PROC_Obj_VolcanicBomb)
@@ -66,12 +44,10 @@ static void* search_big_volc(void* i_actor, void*) {
     return NULL;
 }
 
-/* 80D21BA0-80D21BC0 000100 0020+00 1/1 0/0 0/0 .text            initBaseMtx__15daObjVolcBall_cFv */
 void daObjVolcBall_c::initBaseMtx() {
     setBaseMtx();
 }
 
-/* 80D21BC0-80D21C40 000120 0080+00 1/1 0/0 0/0 .text            setBaseMtx__15daObjVolcBall_cFv */
 void daObjVolcBall_c::setBaseMtx() {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
 
@@ -83,7 +59,6 @@ void daObjVolcBall_c::setBaseMtx() {
     MTXCopy(mDoMtx_stack_c::get(), field_0x28ec);
 }
 
-/* 80D23DCC-80D23E0C 000000 0040+00 7/7 0/0 0/0 .rodata          l_sph_src */
 static const dCcD_SrcSph l_sph_src = {
     {
         {0, {{AT_TYPE_BOMB, 1, 0x1F}, {0, 0x11}, 0}},
@@ -99,7 +74,6 @@ static const dCcD_SrcSph l_sph_src = {
     }
 };
 
-/* 80D21C40-80D21D80 0001A0 0140+00 1/1 0/0 0/0 .text            Create__15daObjVolcBall_cFv */
 int daObjVolcBall_c::Create() {
     initBaseMtx();
     fopAcM_SetMtx(this, field_0x28ec);
@@ -130,7 +104,6 @@ int daObjVolcBall_c::Create() {
 }
 
 
-/* 80D21D80-80D21E28 0002E0 00A8+00 1/1 0/0 0/0 .text            CreateHeap__15daObjVolcBall_cFv */
 int daObjVolcBall_c::CreateHeap() {
     J3DModelData* modelData = (J3DModelData*)dComIfG_getObjectRes(l_arcName, 3);
 
@@ -144,9 +117,8 @@ int daObjVolcBall_c::CreateHeap() {
     return 1;
 }
 
-/* 80D21E28-80D21FA8 000388 0180+00 1/1 0/0 0/0 .text            create__15daObjVolcBall_cFv */
 int daObjVolcBall_c::create() {
-    fopAcM_SetupActor(this, daObjVolcBall_c);
+    fopAcM_ct(this, daObjVolcBall_c);
 
     mIsBigVolc = checkBigVolc();
     if (mIsBigVolc == 1) {
@@ -171,7 +143,6 @@ int daObjVolcBall_c::create() {
     return phase;
 }
 
-/* 80D22424-80D22484 000984 0060+00 1/1 0/0 0/0 .text            execute__15daObjVolcBall_cFv */
 int daObjVolcBall_c::execute() {
     f32 ball_gravity = getData()->mGravity;
     f32 ball_fall_speed = getData()->mMaxFallSpeed;
@@ -185,7 +156,6 @@ int daObjVolcBall_c::execute() {
 
 typedef void (daObjVolcBall_c::*actionFunc)();
 
-/* 80D22484-80D22570 0009E4 00EC+00 1/1 0/0 0/0 .text            action__15daObjVolcBall_cFv */
 void daObjVolcBall_c::action() {
     static actionFunc l_func[] = {
         &daObjVolcBall_c::actionPlayerWait, &daObjVolcBall_c::actionSwWait,
@@ -196,23 +166,19 @@ void daObjVolcBall_c::action() {
     (this->*l_func[mMode])();
 }
 
-/* 80D22570-80D2257C 000AD0 000C+00 1/1 0/0 0/0 .text initActionPlayerWait__15daObjVolcBall_cFv */
 void daObjVolcBall_c::initActionPlayerWait() {
     setAction(MODE_PLAYER_WAIT);
 }
 
-/* 80D2257C-80D225A4 000ADC 0028+00 3/3 0/0 0/0 .text initActionWarning__15daObjVolcBall_cFv */
 void daObjVolcBall_c::initActionWarning() {
     setAction(MODE_QUAKE);
     startQuake();
 }
 
-/* 80D225A4-80D225B0 000B04 000C+00 1/1 0/0 0/0 .text initActionSwWait__15daObjVolcBall_cFv */
 void daObjVolcBall_c::initActionSwWait() {
     setAction(MODE_SWITCH_WAIT);
 }
 
-/* 80D225B0-80D2267C 000B10 00CC+00 1/0 0/0 0/0 .text actionPlayerWait__15daObjVolcBall_cFv */
 void daObjVolcBall_c::actionPlayerWait() {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
 
@@ -225,8 +191,6 @@ void daObjVolcBall_c::actionPlayerWait() {
     }
 }
 
-/* 80D2267C-80D22724 000BDC 00A8+00 1/0 0/0 0/0 .text            actionSwWait__15daObjVolcBall_cFv
- */
 void daObjVolcBall_c::actionSwWait() {
     if (fopAcM_isSwitch(this, getSwBit())) {
         setAction(MODE_STOP);
@@ -234,7 +198,6 @@ void daObjVolcBall_c::actionSwWait() {
     }
 }
 
-/* 80D22724-80D227E4 000C84 00C0+00 1/0 0/0 0/0 .text            actionStop__15daObjVolcBall_cFv */
 void daObjVolcBall_c::actionStop() {
     if (!fopAcM_isSwitch(this, getSwBit())) {
         setAction(MODE_SWITCH_WAIT);
@@ -247,8 +210,6 @@ void daObjVolcBall_c::actionStop() {
     }
 }
 
-/* 80D227E4-80D22944 000D44 0160+00 1/0 0/0 0/0 .text            actionWarning__15daObjVolcBall_cFv
- */
 void daObjVolcBall_c::actionWarning() {
     if (!dComIfGp_getVibration().CheckQuake()) {
         startQuake();
@@ -273,28 +234,17 @@ void daObjVolcBall_c::actionWarning() {
                           dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
 }
 
-/* 80D22944-80D22C6C 000EA4 0328+00 1/0 0/0 0/0 .text            actionEruption__15daObjVolcBall_cFv
- */
-// NONMATCHING small regalloc
 void daObjVolcBall_c::actionEruption() {
     if (!dComIfGp_getVibration().CheckQuake()) {
         startQuake();
     }
 
-    daPy_py_c* player_p = daPy_getPlayerActorClass();
+    daPy_py_c* player_p = (daPy_py_c*)daPy_getPlayerActorClass();
     u32 timer = cLib_calcTimer(&mTime);
-    bool disable_ball_create = true;
+    bool disable_ball_create = timer == 0 ||
+        (getSwBit() != 0xFF && !fopAcM_isSwitch(this, getSwBit()));
 
-    if (timer != 0) {
-        bool bvar2 = false;
-        if (getSwBit() != 0xFF && !fopAcM_isSwitch(this, getSwBit())) {
-            bvar2 = true;
-        }
-
-        if (!bvar2) {
-            disable_ball_create = false;
-        }
-    }
+    vball_s* var_r29 = &mBall[8];
 
     if (!disable_ball_create) {
         if (cLib_calcTimer(&mSearchBallCreateTimer) == 0) {
@@ -306,30 +256,31 @@ void daObjVolcBall_c::actionEruption() {
         }
     }
 
-    if (mBall[8].field_0x376 != 0) {
+    if (var_r29->field_0x376 != 0) {
         field_0x603++;
 
         u8 search_time = getData()->mPlayerSearchTime;
         f32 shadow_intensity = getData()->mSearchBallShadowIntensity;
 
         if (field_0x603 < search_time) {
-            mBall[8].field_0x4.x = player_p->current.pos.x;
-            mBall[8].field_0x4.z = player_p->current.pos.z;
-            mBall[8].field_0x364 = player_p->current.pos;
+            var_r29->field_0x4.x = player_p->current.pos.x;
+            var_r29->field_0x4.z = player_p->current.pos.z;
+            var_r29->field_0x364 = player_p->current.pos;
         }
 
-        cLib_chaseF(&mBall[8].field_0x1c.x, field_0x291c, field_0x291c / (f32)search_time);
-        cLib_chaseF(&mBall[8].field_0x1c.y, field_0x291c, field_0x291c / (f32)search_time);
-        cLib_chaseF(&mBall[8].field_0x1c.z, field_0x291c, field_0x291c / (f32)search_time);
-        cLib_chaseF(&mBall[8].field_0x50, shadow_intensity, shadow_intensity / (f32)search_time);
+        cLib_chaseF(&var_r29->field_0x1c.x, field_0x291c, field_0x291c / (f32)search_time);
+        cLib_chaseF(&var_r29->field_0x1c.y, field_0x291c, field_0x291c / (f32)search_time);
+        cLib_chaseF(&var_r29->field_0x1c.z, field_0x291c, field_0x291c / (f32)search_time);
+        cLib_chaseF(&var_r29->field_0x50, shadow_intensity, shadow_intensity / (f32)search_time);
 
-        mBall[8].field_0x28 = mBall[8].field_0x1c;
-        mBall[8].mSphCc.SetR(field_0x291c * 100.0f);
-        mBall[8].mSphCc.SetC(mBall[8].field_0x4);
-        dComIfG_Ccsp()->Set(&mBall[8].mSphCc);
+        var_r29->field_0x28 = var_r29->field_0x1c;
+        var_r29->mSphCc.SetR(field_0x291c * 100.0f);
+        var_r29->mSphCc.SetC(var_r29->field_0x4);
+        dComIfG_Ccsp()->Set(&var_r29->mSphCc);
     }
 
-    if (!executeBall() && disable_ball_create) {
+    int executeResult = executeBall();
+    if (!executeResult && disable_ball_create) {
         if (mIsBigVolc == 0) {
             setAction(MODE_STOP);
             mTime = getData()->mNormalWaitTime * 30.0f + cM_rndFX(getData()->mRandWaitTime * 30.0f);
@@ -344,8 +295,6 @@ void daObjVolcBall_c::actionEruption() {
                           dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
 }
 
-/* 80D22C6C-80D22CD4 0011CC 0068+00 1/1 0/0 0/0 .text            initActionEnd__15daObjVolcBall_cFv
- */
 void daObjVolcBall_c::initActionEnd() {
     field_0x2925 = 0;
     field_0x2924 = 0;
@@ -358,7 +307,6 @@ void daObjVolcBall_c::initActionEnd() {
     setAction(MODE_END);
 }
 
-/* 80D22CD4-80D22DDC 001234 0108+00 1/0 0/0 0/0 .text            actionEnd__15daObjVolcBall_cFv */
 void daObjVolcBall_c::actionEnd() {
     if (mIsBigVolc != 1 || (mIsBigVolc == 1 && fopAcM_isSwitch(this, getSwBit()))) {
         return;
@@ -389,7 +337,6 @@ void daObjVolcBall_c::actionEnd() {
     
 }
 
-/* 80D22DDC-80D22E24 00133C 0048+00 2/1 0/0 0/0 .text            eventStart__15daObjVolcBall_cFv */
 bool daObjVolcBall_c::eventStart() {
     daObjVolcBom_c* bom_p = (daObjVolcBom_c*)fopAcM_SearchByID(mBigVolcActorID);
     if (bom_p != NULL) {
@@ -399,8 +346,6 @@ bool daObjVolcBall_c::eventStart() {
     return true;
 }
 
-/* 80D22E24-80D22ED4 001384 00B0+00 1/1 0/0 0/0 .text            setEruptEffect__15daObjVolcBall_cFi
- */
 void daObjVolcBall_c::setEruptEffect(int i_ballNo) {
     static u16 const l_effect_id[6] = {0x84A8, 0x84A9, 0x84AA, 0x84AB, 0x84AC, 0x84AD};
 
@@ -413,8 +358,6 @@ void daObjVolcBall_c::setEruptEffect(int i_ballNo) {
     }
 }
 
-/* 80D22ED4-80D22FCC 001434 00F8+00 2/2 0/0 0/0 .text            setFallEffect__15daObjVolcBall_cFi
- */
 void daObjVolcBall_c::setFallEffect(int i_ballNo) {
     static u16 const l_fall_effect_id[4] = {0x84AE, 0x84AF, 0x84B0, 0x84B1};
 
@@ -435,8 +378,6 @@ void daObjVolcBall_c::setFallEffect(int i_ballNo) {
     }
 }
 
-/* 80D22FCC-80D23034 00152C 0068+00 2/2 0/0 0/0 .text            endFallEffect__15daObjVolcBall_cFi
- */
 void daObjVolcBall_c::endFallEffect(int i_ballNo) {
     vball_s* ball = &mBall[i_ballNo];
 
@@ -445,7 +386,6 @@ void daObjVolcBall_c::endFallEffect(int i_ballNo) {
     }
 }
 
-/* 80D23034-80D23188 001594 0154+00 1/1 0/0 0/0 .text createSearchBall__15daObjVolcBall_cFv */
 bool daObjVolcBall_c::createSearchBall() {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
     bool var_r30 = false;
@@ -476,7 +416,6 @@ bool daObjVolcBall_c::createSearchBall() {
     return var_r30;
 }
 
-/* 80D23188-80D23438 0016E8 02B0+00 1/1 0/0 0/0 .text createNormalBall__15daObjVolcBall_cFv */
 bool daObjVolcBall_c::createNormalBall() {
     daPy_py_c* player_p = daPy_getPlayerActorClass();
 
@@ -536,7 +475,6 @@ bool daObjVolcBall_c::createNormalBall() {
     return bvar;
 }
 
-/* 80D23438-80D23868 001998 0430+00 1/1 0/0 0/0 .text            executeBall__15daObjVolcBall_cFv */
 int daObjVolcBall_c::executeBall() {
     int ret = 0;
     vball_s* ball = mBall;
@@ -571,7 +509,7 @@ int daObjVolcBall_c::executeBall() {
 
             ball->mAcch.CrrPos(dComIfG_Bgsp());
 
-            if (ball->mAcch.ChkGroundHit() || ball->mAcch.GetGroundH() == -1000000000.0f) {
+            if (ball->mAcch.ChkGroundHit() || ball->mAcch.GetGroundH() == -G_CM3D_F_INF) {
                 mDoAud_seStart(Z2SE_OBJ_BREAK_ROCK, &mBall[i].field_0x4, 0,
                                dComIfGp_getReverb(fopAcM_GetRoomNo(this)));
                 endFallEffect(i);
@@ -600,7 +538,6 @@ int daObjVolcBall_c::executeBall() {
     return ret;
 }
 
-/* 80D23868-80D23904 001DC8 009C+00 3/3 0/0 0/0 .text            startQuake__15daObjVolcBall_cFv */
 void daObjVolcBall_c::startQuake() {
     if (mIsBigVolc == 0) {
         dComIfGp_getVibration().StartQuake(2, 31, cXyz(0.0f, 1.0f, 0.0f));
@@ -609,7 +546,6 @@ void daObjVolcBall_c::startQuake() {
     }
 }
 
-/* 80D23904-80D23A0C 001E64 0108+00 1/1 0/0 0/0 .text            draw__15daObjVolcBall_cFv */
 int daObjVolcBall_c::draw() {
     g_env_light.settingTevStruct(0, &current.pos, &tevStr);
 
@@ -638,7 +574,6 @@ int daObjVolcBall_c::draw() {
     return 1;
 }
 
-/* 80D23A0C-80D23AA4 001F6C 0098+00 1/1 0/0 0/0 .text            _delete__15daObjVolcBall_cFv */
 int daObjVolcBall_c::_delete() {
     dComIfG_resDelete(&mPhase, l_arcName);
 
@@ -653,28 +588,22 @@ int daObjVolcBall_c::_delete() {
     return 1;
 }
 
-/* 80D23AA4-80D23AC4 002004 0020+00 1/0 0/0 0/0 .text daObjVolcBall_Draw__FP15daObjVolcBall_c */
 static int daObjVolcBall_Draw(daObjVolcBall_c* i_this) {
     return i_this->draw();
 }
 
-/* 80D23AC4-80D23AE4 002024 0020+00 1/0 0/0 0/0 .text daObjVolcBall_Execute__FP15daObjVolcBall_c
- */
 static int daObjVolcBall_Execute(daObjVolcBall_c* i_this) {
     return i_this->execute();
 }
 
-/* 80D23AE4-80D23B04 002044 0020+00 1/0 0/0 0/0 .text daObjVolcBall_Delete__FP15daObjVolcBall_c */
 static int daObjVolcBall_Delete(daObjVolcBall_c* i_this) {
     return i_this->_delete();
 }
 
-/* 80D23B04-80D23B24 002064 0020+00 1/0 0/0 0/0 .text daObjVolcBall_Create__FP10fopAc_ac_c */
 static int daObjVolcBall_Create(fopAc_ac_c* i_this) {
     return static_cast<daObjVolcBall_c*>(i_this)->create();
 }
 
-/* 80D23FE8-80D24008 -00001 0020+00 1/0 0/0 0/0 .data            l_daObjVolcBall_Method */
 static actor_method_class l_daObjVolcBall_Method = {
     (process_method_func)daObjVolcBall_Create,
     (process_method_func)daObjVolcBall_Delete,
@@ -683,7 +612,6 @@ static actor_method_class l_daObjVolcBall_Method = {
     (process_method_func)daObjVolcBall_Draw,
 };
 
-/* 80D24008-80D24038 -00001 0030+00 0/0 0/0 1/0 .data            g_profile_Obj_VolcanicBall */
 extern actor_process_profile_definition g_profile_Obj_VolcanicBall = {
   fpcLy_CURRENT_e,         // mLayerID
   3,                       // mListID

@@ -1,3 +1,6 @@
+#include "d/dolzel.h" // IWYU pragma: keep
+
+#include "global.h"
 #include "d/d_msg_class.h"
 #include <stdio.h>
 #include "d/d_meter2_info.h"
@@ -9,7 +12,26 @@
 #include "d/d_lib.h"
 #include "JSystem/JUtility/JUTFont.h"
 
-/* 80228578-802285CC 222EB8 0054+00 1/1 0/0 0/0 .text            checkCharInfoCharactor__Fi */
+#if REGION_JPN
+#define CHAR_CODE_MALE_ICON 0x8189
+#define CHAR_CODE_FEMALE_ICON 0x818A
+#define CHAR_CODE_STAR_ICON 0x819A
+#define CHAR_CODE_REFMARK 0x81A6
+#define CHAR_CODE_THIN_LEFT_ARROW 0x81A9
+#define CHAR_CODE_THIN_RIGHT_ARROW 0x81A8
+#define CHAR_CODE_THIN_UP_ARROW 0x81AA
+#define CHAR_CODE_THIN_DOWN_ARROW 0x81AB
+#else
+#define CHAR_CODE_MALE_ICON 0xB2
+#define CHAR_CODE_FEMALE_ICON 0xB3
+#define CHAR_CODE_STAR_ICON 0xB1
+#define CHAR_CODE_REFMARK 0x89
+#define CHAR_CODE_THIN_LEFT_ARROW 0xB9
+#define CHAR_CODE_THIN_RIGHT_ARROW 0xBC
+#define CHAR_CODE_THIN_UP_ARROW 0xBD
+#define CHAR_CODE_THIN_DOWN_ARROW 0xBE
+#endif
+
 static bool checkCharInfoCharactor(int c) {
     if (c != 0x8140 && c != 0x8141 && c != 0x8142 && c != 0x0020 && c != 0x0022 && c != 0x0027 &&
         c != 0x002C && c != 0x002E)
@@ -20,7 +42,6 @@ static bool checkCharInfoCharactor(int c) {
     return false;
 }
 
-/* 802285CC-80228608 222F0C 003C+00 3/3 0/0 0/0 .text            changeCodeToChar__FUs */
 static char* changeCodeToChar(u16 param_0) {
     static char mMoji[3];
 
@@ -36,7 +57,6 @@ static char* changeCodeToChar(u16 param_0) {
     return mMoji;
 }
 
-/* 80228608-80228838 222F48 0230+00 5/4 0/0 0/0 .text            change1ByteTo2Bytes__Fi */
 static u16 change1ByteTo2Bytes(int iCharacter) {
     static u16 char_table[] = {
         0x0000, 0x8142, 0x8175, 0x8176, 0x8141, 0x8145, 0x8392, 0x8340, 0x8342, 0x8344, 0x8346,
@@ -161,7 +181,6 @@ static u16 change1ByteTo2Bytes(int iCharacter) {
     return character2Bytes;
 }
 
-/* 80228838-802288A8 223178 0070+00 8/8 0/0 0/0 .text            changeKataToHira__Fi */
 static u16 changeKataToHira(int iCharacter) {
     u16 hiraCharacter = iCharacter;
 
@@ -176,7 +195,6 @@ static u16 changeKataToHira(int iCharacter) {
     return hiraCharacter;
 }
 
-/* 802288A8-802288FC 2231E8 0054+00 4/4 0/0 0/0 .text            isOutfontKanjiCode__Fi */
 static bool isOutfontKanjiCode(int iCharacter) {
     switch (iCharacter) {
     case '\\':
@@ -190,7 +208,6 @@ static bool isOutfontKanjiCode(int iCharacter) {
     }
 }
 
-/* 802288FC-802289A8 22323C 00AC+00 2/2 0/0 0/0 .text            getFontCCColorTable__FUcUc */
 static u32 getFontCCColorTable(u8 i_colorNo, u8 i_fukiKind) {
     static const u32 colorTable[9] = {
         0xFFFFFFFF, 0xF07878FF, 0xAADC8CFF, 0xA0B4DCFF, 0xDCDC82FF,
@@ -225,7 +242,6 @@ static u32 getFontCCColorTable(u8 i_colorNo, u8 i_fukiKind) {
     }
 }
 
-/* 802289A8-80228A54 2232E8 00AC+00 2/2 0/0 0/0 .text            getFontGCColorTable__FUcUc */
 static u32 getFontGCColorTable(u8 i_colorNo, u8 i_fukiKind) {
     static const u32 colorTable[9] = {
         0xFFFFFFFF, 0xF07878FF, 0xAADC8CFF, 0xA0B4DCFF, 0xDCDC82FF,
@@ -260,7 +276,6 @@ static u32 getFontGCColorTable(u8 i_colorNo, u8 i_fukiKind) {
     }
 }
 
-/* 80228A54-80228ACC 223394 0078+00 3/2 0/0 0/0 .text            getOutFontNumberType__Fi */
 static u8 getOutFontNumberType(int param_0) {
     switch (param_0) {
     case 0:
@@ -288,7 +303,38 @@ static u8 getOutFontNumberType(int param_0) {
     }
 }
 
-/* 80228ACC-80228B04 22340C 0038+00 3/3 0/0 0/0 .text            getPohNum__Fv */
+#if VERSION == VERSION_GCN_PAL
+static void setPlayerName(char* i_player_name, u8 param_2) {
+    if (param_2 != 0) {
+        strcpy(i_player_name, dComIfGs_getPlayerName());
+        u32 name_length = strlen(i_player_name);
+        char last = i_player_name[name_length - 1];
+        if (last == 0x73 || last == 0x53 || last == 0x7a || last == 0x5a || last == 0x78 || last == 0x58 || last == 0xdf) {
+            strcat(i_player_name, "'");
+        } else {
+            strcat(i_player_name, "s");
+        }
+    } else {
+        strcpy(i_player_name, dComIfGs_getPlayerName());
+    }
+}
+
+static void setHorseName(char* i_horse_name, u8 param_2) {
+    if (param_2 != 0) {
+        strcpy(i_horse_name, dComIfGs_getHorseName());
+        u32 name_length = strlen(i_horse_name);
+        char last = i_horse_name[name_length - 1];
+        if (last == 0x73 || last == 0x53 || last == 0x7a || last == 0x5a || last == 0x78 || last == 0x58 || last == 0xdf) {
+            strcat(i_horse_name, "'");
+        } else {
+            strcat(i_horse_name, "s");
+        }
+    } else {
+        strcpy(i_horse_name, dComIfGs_getHorseName());
+    }
+}
+#endif
+
 static u8 getPohNum() {
     u8 num = 0;
 
@@ -301,10 +347,9 @@ static u8 getPohNum() {
     return num;
 }
 
-/* 80228B04-80228CB4 223444 01B0+00 0/0 1/1 0/0 .text            __ct__19jmessage_tReferenceFv */
 jmessage_tReference::jmessage_tReference() {
     mpStick = new STControl(5, 2, 3, 2, 0.9f, 0.5f, 0, 0x2000);
-    JUT_ASSERT(518, mpStick != 0);
+    JUT_ASSERT(518, mpStick != NULL);
     mpStick->setWaitParm(5, 2, 3, 2, 0.9f, 0.5f, 0, 0x800);
 
     mActorPos.set(0.0f, 0.0f, 0.0f);
@@ -364,13 +409,11 @@ jmessage_tReference::jmessage_tReference() {
     mNowTagScale = 0;
 }
 
-/* 80228CB4-80228D28 2235F4 0074+00 1/0 0/0 0/0 .text            __dt__19jmessage_tReferenceFv */
 jmessage_tReference::~jmessage_tReference() {
     delete mpStick;
     mpStick = NULL;
 }
 
-/* 80228D28-80228DE0 223668 00B8+00 1/1 0/0 0/0 .text calcDistance__19jmessage_tReferenceFv */
 void jmessage_tReference::calcDistance() {
     if (mActorPos.x == 0.0f && mActorPos.y == 0.0f && mActorPos.z == 0.0f) {
         mDistanceScale = 1.0f;
@@ -381,11 +424,22 @@ void jmessage_tReference::calcDistance() {
     }
 }
 
-/* 80228DE0-80228E6C 223720 008C+00 5/5 0/0 0/0 .text            getLineMax__19jmessage_tReferenceFv
- */
 u8 jmessage_tReference::getLineMax() {
     int line_max;
 
+#if REGION_JPN
+    if (isKanban()) {
+        line_max = 6;
+    } else if (isBook()) {
+        line_max = 7;
+    } else if (isStaffRoll()) {
+        line_max = 10;
+    } else if (isSaveSeq()) {
+        line_max = 5;
+    } else {
+        line_max = 3;
+    }
+#else
     if (isKanban()) {
         line_max = 7;
     } else if (isBook()) {
@@ -397,12 +451,11 @@ u8 jmessage_tReference::getLineMax() {
     } else {
         line_max = 4;
     }
+#endif
 
     return line_max;
 }
 
-/* 80228E6C-80228EA0 2237AC 0034+00 2/2 0/0 0/0 .text            isKanban__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isKanban() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -411,7 +464,6 @@ bool jmessage_tReference::isKanban() {
     return getObjectPtr()->isKanbanMessage();
 }
 
-/* 80228EA0-80228ED4 2237E0 0034+00 2/2 0/0 0/0 .text isPlaceName__19jmessage_tReferenceFv */
 bool jmessage_tReference::isPlaceName() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -420,8 +472,6 @@ bool jmessage_tReference::isPlaceName() {
     return getObjectPtr()->isPlaceMessage();
 }
 
-/* 80228ED4-80228F08 223814 0034+00 2/2 0/0 0/0 .text            isBossName__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isBossName() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -430,8 +480,6 @@ bool jmessage_tReference::isBossName() {
     return getObjectPtr()->isBossMessage();
 }
 
-/* 80228F08-80228F3C 223848 0034+00 2/2 0/0 0/0 .text            isSaveSeq__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isSaveSeq() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -440,7 +488,6 @@ bool jmessage_tReference::isSaveSeq() {
     return getObjectPtr()->isSaveMessage();
 }
 
-/* 80228F3C-80228F70 22387C 0034+00 2/2 0/0 0/0 .text            isBook__19jmessage_tReferenceFv */
 bool jmessage_tReference::isBook() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -449,7 +496,6 @@ bool jmessage_tReference::isBook() {
     return getObjectPtr()->isBookMessage();
 }
 
-/* 80228F70-80228FA4 2238B0 0034+00 3/3 0/0 0/0 .text isStaffRoll__19jmessage_tReferenceFv */
 bool jmessage_tReference::isStaffRoll() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -458,7 +504,6 @@ bool jmessage_tReference::isStaffRoll() {
     return getObjectPtr()->isStaffMessage();
 }
 
-/* 80228FA4-80228FD8 2238E4 0034+00 1/1 0/0 0/0 .text            isHowl__19jmessage_tReferenceFv */
 bool jmessage_tReference::isHowl() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -467,8 +512,6 @@ bool jmessage_tReference::isHowl() {
     return getObjectPtr()->isHowlMessage();
 }
 
-/* 80228FD8-8022900C 223918 0034+00 2/2 0/0 0/0 .text            isMidona__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isMidona() {
     if (getObjectPtr() == NULL) {
         return false;
@@ -477,7 +520,6 @@ bool jmessage_tReference::isMidona() {
     return getObjectPtr()->isMidonaMessage();
 }
 
-/* 8022900C-80229034 22394C 0028+00 1/1 0/0 0/0 .text resetReference__19jmessage_tReferenceFv */
 void jmessage_tReference::resetReference() {
     mSendTimer = 0;
     mSendFlag = 0;
@@ -489,8 +531,6 @@ void jmessage_tReference::resetReference() {
     mSelectType = 0;
 }
 
-/* 80229034-80229168 223974 0134+00 0/0 1/1 0/0 .text            pageSend__19jmessage_tReferenceFv
- */
 void jmessage_tReference::pageSend() {
     field_0x5d2++;
     mLineCount = 0;
@@ -529,7 +569,6 @@ void jmessage_tReference::pageSend() {
     mTopTagScale = mNowTagScale;
 }
 
-/* 80229168-802294A8 223AA8 0340+00 0/0 2/2 0/0 .text selectMessage__19jmessage_tReferenceFv */
 void jmessage_tReference::selectMessage() {
     if (mSelectNum != 0) {
         mpStick->checkTrigger();
@@ -588,7 +627,6 @@ void jmessage_tReference::selectMessage() {
     }
 }
 
-/* 802294A8-80229730 223DE8 0288+00 0/0 1/1 0/0 .text inputNumber__19jmessage_tReferenceFv */
 void jmessage_tReference::inputNumber() {
     mpStick->checkTrigger();
 
@@ -665,7 +703,6 @@ void jmessage_tReference::inputNumber() {
     getObjectPtr()->setInputValue(new_input_val);
 }
 
-/* 80229730-80229744 224070 0014+00 5/5 0/0 0/0 .text            getWord__19jmessage_tReferenceFi */
 char* jmessage_tReference::getWord(int i_no) {
     if (i_no >= 10) {
         JUT_WARN(1093, "%s", "message stack over!!");
@@ -675,30 +712,25 @@ char* jmessage_tReference::getWord(int i_no) {
     return mWord[i_no];
 }
 
-/* 80229744-80229768 224084 0024+00 2/2 0/0 0/0 .text            resetWord__19jmessage_tReferenceFv
- */
 void jmessage_tReference::resetWord() {
     for (int i = 0; i < 10; i++) {
         mWord[i][0] = 0;
     }
 }
 
-/* 80229768-80229788 2240A8 0020+00 3/3 0/0 0/0 .text setCharactor__19jmessage_tReferenceFUs */
 void jmessage_tReference::setCharactor(u16 i_character) {
     mCharactor.data[mCharactor.field_0x40c] = i_character;
     mCharactor.field_0x40c++;
 }
 
-/* 80229788-802297B0 2240C8 0028+00 3/3 0/0 0/0 .text addCharactor__19jmessage_tReferenceFUs */
 void jmessage_tReference::addCharactor(u16 i_character) {
     if (i_character == mCharactor.data[mCharactor.field_0x40e]) {
         mCharactor.field_0x40e++;
     }
 }
 
-/* 802297B0-802297E4 2240F0 0034+00 3/3 0/0 0/0 .text resetCharactor__19jmessage_tReferenceFv */
 void jmessage_tReference::resetCharactor() {
-    for (int i = 0; i < 0x200; i++) {
+    for (int i = 0; i < ARRAY_SIZE(mCharactor.data); i++) {
         mCharactor.data[i] = 0;
     }
 
@@ -707,8 +739,6 @@ void jmessage_tReference::resetCharactor() {
     mCharactor.mCountBackUp = 0;
 }
 
-/* 802297E4-80229810 224124 002C+00 0/0 1/1 0/0 .text
- * shiftCharCountBuffer__19jmessage_tReferenceFv                */
 void jmessage_tReference::shiftCharCountBuffer() {
     for (int i = 30; i > 0; i--) {
         mCharCountBuffer[i] = mCharCountBuffer[i - 1];
@@ -717,8 +747,6 @@ void jmessage_tReference::shiftCharCountBuffer() {
     mCharCountBuffer[0] = getNowLightCount();
 }
 
-/* 80229810-80229848 224150 0038+00 1/1 5/5 0/0 .text
- * resetCharCountBuffer__19jmessage_tReferenceFv                */
 void jmessage_tReference::resetCharCountBuffer() {
     for (int i = 0; i < 31; i++) {
         mCharCountBuffer[i] = 0;
@@ -730,16 +758,12 @@ void jmessage_tReference::resetCharCountBuffer() {
     resetDrawLightCount();
 }
 
-/* 80229848-8022986C 224188 0024+00 1/1 0/0 0/0 .text
- * allsetCharCountBuffer__19jmessage_tReferenceFv               */
 void jmessage_tReference::allsetCharCountBuffer() {
     for (int i = 0; i < 31; i++) {
         mCharCountBuffer[i] = getNowLightCount();
     }
 }
 
-/* 8022986C-802298DC 2241AC 0070+00 2/2 0/0 0/0 .text            isCharSend__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isCharSend() {
     s16 delay_frame;
     s16 var_r5;
@@ -763,7 +787,6 @@ bool jmessage_tReference::isCharSend() {
     return true;
 }
 
-/* 802298DC-8022994C 22421C 0070+00 1/1 0/0 0/0 .text isLightSend__19jmessage_tReferenceFv */
 bool jmessage_tReference::isLightSend() {
     s16 delay_frame;
     s16 var_r5;
@@ -787,8 +810,6 @@ bool jmessage_tReference::isLightSend() {
     return true;
 }
 
-/* 8022994C-802299AC 22428C 0060+00 0/0 1/1 0/0 .text            isLightEnd__19jmessage_tReferenceFv
- */
 bool jmessage_tReference::isLightEnd() {
     s16 delay_frame;
 
@@ -809,8 +830,6 @@ bool jmessage_tReference::isLightEnd() {
     return false;
 }
 
-/* 802299AC-802299EC 2242EC 0040+00 2/2 0/0 0/0 .text
- * decideOutFontRupeeColor__19jmessage_tReferenceFi             */
 void jmessage_tReference::decideOutFontRupeeColor(int i_inputVal) {
     int price_diff = getObjectPtr()->getNowTotalPrice() - getObjectPtr()->getNowTotalPayment();
 
@@ -823,11 +842,8 @@ void jmessage_tReference::decideOutFontRupeeColor(int i_inputVal) {
     }
 }
 
-/* 802299EC-80229A28 22432C 003C+00 0/0 1/1 0/0 .text            __ct__17jmessage_tControlFv */
 jmessage_tControl::jmessage_tControl() {}
 
-/* 80229A28-80229AC4 224368 009C+00 1/1 0/0 0/0 .text
- * __ct__26jmessage_tMeasureProcessorFPC19jmessage_tReference   */
 jmessage_tMeasureProcessor::jmessage_tMeasureProcessor(jmessage_tReference const* pReference)
     : TRenderingProcessor(pReference) {
     jmessage_tReference* reference_p = (jmessage_tReference*)getReference();
@@ -849,8 +865,6 @@ jmessage_tMeasureProcessor::jmessage_tMeasureProcessor(jmessage_tReference const
     field_0x4d = 0;
 }
 
-/* 80229AC4-80229CB4 224404 01F0+00 1/0 0/0 0/0 .text
- * do_begin__26jmessage_tMeasureProcessorFPCvPCc                */
 void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszText) {
     (void)pszText;
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
@@ -862,7 +876,7 @@ void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszTex
     mSeSpeaker = ((JMSMesgEntry_c*)pEntry)->se_speaker;
     mSeMood = ((JMSMesgEntry_c*)pEntry)->se_mood;
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < D_MSG_CLASS_PAGE_CNT_MAX; i++) {
         pReference->setLineLength(i, 0.0f, 0.0f);
         pReference->setPageLine(i, 0);
         pReference->setPageLineMax(i, 0);
@@ -879,9 +893,11 @@ void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszTex
                 pReference->setLineArrange(i, 1);
             }
 
+#if !REGION_JPN
             if (((JMSMesgEntry_c*)pEntry)->unk_0xd == 0) {
                 pReference->setLineArrange(i, 1);
             }
+#endif
         }
     }
 
@@ -916,7 +932,6 @@ void jmessage_tMeasureProcessor::do_begin(void const* pEntry, char const* pszTex
     }
 }
 
-/* 80229CB4-80229E3C 2245F4 0188+00 1/0 0/0 0/0 .text do_end__26jmessage_tMeasureProcessorFv */
 void jmessage_tMeasureProcessor::do_end() {
     if (field_0x49 == 0) {
         field_0x3e++;
@@ -939,8 +954,6 @@ void jmessage_tMeasureProcessor::do_end() {
     Z2GetSpeechMgr2()->setString(pReference->getCharSoundInfo().data, pReference->getCharSoundInfo().field_0x40c, mSeSpeaker, mSeMood);
 }
 
-/* 80229E3C-8022A268 22477C 042C+00 1/0 0/0 0/0 .text do_character__26jmessage_tMeasureProcessorFi
- */
 void jmessage_tMeasureProcessor::do_character(int iCharacter) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     JUTFont* font = pReference->getFont();
@@ -1026,8 +1039,6 @@ static void dummyString() {
     DEAD_STRING("s");
 }
 
-/* 8022A268-8022B0B0 224BA8 0E48+00 5/0 0/0 0/0 .text do_tag__26jmessage_tMeasureProcessorFUlPCvUl
- */
 bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -1470,34 +1481,48 @@ bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_siz
         char buffer[40];
         switch (i_tag & 0xFF00FFFF) {
         case MSGTAG_PLAYER_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setPlayerName(buffer, 1);
+            } else {
+                setPlayerName(buffer, 0);
+            }
+            #endif
             push_word(buffer);
             return true;
         case MSGTAG_HORSE_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setHorseName(buffer, 1);
+            } else {
+                setHorseName(buffer, 0);
+            }
+            #endif
             push_word(buffer);
             return true;
         case MSGTAG_MALE_ICON:
-            push_word(changeCodeToChar(0xB2));
+            push_word(changeCodeToChar(CHAR_CODE_MALE_ICON));
             return true;
         case MSGTAG_FEMALE_ICON:
-            push_word(changeCodeToChar(0xB3));
+            push_word(changeCodeToChar(CHAR_CODE_FEMALE_ICON));
             return true;
         case MSGTAG_STAR_ICON:
-            push_word(changeCodeToChar(0xB1));
+            push_word(changeCodeToChar(CHAR_CODE_STAR_ICON));
             return true;
         case MSGTAG_REFMARK:
-            push_word(changeCodeToChar(0x89));
+            push_word(changeCodeToChar(CHAR_CODE_REFMARK));
             return true;
         case MSGTAG_THIN_LEFT_ARROW:
-            push_word(changeCodeToChar(0xB9));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_LEFT_ARROW));
             return true;
         case MSGTAG_THIN_RIGHT_ARROW:
-            push_word(changeCodeToChar(0xBC));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_RIGHT_ARROW));
             return true;
         case MSGTAG_THIN_UP_ARROW:
-            push_word(changeCodeToChar(0xBD));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_UP_ARROW));
             return true;
         case MSGTAG_THIN_DOWN_ARROW:
-            push_word(changeCodeToChar(0xBE));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_DOWN_ARROW));
             return true;
         case MSGTAG_BULLET:
         case MSGTAG_BULLET_SPACE:
@@ -1538,7 +1563,6 @@ bool jmessage_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_siz
     return false;
 }
 
-/* 8022B0B0-8022B18C 2259F0 00DC+00 2/2 0/0 0/0 .text do_scale__26jmessage_tMeasureProcessorFf */
 void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     field_0x38 = i_scale * pReference->getDistanceScale();
@@ -1548,6 +1572,11 @@ void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
         mPageLineMax--;
         JUT_ASSERT(0x930, mPageLineMax > 0);
 
+#if REGION_JPN
+        if (field_0x3e == 0) {
+            pReference->setPageType(field_0x40, 2);
+        }
+#else
         if (field_0x3e == 0) {
             pReference->setPageType(field_0x40, 2);
         } else if (field_0x3e == 2 && mPageLineMax == 3) {
@@ -1556,7 +1585,9 @@ void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
             } else {
                 pReference->setPageType(field_0x40, 8);
             }
-        } else {
+        }
+#endif
+        else {
             pReference->setPageType(field_0x40, 3);
             if (field_0x3e == 1 && pReference->getPageType(field_0x40) == 2) {
                 pReference->setPageType(field_0x40, 4);
@@ -1565,7 +1596,6 @@ void jmessage_tMeasureProcessor::do_scale(f32 i_scale) {
     }
 }
 
-/* 8022B18C-8022B3EC 225ACC 0260+00 2/1 0/0 0/0 .text do_space__26jmessage_tMeasureProcessorFUl */
 void jmessage_tMeasureProcessor::do_space(u32 i_tag) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     f32 var_f31 = field_0x38;
@@ -1695,8 +1725,6 @@ void jmessage_tMeasureProcessor::do_space(u32 i_tag) {
     }
 }
 
-/* 8022B3EC-8022B454 225D2C 0068+00 3/3 0/0 0/0 .text do_pageType__26jmessage_tMeasureProcessorFi
- */
 void jmessage_tMeasureProcessor::do_pageType(int param_0) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -1713,13 +1741,17 @@ void jmessage_tMeasureProcessor::do_pageType(int param_0) {
     }
 }
 
-/* 8022B454-8022B458 225D94 0004+00 1/1 0/0 0/0 .text do_name1__26jmessage_tMeasureProcessorFv */
 void jmessage_tMeasureProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
+#if REGION_JPN
+    int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
+    // if first character is hiragana or katakana
+    if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
+        push_word(changeCodeToChar(c));
+    }
+#endif
 }
 
-/* 8022B458-8022B4E0 225D98 0088+00 1/1 0/0 0/0 .text
- * do_rubyset__26jmessage_tMeasureProcessorFPCvUl               */
 void jmessage_tMeasureProcessor::do_rubyset(void const* i_data, u32 i_size) {
     if (field_0x44 == 0) {
         u8 length = i_size - 1;
@@ -1741,8 +1773,6 @@ void jmessage_tMeasureProcessor::do_rubyset(void const* i_data, u32 i_size) {
     }
 }
 
-/* 8022B4E0-8022B558 225E20 0078+00 1/1 0/0 0/0 .text push_word__26jmessage_tMeasureProcessorFPc
- */
 void jmessage_tMeasureProcessor::push_word(char* i_word) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     strcpy(pReference->getWord(field_0x4b), i_word);
@@ -1750,14 +1780,12 @@ void jmessage_tMeasureProcessor::push_word(char* i_word) {
     field_0x4b++;
 }
 
-/* 8022B558-8022B5F4 225E98 009C+00 0/0 1/1 0/0 .text
- * __ct__27jmessage_tSequenceProcessorFPC19jmessage_tReferenceP17jmessage_tControl */
 jmessage_tSequenceProcessor::jmessage_tSequenceProcessor(jmessage_tReference const* pReference,
                                                          jmessage_tControl* pControl)
     : JMessage::TSequenceProcessor(pReference, pControl),
       mMeasureProcessor(pReference)
 {
-    field_0xa8 = 1;
+    field_0xa8 = 1 * SCALE_TIME;
     field_0xa4 = field_0xa8;
     field_0xa6 = 0;
     field_0xad = 0;
@@ -1773,19 +1801,16 @@ jmessage_tSequenceProcessor::jmessage_tSequenceProcessor(jmessage_tReference con
     field_0xb4 = 0;
 }
 
-/* 8022B654-8022B658 225F94 0004+00 1/0 0/0 0/0 .text do_reset__27jmessage_tSequenceProcessorFv */
 void jmessage_tSequenceProcessor::do_reset() {}
 
-/* 8022B658-8022BA3C 225F98 03E4+00 1/0 0/0 0/0 .text
- * do_begin__27jmessage_tSequenceProcessorFPCvPCc               */
 void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszText) {
     mpEntry = pEntry;
     mpText = pszText;
 
     if (((JMSMesgEntry_c*)pEntry)->fuki_kind == 8) {
-        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeedSpirit;
+        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeedSpirit * SCALE_TIME;
     } else {
-        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeed;
+        field_0xa8 = g_MsgObject_HIO_c.mDisplaySpeed * SCALE_TIME;
     }
 
     field_0xa4 = field_0xa8;
@@ -1895,7 +1920,6 @@ void jmessage_tSequenceProcessor::do_begin(void const* pEntry, char const* pszTe
     field_0xb5 = 0;
 }
 
-/* 8022BA3C-8022BB7C 22637C 0140+00 1/0 0/0 0/0 .text do_end__27jmessage_tSequenceProcessorFv */
 void jmessage_tSequenceProcessor::do_end() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -1946,11 +1970,9 @@ void jmessage_tSequenceProcessor::do_end() {
     pReference->setNowLightCount(0xFF);
 }
 
-/* 8022BB7C-8022BFE0 2264BC 0464+00 2/0 0/0 0/0 .text do_isReady__27jmessage_tSequenceProcessorFv
- */
 bool jmessage_tSequenceProcessor::do_isReady() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
-    #ifdef DEBUG
+    #if DEBUG
     if (pReference->getRevoMessageID() != 0) {
         return 0;
     }
@@ -1988,7 +2010,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 field_0xae = 1;
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(0x200);
+                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
                 field_0xa4 = field_0xa8;
                 return true;
             }
@@ -2008,7 +2030,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 field_0xae = 1;
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(0x200);
+                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
                 return true;
             }
             
@@ -2031,7 +2053,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
                 if (mDoCPd_c::getTrigA(PAD_1) || field_0xb2 != 0) {
                     field_0xa4 = 0;
                     pReference->onBatchFlag();
-                    pReference->setCharCnt(0x200);
+                    pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
                 }
                 break;
             case 1:
@@ -2040,7 +2062,7 @@ bool jmessage_tSequenceProcessor::do_isReady() {
             case 9:
                 field_0xa4 = 0;
                 pReference->onBatchFlag();
-                pReference->setCharCnt(0x200);
+                pReference->setCharCnt(D_MSG_CLASS_CHAR_CNT_MAX);
                 break;
             case 2:
                 if (field_0xb2 != 0) {
@@ -2055,7 +2077,11 @@ bool jmessage_tSequenceProcessor::do_isReady() {
             }
 
             field_0xa6++;
+#if REGION_JPN
+            if (field_0xa6 >= 1) {
+#else
             if (field_0xa6 >= 2) {
+#endif
                 field_0xa4 = field_0xa8;
                 field_0xa6 = 0;
             }
@@ -2085,8 +2111,6 @@ bool jmessage_tSequenceProcessor::do_isReady() {
     return false;
 }
 
-/* 8022BFE0-8022C1A0 226920 01C0+00 1/0 0/0 0/0 .text
- * do_character__27jmessage_tSequenceProcessorFi                */
 void jmessage_tSequenceProcessor::do_character(int iCharacter) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -2127,8 +2151,6 @@ void jmessage_tSequenceProcessor::do_character(int iCharacter) {
     }
 }
 
-/* 8022C1A0-8022C8FC 226AE0 075C+00 2/0 0/0 0/0 .text
- * do_tag__27jmessage_tSequenceProcessorFUlPCvUl                */
 bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -2219,11 +2241,11 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
             pReference->setSendFlag(4);
             return true;
         case MSGTAG_UNK_6:
-            field_0xa8 = *(u16*)i_data;
+            field_0xa8 = (*(u16*)i_data) * SCALE_TIME;
             field_0xa4 = field_0xa8;
             return true;
         case MSGTAG_PAUSE:
-            field_0xa4 = *(u16*)i_data;
+            field_0xa4 = (*(u16*)i_data) * SCALE_TIME;
             mMouthCheck = 0;
             return true;
         case MSGTAG_SELECT_2WAY:
@@ -2462,19 +2484,21 @@ bool jmessage_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_si
     return false;
 }
 
-/* 8022C8FC-8022C904 22723C 0008+00 1/0 0/0 0/0 .text
- * do_jump_isReady__27jmessage_tSequenceProcessorFv             */
 bool jmessage_tSequenceProcessor::do_jump_isReady() {
     return true;
 }
 
-/* 8022C904-8022C908 227244 0004+00 1/1 0/0 0/0 .text do_name1__27jmessage_tSequenceProcessorFv */
 void jmessage_tSequenceProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
+#if REGION_JPN
+    int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
+    // if first character is hiragana or katakana
+    if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
+        push_word();
+    }
+#endif
 }
 
-/* 8022C908-8022CA24 227248 011C+00 2/1 0/0 0/0 .text do_space__27jmessage_tSequenceProcessorFUl
- */
 void jmessage_tSequenceProcessor::do_space(u32 i_tag) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     pReference->addNowLightCount();
@@ -2553,8 +2577,6 @@ void jmessage_tSequenceProcessor::do_space(u32 i_tag) {
     }
 }
 
-/* 8022CA24-8022CAAC 227364 0088+00 1/1 0/0 0/0 .text
- * do_rubyset__27jmessage_tSequenceProcessorFPCvUl              */
 void jmessage_tSequenceProcessor::do_rubyset(void const* i_data, u32 i_size) {
     if (field_0xac == 0) {
         u8 length = i_size - 1;
@@ -2575,8 +2597,6 @@ void jmessage_tSequenceProcessor::do_rubyset(void const* i_data, u32 i_size) {
     }
 }
 
-/* 8022CAAC-8022CB10 2273EC 0064+00 1/1 0/0 0/0 .text push_word__27jmessage_tSequenceProcessorFv
- */
 void jmessage_tSequenceProcessor::push_word() {
     jmessage_tReference* pReference = (jmessage_tReference*)JMessage::TSequenceProcessor::getReference();
     JMessage::TSequenceProcessor::stack_pushCurrent(pReference->getWord(field_0xb5));
@@ -2584,8 +2604,6 @@ void jmessage_tSequenceProcessor::push_word() {
     pReference->setNowWordCount(field_0xb5);
 }
 
-/* 8022CB10-8022CBE4 227450 00D4+00 2/2 0/0 0/0 .text
- * messageSePlay__27jmessage_tSequenceProcessorFUcUcP4cXyz      */
 void jmessage_tSequenceProcessor::messageSePlay(u8 i_speaker, u8 i_mood, cXyz* i_pos) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     dMsgObject_c* pObject = pReference->getObjectPtr();
@@ -2611,12 +2629,8 @@ void jmessage_tSequenceProcessor::messageSePlay(u8 i_speaker, u8 i_mood, cXyz* i
     }
 }
 
-/* 8022CBE4-8022CBE8 227524 0004+00 1/0 0/0 0/0 .text
- * do_jump__27jmessage_tSequenceProcessorFPCvPCc                */
 void jmessage_tSequenceProcessor::do_jump(void const* pEntry, char const* pszText) {}
 
-/* 8022CBE8-8022CCB0 227528 00C8+00 2/2 0/0 0/0 .text
- * calcStringLength__27jmessage_tSequenceProcessorFv            */
 void jmessage_tSequenceProcessor::calcStringLength() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     pReference->onSelectSetCancelFlag();
@@ -2624,8 +2638,6 @@ void jmessage_tSequenceProcessor::calcStringLength() {
     pReference->offSelectSetCancelFlag();
 }
 
-/* 8022CCB0-8022CDC8 2275F0 0118+00 0/0 1/1 0/0 .text
- * __ct__28jmessage_tRenderingProcessorFPC19jmessage_tReference */
 jmessage_tRenderingProcessor::jmessage_tRenderingProcessor(jmessage_tReference const* pReference) : JMessage::TRenderingProcessor(pReference) {
     mpOutFont = NULL;
     mCharInfoPtr = NULL;
@@ -2665,21 +2677,17 @@ jmessage_tRenderingProcessor::jmessage_tRenderingProcessor(jmessage_tReference c
     field_0x151 = 0;
     field_0x138 = 0.0f;
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < ARRAY_SIZE(field_0x7c); i++) {
         field_0x7c[i] = 0.0f;
     }
 }
 
-/* 8022CDC8-8022CDCC 227708 0004+00 1/0 0/0 0/0 .text do_reset__28jmessage_tRenderingProcessorFv
- */
 void jmessage_tRenderingProcessor::do_reset() {}
 
 static void dummyString2() {
     DEAD_STRING("");
 }
 
-/* 8022CDCC-8022CFD8 22770C 020C+00 1/0 0/0 0/0 .text
- * do_begin__28jmessage_tRenderingProcessorFPCvPCc              */
 void jmessage_tRenderingProcessor::do_begin(void const* pEntry, char const* pszText) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -2719,7 +2727,7 @@ void jmessage_tRenderingProcessor::do_begin(void const* pEntry, char const* pszT
 
     mpOutFont->initialize();
 
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < ARRAY_SIZE(field_0x7c); i++) {
         field_0x7c[i] = 0.0f;
     }
 
@@ -2749,7 +2757,6 @@ void jmessage_tRenderingProcessor::do_begin(void const* pEntry, char const* pszT
     }
 }
 
-/* 8022CFD8-8022D0A0 227918 00C8+00 1/0 0/0 0/0 .text do_end__28jmessage_tRenderingProcessorFv */
 void jmessage_tRenderingProcessor::do_end() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -2773,8 +2780,6 @@ void jmessage_tRenderingProcessor::do_end() {
     }
 }
 
-/* 8022D0A0-8022D74C 2279E0 06AC+00 1/0 0/0 0/0 .text
- * do_character__28jmessage_tRenderingProcessorFi               */
 void jmessage_tRenderingProcessor::do_character(int i_character) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     JUTFont* pFont = pReference->getFont();
@@ -2885,8 +2890,6 @@ void jmessage_tRenderingProcessor::do_character(int i_character) {
     }
 }
 
-/* 8022D74C-8022E12C 22808C 09E0+00 3/0 0/0 0/0 .text
- * do_tag__28jmessage_tRenderingProcessorFUlPCvUl               */
 bool jmessage_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3241,8 +3244,6 @@ bool jmessage_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_s
     return 0;
 }
 
-/* 8022E12C-8022E17C 228A6C 0050+00 0/0 2/2 0/0 .text
- * resetRendering__28jmessage_tRenderingProcessorFv             */
 void jmessage_tRenderingProcessor::resetRendering() {
     if (mCharInfoPtr == NULL) return;
 
@@ -3253,8 +3254,6 @@ void jmessage_tRenderingProcessor::resetRendering() {
     *mpCharInfoCnt = 0;
 }
 
-/* 8022E17C-8022E260 228ABC 00E4+00 2/2 0/0 0/0 .text
- * do_widthcenter__28jmessage_tRenderingProcessorFv             */
 void jmessage_tRenderingProcessor::do_widthcenter() {
     field_0x187 = 0;
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
@@ -3273,8 +3272,6 @@ void jmessage_tRenderingProcessor::do_widthcenter() {
     }
 }
 
-/* 8022E260-8022E318 228BA0 00B8+00 1/1 0/0 0/0 .text
- * do_selwidthcenter__28jmessage_tRenderingProcessorFi          */
 void jmessage_tRenderingProcessor::do_selwidthcenter(int param_1) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3287,8 +3284,6 @@ void jmessage_tRenderingProcessor::do_selwidthcenter(int param_1) {
     }
 }
 
-/* 8022E318-8022E7CC 228C58 04B4+00 3/2 0/0 0/0 .text
- * do_heightcenter__28jmessage_tRenderingProcessorFv            */
 void jmessage_tRenderingProcessor::do_heightcenter() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     field_0x138 = 0.0f;
@@ -3319,6 +3314,73 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
         }
         break;
     }
+#if REGION_JPN
+    case 2:
+        if ((s8)pReference->getLineMax() == 3) {
+            int nowPageLine = pReference->getNowPageLine();
+            field_0x138 = pReference->getLineSpace() * (0.5f * (pReference->getLineMax() - (s16)nowPageLine));
+            var_f31 += field_0x138;
+            break;
+        }
+        if (field_0x142 == 0) {
+            field_0x138 = pReference->getLineSpace();
+            var_f31 += field_0x138;
+        } else if (field_0x142 == 1) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+        }
+        break;
+    case 3: {
+        if (field_0x142 == 1) {
+            int nowPageLine = pReference->getNowPageLine();
+            field_0x138 = pReference->getLineSpace() * (0.5f * (pReference->getLineMax() - (s16)nowPageLine));
+            var_f31 += field_0x138;
+            break;
+        }
+        break;
+    }
+    case 4: {
+        if (field_0x142 == 1) {
+            var_f31 += 0.5f * pReference->getLineSpace();
+        }
+
+        f32 sp8 = pReference->getLineScale(field_0x142) / 100.0f;
+        f32 dVar15 = (pReference->getLineSpace() - (sp8 * pReference->getFontSizeY())) / 2;
+        field_0x138 += dVar15;
+        var_f31 += dVar15;
+        break;
+    }
+    case 5: {
+        if (field_0x142 >= 1) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+        }
+
+        f32 sp8 = pReference->getLineScale(field_0x142) / 100.0f;
+        f32 dVar15 = (pReference->getLineSpace() - (sp8 * pReference->getFontSizeY())) / 2;
+        field_0x138 += dVar15;
+        var_f31 += dVar15;
+
+        break;
+    }
+    case 6:
+        if (field_0x142 <= 1) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+        }
+        break;
+    case 7:
+        if (field_0x142 == 1 || field_0x142 == 2) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+        }
+        break;
+    case 8:
+        if (field_0x142 == 2) {
+            field_0x138 = 0.5f * pReference->getLineSpace();
+            var_f31 += field_0x138;
+        }
+#else
     case 2:
         if (field_0x142 == 0) {
             field_0x138 = pReference->getLineSpace();
@@ -3381,6 +3443,7 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
             field_0x138 = 0.5f * pReference->getLineSpace();
             var_f31 += field_0x138;
         }
+#endif
     }
 
     if (field_0x142 == 0) {
@@ -3402,8 +3465,6 @@ void jmessage_tRenderingProcessor::do_heightcenter() {
     }
 }
 
-/* 8022E7CC-8022E860 22910C 0094+00 2/2 0/0 0/0 .text do_color__28jmessage_tRenderingProcessorFUc
- */
 void jmessage_tRenderingProcessor::do_color(u8 i_colorNo) {
     jmessage_tReference* reference_p = (jmessage_tReference*)getReference();
 
@@ -3421,8 +3482,6 @@ void jmessage_tRenderingProcessor::do_color(u8 i_colorNo) {
     do_strcat(buffer, false, false, false);
 }
 
-/* 8022E860-8022E960 2291A0 0100+00 2/2 0/0 0/0 .text do_scale__28jmessage_tRenderingProcessorFf
- */
 void jmessage_tRenderingProcessor::do_scale(f32 param_1) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3451,8 +3510,6 @@ void jmessage_tRenderingProcessor::do_scale(f32 param_1) {
     do_strcat(buffer, false, true, false);
 }
 
-/* 8022E960-8022E9C0 2292A0 0060+00 1/1 0/0 0/0 .text
- * do_linedown__28jmessage_tRenderingProcessorFs                */
 void jmessage_tRenderingProcessor::do_linedown(s16 param_0) {
     char buffer[16];
 
@@ -3460,8 +3517,6 @@ void jmessage_tRenderingProcessor::do_linedown(s16 param_0) {
     do_strcat(buffer, false, true, false);
 }
 
-/* 8022E9C0-8022EAE4 229300 0124+00 1/1 0/0 0/0 .text do_transY__28jmessage_tRenderingProcessorFsb
- */
 void jmessage_tRenderingProcessor::do_transY(s16 i_transY, bool unused) {
     if (i_transY != 0) {
         char buffer0[16];
@@ -3483,8 +3538,6 @@ void jmessage_tRenderingProcessor::do_transY(s16 i_transY, bool unused) {
     }
 }
 
-/* 8022EAE4-8022ED10 229424 022C+00 2/2 0/0 0/0 .text
- * do_outfont__28jmessage_tRenderingProcessorFUcUl              */
 void jmessage_tRenderingProcessor::do_outfont(u8 i_iconNo, u32 i_color) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     JUTFont* pFont = pReference->getFont();  // fakematch
@@ -3524,8 +3577,6 @@ void jmessage_tRenderingProcessor::do_outfont(u8 i_iconNo, u32 i_color) {
     do_strcat(buffer, false, true, false);
 }
 
-/* 8022ED10-8022EECC 229650 01BC+00 1/1 0/0 0/0 .text do_arrow2__28jmessage_tRenderingProcessorFv
- */
 void jmessage_tRenderingProcessor::do_arrow2() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     JUTFont* pFont = pReference->getFont();  // fakematch
@@ -3548,8 +3599,6 @@ void jmessage_tRenderingProcessor::do_arrow2() {
     field_0x14d++;
 }
 
-/* 8022EECC-8022EF00 22980C 0034+00 1/1 0/0 0/0 .text
- * getLineLength__28jmessage_tRenderingProcessorFi              */
 f32 jmessage_tRenderingProcessor::getLineLength(int i_lineNo) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3559,8 +3608,6 @@ f32 jmessage_tRenderingProcessor::getLineLength(int i_lineNo) {
     return var_f31 + var_f30;
 }
 
-/* 8022EF00-8022F148 229840 0248+00 10/10 0/0 0/0 .text
- * do_strcat__28jmessage_tRenderingProcessorFPcbbb              */
 void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool param_3, bool param_4) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3572,7 +3619,7 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
             } else {
                 JUT_WARN(5316, "%s", "TextBox Alloc Byte Over!!");
             }
-        } else if (field_0x11c < 0x200) {
+        } else if (field_0x11c < D_MSG_CLASS_CHAR_CNT_MAX) {
             if (param_2) {
                 field_0x146++;
                 if (pReference->getBatchColorFlag() != 0) {
@@ -3607,7 +3654,7 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
                         int length = 0;
                         length = strlen(buffer);
 
-                        if (field_0x11c + length < 0x200) {
+                        if (field_0x11c + length < D_MSG_CLASS_CHAR_CNT_MAX) {
                             field_0x148 = strlen(pReference->getTextPtr());
                             field_0x14a = strlen(pReference->getTextSPtr());
 
@@ -3634,8 +3681,6 @@ void jmessage_tRenderingProcessor::do_strcat(char* i_str, bool param_2, bool par
     }
 }
 
-/* 8022F148-8022F384 229A88 023C+00 1/1 0/0 0/0 .text
- * do_rubyset__28jmessage_tRenderingProcessorFPCvUl             */
 void jmessage_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_size) {
     jmessage_tReference* pReference = (jmessage_tReference*) getReference();
     JUTFont* pFont = pReference->getFont();
@@ -3678,8 +3723,6 @@ void jmessage_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_size) {
     }
 }
 
-/* 8022F384-8022F53C 229CC4 01B8+00 3/3 0/0 0/0 .text
- * do_rubystrcat__28jmessage_tRenderingProcessorFPcPcff         */
 void jmessage_tRenderingProcessor::do_rubystrcat(char* i_src, char* i_dst, f32 i_charSpace, f32 param_4) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     if (pReference->isCharSend()) {
@@ -3704,14 +3747,17 @@ void jmessage_tRenderingProcessor::do_rubystrcat(char* i_src, char* i_dst, f32 i
     }
 }
 
-/* 8022F53C-8022F540 229E7C 0004+00 1/1 0/0 0/0 .text do_name1__28jmessage_tRenderingProcessorFv
- */
 void jmessage_tRenderingProcessor::do_name1() {
     const char* name = dComIfGs_getPlayerName();
+#if REGION_JPN
+    int c = (((char)name[0] & 0xFF) << 8) | ((char)name[1] & 0xFF);
+    // if first character is hiragana or katakana
+    if ((c >= 0x829F && c <= 0x82F1) || (c >= 0x8340 && c <= 0x8396)) {
+        push_word();
+    }
+#endif
 }
 
-/* 8022F540-8022F734 229E80 01F4+00 1/1 0/0 0/0 .text do_numset__28jmessage_tRenderingProcessorFs
- */
 void jmessage_tRenderingProcessor::do_numset(s16 i_num) {
     if (9999 < i_num) {
         i_num = 9999;
@@ -3748,16 +3794,12 @@ void jmessage_tRenderingProcessor::do_numset(s16 i_num) {
     }
 }
 
-/* 8022F734-8022F784 22A074 0050+00 1/1 0/0 0/0 .text push_word__28jmessage_tRenderingProcessorFv
- */
 void jmessage_tRenderingProcessor::push_word() {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     stack_pushCurrent(pReference->getWord(field_0x14f));
     field_0x14f++;
 }
 
-/* 8022F784-8022F8C0 22A0C4 013C+00 2/2 0/0 0/0 .text
- * getCharInfo__28jmessage_tRenderingProcessorFfffff            */
 void jmessage_tRenderingProcessor::getCharInfo(f32 param_1, f32 param_2, f32 param_3, f32 param_4, f32 param_5) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
 
@@ -3782,13 +3824,12 @@ void jmessage_tRenderingProcessor::getCharInfo(f32 param_1, f32 param_2, f32 par
     }
 }
 
-/* 8022F8C0-8022F94C 22A200 008C+00 0/0 1/1 0/0 .text __ct__26jmessage_string_tReferenceFv */
 jmessage_string_tReference::jmessage_string_tReference() {
     mPanePtr = NULL;
     mRubyPanePtr = NULL;
     mpFont = mDoExt_getMesgFont();
 
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < ARRAY_SIZE(mLineLength); i++) {
         mLineLength[i] = 0.0f;
         mOutfontLength[i] = 0.0f;
     }
@@ -3796,22 +3837,23 @@ jmessage_string_tReference::jmessage_string_tReference() {
     resetCharactor();
 }
 
-/* 8022F9AC-8022FA2C 22A2EC 0080+00 0/0 3/3 0/0 .text
- * init__26jmessage_string_tReferenceFP10J2DTextBoxP10J2DTextBoxP7JUTFontP10COutFont_cUc */
+jmessage_string_tReference::~jmessage_string_tReference() {
+}
+
 void jmessage_string_tReference::init(J2DTextBox* panePtr, J2DTextBox* runyPanePtr,
                                           JUTFont* font, COutFont_c* outFontPtr, u8 flags) {
     mPanePtr = panePtr;
     mRubyPanePtr = runyPanePtr;
     mOutFontPtr = outFontPtr;
     mLineCount = 0;
-    mLineMax = 12;
+    mLineMax = D_MSG_CLASS_LINE_MAX;
     mNowPage = 0;
     mFlags = flags;
     if (font != NULL) {
         mpFont = font;
     }
 
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < ARRAY_SIZE(mLineLength); i++) {
         mLineLength[i] = 0.0f;
         mOutfontLength[i] = 0.0f;
     }
@@ -3821,20 +3863,12 @@ void jmessage_string_tReference::init(J2DTextBox* panePtr, J2DTextBox* runyPaneP
     }
 }
 
-/* 8022FA2C-8022FA30 22A36C 0004+00 3/3 0/0 0/0 .text
- * setCharactor__26jmessage_string_tReferenceFUs                */
 void jmessage_string_tReference::setCharactor(u16 param_0) {}
 
-/* 8022FA30-8022FA34 22A370 0004+00 3/3 0/0 0/0 .text
- * addCharactor__26jmessage_string_tReferenceFUs                */
 void jmessage_string_tReference::addCharactor(u16 param_0) {}
 
-/* 8022FA34-8022FA38 22A374 0004+00 3/3 0/0 0/0 .text
- * resetCharactor__26jmessage_string_tReferenceFv               */
 void jmessage_string_tReference::resetCharactor() {}
 
-/* 8022FA38-8022FA6C 22A378 0034+00 2/2 1/1 0/0 .text
- * getLineLength__26jmessage_string_tReferenceFi                */
 f32 jmessage_string_tReference::getLineLength(int lineNo) {
     if (lineNo < 0) {
         return 0.0f;
@@ -3847,16 +3881,12 @@ f32 jmessage_string_tReference::getLineLength(int lineNo) {
     return 0.0f;
 }
 
-/* 8022FA6C-8022FA98 22A3AC 002C+00 2/2 0/0 0/0 .text
- * addLineLength__26jmessage_string_tReferenceFif               */
 void jmessage_string_tReference::addLineLength(int lineNo, f32 length) {
     if (lineNo >= 0 && lineNo < mLineMax)  {
         mLineLength[lineNo] += length;
     }
 }
 
-/* 8022FA98-8022FACC 22A3D8 0034+00 1/1 0/0 0/0 .text
- * getOutfontLength__26jmessage_string_tReferenceFi             */
 f32 jmessage_string_tReference::getOutfontLength(int param_0) {
     if (param_0 < 0) return 0.0f;
     if (param_0 < mLineMax) {
@@ -3865,16 +3895,12 @@ f32 jmessage_string_tReference::getOutfontLength(int param_0) {
     return 0.0f;
 }
 
-/* 8022FACC-8022FAF0 22A40C 0024+00 1/1 0/0 0/0 .text
- * setOutfontLength__26jmessage_string_tReferenceFif            */
 void jmessage_string_tReference::setOutfontLength(int param_0, f32 param_1) {
     if (param_0 < 0) return;
     if (param_0 >= mLineMax) return;
     mOutfontLength[param_0] = param_1;
 }
 
-/* 8022FAF0-8022FB24 22A430 0034+00 2/2 0/0 0/0 .text
- * clearOutfontLength__26jmessage_string_tReferenceFi           */
 void jmessage_string_tReference::clearOutfontLength(int param_0) {
     if (param_0 < 0) return;
     if (param_0 >= mLineMax) return;
@@ -3884,8 +3910,6 @@ void jmessage_string_tReference::clearOutfontLength(int param_0) {
     }
 }
 
-/* 8022FB24-8022FB5C 22A464 0038+00 4/4 0/0 0/0 .text
- * getLineCountNowPage__26jmessage_string_tReferenceFv          */
 s16 jmessage_string_tReference::getLineCountNowPage() {
     s16 rv = -1;
     s32 iVar4 = mNowPage * mLineMax;
@@ -3897,19 +3921,13 @@ s16 jmessage_string_tReference::getLineCountNowPage() {
     return rv;
 }
 
-/* 8022FB5C-8022FB98 22A49C 003C+00 0/0 1/1 0/0 .text            __ct__24jmessage_string_tControlFv
- */
 jmessage_string_tControl::jmessage_string_tControl() {}
 
-/* 8022FB98-8022FBE4 22A4D8 004C+00 1/1 0/0 0/0 .text
- * __ct__33jmessage_string_tMeasureProcessorFPC26jmessage_string_tReference */
 jmessage_string_tMeasureProcessor::jmessage_string_tMeasureProcessor(jmessage_string_tReference const* pReference) : JMessage::TRenderingProcessor(pReference) {
     mpReference = (jmessage_string_tReference*)getReference();
     mpReference->resetCharactor();
 }
 
-/* 8022FBE4-8022FC14 22A524 0030+00 1/0 0/0 0/0 .text
- * do_begin__33jmessage_string_tMeasureProcessorFPCvPCc         */
 void jmessage_string_tMeasureProcessor::do_begin(void const* pEntry, char const* pszText) {
     (void)pEntry;
     (void)pszText;
@@ -3917,14 +3935,10 @@ void jmessage_string_tMeasureProcessor::do_begin(void const* pEntry, char const*
     mpReference->resetCharactor();
 }
 
-/* 8022FC14-8022FC28 22A554 0014+00 1/0 0/0 0/0 .text
- * do_end__33jmessage_string_tMeasureProcessorFv                */
 void jmessage_string_tMeasureProcessor::do_end() {
     mpReference->addLineCount();
 }
 
-/* 8022FC28-8022FDF0 22A568 01C8+00 1/0 0/0 0/0 .text
- * do_character__33jmessage_string_tMeasureProcessorFi          */
 void jmessage_string_tMeasureProcessor::do_character(int iCharacter) {
     JUTFont* pFont = mpReference->getFont();
     if (JUTFont::isLeadByte_ShiftJIS(iCharacter)) {
@@ -3955,8 +3969,6 @@ void jmessage_string_tMeasureProcessor::do_character(int iCharacter) {
     }
 }
 
-/* 8022FDF0-8023098C 22A730 0B9C+00 5/0 0/0 0/0 .text
- * do_tag__33jmessage_string_tMeasureProcessorFUlPCvUl          */
 bool jmessage_string_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     f32 var_f30;
     J2DTextBox::TFontSize fontsize;
@@ -4230,35 +4242,49 @@ bool jmessage_string_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u3
         char buffer[40];
         switch (i_tag & 0xFF00FFFF) {
         case MSGTAG_PLAYER_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setPlayerName(buffer, 1);
+            } else {
+                setPlayerName(buffer, 0);
+            }
+            #endif
             // @bug buffer is uninitialized
             stack_pushCurrent(buffer);
             break;
         case MSGTAG_HORSE_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setHorseName(buffer, 1);
+            } else {
+                setHorseName(buffer, 0);
+            }
+            #endif
             stack_pushCurrent(buffer);
             break;
         case MSGTAG_MALE_ICON:
-            stack_pushCurrent(changeCodeToChar(0xB2));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_MALE_ICON));
             break;
         case MSGTAG_FEMALE_ICON:
-            stack_pushCurrent(changeCodeToChar(0xB3));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_FEMALE_ICON));
             break;
         case MSGTAG_STAR_ICON:
-            stack_pushCurrent(changeCodeToChar(0xB1));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_STAR_ICON));
             break;
         case MSGTAG_REFMARK:
-            stack_pushCurrent(changeCodeToChar(0x89));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_REFMARK));
             break;
         case MSGTAG_THIN_LEFT_ARROW:
-            stack_pushCurrent(changeCodeToChar(0xB9));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_THIN_LEFT_ARROW));
             break;
         case MSGTAG_THIN_RIGHT_ARROW:
-            stack_pushCurrent(changeCodeToChar(0xBC));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_THIN_RIGHT_ARROW));
             break;
         case MSGTAG_THIN_UP_ARROW:
-            stack_pushCurrent(changeCodeToChar(0xBD));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_THIN_UP_ARROW));
             break;
         case MSGTAG_THIN_DOWN_ARROW:
-            stack_pushCurrent(changeCodeToChar(0xBE));
+            stack_pushCurrent(changeCodeToChar(CHAR_CODE_THIN_DOWN_ARROW));
             break;
         case MSGTAG_BULLET:
         case MSGTAG_BULLET_SPACE:
@@ -4315,8 +4341,6 @@ bool jmessage_string_tMeasureProcessor::do_tag(u32 i_tag, void const* i_data, u3
     return true;
 }
 
-/* 8023098C-80230A08 22B2CC 007C+00 1/1 0/0 0/0 .text
- * do_rubyset__33jmessage_string_tMeasureProcessorFPCvUl        */
 void jmessage_string_tMeasureProcessor::do_rubyset(void const* i_data, u32 i_size) {
     u8 len = i_size - 1;
     u8* pRuby = (u8*)i_data;
@@ -4343,33 +4367,21 @@ jmessage_string_tSequenceProcessor::jmessage_string_tSequenceProcessor(
     mMeasureProcessor(pReference)
     {}
 
-/* 80230ABC-80230AC0 22B3FC 0004+00 1/0 0/0 0/0 .text
- * do_reset__34jmessage_string_tSequenceProcessorFv             */
 void jmessage_string_tSequenceProcessor::do_reset() {}
 
-/* 80230AC0-80230B7C 22B400 00BC+00 1/0 0/0 0/0 .text
- * do_begin__34jmessage_string_tSequenceProcessorFPCvPCc        */
 void jmessage_string_tSequenceProcessor::do_begin(void const* pEntry, char const* pszText) {
     mpSeqReference = (jmessage_string_tReference*)JMessage::TSequenceProcessor::getReference();
     mMeasureProcessor.process_messageEntryText(this, pEntry, pszText);
 }
 
-/* 80230B7C-80230B80 22B4BC 0004+00 1/0 0/0 0/0 .text
- * do_end__34jmessage_string_tSequenceProcessorFv               */
 void jmessage_string_tSequenceProcessor::do_end() {}
 
-/* 80230B80-80230B88 22B4C0 0008+00 1/0 0/0 0/0 .text
- * do_isReady__34jmessage_string_tSequenceProcessorFv           */
 bool jmessage_string_tSequenceProcessor::do_isReady() {
     return true;
 }
 
-/* 80230B88-80230B8C 22B4C8 0004+00 1/0 0/0 0/0 .text
- * do_character__34jmessage_string_tSequenceProcessorFi         */
 void jmessage_string_tSequenceProcessor::do_character(int iCharacter) {}
 
-/* 80230B8C-80230BBC 22B4CC 0030+00 1/0 0/0 0/0 .text
- * do_tag__34jmessage_string_tSequenceProcessorFUlPCvUl         */
 bool jmessage_string_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     switch (i_tag & 0xFF0000) {
     case MSGTAG_GROUP(0):
@@ -4383,18 +4395,12 @@ bool jmessage_string_tSequenceProcessor::do_tag(u32 i_tag, void const* i_data, u
     return true;
 }
 
-/* 80230BBC-80230BC4 22B4FC 0008+00 1/0 0/0 0/0 .text
- * do_jump_isReady__34jmessage_string_tSequenceProcessorFv      */
 bool jmessage_string_tSequenceProcessor::do_jump_isReady() {
     return true;
 }
 
-/* 80230BC4-80230BC8 22B504 0004+00 1/0 0/0 0/0 .text
- * do_jump__34jmessage_string_tSequenceProcessorFPCvPCc         */
 void jmessage_string_tSequenceProcessor::do_jump(void const* pEntry, char const* pszText) {}
 
-/* 80230BC8-80230C20 22B508 0058+00 0/0 1/1 0/0 .text
- * __ct__35jmessage_string_tRenderingProcessorFPC26jmessage_string_tReference */
 jmessage_string_tRenderingProcessor::jmessage_string_tRenderingProcessor(
     jmessage_string_tReference const* pReference)
     : JMessage::TRenderingProcessor(pReference) {
@@ -4402,8 +4408,6 @@ jmessage_string_tRenderingProcessor::jmessage_string_tRenderingProcessor(
     do_reset();
 }
 
-/* 80230C20-80230C5C 22B560 003C+00 5/5 0/0 0/0 .text
- * getLineCountNowPage__35jmessage_string_tRenderingProcessorFv */
 s16 jmessage_string_tRenderingProcessor::getLineCountNowPage() {
     s16 rv = -1;
     s32 iVar4 = mpReference->getNowPage() * mpReference->getLineMax();
@@ -4414,8 +4418,6 @@ s16 jmessage_string_tRenderingProcessor::getLineCountNowPage() {
     return rv;
 }
 
-/* 80230C5C-80230CA0 22B59C 0044+00 1/0 0/0 0/0 .text
- * do_reset__35jmessage_string_tRenderingProcessorFv            */
 void jmessage_string_tRenderingProcessor::do_reset() {
     field_0x44 = 0.0f;
     field_0x3c = 0.0f;
@@ -4434,16 +4436,12 @@ void jmessage_string_tRenderingProcessor::do_reset() {
     field_0x486[0] = 0;
 }
 
-/* 80230CA0-80230CE8 22B5E0 0048+00 1/0 0/0 0/0 .text
- * do_begin__35jmessage_string_tRenderingProcessorFPCvPCc       */
 void jmessage_string_tRenderingProcessor::do_begin(void const* pEntry, char const* pszText) {
     do_reset();
     do_widthcenter();
     do_heightcenter();
 }
 
-/* 80230CE8-80230D48 22B628 0060+00 1/0 0/0 0/0 .text
- * do_end__35jmessage_string_tRenderingProcessorFv              */
 void jmessage_string_tRenderingProcessor::do_end() {
     if (mpReference->getPanePtr() != NULL) {
         strcpy(mpReference->getPanePtr()->getStringPtr(), field_0x54);
@@ -4454,8 +4452,6 @@ void jmessage_string_tRenderingProcessor::do_end() {
     }
 }
 
-/* 80230D48-80231110 22B688 03C8+00 1/0 0/0 0/0 .text
- * do_character__35jmessage_string_tRenderingProcessorFi        */
 void jmessage_string_tRenderingProcessor::do_character(int iCharacter) {
     JUTFont* pFont = mpReference->getFont();
     if (JUTFont::isLeadByte_ShiftJIS(iCharacter)) {
@@ -4535,8 +4531,6 @@ void jmessage_string_tRenderingProcessor::do_character(int iCharacter) {
     }
 }
 
-/* 80231110-80231D70 22BA50 0C60+00 6/0 0/0 0/0 .text
- * do_tag__35jmessage_string_tRenderingProcessorFUlPCvUl        */
 bool jmessage_string_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, u32 i_size) {
     jmessage_tReference* pReference = (jmessage_tReference*)getReference();
     switch(i_tag & 0xFF0000) {
@@ -4859,35 +4853,49 @@ bool jmessage_string_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, 
         char buffer[40];
         switch (i_tag & 0xFF00FFFF) {
         case MSGTAG_PLAYER_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setPlayerName(buffer, 1);
+            } else {
+                setPlayerName(buffer, 0);
+            }
+            #endif
             // @bug buffer is uninitialized
             push_word(buffer);
             break;
         case MSGTAG_HORSE_GENITIV:
+            #if VERSION == VERSION_GCN_PAL
+            if (dComIfGs_getPalLanguage() == dSv_player_config_c::LANGAUGE_GERMAN) {
+                setHorseName(buffer, 1);
+            } else {
+                setHorseName(buffer, 0);
+            }
+            #endif
             push_word(buffer);
             break;
         case MSGTAG_MALE_ICON:
-            push_word(changeCodeToChar(0xB2));
+            push_word(changeCodeToChar(CHAR_CODE_MALE_ICON));
             break;
         case MSGTAG_FEMALE_ICON:
-            push_word(changeCodeToChar(0xB3));
+            push_word(changeCodeToChar(CHAR_CODE_FEMALE_ICON));
             break;
         case MSGTAG_STAR_ICON:
-            push_word(changeCodeToChar(0xB1));
+            push_word(changeCodeToChar(CHAR_CODE_STAR_ICON));
             break;
         case MSGTAG_REFMARK:
-            push_word(changeCodeToChar(0x89));
+            push_word(changeCodeToChar(CHAR_CODE_REFMARK));
             break;
         case MSGTAG_THIN_LEFT_ARROW:
-            push_word(changeCodeToChar(0xB9));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_LEFT_ARROW));
             break;
         case MSGTAG_THIN_RIGHT_ARROW:
-            push_word(changeCodeToChar(0xBC));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_RIGHT_ARROW));
             break;
         case MSGTAG_THIN_UP_ARROW:
-            push_word(changeCodeToChar(0xBD));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_UP_ARROW));
             break;
         case MSGTAG_THIN_DOWN_ARROW:
-            push_word(changeCodeToChar(0xBE));
+            push_word(changeCodeToChar(CHAR_CODE_THIN_DOWN_ARROW));
             break;
         case MSGTAG_BULLET:
             do_outfont(42);
@@ -4970,8 +4978,6 @@ bool jmessage_string_tRenderingProcessor::do_tag(u32 i_tag, void const* i_data, 
     return 1;
 }
 
-/* 80231D70-80231EF0 22C6B0 0180+00 2/2 0/0 0/0 .text
- * do_widthcenter__35jmessage_string_tRenderingProcessorFv      */
 void jmessage_string_tRenderingProcessor::do_widthcenter() {
     J2DPane* pane;
     f32 scale;
@@ -4992,7 +4998,7 @@ void jmessage_string_tRenderingProcessor::do_widthcenter() {
         scale = 1.0f;
         scale = mDoGph_gInf_c::getScale();
 
-        #if VERSION == VERSION_SHIELD_DEBUG 
+        #if VERSION >= VERSION_WII_USA_R0
         for (; pane != NULL; pane = pane->getParentPane()) {
             if (pane->getUserInfo() == 'n_43') {
                 scale = 1.0f;
@@ -5020,8 +5026,6 @@ void jmessage_string_tRenderingProcessor::do_widthcenter() {
     }
 }
 
-/* 80231EF0-80232044 22C830 0154+00 1/1 0/0 0/0 .text
- * do_heightcenter__35jmessage_string_tRenderingProcessorFv     */
 void jmessage_string_tRenderingProcessor::do_heightcenter() {
     f32 height;
     J2DTextBox::TFontSize fontSize;
@@ -5053,12 +5057,10 @@ void jmessage_string_tRenderingProcessor::do_heightcenter() {
     }
 }
 
-/* 80232044-802320B0 22C984 006C+00 7/7 0/0 0/0 .text
- * do_strcat__35jmessage_string_tRenderingProcessorFPc          */
 void jmessage_string_tRenderingProcessor::do_strcat(char* i_str) {
     if (getLineCountNowPage() >= 0) {
         field_0x54e += strlen(i_str);
-        if (field_0x54e < 512) {
+        if (field_0x54e < ARRAY_SIZE(field_0x54)) {
             strcat(field_0x54, i_str);
         } else {
             JUT_WARN(7531, "%s", "Message Alloc Byte Over!!");
@@ -5066,8 +5068,6 @@ void jmessage_string_tRenderingProcessor::do_strcat(char* i_str) {
     }
 }
 
-/* 802320B0-80232260 22C9F0 01B0+00 1/1 0/0 0/0 .text
- * do_rubyset__35jmessage_string_tRenderingProcessorFPCvUl      */
 void jmessage_string_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_size) {
     if (getLineCountNowPage() >= 0) {
         if (mpReference->getRubyPanePtr() != NULL) {
@@ -5106,12 +5106,10 @@ void jmessage_string_tRenderingProcessor::do_rubyset(void const* i_data, u32 i_s
     }
 }
 
-/* 80232260-802322CC 22CBA0 006C+00 2/2 0/0 0/0 .text
- * do_rubystrcat__35jmessage_string_tRenderingProcessorFPc      */
 void jmessage_string_tRenderingProcessor::do_rubystrcat(char* i_str) {
     if (getLineCountNowPage() >= 0) {
         field_0x550 += strlen(i_str);
-        if (field_0x550 < 512) {
+        if (field_0x550 < ARRAY_SIZE(field_0x254)) {
             strcat(field_0x254, i_str);
         } else {
             JUT_WARN(7613, "%s", "Message Alloc Byte Over!!");
@@ -5119,8 +5117,6 @@ void jmessage_string_tRenderingProcessor::do_rubystrcat(char* i_str) {
     }
 }
 
-/* 802322CC-8023256C 22CC0C 02A0+00 2/2 0/0 0/0 .text
- * do_outfont__35jmessage_string_tRenderingProcessorFUc         */
 void jmessage_string_tRenderingProcessor::do_outfont(u8 i_iconNo) {
     if (mpReference->getPanePtr() != NULL) {
         f32 charSpace = mpReference->getPanePtr()->getCharSpace();
@@ -5176,8 +5172,6 @@ void jmessage_string_tRenderingProcessor::do_outfont(u8 i_iconNo) {
     }
 }
 
-/* 8023256C-80232600 22CEAC 0094+00 1/1 0/0 0/0 .text
- * do_color__35jmessage_string_tRenderingProcessorFUc           */
 void jmessage_string_tRenderingProcessor::do_color(u8 i_colorNo) {
     u32 ccColor;
     u32 gcColor;
@@ -5194,8 +5188,6 @@ void jmessage_string_tRenderingProcessor::do_color(u8 i_colorNo) {
     do_strcat(buffer);
 }
 
-/* 80232600-80232690 22CF40 0090+00 1/1 0/0 0/0 .text
- * do_scale__35jmessage_string_tRenderingProcessorFf            */
 void jmessage_string_tRenderingProcessor::do_scale(f32 i_scale) {
     J2DTextBox::TFontSize fontSize;
     mpReference->getPanePtr()->getFontSize(fontSize);
@@ -5207,16 +5199,12 @@ void jmessage_string_tRenderingProcessor::do_scale(f32 i_scale) {
     do_strcat(buffer);
 }
 
-/* 80232690-802326E4 22CFD0 0054+00 1/1 0/0 0/0 .text
- * do_linedown__35jmessage_string_tRenderingProcessorFs         */
 void jmessage_string_tRenderingProcessor::do_linedown(s16 i_lineNo) {
     char buffer[16];
     sprintf(buffer, "\x1B" "CD[%d]", i_lineNo);
     do_strcat(buffer);
 }
 
-/* 802326E4-802327BC 22D024 00D8+00 1/1 0/0 0/0 .text
- * do_numset__35jmessage_string_tRenderingProcessorFs           */
 void jmessage_string_tRenderingProcessor::do_numset(s16 i_num) {
     if (9999 < i_num) {
         i_num = 9999;
@@ -5231,8 +5219,6 @@ void jmessage_string_tRenderingProcessor::do_numset(s16 i_num) {
     do_outfont(getOutFontNumberType(i_num % 10));
 }
 
-/* 802327BC-802327F8 22D0FC 003C+00 1/1 0/0 0/0 .text
- * push_word__35jmessage_string_tRenderingProcessorFPCc         */
 void jmessage_string_tRenderingProcessor::push_word(char const* i_word) {
     strcpy(field_0x486, i_word);
     stack_pushCurrent(field_0x486);

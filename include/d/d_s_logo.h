@@ -8,12 +8,15 @@ class JKRHeap;
 struct ResTIMG;
 class dDlst_2D_c;
 class mDoDvdThd_mountXArchive_c;
+class mDoDvdThd_mountArchive_c;
 class mDoDvdThd_toMainRam_c;
 
 class dLog_HIO_c {
 public:
-    /* 802560A4 */ dLog_HIO_c();
-    /* 8025855C */ virtual ~dLog_HIO_c();
+    dLog_HIO_c();
+    virtual ~dLog_HIO_c();
+
+    u8 field_0x4[0x8 - 0x4];
 };  // Size: 0x8
 
 class dScnLogo_c : public scene_class {
@@ -38,35 +41,47 @@ public:
     };
 
     dScnLogo_c() {}
-    /* 802560B4 */ void preLoad_dyl_create();
-    /* 802560F8 */ void preLoad_dyl_remove();
-    /* 8025611C */ bool preLoad_dyl();
-    /* 80256198 */ void checkProgSelect();
-    /* 80256210 */ int draw();
-    /* 80256264 */ void progInDraw();
-    /* 8025631C */ void progSelDraw();
-    /* 802568E0 */ void progOutDraw();
-    /* 80256A3C */ void progSetDraw();
-    /* 80256AC0 */ void progSet2Draw();
-    /* 80256B3C */ void progChangeDraw();
-    /* 80256BF4 */ void warningInDraw();
-    /* 80256C68 */ void warningDispDraw();
-    /* 80256DC4 */ void warningOutDraw();
-    /* 80256E48 */ void nintendoInDraw();
-    /* 80256ECC */ void nintendoOutDraw();
-    /* 80256F50 */ void dolbyInDraw();
-    /* 80256FD4 */ void dolbyOutDraw();
-    /* 80257058 */ void dolbyOutDraw2();
-    /* 80257070 */ void dvdWaitDraw();
-    /* 80257284 */ void nextSceneChange();
-    /* 802572B8 */ ~dScnLogo_c();
-    /* 80257AE0 */ int create();
-    /* 80257C64 */ void logoInitGC();
-    /* 80257FEC */ void dvdDataLoad();
-    /* 802584D8 */ void setProgressiveMode(u8);
-    /* 802584FC */ u8 getProgressiveMode();
-    /* 80258520 */ bool isProgressiveMode();
-    /* 8025854C */ void setRenderMode();
+    void preLoad_dyl_create();
+    void preLoad_dyl_remove();
+    bool preLoad_dyl();
+    void checkProgSelect();
+    int draw();
+    void progInDraw();
+    void progSelDraw();
+    void progOutDraw();
+    void progSetDraw();
+    void progSet2Draw();
+    void progChangeDraw();
+    void warningInDraw();
+    void warningDispDraw();
+    void warningOutDraw();
+    void nintendoInDraw();
+    void nintendoOutDraw();
+    void dolbyInDraw();
+    void dolbyOutDraw();
+    void dolbyOutDraw2();
+    void dvdWaitDraw();
+    void nextSceneChange();
+    ~dScnLogo_c();
+    int create();
+    void logoInitGC();
+    void dvdDataLoad();
+    void setProgressiveMode(u8);
+    u8 getProgressiveMode();
+    bool isProgressiveMode();
+    void setRenderMode();
+
+    #if VERSION == VERSION_GCN_PAL
+    u8 getPalLanguage();
+    #endif
+
+    #if DEBUG
+    static void onOpeningCut() {
+        mOpeningCut = true;
+    }
+    
+    static u8 mOpeningCut;
+    #endif
 
 public:
     /* 0x1C4 */ request_of_phase_process_class field_0x1c4;
@@ -82,6 +97,9 @@ public:
     /* 0x1F0 */ dDlst_2D_c* mProgressiveYes;
     /* 0x1F4 */ dDlst_2D_c* mProgressiveNo;
     /* 0x1F8 */ dDlst_2D_c* mProgressiveSel;
+#if VERSION == VERSION_GCN_PAL
+    /* 0x1FC */ mDoDvdThd_mountArchive_c* mpPalLogoResCommand;
+#endif
     /* 0x1FC */ request_of_phase_process_class* m_preLoad_dylPhase;
     /* 0x200 */ ResTIMG* mProgressivePro;
     /* 0x204 */ ResTIMG* mProgressiveInter;

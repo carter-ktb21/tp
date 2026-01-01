@@ -19,7 +19,7 @@ struct JPAExTexShapeData {
     /* 0x24 */ s8 mExpScale;
     /* 0x25 */ s8 mIndTexIdx;
     /* 0x26 */ s8 mSecTexIdx;
-};
+};  // Size: 0x28
 
 /**
  * @ingroup jsystem-jparticle
@@ -27,7 +27,7 @@ struct JPAExTexShapeData {
  */
 class JPAExTexShape {
 public:
-    /* 8027B13C */ JPAExTexShape(u8 const*);
+    JPAExTexShape(u8 const*);
 
     const f32* getIndTexMtx() const { return &mpData->mIndTexMtx[0][0]; }
     s8 getExpScale() const { return mpData->mExpScale; }

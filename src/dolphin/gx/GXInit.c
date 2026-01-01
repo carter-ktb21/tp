@@ -17,7 +17,7 @@
 #define RBUILD_TIME "06:27:12"
 #endif
 
-#ifdef DEBUG
+#if DEBUG
 const char* __GXVersion = "<< Dolphin SDK - GX\tdebug build: "BUILD_DATE" "DBUILD_TIME" (0x2301) >>";
 #else
 const char* __GXVersion = "<< Dolphin SDK - GX\trelease build: "BUILD_DATE" "RBUILD_TIME" (0x2301) >>";
@@ -43,7 +43,7 @@ void* __piReg;
 GXBool __GXinBegin;
 #endif
 
-static u16 DefaultTexData[] __attribute__((aligned(32))) = {
+static u16 DefaultTexData[] ATTRIBUTE_ALIGN(32) = {
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
 };

@@ -14,16 +14,16 @@ struct TCreateObject : public JStudio::TCreateObject {
         pJPAEmitterManager_ = p_emitMgr;
         pJSGSystem_ = p_system;
         mPermit_onExit_notEnd = false;
-        JUT_ASSERT(48, pJPAEmitterManager_!=0);
+        JUT_ASSERT(48, pJPAEmitterManager_!=NULL);
     }
 
-    /* 8028E3A0 */ virtual ~TCreateObject();
-    /* 8028E400 */ virtual bool create(JStudio::TObject**,
+    virtual ~TCreateObject();
+    virtual bool create(JStudio::TObject**,
                                        JStudio::stb::data::TParse_TBlock_object const&);
-    /* 8028E474 */ virtual JPABaseEmitter* emitter_create(u32);
-    /* 8028E4E4 */ virtual void emitter_destroy(JPABaseEmitter*);
+    virtual JPABaseEmitter* emitter_create(u32);
+    virtual void emitter_destroy(JPABaseEmitter*);
 
-    /* 8028E508 */ static JStudio::TObject*
+    static JStudio::TObject*
     createObject_JPA_PARTICLE_(JStudio::stb::data::TParse_TBlock_object const&,
                                JStudio_JParticle::TCreateObject*);
 
@@ -42,13 +42,12 @@ struct TAdaptor_particle : public JStudio::TAdaptor_particle {
         TJPACallback_emitter_(TAdaptor_particle* param_1) {
             pThis_ = param_1;
             pOld = NULL;
-            JUT_ASSERT(113, pThis_!=0);
+            JUT_ASSERT(113, pThis_!=NULL);
         }
-        /* 8028E700 */ virtual ~TJPACallback_emitter_() {}
-        /* 8028ECC0 */ virtual void execute(JPABaseEmitter*);
-        /* 8028F060 */ virtual void executeAfter(JPABaseEmitter*);
-        /* 8028F098 */ virtual void draw(JPABaseEmitter*);
-        /* 8028F0D0 */ virtual void drawAfter(JPABaseEmitter*);
+        virtual void execute(JPABaseEmitter*);
+        virtual void executeAfter(JPABaseEmitter*);
+        virtual void draw(JPABaseEmitter*);
+        virtual void drawAfter(JPABaseEmitter*);
 
         JPAEmitterCallBack* getOld() { return pOld; }
         void setOld(JPAEmitterCallBack* cb) { pOld = cb; }
@@ -68,30 +67,30 @@ struct TAdaptor_particle : public JStudio::TAdaptor_particle {
         /* 0x0 */ JPABaseEmitter* pJPAEmitter_;
     };
 
-    /* 8028E60C */ TAdaptor_particle(JStudio_JParticle::TCreateObject*);
-    /* 8028F108 */ void beginParticle_fadeIn_();
-    /* 8028F1C0 */ void endParticle_fadeOut_(u32);
+    TAdaptor_particle(JStudio_JParticle::TCreateObject*);
+    void beginParticle_fadeIn_();
+    void endParticle_fadeOut_(u32);
 
-    /* 8028E760 */ virtual ~TAdaptor_particle();
-    /* 8028E850 */ virtual void adaptor_do_prepare();
-    /* 8028E97C */ virtual void adaptor_do_end();
-    /* 8028E980 */ virtual void adaptor_do_update(u32);
-    /* 8028EA68 */ virtual void adaptor_do_PARTICLE(JStudio::data::TEOperationData, void const*, u32);
-    /* 8028EA7C */ virtual void adaptor_do_BEGIN(JStudio::data::TEOperationData, void const*, u32);
-    /* 8028EAB0 */ virtual void adaptor_do_BEGIN_FADE_IN(JStudio::data::TEOperationData, void const*,
+    virtual ~TAdaptor_particle();
+    virtual void adaptor_do_prepare();
+    virtual void adaptor_do_end();
+    virtual void adaptor_do_update(u32);
+    virtual void adaptor_do_PARTICLE(JStudio::data::TEOperationData, void const*, u32);
+    virtual void adaptor_do_BEGIN(JStudio::data::TEOperationData, void const*, u32);
+    virtual void adaptor_do_BEGIN_FADE_IN(JStudio::data::TEOperationData, void const*,
                                                     u32);
-    /* 8028EAF8 */ virtual void adaptor_do_END(JStudio::data::TEOperationData, void const*, u32);
-    /* 8028EB24 */ virtual void adaptor_do_END_FADE_OUT(JStudio::data::TEOperationData, void const*,
+    virtual void adaptor_do_END(JStudio::data::TEOperationData, void const*, u32);
+    virtual void adaptor_do_END_FADE_OUT(JStudio::data::TEOperationData, void const*,
                                                 u32);
-    /* 8028EB6C */ virtual void adaptor_do_PARENT(JStudio::data::TEOperationData, void const*, u32);
-    /* 8028EBD8 */ virtual void adaptor_do_PARENT_NODE(JStudio::data::TEOperationData, void const*,
+    virtual void adaptor_do_PARENT(JStudio::data::TEOperationData, void const*, u32);
+    virtual void adaptor_do_PARENT_NODE(JStudio::data::TEOperationData, void const*,
                                                 u32);
-    /* 8028EC58 */ virtual void adaptor_do_PARENT_ENABLE(JStudio::data::TEOperationData, void const*,
+    virtual void adaptor_do_PARENT_ENABLE(JStudio::data::TEOperationData, void const*,
                                                     u32);
-    /* 8028EC74 */ virtual void adaptor_do_PARENT_FUNCTION(JStudio::data::TEOperationData, void const*,
+    virtual void adaptor_do_PARENT_FUNCTION(JStudio::data::TEOperationData, void const*,
                                                     u32);
-    /* 8028EC88 */ virtual void adaptor_do_REPEAT(JStudio::data::TEOperationData, void const*, u32);
-    /* 8028ECA4 */ virtual void adaptor_do_ON_EXIT_NOT_END(JStudio::data::TEOperationData, void const*,
+    virtual void adaptor_do_REPEAT(JStudio::data::TEOperationData, void const*, u32);
+    virtual void adaptor_do_ON_EXIT_NOT_END(JStudio::data::TEOperationData, void const*,
                                                     u32);
     
     static bool state_isFade_(u8 param_1) {

@@ -22,15 +22,15 @@ public:
         MODE_MAX_e,
     };
 
-    /* 80C95E18 */ void initWait();
-    /* 80C95E2C */ void executeWait();
-    /* 80C95E88 */ void initDemo();
-    /* 80C95E8C */ void executeDemo();
-    /* 80C95EFC */ inline void setBaseMtx();
+    void initWait();
+    void executeWait();
+    void initDemo();
+    void executeDemo();
+    inline void setBaseMtx();
     inline void initBaseMtx();
     inline void create_init();
-    /* 80C95F50 */ static int createHeapCallBack(fopAc_ac_c* i_this);
-    /* 80C95F70 */ int CreateHeap();
+    static int createHeapCallBack(fopAc_ac_c* i_this);
+    int CreateHeap();
 
     inline ~daObjMirror6Pole_c();
 
@@ -44,22 +44,17 @@ public:
 
     bool isSwitch() {
         return fopAcM_isSwitch(this, getSwitchNo()) ||
+               /* dSv_event_flag_c::F_0361 - Arbiter's Grounds - Spun the spinning pillars */
                dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[361]) ||
+               /* dSv_event_flag_c::F_0354 - Cutscene - [cutscene] Mirror complete */
                dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[354]);
     }
 
-    void setAction(Mode_e i_action) {
-        mMode = i_action;
-        mAction = ActionTable[mMode];
+    inline void setAction(Mode_e i_action);
+    inline void callInit();
+    inline void callExecute();
 
-        callInit();
-    }
-
-    void callInit() { (this->*mAction[0])(); }
-
-    void callExecute() { (this->*mAction[1])(); }
-
-    static actionFunc ActionTable[][2];
+    static const actionFunc ActionTable[][2];
 
 private:
     /* 0x568 */ J3DModel* mpModel;

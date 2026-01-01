@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/gx.h>
 #include <dolphin/perf.h>
 #include "fake_tgmath.h"
@@ -42,7 +42,7 @@ void PERFSetEventColor(u8 id, GXColor color);
 void PERFStartFrame(void);
 void PERFEndFrame(void);
 void PERFEventStart(u8 id);
-__declspec(weak) s32 PERFGetNewSample(void);
+DECL_WEAK s32 PERFGetNewSample(void);
 void PERFEventEnd(u8 id);
 static void PERFStartAutoSample(void);
 static void PERFEndAutoSample(void);
@@ -50,7 +50,7 @@ static void PERFTimerCallback(OSAlarm* alarm, OSContext* context);
 void PERFStartAutoSampling(f32 msInterval);
 void PERFStopAutoSampling(void);
 
-#ifndef DEBUG
+#if !DEBUG
 inline s32 PERFGetNewSample(void) {
     if (PERFCurrSample >= (PERFNumSamples - 1)) {
         PERFCurrSample = PERFNumSamples - 1;
@@ -331,7 +331,7 @@ void PERFEventStart(u8 id) {
 }
 
 #if DEBUG
-__declspec(weak) s32 PERFGetNewSample(void) {
+DECL_WEAK s32 PERFGetNewSample(void) {
     if (PERFCurrSample >= (PERFNumSamples - 1)) {
         PERFCurrSample = PERFNumSamples - 1;
         return PERFCurrSample;

@@ -3,24 +3,25 @@
  *
  */
 
-#include "d/d_ovlp_fade3.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include "JSystem/J2DGraph/J2DOrthoGraph.h"
+#include "d/d_ovlp_fade3.h"
+#include "d/d_camera.h"
 #include "d/d_s_play.h"
 #include "m_Do/m_Do_audio.h"
 #include "m_Do/m_Do_graphic.h"
 
-/* 80252ED4-80252F28 24D814 0054+00 1/0 0/0 0/0 .text            draw__16dDlst_snapShot_cFv */
 void dDlst_snapShot_c::draw() {
-    GXSetTexCopySrc(0, 0, 608, 448);
-    GXSetTexCopyDst(608 / 2, 448 / 2, GX_TF_RGBA8, GX_TRUE);
+    GXSetTexCopySrc(0, 0, FB_WIDTH, FB_HEIGHT);
+    GXSetTexCopyDst(FB_WIDTH / 2, FB_HEIGHT / 2, GX_TF_RGBA8, GX_TRUE);
     GXCopyTex(mDoGph_gInf_c::getFrameBufferTex(), GX_FALSE);
     GXPixModeSync();
 }
 
-/* 80252F28-8025343C 24D868 0514+00 1/0 0/0 0/0 .text            draw__15dOvlpFd3_dlst_cFv */
 void dOvlpFd3_dlst_c::draw() {
-    GXSetViewport(0.0f, 0.0f, 608.0f, 448.0f, 0.0f, 1.0f);
-    GXSetScissor(0, 0, 608, 448);
+    GXSetViewport(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0.0f, 1.0f);
+    GXSetScissor(0, 0, FB_WIDTH, FB_HEIGHT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_CLR_RGB, GX_RGBA4, 0);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -56,8 +57,8 @@ void dOvlpFd3_dlst_c::draw() {
     C_MTXPerspective(m, 60.0f, mDoGph_gInf_c::getWidthF() / mDoGph_gInf_c::getHeightF(), 100.0f,
                      100000.0f);
     GXSetProjection(m, GX_PERSPECTIVE);
-    GXInitTexObj(mDoGph_gInf_c::getFrameBufferTexObj(), mDoGph_gInf_c::getFrameBufferTex(), 304,
-                 224, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(mDoGph_gInf_c::getFrameBufferTexObj(), mDoGph_gInf_c::getFrameBufferTex(), FB_WIDTH / 2,
+                 FB_HEIGHT / 2, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(mDoGph_gInf_c::getFrameBufferTexObj(), GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f,
                     GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(mDoGph_gInf_c::getFrameBufferTexObj(), GX_TEXMAP0);
@@ -90,17 +91,19 @@ void dOvlpFd3_dlst_c::draw() {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_CLR_RGB, GX_RGBA4, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_CLR_RGBA, GX_RGB8, 0);
 
+    s16 w = (s16)mDoGph_gInf_c::getWidthF();
+    s16 h = (s16)mDoGph_gInf_c::getHeightF();
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition2s16(-mDoGph_gInf_c::getWidth() / 2, mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(-w / 2, h / 2);
     GXTexCoord2s8(0, 0);
 
-    GXPosition2s16(mDoGph_gInf_c::getWidth() / 2, mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(w / 2, h / 2);
     GXTexCoord2s8(1, 0);
 
-    GXPosition2s16(mDoGph_gInf_c::getWidth() / 2, -mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(w / 2, -h / 2);
     GXTexCoord2s8(1, 1);
 
-    GXPosition2s16(-mDoGph_gInf_c::getWidth() / 2, -mDoGph_gInf_c::getHeight() / 2);
+    GXPosition2s16(-w / 2, -h / 2);
     GXTexCoord2s8(0, 1);
     GXEnd();
 
@@ -110,7 +113,6 @@ void dOvlpFd3_dlst_c::draw() {
     graf_ctx->setup2D();
 }
 
-/* 8025343C-80253518 24DD7C 00DC+00 1/1 0/0 0/0 .text            __ct__10dOvlpFd3_cFv */
 dOvlpFd3_c::dOvlpFd3_c() {
     setExecute(&dOvlpFd3_c::execFirstSnap);
     dComIfGp_2dShowOff();
@@ -125,11 +127,10 @@ dOvlpFd3_c::dOvlpFd3_c() {
     mDoGph_gInf_c::startFadeOut(XREG_S(3) + (field_0x11f >> 1) + 90);
 }
 
-/* 80253518-802535AC 24DE58 0094+00 1/0 0/0 0/0 .text            execFirstSnap__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execFirstSnap() {
     if (cLib_calcTimer(&field_0x11f) == 0 && field_0x11c != 0) {
         if (cLib_calcTimer(&mTimer) == 0) {
-            setExecute(&execFadeOut);
+            setExecute(&dOvlpFd3_c::execFadeOut);
             fopOvlpM_Done(this);
             mTimer = 0xFF;
         }
@@ -138,7 +139,6 @@ void dOvlpFd3_c::execFirstSnap() {
     }
 }
 
-/* 802535AC-8025368C 24DEEC 00E0+00 1/0 0/0 0/0 .text            execFadeOut__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execFadeOut() {
     dComIfGp_setWindowNum(0);
 
@@ -162,7 +162,6 @@ void dOvlpFd3_c::execFadeOut() {
     }
 }
 
-/* 8025368C-80253730 24DFCC 00A4+00 1/0 0/0 0/0 .text            execNextSnap__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execNextSnap() {
     if (cLib_calcTimer(&mTimer) == 0) {
         if (!JFWDisplay::getManager()->getFader()->startFadeIn(XREG_S(4) + 26)) {
@@ -175,7 +174,6 @@ void dOvlpFd3_c::execNextSnap() {
     }
 }
 
-/* 80253730-802537AC 24E070 007C+00 1/0 0/0 0/0 .text            execFadeIn__10dOvlpFd3_cFv */
 void dOvlpFd3_c::execFadeIn() {
     field_0x114 -= TREG_S(0) + 0x800;
 
@@ -205,7 +203,6 @@ void dOvlpFd3_c::draw() {
     }
 }
 
-/* 802537AC-80253880 24E0EC 00D4+00 1/0 0/0 0/0 .text            dOvlpFd3_Draw__FP10dOvlpFd3_c */
 static int dOvlpFd3_Draw(dOvlpFd3_c* i_this) {
     i_this->draw();
     return 1;
@@ -215,37 +212,30 @@ void dOvlpFd3_c::execute() {
     (this->*mExecuteFn)();
 }
 
-/* 80253880-802538AC 24E1C0 002C+00 1/0 0/0 0/0 .text            dOvlpFd3_Execute__FP10dOvlpFd3_c */
 static int dOvlpFd3_Execute(dOvlpFd3_c* i_this) {
     i_this->execute();
     return 1;
 }
 
-/* 802538AC-802538B4 24E1EC 0008+00 1/0 0/0 0/0 .text            dOvlpFd3_IsDelete__FP10dOvlpFd3_c
- */
 static int dOvlpFd3_IsDelete(dOvlpFd3_c* i_this) {
     return 1;
 }
 
-/* 802538B4-802538BC 24E1F4 0008+00 1/0 0/0 0/0 .text            dOvlpFd3_Delete__FP10dOvlpFd3_c */
 static int dOvlpFd3_Delete(dOvlpFd3_c* i_this) {
     return 1;
 }
 
-/* 802538BC-802538E8 24E1FC 002C+00 1/0 0/0 0/0 .text            dOvlpFd3_Create__FPv */
 static int dOvlpFd3_Create(void* i_this) {
     new (i_this) dOvlpFd3_c();
     return cPhs_COMPLEATE_e;
 }
 
-/* 803C2DA0-803C2DB4 -00001 0014+00 1/0 0/0 0/0 .data            l_dOvlpFd3_Method */
 static leafdraw_method_class l_dOvlpFd3_Method = {
     (process_method_func)dOvlpFd3_Create,  (process_method_func)dOvlpFd3_Delete,
     (process_method_func)dOvlpFd3_Execute, (process_method_func)dOvlpFd3_IsDelete,
     (process_method_func)dOvlpFd3_Draw,
 };
 
-/* 803C2DB4-803C2DDC -00001 0028+00 0/0 0/0 1/0 .data            g_profile_OVERLAP3 */
 extern overlap_process_profile_definition g_profile_OVERLAP3 = {
     fpcLy_ROOT_e,
     0,

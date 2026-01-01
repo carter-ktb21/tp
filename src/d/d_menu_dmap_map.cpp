@@ -2,33 +2,27 @@
 // Translation Unit: d/d_menu_dmap_map
 //
 
-#include "d/d_menu_dmap_map.h"
-#include "d/d_menu_dmap.h"
-#include "d/d_map_path_dmap.h"
-#include "d/d_com_inf_game.h"
-#include "m_Do/m_Do_graphic.h"
-#include "f_op/f_op_msg_mng.h"
+#include "d/dolzel.h" // IWYU pragma: keep
+
 #include <cmath.h>
+#include "d/d_com_inf_game.h"
+#include "d/d_map_path_dmap.h"
+#include "d/d_menu_dmap.h"
+#include "d/d_menu_dmap_map.h"
+#include "f_op/f_op_msg_mng.h"
+#include "m_Do/m_Do_graphic.h"
 
 struct dMdm_HIO_prm_res_dst_s {
     static void* m_res;
 };
 
-/* 803BCB60-803BCB6C 019C80 000C+00 1/1 0/0 0/0 .data            cNullVec__6Z2Calc */
-static u8 cNullVec__6Z2Calc[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-
-/* 801C084C-801C086C 1BB18C 0020+00 1/0 0/0 0/0 .text            hasMap__15renderingDmap_cCFv */
 bool renderingDmap_c::hasMap() const {
     return dMapInfo_n::chkGetMap();
 }
 
-/* 801C086C-801C0B40 1BB1AC 02D4+00 2/0 0/0 0/0 .text
- * isDrawIconSingle2__15renderingDmap_cCFPCQ27dTres_c6data_sbbi */
 bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool param_1,
                                         bool param_2, int param_3) const {
-    JUT_ASSERT(995, i_data != 0);
+    JUT_ASSERT(995, i_data != NULL);
 
     bool rt = false;
     int var_r27 = dTres_c::getTypeToTypeGroupNo(i_data->mType);
@@ -50,7 +44,7 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
 
     switch (var_r27) {
     default:
-        JUT_ASSERT(1015, 0);
+        JUT_ASSERT(1015, FALSE);
         break;
     case 0:
         if (var_r29 && i_data->mNo != 0xFF && !dComIfGs_isTbox(i_data->mNo)) {
@@ -69,7 +63,7 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         }
         break;
     case 4:
-        JUT_ASSERT(1044, 0);
+        JUT_ASSERT(1044, FALSE);
         break;
     case 5:
         if ((i_data->mNo == 0xFF || (i_data->mNo != 0xFF && !dComIfGs_isTbox(i_data->mNo))) && (i_data->mSwBit == 0xFF || (i_data->mSwBit != 0xFF && dComIfGs_isSwitch(i_data->mSwBit, i_data->mRoomNo))) && param_1) {
@@ -77,7 +71,7 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         }
         break;
     case 6:
-        JUT_ASSERT(1070, 0);
+        JUT_ASSERT(1070, FALSE);
         break;
     case 3:
         if (var_r29 && (i_data->mSwBit == 0xFF || (i_data->mSwBit != 0xFF && dComIfGs_isSwitch(i_data->mSwBit, i_data->mRoomNo))) && !dComIfGs_isStageBossEnemy()) {
@@ -90,7 +84,7 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         }
         break;
     case 10:
-        JUT_ASSERT(1100, 0);
+        JUT_ASSERT(1100, FALSE);
         break;
     case 11:
         if (var_r29) {
@@ -104,7 +98,7 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
         break;
     case 13:
     case 14:
-        JUT_ASSERT(1123, 0);
+        JUT_ASSERT(1123, FALSE);
         break;
     case 15:
         if (var_r29 && (i_data->mNo == 0xFF || (i_data->mNo != 0xFF && dComIfGs_isTbox(i_data->mNo)))) {
@@ -121,12 +115,10 @@ bool renderingDmap_c::isDrawIconSingle2(dTres_c::data_s const* i_data, bool para
     return rt;
 }
 
-/* 801C0B40-801C0B48 1BB480 0008+00 1/0 0/0 0/0 .text getPlayerCursorSize__15renderingDmap_cFv */
 f32 renderingDmap_c::getPlayerCursorSize() {
     return 0.0f;
 }
 
-/* 801C0B48-801C0BAC 1BB488 0064+00 1/1 0/0 0/0 .text getLineWidthZoomBig__15renderingDmap_cFi */
 int renderingDmap_c::getLineWidthZoomBig(int param_0) {
     static const u8 l_lineWidthPatOff[] = {0, 0, 6, 0, 0};
     static const u8 l_lineWidthPatOn[] = {6, 6, 12, 0, 0};
@@ -143,8 +135,6 @@ int renderingDmap_c::getLineWidthZoomBig(int param_0) {
     return var_r28[param_0];
 }
 
-/* 801C0BAC-801C0C10 1BB4EC 0064+00 1/1 0/0 0/0 .text getLineWidthZoomSmall__15renderingDmap_cFi
- */
 int renderingDmap_c::getLineWidthZoomSmall(int param_0) {
     static const u8 l_lineWidthPatOff[] = {0, 0, 6, 0, 0};
     static const u8 l_lineWidthPatOn[] = {0, 0, 6, 0, 0};
@@ -161,8 +151,6 @@ int renderingDmap_c::getLineWidthZoomSmall(int param_0) {
     return var_r28[param_0];
 }
 
-/* 801C0C10-801C0C48 1BB550 0038+00 1/0 0/0 0/0 .text            getLineWidth__15renderingDmap_cFi
- */
 int renderingDmap_c::getLineWidth(int param_0) {
     int var_r31;
     if (field_0x34 > 0.5f) {
@@ -174,8 +162,7 @@ int renderingDmap_c::getLineWidth(int param_0) {
     return var_r31;
 }
 
-/* 80395860-80395950 -00001 00F0+00 1/1 0/0 0/0 .rodata          l_paletteDmap_m */
-static u32 const l_paletteDmap_m[60] = {
+static u32 const l_paletteDmap_m[60] ATTRIBUTE_ALIGN(32) = {
     0x00000000,
     0x00000000,
     0x80008000,
@@ -238,7 +225,6 @@ static u32 const l_paletteDmap_m[60] = {
     0x00000000,
 };
 
-/* 801C0C48-801C0CB8 1BB588 0070+00 1/0 0/0 0/0 .text            getColor__15renderingDmap_cFi */
 const GXColor* renderingDmap_c::getColor(int param_0) {
     static const GXColor l_dungeon_offColor[] = {
         {0x08, 0x00, 0x00, 0x00},
@@ -288,25 +274,20 @@ const GXColor* renderingDmap_c::getColor(int param_0) {
     return &var_r28[param_0];
 }
 
-/* 801C0CB8-801C0CD8 1BB5F8 0020+00 1/0 0/0 0/0 .text            afterDrawPath__15renderingDmap_cFv
- */
 void renderingDmap_c::afterDrawPath() {
     renderingPlusDoor_c::afterDrawPath();
 }
 
-/* 80451088-8045108C 000588 0004+00 2/2 0/0 0/0 .sbss            m_res__22dMdm_HIO_prm_res_dst_s */
 void* dMdm_HIO_prm_res_dst_s::m_res;
 
-/* 801C0CD8-801C0D04 1BB618 002C+00 1/1 0/0 0/0 .text _create__15dMenu_DmapMap_cFUsUsUsUsPv */
 void dMenu_DmapMap_c::_create(u16 param_0, u16 param_1, u16 param_2, u16 param_3,
                               void* res) {
-    JUT_ASSERT(1569, res != 0);
+    JUT_ASSERT(1569, res != NULL);
     dMdm_HIO_prm_res_dst_s::m_res = res;
     field_0x84 = 120;
     setTexture(param_0, param_1, param_2, param_3);
 }
 
-/* 801C0D04-801C0D70 1BB644 006C+00 1/1 0/0 0/0 .text            _delete__15dMenu_DmapMap_cFv */
 void dMenu_DmapMap_c::_delete() {
     for (int i = 0; i < 2; i++) {
         if (mMapImage_p[i] != NULL) {
@@ -319,29 +300,25 @@ void dMenu_DmapMap_c::_delete() {
     }
 }
 
-/* 801C0D70-801C0E4C 1BB6B0 00DC+00 1/1 0/0 0/0 .text setTexture__15dMenu_DmapMap_cFUsUsUsUs */
 void dMenu_DmapMap_c::setTexture(u16 param_0, u16 param_1, u16 param_2, u16 param_3) {
     for (int lp1 = 0; lp1 < 2; lp1++) {
         u32 var_r27 = GXGetTexBufferSize(param_0, param_1, 9, 0, 0);
         mMapImage_p[lp1] = new (0x20) u8[var_r27];
-        JUT_ASSERT(1672, mMapImage_p[lp1] != 0);
+        JUT_ASSERT(1672, mMapImage_p[lp1] != NULL);
         mRend[lp1].init(mMapImage_p[lp1], param_0, param_1, param_2, param_3);
 
         mResTIMG[lp1] = new (0x20) ResTIMG;
-        JUT_ASSERT(1687, mResTIMG[lp1] != 0);
+        JUT_ASSERT(1687, mResTIMG[lp1] != NULL);
         mRend[lp1].makeResTIMG(mResTIMG[lp1], param_0, param_1, mMapImage_p[lp1], (u8*)dMdm_HIO_prm_res_dst_s::m_res, 30);
     }
 }
 
-/* 801C0E4C-801C0EE0 1BB78C 0094+00 1/1 0/0 0/0 .text            setPos__15dMenu_DmapMap_cFiifffbf
- */
 void dMenu_DmapMap_c::setPos(int param_0, int param_1, f32 param_2, f32 param_3, f32 param_4,
                              bool param_5, f32 param_6) {
     mRend[0].entry(param_2, param_3, param_4, dComIfGp_roomControl_getStayNo(), param_0, param_6);
     mRend[1].entry(param_2, param_3, param_4, dComIfGp_roomControl_getStayNo(), param_1, param_6);
 }
 
-/* 801C0EE0-801C0F24 1BB820 0044+00 0/0 2/2 0/0 .text getMapBlendPer__20dMenu_StageMapCtrl_cCFv */
 f32 dMenu_StageMapCtrl_c::getMapBlendPer() const {
     f32 var_f31;
     if (field_0x90 == 0.0f) {
@@ -353,36 +330,26 @@ f32 dMenu_StageMapCtrl_c::getMapBlendPer() const {
     return var_f31;
 }
 
-/* 801C0F24-801C0F3C 1BB864 0018+00 0/0 1/1 0/0 .text
- * getPixelStageSizeX__20dMenu_StageMapCtrl_cCFv                */
 f32 dMenu_StageMapCtrl_c::getPixelStageSizeX() const {
     f32 var_f31 = dMpath_c::getSizeX();
     return var_f31 * (1.0f / field_0xbc);
 }
 
-/* 801C0F3C-801C0F54 1BB87C 0018+00 0/0 1/1 0/0 .text
- * getPixelStageSizeZ__20dMenu_StageMapCtrl_cCFv                */
 f32 dMenu_StageMapCtrl_c::getPixelStageSizeZ() const {
     f32 var_f31 = dMpath_c::getSizeZ();
     return var_f31 * (1.0f / field_0xbc);
 }
 
-/* 801C0F54-801C0F74 1BB894 0020+00 0/0 1/1 0/0 .text getPixelCenterX__20dMenu_StageMapCtrl_cCFv
- */
 f32 dMenu_StageMapCtrl_c::getPixelCenterX() const {
     f32 var_f31 = dMpath_c::getCenterX();
     return (1.0f / field_0xbc) * (field_0x9c - var_f31);
 }
 
-/* 801C0F74-801C0F94 1BB8B4 0020+00 0/0 1/1 0/0 .text getPixelCenterZ__20dMenu_StageMapCtrl_cCFv
- */
 f32 dMenu_StageMapCtrl_c::getPixelCenterZ() const {
     f32 var_f31 = dMpath_c::getCenterZ();
     return (1.0f / field_0xbc) * (field_0xa0 - var_f31);
 }
 
-/* 801C0F94-801C0FF8 1BB8D4 0064+00 0/0 1/1 0/0 .text
- * initGetTreasureList__20dMenu_StageMapCtrl_cFUcSc             */
 void dMenu_StageMapCtrl_c::initGetTreasureList(u8 param_0, s8 param_1) {
     field_0xf6 = param_0;
     field_0xf7 = param_1;
@@ -394,8 +361,6 @@ inline static s16 rightModeCnvRot(s16 param_0) {
     return param_0;
 }
 
-/* 801C0FF8-801C1128 1BB938 0130+00 0/0 1/1 0/0 .text
- * getTreasureList__20dMenu_StageMapCtrl_cFPfPfPScPUcPSc        */
 bool dMenu_StageMapCtrl_c::getTreasureList(f32* o_posX, f32* o_posY, s8* param_2, u8* o_swbit,
                                            s8* o_roomNo) {
     bool var_r30 = false;
@@ -404,7 +369,7 @@ bool dMenu_StageMapCtrl_c::getTreasureList(f32* o_posX, f32* o_posY, s8* param_2
         Vec sp10;
         sp10 = *field_0x8c->getPos();
 
-        if (getRendPointer(0)->isDrawIconSingle(field_0x8c->getDataPointer(), (s8)dComIfGp_roomControl_getStayNo(), field_0xf7, true, true, &sp10)) {
+        if (getRendPointer(0)->isDrawIconSingle(field_0x8c->getDataPointer(), (s8)dComIfGp_roomControl_getStayNo(), field_0xf7, 1, true, &sp10)) {
             cnvPosTo2Dpos(sp10.x, sp10.z, o_posX, o_posY);
 
             if (param_2 != NULL) {
@@ -433,8 +398,6 @@ inline static f32 rightModeCnvPos(f32 param_0) {
     return param_0;
 }
 
-/* 801C1128-801C1194 1BBA68 006C+00 3/3 0/0 0/0 .text
- * cnvPosTo2Dpos__20dMenu_StageMapCtrl_cCFffPfPf                */
 void dMenu_StageMapCtrl_c::cnvPosTo2Dpos(f32 param_0, f32 param_1, f32* param_2,
                                          f32* param_3) const {
     if (param_2 != NULL) {
@@ -446,12 +409,10 @@ void dMenu_StageMapCtrl_c::cnvPosTo2Dpos(f32 param_0, f32 param_1, f32* param_2,
     }
 }
 
-/* 801C1194-801C1218 1BBAD4 0084+00 0/0 1/1 0/0 .text
- * getPlayerDrawInfo__20dMenu_StageMapCtrl_cCFPfPfPs            */
 void dMenu_StageMapCtrl_c::getPlayerDrawInfo(f32* i_dispX, f32* i_dispY, s16* i_rotY) const {
-    JUT_ASSERT(2030, i_dispX != 0);
-    JUT_ASSERT(2031, i_dispX != 0);
-    JUT_ASSERT(2032, i_rotY != 0);
+    JUT_ASSERT(2030, i_dispX != NULL);
+    JUT_ASSERT(2031, i_dispX != NULL);
+    JUT_ASSERT(2032, i_rotY != NULL);
 
     Vec sp10 = dMapInfo_n::getMapPlayerPos();
     cnvPosTo2Dpos(sp10.x, sp10.z, i_dispX, i_dispY);
@@ -461,12 +422,10 @@ void dMenu_StageMapCtrl_c::getPlayerDrawInfo(f32* i_dispX, f32* i_dispY, s16* i_
     }
 }
 
-/* 801C1218-801C12A8 1BBB58 0090+00 0/0 1/1 0/0 .text
- * getRestartDrawInfo__20dMenu_StageMapCtrl_cCFPfPfPs           */
 s8 dMenu_StageMapCtrl_c::getRestartDrawInfo(f32* i_dispX, f32* i_dispY, s16* i_rotY) const {
-    JUT_ASSERT(2057, i_dispX != 0);
-    JUT_ASSERT(2058, i_dispX != 0);
-    JUT_ASSERT(2059, i_rotY != 0);
+    JUT_ASSERT(2057, i_dispX != NULL);
+    JUT_ASSERT(2058, i_dispX != NULL);
+    JUT_ASSERT(2059, i_rotY != NULL);
 
     Vec sp10 = dMapInfo_n::getMapRestartPos();
     cnvPosTo2Dpos(sp10.x, sp10.z, i_dispX, i_dispY);
@@ -476,18 +435,14 @@ s8 dMenu_StageMapCtrl_c::getRestartDrawInfo(f32* i_dispX, f32* i_dispY, s16* i_r
         *i_rotY = rightModeCnvRot(var_r29);
     }
 
-    dMapInfo_c::calcNowStayFloorNo(sp10.y, true);
+    return dMapInfo_c::calcNowStayFloorNo(sp10.y, true);
 }
 
-/* 801C12A8-801C12B4 1BBBE8 000C+00 0/0 2/2 0/0 .text
- * setPlusNowStayFloorNo__20dMenu_StageMapCtrl_cFScUc           */
 void dMenu_StageMapCtrl_c::setPlusNowStayFloorNo(s8 param_0, u8 param_1) {
     field_0xea = param_0;
     field_0xf0 = param_1;
 }
 
-/* 801C12B4-801C1878 1BBBF4 05C4+00 2/2 0/0 0/0 .text            moveFloor__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::moveFloor() {
     if ((field_0xf3 == 0) && (field_0xf1 == 0)) {
         if (field_0xea != 0) {
@@ -575,27 +530,20 @@ void dMenu_StageMapCtrl_c::moveFloor() {
     }
 }
 
-/* 801C1878-801C188C 1BC1B8 0014+00 1/0 0/0 0/0 .text wait_init_proc__20dMenu_StageMapCtrl_cFv */
 void dMenu_StageMapCtrl_c::wait_init_proc() {
     field_0x90 = 0.0f;
     field_0xe8 = field_0xe7;
 }
 
-/* 801C188C-801C18AC 1BC1CC 0020+00 1/0 0/0 0/0 .text            wait_proc__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::wait_proc() {
     moveFloor();
 }
 
-/* 801C18AC-801C18C0 1BC1EC 0014+00 1/0 0/0 0/0 .text zoomIn_init_proc__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::zoomIn_init_proc() {
     field_0xf4 = field_0xf2;
     field_0xd8 = 0.0f;
 }
 
-/* 801C18C0-801C1B14 1BC200 0254+00 1/0 0/0 0/0 .text
- * getZoomMinMaxCheck__19dMenu_DmapMapCtrl_cFPfPfPfPfPbPb       */
 void dMenu_DmapMapCtrl_c::getZoomMinMaxCheck(f32* param_0, f32* param_1, f32* param_2,
                                              f32* param_3, bool* param_4, bool* param_5) {
     f32 var_f31 = FLT_MAX;
@@ -607,7 +555,7 @@ void dMenu_DmapMapCtrl_c::getZoomMinMaxCheck(f32* param_0, f32* param_1, f32* pa
     for (int i = 0; i < 64; i++) {
         if (dMpath_c::getRoomPointer(0, i) || dMpath_c::getRoomPointer(1, i)) {
             dStage_FileList2_dt_c* fileList2_p = dStage_roomControl_c::getFileList2(i);
-            JUT_ASSERT(2360, fileList2_p != 0);
+            JUT_ASSERT(2360, fileList2_p != NULL);
 
             if (fileList2_p != NULL && (dMapInfo_n::chkGetMap() || dMapInfo_n::chkGetCompass() || dMapInfo_n::isVisitedRoom(i) || field_0xe6 == i)) {
                 f32 sp18, sp14, sp10, spC;
@@ -672,14 +620,12 @@ void dMenu_DmapMapCtrl_c::getZoomMinMaxCheck(f32* param_0, f32* param_1, f32* pa
     }
 }
 
-/* 801C1B14-801C1BA4 1BC454 0090+00 1/0 0/0 0/0 .text calcZoomCenter__19dMenu_DmapMapCtrl_cFPfPf
- */
 void dMenu_DmapMapCtrl_c::calcZoomCenter(f32* param_0, f32* param_1) {
     f32 spC = 0.0f;
     f32 sp8 = 0.0f;
 
     dStage_FileList2_dt_c* fileList2_p = dStage_roomControl_c::getFileList2(field_0xe6);
-    JUT_ASSERT(2437, fileList2_p != 0);
+    JUT_ASSERT(2437, fileList2_p != NULL);
 
     if (fileList2_p != NULL) {
         dMapInfo_n::getRoomCenter(field_0xe6, &spC, &sp8);
@@ -694,13 +640,11 @@ void dMenu_DmapMapCtrl_c::calcZoomCenter(f32* param_0, f32* param_1) {
     }
 }
 
-/* 801C1BA4-801C1C40 1BC4E4 009C+00 1/0 0/0 0/0 .text getZoomCmPerPixel__19dMenu_DmapMapCtrl_cFv
- */
 f32 dMenu_DmapMapCtrl_c::getZoomCmPerPixel() {
     f32 var_f30 = field_0x98 < field_0x94 ? field_0x98 : field_0x94;
 
     stage_stag_info_class* pstag = dComIfGp_getStage()->getStagInfo();
-    JUT_ASSERT(2467, pstag != 0);
+    JUT_ASSERT(2467, pstag != NULL);
 
     f32 var_f29 = 10800.0f / var_f30;
     f32 var_f31 = 0.0f;
@@ -719,8 +663,7 @@ f32 dMenu_DmapMapCtrl_c::getZoomCmPerPixel() {
     return var_f29;
 }
 
-/* 803BCBC0-803BCCB4 -00001 00F4+00 0/0 0/0 0/0 .data            l_data */
-static u32 l_data[61] ALIGN_DECL(32) = {
+static u32 l_data[61] ATTRIBUTE_ALIGN(32) = {
     0x80008000,
     0x80008000,
     0x00000000,
@@ -784,7 +727,6 @@ static u32 l_data[61] ALIGN_DECL(32) = {
     0x45610000,
 };
 
-/* 803BCCE4-803BCD14 019E04 0030+00 7/8 0/0 0/0 .data            init_process */
 typedef void (dMenu_StageMapCtrl_c::*process_fn)();
 static process_fn init_process[] = {
     &dMenu_StageMapCtrl_c::wait_init_proc,
@@ -793,7 +735,6 @@ static process_fn init_process[] = {
     &dMenu_StageMapCtrl_c::zoomOut_init_proc,
 };
 
-/* 801C1C40-801C1CEC 1BC580 00AC+00 0/0 1/1 0/0 .text initZoomIn__20dMenu_StageMapCtrl_cFUc */
 void dMenu_StageMapCtrl_c::initZoomIn(u8 param_0) {
     f32 sp10 = 0.0f;
     f32 spC = 0.0f;
@@ -808,7 +749,6 @@ void dMenu_StageMapCtrl_c::initZoomIn(u8 param_0) {
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C1CEC-801C1E00 1BC62C 0114+00 0/0 1/1 0/0 .text initZoomIn__20dMenu_StageMapCtrl_cFUcff */
 void dMenu_StageMapCtrl_c::initZoomIn(u8 param_0, f32 param_1, f32 param_2) {
     field_0xe0 = getZoomCmPerPixel();
     field_0xac = field_0xa4 + (field_0xdc * param_1);
@@ -832,8 +772,6 @@ void dMenu_StageMapCtrl_c::initZoomIn(u8 param_0, f32 param_1, f32 param_2) {
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C1E00-801C1E74 1BC740 0074+00 0/0 1/1 0/0 .text
- * initZoomInCenterHold__20dMenu_StageMapCtrl_cFUc              */
 void dMenu_StageMapCtrl_c::initZoomInCenterHold(u8 param_0) {
     field_0xe0 = getZoomCmPerPixel();
     field_0xf2 = param_0;
@@ -842,14 +780,12 @@ void dMenu_StageMapCtrl_c::initZoomInCenterHold(u8 param_0) {
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C1E74-801C1EC0 1BC7B4 004C+00 2/2 0/0 0/0 .text zoomCalcSet__20dMenu_StageMapCtrl_cFf */
 void dMenu_StageMapCtrl_c::zoomCalcSet(f32 param_0) {
     field_0x9c = field_0xa4 + (param_0 * (field_0xac - field_0xa4));
     field_0xa0 = field_0xa8 + (param_0 * (field_0xb0 - field_0xa8));
     field_0xbc = field_0xdc + (param_0 * (field_0xe0 - field_0xdc));
 }
 
-/* 801C1EC0-801C1F2C 1BC800 006C+00 1/0 0/0 0/0 .text zoomIn_proc__20dMenu_StageMapCtrl_cFv */
 void dMenu_StageMapCtrl_c::zoomIn_proc() {
     f32 temp_f1 = fopMsgM_valueIncrease(field_0xf2, field_0xf2 - field_0xf4, 4);
     field_0xd8 = temp_f1;
@@ -861,7 +797,6 @@ void dMenu_StageMapCtrl_c::zoomIn_proc() {
     }
 }
 
-/* 801C1F2C-801C1F70 1BC86C 0044+00 0/0 1/1 0/0 .text initZoomOut__20dMenu_StageMapCtrl_cFUc */
 void dMenu_StageMapCtrl_c::initZoomOut(u8 param_0) {
     field_0xf2 = param_0;
     field_0xf5 = 3;
@@ -869,7 +804,6 @@ void dMenu_StageMapCtrl_c::initZoomOut(u8 param_0) {
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C1F70-801C2004 1BC8B0 0094+00 0/0 1/1 0/0 .text initZoomWait__20dMenu_StageMapCtrl_cFff */
 void dMenu_StageMapCtrl_c::initZoomWait(f32 param_0, f32 param_1) {
     field_0xac = param_0;
     field_0xb0 = param_1;
@@ -883,8 +817,6 @@ void dMenu_StageMapCtrl_c::initZoomWait(f32 param_0, f32 param_1) {
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C2004-801C2028 1BC944 0024+00 1/0 0/0 0/0 .text zoomWait_init_proc__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::zoomWait_init_proc() {
     field_0xb4 = 0.0f;
     field_0xb8 = 0.0f;
@@ -893,13 +825,10 @@ void dMenu_StageMapCtrl_c::zoomWait_init_proc() {
     field_0xe8 = field_0xe7;
 }
 
-/* 801C2028-801C205C 1BC968 0034+00 1/0 0/0 0/0 .text isEnableZoomMove__19dMenu_DmapMapCtrl_cCFv
- */
 bool dMenu_DmapMapCtrl_c::isEnableZoomMove() const {
     return field_0xf3 == 0 && (!getDisableZoomMoveFlgX() || !getDisableZoomMoveFlgZ());
 }
 
-/* 801C205C-801C2198 1BC99C 013C+00 1/0 0/0 0/0 .text zoomWait_proc__20dMenu_StageMapCtrl_cFv */
 void dMenu_StageMapCtrl_c::zoomWait_proc() {
     if (isEnableZoomMove()) {
         if (field_0xf8 == 0 && fabsf(field_0xb4) > 0.01f) {
@@ -935,14 +864,11 @@ void dMenu_StageMapCtrl_c::zoomWait_proc() {
     moveFloor();
 }
 
-/* 801C2198-801C21AC 1BCAD8 0014+00 1/0 0/0 0/0 .text zoomOut_init_proc__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::zoomOut_init_proc() {
     field_0xf4 = field_0xf2;
     field_0xd8 = 1.0f;
 }
 
-/* 801C21AC-801C2234 1BCAEC 0088+00 1/0 0/0 0/0 .text zoomOut_proc__20dMenu_StageMapCtrl_cFv */
 void dMenu_StageMapCtrl_c::zoomOut_proc() {
     f32 temp_f1 = fopMsgM_valueIncrease(field_0xf2, field_0xf2 - field_0xf4, 4);
     zoomCalcSet(1.0f - temp_f1);
@@ -954,7 +880,6 @@ void dMenu_StageMapCtrl_c::zoomOut_proc() {
     }
 }
 
-/* 803BCD44-803BCD74 019E64 0030+00 1/2 0/0 0/0 .data            move_process */
 static process_fn move_process[] = {
     &dMenu_StageMapCtrl_c::wait_proc,
     &dMenu_StageMapCtrl_c::zoomIn_proc,
@@ -962,7 +887,6 @@ static process_fn move_process[] = {
     &dMenu_StageMapCtrl_c::zoomOut_proc,
 };
 
-/* 801C2234-801C22A8 1BCB74 0074+00 0/0 1/1 0/0 .text            move__20dMenu_StageMapCtrl_cFv */
 void dMenu_StageMapCtrl_c::move() {
     u8 temp_r30 = field_0xf5;
     (this->*move_process[field_0xf5])();
@@ -972,15 +896,12 @@ void dMenu_StageMapCtrl_c::move() {
     }
 }
 
-/* 801C22A8-801C22F8 1BCBE8 0050+00 1/0 0/0 0/0 .text            draw__19dMenu_DmapMapCtrl_cFv */
 void dMenu_DmapMapCtrl_c::draw() {
     if (field_0xef != 0) {
         setPos(field_0xeb, field_0xec, field_0x9c, field_0xa0, field_0xbc, true, field_0xd8);
     }
 }
 
-/* 801C22F8-801C231C 1BCC38 0024+00 0/0 1/1 0/0 .text
- * getPlayerStayFloorNo__20dMenu_StageMapCtrl_cCFv              */
 s8 dMenu_StageMapCtrl_c::getPlayerStayFloorNo() const {
     s8 var_r31 = 0;
     if (dMapInfo_c::getNowStayFloorNoDecisionFlg()) {
@@ -990,8 +911,6 @@ s8 dMenu_StageMapCtrl_c::getPlayerStayFloorNo() const {
     return var_r31;
 }
 
-/* 801C231C-801C235C 1BCC5C 0040+00 0/0 1/1 0/0 .text _create__20dMenu_StageMapCtrl_cFUsUsUsUsPv
- */
 void dMenu_StageMapCtrl_c::_create(u16 param_0, u16 param_1, u16 param_2, u16 param_3,
                                    void* param_4) {
     s8 var_r31;
@@ -1002,20 +921,14 @@ void dMenu_StageMapCtrl_c::_create(u16 param_0, u16 param_1, u16 param_2, u16 pa
     _create(param_0, param_1, param_2, param_3, var_r31, param_4);
 }
 
-/* 8045108C-80451090 00058C 0004+00 1/1 0/0 0/0 .sbss m_zoomCenterMinX__20dMenu_StageMapCtrl_c */
 f32 dMenu_StageMapCtrl_c::m_zoomCenterMinX;
 
-/* 80451090-80451094 000590 0004+00 1/1 0/0 0/0 .sbss m_zoomCenterMaxX__20dMenu_StageMapCtrl_c */
 f32 dMenu_StageMapCtrl_c::m_zoomCenterMaxX;
 
-/* 80451094-80451098 000594 0004+00 1/1 0/0 0/0 .sbss m_zoomCenterMinZ__20dMenu_StageMapCtrl_c */
 f32 dMenu_StageMapCtrl_c::m_zoomCenterMinZ;
 
-/* 80451098-804510A0 000598 0004+04 1/1 0/0 0/0 .sbss m_zoomCenterMaxZ__20dMenu_StageMapCtrl_c */
 f32 dMenu_StageMapCtrl_c::m_zoomCenterMaxZ;
 
-/* 801C235C-801C2518 1BCC9C 01BC+00 1/1 1/1 0/0 .text _create__20dMenu_StageMapCtrl_cFUsUsUsUsScPv
- */
 void dMenu_StageMapCtrl_c::_create(u16 param_0, u16 param_1, u16 param_2, u16 param_3,
                                    s8 param_4, void* param_5) {
     field_0xe6 = dComIfGp_roomControl_getStayNo();
@@ -1053,13 +966,10 @@ void dMenu_StageMapCtrl_c::_create(u16 param_0, u16 param_1, u16 param_2, u16 pa
     (this->*init_process[field_0xf5])();
 }
 
-/* 801C2518-801C2538 1BCE58 0020+00 0/0 1/1 0/0 .text            _delete__20dMenu_StageMapCtrl_cFv
- */
 void dMenu_StageMapCtrl_c::_delete() {
     dMenu_DmapMap_c::_delete();
 }
 
-/* 801C2538-801C2578 1BCE78 0040+00 0/0 1/1 0/0 .text isEnableZoomIn__20dMenu_StageMapCtrl_cFv */
 bool dMenu_StageMapCtrl_c::isEnableZoomIn() {
     bool var_r30 = 0;
     if (field_0xf3 == 0 && dStage_roomControl_c::getFileList2(field_0xe6) != NULL) {
@@ -1069,25 +979,18 @@ bool dMenu_StageMapCtrl_c::isEnableZoomIn() {
     return var_r30;
 }
 
-/* 801C2578-801C2588 1BCEB8 0010+00 0/0 1/1 0/0 .text isEnableZoomOut__20dMenu_StageMapCtrl_cFv */
 bool dMenu_StageMapCtrl_c::isEnableZoomOut() {
     return field_0xf3 == 0;
 }
 
-/* 801C2588-801C2590 1BCEC8 0008+00 0/0 1/1 0/0 .text setPlusZoomCenterX__20dMenu_StageMapCtrl_cFf
- */
 void dMenu_StageMapCtrl_c::setPlusZoomCenterX(f32 param_0) {
     field_0xb4 = param_0;
 }
 
-/* 801C2590-801C2598 1BCED0 0008+00 0/0 1/1 0/0 .text setPlusZoomCenterZ__20dMenu_StageMapCtrl_cFf
- */
 void dMenu_StageMapCtrl_c::setPlusZoomCenterZ(f32 param_0) {
     field_0xb8 = param_0;
 }
 
-/* 801C2598-801C25C0 1BCED8 0028+00 1/0 0/0 0/0 .text
- * getInitWholeMapScale__19dMenu_DmapMapCtrl_cFPfffff           */
 void dMenu_DmapMapCtrl_c::getInitWholeMapScale(f32* param_0, f32 param_1, f32 param_2,
                                                f32 param_3, f32 param_4) {
     if (param_0 != NULL) {
@@ -1105,8 +1008,6 @@ void dMenu_DmapMapCtrl_c::getInitWholeMapScale(f32* param_0, f32 param_1, f32 pa
     }
 }
 
-/* 801C25C0-801C25E4 1BCF00 0024+00 1/0 0/0 0/0 .text
- * getInitDispCenter__19dMenu_DmapMapCtrl_cFPfPf                */
 void dMenu_DmapMapCtrl_c::getInitDispCenter(f32* param_0, f32* param_1) {
     if (param_0 != NULL) {
         *param_0 = dMpath_c::getCenterX();
@@ -1117,45 +1018,32 @@ void dMenu_DmapMapCtrl_c::getInitDispCenter(f32* param_0, f32* param_1) {
     }
 }
 
-/* 801C25E4-801C25E8 1BCF24 0004+00 1/0 0/0 0/0 .text            beforeDrawPath__15renderingDmap_cFv
- */
 void renderingDmap_c::beforeDrawPath() {}
 
-/* 801C25E8-801C2614 1BCF28 002C+00 1/0 0/0 0/0 .text getRestartCursorSize__15renderingDmap_cFv */
 f32 renderingDmap_c::getRestartCursorSize() {
     return getPlayerCursorSize();
 }
 
-/* 801C2614-801C261C 1BCF54 0008+00 1/0 0/0 0/0 .text            isRendAllRoom__15renderingDmap_cCFv
- */
 bool renderingDmap_c::isRendAllRoom() const {
     return true;
 }
 
-/* 801C261C-801C2624 1BCF5C 0008+00 1/0 0/0 0/0 .text            isRendDoor__15renderingDmap_cCFv */
 bool renderingDmap_c::isRendDoor() const {
     return true;
 }
 
-/* 801C2624-801C262C 1BCF64 0008+00 1/0 0/0 0/0 .text            isCheckFloor__15renderingDmap_cCFv
- */
 bool renderingDmap_c::isCheckFloor() const {
     return true;
 }
 
-/* 801C262C-801C2634 1BCF6C 0008+00 1/0 0/0 0/0 .text            isRendRestart__15renderingDmap_cCFv
- */
 bool renderingDmap_c::isRendRestart() const {
     return true;
 }
 
-/* 801C2634-801C263C 1BCF74 0008+00 1/0 0/0 0/0 .text            isRendCursor__15renderingDmap_cCFv
- */
 bool renderingDmap_c::isRendCursor() const {
     return true;
 }
 
-/* 801C263C-801C2644 1BCF7C 0008+00 1/0 0/0 0/0 .text            isRendIcon__15renderingDmap_cCFv */
 bool renderingDmap_c::isRendIcon() const {
     return true;
 }

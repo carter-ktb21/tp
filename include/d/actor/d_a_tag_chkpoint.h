@@ -6,7 +6,7 @@
 
 class daTag_Chk_c : public fopAc_ac_c {
 public:
-    /* 8048A6F8 */ int execute();
+    int execute();
 
     u16 getAreaType() { return home.angle.z & 0x100; }
     u16 getHeight() { return fopAcM_GetParam(this) & 0xff; }
@@ -14,7 +14,7 @@ public:
     u8 getSwBit2() { return fopAcM_GetParam(this) >> 16; }
 
     int create() {
-        fopAcM_SetupActor(this, daTag_Chk_c);
+        fopAcM_ct(this, daTag_Chk_c);
 
         if (getAreaType() == 0) {
             scale.x *= 50.0f;

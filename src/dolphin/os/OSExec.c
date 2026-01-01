@@ -1,4 +1,4 @@
-#include <dolphin.h>
+#include <dolphin/dolphin.h>
 #include <dolphin/os.h>
 
 #include "__os.h"
@@ -51,7 +51,7 @@ static int PackArgs(void* addr, s32 argc, char** argv) {
 }
 
 #ifdef __GEKKO__
-static asm void Run(register void* entryPoint) {
+static asm void Run(__REGISTER void* entryPoint) {
     nofralloc
 
     mflr r0

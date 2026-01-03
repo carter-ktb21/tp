@@ -123,7 +123,7 @@ enum L5_R50_RES_FIL_ID {
 };
 
 /* 80639F74 0001+00 data_80639F74 @1009 */
-static bool hioInit;
+static bool hio_set;
 
 static daB_YO_HIO_c l_HIO;
 
@@ -569,7 +569,7 @@ void daB_YO_c::setIcicleSubNumber() {
 }
 
 void daB_YO_c::setWindowBreakEffect(int param_0) {
-    static s16 yo_window_angle[6] = {0xC000, 0xE000, 0x6000, 0x2000, 0x4000, 0x0000};
+    static s16 yo_window_angle[6] = {-0x4000, -0x2000, 0x6000, 0x2000, 0x4000, 0x0000};
     static u16 madoware_effect_id[4] = {0x87C1, 0x87C2, 0x87C3, 0x87C4};
     csXyz angle(0, yo_window_angle[param_0], 0);
     cXyz pos(0.0f, 0.0f, 0.0f);
@@ -3074,7 +3074,7 @@ int daB_YO_c::_delete() {
     dComIfG_resDelete(&mPhase5, "E_FZ");
 
     if (mHIOInit) {
-        hioInit = false;
+        hio_set = false;
     }
 
     if (mpRoomArenaBgW != NULL) {
@@ -3305,8 +3305,8 @@ cPhs__Step daB_YO_c::create() {
                 return cPhs_ERROR_e;
             }
 
-            if (!hioInit) {
-                hioInit = true;
+            if (!hio_set) {
+                hio_set = true;
                 mHIOInit = true;
                 l_HIO.field_0x4 = -1;
             }

@@ -1,6 +1,6 @@
 /**
  * @file d_a_e_sm2.cpp
- * 
+ * ChuChu Slime Enemy
 */
 
 #include "d/dolzel_rel.h" // IWYU pragma: keep
@@ -143,7 +143,8 @@ static void sm2_delete(e_sm2_class* i_this) {
     } else {
         i_this->action = ACTION_ROOF;
         i_this->mode = 0;
-        i_this->timers[0] = 30.0f + cM_rndF(60.0f);
+        // Wait timer before appearing from ceiling (SCALE_TIME)
+        i_this->timers[0] = (30.0f + cM_rndF(60.0f)) * SCALE_TIME;
         actor->current.pos = actor->home.pos;
         i_this->color_alpha = 1.0f;
         i_this->field_0x6b0 = 1.0f;
@@ -236,9 +237,11 @@ static void normal_move(e_sm2_class* i_this) {
         if (i_this->timers[0] == 0) {
             if (i_this->field_0x6a8 == 0) {
                 i_this->mCurrentAngleYTarget = cM_rndF(65536.0f);
-                i_this->timers[0] = 23.0f + cM_rndF(3.0f);
+                // Wait timer before moving on ceiling (SCALE_TIME)
+                i_this->timers[0] = (23.0f + cM_rndF(3.0f)) * SCALE_TIME;
             } else {
-                i_this->timers[0] = 8.0f + cM_rndF(3.0f);
+                // Wait timer for damaged state (SCALE_TIME)
+                i_this->timers[0] = (8.0f + cM_rndF(3.0f)) * SCALE_TIME;
             }
 
             i_this->mCurrentAngleYTargetStep = 0;
@@ -262,14 +265,16 @@ static void normal_move(e_sm2_class* i_this) {
             }
 
             if (i_this->field_0x6a8 == 0) {
-                i_this->timers[0] = 23.0f + cM_rndF(3.0f);
+                // Return to wait timer after moving (SCALE_TIME)
+                i_this->timers[0] = (23.0f + cM_rndF(3.0f)) * SCALE_TIME;
             } else {
                 s16 sp8 = actor->current.angle.y - i_this->mCurrentAngleYTarget;
                 if (sp8 < 0x1000 && sp8 > -0x1000 && i_this->dist_to_pl < (400.0f + (100.0f * i_this->size))) {
                     i_this->action = ACTION_ATTACK;
                     i_this->mode = 0;
                 } else {
-                    i_this->timers[0] = 8.0f + cM_rndF(3.0f);
+                    // Return to wait timer for damaged state (SCALE_TIME)
+                    i_this->timers[0] = (8.0f + cM_rndF(3.0f)) * SCALE_TIME;
                 }
             }
         }
@@ -329,7 +334,8 @@ static void attack(e_sm2_class* i_this) {
 
         if (i_this->acch.ChkGroundHit()) {
             i_this->mode = 2;
-            i_this->timers[0] = BREG_S(3) + 10;
+            // Ground impact recovery timer after jump (SCALE_TIME)
+            i_this->timers[0] = (BREG_S(3) + 10) * SCALE_TIME;
             i_this->field_0x82c = 5.0f;
             i_this->field_0x6aa = 23;
 
@@ -348,7 +354,8 @@ static void attack(e_sm2_class* i_this) {
         if (actor->speedF < 1.0f) {
             i_this->action = ACTION_NORMAL_MOVE;
             i_this->mode = 0;
-            i_this->timers[0] = cM_rndF(20.0f);
+            // Wait timer before next movement (SCALE_TIME)
+            i_this->timers[0] = cM_rndF(20.0f) * SCALE_TIME;
         }
         break;
     case 10:
@@ -389,7 +396,8 @@ static s8 combine(e_sm2_class* i_this) {
     if (combine_actor == NULL || combine_actor->action != ACTION_COMBINE) {
         i_this->action = ACTION_NORMAL_MOVE;
         i_this->mode = 0;
-        i_this->timers[0] = 20.0f + cM_rndF(20.0f);
+        // Fallback timer when combine partner is lost (SCALE_TIME)
+        i_this->timers[0] = (20.0f + cM_rndF(20.0f)) * SCALE_TIME;
         return cc_co_ON;
     }
 
@@ -409,7 +417,8 @@ static s8 combine(e_sm2_class* i_this) {
     switch (i_this->mode) {
     case 0:
         if (i_this->timers[0] == 0) {
-            i_this->timers[0] = 8.0f + cM_rndF(3.0f);
+            // Wait timer during combine mode (SCALE_TIME)
+            i_this->timers[0] = (8.0f + cM_rndF(3.0f)) * SCALE_TIME;
             i_this->mode = 1;
         }
         break;
@@ -419,7 +428,8 @@ static s8 combine(e_sm2_class* i_this) {
 
         if (i_this->timers[0] == 0) {
             i_this->mode = 0;
-            i_this->timers[0] = 8.0f + cM_rndF(3.0f);
+            // Return to wait in combine mode (SCALE_TIME)
+            i_this->timers[0] = (8.0f + cM_rndF(3.0f)) * SCALE_TIME;
         }
         break;
     case 5:
@@ -497,17 +507,22 @@ static s8 roof(e_sm2_class* i_this) {
         if (i_this->field_0x5b8 != 0) {
             if (dComIfGs_isSwitch(i_this->field_0x5b8, fopAcM_GetRoomNo(actor))) {
                 i_this->mode = 2;
-                i_this->timers[0] = 2.0f + cM_rndF(50.0f);
-                i_this->timers[1] = i_this->timers[0] + 50;
+                // Delay before emerging from ground via switch (SCALE_TIME)
+                i_this->timers[0] = (2.0f + cM_rndF(50.0f)) * SCALE_TIME;
+                // Extended timer for full emergence sequence (SCALE_TIME)
+                i_this->timers[1] = i_this->timers[0] + 50 * SCALE_TIME;
             }
         } else if (fopAcM_searchPlayerDistanceXZ(actor) < (100.0f * i_this->field_0x5b6)) {
             i_this->mode = 2;
             if (strcmp(dComIfGp_getStartStageName(), "D_SB07") == 0) {
-                i_this->timers[0] = 2.0f + cM_rndF(50.0f);
+                // Delay before emerging from ground near player (SCALE_TIME)
+                i_this->timers[0] = (2.0f + cM_rndF(50.0f)) * SCALE_TIME;
             } else {
-                i_this->timers[0] = 2;
+                // Quick emergence in other stages (SCALE_TIME)
+                i_this->timers[0] = 2 * SCALE_TIME;
             }
-            i_this->timers[1] = i_this->timers[0] + 50;
+            // Extended timer for full emergence sequence (SCALE_TIME)
+            i_this->timers[1] = i_this->timers[0] + 50 * SCALE_TIME;
         }
         break;
     case 2:
@@ -530,7 +545,8 @@ static s8 roof(e_sm2_class* i_this) {
 
             if (i_this->field_0x830 > 0.9f * (1.3f + KREG_F(17))) {
                 i_this->mode = 3;
-                i_this->timers[0] = 5;
+                // Brief pause after emerging fully from ground (SCALE_TIME)
+                i_this->timers[0] = 5 * SCALE_TIME;
             }
         }
         break;
@@ -542,7 +558,8 @@ static s8 roof(e_sm2_class* i_this) {
         if (i_this->acch.ChkGroundHit()) {
             i_this->action = ACTION_NORMAL_MOVE;
             i_this->mode = 0;
-            i_this->timers[0] = 40.0f + cM_rndF(30.0f);
+            // Wait timer after landing from ground emergence (SCALE_TIME)
+            i_this->timers[0] = (40.0f + cM_rndF(30.0f)) * SCALE_TIME;
             i_this->field_0x6a8 = 0;
             i_this->field_0x830 = 1.0f;
             i_this->field_0x6aa = 20;
@@ -645,7 +662,8 @@ static void fail(e_sm2_class* i_this) {
     if (i_this->acch.ChkGroundHit()) {
         if (i_this->mode == 0) {
             i_this->mode = 1;
-            i_this->timers[1] = 25;
+            // Death animation duration timer (SCALE_TIME)
+            i_this->timers[1] = 25 * SCALE_TIME;
         }
 
         cLib_addCalc2(&i_this->field_0x6b0, 0.5f + BREG_F(9), 0.05f, 0.05f + VREG_F(7));
@@ -664,7 +682,8 @@ static void fail(e_sm2_class* i_this) {
     if (i_this->mode == 1) {
         if (actor->eventInfo.checkCommandCatch()) {
             i_this->mode = 2;
-            i_this->timers[0] = KREG_S(7) + 9;
+            // Bottle catch sequence timer (SCALE_TIME)
+            i_this->timers[0] = (KREG_S(7) + 9) * SCALE_TIME;
         } else {
             static u8 item_no[] = {
                 fpcNm_ITEM_CHUCHU_GREEN,
@@ -861,7 +880,8 @@ static void damage_check(e_sm2_class* i_this) {
                         i_this->type = new_color_type;
                         sm_hit_actor->type = new_color_type;
 
-                        sm_hit_actor->timers[0] = 100;
+                        // Invulnerability timer for other ChuChu after combining (SCALE_TIME)
+                        sm_hit_actor->timers[0] = 100 * SCALE_TIME;
                         sm_hit_actor->combine_actor_pid = fopAcM_GetID(actor);
                         return;
                     }
@@ -898,8 +918,8 @@ static void damage_check(e_sm2_class* i_this) {
                         for (int j = 0; j < bun_d[i_this->sizetype]; j++) {
                             static int j_d[] = {0, 6, 1, 5, 2, 4, 0, 6, 1, 5, 2, 4};
                             static s16 ya_d[] = {
-                                0x0000, 0x8000, 0x0000, 0x8000, 0x0000, 0x8000,
-                                0x0000, 0x8000, 0x0000, 0x8000, 0x0000, 0x8000,
+                                0x0000, -0x8000, 0x0000, -0x8000, 0x0000, -0x8000,
+                                0x0000, -0x8000, 0x0000, -0x8000, 0x0000, -0x8000,
                             };
                             static f32 y_ad[] = {20.0f, 30.0f, 40.0f, 50.0f, 60.0f,};
 
@@ -1053,12 +1073,14 @@ static void action(e_sm2_class* i_this) {
     MtxPosition(&work, &offset);
     actor->speed.x = offset.x;
     actor->speed.z = offset.z;
-    actor->speed.y += actor->gravity;
+    // Frame-based accumulator: Gravity velocity increments each frame
+    actor->speed.y += actor->gravity * DELTA_TIME;
     if (actor->speed.y < -100.0f) {
         actor->speed.y = -100.0f;
     }
 
-    actor->current.pos += actor->speed;
+    // Frame-based accumulator: Position increments each frame based on velocity
+    actor->current.pos += actor->speed * DELTA_TIME;
 
     cXyz* cc_move_p = i_this->ccStts.GetCCMoveP();
     if (cc_move_p != NULL) {
@@ -1276,7 +1298,8 @@ static void action(e_sm2_class* i_this) {
     static f32 asp[] = {500.0f, 400.0f, 300.0f, 200.0f, 100.0f};
     static f32 asp2[] = {3500.0f, 3000.0f, 2500.0f, 2000.0f, 1500.0f};
 
-    i_this->field_0x828 += (s16)(asp2[i_this->sizetype] + (i_this->field_0x82c * asp[i_this->sizetype]));
+    // Frame-based accumulator: Wobble rotation angle increments each frame
+    i_this->field_0x828 += (s16)((asp2[i_this->sizetype] + (i_this->field_0x82c * asp[i_this->sizetype])) * DELTA_TIME);
 
     for (int i = 0; i < 8; i++) {
         if (i_this->action != ACTION_FAIL) {
@@ -1612,7 +1635,8 @@ static int daE_SM2_Create(fopAc_ac_c* i_this) {
             a_this->is_roof = TRUE;
         } else {
             a_this->action = ACTION_NORMAL_MOVE;
-            a_this->timers[0] = cM_rndF(20.0f);
+            // Initial wait timer after spawning (SCALE_TIME)
+            a_this->timers[0] = cM_rndF(20.0f) * SCALE_TIME;
             a_this->combine_off_timer = 100.0f + cM_rndF(100.0f);
         }
 

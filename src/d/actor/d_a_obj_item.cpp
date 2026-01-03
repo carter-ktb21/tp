@@ -648,7 +648,7 @@ void daItem_c::procMainBoomHitWait() {
 }
 
 void daItem_c::move_proc_call() {
-    static procFunc mode_proc[] = {&daItem_c::mode_wait, &daItem_c::mode_water};
+    static const procFunc mode_proc[] = {&daItem_c::mode_wait, &daItem_c::mode_water};
 
     if (checkFlag(FLAG_NO_MOVE_e)) {
         RotateYBase();
@@ -931,7 +931,8 @@ int daItem_c::itemActionForRupee() {
 
     if (mAcch.ChkGroundHit()) {
         RotateYBase();
-        speedF *= 0.95f;
+        // Frame-based decay: Exponential friction using powf for framerate independence
+        speedF *= powf(0.95f, DELTA_TIME);
     }
 
     if (field_0x94b >= 2) {
@@ -939,7 +940,8 @@ int daItem_c::itemActionForRupee() {
     }
 
     if (field_0x94b == 0) {
-        shape_angle.x += getData().mRotateXSpeed;
+        // Frame-based accumulator: Rotation angle increments each frame
+        shape_angle.x += getData().mRotateXSpeed * DELTA_TIME;
     } else {
         shape_angle.x = 0;
     }
@@ -1159,7 +1161,7 @@ procFunc daItem_c::mFuncPtr[] = {
     &daItem_c::procMainForceGet,      NULL,
 };
 
-dCcD_SrcCyl daItem_c::m_cyl_src = {
+const dCcD_SrcCyl daItem_c::m_cyl_src = {
     {
         {0, {{0, 0, 0}, {0xFFFFFFFF, 17}, 0x59}},
         {dCcD_SE_NONE, 0, 0, 0, {0}},

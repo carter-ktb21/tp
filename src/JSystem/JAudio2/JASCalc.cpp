@@ -6,8 +6,8 @@
 
 void JASCalc::imixcopy(const s16* s1, const s16* s2, s16* dst, u32 n) {
     for (n; n != 0; n--) {
-        *dst++ = *((s16*)s1)++;
-        *dst++ = *((s16*)s2)++;
+        *dst++ = *(s1)++;
+        *dst++ = *(s2)++;
     }
 }
 
@@ -21,10 +21,10 @@ void JASCalc::bcopyfast(const void* src, void* dest, u32 size) {
     u32* udest = (u32*)dest;
 
     for (size = size / (4 * sizeof(u32)); size != 0; size--) {
-        copy1 = *((u32*)usrc)++;
-        copy2 = *((u32*)usrc)++;
-        copy3 = *((u32*)usrc)++;
-        copy4 = *((u32*)usrc)++;
+        copy1 = *(usrc)++;
+        copy2 = *(usrc)++;
+        copy3 = *(usrc)++;
+        copy4 = *(usrc)++;
 
         *udest++ = copy1;
         *udest++ = copy2;
@@ -263,12 +263,15 @@ s16 const JASCalc::CUTOFF_TO_IIR_TABLE[128][4] = {
     0x7FFF, 0x0000, 0x0000, 0x0000,
 };
 
+template <>
+s16 JASCalc::clamp(s32);
+
 // currently required because of missing functions
-// JASCalc::hannWindow(short *, unsigned long)
-// JASCalc::hammWindow(short *, unsigned long)
-// JASCalc::fft(float *, float *, unsigned long, long)
+// JASCalc::hannWindow(short *, u32)
+// JASCalc::hammWindow(short *, u32)
+// JASCalc::fft(float *, float *, u32, s32)
 f32 JASCalc::fake1() { return 0.5f; }
-f32 JASCalc::fake2(long x) { return JASCalc::clamp<s16, long>(x); }
+f32 JASCalc::fake2(s32 x) { return JASCalc::clamp<s16, s32>(x); }
 f32 JASCalc::fake3() { return 0.0f; }
 
 f32 JASCalc::pow2(f32 x) {

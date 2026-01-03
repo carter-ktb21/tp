@@ -134,7 +134,7 @@ void daE_GM_c::setAction(actionFunc action) {
     (this->*mAction)();
 }
 
-static u8 l_initHIO;
+static u8 hio_set;
 
 static daE_GM_HIO_c l_HIO;
 
@@ -332,11 +332,11 @@ void daE_GM_c::appear() {
 }
 
 static s16 const l_rand[4] = {
-    0xF800, 0x0400, 0xFC00, 0x0800,
+    -0x0800, 0x0400, -0x0400, 0x0800,
 };
 
 static s16 const l_rand2[4] = {
-    0xD000, 0x3800, 0xB800, 0x5000,
+    -0x3000, 0x3800, -0x4800, 0x5000,
 };
 
 static f32 const l_rand_base_spd[4] = {
@@ -1646,8 +1646,8 @@ int daE_GM_c::_delete() {
         l_coreActorID = fpcM_ERROR_PROCESS_ID_e;
     }
 
-    if (l_initHIO != 0) {
-        l_initHIO = 0;
+    if (hio_set != 0) {
+        hio_set = 0;
         mDoHIO_DELETE_CHILD(l_HIO.id);
     }
 
@@ -1755,8 +1755,8 @@ cPhs__Step daE_GM_c::create() {
 
         OS_REPORT("//////////////E_GM SET 2 !!\n");
 
-        if (l_initHIO == 0) {
-            l_initHIO = 1;
+        if (hio_set == 0) {
+            hio_set = 1;
             field_0xa77 = 1;
             l_HIO.id = -1;
         }

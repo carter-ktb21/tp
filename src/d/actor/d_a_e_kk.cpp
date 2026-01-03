@@ -213,7 +213,7 @@ void daE_KK_c::setActionMode(int i_action, int i_mode) {
     mMoveMode = i_mode;
 }
 
-static u8 l_initHIO;
+static u8 hio_set;
 
 static daE_KK_HIO_c l_HIO;
 
@@ -564,10 +564,13 @@ void daE_KK_c::executeSpearThrow() {
                 break;
             }
         }
-        if ((s32)mpMorfSO->getFrame() == 0x17) {
+        // Check animation frame for javelin spawn and use flag to prevent multiple spawns
+        // Without field_0x67d check: at 60fps the animation could stay on frame 0x17 for multiple
+        // game frames, causing fopAcM_createChild to spawn 2-3 javelins instead of 1
+        if ((s32)mpMorfSO->getFrame() == 0x17 && field_0x67d == 0) {
             fopAcM_createChild(PROC_E_KK, fopAcM_GetID(this), 0xFF0001, &field_0x698,
                                fopAcM_GetRoomNo(this), &shape_angle, NULL, -1, NULL);
-            field_0x67d = 1;
+            field_0x67d = 1;  // Set flag so we only spawn once per throw animation
             mCyl.OffTgNoHitMark();
             mCyl.OffTgShield();
             mCreatureSound.startCreatureSound(Z2SE_EN_KK_THROW, 0, -1);
@@ -1006,7 +1009,9 @@ void daE_KK_c::executeWeaponMove() {
                                          -1.0f, -1.0f, 0);
             }
             mStts.Init(0xFF, 0, this);
-            mTimer = (s16)cM_rndF(20.0f) + 30;
+            // Javelin despawn timer: 30-50 frames. Timers decrement by 1 each frame, not by DELTA_TIME,
+            // so we multiply the assignment by SCALE_TIME to maintain the intended duration
+            mTimer = ((s16)cM_rndF(20.0f) + 30) * SCALE_TIME;
             mMoveMode = 2;
         }
         goto end;
@@ -1309,7 +1314,7 @@ int daE_KK_c::_delete() {
     dComIfG_resDelete(&mPhaseReq, "E_KK");
 
     if (mHIOInit != 0) {
-        l_initHIO = false;
+        hio_set = false;
         mDoHIO_DELETE_CHILD(l_HIO.field_0x4);
     }
 
@@ -1382,8 +1387,8 @@ int daE_KK_c::create() {
         if (field_0x679 != 1 && field_0x67b != 0xFF && fopAcM_isSwitch(this, field_0x67b)) {
             return cPhs_ERROR_e;
         }
-        if (!l_initHIO) {
-            l_initHIO = 1;
+        if (!hio_set) {
+            hio_set = 1;
             mHIOInit = 1;
             l_HIO.field_0x4 = mDoHIO_CREATE_CHILD("氷の剣士", &l_HIO);
         }

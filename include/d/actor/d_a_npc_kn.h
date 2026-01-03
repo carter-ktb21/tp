@@ -179,7 +179,7 @@ public:
 
 public:
     void initialize() {
-        memset(&mFootLPos, 0, (int)&field_0xe3c - (int)&mFootLPos);
+        memset(&mFootLPos, 0, (intptr_t)&field_0xe3c - (intptr_t)&mFootLPos);
 
         mFaceMotionSeqMngr.initialize();
         mMotionSeqMngr.initialize();
@@ -416,7 +416,7 @@ public:
     static dCcD_SrcSph mCcDSph;
     static s16 mSrchName;
     static fopAc_ac_c* mFindActorPtrs[50];
-    static u8 mFindCount[4];
+    static int mFindCount;
 
 private:
     /* 0x0E44 */ J3DModel* mpPodModel;

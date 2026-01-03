@@ -169,6 +169,14 @@ cd Twilight-Princess-Ultimate-Edition</pre>
 
 <hr>
 
+<hr>
+
+<h2><b>Tools</b></h2>
+<h3>BMG Editor</h3>
+<p>Update custom_text.xml according to the template and bmg_editor.py will rebuild an iso with your custom text!</p>
+
+<hr>
+
 <h2><b>Credits</b></h2>
 
 <h3>Zelda Reverse Engineering Team</h3>

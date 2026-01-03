@@ -38,7 +38,11 @@ compile_commands.json
 
 # Environment files
 .env
+
 # Claude Code
 .claude
 /.claude
 .claude/settings.local.json
+
+# BMG files
+*.bmg

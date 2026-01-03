@@ -931,7 +931,8 @@ int daItem_c::itemActionForRupee() {
 
     if (mAcch.ChkGroundHit()) {
         RotateYBase();
-        speedF *= 0.95f;
+        // Frame-based decay: Exponential friction using powf for framerate independence
+        speedF *= powf(0.95f, DELTA_TIME);
     }
 
     if (field_0x94b >= 2) {
@@ -939,7 +940,8 @@ int daItem_c::itemActionForRupee() {
     }
 
     if (field_0x94b == 0) {
-        shape_angle.x += getData().mRotateXSpeed;
+        // Frame-based accumulator: Rotation angle increments each frame
+        shape_angle.x += getData().mRotateXSpeed * DELTA_TIME;
     } else {
         shape_angle.x = 0;
     }

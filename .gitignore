@@ -46,3 +46,6 @@ compile_commands.json
 
 # BMG files
 *.bmg
+
+# BLO files
+*.blo

@@ -1,5 +1,4 @@
 import os
-import argparse
 import struct
 from gclib.gcm import GCM
 from gclib.rarc import RARC, RARCFileEntry
@@ -25,6 +24,7 @@ def parse_blo(blo_bytes: BytesIO):
 
 class BLO:
     def __init__(self, data: BytesIO):
+        self.name = str()
         data.seek(0)
         self.tag = data.read(4)
         self.type = data.read(4)
@@ -36,10 +36,27 @@ class BLO:
         self.fnt1_section = FNT1_Section(data)
         self.mat1_section = MAT1_Section(data)
         self.elements = PAN2(data, True)
+        self.padding = data.read(self.size - data.tell())
 
     def to_bytes(self):
         out = bytearray()
-        
+        out += self.tag
+        out += self.type
+        out += self.size.to_bytes(4, 'big')
+        out += self.blocks.to_bytes(4, 'big')
+        out += self.header_padding
+        out += self.inf1_section.to_bytes()
+        out += self.tex1_section.to_bytes()
+        out += self.fnt1_section.to_bytes()
+        out += self.mat1_section.to_bytes()
+        out += self.elements.to_bytes()
+        out += self.padding
+        return out
+
+    def rebuild_blo(self, path: str):
+        data = self.to_bytes()
+        with open(path, "wb") as f:
+            f.write(data)
 
 
 class INF1_Section:
@@ -50,6 +67,14 @@ class INF1_Section:
         padding_size = self.size - 16
         self.padding = data.read(padding_size)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.unknown
+        out += self.padding
+        return out
+
 
 # TEX1 ---------------------------------------------------------------------------------
 class TEX1_Section:
@@ -58,10 +83,11 @@ class TEX1_Section:
         self.size_after_header = self.header.section_size - self.header.header_size
         self.offset_count = data.read(2)
         self.offsets: List[bytes] = []
+        self.texture_refs: List[TEX1_Reference] = []
+        self.padding = bytes()
         if bytes_to_int(self.header.texture_count) > 0:
             for i in range(int.from_bytes(self.offset_count, byteorder='big')):
                 self.offsets.insert(i, data.read(2))
-            self.texture_refs: List[TEX1_Reference] = []
             for i in range(int.from_bytes(self.offset_count, byteorder='big')):
                 if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
                     ref = TEX1_Reference()
@@ -78,6 +104,21 @@ class TEX1_Section:
         else:
             self.padding = data.read(14)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.header.to_bytes()
+        out += self.offset_count
+
+        for offset in self.offsets:
+            out += offset
+
+        for ref in self.texture_refs:
+            out += ref.res_type
+            out += ref.texture
+
+        out += self.padding
+        return out
+
 
 class TEX1_Header:
     def __init__(self, data: BytesIO):
@@ -86,6 +127,15 @@ class TEX1_Header:
         self.texture_count = data.read(2)
         self.padding = data.read(2)
         self.header_size = bytes_to_int(data.read(4))
+
+    def to_bytes(self):
+        out = bytearray()
+        out += self.magic
+        out += self.section_size.to_bytes(4, 'big')
+        out += self.texture_count
+        out += self.padding
+        out += self.header_size.to_bytes(4, 'big')
+        return out
 
 
 class TEX1_Reference:
@@ -102,10 +152,11 @@ class FNT1_Section:
         self.size_after_header = self.header.section_size - self.header.header_size
         self.offset_count = data.read(2)
         self.offsets: List[bytes] = []
+        self.font_refs: List[FNT1_Reference] = []
+        self.padding = bytes()
         if bytes_to_int(self.header.font_count) > 0:
             for i in range(int.from_bytes(self.offset_count, byteorder='big')):
                 self.offsets.insert(i, data.read(2))
-            self.font_refs: List[FNT1_Reference] = []
             for i in range(int.from_bytes(self.offset_count, byteorder='big')):
                 if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
                     ref = FNT1_Reference()
@@ -122,6 +173,21 @@ class FNT1_Section:
         else:
             self.padding = data.read(14)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.header.to_bytes()
+        out += self.offset_count
+
+        for offset in self.offsets:
+            out += offset
+
+        for ref in self.font_refs:
+            out += ref.res_type
+            out += ref.font
+
+        out += self.padding
+        return out
+
 
 class FNT1_Header:
     def __init__(self, data: BytesIO):
@@ -130,6 +196,15 @@ class FNT1_Header:
         self.font_count = data.read(2)
         self.padding = data.read(2)
         self.header_size = bytes_to_int(data.read(4))
+
+    def to_bytes(self):
+        out = bytearray()
+        out += self.magic
+        out += self.section_size.to_bytes(4, 'big')
+        out += self.font_count
+        out += self.padding
+        out += self.header_size.to_bytes(4, 'big')
+        return out
 
 
 class FNT1_Reference:
@@ -170,6 +245,38 @@ class MAT1_Section:
         self.alpha_comp_info_section = Alpha_Comp_Info_Section(data, self.offsets, self.mat_init_section)
         self.blend_info_section = Blend_Info_Section(data, self.offsets, self.mat_init_section)
         self.dither_section = Dither_Section(data, self, self.offsets, self.mat_init_section)
+
+    def to_bytes(self):
+        out = bytearray()
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.material_count
+        out += self.padding
+        out += self.offsets.to_bytes()
+        out += self.mat_init_section.to_bytes()
+        out += self.mat_init_idx_section.to_bytes()
+        out += self.unknown_section.to_bytes()
+        out += self.ind_init_data_section.to_bytes()
+        out += self.cull_modes.to_bytes()
+        out += self.mat_colors.to_bytes()
+        out += self.color_chan_num_section.to_bytes()
+        out += self.color_chan_info_section.to_bytes()
+        out += self.tex_gen_num_section.to_bytes()
+        out += self.tex_coord_info_section.to_bytes()
+        out += self.tex_mtx_info_section.to_bytes()
+        out += self.tex_no_section.to_bytes()
+        out += self.font_no_section.to_bytes()
+        out += self.tev_order_info_section.to_bytes()
+        out += self.tev_color_section.to_bytes()
+        out += self.tev_k_color_section.to_bytes()
+        out += self.tev_stage_num_section.to_bytes()
+        out += self.tev_stage_info_section.to_bytes()
+        out += self.tev_swap_mode_info_section.to_bytes()
+        out += self.tev_swap_mode_table_info_section.to_bytes()
+        out += self.alpha_comp_info_section.to_bytes()
+        out += self.blend_info_section.to_bytes()
+        out += self.dither_section.to_bytes()
+        return out
 
 
 class MAT1_Section_Offsets:
@@ -235,6 +342,33 @@ class MAT1_Section_Offsets:
 
         return min(candidates)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.mat_init_data_offset.to_bytes(4, 'big')
+        out += self.mat_init_data_indexes_offset.to_bytes(4, 'big')
+        out += self.offset_3.to_bytes(4, 'big')
+        out += self.ind_init_data_offset.to_bytes(4, 'big')
+        out += self.cull_mode_offset.to_bytes(4, 'big')
+        out += self.mat_color_offset.to_bytes(4, 'big')
+        out += self.color_chan_num_offset.to_bytes(4, 'big')
+        out += self.color_chan_info_offset.to_bytes(4, 'big')
+        out += self.tex_gen_num_offset.to_bytes(4, 'big')
+        out += self.tex_coord_info_offset.to_bytes(4, 'big')
+        out += self.tex_mtx_info_offset.to_bytes(4, 'big')
+        out += self.tex_no_offset.to_bytes(4, 'big')
+        out += self.font_no_offset.to_bytes(4, 'big')
+        out += self.tev_order_info_offset.to_bytes(4, 'big')
+        out += self.tev_color_offset.to_bytes(4, 'big')
+        out += self.tev_k_color_offset.to_bytes(4, 'big')
+        out += self.tev_stage_num_offset.to_bytes(4, 'big')
+        out += self.tev_stage_info_offset.to_bytes(4, 'big')
+        out += self.tev_swap_mode_info_offset.to_bytes(4, 'big')
+        out += self.tev_swap_mode_table_info_offset.to_bytes(4, 'big')
+        out += self.alpha_comp_info_offset.to_bytes(4, 'big')
+        out += self.blend_info_offset.to_bytes(4, 'big')
+        out += self.dither_offset.to_bytes(4, 'big')
+        return out
+
 
 # Mat Init Data ------------------------
 class Mat_Init_Data_Section:
@@ -271,7 +405,7 @@ class Mat_Init_Data_Section:
             cullModeCount = bytes_to_int(self.mat_init_data[i].cull_mode_idx)
             if cullModeCount > self.cull_mode_count:
                 self.cull_mode_count = cullModeCount
-            
+
             # Mat Colors
             for j in range(1):
                 matColorCount = bytes_to_int(self.mat_init_data[i].mat_color_idx_tbl[j])
@@ -392,6 +526,51 @@ class Mat_Init_Data_Section:
         self.blend_info_count += 1
         self.dither_count += 1
 
+    def to_bytes(self):
+        out = bytearray()
+        for initData in self.mat_init_data:
+            out += initData.mat_mode
+            out += initData.cull_mode_idx
+            out += initData.color_chan_num_idx
+            out += initData.tex_gen_num_idx
+            out += initData.tev_stage_num_idx
+            out += initData.dither_idx
+            out += initData.mat_alpha_calc
+            out += initData.unknown_field_7
+            for matColorIdx in initData.mat_color_idx_tbl:
+                out += matColorIdx
+            for colorChanInfoIdx in initData.color_chan_info_idx_tbl:
+                out += colorChanInfoIdx
+            for texCoordInfoIdx in initData.tex_coord_info_idx_tbl:
+                out += texCoordInfoIdx
+            for texMtxInfoIdx in initData.tex_mtx_info_idx_tbl:
+                out += texMtxInfoIdx
+            for texNoIdx in initData.tex_no_idx_tbl:
+                out += texNoIdx
+            out += initData.font_no_idx
+            for tevKColorIdx in initData.tev_k_color_idx_tbl:
+                out += tevKColorIdx
+            for tevKColorSel in initData.tev_k_color_sel:
+                out += tevKColorSel
+            for tevKAlphaSel in initData.tev_k_alpha_sel:
+                out += tevKAlphaSel
+            for tevOrderInfoIdx in initData.tev_order_info_idx_tbl:
+                out += tevOrderInfoIdx
+            for tevColorIdx in initData.tev_color_idx_tbl:
+                out += tevColorIdx
+            for tevStageInfoIdx in initData.tev_stage_info_idx_tbl:
+                out += tevStageInfoIdx
+            for tevSwapModeInfoIdx in initData.tev_swap_mode_info_idx_tbl:
+                out += tevSwapModeInfoIdx
+            for tevSwapModeTblInfoIdx in initData.tev_swap_mode_tbl_info_idx_tbl:
+                out += tevSwapModeTblInfoIdx
+            out += initData.alpha_comp_info_idx
+            out += initData.blend_info_idx
+            out += initData.unknown_field_E6
+        out += self.padding
+        return out
+
+
 class J2D_Material_Init_Data:
     def __init__(self, data: BytesIO):
         self.mat_mode = data.read(1)
@@ -439,6 +618,13 @@ class Mat_Init_Data_Idx_Section:
             # In each section, the padding variable reads the number of bytes left in the section until the next offset. (This can be zero!!!)
             next_offset = offsets.find_next_valid_offset(offsets.mat_init_data_indexes_offset)
             self.padding = data.read((next_offset - offsets.mat_init_data_indexes_offset) - (indexCount * 2))
+
+    def to_bytes(self):
+        out = bytearray()
+        for index in self.indexes:
+            out += index
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -449,12 +635,23 @@ class Unknown_Section:
         else:
             self.data = data.read(offsets.cull_mode_offset - offsets.offset_3)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.data
+        return out
+
 
 # Ind Init Data ------------------------
 class Ind_Init_Data_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets):
+        self.data = bytes()
         if offsets.ind_init_data_offset > 0:
-            data.read(offsets.cull_mode_offset - offsets.ind_init_data_offset)
+            self.data = data.read(offsets.cull_mode_offset - offsets.ind_init_data_offset)
+
+    def to_bytes(self):
+        out = bytearray()
+        out += self.data
+        return out
 # --------------------------------------
 
 
@@ -467,6 +664,13 @@ class Cull_Mode_Section:
                 self.cull_modes.insert(i, bytes_to_int(data.read(4)))
             next_offset = offsets.find_next_valid_offset(offsets.cull_mode_offset)
             self.padding = data.read((next_offset - offsets.cull_mode_offset) - ((initData.cull_mode_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for cullMode in self.cull_modes:
+            out += cullMode.to_bytes(4, 'big')
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -479,6 +683,16 @@ class Mat_Color_Section:
                 self.colors.insert(i, GXColor(data))
             next_offset = offsets.find_next_valid_offset(offsets.mat_color_offset)
             self.padding = data.read((next_offset - offsets.mat_color_offset) - ((initData.mat_color_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for color in self.colors:
+            out += color.r
+            out += color.g
+            out += color.b
+            out += color.a
+        out += self.padding
+        return out
 
 
 class GXColor:
@@ -499,6 +713,13 @@ class Color_Chan_Num_Section:
                 self.color_chan_num.insert(i, data.read(1))
             next_offset = offsets.find_next_valid_offset(offsets.color_chan_num_offset)
             self.padding = data.read((next_offset - offsets.color_chan_num_offset) - ((initData.color_chan_num_count)))
+
+    def to_bytes(self):
+        out = bytearray()
+        for colorChanNum in self.color_chan_num:
+            out += colorChanNum
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -511,6 +732,16 @@ class Color_Chan_Info_Section:
                 self.color_chan_info.insert(i, J2D_Color_Chan_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.color_chan_info_offset)
             self.padding = data.read((next_offset - offsets.color_chan_info_offset) - ((initData.color_chan_info_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for colorChanInfo in self.color_chan_info:
+            out += colorChanInfo.field_0x0
+            out += colorChanInfo.field_0x1
+            out += colorChanInfo.field_0x2
+            out += colorChanInfo.field_0x3
+        out += self.padding
+        return out
 
 
 class J2D_Color_Chan_Info:
@@ -531,6 +762,13 @@ class Tex_Gen_Num_Section:
                 self.tex_gen_num.insert(i, data.read(1))
             next_offset = offsets.find_next_valid_offset(offsets.tex_gen_num_offset)
             self.padding = data.read((next_offset - offsets.tex_gen_num_offset) - (initData.tex_gen_num_count))
+
+    def to_bytes(self):
+        out = bytearray()
+        for texGenNum in self.tex_gen_num:
+            out += texGenNum
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -538,12 +776,21 @@ class Tex_Gen_Num_Section:
 class Tex_Coord_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
         if offsets.tex_coord_info_offset > 0:
-            count = (offsets.tex_mtx_info_offset - offsets.tex_coord_info_offset) // 4
             self.tex_coord_info: List[J2D_Tex_Coord_Info] = []
             for i in range(initData.tex_coord_info_count):
                 self.tex_coord_info.insert(i, J2D_Tex_Coord_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.tex_coord_info_offset)
             self.padding = data.read((next_offset - offsets.tex_coord_info_offset) - ((initData.tex_coord_info_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for texCoordInfo in self.tex_coord_info:
+            out += texCoordInfo.tex_gen_type
+            out += texCoordInfo.tex_gen_src
+            out += texCoordInfo.tex_gen_mtx
+            out += texCoordInfo.padding
+        out += self.padding
+        return out
 
 
 class J2D_Tex_Coord_Info:
@@ -558,12 +805,20 @@ class J2D_Tex_Coord_Info:
 # Tex Mtx Info -------------------------
 class Tex_Mtx_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
+        self.tex_mtx_info: List[J2D_Tex_Mtx_Info] = []
+        self.padding = bytes()
         if offsets.tex_mtx_info_offset > 0:
-            self.tex_mtx_info: List[J2D_Tex_Mtx_Info] = []
             for i in range(initData.tex_mtx_info_count):
                 self.tex_mtx_info.insert(i, J2D_Tex_Mtx_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.tex_mtx_info_offset)
             self.padding = data.read((next_offset - offsets.tex_mtx_info_offset) - ((initData.tex_mtx_info_count) * 36))
+
+    def to_bytes(self):
+        out = bytearray()
+        for texMtxInfo in self.tex_mtx_info:
+            out += texMtxInfo.to_bytes()
+        out += self.padding
+        return out
 
 
 class J2D_Tex_Mtx_Info:
@@ -577,6 +832,18 @@ class J2D_Tex_Mtx_Info:
         self.center_z = struct.unpack('>f', data.read(4))[0]
         self.tex_srt_info = J2D_Texture_SRT_Info(data)
 
+    def to_bytes(self):
+        out = bytearray()
+        out += self.tex_mtx_type
+        out += self.tex_mtx_dcc
+        out += self.field_0x2
+        out += self.field_0x3
+        out += struct.pack('>f', self.center_x)
+        out += struct.pack('>f', self.center_y)
+        out += struct.pack('>f', self.center_z)
+        out += self.tex_srt_info.to_bytes()
+        return out
+
 
 class J2D_Texture_SRT_Info:
     def __init__(self, data: BytesIO):
@@ -585,30 +852,56 @@ class J2D_Texture_SRT_Info:
         self.rotation_deg = struct.unpack('>f', data.read(4))[0]
         self.translation_x = struct.unpack('>f', data.read(4))[0]
         self.translation_y = struct.unpack('>f', data.read(4))[0]
+
+    def to_bytes(self):
+        out = bytearray()
+        out += struct.pack('>f', self.scale_x)
+        out += struct.pack('>f', self.scale_y)
+        out += struct.pack('>f', self.rotation_deg)
+        out += struct.pack('>f', self.translation_x)
+        out += struct.pack('>f', self.translation_y)
+        return out
+
 # --------------------------------------
 
 
 # Tex No -------------------------------
 class Tex_No_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
+        self.tex_no: List[bytes] = []
+        self.padding = bytes()
         if offsets.tex_no_offset > 0:
-            self.tex_no: List[bytes] = []
             for i in range(initData.tex_no_count):
                 self.tex_no.insert(i, data.read(2))
             next_offset = offsets.find_next_valid_offset(offsets.tex_no_offset)
             self.padding = data.read((next_offset - offsets.tex_no_offset) - ((initData.tex_no_count) * 2))
+
+    def to_bytes(self):
+        out = bytearray()
+        for texNo in self.tex_no:
+            out += texNo
+        out += self.padding
+        return out
 # --------------------------------------
 
 
 # Font No ------------------------------
 class Font_No_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
+        self.font_no: List[bytes] = []
+        self.padding = bytes()
         if offsets.font_no_offset > 0:
-            self.font_no: List[bytes] = []
             for i in range(initData.font_no_count):
                 self.font_no.insert(i, data.read(2))
             next_offset = offsets.find_next_valid_offset(offsets.font_no_offset)
             self.padding = data.read((next_offset - offsets.font_no_offset) - ((initData.font_no_count) * 2))
+
+    def to_bytes(self):
+        out = bytearray()
+        for fontNo in self.font_no:
+            out += fontNo
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -619,9 +912,18 @@ class Tev_Order_Info_Section:
             self.tev_order_info: List[J2D_Tev_Order_Info] = []
             for i in range(initData.tev_order_info_count):
                 self.tev_order_info.insert(i, J2D_Tev_Order_Info(data))
-                print(self.tev_order_info[i].tex_coord)
             next_offset = offsets.find_next_valid_offset(offsets.tev_order_info_offset)
             self.padding = data.read((next_offset - offsets.tev_order_info_offset) - ((initData.tev_order_info_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for tevOrderInfo in self.tev_order_info:
+            out += tevOrderInfo.tex_coord
+            out += tevOrderInfo.tex_map
+            out += tevOrderInfo.color
+            out += tevOrderInfo.field_0x3
+        out += self.padding
+        return out
 
 
 class J2D_Tev_Order_Info:
@@ -643,6 +945,16 @@ class Tev_Color_Section:
             next_offset = offsets.find_next_valid_offset(offsets.tev_color_offset)
             self.padding = data.read((next_offset - offsets.tev_color_offset) - ((initData.tev_color_count) * 8))
 
+    def to_bytes(self):
+        out = bytearray()
+        for tevColor in self.tev_color:
+            out += tevColor.r
+            out += tevColor.g
+            out += tevColor.b
+            out += tevColor.a
+        out += self.padding
+        return out
+
 
 class GXColorS10:
     def __init__(self, data: BytesIO):
@@ -662,6 +974,16 @@ class Tev_K_Color_Section:
                 self.tev_k_color.insert(i, GXColor(data))
             next_offset = offsets.find_next_valid_offset(offsets.tev_k_color_offset)
             self.padding = data.read((next_offset - offsets.tev_k_color_offset) - ((initData.tev_k_color_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for tevKColor in self.tev_k_color:
+            out += tevKColor.r
+            out += tevKColor.g
+            out += tevKColor.b
+            out += tevKColor.a
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -674,6 +996,13 @@ class Tev_Stage_Num_Section:
                 self.tev_stage_num.insert(i, data.read(1))
             next_offset = offsets.find_next_valid_offset(offsets.tev_stage_num_offset)
             self.padding = data.read((next_offset - offsets.tev_stage_num_offset) - (initData.tev_stage_num_count))
+
+    def to_bytes(self):
+        out = bytearray()
+        for tevStageNum in self.tev_stage_num:
+            out += tevStageNum
+        out += self.padding
+        return out
 # --------------------------------------
 
 
@@ -686,6 +1015,13 @@ class Tev_Stage_Info_Section:
                 self.tev_stage_info.insert(i, J2D_Tev_Stage_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.tev_stage_info_offset)
             self.padding = data.read((next_offset - offsets.tev_stage_info_offset) - ((initData.tev_stage_info_count) * 20))
+
+    def to_bytes(self):
+        out = bytearray()
+        for tevStageInfo in self.tev_stage_info:
+            out += tevStageInfo.to_bytes()
+        out += self.padding
+        return out
 
 
 class J2D_Tev_Stage_Info:
@@ -710,6 +1046,30 @@ class J2D_Tev_Stage_Info:
         self.a_clamp = data.read(1)
         self.a_reg = data.read(1)
         self.field_0x13 = data.read(1)
+
+    def to_bytes(self):
+        out = bytearray()
+        out += self.field_0x0
+        out += self.color_a
+        out += self.color_b
+        out += self.color_c
+        out += self.color_d
+        out += self.c_op
+        out += self.c_bias
+        out += self.c_scale
+        out += self.c_clamp
+        out += self.c_reg
+        out += self.alpha_a
+        out += self.alpha_b
+        out += self.alpha_c
+        out += self.alpha_d
+        out += self.a_op
+        out += self.a_bias
+        out += self.a_scale
+        out += self.a_clamp
+        out += self.a_reg
+        out += self.field_0x13
+        return out
 # --------------------------------------
 
 
@@ -722,6 +1082,16 @@ class Tev_Swap_Mode_Info_Section:
                 self.tev_swap_mode_info.insert(i, J2D_Tev_Swap_Mode_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.tev_swap_mode_info_offset)
             self.padding = data.read((next_offset - offsets.tev_swap_mode_info_offset) - ((initData.tev_swap_mode_info_count) * 4))
+
+    def to_bytes(self):
+        out = bytearray()
+        for tevSwapModeInfo in self.tev_swap_mode_info:
+            out += tevSwapModeInfo.ras_sel
+            out += tevSwapModeInfo.tex_sel
+            out += tevSwapModeInfo.field_0x2
+            out += tevSwapModeInfo.field_0x3
+        out += self.padding
+        return out
 
 
 class J2D_Tev_Swap_Mode_Info:
@@ -743,6 +1113,16 @@ class Tev_Swap_Mode_Table_Info_Section:
             next_offset = offsets.find_next_valid_offset(offsets.tev_swap_mode_table_info_offset)
             self.padding = data.read((next_offset - offsets.tev_swap_mode_table_info_offset) - ((initData.tev_swap_mode_table_info_count) * 4))
 
+    def to_bytes(self):
+        out = bytearray()
+        for tevSwapModeTblInfo in self.tev_swap_mode_table_info:
+            out += tevSwapModeTblInfo.field_0x0
+            out += tevSwapModeTblInfo.field_0x1
+            out += tevSwapModeTblInfo.field_0x2
+            out += tevSwapModeTblInfo.field_0x3
+        out += self.padding
+        return out
+
 
 class J2D_Tev_Swap_Mode_Table_Info:
     def __init__(self, data: BytesIO):
@@ -762,6 +1142,20 @@ class Alpha_Comp_Info_Section:
                 self.alpha_comp_info.insert(i, J2D_Alpha_Comp_Info(data))
             next_offset = offsets.find_next_valid_offset(offsets.alpha_comp_info_offset)
             self.padding = data.read((next_offset - offsets.alpha_comp_info_offset) - ((initData.alpha_comp_info_count) * 8))
+
+    def to_bytes(self):
+        out = bytearray()
+        for alphaCompInfo in self.alpha_comp_info:
+            out += alphaCompInfo.field_0x0
+            out += alphaCompInfo.field_0x1
+            out += alphaCompInfo.ref_0
+            out += alphaCompInfo.ref_1
+            out += alphaCompInfo.field_0x4
+            out += alphaCompInfo.field_0x5
+            out += alphaCompInfo.field_0x6
+            out += alphaCompInfo.field_0x7
+        out += self.padding
+        return out
 
 
 class J2D_Alpha_Comp_Info:
@@ -787,6 +1181,16 @@ class Blend_Info_Section:
             next_offset = offsets.find_next_valid_offset(offsets.blend_info_offset)
             self.padding = data.read((next_offset - offsets.blend_info_offset) - ((initData.blend_info_count) * 4))
 
+    def to_bytes(self):
+        out = bytearray()
+        for blendInfo in self.blend_info:
+            out += blendInfo.type
+            out += blendInfo.src_factor
+            out += blendInfo.dst_factor
+            out += blendInfo.op
+        out += self.padding
+        return out
+
 
 class J2D_Blend_Info:
     def __init__(self, data: BytesIO):
@@ -804,10 +1208,15 @@ class Dither_Section:
             self.dither: List[bytes] = []
             for i in range(initData.dither_count):
                 self.dither.insert(i, data.read(1))
-                print(self.dither[i])
             # This last padding formula is a little different as there is not a "next offset" to calculate with
             self.padding = data.read((mat1Section.size - offsets.dither_offset) - ((initData.dither_count)))
-            print(self.padding)
+
+    def to_bytes(self):
+        out = bytearray()
+        for dither in self.dither:
+            out += dither
+        out += self.padding
+        return out
 # --------------------------------------
 # --------------------------------------------------------------------------------------
 
@@ -834,17 +1243,19 @@ class PAN1:
 class PAN2:
     def __init__(self, data: BytesIO, isParent: bool):
         # Check for BGN1 tag
+        self.start_tag = bytes()
+        self.start_tag_size = int()
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
-            self.tag = tag
-            self.tag_size = bytes_to_int(data.read(4))
+            print(tag)
+            self.start_tag = tag
+            self.start_tag_size = bytes_to_int(data.read(4))
         else:
             data.seek(old_pos)
 
         # Parse PAN2 data
         self.magic = data.read(4)
-        print(self.magic)
         self.size = bytes_to_int(data.read(4))
         self.field_0x8 = data.read(2)
         self.field_0xa = data.read(2)
@@ -852,7 +1263,6 @@ class PAN2:
         self.base_position = data.read(1)
         self.padding = data.read(2)
         self.info_tag = data.read(8)
-        print(self.info_tag)
         self.user_info_tag = data.read(8)
         self.rot_offset_x = struct.unpack('>f', data.read(4))[0]
         self.rot_offset_y = struct.unpack('>f', data.read(4))[0]
@@ -864,9 +1274,11 @@ class PAN2:
         self.translate_x = struct.unpack('>f', data.read(4))[0]
         self.translate_y = struct.unpack('>f', data.read(4))[0]
         self.end_padding = data.read(4)
+        self.end_tag = bytes()
+        self.end_tag_size = int()
 
+        self.child_nodes: List[Union[PAN2 | PIC2 | TBX2 | WIN2]] = []
         if isParent:
-            self.child_nodes: List[Union[PAN2 | PIC2 | TBX2]] = []
             while True:
                 old_pos = data.tell()
                 tag = data.read(4)
@@ -899,17 +1311,63 @@ class PAN2:
                 elif tag == b'WIN2':
                     data.seek(old_pos)
                     self.child_nodes.append(WIN2(data))
-                elif tag in (b'END1', b'EXT1', b'TEND1'):
-                    self.end_tag = tag
-                    print(tag)
-                    self.tag_size = bytes_to_int(data.read(4))
-                    break
                 else:
+                    self.end_tag = tag
+                    if self.end_tag == b'EXT1':
+                        print("TRUE")
+                    self.end_tag_size = bytes_to_int(data.read(4))
                     break
+
+    def to_bytes(self):
+        out = bytearray()
+        if self.start_tag == b'BGN1':
+            out += self.start_tag
+            out += self.start_tag_size.to_bytes(4, 'big')
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.field_0x8
+        out += self.field_0xa
+        out += self.visible
+        out += self.base_position
+        out += self.padding
+        out += self.info_tag
+        out += self.user_info_tag
+        out += struct.pack('>f', self.rot_offset_x)
+        out += struct.pack('>f', self.rot_offset_y)
+        out += struct.pack('>f', self.scale_x)
+        out += struct.pack('>f', self.scale_y)
+        out += struct.pack('>f', self.rotate_x)
+        out += struct.pack('>f', self.rotate_y)
+        out += struct.pack('>f', self.rotate_z)
+        out += struct.pack('>f', self.translate_x)
+        out += struct.pack('>f', self.translate_y)
+        out += self.end_padding
+
+        for node in self.child_nodes:
+            magic = node.magic
+            match magic:
+                case b'PAN2':
+                    out += node.to_bytes()
+
+                case b'PIC2':
+                    out += node.to_bytes()
+
+                case b'TBX2':
+                    out += node.to_bytes()
+
+                case b'WIN2':
+                    out += node.to_bytes()
+
+        out += self.end_tag
+        if self.end_tag_size > 0:
+            out += self.end_tag_size.to_bytes(4, 'big')
+        return out
 
 
 class PIC2:
     def __init__(self, data: BytesIO):
+        self.tag = bytes()
+        self.tag_size = int()
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
@@ -918,7 +1376,6 @@ class PIC2:
         else:
             data.seek(old_pos)
 
-        current_pos = 0
         self.magic = data.read(4)
         self.size = bytes_to_int(data.read(4))
         self.base_pan2 = PAN2(data, False)
@@ -930,16 +1387,31 @@ class PIC2:
         self.field_0x10: List[bytes] = [data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2)]
         self.corner_color: List[bytes] = [data.read(4), data.read(4), data.read(4), data.read(4)]
 
-        # old_pos = data.tell()
-        # tag = data.read(4)
-        # if tag == b''
-        # current_pos += 56 + self.base_pan2.size
-        # self.end_padding = data.read(self.size - current_pos)
-        # print(self.end_padding)
+    def to_bytes(self):
+        out = bytearray()
+        if self.tag == b'BGN1':
+            out += self.tag
+            out += self.tag_size.to_bytes(4, 'big')
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.base_pan2.to_bytes()
+        out += self.field_0x0
+        out += self.material_num
+        out += self.field_0x4
+        out += self.field_0x6
+        for item in self.field_0x8:
+            out += item
+        for item in self.field_0x10:
+            out += item
+        for cornerColor in self.corner_color:
+            out += cornerColor
+        return out
 
 
 class TBX2:
     def __init__(self, data: BytesIO):
+        self.tag = bytes()
+        self.tag_size = int()
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
@@ -970,9 +1442,37 @@ class TBX2:
         current_pos += 40 + self.base_pan2.size
         self.end_padding = data.read(self.size - current_pos)
 
+    def to_bytes(self):
+        out = bytearray()
+        if self.tag == b'BGN1':
+            out += self.tag
+            out += self.tag_size.to_bytes(4, 'big')
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.base_pan2.to_bytes()
+        out += self.field_0x0
+        out += self.field_0x2
+        out += self.material_num
+        out += self.char_space
+        out += self.line_space
+        out += self.font_size_x
+        out += self.font_size_y
+        out += self.h_bind
+        out += self.v_bind
+        out += self.char_color
+        out += self.grad_color
+        out += self.connected
+        out += self.field_0x19
+        out += self.field_0x1c
+        out += self.field_0x1e
+        out += self.end_padding
+        return out
+
 
 class WIN2:
     def __init__(self, data: BytesIO):
+        self.tag = bytes()
+        self.tag_size = int()
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
@@ -980,13 +1480,24 @@ class WIN2:
             self.tag_size = bytes_to_int(data.read(4))
         else:
             data.seek(old_pos)
-        
+
         self.magic = data.read(4)
-        print(self.magic)
         self.size = bytes_to_int(data.read(4))
         self.base_pan2 = PAN2(data, False)
         self.data = data.read((self.size - 8) - self.base_pan2.size)
+
+    def to_bytes(self):
+        out = bytearray()
+        if self.tag == b'BGN1':
+            out += self.tag
+            out += self.tag_size.to_bytes(4, 'big')
+        out += self.magic
+        out += self.size.to_bytes(4, 'big')
+        out += self.base_pan2.to_bytes()
+        out += self.data
+        return out
 # --------------------------------------------------------------------------------------
+
 
 def main():
     Tk().withdraw()
@@ -998,14 +1509,6 @@ def main():
     if not iso_filepath:
         print("No iso selected")
         exit()
-
-    # blo_filepath = askopenfilename(
-    #     title="Select blo file",
-    #     filetypes=[("BLO files", "*.blo"), ("All files", "*.*")]
-    # )
-    # if not blo_filepath:
-    #     print("No file selected")
-    #     exit()
 
     gcm = GCM(iso_filepath)
     gcm.read_entire_disc()
@@ -1036,9 +1539,13 @@ def main():
     for i, entry in enumerate(blo_files):
         print(entry.name)
         blos.insert(i, parse_blo(entry.data))
+        blos[i].name = entry.name
+
+    BASE_DIR = Path(__file__).resolve().parent
 
     for blo in blos:
-        print(blo.tag)
+        blo.rebuild_blo(BASE_DIR / f"output/{blo.name}")
+
 
 if __name__ == "__main__":
     main()

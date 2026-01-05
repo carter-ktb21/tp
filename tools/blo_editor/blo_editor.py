@@ -1,5 +1,6 @@
 import os
 import argparse
+import struct
 from gclib.gcm import GCM
 from gclib.rarc import RARC, RARCFileEntry
 from gclib.yaz0_yay0 import Yaz0
@@ -27,21 +28,24 @@ class BLO:
         data.seek(0)
         self.tag = data.read(4)
         self.type = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
-        self.blocks = int.from_bytes(data.read(4), byteorder='big')
+        self.size = bytes_to_int(data.read(4))
+        self.blocks = bytes_to_int(data.read(4))
         self.header_padding = data.read(16)
         self.inf1_section = INF1_Section(data)
         self.tex1_section = TEX1_Section(data)
-        # print(self.tex1_section)
         self.fnt1_section = FNT1_Section(data)
         self.mat1_section = MAT1_Section(data)
         self.elements = PAN2(data, True)
+
+    def to_bytes(self):
+        out = bytearray()
+        
 
 
 class INF1_Section:
     def __init__(self, data: BytesIO):
         self.magic = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
+        self.size = bytes_to_int(data.read(4))
         self.unknown = data.read(8)
         padding_size = self.size - 16
         self.padding = data.read(padding_size)
@@ -50,37 +54,38 @@ class INF1_Section:
 # TEX1 ---------------------------------------------------------------------------------
 class TEX1_Section:
     def __init__(self, data: BytesIO):
-        # section_start = data.tell()
         self.header = TEX1_Header(data)
         self.size_after_header = self.header.section_size - self.header.header_size
         self.offset_count = data.read(2)
         self.offsets: List[bytes] = []
-        for i in range(int.from_bytes(self.offset_count, byteorder='big')):
-            self.offsets.insert(i, data.read(2))
-        self.texture_refs: List[TEX1_Reference] = []
-        for i in range(int.from_bytes(self.offset_count, byteorder='big')):
-            if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
-                ref = TEX1_Reference()
-                ref_size = int.from_bytes(self.offsets[i + 1], byteorder='big') - int.from_bytes(self.offsets[i], byteorder='big') - 1
-                ref.res_type = data.read(1)
-                ref.texture = data.read(ref_size)
-                self.texture_refs.insert(i, ref)
-            else:
-                ref = TEX1_Reference()
-                ref.res_type = data.read(1)
-                size = self.size_after_header - int.from_bytes(self.offsets[i], byteorder='big') - 1
-                ref.texture = data.read(size)
-                self.texture_refs.insert(i, ref)
-        # self.padding = data.read(self.header.section_size - data.tell())
+        if bytes_to_int(self.header.texture_count) > 0:
+            for i in range(int.from_bytes(self.offset_count, byteorder='big')):
+                self.offsets.insert(i, data.read(2))
+            self.texture_refs: List[TEX1_Reference] = []
+            for i in range(int.from_bytes(self.offset_count, byteorder='big')):
+                if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
+                    ref = TEX1_Reference()
+                    ref_size = int.from_bytes(self.offsets[i + 1], byteorder='big') - int.from_bytes(self.offsets[i], byteorder='big') - 1
+                    ref.res_type = data.read(1)
+                    ref.texture = data.read(ref_size)
+                    self.texture_refs.insert(i, ref)
+                else:
+                    ref = TEX1_Reference()
+                    ref.res_type = data.read(1)
+                    size = self.size_after_header - int.from_bytes(self.offsets[i], byteorder='big') - 1
+                    ref.texture = data.read(size)
+                    self.texture_refs.insert(i, ref)
+        else:
+            self.padding = data.read(14)
 
 
 class TEX1_Header:
     def __init__(self, data: BytesIO):
         self.magic = data.read(4)
-        self.section_size = int.from_bytes(data.read(4), byteorder='big')
+        self.section_size = bytes_to_int(data.read(4))
         self.texture_count = data.read(2)
         self.padding = data.read(2)
-        self.header_size = int.from_bytes(data.read(4), byteorder='big')
+        self.header_size = bytes_to_int(data.read(4))
 
 
 class TEX1_Reference:
@@ -97,31 +102,34 @@ class FNT1_Section:
         self.size_after_header = self.header.section_size - self.header.header_size
         self.offset_count = data.read(2)
         self.offsets: List[bytes] = []
-        for i in range(int.from_bytes(self.offset_count, byteorder='big')):
-            self.offsets.insert(i, data.read(2))
-        self.font_refs: List[FNT1_Reference] = []
-        for i in range(int.from_bytes(self.offset_count, byteorder='big')):
-            if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
-                ref = FNT1_Reference()
-                ref_size = int.from_bytes(self.offsets[i + 1], byteorder='big') - int.from_bytes(self.offsets[i], byteorder='big') - 1
-                ref.res_type = data.read(1)
-                ref.font = data.read(ref_size)
-                self.font_refs.insert(i, ref)
-            else:
-                ref = FNT1_Reference()
-                ref.res_type = data.read(1)
-                size = self.size_after_header - int.from_bytes(self.offsets[i], byteorder='big') - 1
-                ref.font = data.read(size)
-                self.font_refs.insert(i, ref)
+        if bytes_to_int(self.header.font_count) > 0:
+            for i in range(int.from_bytes(self.offset_count, byteorder='big')):
+                self.offsets.insert(i, data.read(2))
+            self.font_refs: List[FNT1_Reference] = []
+            for i in range(int.from_bytes(self.offset_count, byteorder='big')):
+                if i + 1 < int.from_bytes(self.offset_count, byteorder='big'):
+                    ref = FNT1_Reference()
+                    ref_size = int.from_bytes(self.offsets[i + 1], byteorder='big') - int.from_bytes(self.offsets[i], byteorder='big') - 1
+                    ref.res_type = data.read(1)
+                    ref.font = data.read(ref_size)
+                    self.font_refs.insert(i, ref)
+                else:
+                    ref = FNT1_Reference()
+                    ref.res_type = data.read(1)
+                    size = self.size_after_header - int.from_bytes(self.offsets[i], byteorder='big') - 1
+                    ref.font = data.read(size)
+                    self.font_refs.insert(i, ref)
+        else:
+            self.padding = data.read(14)
 
 
 class FNT1_Header:
     def __init__(self, data: BytesIO):
         self.magic = data.read(4)
-        self.section_size = int.from_bytes(data.read(4), byteorder='big')
+        self.section_size = bytes_to_int(data.read(4))
         self.font_count = data.read(2)
         self.padding = data.read(2)
-        self.header_size = int.from_bytes(data.read(4), byteorder='big')
+        self.header_size = bytes_to_int(data.read(4))
 
 
 class FNT1_Reference:
@@ -135,7 +143,7 @@ class FNT1_Reference:
 class MAT1_Section:
     def __init__(self, data: BytesIO):
         self.magic = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
+        self.size = bytes_to_int(data.read(4))
         self.material_count = data.read(2)
         self.padding = data.read(2)
         self.offsets = MAT1_Section_Offsets(data)
@@ -166,29 +174,66 @@ class MAT1_Section:
 
 class MAT1_Section_Offsets:
     def __init__(self, data: BytesIO):
-        self.mat_init_data_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.mat_init_data_indexes_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.offset_3 = int.from_bytes(data.read(4), byteorder='big')
-        self.ind_init_data_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.cull_mode_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.mat_color_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.color_chan_num_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.color_chan_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tex_gen_num_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tex_coord_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tex_mtx_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tex_no_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.font_no_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_order_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_color_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_k_color_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_stage_num_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_stage_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_swap_mode_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.tev_swap_mode_table_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.alpha_comp_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.blend_info_offset = int.from_bytes(data.read(4), byteorder='big')
-        self.dither_offset = int.from_bytes(data.read(4), byteorder='big')
+        self.mat_init_data_offset = bytes_to_int(data.read(4))
+        self.mat_init_data_indexes_offset = bytes_to_int(data.read(4))
+        self.offset_3 = bytes_to_int(data.read(4))
+        self.ind_init_data_offset = bytes_to_int(data.read(4))
+        self.cull_mode_offset = bytes_to_int(data.read(4))
+        self.mat_color_offset = bytes_to_int(data.read(4))
+        self.color_chan_num_offset = bytes_to_int(data.read(4))
+        self.color_chan_info_offset = bytes_to_int(data.read(4))
+        self.tex_gen_num_offset = bytes_to_int(data.read(4))
+        self.tex_coord_info_offset = bytes_to_int(data.read(4))
+        self.tex_mtx_info_offset = bytes_to_int(data.read(4))
+        self.tex_no_offset = bytes_to_int(data.read(4))
+        self.font_no_offset = bytes_to_int(data.read(4))
+        self.tev_order_info_offset = bytes_to_int(data.read(4))
+        self.tev_color_offset = bytes_to_int(data.read(4))
+        self.tev_k_color_offset = bytes_to_int(data.read(4))
+        self.tev_stage_num_offset = bytes_to_int(data.read(4))
+        self.tev_stage_info_offset = bytes_to_int(data.read(4))
+        self.tev_swap_mode_info_offset = bytes_to_int(data.read(4))
+        self.tev_swap_mode_table_info_offset = bytes_to_int(data.read(4))
+        self.alpha_comp_info_offset = bytes_to_int(data.read(4))
+        self.blend_info_offset = bytes_to_int(data.read(4))
+        self.dither_offset = bytes_to_int(data.read(4))
+
+    def find_next_valid_offset(self, current_offset: int):
+        offsets = [
+            self.mat_init_data_offset,
+            self.mat_init_data_indexes_offset,
+            self.offset_3,
+            self.ind_init_data_offset,
+            self.cull_mode_offset,
+            self.mat_color_offset,
+            self.color_chan_num_offset,
+            self.color_chan_info_offset,
+            self.tex_gen_num_offset,
+            self.tex_coord_info_offset,
+            self.tex_mtx_info_offset,
+            self.tex_no_offset,
+            self.font_no_offset,
+            self.tev_order_info_offset,
+            self.tev_color_offset,
+            self.tev_k_color_offset,
+            self.tev_stage_num_offset,
+            self.tev_stage_info_offset,
+            self.tev_swap_mode_info_offset,
+            self.tev_swap_mode_table_info_offset,
+            self.alpha_comp_info_offset,
+            self.blend_info_offset,
+            self.dither_offset,
+        ]
+
+        candidates = [
+            o for o in offsets
+            if o != 0 and o > current_offset
+        ]
+
+        if not candidates:
+            return None
+
+        return min(candidates)
 
 
 # Mat Init Data ------------------------
@@ -223,108 +268,108 @@ class Mat_Init_Data_Section:
         self.dither_count = int(0)
         for i, matInitData in enumerate(self.mat_init_data):
             # Cull Modes
-            cullModeCount = bytes_to_int(matInitData.cull_mode_idx)
+            cullModeCount = bytes_to_int(self.mat_init_data[i].cull_mode_idx)
             if cullModeCount > self.cull_mode_count:
                 self.cull_mode_count = cullModeCount
             
             # Mat Colors
             for j in range(1):
-                matColorCount = bytes_to_int(matInitData.mat_color_idx_tbl[j])
+                matColorCount = bytes_to_int(self.mat_init_data[i].mat_color_idx_tbl[j])
                 if matColorCount > self.mat_color_count:
                     self.mat_color_count = matColorCount
 
             # Color Chan Nums
-            colorChanNumCount = bytes_to_int(matInitData.color_chan_num_idx)
+            colorChanNumCount = bytes_to_int(self.mat_init_data[i].color_chan_num_idx)
             if colorChanNumCount > self.color_chan_num_count:
                 self.color_chan_num_count = colorChanNumCount
 
             # Color Chan Info
             for j in range(3):
-                colorChanInfoCount = bytes_to_int(matInitData.color_chan_info_idx_tbl[j])
+                colorChanInfoCount = bytes_to_int(self.mat_init_data[i].color_chan_info_idx_tbl[j])
                 if colorChanInfoCount > self.color_chan_info_count:
                     self.color_chan_info_count = colorChanInfoCount
 
             # Tex Gen Num
-            texGenNumCount = bytes_to_int(matInitData.tex_gen_num_idx)
+            texGenNumCount = bytes_to_int(self.mat_init_data[i].tex_gen_num_idx)
             if texGenNumCount > self.tex_gen_num_count:
                 self.tex_gen_num_count = texGenNumCount
 
             # Tex Coord Info
             for j in range(7):
-                texCoordInfoCount = bytes_to_int(matInitData.tex_coord_info_idx_tbl[j])
+                texCoordInfoCount = bytes_to_int(self.mat_init_data[i].tex_coord_info_idx_tbl[j])
                 if texCoordInfoCount > self.tex_coord_info_count:
                     self.tex_coord_info_count = texCoordInfoCount
 
             # Tex Mtx Info
             for j in range(9):
-                texMtxInfoCount = bytes_to_int(matInitData.tex_mtx_info_idx_tbl[j])
+                texMtxInfoCount = bytes_to_int(self.mat_init_data[i].tex_mtx_info_idx_tbl[j])
                 if texMtxInfoCount > self.tex_mtx_info_count:
                     self.tex_mtx_info_count = texMtxInfoCount
 
             # Tex No
             for j in range(7):
-                texNoCount = bytes_to_int(matInitData.tex_no_idx_tbl[j])
+                texNoCount = bytes_to_int(self.mat_init_data[i].tex_no_idx_tbl[j])
                 if texNoCount > self.tex_no_count:
                     self.tex_no_count = texNoCount
 
             # Font No
-            fontNoCount = bytes_to_int(matInitData.font_no_idx)
+            fontNoCount = bytes_to_int(self.mat_init_data[i].font_no_idx)
             if fontNoCount > self.font_no_count:
                 self.font_no_count = fontNoCount
 
             # Tev Order Info
             for j in range(15):
-                tevOrderInfoCount = bytes_to_int(matInitData.tev_order_info_idx_tbl[j])
+                tevOrderInfoCount = bytes_to_int(self.mat_init_data[i].tev_order_info_idx_tbl[j])
                 if tevOrderInfoCount > self.tev_order_info_count:
                     self.tev_order_info_count = tevOrderInfoCount
 
             # Tev Color
             for j in range(3):
-                tevColorCount = bytes_to_int(matInitData.tev_color_idx_tbl[j])
+                tevColorCount = bytes_to_int(self.mat_init_data[i].tev_color_idx_tbl[j])
                 if tevColorCount > self.tev_color_count:
                     self.tev_color_count = tevColorCount
 
             # TevK Color
             for j in range(3):
-                tevKColorCount = bytes_to_int(matInitData.tev_k_color_idx_tbl[j])
+                tevKColorCount = bytes_to_int(self.mat_init_data[i].tev_k_color_idx_tbl[j])
                 if tevKColorCount > self.tev_k_color_count:
                     self.tev_k_color_count = tevKColorCount
 
             # Tev Stage Num
-            tevStageNumCount = bytes_to_int(matInitData.tev_stage_num_idx)
+            tevStageNumCount = bytes_to_int(self.mat_init_data[i].tev_stage_num_idx)
             if tevStageNumCount > self.tev_stage_num_count:
                 self.tev_stage_num_count = tevStageNumCount
 
             # Tev Stage Info
             for j in range(15):
-                tevStageInfoCount = bytes_to_int(matInitData.tev_stage_info_idx_tbl[j])
+                tevStageInfoCount = bytes_to_int(self.mat_init_data[i].tev_stage_info_idx_tbl[j])
                 if tevStageInfoCount > self.tev_stage_info_count:
                     self.tev_stage_info_count = tevStageInfoCount
 
             # Tev Swap Mode Info
             for j in range(15):
-                tevSwapModeInfoCount = bytes_to_int(matInitData.tev_swap_mode_info_idx_tbl[j])
+                tevSwapModeInfoCount = bytes_to_int(self.mat_init_data[i].tev_swap_mode_info_idx_tbl[j])
                 if tevSwapModeInfoCount > self.tev_swap_mode_info_count:
                     self.tev_swap_mode_info_count = tevSwapModeInfoCount
 
             # Tev Swap Mode Table Info
             for j in range(3):
-                tevSwapModeTableInfoCount = bytes_to_int(matInitData.tev_swap_mode_tbl_info_idx_tbl[j])
+                tevSwapModeTableInfoCount = bytes_to_int(self.mat_init_data[i].tev_swap_mode_tbl_info_idx_tbl[j])
                 if tevSwapModeTableInfoCount > self.tev_swap_mode_table_info_count:
                     self.tev_swap_mode_table_info_count = tevSwapModeTableInfoCount
 
             # Alpha Comp Info
-            alphaCompInfoCount = bytes_to_int(matInitData.alpha_comp_info_idx)
+            alphaCompInfoCount = bytes_to_int(self.mat_init_data[i].alpha_comp_info_idx)
             if alphaCompInfoCount > self.alpha_comp_info_count:
                 self.alpha_comp_info_count = alphaCompInfoCount
 
             # Blend Info
-            blendInfoCount = bytes_to_int(matInitData.blend_info_idx)
+            blendInfoCount = bytes_to_int(self.mat_init_data[i].blend_info_idx)
             if blendInfoCount > self.blend_info_count:
                 self.blend_info_count = blendInfoCount
 
             # Dither
-            ditherCount = bytes_to_int(matInitData.dither_idx)
+            ditherCount = bytes_to_int(self.mat_init_data[i].dither_idx)
             if ditherCount > self.dither_count:
                 self.dither_count = ditherCount
         self.cull_mode_count += 1
@@ -385,13 +430,15 @@ class J2D_Material_Init_Data:
 # Mat Init Data Idx ---------------------
 class Mat_Init_Data_Idx_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets):
-        indexCount = (offsets.mat_init_data_indexes_offset - offsets.mat_init_data_offset) // 232
-        self.indexes: List[bytes] = []
-        for i in range(indexCount):
-            index = data.read(2)
-            self.indexes.insert(i, index)
-        # In each section, the padding variable reads the number of bytes left in the section until the next offset. (This can be zero!!!)
-        self.padding = data.read((offsets.offset_3 - offsets.mat_init_data_indexes_offset) - (indexCount * 2))
+        if offsets.mat_init_data_indexes_offset > 0:
+            indexCount = (offsets.mat_init_data_indexes_offset - offsets.mat_init_data_offset) // 232
+            self.indexes: List[bytes] = []
+            for i in range(indexCount):
+                index = data.read(2)
+                self.indexes.insert(i, index)
+            # In each section, the padding variable reads the number of bytes left in the section until the next offset. (This can be zero!!!)
+            next_offset = offsets.find_next_valid_offset(offsets.mat_init_data_indexes_offset)
+            self.padding = data.read((next_offset - offsets.mat_init_data_indexes_offset) - (indexCount * 2))
 # --------------------------------------
 
 
@@ -414,20 +461,24 @@ class Ind_Init_Data_Section:
 # Cull Modes ---------------------------
 class Cull_Mode_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.cull_modes: List[int] = []
-        for i in range(initData.cull_mode_count):
-            self.cull_modes.insert(i, bytes_to_int(data.read(4)))
-        self.padding = data.read((offsets.mat_color_offset - offsets.cull_mode_offset) - ((initData.cull_mode_count) * 4))
+        if offsets.cull_mode_offset > 0:
+            self.cull_modes: List[int] = []
+            for i in range(initData.cull_mode_count):
+                self.cull_modes.insert(i, bytes_to_int(data.read(4)))
+            next_offset = offsets.find_next_valid_offset(offsets.cull_mode_offset)
+            self.padding = data.read((next_offset - offsets.cull_mode_offset) - ((initData.cull_mode_count) * 4))
 # --------------------------------------
 
 
 # Mat Colors ---------------------------
 class Mat_Color_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.colors: List[GXColor] = []
-        for i in range(initData.mat_color_count):
-            self.colors.insert(i, GXColor(data))
-        self.padding = data.read((offsets.color_chan_num_offset - offsets.mat_color_offset) - ((initData.mat_color_count) * 4))
+        if offsets.mat_color_offset > 0:
+            self.colors: List[GXColor] = []
+            for i in range(initData.mat_color_count):
+                self.colors.insert(i, GXColor(data))
+            next_offset = offsets.find_next_valid_offset(offsets.mat_color_offset)
+            self.padding = data.read((next_offset - offsets.mat_color_offset) - ((initData.mat_color_count) * 4))
 
 
 class GXColor:
@@ -442,20 +493,24 @@ class GXColor:
 # Color Chan Nums ----------------------
 class Color_Chan_Num_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.color_chan_num: List[bytes] = []
-        for i in range(initData.color_chan_num_count):
-            self.color_chan_num.insert(i, data.read(1))
-        self.padding = data.read((offsets.color_chan_info_offset - offsets.color_chan_num_offset) - ((initData.color_chan_num_count)))
+        if offsets.color_chan_num_offset > 0:
+            self.color_chan_num: List[bytes] = []
+            for i in range(initData.color_chan_num_count):
+                self.color_chan_num.insert(i, data.read(1))
+            next_offset = offsets.find_next_valid_offset(offsets.color_chan_num_offset)
+            self.padding = data.read((next_offset - offsets.color_chan_num_offset) - ((initData.color_chan_num_count)))
 # --------------------------------------
 
 
 # Color Chan Info ----------------------
 class Color_Chan_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.color_chan_info: List[J2D_Color_Chan_Info] = []
-        for i in range(initData.color_chan_info_count):
-            self.color_chan_info.insert(i, J2D_Color_Chan_Info(data))
-        self.padding = data.read((offsets.tex_gen_num_offset - offsets.color_chan_info_offset) - ((initData.color_chan_info_count) * 4))
+        if offsets.color_chan_info_offset > 0:
+            self.color_chan_info: List[J2D_Color_Chan_Info] = []
+            for i in range(initData.color_chan_info_count):
+                self.color_chan_info.insert(i, J2D_Color_Chan_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.color_chan_info_offset)
+            self.padding = data.read((next_offset - offsets.color_chan_info_offset) - ((initData.color_chan_info_count) * 4))
 
 
 class J2D_Color_Chan_Info:
@@ -470,21 +525,25 @@ class J2D_Color_Chan_Info:
 # Tex Gen Num --------------------------
 class Tex_Gen_Num_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tex_gen_num: List[bytes] = []
-        for i in range(initData.tex_gen_num_count):
-            self.tex_gen_num.insert(i, data.read(1))
-            print(self.tex_gen_num[i])
-        self.padding = data.read((offsets.tex_coord_info_offset - offsets.tex_gen_num_offset) - (initData.tex_gen_num_count))
+        if offsets.tex_gen_num_offset > 0:
+            self.tex_gen_num: List[bytes] = []
+            for i in range(initData.tex_gen_num_count):
+                self.tex_gen_num.insert(i, data.read(1))
+            next_offset = offsets.find_next_valid_offset(offsets.tex_gen_num_offset)
+            self.padding = data.read((next_offset - offsets.tex_gen_num_offset) - (initData.tex_gen_num_count))
 # --------------------------------------
 
 
 # Tex Coord Info -----------------------
 class Tex_Coord_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tex_coord_info: List[J2D_Tex_Coord_Info] = []
-        for i in range(initData.tex_coord_info_count):
-            self.tex_coord_info.insert(i, J2D_Tex_Coord_Info(data))
-        self.padding = data.read((offsets.tex_mtx_info_offset - offsets.tex_coord_info_offset) - ((initData.tex_coord_info_count) * 4))
+        if offsets.tex_coord_info_offset > 0:
+            count = (offsets.tex_mtx_info_offset - offsets.tex_coord_info_offset) // 4
+            self.tex_coord_info: List[J2D_Tex_Coord_Info] = []
+            for i in range(initData.tex_coord_info_count):
+                self.tex_coord_info.insert(i, J2D_Tex_Coord_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tex_coord_info_offset)
+            self.padding = data.read((next_offset - offsets.tex_coord_info_offset) - ((initData.tex_coord_info_count) * 4))
 
 
 class J2D_Tex_Coord_Info:
@@ -499,10 +558,12 @@ class J2D_Tex_Coord_Info:
 # Tex Mtx Info -------------------------
 class Tex_Mtx_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tex_mtx_info: List[J2D_Tex_Mtx_Info] = []
-        for i in range(initData.tex_mtx_info_count):
-            self.tex_mtx_info.insert(i, J2D_Tex_Mtx_Info(data))
-        self.padding = data.read((offsets.tex_no_offset - offsets.tex_mtx_info_offset) - ((initData.tex_mtx_info_count) * 36))
+        if offsets.tex_mtx_info_offset > 0:
+            self.tex_mtx_info: List[J2D_Tex_Mtx_Info] = []
+            for i in range(initData.tex_mtx_info_count):
+                self.tex_mtx_info.insert(i, J2D_Tex_Mtx_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tex_mtx_info_offset)
+            self.padding = data.read((next_offset - offsets.tex_mtx_info_offset) - ((initData.tex_mtx_info_count) * 36))
 
 
 class J2D_Tex_Mtx_Info:
@@ -511,49 +572,56 @@ class J2D_Tex_Mtx_Info:
         self.tex_mtx_dcc = data.read(1)
         self.field_0x2 = data.read(1)
         self.field_0x3 = data.read(1)
-        self.center_x = float.fromhex(data.read(4).hex())
-        self.center_y = float.fromhex(data.read(4).hex())
-        self.center_z = float.fromhex(data.read(4).hex())
+        self.center_x = struct.unpack('>f', data.read(4))[0]
+        self.center_y = struct.unpack('>f', data.read(4))[0]
+        self.center_z = struct.unpack('>f', data.read(4))[0]
         self.tex_srt_info = J2D_Texture_SRT_Info(data)
 
 
 class J2D_Texture_SRT_Info:
     def __init__(self, data: BytesIO):
-        self.scale_x = float.fromhex(data.read(4).hex())
-        self.scale_y = float.fromhex(data.read(4).hex())
-        self.rotation_deg = float.fromhex(data.read(4).hex())
-        self.translation_x = float.fromhex(data.read(4).hex())
-        self.translation_y = float.fromhex(data.read(4).hex())
+        self.scale_x = struct.unpack('>f', data.read(4))[0]
+        self.scale_y = struct.unpack('>f', data.read(4))[0]
+        self.rotation_deg = struct.unpack('>f', data.read(4))[0]
+        self.translation_x = struct.unpack('>f', data.read(4))[0]
+        self.translation_y = struct.unpack('>f', data.read(4))[0]
 # --------------------------------------
 
 
 # Tex No -------------------------------
 class Tex_No_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tex_no: List[bytes] = []
-        for i in range(initData.tex_no_count):
-            self.tex_no.insert(i, data.read(2))
-        self.padding = data.read((offsets.font_no_offset - offsets.tex_no_offset) - ((initData.tex_no_count) * 2))
+        if offsets.tex_no_offset > 0:
+            self.tex_no: List[bytes] = []
+            for i in range(initData.tex_no_count):
+                self.tex_no.insert(i, data.read(2))
+            next_offset = offsets.find_next_valid_offset(offsets.tex_no_offset)
+            self.padding = data.read((next_offset - offsets.tex_no_offset) - ((initData.tex_no_count) * 2))
 # --------------------------------------
 
 
 # Font No ------------------------------
 class Font_No_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.font_no: List[bytes] = []
-        for i in range(initData.font_no_count):
-            self.font_no.insert(i, data.read(2))
-        self.padding = data.read((offsets.tev_order_info_offset - offsets.font_no_offset) - ((initData.font_no_count) * 2))
+        if offsets.font_no_offset > 0:
+            self.font_no: List[bytes] = []
+            for i in range(initData.font_no_count):
+                self.font_no.insert(i, data.read(2))
+            next_offset = offsets.find_next_valid_offset(offsets.font_no_offset)
+            self.padding = data.read((next_offset - offsets.font_no_offset) - ((initData.font_no_count) * 2))
 # --------------------------------------
 
 
 # Tev Order Info -----------------------
 class Tev_Order_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_order_info: List[J2D_Tev_Order_Info] = []
-        for i in range(initData.tev_order_info_count):
-            self.tev_order_info.insert(i, J2D_Tev_Order_Info(data))
-        self.padding = data.read((offsets.tev_color_offset - offsets.tev_order_info_offset) - ((initData.tev_order_info_count) * 4))
+        if offsets.tev_order_info_offset > 0:
+            self.tev_order_info: List[J2D_Tev_Order_Info] = []
+            for i in range(initData.tev_order_info_count):
+                self.tev_order_info.insert(i, J2D_Tev_Order_Info(data))
+                print(self.tev_order_info[i].tex_coord)
+            next_offset = offsets.find_next_valid_offset(offsets.tev_order_info_offset)
+            self.padding = data.read((next_offset - offsets.tev_order_info_offset) - ((initData.tev_order_info_count) * 4))
 
 
 class J2D_Tev_Order_Info:
@@ -568,10 +636,12 @@ class J2D_Tev_Order_Info:
 # Tev Color ----------------------------
 class Tev_Color_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_color: List[GXColorS10] = []
-        for i in range(initData.tev_color_count):
-            self.tev_color.insert(i, GXColorS10(data))
-        self.padding = data.read((offsets.tev_k_color_offset - offsets.tev_color_offset) - ((initData.tev_color_count) * 8))
+        if offsets.tev_color_offset > 0:
+            self.tev_color: List[GXColorS10] = []
+            for i in range(initData.tev_color_count):
+                self.tev_color.insert(i, GXColorS10(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_color_offset)
+            self.padding = data.read((next_offset - offsets.tev_color_offset) - ((initData.tev_color_count) * 8))
 
 
 class GXColorS10:
@@ -586,30 +656,36 @@ class GXColorS10:
 # TevK Color ---------------------------
 class Tev_K_Color_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_k_color: List[GXColor] = []
-        for i in range(initData.tev_k_color_count):
-            self.tev_k_color.insert(i, GXColor(data))
-        self.padding = data.read((offsets.tev_stage_num_offset - offsets.tev_k_color_offset) - ((initData.tev_k_color_count) * 4))
+        if offsets.tev_k_color_offset > 0:
+            self.tev_k_color: List[GXColor] = []
+            for i in range(initData.tev_k_color_count):
+                self.tev_k_color.insert(i, GXColor(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_k_color_offset)
+            self.padding = data.read((next_offset - offsets.tev_k_color_offset) - ((initData.tev_k_color_count) * 4))
 # --------------------------------------
 
 
 # Tev Stage Num ------------------------
 class Tev_Stage_Num_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_stage_num: List[bytes] = []
-        for i in range(initData.tev_stage_num_count):
-            self.tev_stage_num.insert(i, data.read(1))
-        self.padding = data.read((offsets.tev_stage_info_offset - offsets.tev_stage_num_offset) - (initData.tev_stage_num_count))
+        if offsets.tev_stage_num_offset > 0:
+            self.tev_stage_num: List[bytes] = []
+            for i in range(initData.tev_stage_num_count):
+                self.tev_stage_num.insert(i, data.read(1))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_stage_num_offset)
+            self.padding = data.read((next_offset - offsets.tev_stage_num_offset) - (initData.tev_stage_num_count))
 # --------------------------------------
 
 
 # Tev Stage Info -----------------------
 class Tev_Stage_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_stage_info: List[J2D_Tev_Stage_Info] = []
-        for i in range(initData.tev_stage_info_count):
-            self.tev_stage_info.insert(i, J2D_Tev_Stage_Info(data))
-        self.padding = data.read((offsets.tev_swap_mode_info_offset - offsets.tev_stage_info_offset) - ((initData.tev_stage_info_count) * 20))
+        if offsets.tev_stage_info_offset > 0:
+            self.tev_stage_info: List[J2D_Tev_Stage_Info] = []
+            for i in range(initData.tev_stage_info_count):
+                self.tev_stage_info.insert(i, J2D_Tev_Stage_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_stage_info_offset)
+            self.padding = data.read((next_offset - offsets.tev_stage_info_offset) - ((initData.tev_stage_info_count) * 20))
 
 
 class J2D_Tev_Stage_Info:
@@ -640,10 +716,12 @@ class J2D_Tev_Stage_Info:
 # Tev Swap Mode Info -------------------
 class Tev_Swap_Mode_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_swap_mode_info: List[J2D_Tev_Swap_Mode_Info] = []
-        for i in range(initData.tev_swap_mode_info_count):
-            self.tev_swap_mode_info.insert(i, J2D_Tev_Swap_Mode_Info(data))
-        self.padding = data.read((offsets.tev_swap_mode_table_info_offset - offsets.tev_swap_mode_info_offset) - ((initData.tev_swap_mode_info_count) * 4))
+        if offsets.tev_swap_mode_info_offset > 0:
+            self.tev_swap_mode_info: List[J2D_Tev_Swap_Mode_Info] = []
+            for i in range(initData.tev_swap_mode_info_count):
+                self.tev_swap_mode_info.insert(i, J2D_Tev_Swap_Mode_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_swap_mode_info_offset)
+            self.padding = data.read((next_offset - offsets.tev_swap_mode_info_offset) - ((initData.tev_swap_mode_info_count) * 4))
 
 
 class J2D_Tev_Swap_Mode_Info:
@@ -658,10 +736,12 @@ class J2D_Tev_Swap_Mode_Info:
 # Tev Swap Mode Table Info -------------
 class Tev_Swap_Mode_Table_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.tev_swap_mode_table_info: List[J2D_Tev_Swap_Mode_Table_Info] = []
-        for i in range(initData.tev_swap_mode_table_info_count):
-            self.tev_swap_mode_table_info.insert(i, J2D_Tev_Swap_Mode_Table_Info(data))
-        self.padding = data.read((offsets.alpha_comp_info_offset - offsets.tev_swap_mode_table_info_offset) - ((initData.tev_swap_mode_table_info_count) * 4))
+        if offsets.tev_swap_mode_table_info_offset > 0:
+            self.tev_swap_mode_table_info: List[J2D_Tev_Swap_Mode_Table_Info] = []
+            for i in range(initData.tev_swap_mode_table_info_count):
+                self.tev_swap_mode_table_info.insert(i, J2D_Tev_Swap_Mode_Table_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.tev_swap_mode_table_info_offset)
+            self.padding = data.read((next_offset - offsets.tev_swap_mode_table_info_offset) - ((initData.tev_swap_mode_table_info_count) * 4))
 
 
 class J2D_Tev_Swap_Mode_Table_Info:
@@ -676,10 +756,12 @@ class J2D_Tev_Swap_Mode_Table_Info:
 # Alpha Comp Info ----------------------
 class Alpha_Comp_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.alpha_comp_info: List[J2D_Alpha_Comp_Info] = []
-        for i in range(initData.alpha_comp_info_count):
-            self.alpha_comp_info.insert(i, J2D_Alpha_Comp_Info(data))
-        self.padding = data.read((offsets.blend_info_offset - offsets.alpha_comp_info_offset) - ((initData.alpha_comp_info_count) * 8))
+        if offsets.alpha_comp_info_offset > 0:
+            self.alpha_comp_info: List[J2D_Alpha_Comp_Info] = []
+            for i in range(initData.alpha_comp_info_count):
+                self.alpha_comp_info.insert(i, J2D_Alpha_Comp_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.alpha_comp_info_offset)
+            self.padding = data.read((next_offset - offsets.alpha_comp_info_offset) - ((initData.alpha_comp_info_count) * 8))
 
 
 class J2D_Alpha_Comp_Info:
@@ -698,10 +780,12 @@ class J2D_Alpha_Comp_Info:
 # Blend Info ---------------------------
 class Blend_Info_Section:
     def __init__(self, data: BytesIO, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.blend_info: List[J2D_Blend_Info] = []
-        for i in range(initData.blend_info_count):
-            self.blend_info.insert(i, J2D_Blend_Info(data))
-        self.padding = data.read((offsets.dither_offset - offsets.blend_info_offset) - ((initData.blend_info_count) * 4))
+        if offsets.blend_info_offset > 0:
+            self.blend_info: List[J2D_Blend_Info] = []
+            for i in range(initData.blend_info_count):
+                self.blend_info.insert(i, J2D_Blend_Info(data))
+            next_offset = offsets.find_next_valid_offset(offsets.blend_info_offset)
+            self.padding = data.read((next_offset - offsets.blend_info_offset) - ((initData.blend_info_count) * 4))
 
 
 class J2D_Blend_Info:
@@ -716,11 +800,14 @@ class J2D_Blend_Info:
 # Dither -------------------------------
 class Dither_Section:
     def __init__(self, data: BytesIO, mat1Section: MAT1_Section, offsets: MAT1_Section_Offsets, initData: Mat_Init_Data_Section):
-        self.dither: List[bytes] = []
-        for i in range(initData.dither_count):
-            self.dither.insert(i, data.read(1))
-        # This last padding formula is a little different as there is not a "next offset" to calculate with
-        self.padding = data.read((mat1Section.size - offsets.dither_offset) - ((initData.dither_count)))
+        if offsets.dither_offset > 0:
+            self.dither: List[bytes] = []
+            for i in range(initData.dither_count):
+                self.dither.insert(i, data.read(1))
+                print(self.dither[i])
+            # This last padding formula is a little different as there is not a "next offset" to calculate with
+            self.padding = data.read((mat1Section.size - offsets.dither_offset) - ((initData.dither_count)))
+            print(self.padding)
 # --------------------------------------
 # --------------------------------------------------------------------------------------
 
@@ -746,142 +833,94 @@ class PAN1:
 
 class PAN2:
     def __init__(self, data: BytesIO, isParent: bool):
-        #     self.tag = bytes()
-        #     self.tag_size = 0
-        #     self.magic = bytes()
-        #     self.size = 0
-        #     self.field_0x8 = bytes()
-        #     self.field_0xa = bytes()
-        #     self.visible = bytes()
-        #     self.base_position = bytes()
-        #     self.padding = bytes()
-        #     self.info_tag = bytes()
-        #     self.user_info_tag = bytes()
-        #     self.rot_offset_x = 0.0
-        #     self.rot_offset_y = 0.0
-        #     self.scale_x = 0.0
-        #     self.scale_y = 0.0
-        #     self.rotate_x = 0.0
-        #     self.rotate_y = 0.0
-        #     self.rotate_z = 0.0
-        #     self.translate_x = 0.0
-        #     self.translate_y = 0.0
-        #     self.end_padding = bytes()
-        #     self.child_nodes: List[Union[PAN2 | PIC2 | TBX2]] = []
-        #     self.end_tag = bytes()
-        #     self.end_tag_size = 0
-
-        # def parse_bytes(self, data: BytesIO):
         # Check for BGN1 tag
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
             self.tag = tag
-            self.tag_size = int.from_bytes(data.read(4), byteorder='big')
+            self.tag_size = bytes_to_int(data.read(4))
         else:
             data.seek(old_pos)
 
         # Parse PAN2 data
         self.magic = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
+        print(self.magic)
+        self.size = bytes_to_int(data.read(4))
         self.field_0x8 = data.read(2)
         self.field_0xa = data.read(2)
         self.visible = data.read(1)
         self.base_position = data.read(1)
         self.padding = data.read(2)
         self.info_tag = data.read(8)
+        print(self.info_tag)
         self.user_info_tag = data.read(8)
-        self.rot_offset_x = float.fromhex(data.read(4).hex())
-        self.rot_offset_y = float.fromhex(data.read(4).hex())
-        self.scale_x = float.fromhex(data.read(4).hex())
-        self.scale_y = float.fromhex(data.read(4).hex())
-        self.rotate_x = float.fromhex(data.read(4).hex())
-        self.rotate_y = float.fromhex(data.read(4).hex())
-        self.rotate_z = float.fromhex(data.read(4).hex())
-        self.translate_x = float.fromhex(data.read(4).hex())
-        self.translate_y = float.fromhex(data.read(4).hex())
+        self.rot_offset_x = struct.unpack('>f', data.read(4))[0]
+        self.rot_offset_y = struct.unpack('>f', data.read(4))[0]
+        self.scale_x = struct.unpack('>f', data.read(4))[0]
+        self.scale_y = struct.unpack('>f', data.read(4))[0]
+        self.rotate_x = struct.unpack('>f', data.read(4))[0]
+        self.rotate_y = struct.unpack('>f', data.read(4))[0]
+        self.rotate_z = struct.unpack('>f', data.read(4))[0]
+        self.translate_x = struct.unpack('>f', data.read(4))[0]
+        self.translate_y = struct.unpack('>f', data.read(4))[0]
         self.end_padding = data.read(4)
 
         if isParent:
             self.child_nodes: List[Union[PAN2 | PIC2 | TBX2]] = []
             while True:
-                # start_pos = data.tell()
-                # tag = data.read(4)
-                # if not tag:
-                #     break
-
-                # size = int.from_bytes(data.read(4), 'big')
-                # chunk_start = start_pos
-
-                # if tag == b'PAN2':
-                #     self.child_nodes.append(PAN2(data, True))
-                # elif tag == b'PIC2':
-                #     self.child_nodes.append(PIC2(data))
-                # elif tag == b'TBX2':
-                #     self.child_nodes.append(TBX2(data))
-                # elif tag in (b'END1', b'EXT1'):
-                #     data.seek(chunk_start + size)  # move past the END/EXT block
-                #     break
-                # else:
-                #     # unknown chunk, just skip
-                #     data.seek(chunk_start + size)
-
                 old_pos = data.tell()
                 tag = data.read(4)
                 self.tag = tag
-                # print(tag)
                 if tag == b'BGN1':
-                    # print(tag)
-                    tag_size = data.read(int.from_bytes(data.read(4), byteorder='big'))
+                    tag_size = bytes_to_int(data.read(4))
                     data.seek(old_pos)
-                    data.read(bytes_to_int(tag_size))
+                    data.read(tag_size)
                     # Determine child node(s) type
                     magic = data.read(4)
                     data.seek(old_pos)
                     match magic:
                         case b'PAN2':
-                            if self.child_nodes[0]:
-                                self.child_nodes.append(PAN2(data, True))
-                            else:
-                                self.child_nodes.insert(0, PAN2(data, True))
-
+                            self.child_nodes.append(PAN2(data, True))
                         case b'PIC2':
-                            if self.child_nodes[0]:
-                                self.child_nodes.append(PIC2(data))
-                            else:
-                                self.child_nodes.insert(0, PIC2(data))
-
+                            self.child_nodes.append(PIC2(data))
                         case b'TBX2':
-                            if self.child_nodes[0]:
-                                self.child_nodes.append(TBX2(data))
-                            else:
-                                self.child_nodes.insert(0, TBX2(data))
+                            self.child_nodes.append(TBX2(data))
+                        case b'WIN2':
+                            self.child_nodes.append(WIN2(data))
+                elif tag == b'PAN2':
+                    data.seek(old_pos)
+                    self.child_nodes.append(PAN2(data, True))
                 elif tag == b'PIC2':
-                    if self.child_nodes[0]:
-                        self.child_nodes.append(PIC2(data))
-                    else:
-                        self.child_nodes.insert(0, PIC2(data))
+                    data.seek(old_pos)
+                    self.child_nodes.append(PIC2(data))
                 elif tag == b'TBX2':
-                    if self.child_nodes[0]:
-                        self.child_nodes.append(TBX2(data))
-                    else:
-                        self.child_nodes.insert(0, TBX2(data))
-                elif tag == b'END1' or tag == b'EXT1':
+                    data.seek(old_pos)
+                    self.child_nodes.append(TBX2(data))
+                elif tag == b'WIN2':
+                    data.seek(old_pos)
+                    self.child_nodes.append(WIN2(data))
+                elif tag in (b'END1', b'EXT1', b'TEND1'):
+                    self.end_tag = tag
+                    print(tag)
+                    self.tag_size = bytes_to_int(data.read(4))
                     break
-
-            self.end_tag = tag
-            self.end_tag_size = data.read(4)
-
-    def to_bytes(self) -> bytes:
-        out = bytearray()
-        return out
+                else:
+                    break
 
 
 class PIC2:
     def __init__(self, data: BytesIO):
+        old_pos = data.tell()
+        tag = data.read(4)
+        if tag == b'BGN1':
+            self.tag = tag
+            self.tag_size = bytes_to_int(data.read(4))
+        else:
+            data.seek(old_pos)
+
         current_pos = 0
         self.magic = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
+        self.size = bytes_to_int(data.read(4))
         self.base_pan2 = PAN2(data, False)
         self.field_0x0 = data.read(2)
         self.material_num = data.read(2)
@@ -890,15 +929,28 @@ class PIC2:
         self.field_0x8: List[bytes] = [data.read(2), data.read(2), data.read(2), data.read(2)]
         self.field_0x10: List[bytes] = [data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2), data.read(2)]
         self.corner_color: List[bytes] = [data.read(4), data.read(4), data.read(4), data.read(4)]
-        current_pos += 56 + len(self.base_pan2)
-        self.end_padding = data.read(self.size - current_pos)
+
+        # old_pos = data.tell()
+        # tag = data.read(4)
+        # if tag == b''
+        # current_pos += 56 + self.base_pan2.size
+        # self.end_padding = data.read(self.size - current_pos)
+        # print(self.end_padding)
 
 
 class TBX2:
     def __init__(self, data: BytesIO):
+        old_pos = data.tell()
+        tag = data.read(4)
+        if tag == b'BGN1':
+            self.tag = tag
+            self.tag_size = bytes_to_int(data.read(4))
+        else:
+            data.seek(old_pos)
+
         current_pos = 0
         self.magic = data.read(4)
-        self.size = int.from_bytes(data.read(4), byteorder='big')
+        self.size = bytes_to_int(data.read(4))
         self.base_pan2 = PAN2(data, False)
         self.field_0x0 = data.read(2)
         self.field_0x2 = data.read(2)
@@ -915,8 +967,25 @@ class TBX2:
         self.field_0x19 = data.read(3)
         self.field_0x1c = data.read(2)
         self.field_0x1e = data.read(2)
-        current_pos += 40 + len(self.base_pan2)
+        current_pos += 40 + self.base_pan2.size
         self.end_padding = data.read(self.size - current_pos)
+
+
+class WIN2:
+    def __init__(self, data: BytesIO):
+        old_pos = data.tell()
+        tag = data.read(4)
+        if tag == b'BGN1':
+            self.tag = tag
+            self.tag_size = bytes_to_int(data.read(4))
+        else:
+            data.seek(old_pos)
+        
+        self.magic = data.read(4)
+        print(self.magic)
+        self.size = bytes_to_int(data.read(4))
+        self.base_pan2 = PAN2(data, False)
+        self.data = data.read((self.size - 8) - self.base_pan2.size)
 # --------------------------------------------------------------------------------------
 
 def main():
@@ -954,8 +1023,10 @@ def main():
 
                 for entry in arc.file_entries:
                     if (entry.name.lower().endswith(".blo")):
-                        entry.decompress_data_if_necessary()
-                        blo_files.append(entry)
+                        # Skip file_error.blo as it utilizes older blo1 sections
+                        if not entry.name.lower().endswith("file_error.blo"):
+                            entry.decompress_data_if_necessary()
+                            blo_files.append(entry)
             except Exception as e:
                 print(f"  [failed to read ARC: {e}]")
                 continue

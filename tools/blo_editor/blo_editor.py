@@ -1248,7 +1248,6 @@ class PAN2:
         old_pos = data.tell()
         tag = data.read(4)
         if tag == b'BGN1':
-            print(tag)
             self.start_tag = tag
             self.start_tag_size = bytes_to_int(data.read(4))
         else:
@@ -1263,6 +1262,7 @@ class PAN2:
         self.base_position = data.read(1)
         self.padding = data.read(2)
         self.info_tag = data.read(8)
+        print(self.info_tag)
         self.user_info_tag = data.read(8)
         self.rot_offset_x = struct.unpack('>f', data.read(4))[0]
         self.rot_offset_y = struct.unpack('>f', data.read(4))[0]
@@ -1313,8 +1313,6 @@ class PAN2:
                     self.child_nodes.append(WIN2(data))
                 else:
                     self.end_tag = tag
-                    if self.end_tag == b'EXT1':
-                        print("TRUE")
                     self.end_tag_size = bytes_to_int(data.read(4))
                     break
 

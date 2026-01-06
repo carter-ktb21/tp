@@ -146,7 +146,7 @@ private:
     /* 0x20C */ CPaneMgr* mpButtonText[2];
     /* 0x214 */ CPaneMgr* mpTVButtonAB;
     /* 0x218 */ CPaneMgr* mpTVButtonText;
-    /* 0x21C */ J2DTextBox* field_0x21c[6][2];
+    /* 0x21C */ J2DTextBox* mMenuOptionLabelText[6][2];
     /* 0x24C */ u8 field_0x24c[0x8];
     /* 0x254 */ J2DTextBox* field_0x254[2];
     /* 0x25C */ J2DTextBox* field_0x25c[5];
@@ -199,7 +199,7 @@ private:
     /* 0x3EC */ u8 mQuitStatus;
     /* 0x3ED */ u8 field_0x3ed;
     /* 0x3EE */ u8 mUseFlag;
-    /* 0x3EF */ u8 field_0x3ef;
+    /* 0x3EF */ u8 mSelection;
     /* 0x3F0 */ u8 field_0x3f0;
     /* 0x3F1 */ u8 field_0x3f1;
     /* 0x3F2 */ u8 field_0x3f2;

@@ -815,7 +815,7 @@ config.libs = [
             Object(MatchingFor(ALL_GCN), "d/d_menu_insect.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_item_explain.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_letter.cpp"),
-            Object(MatchingFor(ALL_GCN), "d/d_menu_option.cpp"),
+            Object(Modded, "d/d_menu_option.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_ring.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_save.cpp"),
             Object(MatchingFor(ALL_GCN), "d/d_menu_skill.cpp"),

@@ -117,6 +117,7 @@ void dMenu_Option_c::_create() {
     JUT_ASSERT(210, fg != false);
 
     mpScreen->search('base_a_n')->hide();
+    // These hide calls hide a yellow ball of light at the same spot that the left and right arrows appear in each menu bar
     mpScreen->search('y_set_p4')->hide();
     mpScreen->search('y_set_p3')->hide();
     mpScreen->search('y_set_p2')->hide();
@@ -258,7 +259,7 @@ void dMenu_Option_c::_create() {
     field_0x3e1 = 10;
     field_0x3e2 = 0xff;
     field_0x3e3 = 0xc0;
-    field_0x3ef = 0;
+    mSelection = 0;
     field_0x3f0 = 0xff;
     field_0x3f1 = 0xff;
     field_0x3f2 = 0;
@@ -482,27 +483,29 @@ void dMenu_Option_c::_move() {
     }
 
     if (mDoGph_gInf_c::getFader()->getStatus() == 1) {
-        if (mDoCPd_c::getTrigA(PAD_1) != 0 && field_0x3ef != SelectType3 && field_0x3f3 == 5) {
-            if (field_0x3f4 == 5 && field_0x3ef != SelectType4 && field_0x3ef != SelectType5 && field_0x3ef != SelectType6 &&
-                field_0x3ef != SelectType7)
+        // If the A button is pressed and the confirmation screen has not already appeared, initilize the confirmation
+        // screen and execute its process function 
+        if (mDoCPd_c::getTrigA(PAD_1) != 0 && mSelection != SelectType3 && field_0x3f3 == 5) {
+            if (field_0x3f4 == 5 && mSelection != SelectType4 && mSelection != SelectType5 && mSelection != SelectType6 &&
+                mSelection != SelectType7)
             {
                 if (mDoCPd_c::getTrigStart(PAD_1) == 0 && mDoCPd_c::getTrigB(PAD_1) == 0) {
                     if (mDoCPd_c::getTrigUp(PAD_1) == 0 && mDoCPd_c::getTrigDown(PAD_1) == 0 &&
                         mDoCPd_c::getTrigLeft(PAD_1) == 0 && mDoCPd_c::getTrigRight(PAD_1) == 0)
                     {
                         field_0x3f7 = 1;
-                        field_0x3f5 = field_0x3ef;
-                        field_0x3ef = SelectType4;
+                        field_0x3f5 = mSelection;
+                        mSelection = SelectType4;
                         dMeter2Info_set2DVibration();
-                        (this->*init[field_0x3ef])();
+                        (this->*init[mSelection])();
                         goto skip;
                     }
                 }
             }
         }
 
-        if (mDoCPd_c::getTrigB(PAD_1) != 0 && field_0x3ef != SelectType3 && field_0x3f3 == 5 &&
-            field_0x3ef != SelectType4 && field_0x3ef != SelectType5 && field_0x3ef != SelectType6 && field_0x3ef != SelectType7)
+        if (mDoCPd_c::getTrigB(PAD_1) != 0 && mSelection != SelectType3 && field_0x3f3 == 5 &&
+            mSelection != SelectType4 && mSelection != SelectType5 && mSelection != SelectType6 && mSelection != SelectType7)
         {
             if (field_0x3f4 == 5 && mDoCPd_c::getTrigStart(PAD_1) == 0 &&
                 mDoCPd_c::getTrigA(PAD_1) == 0 && mDoCPd_c::getTrigUp(PAD_1) == 0 &&
@@ -510,22 +513,22 @@ void dMenu_Option_c::_move() {
                 mDoCPd_c::getTrigRight(PAD_1) == 0)
             {
                 field_0x3f7 = 0;
-                field_0x3f5 = field_0x3ef;
-                field_0x3ef = SelectType4;
+                field_0x3f5 = mSelection;
+                mSelection = SelectType4;
                 dMeter2Info_set2DVibration();
-                (this->*init[field_0x3ef])();
+                (this->*init[mSelection])();
             }
         }
     }
 skip:
-    u8 oldValue = field_0x3ef;
+    u8 oldValue = mSelection;
     if (field_0x3f3 == 5 && oldValue != SelectType4 && oldValue != SelectType5 && oldValue != SelectType6 && oldValue != SelectType7) {
         dpdMenuMove();
     }
 
     field_0x3f2 = 0;
     if (field_0x3f1 != 0xff) {
-        if (field_0x3f0 != field_0x3f1 && field_0x3ef != field_0x3f1) {
+        if (field_0x3f0 != field_0x3f1 && mSelection != field_0x3f1) {
             field_0x3f0 = field_0x3f1;
             field_0x3f2 = 1;
         }
@@ -533,10 +536,10 @@ skip:
         field_0x3f0 = 0xff;
     }
 
-    (this->*process[field_0x3ef])();
+    (this->*process[mSelection])();
     mpSelectScreen->animation();
-    if (oldValue != field_0x3ef) {
-        (this->*init[field_0x3ef])();
+    if (oldValue != mSelection) {
+        (this->*init[mSelection])();
     }
     
     setHIO(false);
@@ -582,8 +585,8 @@ void dMenu_Option_c::drawHaihai() {
     field_0x3f6 = 0;
     field_0x3f6 |= 1;
     field_0x3f6 |= 4;
-    if (selectType < SelectType4 && field_0x3f6 != 0 && field_0x3f3 == 5 && field_0x3ef != SelectType4 &&
-        field_0x3ef != SelectType5 && field_0x3ef != SelectType6 && field_0x3ef != SelectType7)
+    if (selectType < SelectType4 && field_0x3f6 != 0 && field_0x3f3 == 5 && mSelection != SelectType4 &&
+        mSelection != SelectType5 && mSelection != SelectType6 && mSelection != SelectType7)
     {
         mpMeterHaihai->_execute(0);
         Vec haihaiPosL =
@@ -657,7 +660,7 @@ bool dMenu_Option_c::_open() {
     if (mFrame >= openFrame) {
         mFrame = closeFrame;
         mQuitStatus = 2;
-        field_0x3ef = 0;
+        mSelection = 0;
         atten_init();
         for (int i = 0; i < 5; i++) {
             f32 scale = field_0x380;
@@ -724,7 +727,7 @@ void dMenu_Option_c::atten_move() {
     if (field_0x3f3 != 5) {
         (this->*tv_process[field_0x3f3])();
     } else if (downTrigger) {
-        field_0x3ef = 1;
+        mSelection = 1;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (leftTrigger) {
         if (field_0x3e4 == 0) {
@@ -734,7 +737,7 @@ void dMenu_Option_c::atten_move() {
             field_0x3e4 = 0;
             field_0x3da = -5;
         }
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = 0;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (rightTrigger) {
@@ -745,7 +748,7 @@ void dMenu_Option_c::atten_move() {
             field_0x3e4 = 0;
             field_0x3da = 5;
         }
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = 0;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else {
@@ -771,10 +774,10 @@ void dMenu_Option_c::ruby_move() {
     if (field_0x3f3 != 5) {
         (this->*tv_process[field_0x3f3])();
     } else if (upTrigger) {
-        field_0x3ef = SelectType0_JPN;
+        mSelection = SelectType0_JPN;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (downTrigger) {
-        field_0x3ef = SelectType1;
+        mSelection = SelectType1;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (leftTrigger) {
         if (field_0x3e5_JPN == 0) {
@@ -784,7 +787,7 @@ void dMenu_Option_c::ruby_move() {
             field_0x3e5_JPN = 0;
             field_0x3da = -5;
         }
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = SelectType0;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (rightTrigger) {
@@ -795,7 +798,7 @@ void dMenu_Option_c::ruby_move() {
             field_0x3e5_JPN = 0;
             field_0x3da = 5;
         }
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = SelectType0;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else {
@@ -820,10 +823,10 @@ void dMenu_Option_c::vib_move() {
     if (field_0x3f3 != 5) {
         (this->*tv_process[field_0x3f3])();
     } else if (upTrigger) {
-        field_0x3ef = SelectType0;
+        mSelection = SelectType0;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (downTrigger) {
-        field_0x3ef = SelectType2;
+        mSelection = SelectType2;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (leftTrigger) {
         if (isRumbleSupported()) {
@@ -835,7 +838,7 @@ void dMenu_Option_c::vib_move() {
                 field_0x3ea = 0;
                 field_0x3da = -5;
             }
-            field_0x3ef = SelectType3;
+            mSelection = SelectType3;
             field_0x3f5 = SelectType1;
             Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
                                      0);
@@ -850,7 +853,7 @@ void dMenu_Option_c::vib_move() {
                 field_0x3ea = 0;
                 field_0x3da = 5;
             }
-            field_0x3ef = SelectType3;
+            mSelection = SelectType3;
             field_0x3f5 = SelectType1;
             Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
                                      0);
@@ -876,7 +879,7 @@ void dMenu_Option_c::sound_move() {
     if (field_0x3f3 != 5) {
         (this->*tv_process[field_0x3f3])();
     } else if (upTrigger) {
-        field_0x3ef = SelectType1;
+        mSelection = SelectType1;
         Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (leftTrigger) {
         if (field_0x3e9 == 2) {
@@ -901,7 +904,7 @@ void dMenu_Option_c::sound_move() {
         }
         Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[field_0x3e9]);
         setSoundMode(dMo_soundMode[field_0x3e9]);
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = SelectType2;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else if (rightTrigger) {
@@ -927,7 +930,7 @@ void dMenu_Option_c::sound_move() {
         }
         Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[field_0x3e9]);
         setSoundMode(dMo_soundMode[field_0x3e9]);
-        field_0x3ef = SelectType3;
+        mSelection = SelectType3;
         field_0x3f5 = SelectType2;
         Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else {
@@ -1009,7 +1012,7 @@ void dMenu_Option_c::change_move() {
                 }
             }
         }
-        field_0x3ef = field_0x3f5;
+        mSelection = field_0x3f5;
     }
 }
 
@@ -1041,7 +1044,7 @@ void dMenu_Option_c::confirm_open_move() {
     }
     if (status == 1 && yesNoMenuMove == 1 && field_0x374 == 1.0f) {
         yesnoCursorShow();
-        field_0x3ef = SelectType5;
+        mSelection = SelectType5;
     }
     mpWarning->_move();
     setAnimation();
@@ -1058,12 +1061,12 @@ void dMenu_Option_c::confirm_move_move() {
 
     if (mDoCPd_c::getTrigA(PAD_1) != 0) {
         yesNoSelectStart();
-        field_0x3ef = SelectType7;
+        mSelection = SelectType7;
         dMeter2Info_set2DVibrationM();
     } else if (mDoCPd_c::getTrigB(PAD_1) != 0) {
         field_0x3f9 = 0;
         yesnoCancelAnmSet();
-        field_0x3ef = SelectType7;
+        mSelection = SelectType7;
         dMeter2Info_set2DVibrationM();
     } else if (rightTrigger != 0) {
         if (field_0x3f9 != 0) {
@@ -1072,7 +1075,7 @@ void dMenu_Option_c::confirm_move_move() {
             field_0x3fa = field_0x3f9;
             field_0x3f9 = 0;
             yesnoSelectAnmSet();
-            field_0x3ef = SelectType6;
+            mSelection = SelectType6;
         }
     } else if (leftTrigger != 0) {
         if (field_0x3f9 != 1) {
@@ -1081,7 +1084,7 @@ void dMenu_Option_c::confirm_move_move() {
             field_0x3fa = field_0x3f9;
             field_0x3f9 = 1;
             yesnoSelectAnmSet();
-            field_0x3ef = SelectType6;
+            mSelection = SelectType6;
         }
     }
     mpWarning->_move();
@@ -1097,7 +1100,7 @@ void dMenu_Option_c::confirm_select_move() {
 
     if (selectMoveAnm == 1 && wakuAlphaAnm == 1) {
         yesnoCursorShow();
-        field_0x3ef = SelectType5;
+        mSelection = SelectType5;
     }
     mpWarning->_move();
     setAnimation();
@@ -1142,7 +1145,7 @@ void dMenu_Option_c::confirm_close_move() {
                 mpDrawCursor->offPlayAnime(0);
             } else {
                 mpDrawCursor->setParam(1.01f, 0.85f, 0.02f, 0.5f, 0.5f);
-                field_0x3ef = field_0x3f5;
+                mSelection = field_0x3f5;
             }
         } else if (field_0x3f9 == 1) {
             mQuitStatus = 3;
@@ -1154,7 +1157,7 @@ void dMenu_Option_c::confirm_close_move() {
             mpDrawCursor->offPlayAnime(0);
         } else {
             mpDrawCursor->setParam(1.01f, 0.85f, 0.02f, 0.5f, 0.5f);
-            field_0x3ef = field_0x3f5;
+            mSelection = field_0x3f5;
         }
     }
     mpWarning->_move();
@@ -1529,87 +1532,91 @@ void dMenu_Option_c::screenSet() {
         field_0x25c[i]->setString(0x40, "");
         mpString->getString(0x564, field_0x25c[i], NULL, NULL, NULL, 0);
     }
+
+    // Set the text for the labels of each menu option
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[0][i] = (J2DTextBox*)mpScreen->search(menu_t0[i]);
+        mMenuOptionLabelText[0][i] = (J2DTextBox*)mpScreen->search(menu_t0[i]);
         mpScreen->search(fenu_t0[i])->hide();
 #else
-        field_0x21c[0][i] = (J2DTextBox*)mpScreen->search(fenu_t0[i]);
+        mMenuOptionLabelText[0][i] = (J2DTextBox*)mpScreen->search(fenu_t0[i]);
         mpScreen->search(menu_t0[i])->hide();
 #endif
-        field_0x21c[0][i]->setFont(mpFont);
-        field_0x21c[0][i]->setString(0x40, "");
-        mpString->getString(0x548, field_0x21c[0][i], NULL, NULL, NULL, 0);
+        mMenuOptionLabelText[0][i]->setFont(mpFont);
+        mMenuOptionLabelText[0][i]->setString(0x40, "");
+        mpString->getString(0x548, mMenuOptionLabelText[0][i], NULL, NULL, NULL, 0);
     }
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[1][i] = (J2DTextBox*)mpScreen->search(menu_t1[i]);
+        mMenuOptionLabelText[1][i] = (J2DTextBox*)mpScreen->search(menu_t1[i]);
         mpScreen->search(fenu_t1[i])->hide();
 #else
-        field_0x21c[1][i] = (J2DTextBox*)mpScreen->search(fenu_t2[i]);
+        mMenuOptionLabelText[1][i] = (J2DTextBox*)mpScreen->search(fenu_t2[i]);
         mpScreen->search(menu_t2[i])->hide();
 #endif
-        field_0x21c[1][i]->setFont(mpFont);
-        field_0x21c[1][i]->setString(0x40, "");
+        mMenuOptionLabelText[1][i]->setFont(mpFont);
+        mMenuOptionLabelText[1][i]->setString(0x40, "");
 #if VERSION == VERSION_GCN_JPN
-        mpString->getString(0x54B, field_0x21c[1][i], NULL, NULL, NULL, 0);
+        mpString->getString(0x54B, mMenuOptionLabelText[1][i], NULL, NULL, NULL, 0);
 #else
-        mpString->getString(0x54E, field_0x21c[1][i], NULL, NULL, NULL, 0);
+        mpString->getString(0x54E, mMenuOptionLabelText[1][i], NULL, NULL, NULL, 0);
 #endif
     }
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[2][i] = (J2DTextBox*)mpScreen->search(menu_t2[i]);
+        mMenuOptionLabelText[2][i] = (J2DTextBox*)mpScreen->search(menu_t2[i]);
         mpScreen->search(fenu_t2[i])->hide();
 #else
-        field_0x21c[2][i] = (J2DTextBox*)mpScreen->search(fenu_t3[i]);
+        mMenuOptionLabelText[2][i] = (J2DTextBox*)mpScreen->search(fenu_t3[i]);
         mpScreen->search(menu_t3[i])->hide();
 #endif
-        field_0x21c[2][i]->setFont(mpFont);
-        field_0x21c[2][i]->setString(0x40, "");
+        mMenuOptionLabelText[2][i]->setFont(mpFont);
+        mMenuOptionLabelText[2][i]->setString(0x40, "");
 #if VERSION == VERSION_GCN_JPN
-        mpString->getString(0x54E, field_0x21c[2][i], NULL, NULL, NULL, 0);
+        mpString->getString(0x54E, mMenuOptionLabelText[2][i], NULL, NULL, NULL, 0);
 #else
-        mpString->getString(0x54F, field_0x21c[2][i], NULL, NULL, NULL, 0);
+        mpString->getString(0x54F, mMenuOptionLabelText[2][i], NULL, NULL, NULL, 0);
 #endif
     }
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[3][i] = (J2DTextBox*)mpScreen->search(menu_t3[i]);
+        mMenuOptionLabelText[3][i] = (J2DTextBox*)mpScreen->search(menu_t3[i]);
         mpScreen->search(fenu_t3[i])->hide();
 #else
-        field_0x21c[3][i] = (J2DTextBox*)mpScreen->search(fenu_t4[i]);
+        mMenuOptionLabelText[3][i] = (J2DTextBox*)mpScreen->search(fenu_t4[i]);
         mpScreen->search(menu_t4[i])->hide();
 #endif
-        field_0x21c[3][i]->setFont(mpFont);
-        field_0x21c[3][i]->setString(0x40, "");
+        mMenuOptionLabelText[3][i]->setFont(mpFont);
+        mMenuOptionLabelText[3][i]->setString(0x40, "");
 #if VERSION == VERSION_GCN_JPN
-        mpString->getString(0x54F, field_0x21c[3][i], NULL, NULL, NULL, 0);
+        mpString->getString(0x54F, mMenuOptionLabelText[3][i], NULL, NULL, NULL, 0);
 #endif
     }
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[4][i] = (J2DTextBox*)mpScreen->search(menu_t4[i]);
+        mMenuOptionLabelText[4][i] = (J2DTextBox*)mpScreen->search(menu_t4[i]);
         mpScreen->search(fenu_t4[i])->hide();
 #else
-        field_0x21c[4][i] = (J2DTextBox*)mpScreen->search(fenu_t1[i]);
+        mMenuOptionLabelText[4][i] = (J2DTextBox*)mpScreen->search(fenu_t1[i]);
         mpScreen->search(menu_t1[i])->hide();
 #endif
-        field_0x21c[4][i]->setFont(mpFont);
-        field_0x21c[4][i]->setString(0x40, "");
+        mMenuOptionLabelText[4][i]->setFont(mpFont);
+        mMenuOptionLabelText[4][i]->setString(0x40, "");
     }
     for (int i = 0; i < 2; i++) {
 #if VERSION == VERSION_GCN_JPN
-        field_0x21c[5][i] = (J2DTextBox*)mpScreen->search(menu_t5[i]);
+        mMenuOptionLabelText[5][i] = (J2DTextBox*)mpScreen->search(menu_t5[i]);
         mpScreen->search(fenu_t5[i])->hide();
 #else
-        field_0x21c[5][i] = (J2DTextBox*)mpScreen->search(fenu_t5[i]);
+        mMenuOptionLabelText[5][i] = (J2DTextBox*)mpScreen->search(fenu_t5[i]);
         mpScreen->search(menu_t5[i])->hide();
 #endif
-        field_0x21c[5][i]->setFont(mpFont);
-        field_0x21c[5][i]->setString(0x40, "");
-        mpString->getString(0x554, field_0x21c[5][i], NULL, NULL, NULL, 0);
+        mMenuOptionLabelText[5][i]->setFont(mpFont);
+        mMenuOptionLabelText[5][i]->setString(0x40, "");
+        mpString->getString(0x554, mMenuOptionLabelText[5][i], NULL, NULL, NULL, 0);
     }
+
+    // Get pane managers for each menu option's selections
     for (int i = 0; i < 6; i++) {
 #if VERSION == VERSION_GCN_JPN
         paneResize(menut_0[i]);
@@ -1696,6 +1703,7 @@ void dMenu_Option_c::screenSet() {
     }
     field_0x3b4 = 0.0f;
     menuVisible();
+    
 #if VERSION == VERSION_GCN_JPN
     mpBackScreen->search('jpn_n')->show();
     mpBackScreen->search('foregn_n')->hide();
@@ -1894,11 +1902,11 @@ void dMenu_Option_c::setCursorPos(u8 i_index) {
 void dMenu_Option_c::setSelectColor(u8 param_0, bool param_1) {
     for (int i = 0; i < 6; i++) {
         if (i == param_0 || param_1) {
-            if (field_0x21c[i][0] != NULL) {
-                field_0x21c[i][0]->setFontColor(field_0x3b8, field_0x3b8);
+            if (mMenuOptionLabelText[i][0] != NULL) {
+                mMenuOptionLabelText[i][0]->setFontColor(field_0x3b8, field_0x3b8);
             }
-            if (field_0x21c[i][1] != NULL) {
-                field_0x21c[i][1]->setFontColor(field_0x3b8, field_0x3b8);
+            if (mMenuOptionLabelText[i][1] != NULL) {
+                mMenuOptionLabelText[i][1]->setFontColor(field_0x3b8, field_0x3b8);
             }
             mpMenuNull[i]->scale(mBarScale[0], mBarScale[0]);
             if (mpMenuPaneC[i] != NULL) {
@@ -1911,11 +1919,11 @@ void dMenu_Option_c::setSelectColor(u8 param_0, bool param_1) {
                 }
             }
         } else {
-            if (field_0x21c[i][0] != NULL) {
-                field_0x21c[i][0]->setFontColor(field_0x3bc, field_0x3bc);
+            if (mMenuOptionLabelText[i][0] != NULL) {
+                mMenuOptionLabelText[i][0]->setFontColor(field_0x3bc, field_0x3bc);
             }
-            if (field_0x21c[i][1] != NULL) {
-                field_0x21c[i][1]->setFontColor(field_0x3bc, field_0x3bc);
+            if (mMenuOptionLabelText[i][1] != NULL) {
+                mMenuOptionLabelText[i][1]->setFontColor(field_0x3bc, field_0x3bc);
             }
             mpMenuNull[i]->scale(mBarScale[1], mBarScale[1]);
             if (mpMenuPaneC[i] != NULL) {
@@ -1932,8 +1940,8 @@ void dMenu_Option_c::setSelectColor(u8 param_0, bool param_1) {
 }
 
 u8 dMenu_Option_c::getSelectType() {
-    if (field_0x3ef < SelectType3) {
-        return field_0x3ef;
+    if (mSelection < SelectType3) {
+        return mSelection;
     }
     if (field_0x3f5 < SelectType3) {
         return field_0x3f5;

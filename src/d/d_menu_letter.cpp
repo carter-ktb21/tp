@@ -381,8 +381,8 @@ int dMenu_Letter_c::_close() {
 }
 
 void dMenu_Letter_c::wait_init() {
-    setAButtonString(0x40c);
-    setBButtonString(0x3f9);
+    setAButtonString(0x40c); // Confirm
+    setBButtonString(0x3f9); // Back
 }
 
 void dMenu_Letter_c::wait_move() {
@@ -544,10 +544,10 @@ void dMenu_Letter_c::read_move_init() {
     if (field_0x3e2 > 1) {
         if (field_0x3e3 == field_0x3e2) {
             setAButtonString(0);
-            setBButtonString(0x3f9);
+            setBButtonString(0x3f9); // Back
         } else {
-            setAButtonString(0x408);
-            setBButtonString(0x3f9);
+            setAButtonString(0x408); // Next
+            setBButtonString(0x3f9); // Back
         }
         CPaneMgr paneMgr;
         J2DPane* pane = mpLetterScreen[0]->search('set_ya_n');
@@ -555,7 +555,7 @@ void dMenu_Letter_c::read_move_init() {
         mpArrow->setPos(pos.x, pos.y);
     } else {
         setAButtonString(0);
-        setBButtonString(0x3f9);
+        setBButtonString(0x3f9); // Back
     }
 }
 
@@ -924,10 +924,10 @@ void dMenu_Letter_c::screenSetBase() {
     text2->setFont(mDoExt_getMesgFont());
     text3->setFont(mDoExt_getMesgFont());
     text4->setFont(mDoExt_getMesgFont());
-    dMeter2Info_getStringKanji(0x4d7, text1->getStringPtr(), 0);
-    dMeter2Info_getStringKanji(0x4d7, text2->getStringPtr(), 0);
-    dMeter2Info_getStringKanji(0x4d7, text3->getStringPtr(), 0);
-    dMeter2Info_getStringKanji(0x4d7, text4->getStringPtr(), 0);
+    dMeter2Info_getStringKanji(0x4d7, text1->getStringPtr(), 0); // Turn page
+    dMeter2Info_getStringKanji(0x4d7, text2->getStringPtr(), 0); // Turn page
+    dMeter2Info_getStringKanji(0x4d7, text3->getStringPtr(), 0); // Turn page
+    dMeter2Info_getStringKanji(0x4d7, text4->getStringPtr(), 0); // Turn page
     ((J2DTextBox*)mpBaseScreen->search('pi_no_00'))->setFont(mDoExt_getMesgFont());
     ((J2DTextBox*)mpBaseScreen->search('pi_no_01'))->setFont(mDoExt_getMesgFont());
     ((J2DTextBox*)mpBaseScreen->search('pi_no_02'))->setFont(mDoExt_getMesgFont());

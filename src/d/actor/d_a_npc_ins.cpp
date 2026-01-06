@@ -304,6 +304,8 @@ daNpcIns_c::~daNpcIns_c() {
 }
 
 static insect_param_data const l_insectParams[24] = {
+    /* Oh, oh, oh boy!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} 
+       Who's your friend?\nYou're a li'l {Tag - 5 bytes | Group 00 | Name: returned-bug! Aren't you,\nyou li'l cutie?! */
     {0x0191, 0x709, 0, 0},
     {0x0192, 0x709, 0, 0},
     {0x0193, 0x70A, 0, 0},
@@ -410,8 +412,8 @@ cPhs__Step daNpcIns_c::Create() {
             return cPhs_ERROR_e;
         }
 
-        mInsectMsgNo = getMessageNo();
-        field_0xe16 = mInsectMsgNo;
+        mMsgFlowNo = getMessageNo();
+        mInitialMsgFlowNo = mMsgFlowNo;
         mAnm_p->getModel()->getModelData();
         fopAcM_SetMtx(this, mAnm_p->getModel()->getBaseTRMtx());
         fopAcM_setCullSizeBox(this, -160.0f, -50.0f, -160.0f, 160.0f, 220.0f, 160.0f);
@@ -1230,20 +1232,26 @@ int daNpcIns_c::waitPresent(void* param_1) {
 
                 if (type != 0) {
                     OS_REPORT("Insects released. Type=%d\n", type);
-                    mInsectMsgNo = getInsectMessageNo(type);
+                    mMsgFlowNo = getInsectMessageNo(type);
                     daNpcF_onEvtBit(getInsectEvtBitNo(type));
                     dMsgObject_setInsectItemNo(type);
                     daPy_py_c* player = daPy_getPlayerActorClass();
                     player->changeOriginalDemo();
                     player->changeDemoMode(0x25, 2, type, 0);
                 } else {
-                    mInsectMsgNo = 0x719;
+                    /* {Tag - 7 bytes | Group FF | Name: size - pct = 80}Sniff sniff...\n{Tag - 7 bytes | Group FF | Name: size - pct = 100}
+                       I sense it! The distinct pheromones\nof {Tag - 6 bytes | Group FF | Name: color - hue = 1}golden bugs 
+                       {Tag - 6 bytes | Group FF | Name: color - hue = 0}on you! */
+                    mMsgFlowNo = 0x719;
                 }
 
                 dMeter2Info_setInsectSelectType(0xFF);
             }
 
-            if (mInsectMsgNo != 0x719) {
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 80}Sniff sniff...\n{Tag - 7 bytes | Group FF | Name: size - pct = 100}
+               I sense it! The distinct pheromones\nof {Tag - 6 bytes | Group FF | Name: color - hue = 1}golden bugs 
+               {Tag - 6 bytes | Group FF | Name: color - hue = 0}on you! */
+            if (mMsgFlowNo != 0x719) {
                 if (!daPy_getPlayerActorClass()->checkInsectRelease()) {
                     break;
                 }
@@ -1357,7 +1365,8 @@ int daNpcIns_c::goHome(void* param_1) {
                 setExpression(EXPR_NONE, -1.0f);
                 setMotion(MOT_K_WALK, -1.0f, 0);
                 speedF = daNpcIns_Param_c::m.walk_speed;
-                mInsectMsgNo = 0x27;
+                /* Why, hello! */
+                mMsgFlowNo = 0x27;
                 mMode = 2;
             }
             break;
@@ -1440,20 +1449,21 @@ int daNpcIns_c::talk(void* param_1) {
     switch (mMode) {
         case 0:
             if (daPy_py_c::checkNowWolf()) {
-                mInsectMsgNo = 0x25;
+                /* Oh, hello, puppy... */
+                mMsgFlowNo = 0x25;
             }
 
-            initTalk(mInsectMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mTurnMode = 0;
             mMsgTimer = 0;
             mOrderSpeakEvent = 0;
-            field_0xe14 = fopAcM_searchPlayerAngleY(this);
+            mPlayerAngleY = fopAcM_searchPlayerAngleY(this);
             setLookMode(LOOK_PLAYER_TALK);
             mMode = 2;
             break;
         
         case 2:
-            if (field_0xe14 == mCurAngle.y) {
+            if (mPlayerAngleY == mCurAngle.y) {
                 if (talkProc(NULL, TRUE, NULL)) {
                     mActorMngr[0].entry(daPy_getPlayerActorClass());
 
@@ -1474,7 +1484,7 @@ int daNpcIns_c::talk(void* param_1) {
                                 field_0x9ec = true;
                                 mOrderSpeakEvent = 1;
                             }
-                        } else if (eventID == 0x18 && mInsectMsgNo == field_0xe16) {
+                        } else if (eventID == 0x18 && mMsgFlowNo == mInitialMsgFlowNo) {
                             dMeter2Info_setPauseStatus(8);
                             field_0x9ec = true;
                             setAction(&daNpcIns_c::waitPresent);
@@ -1499,14 +1509,14 @@ int daNpcIns_c::talk(void* param_1) {
                         setExpressionTalkAfter();
                     }
                 }
-            } else if (step(field_0xe14, 1)) {
+            } else if (step(mPlayerAngleY, 1)) {
                 setMotion(MOT_WAIT_A, -1.0f, 0);
                 mTurnMode = 0;
             }
             break;
 
         case 3:
-            mInsectMsgNo = field_0xe16;
+            mMsgFlowNo = mInitialMsgFlowNo;
             setExpression(EXPR_NONE, -1.0f);
 
             if (!field_0x9ec) {

@@ -272,9 +272,9 @@ cPhs__Step daNpc_GWolf_c::create() {
     mExitId = fopAcM_GetParam(this) >> 24;
 
     if (home.angle.x != 0xFFFF) {
-        field_0xe08 = home.angle.x;
+        mMsgFlowNo = home.angle.x;
     } else {
-        field_0xe08 = -1;
+        mMsgFlowNo = -1;
     }
 
     swBit = getSwBitFromParam();
@@ -1497,6 +1497,7 @@ BOOL daNpc_GWolf_c::ECut_howlingSessionA(int i_staffId) {
                 break;
             
             case 25:
+                /* Let teachings of old pass to you... */
                 initTalk(0xBCB, NULL);
                 field_0x9eb = true;
                 break;
@@ -1792,9 +1793,9 @@ BOOL daNpc_GWolf_c::talk(void* param_1) {
                 break;
             }
 
-            int msgNo = field_0xe08;
+            int msgFlowNo = mMsgFlowNo;
             mOrderSpeakEvt = false;
-            initTalk(msgNo, NULL);
+            initTalk(msgFlowNo, NULL);
             mTurnMode = 0;
             mMode = 2;
             // fallthrough

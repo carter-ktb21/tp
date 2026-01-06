@@ -784,6 +784,7 @@ void daB_YO_c::executeOpening() {
         mCamFovY = 68.0f;
         current.angle.y = -0x1000;
         shape_angle.y = -0x1000;
+        /* Please... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}This way, uh.{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 43} */
         setYoMessage(0x234E);
         ystone_pos.set(0.0f, 0.0f, 3000.0f);
         mYstoneID = fopAcM_create(PROC_OBJ_YSTONE, 5, &ystone_pos, fopAcM_GetRoomNo(this),
@@ -866,6 +867,7 @@ void daB_YO_c::executeOpening() {
         cLib_chasePos(&mCamCenter, cam_pos, 4.0f);
         if (mActionTimer == 0) {
             mMode = 6;
+            /* Here...mirror. You look at it, uh...{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 109} */
             setYoMessage(0x234F);
             mActionTimer = 30;
         }
@@ -901,6 +903,7 @@ void daB_YO_c::executeOpening() {
             setBck(ANM_TALK_A, J3DFrameCtrl::EMode_LOOP, 10.0f, 1.0f);
         }
         if (mActionTimer == 0) {
+            /* Uh...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15} So pretty...{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 65} */
             setYoMessage(0x2350);
             mMode = 8;
             mActionTimer = 60;
@@ -927,6 +930,13 @@ void daB_YO_c::executeOpening() {
         cam_pos.set(120.0f, 120.0f, -2032.0f);
         cLib_chasePos(&mCamCenter, cam_pos, 4.0f);
         if (mActionTimer == 0) {
+            /* Pretty{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Uh{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} So pretty{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 7}.
+               {Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 33} */
             setYoMessage(0x2351);
             mMode = 10;
         }
@@ -947,6 +957,10 @@ void daB_YO_c::executeOpening() {
         if (mpYetaMorf->isStop()) {
             setBck(ANM_TALK_B, J3DFrameCtrl::EMode_LOOP, 3.0f, 1.0f);
             mMode = 12;
+            /* {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 5}Pretty...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} Pretty...
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}mirror...{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 5} 
+               Lovely{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 5}.{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 5}.
+               {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 5}.{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 37} */
             setYoMessage(0x235F);
         }
         if (mActionTimer2 == 1) {
@@ -992,6 +1006,8 @@ void daB_YO_c::executeOpening() {
         }
         if (mpYetaMorf->isStop()) {
             mMode = 16;
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 150}{Tag - 5 bytes | Group 00 | Name: instant}NOT TAKE MIRROR!
+               {Tag - 5 bytes | Group 00 | Name: type}{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 30} */
             setYoMessage(0x2352);
             setBck(ANM_ANGRY_WAIT, J3DFrameCtrl::EMode_LOOP, 3.0f, 1.0f);
         }

@@ -269,7 +269,7 @@ private:
     /* 0xE7C */ int mItemNo;
     /* 0xE80 */ int field_0xe80;
     /* 0xE84 */ int field_0xe84;
-    /* 0xE88 */ int mMsgNo;
+    /* 0xE88 */ int mMsgFlowNo;
     /* 0xE8C */ f32 field_0xe8c;
     /* 0xE90 */ s16 mLookMode;
     /* 0xE92 */ s16 field_0xe92;

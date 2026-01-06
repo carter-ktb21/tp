@@ -207,7 +207,7 @@ int daNpcRafrel_c::Create() {
         mType = 2;
     }
 
-    field_0xe0c = getMessageNo();
+    mMsgFlowNo = getMessageNo();
 
     int phase_state = cPhs_ERROR_e;
     for (int i = 0; l_loadRes_list[mType][i] >= 0; i++) {
@@ -1154,7 +1154,10 @@ bool daNpcRafrel_c::wait_type01(void* param_0) {
                     }
 
                     if (dComIfGp_event_getPreItemNo() == 0x90) {
-                        field_0xe0c = 0x21;
+                        /* Just hand that to {Tag - 6 bytes | Group FF | Name: color - hue = 1}Fyer
+                           {Tag - 6 bytes | Group FF | Name: color - hue = 0}. You'll find\nhim running an amusement ride\ndown there on 
+                           {Tag - 6 bytes | Group FF | Name: color - hue = 1}Lake Hylia{Tag - 6 bytes | Group FF | Name: color - hue = 0}. */
+                        mMsgFlowNo = 0x21;
                         setAction(&daNpcRafrel_c::talk);
                     } else {
 #if VERSION != VERSION_SHIELD_DEBUG
@@ -1310,7 +1313,7 @@ bool daNpcRafrel_c::talk(void* param_0) {
 
     switch (field_0xe10) {
     case 0:
-        initTalk(field_0xe0c, NULL);
+        initTalk(mMsgFlowNo, NULL);
         mTurnMode = 0;
         mMsgTimer = 0;
         field_0xe16 = 0;
@@ -1357,7 +1360,7 @@ bool daNpcRafrel_c::talk(void* param_0) {
         }
         break;
     case 3:
-        field_0xe0c = getMessageNo();
+        mMsgFlowNo = getMessageNo();
         setExpression(7, -1.0f);
         if (field_0x9ec == 0) {
             dComIfGp_event_reset();
@@ -1552,7 +1555,7 @@ int daNpcRafrel_c::EvCut_Appear(int i_staffId) {
         switch (*(u32*)cutname) {
         case '0001':
             setLookMode(LOOK_NONE, NULL);
-            initTalk(field_0xe0c, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             field_0xe14 = 1;
             break;
@@ -1564,7 +1567,7 @@ int daNpcRafrel_c::EvCut_Appear(int i_staffId) {
         case '0009':
         case '0011':
             setLookMode(LOOK_PLAYER_TALK, NULL);
-            initTalk(field_0xe0c, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             break;
         case '0002':
@@ -1666,7 +1669,7 @@ int daNpcRafrel_c::EvCut_WiretapSponsor(int i_staffId) {
         switch (*cutname) {
         case '0001':
             dComIfGp_setMesgCameraInfoActor(actors[0], actors[1], actors[2], actors[3], NULL, NULL, NULL, NULL, NULL, NULL);
-            initTalk(field_0xe0c, actors);
+            initTalk(mMsgFlowNo, actors);
             break;
         default:
             JUT_ASSERT(2138, FALSE);

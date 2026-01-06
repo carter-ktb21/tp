@@ -353,7 +353,7 @@ int dTimer_c::start(int i_timer_mode, s16 param_1) {
     if (param_1 == -1) {
         if (m_mode == 0) {
             if (i_timer_mode == 2 || i_timer_mode == 7) {
-                dTimer_createStart2D(i_timer_mode, 0x3E3);
+                dTimer_createStart2D(i_timer_mode, 0x3E3); // START!
             }
 
             field_0x168 = g_drawHIO.mMiniGame.mStartPikariDisplayFrames;

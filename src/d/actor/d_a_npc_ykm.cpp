@@ -3481,10 +3481,10 @@ BOOL daNpc_ykM_c::race(void* param_1) {
                                 if (dComIfG_getTimerPtr()->isStart()) {
                                     if (field_0x157c != 0) {
                                         mDoAud_subBgmStart(Z2BGM_SNOWBOARD_LOSE);
-                                        dMeter2Info_setMeterString(0x539);
+                                        dMeter2Info_setMeterString(0x539); // YOU LOSE!
                                     } else {
                                         mDoAud_subBgmStart(Z2BGM_SNOWBOARD_WIN);
-                                        dMeter2Info_setMeterString(0x538);
+                                        dMeter2Info_setMeterString(0x538); // YOU WIN!
                                     }
 
                                     dComIfG_TimerEnd(5, -1);

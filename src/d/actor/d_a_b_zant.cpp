@@ -1390,7 +1390,9 @@ void daB_ZANT_c::executeOpening() {
             mMode = MODE_MSG_1_WAIT;
             mModeTimer = 20;
             setBck(BCK_ZAN_OP_3, J3DFrameCtrl::EMode_LOOP, 3.0f, 1.0f);
-            setZantMessage(0xE3B);  // My god had only one wish...
+            /* {Tag - 6 bytes | Group FF | Name: color - hue = 1}My god{Tag - 6 bytes | Group FF | Name: color - hue = 0} had only one wish...
+               {Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
+            setZantMessage(0xE3B);
         }
         break;
     case MODE_MSG_1_WAIT:
@@ -1458,6 +1460,8 @@ void daB_ZANT_c::executeOpening() {
 
         if (mModeTimer == 0) {
             mMode = MODE_MSG_2;
+            /* To merge shadow and light...and\nmake {Tag - 6 bytes | Group FF | Name: color - hue = 1}darkness
+               {Tag - 6 bytes | Group FF | Name: color - hue = 0}!{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
             setZantMessage(0xE3C);
         }
         break;

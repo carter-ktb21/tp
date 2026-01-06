@@ -4297,7 +4297,7 @@ static void uki_main(dmg_rod_class* i_this) {
             }
 
             Z2GetAudioMgr()->seStart(Z2SE_AL_FISHING_HIT, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-            dMeter2Info_setMeterString(0x4C7);
+            dMeter2Info_setMeterString(0x4C7); // "FISH ON!"
             Z2GetAudioMgr()->changeFishingBgm(2);
 
             i_this->timers[3] = 20;

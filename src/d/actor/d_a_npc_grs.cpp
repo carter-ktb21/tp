@@ -950,10 +950,8 @@ int daNpc_grS_c::doEvent() {
                 setExpression(expression, -1.0f);
                 setMotion(motion, -1.0f, 0);
             }
-        } else {
-            if (msgTimerOld != 0 && !field_0x9eb) {
-                setExpressionTalkAfter();
-            }
+        } else if (msgTimerOld != 0 && !field_0x9eb) {
+            setExpressionTalkAfter();
         }
     } else {
         mMsgTimer = 0;

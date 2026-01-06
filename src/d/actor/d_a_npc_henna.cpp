@@ -1138,11 +1138,14 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         }
         if (i_this->field_0x754 >= 160) {
             if (i_this->field_0x754 == 160) {
-                i_this->mMsgFlow.init(actor, 0x321, 0, NULL);
+                i_this->mMsgFlow.init(actor, 0x321, 0, NULL); // Hi there!
                 unkXyz_6c.set(-67.0f, 0.0f, 105.0f);
                 daPy_getPlayerActorClass()->setPlayerPosAndAngle(&unkXyz_6c, 0xffffe1c5, 0);
             }
             i_this->mMsgFlow.doFlow(actor, NULL, 0);
+            /* Hey! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}
+               You... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 20}
+               You've never been here\nbefore, have you? */
             if (i_this->mMsgFlow.getNowMsgNo() == 0x1f42) {
                 i_this->cam_mode = 11;
                 i_this->field_0x754 = -20;
@@ -1181,8 +1184,11 @@ static void demo_camera_shop(npc_henna_class* i_this) {
             if (i_this->field_0x5be == 1) {
                 i_this->field_0x5be = 2;
                 if (i_this->field_0x7b7 >= 4) {
+                    /* That's it! Enough!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} You're being a\njerk! 
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}Get OUT! */
                     i_this->mMsgFlow.init(actor, 0x354, 0, NULL);
                 } else {
+                    /* C'mon... Can't you try to control\nyourself? I'm gonna have to ask\nyou to leave. */
                     i_this->mMsgFlow.init(actor, 0x353, 0, NULL);
                 }
                 anm_init(i_this, 18, -10.0f, 2, 1.0f);
@@ -1197,20 +1203,27 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                 /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                 if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d1])) {
                     if (i_this->field_0x709 != 0) {
+                        /* Dearie me! I'm sorry! I don't know\nwhy, but sometimes I just get\nitchy... */
                         i_this->mMsgFlow.init(actor, 0x327, 0, NULL);
                         i_this->field_0x6ba = 90;
                     } else {
+                        /* It's {Tag - 6 bytes | Group FF | Name: color - hue = 6}20 Rupees{Tag - 6 bytes | Group FF | Name: color - hue = 0} 
+                           to try some lure\nfishing. There's no time limit, and\nthe canoe rental's included! */
                         i_this->mMsgFlow.init(actor, 0x325, 0, NULL);
                     }
                     i_this->cam_mode = 20;
                     i_this->field_0x754 = 0;
                 } else {
                     if (i_this->field_0x709 != 0) {
+                        /* Event Node | Event Func Idx - 21 | Event Func Params - b'\x00\x00\x00\x0f' | Indirection Table Idx - b'\x00\xd5' */
                         i_this->mMsgFlow.init(actor, 0x326, 0, NULL);
                         i_this->field_0x6ba = 90;
                     } else if (i_this->field_0x5bc == 0) {
+                        /* It's {Tag - 6 bytes | Group FF | Name: color - hue = 6}20 Rupees{Tag - 6 bytes | Group FF | Name: color - hue = 0} 
+                           to try some lure\nfishing. There's no time limit, and\nthe canoe rental's included! */
                         i_this->mMsgFlow.init(actor, 0x323, 0, NULL);
                     } else {
+                        /* You wanna try some lure fishing? */
                         i_this->mMsgFlow.init(actor, 0x324, 0, NULL);
                     }
                 }
@@ -1251,24 +1264,26 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     if (dComIfGs_getRupee() >= 20) {
                         /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                         if (!dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d1])) {
-                            i_this->mMsgFlow.init(actor, 0x32e, 0, NULL);
+                            i_this->mMsgFlow.init(actor, 0x32E, 0, NULL); // OK!
                             /* dSv_event_flag_c::F_0465 - Fishing Pond - Reserved for fishing */
                             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d1]);
                             /* dSv_event_flag_c::F_0464 - Fishing Pond - Reserved for fishing */
                             dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d0]);
                             data_80450CA0 = 1;
                         } else {
-                            i_this->mMsgFlow.init(actor, 0x32f, 0, NULL);
+                            i_this->mMsgFlow.init(actor, 0x32F, 0, NULL); // OK!
                         }
                         dComIfGp_setItemRupeeCount(0xffffffec);
                         /* dSv_event_flag_c::F_0463 - Fishing Pond - Reserved for fishing */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1cf]);
                         i_this->field_0x5b6 = 1;
                     } else {
+                        /* Ooh... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}Dearie me... 
+                           {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}You have no\nmoney, silly! */
                         i_this->mMsgFlow.init(actor, 0x332, 0, NULL);
                     }
                 } else {
-                    i_this->mMsgFlow.init(actor, 0x331, 0, NULL);
+                    i_this->mMsgFlow.init(actor, 0x331, 0, NULL); // Hmm? You sure?
                 }
             }
             if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
@@ -1310,6 +1325,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
                 if (dComIfGs_getRupee() >= 100) {
+                    /* OK! Let's get fishing! */
                     i_this->mMsgFlow.init(actor, 0x330, 0, NULL);
                     dComIfGp_setItemRupeeCount(-100);
                     /* dSv_event_flag_c::F_0463 - Fishing Pond - Reserved for fishing */
@@ -1319,6 +1335,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     data_80450CA0 = 1;
                     i_this->field_0x5b6 = 1;
                 } else {
+                    /* Ooh... {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}Dearie me... 
+                       {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15}You have no\nmoney, silly! */
                     i_this->mMsgFlow.init(actor, 0x332, 0, NULL);
                 }
             }
@@ -1351,17 +1369,21 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 5) {
             if (i_this->field_0x754 == 5) {
                 if (i_this->field_0x7b5 > 25) {
+                    /* Hey, take it easy! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}There's no call\nfor that! */
                     i_this->mMsgFlow.init(actor, 0x352, 0, NULL);
+                } else if (i_this->field_0x7b5 > 5) {
+                    /* Hey, take it easy!{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} You be nice to\nPurdy! */
+                    i_this->mMsgFlow.init(actor, 0x351, 0, NULL);
                 } else {
-                    if (i_this->field_0x7b5 > 5) {
-                        i_this->mMsgFlow.init(actor, 0x351, 0, NULL);
-                    } else {
-                        i_this->mMsgFlow.init(actor, 0x350, 0, NULL);
-                    }
+                    /* Hey, take it easy! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}
+                       What're you\ndoing?! {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}You're spooking the fish! */
+                    i_this->mMsgFlow.init(actor, 0x350, 0, NULL);
                 }
+
                 i_this->field_0x7b5 = 0;
                 i_this->field_0x688 = 2;
             }
+
             if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
                 i_this->cam_mode = 101;
                 i_this->field_0x688 = 0;
@@ -1384,6 +1406,8 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         unkBool1 = TRUE;
         if (i_this->field_0x754 >= 5) {
             if (i_this->field_0x754 == 5) {
+                /* Huh?{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10} You're heading for home\nalready?
+                   {Tag - 7 bytes | Group 00 | Name: pause - frame_count = 15} That was sure quick! */
                 i_this->mMsgFlow.init(actor, 0x322, 0, NULL);
             }
             if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
@@ -1461,39 +1485,48 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     }
 
                     if (unkInt1 == 0) {
+                        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0277 | Indirection Table Offset - 0x00ef */
                         i_this->mMsgFlow.init(actor, 0x333, 0, NULL);
                     } else if (unkInt1 >= 4) {
+                        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0277 | Indirection Table Offset - 0x00f9 */
                         i_this->mMsgFlow.init(actor, 0x336, 0, NULL);
+                    } else if (dComIfGs_getEventReg(check_kind[1]) >= 10) {
+                        /* To think I'd see the day where I'd\nhave a Hylian loach to look at every\nday... */
+                        i_this->mMsgFlow.init(actor, 0x335, 0, NULL);
                     } else {
-                        if (dComIfGs_getEventReg(check_kind[1]) >= 10) {
-                            i_this->mMsgFlow.init(actor, 0x335, 0, NULL);
-                        } else {
-                            i_this->mMsgFlow.init(actor, 0x334, 0, NULL);
-                        }
+                        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0277 | Indirection Table Offset - 0x00f4 */
+                        i_this->mMsgFlow.init(actor, 0x334, 0, NULL);
                     }
                     break;
                 case 2:
                     /* dSv_event_flag_c::F_0469 - Fishing Pond - Reserved for fishing */
                     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x1d5])) {
+                        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x027b | Indirection Table Offset - 0x00ff */
                         i_this->mMsgFlow.init(actor, 0x338, 0, NULL);
                     } else {
+                        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x027a | Indirection Table Offset - 0x00fc */
                         i_this->mMsgFlow.init(actor, 0x337, 0, NULL);
                     }
                     break;
                 case 3:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x027c | Indirection Table Offset - 0x0102 */
                     i_this->mMsgFlow.init(actor, 0x339, 0, NULL);
                     break;
                 case 4:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x027e | Indirection Table Offset - 0x0107 */
                     i_this->mMsgFlow.init(actor, 0x33a, 0, NULL);
                     break;
                 case 5:
+                    /* Soooo cute, isn't she? Her name's\nPurdy! */
                     i_this->mMsgFlow.init(actor, 0x33b, 0, NULL);
                     data_80450C9D |= 0x80;
                     break;
                 case 6:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0280 | Indirection Table Offset - 0x010f */
                     i_this->mMsgFlow.init(actor, 0x33d, 0, NULL);
                     break;
                 case 7:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0281 | Indirection Table Offset - 0x0112 */
                     i_this->mMsgFlow.init(actor, 0x33e, 0, NULL);
                     break;
                 case 8: {
@@ -1501,53 +1534,68 @@ static void demo_camera_shop(npc_henna_class* i_this) {
                     if (kankyo->raincnt == 0) {
                         hour = kankyo->daytime / 15.0f;
                         if (hour < 8 || hour > 16) {
-                            i_this->mMsgFlow.init(actor, 0x371, 0, NULL);
+                            /* Aw, if you're wondering what\nthings look like outside, why don't\nyou just go out and see for\nyourself? */
+                            i_this->mMsgFlow.init(actor, 0x371, 0, NULL); 
                         } else {
+                            /* This weather feels so gooooood! */
                             i_this->mMsgFlow.init(actor, 0x346, 0, NULL);
                         }
                     } else {
+                        /* Sure is lousy weather today, huh? */
                         i_this->mMsgFlow.init(actor, 0x347, 0, NULL);
                     }
                     break;
                 }
                 case 0xb:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x028a | Indirection Table Offset - 0x01d1 */
                     i_this->mMsgFlow.init(actor, 0x35f, 0, NULL);
                     break;
                 case 0xc:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0287 | Indirection Table Offset - 0x012e */
                     i_this->mMsgFlow.init(actor, 0x344, 0, NULL);
                     break;
                 case 0xd:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0285 | Indirection Table Offset - 0x0122 */
                     i_this->mMsgFlow.init(actor, 0x342, 0, NULL);
                     break;
                 case 0xe:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0286 | Indirection Table Offset - 0x0125 */
                     i_this->mMsgFlow.init(actor, 0x343, 0, NULL);
                     break;
                 case 0xf:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0284 | Indirection Table Offset - 0x011f */
                     i_this->mMsgFlow.init(actor, 0x341, 0, NULL);
                     break;
                 case 0x10:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0283 | Indirection Table Offset - 0x011b */
                     i_this->mMsgFlow.init(actor, 0x340, 0, NULL);
                     break;
                 case 0x11:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0282 | Indirection Table Offset - 0x0115 */
                     i_this->mMsgFlow.init(actor, 0x33f, 0, NULL);
                     break;
                 case 0x12:
+                    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x027f | Indirection Table Offset - 0x010c */
                     i_this->mMsgFlow.init(actor, 0x33c, 0, NULL);
                     break;
                 case 0x13:
                     /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll
                      * goal game cleared */
                     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x335])) {
+                        /* It's the special-edition Rollgoal\ngame! */
                         i_this->mMsgFlow.init(actor, 0x366, 0, NULL);
                     } else {
                         dComIfGp_event_offHindFlag(0x80);
                         dComIfGp_setMessageCountNumber(
                             (s16)((s16)((lbl_82_bss_91 & 7) + (lbl_82_bss_91 >> 3) * 10) + 11));
                         if (lbl_82_bss_91 == 0) {
+                            /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0299 | Indirection Table Offset - 0x013e */
                             i_this->mMsgFlow.init(actor, 0x348, 0, NULL);
                         } else if (lbl_82_bss_91 == 0x3f) {
+                            /* Event Node | Event Func Idx - 0x0d | Event Func Params - 0x00000002 | Indirection Table Idx - 0x01f4 */
                             i_this->mMsgFlow.init(actor, 0x370, 0, NULL);
                         } else {
+                            /* Branch Node | Query Func Idx - 0x0012 | Query Func Param - 0x0000 | Indirection Table Offset - 0x014c */
                             i_this->mMsgFlow.init(actor, 0x34b, 0, NULL);
                         }
                     }
@@ -1594,6 +1642,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     }
     case 42: {
         if (i_this->field_0x754 == 1) {
+            /* Hey, sorry, business is business.\nYou need money to play! */
             i_this->mMsgFlow.init(actor, 0x349, 0, NULL);
         }
         if (i_this->mMsgFlow.doFlow(actor, NULL, 0) != 0) {
@@ -1604,6 +1653,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     }
     case 43: {
         if (i_this->field_0x754 == 1) {
+            /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0077 | Indirection Table Offset - 0x0142 */
             i_this->mMsgFlow.init(actor, 0x34a, 0, NULL);
             i_this->cam_mode = 42;
         }
@@ -1646,16 +1696,22 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 >= 15) {
             if (i_this->field_0x754 == 15) {
                 if (data_80450C9A == 0) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00da */
                     i_this->mMsgFlow.init(actor, 0x328, 0, NULL);
                 } else if (data_80450C9B == 2) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00dd */
                     i_this->mMsgFlow.init(actor, 0x329, 0, NULL);
                 } else if (data_80450C9B == 3) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00e0 */
                     i_this->mMsgFlow.init(actor, 0x32a, 0, NULL);
                 } else if (data_80450C9B == 4) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00e3 */
                     i_this->mMsgFlow.init(actor, 0x32b, 0, NULL);
                 } else if (data_80450C9B == 1) {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00ea */
                     i_this->mMsgFlow.init(actor, 0x32d, 0, NULL);
                 } else {
+                    /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x0078 | Indirection Table Offset - 0x00e7 */
                     i_this->mMsgFlow.init(actor, 0x32c, 0, NULL);
                 }
             }
@@ -1728,6 +1784,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         cLib_addCalc2(&i_this->field_0x7bc, 55.0f, 0.5f, 5.0f);
 
         if (i_this->field_0x754 == 0) {
+            /* Event Node | Event Func Idx - 0x0d | Event Func Params - 0x00000000 | Indirection Table Idx - 0x01ca */
             i_this->mMsgFlow.init(actor, 0x355, 0, NULL);
             anm_init(i_this, 18, -10.0f, 2, 1.0f);
             i_this->field_0x688 = 2;
@@ -1742,6 +1799,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
     case 62: {
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
+                /* If saying sorry solved everything,{Tag - 7 bytes | Group 00 | Name: pause - frame_count = 10}\nall the soldiers in Hyrule would be\nout of jobs... */
                 i_this->mMsgFlow.init(actor, 0x356, 0, NULL);
             }
 
@@ -1792,6 +1850,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 == 0x14) {
             mDoGph_gInf_c::fadeIn(0.1f, g_blackColor);
 
+            /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0296 | Indirection Table Offset - 0x0151 */
             i_this->mMsgFlow.init(actor, 0x34c, 0, NULL);
 
             i_this->cam_mode = 71;
@@ -1879,12 +1938,16 @@ static void demo_camera_shop(npc_henna_class* i_this) {
             }
             if (i_this->field_0x754 == 10) {
                 if (actor->health == 0) {
+                    /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x0153 */
                     i_this->mMsgFlow.init(actor, 0x34d, 0, NULL);
                 } else if (actor->health == 1) {
+                    /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x01e4 */
                     i_this->mMsgFlow.init(actor, 0x364, 0, NULL);
                 } else if (actor->health == 2) {
+                    /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x01d5 */
                     i_this->mMsgFlow.init(actor, 0x360, 0, NULL);
                 } else {
+                    /* Event Node | Event Func Idx - 0x0a | Event Func Params - 0x00770000 | Indirection Table Idx - 0x01e3 */
                     i_this->mMsgFlow.init(actor, 0x363, 0, NULL);
                 }
                 i_this->cam_mode = 74;
@@ -1950,23 +2013,28 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         if (i_this->field_0x754 == 10) {
              /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll goal game cleared */
             if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[0x335])) {
+                /* {Tag - 5 bytes | Group 00 | Name: instant}{Tag - 7 bytes | Group FF | Name: size - pct = 125}GOOOAAALLL!!!!{Tag - 5 bytes | Group 00 | Name: type} */
                 i_this->mMsgFlow.init(actor, 0x36f, 0, NULL);
             } else {
                 if ((lbl_82_bss_91 & 7) == 0x7) {
                     if (lbl_82_bss_91 == 0x3f) {
+                        /* {Tag - 5 bytes | Group 00 | Name: instant}{Tag - 7 bytes | Group FF | Name: size - pct = 125}GOOOAAALLL!!!!{Tag - 5 bytes | Group 00 | Name: type} */
                         i_this->mMsgFlow.init(actor, 0x365, 0, NULL);
                         /* dSv_event_flag_c::KORO2_ALLCLEAR - Fishing - After all stages (8-8) of roll goal game cleared */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x335]);
                         dComIfGp_setItemRupeeCount(1000);
                     } else if ((lbl_82_bss_91 & 0x38) == 0) {
+                        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x015e */
                         i_this->mMsgFlow.init(actor, 0x34f, 0, NULL);
                         /* dSv_event_flag_c::F_0469 - Fishing Pond - Reserved for fishing */
                         dComIfGs_onEventBit(dSv_event_flag_c::saveBitLabels[0x1d5]);
                     } else {
+                        /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x015e */
                         i_this->mMsgFlow.init(actor, 0x34f, 0, NULL);
                         dComIfGp_setItemRupeeCount(10);
                     }
                 } else {
+                    /* Event Node | Event Func Idx - 0x0b | Event Func Params - 0x00770000 | Indirection Table Idx - 0x0157 */
                     i_this->mMsgFlow.init(actor, 0x34e, 0, NULL);
                     dComIfGp_setItemRupeeCount(10);
                 }
@@ -2083,6 +2151,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         i_this->field_0x7b9 = 0;
         if (i_this->field_0x754 >= 2) {
             if (i_this->field_0x754 == 2) {
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0296 | Indirection Table Offset - 0x0151 */
                 i_this->mMsgFlow.init(actor, 0x34c, 0, NULL);
                 __memcpy(unkIntArr2, unkLimitsMs2, sizeof(unkLimitsMs2));
                 dTimer_createTimer(6, unkIntArr2[0], 1, 0, 210.0f, 410.0f, 32.0f, 419.0f);
@@ -2127,6 +2196,7 @@ static void demo_camera_shop(npc_henna_class* i_this) {
         cLib_addCalc2(&i_this->field_0x7bc, 25.0f + TREG_F(12), 0.1f, 0.2f);
         if (i_this->field_0x754 >= 1) {
             if (i_this->field_0x754 == 1) {
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0297 | Indirection Table Offset - 0x01d9 */
                 i_this->mMsgFlow.init(actor, 0x362, 0, NULL);
             }
             if (i_this->field_0x754 == 15) {
@@ -2214,21 +2284,27 @@ static void message_guide(npc_henna_class* i_this) {
                 if (i_this->field_0x7d5 != 0 &&
                     (i_this->field_0x7d6 == 0 || (i_this->field_0x5bc & 0x3) == 0))
                 {
+                    /* Aren't those little ducks so cute?\nThey're my pets! */
                     i_this->mMsgFlow.init(actor, 0x3c3, 0, NULL);
                     i_this->field_0x7d5 = 0x0;
                     i_this->field_0x7d6 = 0x1;
                 } else if (i_this->demo_timer != 0) {
                     i_this->demo_timer = 0;
+                    /* Hey! It's dripping wet! Not only is\nthat dangerous, but it'll scare all\nthe fish off, silly! */
                     i_this->mMsgFlow.init(actor, 0x3cc, 0, NULL);
                 } else if (i_this->field_0x7cc == 0) {
                     if (i_this->field_0x5bc < 4) {
+                        /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 578}Use {Tag - 5 bytes | Group 00 | Name: B} to cast! */
                         i_this->mMsgFlow.init(actor, 0x3cd, 0, NULL);
                     } else if ((i_this->field_0x5bc & 1) != 0) {
+                        /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 578}Use {Tag - 5 bytes | Group 00 | Name: B} to cast! */
                         i_this->mMsgFlow.init(actor, 0x3cd, 0, NULL);
                     } else {
+                        /* You won't be able to cast if there's\nan obstacle in the way. Don't \nforget that! */
                         i_this->mMsgFlow.init(actor, 0x3ce, 0, NULL);
                     }
                 } else {
+                    /* You won't be able to cast if there's\nan obstacle in the way. Don't \nforget that! */
                     i_this->mMsgFlow.init(actor, 0x3ce, 0, NULL);
                 }
             }

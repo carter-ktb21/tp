@@ -127,7 +127,7 @@ private:
     /* 0xD68 */ f32 field_0xd68;
     /* 0xD6C */ f32 field_0xd6c;
     /* 0xD70 */ s16 field_0xd70;
-    /* 0xD72 */ s16 mMsgNo;
+    /* 0xD72 */ s16 mMsgFlowNo;
     /* 0xD74 */ s16 mLookMode;
     /* 0xD76 */ u16 mMode;
     /* 0xD78 */ s16 field_0xd78;

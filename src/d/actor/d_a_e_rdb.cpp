@@ -1141,6 +1141,7 @@ static void demo_camera(e_rdb_class* i_this) {
         player->setPlayerPosAndAngle(&sp34, i_this->mAngleToPlayer + (u16)-0x8000, 0);
         if (i_this->field_0x10aa >= 170) {
             if (i_this->field_0x10aa == 170) {
+                /* I have come to play! */
                 i_this->mMsgFlow.init(a_this, 0x389, 0, NULL);
             }
 
@@ -1235,6 +1236,7 @@ static void demo_camera(e_rdb_class* i_this) {
 
         if (i_this->field_0x10aa >= 360) {
             if (i_this->field_0x10aa == 360) {
+                /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x01f4 */
                 i_this->mMsgFlow.init(a_this, 0x388, 0, NULL);
             }
 
@@ -1307,6 +1309,7 @@ static void demo_camera(e_rdb_class* i_this) {
 
         if (i_this->field_0x10aa >= 220) {
             if (i_this->field_0x10aa == 220) {
+                /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x01f4 */
                 i_this->mMsgFlow.init(a_this, 0x388, 0, NULL);
             }
 

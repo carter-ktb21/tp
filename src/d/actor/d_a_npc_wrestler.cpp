@@ -676,7 +676,7 @@ cPhs__Step daNpcWrestler_c::Create() {
     fopAcM_ct(this, daNpcWrestler_c);
 
     mType = getType();
-    mMsgNo = getMessageNo();
+    mMsgFlowNo = getMessageNo();
     field_0xe04 = l_anmList[mType];
 
     cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&mPhase, l_resALink);
@@ -1876,7 +1876,7 @@ bool daNpcWrestler_c::talk(void* param_1) {
 
     switch (field_0xe96) {
         case 0: {
-            initTalk(mMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             initTalkAngle();
             mMsgTimer = 0;
             field_0xe99 = 0;
@@ -2161,7 +2161,7 @@ bool daNpcWrestler_c::sumouReady(void* param_1) {
         case 0:
             field_0xe84 = 0;
             if (mType == 0) {
-                mMsgNo = 7;
+                mMsgFlowNo = 7;
             }
 
             daPy_getPlayerActorClass()->offPlayerNoDraw();
@@ -2252,7 +2252,7 @@ bool daNpcWrestler_c::sumouReady(void* param_1) {
 
                 case 4:
                     if (field_0xe80++ > field_0xbd8->ready_appearance_time) {
-                        dMeter2Info_setMeterString(0x515);
+                        dMeter2Info_setMeterString(0x515); // READY?
                         Z2GetAudioMgr()->seStart(Z2SE_SY_SUMO_READY, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
                         field_0xe80 = 0;
                         field_0xe84++;
@@ -2261,7 +2261,7 @@ bool daNpcWrestler_c::sumouReady(void* param_1) {
 
                 case 5:
                     if (field_0xe80++ > field_0xbd8->fight_appearance_time) {
-                        dMeter2Info_setMeterString(0x516);
+                        dMeter2Info_setMeterString(0x516); // FIGHT!
                         Z2GetAudioMgr()->seStart(Z2SE_SY_SUMO_START, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
                         Z2GetAudioMgr()->changeSubBgmStatus(1);
                         dComIfGp_setDoStatus(21, 0);
@@ -4554,7 +4554,7 @@ bool daNpcWrestler_c::demoTalkAfterLose(void* param_1) {
     bool retval = false;
     switch (field_0xe96) {
         case 0:
-            initTalk(mMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             field_0xe99 = 0;
             field_0xe84 = 0;
@@ -4588,7 +4588,7 @@ bool daNpcWrestler_c::demoTalkAfterLose(void* param_1) {
                 case 1:
                     if (mAnm_p->isStop()) {
                         setLookMode(3);
-                        initTalk(mMsgNo, NULL);
+                        initTalk(mMsgFlowNo, NULL);
                         field_0xe84++;
                     }
                     break;
@@ -4656,7 +4656,7 @@ BOOL daNpcWrestler_c::EvCut_grDSEntry(int i_cutIndex) {
             case '0006':
             case '0008':
             case '0009':
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 mMsgTimer = 0;
                 initTalkAngle();
                 break;
@@ -4665,7 +4665,7 @@ BOOL daNpcWrestler_c::EvCut_grDSEntry(int i_cutIndex) {
                 setMotionAnm(62, 0.0f);
                 // fallthrough
             case '0004':
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 mMsgTimer = 0;
                 break;
 
@@ -4801,7 +4801,7 @@ BOOL daNpcWrestler_c::EvCut_grDSEntry3_4(int i_cutIndex) {
             case '0001':
                 setLookMode(3);
                 mActorMngr[0].entry(daPy_getPlayerActorClass());
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 initTalkAngle();
                 mMsgTimer = 0;
                 break;
@@ -4861,7 +4861,7 @@ BOOL daNpcWrestler_c::EvCut_grDSEntry5(int i_cutIndex) {
             case '0002':
                 setLookMode(3);
                 mActorMngr[0].entry(daPy_getPlayerActorClass());
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 initTalkAngle();
                 mMsgTimer = 0;
                 break;
@@ -4935,7 +4935,7 @@ BOOL daNpcWrestler_c::EvCut_grDSLose(int i_cutIndex) {
 
             case '0003':
             case '0004':
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 initTalkAngle();
                 mMsgTimer = 0;
                 break;

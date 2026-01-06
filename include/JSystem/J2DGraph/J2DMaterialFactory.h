@@ -9,33 +9,33 @@
  * 
  */
 struct J2DMaterialBlock {
-    u32 field_0x0;
-    u32 field_0x4;
-    u16 field_0x8;
-    u16 field_0xa;
-    u32 field_0xc;
-    u32 field_0x10;
-    u32 field_0x14;
-    u32 field_0x18;
-    u32 field_0x1c;
-    u32 field_0x20;
-    u32 field_0x24;
-    u32 field_0x28;
-    u32 field_0x2c;
-    u32 field_0x30;
-    u32 field_0x34;
-    u32 field_0x38;
-    u32 field_0x3c;
-    u32 field_0x40;
-    u32 field_0x44;
-    u32 field_0x48;
-    u32 field_0x4c;
-    u32 field_0x50;
-    u32 field_0x54;
-    u32 field_0x58;
-    u32 field_0x5c;
-    u32 field_0x60;
-    u32 field_0x64;
+    /* 0x00 */ u32 magic;
+    /* 0x04 */ u32 mat1_section_size;
+    /* 0x08 */ u16 material_num;
+    /* 0x0A */ u16 padding;
+    /* 0x0C */ u32 mat_init_data_offset;
+    /* 0x10 */ u32 mat_init_data_indexes_offset;
+    /* 0x14 */ u32 offset_3;
+    /* 0x18 */ u32 ind_init_data_offset;
+    /* 0x1C */ u32 cull_mode_offset;
+    /* 0x20 */ u32 mat_color_offset;
+    /* 0x24 */ u32 color_chan_num_offset;
+    /* 0x28 */ u32 color_chan_info_offset;
+    /* 0x2C */ u32 tex_gen_num_offset;
+    /* 0x30 */ u32 tex_coord_info_offset;
+    /* 0x34 */ u32 tex_mtx_info_offset;
+    /* 0x38 */ u32 tex_no_offset;
+    /* 0x3C */ u32 font_no_offset;
+    /* 0x40 */ u32 tev_order_info_offset;
+    /* 0x44 */ u32 tev_color_offset;
+    /* 0x48 */ u32 tev_k_color_offset;
+    /* 0x4C */ u32 tev_stage_num_offset;
+    /* 0x50 */ u32 tev_stage_info_offset;
+    /* 0x54 */ u32 tev_swap_mode_info_offset;
+    /* 0x58 */ u32 tev_mode_swap_tbl_info_offset;
+    /* 0x5C */ u32 alpha_comp_info_offset;
+    /* 0x60 */ u32 blend_info_offset;
+    /* 0x64 */ u32 dither_offset;
 };
 
 typedef struct _GXColor GXColor;
@@ -51,12 +51,12 @@ class J2DMaterial;
  */
 struct J2DIndInitData {
     u8 field_0x0;
-    u8 field_0x1;
+    u8 tex_stage_num;
     u8 field_0x2[2];
-    J2DIndTexOrderInfo field_0x4[4];
-    J2DIndTexMtxInfo field_0xc[3];
-    J2DIndTexCoordScaleInfo field_0x60[4];
-    J2DIndTevStageInfo field_0x68[4];
+    J2DIndTexOrderInfo tex_order_info[4];
+    J2DIndTexMtxInfo tex_mtx_info[3];
+    J2DIndTexCoordScaleInfo tex_coord_scale_info[4];
+    J2DIndTevStageInfo tev_stage_info[4];
     u8 field_0xac[0x90];
 };
 
@@ -65,30 +65,30 @@ struct J2DIndInitData {
  * 
  */
 struct J2DMaterialInitData {
-    u8 field_0x0;
-    u8 field_0x1;
-    u8 field_0x2;
-    u8 field_0x3;
-    u8 field_0x4;
-    u8 field_0x5;
-    u8 field_0x6;
+    u8 mat_mode;
+    u8 cull_mode_idx;
+    u8 color_chan_num_idx;
+    u8 tex_gen_num_idx;
+    u8 tev_stage_num_idx;
+    u8 dither_idx;
+    u8 mat_alpha_calc;
     u8 field_0x7;
-    u16 field_0x8[2];
-    u16 field_0xc[4];
-    u16 field_0x14[8];
-    u16 field_0x24[0xa];
-    u16 field_0x38[8];
-    u16 field_0x48;
-    u16 field_0x4a[4];
-    u8 field_0x52[0x10];
-    u8 field_0x62[0x10];
-    u16 field_0x72[0x10];
-    u16 field_0x92[0x4];
-    u16 field_0x9a[0x10];
-    u16 field_0xba[0x10];
-    u16 field_0xda[0x4];
-    u16 field_0xe2;
-    u16 field_0xe4;
+    u16 mat_color_idx_tbl[2];
+    u16 color_chan_info_idx_tbl[4];
+    u16 tex_coord_info_idx_tbl[8];
+    u16 tex_mtx_info_idx_tbl[0xa];
+    u16 tex_no_idx_tbl[8];
+    u16 font_no_idx;
+    u16 tev_k_color_idx_tbl[4];
+    u8 tev_k_color_sel[0x10];
+    u8 tev_k_alpha_sel[0x10];
+    u16 tev_order_info_idx_tbl[0x10];
+    u16 tev_color_idx_tbl[0x4];
+    u16 tev_stage_info_idx_tbl[0x10];
+    u16 tev_swap_mode_info_idx_tbl[0x10];
+    u16 tev_swap_mode_tbl_info_idx_tbl[0x4];
+    u16 alpha_comp_info_idx;
+    u16 blend_info_idx;
     u16 field_0xe6;
 };
 struct J2DTevStageInfo;
@@ -134,38 +134,38 @@ public:
     u8 newDither(int) const;
 
     u32 getMaterialMode(int idx) const {
-        return field_0x4[field_0x8[idx]].field_0x0;
+        return mMatInitData[mMatInitDataIndexes[idx]].mat_mode;
     }
 
     u8 getMaterialAlphaCalc(int idx) const {
-        return field_0x4[field_0x8[idx]].field_0x6;
+        return mMatInitData[mMatInitDataIndexes[idx]].mat_alpha_calc;
     }
 
 private:
-    /* 0x00 */ u16 field_0x0;
+    /* 0x00 */ u16 mMaterialNum;
     /* 0x02 */ u16 field_0x2;
-    /* 0x04 */ J2DMaterialInitData* field_0x4;
-    /* 0x08 */ u16* field_0x8;
-    /* 0x0C */ J2DIndInitData* field_0xc;
-    /* 0x10 */ GXColor* field_0x10;
-    /* 0x14 */ u8* field_0x14;
-    /* 0x18 */ J2DColorChanInfo* field_0x18;
-    /* 0x1C */ u8* field_0x1c;
-    /* 0x20 */ J2DTexCoordInfo* field_0x20;
-    /* 0x24 */ J2DTexMtxInfo* field_0x24;
-    /* 0x28 */ u16* field_0x28;
-    /* 0x2C */ u16* field_0x2c;
-    /* 0x30 */ _GXCullMode* field_0x30;
-    /* 0x34 */ J2DTevOrderInfo* field_0x34;
-    /* 0x38 */ _GXColorS10* field_0x38;
-    /* 0x3C */ GXColor* field_0x3c;
-    /* 0x40 */ u8* field_0x40;
-    /* 0x44 */ J2DTevStageInfo* field_0x44;
-    /* 0x48 */ J2DTevSwapModeInfo* field_0x48;
-    /* 0x4C */ J2DTevSwapModeTableInfo* field_0x4c;
-    /* 0x50 */ J2DAlphaCompInfo* field_0x50;
-    /* 0x54 */ J2DBlendInfo* field_0x54;
-    /* 0x58 */ u8* field_0x58;
+    /* 0x04 */ J2DMaterialInitData* mMatInitData;
+    /* 0x08 */ u16* mMatInitDataIndexes;
+    /* 0x0C */ J2DIndInitData* mIndInitData;
+    /* 0x10 */ GXColor* mMatColor;
+    /* 0x14 */ u8* mColorChanNum;
+    /* 0x18 */ J2DColorChanInfo* mColorChanInfo;
+    /* 0x1C */ u8* mTexGenNum;
+    /* 0x20 */ J2DTexCoordInfo* mTexCoordInfo;
+    /* 0x24 */ J2DTexMtxInfo* mTexMtxInfo;
+    /* 0x28 */ u16* mTexNo;
+    /* 0x2C */ u16* mFontNo;
+    /* 0x30 */ _GXCullMode* mCullMode;
+    /* 0x34 */ J2DTevOrderInfo* mTevOrderInfo;
+    /* 0x38 */ _GXColorS10* mTevColor;
+    /* 0x3C */ GXColor* mTevKColor;
+    /* 0x40 */ u8* mTevStageNum;
+    /* 0x44 */ J2DTevStageInfo* mTevStageInfo;
+    /* 0x48 */ J2DTevSwapModeInfo* mTevSwapModeInfo;
+    /* 0x4C */ J2DTevSwapModeTableInfo* mTevSwapModeTableInfo;
+    /* 0x50 */ J2DAlphaCompInfo* mAlphaCompInfo;
+    /* 0x54 */ J2DBlendInfo* mBlendInfo;
+    /* 0x58 */ u8* mDither;
 };
 
 #endif /* J2DMATERIALFACTORY_H */

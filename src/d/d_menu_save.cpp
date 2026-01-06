@@ -171,8 +171,8 @@ void dMenu_save_c::screenSet() {
     static u64 l_tagName20[2] = {'er_for0', 'er_for1'};
 #endif
     static u64 l_tagName13[3] = {'w_dat_i0', 'w_dat_i1', 'w_dat_i2'};
-    static u8 l_msgNum0[2] = {0x08, 0x07};
-    static u8 l_msgNum[2] = {0x54, 0x55};
+    static u8 l_msgNum0[2] = {0x08 /* No */, 0x07 /* Yes */};
+    static u8 l_msgNum[2] = {0x54 /* Back */, 0x55 /* Confirm */};
 
     mSaveSel.Scr = new J2DScreen();
     mSaveSel.Scr->setPriority("zelda_file_select2.blo", 0x1100000, mpArchive);
@@ -1997,7 +1997,7 @@ void dMenu_save_c::yesNoCursorMoveAnm() {
 void dMenu_save_c::yesnoCancelAnmSet() {
     mDoAud_seStart(Z2SE_SY_CURSOR_CANCEL, NULL, 0, 0);
     mSelIcon->setAlphaRate(0.0f);
-    headerTxtSet(0x4CA);
+    headerTxtSet(0x4CA); // Save to which log?
     selectDataMoveAnmInitSet(SelOpenEndFrameTbl[mSelectedFile],
                              SelOpenStartFrameTbl[mSelectedFile]);
     yesnoMenuMoveAnmInitSet(2099, 2089, 0);
@@ -2050,12 +2050,12 @@ bool dMenu_save_c::headerTxtChangeAnm() {
     return changed;
 }
 
-void dMenu_save_c::errDispInitSet(int param_0) {
-    headerTxtSet(1);
+void dMenu_save_c::errDispInitSet(int msgID) {
+    headerTxtSet(1); // Checking Memory Card in Slot A...
     mpErrTxtPane[mErrTxtType]->setAlpha(255);
     mpErrTxtPane[mErrTxtType ^ 1]->setAlpha(0);
 
-    mSaveSel.mMsgString->getString(param_0, (J2DTextBox*)mpErrTxtPane[mErrTxtType]->getPanePtr(),
+    mSaveSel.mMsgString->getString(msgID, (J2DTextBox*)mpErrTxtPane[mErrTxtType]->getPanePtr(),
                                    NULL, mSaveSel.font[0], NULL, 0);
 
     if (field_0xd2 != 0 || field_0xd3 != 0) {

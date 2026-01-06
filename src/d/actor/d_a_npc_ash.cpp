@@ -584,6 +584,7 @@ void daNpcAsh_c::reset() {
     mExpressionMorfOverride = 0;
     mMotionMorfOverride = 0;
 
+    /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0107 | Indirection Table Offset - 0x0092 */
     if (mFlowID == 0x42d) {
         field_0xf5f = 0;
     } else {
@@ -903,6 +904,7 @@ bool daNpcAsh_c::talk(void* param_0) {
         initTalk(mFlowID, NULL);
         mTurnMode = 0;
         mMsgTimer = 0;
+        /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0107 | Indirection Table Offset - 0x0092 */
         if (mFlowID == 0x42d) {
             field_0xf5f++;
         }
@@ -925,17 +927,13 @@ bool daNpcAsh_c::talk(void* param_0) {
                 if (ctrlMsgAnm(expression, motion, this, 0)) {
                     setExpression(expression, -1.0f);
                     setMotion(motion, -1.0f, false);
-                } else {
-                    if (prev_msg_timer != 0 && mMsgTimer == 0) {
-                        setExpressionTalkAfter();
-                    }
+                } else if (prev_msg_timer != 0 && mMsgTimer == 0) {
+                    setExpressionTalkAfter();
                 }
             }
-        } else {
-            if (step(fopAcM_searchPlayerAngleY(this), true)) {
-                setMotion(MOT_WAIT_A, -1.0f, false);
-                mTurnMode = 0;
-            }
+        } else if (step(fopAcM_searchPlayerAngleY(this), true)) {
+            setMotion(MOT_WAIT_A, -1.0f, false);
+            mTurnMode = 0;
         }
         break;
 

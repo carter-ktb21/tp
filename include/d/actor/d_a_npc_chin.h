@@ -195,7 +195,7 @@ public:
     /* 0xDF4 */ fpc_ProcID field_0xdf4;
     /* 0xDF8 */ int field_0xdf8;
     /* 0xDFC */ int field_0xdfc;
-    /* 0xE00 */ s16 field_0xe00;
+    /* 0xE00 */ s16 mMsgFlowNo;
     /* 0xE02 */ s16 mLookMode;
     /* 0xE04 */ s16 mActionMode;
     /* 0xE06 */ u8 field_0xe06;

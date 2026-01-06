@@ -435,9 +435,9 @@ cPhs__Step daNpc_Grz_c::create() {
     mSwNo = fopAcM_GetParam(this) >> 16;
 
     if (home.angle.x != 0xFFFF) {
-        mMsgNo = home.angle.x;
+        mMsgFlowNo = home.angle.x;
     } else {
-        mMsgNo = -1;
+        mMsgFlowNo = -1;
     }
 
     if (isDelete()) {
@@ -1265,7 +1265,7 @@ void daNpc_Grz_c::reset() {
 
     if (mType == TYPE_LIEDOWN) {
         field_0x1a84 = 2;
-        mMsgNo = 208;
+        mMsgFlowNo = 208;
         mColor.r = daNpc_Grz_Param_c::m.color_r;
         mColor.g = daNpc_Grz_Param_c::m.color_g;
         mColor.b = daNpc_Grz_Param_c::m.color_b;
@@ -1889,7 +1889,7 @@ int daNpc_Grz_c::talk(void* param_1) {
                 break;
             }
 
-            initTalk(mMsgNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mTurnMode = 0;
             mMode = 2;
             // fallthrough
@@ -2057,7 +2057,7 @@ int daNpc_Grz_c::doTalkStandCut(int i_staffId) {
                 break;
 
             case 20:
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
         }
     }
@@ -2264,7 +2264,7 @@ int daNpc_Grz_c::doStoneSmashCut(int i_staffId) {
                 break;
             
             case 50:
-                initTalk(mMsgNo, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
 
             case 60:

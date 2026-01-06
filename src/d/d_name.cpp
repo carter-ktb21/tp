@@ -1322,10 +1322,10 @@ void dName_c::screenSet() {
         'm_eigo_0', 'm_eigo_1', 'm_eigo_2', 'p_end_0', 'p_end_1', 'p_end_2',
     };
     static u32 l_menu_msg[4] = {
-        0x38B,
-        0x38C,
-        0x388,
-        0x38E,
+        0x38B, // ABC
+        0x38C, // abc
+        0x388, // English
+        0x38E, // END
     };
 #endif
     static u64 l_tagName[65] = {

@@ -2313,7 +2313,7 @@ dMenu_Fmap2DTop_c::dMenu_Fmap2DTop_c(JKRExpHeap* i_heap, STControl* i_stick) {
         mpTitleScreen->search(sfont_name[i])->hide();
 #endif
     }
-    setTitleNameString(0x3e0);
+    setTitleNameString(0x3e0); // Field Map
 
     static const u64 cont_zt[5] = {'cont_zt', 'cont_zt1', 'cont_zt2', 'cont_zt3', 'cont_zt4'};
     static const u64 font_zt[5] = {'font_zt1', 'font_zt2', 'font_zt3', 'font_zt4', 'font_zt5'};
@@ -2351,7 +2351,7 @@ dMenu_Fmap2DTop_c::dMenu_Fmap2DTop_c(JKRExpHeap* i_heap, STControl* i_stick) {
         mpTitleScreen->search(cont_bt[i])->hide();
 #endif
     }
-    setBButtonString(0x522, 0xff);
+    setBButtonString(0x522, 0xff); // Zoom out
 
     static const u64 cont_at[5] = {'cont_at', 'cont_at1', 'cont_at2', 'cont_at3', 'cont_at4'};
     static const u64 font_at[5] = {'font_at1', 'font_at2', 'font_at3', 'font_at4', 'font_at5'};

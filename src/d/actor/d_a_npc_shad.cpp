@@ -400,15 +400,15 @@ cPhs__Step daNpcShad_c::Create() {
         bVar1 = true;
     }
 
-    s16 sVar1;
+    s16 msgFlowNo;
     if (bVar1) {
-        sVar1 = 0x42;
+        msgFlowNo = 0x42;
     } else {
-        sVar1 = getMessageNo();
+        msgFlowNo = getMessageNo();
     }
 
-    field_0xe14 = sVar1;
-    field_0xe16 = field_0xe14;
+    mMsgFlowNo = msgFlowNo;
+    mInitialMsgFlowNo = mMsgFlowNo;
 
     cPhs__Step phase = cPhs_ERROR_e;
     for (int i = 0; l_loadRes_list[mMode][i] >= 0; i++) {
@@ -1282,7 +1282,7 @@ bool daNpcShad_c::wait_type1(void* param_1) {
                 daTag_EvtArea_c* tag = (daTag_EvtArea_c*)mActorMngr[4].getActorP();
                 if (tag != NULL) {
                     if (tag->chkPointInArea(*fopAcM_GetPosition_p(daPy_getPlayerActorClass()))) {
-                        field_0xe14 = 67;
+                        mMsgFlowNo = 67;
                         daNpcF_offTmpBit(0xB);
                         daNpcF_offTmpBit(0xC);
                         daNpcF_offTmpBit(0xD);
@@ -1336,7 +1336,7 @@ bool daNpcShad_c::wait_type1(void* param_1) {
 
                         u8 sVar1 = dComIfGp_event_getPreItemNo();
                         if (sVar1 == 0xE9) {
-                            field_0xe14 = 64;
+                            mMsgFlowNo = 64;
                             daNpcF_offTmpBit(0xB);
                             daNpcF_offTmpBit(0xC);
                             daNpcF_offTmpBit(0xD);
@@ -1344,7 +1344,7 @@ bool daNpcShad_c::wait_type1(void* param_1) {
                             mOrderEvtNo = 3;
                             changeEvent(l_evtArcs[mOrderEvtNo], l_evtNames[mOrderEvtNo], 1, 0xFFFF);
                         } else if (sVar1 == 0xEB) {
-                            field_0xe14 = 65;
+                            mMsgFlowNo = 65;
                             daNpcF_offTmpBit(0xB);
                             daNpcF_offTmpBit(0xC);
                             daNpcF_offTmpBit(0xD);
@@ -1356,7 +1356,7 @@ bool daNpcShad_c::wait_type1(void* param_1) {
                             fopAcM_orderChangeEventId(this, eventIdx, 1, 0xFFFF);
                         }
                     } else if (daNpcF_chkEvtBit(0x313)) {
-                        field_0xe14 = 68;
+                        mMsgFlowNo = 68;
                         daNpcF_offTmpBit(0xB);
                         mOrderEvtNo = 8;
                         changeEvent(l_evtArcs[mOrderEvtNo], l_evtNames[mOrderEvtNo], 1, 0xFFFF);
@@ -1472,7 +1472,7 @@ bool daNpcShad_c::talk(void* param_1) {
 
     switch (field_0xe1a) {
         case 0:
-            initTalk(field_0xe14, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mTurnMode = 0;
             mMsgTimer = 0;
             speedF = 0.0f;
@@ -1520,7 +1520,7 @@ bool daNpcShad_c::talk(void* param_1) {
 
         case 3:
             field_0xe1f = 1;
-            field_0xe14 = field_0xe16;
+            mMsgFlowNo = mInitialMsgFlowNo;
             setExpression(EXPR_NONE, -1.0f);
 
             if (!field_0x9ec) {
@@ -1710,11 +1710,11 @@ BOOL daNpcShad_c::EvCut_ToChantSpell1(int i_cutIndex) {
             case '0001':
             case '0002':
                 setLookMode(LOOK_NONE, NULL, NULL);
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
 
             case '0005':
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 setExpression(EXPR_H_DISCOURAGED, -1.0f);
                 setMotion(MOT_DISCOURAGED_WAIT, -1.0f, FALSE);
                 break;
@@ -1733,7 +1733,7 @@ BOOL daNpcShad_c::EvCut_ToChantSpell1(int i_cutIndex) {
                 break;
 
             case '0008':
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 Z2GetAudioMgr()->subBgmStart(Z2BGM_ITEM_GET);
                 break;
 
@@ -1741,7 +1741,7 @@ BOOL daNpcShad_c::EvCut_ToChantSpell1(int i_cutIndex) {
                 setAngle(home.angle.y - 0x2000);
                 // fallthrough
             case '0010':
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
 
             default:
@@ -1866,14 +1866,14 @@ BOOL daNpcShad_c::EvCut_ToChantSpell2(int i_cutIndex) {
                 setLookMode(LOOK_NONE, NULL, NULL);
                 // falllthrough
             case '0005':
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 setExpression(EXPR_NONE, -1.0f);
                 setMotion(MOT_WAIT_A, -1.0f, FALSE);
                 break;
 
             case '0006':
                 Z2GetAudioMgr()->unMuteSceneBgm(70);
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 setExpression(EXPR_NONE, -1.0f);
                 setMotion(MOT_WAIT_A, -1.0f, FALSE);
                 break;
@@ -1888,7 +1888,7 @@ BOOL daNpcShad_c::EvCut_ToChantSpell2(int i_cutIndex) {
                     current.pos = home.pos;
                     old.pos = current.pos;
                     speedF = 0.0f;
-                    field_0xe14 = 0x42;
+                    mMsgFlowNo = 0x42;
                     setExpression(EXPR_H_DISCOURAGED, -1.0f);
                     setMotion(MOT_DISCOURAGED_WAIT, -1.0f, FALSE);
                 }
@@ -1896,7 +1896,7 @@ BOOL daNpcShad_c::EvCut_ToChantSpell2(int i_cutIndex) {
 
             case '0009':
                 setAngle(home.angle.y - 0x2000);
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
 
             case '0010':
@@ -1917,7 +1917,7 @@ BOOL daNpcShad_c::EvCut_ToChantSpell2(int i_cutIndex) {
         Z2GetAudioMgr()->unMuteSceneBgm(70);
         daNpcF_clearMessageTmpBit();
         daNpcF_onEvtBit(0x12F);
-        field_0xe14 = 0x42;
+        mMsgFlowNo = 0x42;
         mOrderEvtNo = 5;
         dMsgObject_onKillMessageFlag();
         changeEvent(l_evtArcs[mOrderEvtNo], l_evtNames[mOrderEvtNo], 1, 0xFFFF);
@@ -2088,7 +2088,7 @@ BOOL daNpcShad_c::EvCut_DiscoveryCannon(int i_cutIndex) {
                 // fallthrough
             case '0002':
                 dComIfGs_onSaveSwitch(79);
-                initTalk(field_0xe14, NULL);
+                initTalk(mMsgFlowNo, NULL);
                 break;
 
             default:
@@ -2408,7 +2408,7 @@ BOOL daNpcShad_c::EvCut_WiretapSponsor(int i_cutIndex) {
         switch (*cutName) {
             case '0001':
                 dComIfGp_setMesgCameraInfoActor(actors[0], actors[1], actors[2], actors[3], NULL, NULL, NULL, NULL, NULL, NULL);
-                initTalk(field_0xe14, (fopAc_ac_c**)&actors[0]);
+                initTalk(mMsgFlowNo, (fopAc_ac_c**)&actors[0]);
                 break;
 
             default:

@@ -136,7 +136,7 @@ private:
     /* 0xDD8 */ u32 field_0xdd8;
     /* 0xDDC */ u32 field_0xddc;
     /* 0xDE0 */ s16 mFlowID;
-    /* 0xDE2 */ s16 field_de2;
+    /* 0xDE2 */ s16 mInitialFlowID;
     /* 0xDE4 */ s16 mLookMode;
     /* 0xDE6 */ u16 mMode;
     /* 0xDE8 */ bool field_0xde8;

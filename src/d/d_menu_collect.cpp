@@ -275,6 +275,7 @@ void dMenu_Collect2D_c::screenSet() {
 #else
     static_cast<J2DTextBox*>(mpScreen->search('f_t00'))->setFont(mDoExt_getRubyFont());
     static_cast<J2DTextBox*>(mpScreen->search('f_t00'))->setString(0x20, "");
+    // Collection
     dMeter2Info_getStringKanji(
         0x3E1, static_cast<J2DTextBox*>(mpScreen->search('f_t00'))->getStringPtr(), NULL);
     mpScreen->search('t_t00')->hide();
@@ -297,8 +298,10 @@ void dMenu_Collect2D_c::screenSet() {
         static_cast<J2DTextBox*>(mpScreen->search(ftext_op[i]))->setFont(mDoExt_getMesgFont());
         static_cast<J2DTextBox*>(mpScreen->search(ftext_sv[i]))->setString(0x20, "");
         static_cast<J2DTextBox*>(mpScreen->search(ftext_op[i]))->setString(0x20, "");
+        // Save
         dMeter2Info_getStringKanji(
             0x60, static_cast<J2DTextBox*>(mpScreen->search(ftext_sv[i]))->getStringPtr(), NULL);
+        // Options
         dMeter2Info_getStringKanji(
             0x5F, static_cast<J2DTextBox*>(mpScreen->search(ftext_op[i]))->getStringPtr(), NULL);
         mpScreen->search(text_sv[i])->hide();
@@ -467,31 +470,31 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x184[1][0] = 0;
     field_0x184[2][0] = 0;
     if (dComIfGs_isItemFirstBit(0x28)) {
-        field_0x184[3][0] = 0x18d;
+        field_0x184[3][0] = 0x18d; // Ordon Sword
     } else {
-        field_0x184[3][0] = 0x1a4;
+        field_0x184[3][0] = 0x1a4; // Wooden Sword
     }
     if (dComIfGs_isItemFirstBit(0x49)) {
-        field_0x184[4][0] = 0x1ae;
+        field_0x184[4][0] = 0x1ae; // Master Sword
     } else {
-        field_0x184[4][0] = 0x18e;
+        field_0x184[4][0] = 0x18e; // Master Sword
     }
-    field_0x184[5][0] = 0x186;
+    field_0x184[5][0] = 0x186; // Pieces of Heart
     if (field_0x22d[6][0] == 2) {
         if (dMenu_Collect3D_c::getMirrorNum() >= 4) {
-            field_0x184[6][0] = 0x20c;
+            field_0x184[6][0] = 0x20c; // Mirror Shards
         } else {
             if (dMenu_Collect3D_c::getMirrorNum() >= 2) {
-                field_0x184[6][0] = 0x20b;
+                field_0x184[6][0] = 0x20b; // Mirror Shards
             } else {
-                field_0x184[6][0] = 0x20a;
+                field_0x184[6][0] = 0x20a; // Mirror Shards
             }
         }
     } else {
         if (dMenu_Collect3D_c::getCrystalNum() <= 1) {
-            field_0x184[6][0] = 0x5aa;
+            field_0x184[6][0] = 0x5aa; // Fused Shadows
         } else {
-            field_0x184[6][0] = 0x5ab;
+            field_0x184[6][0] = 0x5ab; // Fused Shadows
         }
     }
     field_0x184[0][1] = 0;
@@ -502,44 +505,44 @@ void dMenu_Collect2D_c::screenSet() {
     } else {
         field_0x184[3][1] = 0x18f;
     }
-    field_0x184[4][1] = 0x191;
-    field_0x184[5][1] = 0x192;
+    field_0x184[4][1] = 0x191; // Hylian Shield
+    field_0x184[5][1] = 0x192; // Ooccoo's Note
     field_0x184[6][1] = 0;
     field_0x184[0][2] = 0;
     field_0x184[1][2] = 0;
     field_0x184[2][2] = 0;
-    field_0x184[3][2] = 0x194;
-    field_0x184[4][2] = 0x196;
-    field_0x184[5][2] = 0x195;
+    field_0x184[3][2] = 0x194; // Hero's Clothes
+    field_0x184[4][2] = 0x196; // Zora Armor
+    field_0x184[5][2] = 0x195; // Magic Armor
     field_0x184[6][2] = 0;
     if (dComIfGs_getRupeeMax() == WALLET_MAX) {
-        field_0x184[0][3] = 0x199;
+        field_0x184[0][3] = 0x199; // Wallet
     } else if (dComIfGs_getRupeeMax() == BIG_WALLET_MAX) {
-        field_0x184[0][3] = 0x19a;
+        field_0x184[0][3] = 0x19a; // Big Wallet
     } else {
-        field_0x184[0][3] = 0x19b;
+        field_0x184[0][3] = 0x19b; // Giant Wallet
     }
     if (dComIfGs_getArrowMax() == QUIVER_MAX) {
-        field_0x184[1][3] = 0x1b9;
+        field_0x184[1][3] = 0x1b9; // Quiver
     } else if (dComIfGs_getArrowMax() == BIG_QUIVER_MAX) {
-        field_0x184[1][3] = 0x1ba;
+        field_0x184[1][3] = 0x1ba; // Big Quiver
     } else {
-        field_0x184[1][3] = 0x1bb;
+        field_0x184[1][3] = 0x1bb; // Big Quiver
     }
-    field_0x184[2][3] = 0x5b8;
-    field_0x184[3][3] = 0x5b0;
+    field_0x184[2][3] = 0x5b8; // Golden Bugs
+    field_0x184[3][3] = 0x5b0; // Hidden Skills
     field_0x184[4][3] = 0;
     field_0x184[5][3] = 0;
     field_0x184[6][3] = 0;
     field_0x184[0][4] = dMsgObject_getSmellTypeMessageID();
-    field_0x184[1][4] = 0x245;
-    field_0x184[2][4] = 0x5a1;
-    field_0x184[3][4] = 0x4c8;
+    field_0x184[1][4] = 0x245; // Poe Souls
+    field_0x184[2][4] = 0x5a1; // Fish Journal
+    field_0x184[3][4] = 0x4c8; // Letters
     field_0x184[4][4] = 0;
     field_0x184[5][4] = 0;
     field_0x184[6][4] = 0;
-    field_0x184[0][5] = 0x60;
-    field_0x184[1][5] = 0x5f;
+    field_0x184[0][5] = 0x60; // Save
+    field_0x184[1][5] = 0x5f; // Options
     field_0x184[2][5] = 0;
     field_0x184[3][5] = 0;
     field_0x184[4][5] = 0;
@@ -548,43 +551,62 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x1d8[0][0] = 0;
     field_0x1d8[1][0] = 0;
     field_0x1d8[2][0] = 0;
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 3172}
+       {Tag - 5 bytes | Group 00 | Name: link}'s beloved wooden\nsword.\nJust use  {Tag - 5 bytes | Group 00 | Name: B} to swing it.\n */
     field_0x1d8[3][0] = field_0x184[3][0] + 0x100;
+
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 3150}
+       The blade of evil's bane. Those\nwith evil hearts cannot touch it.\nSwing with  {Tag - 5 bytes | Group 00 | Name: B} 
+       and sheathe with  {Tag - 5 bytes | Group 00 | Name: A}. */
     field_0x1d8[4][0] = field_0x184[4][0] + 0x100;
+
+    /* Five pieces will make a full Heart\nContainer. More containers mean\nmore life. */
     field_0x1d8[5][0] = field_0x184[5][0] + 0x100;
     if (field_0x22d[6][0] == 2) {
         if (dMenu_Collect3D_c::getMirrorNum() >= 4) {
-            field_0x1d8[6][0] = 0x30c;
+            field_0x1d8[6][0] = 0x30c; // The mirror connecting light and\nshadow. The light emerging from it\nopens the way to the Twilight Realm.
         } else {
             if (dMenu_Collect3D_c::getMirrorNum() >= 2) {
-                field_0x1d8[6][0] = 0x30b;
+                field_0x1d8[6][0] = 0x30b; // Part of the Mirror of Twilight,\nwhich connects light and shadow.\nCollect all the parts to complete it.
             } else {
-                field_0x1d8[6][0] = 0x30a;
+                field_0x1d8[6][0] = 0x30a; // Part of the Mirror of Twilight,\nwhich connects light and shadow.\nCollect all the parts to complete it.
             }
         }
     } else {
         if (dMenu_Collect3D_c::getCrystalNum() <= 1) {
-            field_0x1d8[6][0] = 0x5ac;
+            field_0x1d8[6][0] = 0x5ac; // Items said to possess dangerous\npowers. The light spirits know where\nthe three hidden in Hyrule lie.
         } else {
-            field_0x1d8[6][0] = 0x5ad;
+            field_0x1d8[6][0] = 0x5ad; // Items said to possess dangerous\npowers. The light spirits know where\nthe three hidden in Hyrule lie.
         }
     }
     field_0x1d8[0][1] = 0;
     field_0x1d8[1][1] = 0;
     field_0x1d8[2][1] = 0;
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 3151}
+       A traditional Ordon shield.\nDefend against attacks with {Tag - 5 bytes | Group 00 | Name: L}.\nFire will burn it away! */
     field_0x1d8[3][1] = field_0x184[3][1] + 0x100;
+
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 3153}
+       A shield with a Hylian crest.\nDefend against attacks with {Tag - 5 bytes | Group 00 | Name: L}.\nIt's metal and will never burn. */
     field_0x1d8[4][1] = field_0x184[4][1] + 0x100;
+
+    /* {Tag - 6 bytes | Group FF | Name: color - hue = 1}Ooccoo has things to do.\nSo she will remain here.\nIf you return, let's get together!
+       {Tag - 6 bytes | Group FF | Name: color - hue = 0}\n...That's what this says. */
     field_0x1d8[5][1] = field_0x184[5][1] + 0x100;
     field_0x1d8[6][1] = 0;
     field_0x1d8[0][2] = 0;
     field_0x1d8[1][2] = 0;
     field_0x1d8[2][2] = 0;
-    field_0x1d8[3][2] = field_0x184[3][2] + 0x100;
-    field_0x1d8[4][2] = field_0x184[4][2] + 0x100;
-    field_0x1d8[5][2] = field_0x184[5][2] + 0x100;
+    field_0x1d8[3][2] = field_0x184[3][2] + 0x100; // Green clothes. It is said that the\nhero who long ago saved Hyrule\nfrom danger wore these.
+    field_0x1d8[4][2] = field_0x184[4][2] + 0x100; // Garments made of Zora scales. They\nlet you breathe and swim in water\nbut are weak against fire and ice.
+    field_0x1d8[5][2] = field_0x184[5][2] + 0x100; // Armor that protects its wearer by\nmaking Rupees magical. Without\nRupees, it impedes movement.
     field_0x1d8[6][2] = 0;
-    field_0x1d8[0][3] = field_0x184[0][3] + 0x100;
-    field_0x1d8[1][3] = field_0x184[1][3] + 0x100;
-    field_0x1d8[2][3] = 0x5b9;
+    field_0x1d8[0][3] = field_0x184[0][3] + 0x100; // The wallet given by Agitha to\nbenefactors of the insect kingdom.\nIt can hold up to 1,000 Rupees.\n
+    field_0x1d8[1][3] = field_0x184[1][3] + 0x100; // A quiver with a huge capacity.\nIt can hold up to 100 arrows.
+    field_0x1d8[2][3] = 0x5b9; // Hylian Pike
+
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 1457}
+       Call the golden wolf at howling stones.\nYour map will show where to learn a new\nskill. Press {Tag - 5 bytes | Group 00 | Name: A} to open the skill list. */
     field_0x1d8[3][3] = 0x5b1;
     field_0x1d8[4][3] = 0;
     field_0x1d8[5][3] = 0;
@@ -592,17 +614,23 @@ void dMenu_Collect2D_c::screenSet() {
     field_0x1d8[0][4] = dMsgObject_getSmellTypeMessageID() + 0x100;
         /* dSv_event_flag_c::F_0456 - Castle Town - First time meeting with Jovani */
     if (dComIfGs_isEventBit(dSv_event_flag_c::saveBitLabels[456])) {
-        field_0x1d8[1][4] = 0x12d8;
+        field_0x1d8[1][4] = 0x12d8; // Spirits held by Poes visible to\nhoned senses. Collect 20 or more\nof them and take them to Jovani.
     } else {
-        field_0x1d8[1][4] = field_0x184[1][4] + 0x100;
+        field_0x1d8[1][4] = field_0x184[1][4] + 0x100; // Spirits held by the Poes visible to\nhoned senses.
     }
+
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 1445}
+       A bobber-fishing journal. Press {Tag - 5 bytes | Group 00 | Name: A} to\nopen it and view the largest size and\nnumber of fish 
+       {Tag - 5 bytes | Group 00 | Name: link}'s caught. */
     field_0x1d8[2][4] = 0x5a2;
+    /* {Tag - 9 bytes | Group 03 | Name: wii-divert-to-idx - idx = 1229}
+       Letters to {Tag - 5 bytes | Group 00 | Name: link}\nPress {Tag - 5 bytes | Group 00 | Name: A} to open it and read all\nletters you've received so far. */
     field_0x1d8[3][4] = 0x4c9;
     field_0x1d8[4][4] = 0;
     field_0x1d8[5][4] = 0;
     field_0x1d8[6][4] = 0;
-    field_0x1d8[0][5] = 0x4c5;
-    field_0x1d8[1][5] = 0x4c6;
+    field_0x1d8[0][5] = 0x4c5; // Save your quest.
+    field_0x1d8[1][5] = 0x4c6; // Change game settings.
     field_0x1d8[2][5] = 0;
     field_0x1d8[3][5] = 0;
     field_0x1d8[4][5] = 0;
@@ -1689,32 +1717,32 @@ void dMenu_Collect2D_c::wait_proc() {
         }
         if (mCursorX >= 3 && mCursorX <= 4 && mCursorY <= 2 || (mCursorX == 5 && mCursorY == 2)) {
             if (field_0x22d[mCursorX][mCursorY] != 0 && !mIsWolf) {
-                setAButtonString(0x436);
+                setAButtonString(0x436); // Equip
             } else {
                 setAButtonString(0);
             }
         } else if ((mCursorX == 0 && mCursorY == 5) || (mCursorX == 1 && mCursorY == 5)) {
-            setAButtonString(0x40C);
+            setAButtonString(0x40C); // Confirm
         } else {
             if (field_0x22d[mCursorX][mCursorY] != 0) {
                 if (mCursorX == 3 && mCursorY == 4) {
                     if (field_0x22d[3][4] != 0) {
-                        setAButtonString(0x3EE);
+                        setAButtonString(0x3EE); // Open
                     }
                 } else if (mCursorX == 2 && mCursorY == 4) {
                     if (isFishIconVisible()) {
-                        setAButtonString(0x3EE);
+                        setAButtonString(0x3EE); // Open
                     }
                 } else if (mCursorX == 3 && mCursorY == 3) {
                     if (isSkillIconVisible()) {
-                        setAButtonString(0x3EE);
+                        setAButtonString(0x3EE); // Open
                     }
                 } else if (mCursorX == 2 && mCursorY == 3) {
                     if (isInsectIconVisible()) {
-                        setAButtonString(0x3EE);
+                        setAButtonString(0x3EE); // Open
                     }
                 } else if (mCursorX < 3 && mCursorY < 3) {
-                    setAButtonString(0x40C);
+                    setAButtonString(0x40C); // Confirm
                 } else {
                     setAButtonString(0);
                 }
@@ -1722,7 +1750,7 @@ void dMenu_Collect2D_c::wait_proc() {
                 setAButtonString(0);
             }
         }
-        setBButtonString(0x3F9);
+        setBButtonString(0x3F9); // Back
     }
 }
 
@@ -1753,7 +1781,7 @@ void dMenu_Collect2D_c::save_open_proc() {
 }
 
 void dMenu_Collect2D_c::save_move_init() {
-    setAButtonString(0x040c);
+    setAButtonString(0x040c); // Confirm
     setBButtonString(0);
 }
 
@@ -1809,8 +1837,8 @@ void dMenu_Collect2D_c::option_open_proc() {
 }
 
 void dMenu_Collect2D_c::option_move_init() {
-    setAButtonString(0x040c);
-    setBButtonString(0x03f9);
+    setAButtonString(0x040c); // Confirm
+    setBButtonString(0x03f9); // Back
 }
 
 void dMenu_Collect2D_c::option_move_proc() {
@@ -1864,8 +1892,8 @@ void dMenu_Collect2D_c::letter_open_proc() {
 }
 
 void dMenu_Collect2D_c::letter_move_init() {
-    setAButtonString(0x040c);
-    setBButtonString(0x03f9);
+    setAButtonString(0x040c); // Confirm
+    setBButtonString(0x03f9); // Back
 }
 
 void dMenu_Collect2D_c::letter_move_proc() {
@@ -1919,8 +1947,8 @@ void dMenu_Collect2D_c::fishing_open_proc() {
 }
 
 void dMenu_Collect2D_c::fishing_move_init() {
-    setAButtonString(0x040c);
-    setBButtonString(0x03f9);
+    setAButtonString(0x040c); // Confirm
+    setBButtonString(0x03f9); // Back
 }
 
 void dMenu_Collect2D_c::fishing_move_proc() {
@@ -1974,8 +2002,8 @@ void dMenu_Collect2D_c::skill_open_proc() {
 }
 
 void dMenu_Collect2D_c::skill_move_init() {
-    setAButtonString(0x040c);
-    setBButtonString(0x03f9);
+    setAButtonString(0x040c); // Confirm
+    setBButtonString(0x03f9); // Back
 }
 
 void dMenu_Collect2D_c::skill_move_proc() {
@@ -2029,8 +2057,8 @@ void dMenu_Collect2D_c::insect_open_proc() {
 }
 
 void dMenu_Collect2D_c::insect_move_init() {
-    setAButtonString(0x040c);
-    setBButtonString(0x03f9);
+    setAButtonString(0x040c); // Confirm
+    setBButtonString(0x03f9); // Back
 }
 
 void dMenu_Collect2D_c::insect_move_proc() {

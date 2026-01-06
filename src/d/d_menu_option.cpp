@@ -99,7 +99,7 @@ void dMenu_Option_c::_create() {
     static const u64 l_tagName9[2] = {'w_no_m', 'w_yes_m'};
     static const u64 l_tagName10[2] = {'w_no_g', 'w_yes_g'};
     static const u64 l_tagName11[2] = {'w_no_gr', 'w_yes_gr'};
-    static const u8 l_msgNum2[2] = {8, 7};
+    static const u8 l_msgNum2[2] = {8 /* No */, 7 /* Yes */};
 
     mpFont = mDoExt_getMesgFont();
     mpString = new dMsgString_c();
@@ -180,8 +180,8 @@ void dMenu_Option_c::_create() {
         ((J2DTextBox*)(mpScreenIcon->search(text_a_tag[i])))->setString(0x20, "");
         ((J2DTextBox*)(mpScreenIcon->search(text_b_tag[i])))->setString(0x20, "");
     }
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
     ResTIMG* timg = (ResTIMG*)dComIfGp_getMain2DArchive()->getResource('TIMG', "tt_block8x8.bti");
     mpBlackTex = new J2DPicture(timg);
     JUT_ASSERT(402, mpBlackTex != NULL);
@@ -715,8 +715,8 @@ bool dMenu_Option_c::_close() {
 void dMenu_Option_c::atten_init() {
     mpDrawCursor->setAlphaRate(1.0f);
     setCursorPos(0);
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
 }
 
 void dMenu_Option_c::atten_move() {
@@ -810,8 +810,8 @@ void dMenu_Option_c::ruby_move() {
 void dMenu_Option_c::vib_init() {
     mpDrawCursor->setAlphaRate(1.0f);
     setCursorPos(SelectType1);
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
 }
 
 void dMenu_Option_c::vib_move() {
@@ -866,8 +866,8 @@ void dMenu_Option_c::vib_move() {
 void dMenu_Option_c::sound_init() {
     mpDrawCursor->setAlphaRate(1.0f);
     setCursorPos(SelectType2);
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
 }
 
 void dMenu_Option_c::sound_move() {
@@ -939,8 +939,8 @@ void dMenu_Option_c::sound_move() {
 }
 
 void dMenu_Option_c::change_init() {
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
 }
 
 void dMenu_Option_c::change_move() {
@@ -1051,8 +1051,8 @@ void dMenu_Option_c::confirm_open_move() {
 }
 
 void dMenu_Option_c::confirm_move_init() {
-    setAButtonString(0x40C);
-    setBButtonString(0x3F9);
+    setAButtonString(0x40C); // Confirm
+    setBButtonString(0x3F9); // Back
 }
 
 void dMenu_Option_c::confirm_move_move() {
@@ -1170,7 +1170,7 @@ void dMenu_Option_c::tv_open1_move() {
         field_0x330 = 0.0f;
         field_0x3f3 = 1;
         setAButtonString(0);
-        setBButtonString(0x3F9);
+        setBButtonString(0x3F9); // Back
         setCursorPos(getSelectType());
     }
 }
@@ -1185,8 +1185,8 @@ void dMenu_Option_c::tv_move_move() {
     if (mDoCPd_c::getTrigZ(PAD_1) != 0 || mDoCPd_c::getTrigA(PAD_1) != 0) {
         Z2GetAudioMgr()->seStart(Z2SE_SY_MENU_BACK, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
         field_0x3f3 = 3;
-        setAButtonString(0x40C);
-        setBButtonString(0x3F9);
+        setAButtonString(0x40C); // Confirm
+        setBButtonString(0x3F9); // Back
         dMw_c::dMw_fade_out();
         dMeter2Info_set2DVibration();
     }

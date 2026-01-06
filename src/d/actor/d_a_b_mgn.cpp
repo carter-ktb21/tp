@@ -2671,6 +2671,8 @@ void daB_MGN_c::executeOpening() {
 
         cLib_addCalcPos2(&mDemoCamCenter, work, 0.5f, 100.0f);
         if (mpMgnModelMorf->checkFrame(nREG_F(0) + 365.0f)) {
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 82}Dark Beast
+               {Tag - 7 bytes | Group FF | Name: size - pct = 100}\nGANON{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 90} */
             fopMsgM_messageSetDemo(0x491);
         }
 

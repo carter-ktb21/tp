@@ -188,7 +188,10 @@ static void demo_camera(npc_sq_class* i_this) {
 
     case 4:
         i_this->mMsgFlow.doFlow(_this, NULL, 0);
-        if (i_this->mMsgFlow.getNowMsgNo() == 0x2747 || i_this->mMsgFlow.getNowMsgNo() == 0x273E) {
+            /* But I know...you're not one of\nthem. */
+        if (i_this->mMsgFlow.getNowMsgNo() == 0x2747 ||
+            /* But you're different... You're not\na bad thing, are you? */
+            i_this->mMsgFlow.getNowMsgNo() == 0x273E) {
             i_this->mDemoMode = 5;
             anm_init(i_this, 5, 0.0f, 2, 1.0f);
         }
@@ -204,7 +207,12 @@ static void demo_camera(npc_sq_class* i_this) {
         i_this->mCameraCenter = _this->current.pos;
         i_this->mCameraCenter.y += 20.0f;
         i_this->mMsgFlow.doFlow(_this, NULL, 0);
-        if (i_this->mMsgFlow.getNowMsgNo() == 0x2749 || i_this->mMsgFlow.getNowMsgNo() == 0x2740) {
+            /* If you run into any trouble, try\n{Tag - 6 bytes | Group FF | Name: color - hue = 1}talking{Tag - 6 bytes | Group FF | Name: color - hue = 0} 
+               to the {Tag - 6 bytes | Group FF | Name: color - hue = 1}animals{Tag - 6 bytes | Group FF | Name: color - hue = 0}. */
+        if (i_this->mMsgFlow.getNowMsgNo() == 0x2749 ||
+            /* If you run into any trouble, try\n{Tag - 6 bytes | Group FF | Name: color - hue = 1}talking{Tag - 6 bytes | Group FF | Name: color - hue = 0} 
+               to the {Tag - 6 bytes | Group FF | Name: color - hue = 1}animals{Tag - 6 bytes | Group FF | Name: color - hue = 0} in town. */
+            i_this->mMsgFlow.getNowMsgNo() == 0x2740) {
             i_this->mDemoMode = 6;
         }
         break;
@@ -329,6 +337,7 @@ static cPhs__Step daNpc_Sq_Create(fopAc_ac_c* i_this) {
 
         _this->mParam0 = (u8)fopAcM_GetParam(_this);
         _this->mParam1 = (u8)(fopAcM_GetParam(_this) >> 8);
+        /* Branch Node | Query Func Idx - 0x000a | Query Func Param - 0x000b | Indirection Table Offset - 0x0293 */
         _this->mFlowID = 0xDB;
         _this->shape_angle.z = 0;
         _this->current.angle.z = 0;

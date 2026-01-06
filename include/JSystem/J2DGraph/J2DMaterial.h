@@ -48,7 +48,7 @@ public:
 
 // private:
     /* 0x04 */ void* field_0x4;
-    /* 0x08 */ int field_0x8;
+    /* 0x08 */ int mMatMode;
     /* 0x0C */ u16 mIndex;
     /* 0x0E */ bool mVisible;
     /* 0x0F */ u8 mMaterialAlphaCalc;

@@ -65,7 +65,7 @@ private:
     /* 0xDF8 */ int field_0xdf8;
     /* 0xDFC */ int field_0xdfc;
     /* 0xE00 */ int field_0xe00;
-    /* 0xE04 */ int mMessageNo;
+    /* 0xE04 */ int mMsgFlowNo;
     /* 0xE08 */ s16 mLookMode;
     /* 0xE0A */ s16 field_0xe0a;
     /* 0xE0C */ u16 mActionMode;

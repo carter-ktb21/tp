@@ -411,7 +411,7 @@ static void swim_on(fr_class* i_this) {
 
         i_this->shape_angle.z = cM_ssin(i_this->field_0x5d0 * (600 + BREG_S(1))) * (500 + BREG_S(2));
 
-        if (((i_this->field_0x994 == -1 || !daPy_py_c::checkNowWolf()) &&
+        if (((i_this->mMsgFlowNo == -1 || !daPy_py_c::checkNowWolf()) &&
             i_this->field_0x5d2 != 0x28) && i_this->field_0x5d8 < l_HIO.field_0x18) {
             i_this->field_0x5d2 = 0x28;
             i_this->field_0x5d4 = 0;
@@ -443,7 +443,7 @@ static void swim_off(fr_class* i_this) {
         sibuki_set(i_this);
         i_this->speedF *= 0.4f;
         mDoAud_seStart(Z2SE_AL_UKI_OUT_WATER, &i_this->current.pos, 0, 0);
-    } else if (((i_this->field_0x994 == -1 || !daPy_py_c::checkNowWolf()) && i_this->field_0x5d2 != 5) && i_this->field_0x5d8 < l_HIO.field_0x18) {
+    } else if (((i_this->mMsgFlowNo == -1 || !daPy_py_c::checkNowWolf()) && i_this->field_0x5d2 != 5) && i_this->field_0x5d8 < l_HIO.field_0x18) {
         i_this->field_0x5d2 = 5;
         i_this->field_0x5d4 = 0;
     }
@@ -511,7 +511,7 @@ static void action(fr_class* i_this) {
         break;
     }
 
-    if (((i_this->field_0x991 == 1 && i_this->field_0x994 != -1) && daPy_py_c::checkNowWolf()) && i_this->field_0x5d8 < 300.0f) {
+    if (((i_this->field_0x991 == 1 && i_this->mMsgFlowNo != -1) && daPy_py_c::checkNowWolf()) && i_this->field_0x5d8 < 300.0f) {
         i_this->field_0x5d2 = 10;
         i_this->field_0x5d4 = 0;
     }
@@ -580,12 +580,12 @@ static int message(fr_class* i_this) {
     }
 
     if (dComIfGp_event_runCheck() && i_this->eventInfo.checkCommandTalk()) {
-        i_this->mMsgFlow.init(i_this, i_this->field_0x994, 0, NULL);
+        i_this->mMsgFlow.init(i_this, i_this->mMsgFlowNo, 0, NULL);
         i_this->field_0x992 = 1;
-        OS_REPORT("////////FR MSG FNO %d\n", i_this->field_0x994);
+        OS_REPORT("////////FR MSG FNO %d\n", i_this->mMsgFlowNo);
     }
 
-    if ((i_this->field_0x991 == 2 && i_this->field_0x994 != -1) && daPy_py_c::checkNowWolf()) {
+    if ((i_this->field_0x991 == 2 && i_this->mMsgFlowNo != -1) && daPy_py_c::checkNowWolf()) {
         fopAcM_OnStatus(i_this, 0);
         cLib_onBit<u32>(i_this->attention_info.flags, fopAc_AttnFlag_SPEAK_e | fopAc_AttnFlag_TALK_e);
         i_this->eventInfo.onCondition(1);
@@ -687,9 +687,9 @@ static int daFr_Create(fopAc_ac_c* a_this) {
 
         i_this->field_0x5b4 = fopAcM_GetParam(actor);
         actor->current.angle.x = 0;
-        i_this->field_0x994 = actor->current.angle.z;
+        i_this->mMsgFlowNo = actor->current.angle.z;
         actor->current.angle.z = actor->shape_angle.z = 0;
-        OS_REPORT("FR MSGFLOWNO %d\n", i_this->field_0x994);
+        OS_REPORT("FR MSGFLOWNO %d\n", i_this->mMsgFlowNo);
         OS_REPORT("FR//////////////FR SET 1 !!\n");
 
         if (!fopAcM_entrySolidHeap(actor, useHeapIfrt, 0x14e0)) {

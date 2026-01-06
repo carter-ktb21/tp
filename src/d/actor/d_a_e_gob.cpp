@@ -1239,7 +1239,8 @@ static void message(e_gob_class* i_this) {
 
         if (dComIfGp_event_runCheck()) {
             if (actor->eventInfo.checkCommandTalk() && i_this->field_0xd90 == 0) {
-                i_this->mMsgFlow.init(i_this, 203, 0, NULL);
+                /* Branch Node | Query Func Idx - 0x0001 | Query Func Param - 0x0040 | Indirection Table Offset - 0x0196 */
+                i_this->mMsgFlow.init(i_this, 0xCB, 0, NULL);
                 i_this->field_0xd90 = 1;
             }
         } else {
@@ -1703,7 +1704,8 @@ static void demo_camera(e_gob_class* i_this) {
 
         if (i_this->mDemoCamTimer >= 60) {
             if (i_this->mDemoCamTimer == 60) {
-                i_this->mMsgFlow.init(i_this, 201, 0, NULL);
+                /* Whoa... Human?! */
+                i_this->mMsgFlow.init(i_this, 0xC9, 0, NULL);
             }
 
             if (i_this->mMsgFlow.doFlow(i_this, NULL, 0)) {
@@ -1894,10 +1896,12 @@ static void demo_camera(e_gob_class* i_this) {
 
         if (i_this->mDemoCamTimer >= 60) {
             if (i_this->mDemoCamTimer == 60) {
-                i_this->mMsgFlow.init(i_this, 202, 0, NULL);
+                /* Ugh... That...hurt a lot. Who knew\nthat humans were capable of such\nfeats of strength... */
+                i_this->mMsgFlow.init(i_this, 0xCA, 0, NULL);
                 Z2GetAudioMgr()->unMuteSceneBgm(45);
             }
 
+            /* But in exchange, you must save the\npatriarch of our tribe! */
             if ((i_this->mMsgFlow.getMsgNo() == 0x1777 || mDoCPd_c::getTrigA(PAD_1)) && i_this->mMode < 4) {
                 i_this->mMode = 4;
             }

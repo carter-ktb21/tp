@@ -2755,10 +2755,10 @@ int daNpc_ykW_c::race(void* param_0) {
                             if (dComIfG_getTimerPtr()->isStart()) {
                                 if (field_0x106b != 0) {
                                     mDoAud_subBgmStart(0x1000099);
-                                    dMeter2Info_setMeterString(0x539);
+                                    dMeter2Info_setMeterString(0x539); // YOU LOSE!
                                 } else {
                                     mDoAud_subBgmStart(0x1000098);
-                                    dMeter2Info_setMeterString(0x538);
+                                    dMeter2Info_setMeterString(0x538); // YOU WIN!
                                 }
                                 dComIfG_TimerEnd(5, -1);
                                 if ((dComIfG_getTimerNowTimeMs() < dComIfGs_getRaceGameTime()) ||

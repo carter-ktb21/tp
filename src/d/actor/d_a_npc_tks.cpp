@@ -289,7 +289,7 @@ cPhs__Step daNpcTks_c::Create() {
         mTksTsubo.mTsuboType = 2;
     }
 
-    mMessageNo = getMessageNo();
+    mMsgFlowNo = getMessageNo();
 
     cPhs__Step phase = cPhs_ERROR_e;
     for (int i = 0; l_loadRes_list[mTksTsubo.mTsuboType][i] >= 0; i++) {
@@ -1156,7 +1156,7 @@ void daNpcTks_c::talk() {
     switch (mMode) {
         case 0:
             setMotion(MOT_WAIT_A, -1.0f, 0);
-            initTalk(mMessageNo, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mMsgTimer = 0;
             mTurnMode = 0;
             setLookMode(LOOK_PLAYER_TALK, NULL);
@@ -1584,7 +1584,7 @@ void daNpcTks_c::demo_appear() {
                                 break;
 
                             case '0005':
-                                initTalk(mMessageNo, NULL);
+                                initTalk(mMsgFlowNo, NULL);
                                 mMsgTimer = 0;
                                 setLookMode(LOOK_PLAYER_TALK, NULL);
                                 break;
@@ -1891,7 +1891,7 @@ void daNpcTks_c::demo_farewell() {
                             case '0007':
                             case '0008':
                             case '0009':
-                                initTalk(mMessageNo, NULL);
+                                initTalk(mMsgFlowNo, NULL);
                                 mMsgTimer = 0;
                                 setLookMode(LOOK_PLAYER_TALK, NULL);
                                 setAngle(fopAcM_searchPlayerAngleY(this));
@@ -2330,7 +2330,7 @@ void daNpcTks_c::demo_Lv7Start() {
 
                             case '0004':
                             case '0008':
-                                initTalk(mMessageNo, NULL);
+                                initTalk(mMsgFlowNo, NULL);
                                 mMsgTimer = 0;
                                 setLookMode(LOOK_PLAYER_TALK, NULL);
                                 break;
@@ -2499,8 +2499,9 @@ void daNpcTks_c::demo_Lv7Start() {
                             break;
 
                         case '0004': {
-                            int iVar1[2] = {0x2520, -1};
-                            if (talkProc(iVar1, TRUE, NULL)) {
+                            /* {Tag - 5 bytes | Group 00 | Name: instant}EEEEEK!{Tag - 5 bytes | Group 00 | Name: type}{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 30} */
+                            int msgID[2] = {0x2520, -1};
+                            if (talkProc(msgID, TRUE, NULL)) {
                                 if (!mFlow.checkEndFlow()) {
                                     fopAc_ac_c* actor_p = fopAcM_SearchByName(PROC_Tag_Lv7Gate);
                                     if (actor_p != NULL) {

@@ -104,7 +104,7 @@ const daNpcPray_HIOParam daNpcPray_Param_c::m = {
 int daNpcPray_c::Create() {
     fopAcM_ct(this, daNpcPray_c);
 
-    mMessageNo = getMessageNo();
+    mMsgFlowNo = getMessageNo();
 
     int phase_state = cPhs_ERROR_e;
     for (int i = 0; i < 2; i++) {
@@ -585,7 +585,7 @@ bool daNpcPray_c::talk(void*) {
 
     switch (mActionMode) {
     case 0:
-        initTalk(mMessageNo, NULL);
+        initTalk(mMsgFlowNo, NULL);
         mMsgTimer = 0;
         field_0xe0e = 0;
         setLookMode(3);

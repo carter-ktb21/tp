@@ -122,7 +122,7 @@ private:
     /* 0xE08 */ fpc_ProcID field_0xe00;
     /* 0xE04 */ int field_0xe04;
     /* 0xE08 */ int field_0xe08;
-    /* 0xE0C */ s16 field_0xe0c;
+    /* 0xE0C */ s16 mMsgFlowNo;
     /* 0xE0E */ s16 field_0xe0e;
     /* 0xE10 */ u16 field_0xe10;
     /* 0xE12 */ s16 field_0xe12;

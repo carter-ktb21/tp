@@ -1264,16 +1264,12 @@ void dMeter2Draw_c::initButtonCross() {
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju3'))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju4'))->setString(0x40, "");
 
-    dMeter2Info_getString(
-        0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju0'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju1'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju2'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju3'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju4'))->getStringPtr(), NULL);
+    // ITEMS
+    dMeter2Info_getString( 0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju0'))->getStringPtr(), NULL);
+    dMeter2Info_getString( 0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju1'))->getStringPtr(), NULL);
+    dMeter2Info_getString( 0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju2'))->getStringPtr(), NULL);
+    dMeter2Info_getString( 0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju3'))->getStringPtr(), NULL);
+    dMeter2Info_getString( 0x61, static_cast<J2DTextBox*>(mpScreen->search('cont_ju4'))->getStringPtr(), NULL);
 
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju5'))->setFont(mDoExt_getMesgFont());
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju6'))->setFont(mDoExt_getMesgFont());
@@ -1287,16 +1283,12 @@ void dMeter2Draw_c::initButtonCross() {
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju8'))->setString(0x40, "");
     static_cast<J2DTextBox*>(mpScreen->search('cont_ju9'))->setString(0x40, "");
 
-    dMeter2Info_getString(
-        0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju5'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju6'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju7'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju8'))->getStringPtr(), NULL);
-    dMeter2Info_getString(
-        0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju9'))->getStringPtr(), NULL);
+    // MAP
+    dMeter2Info_getString(0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju5'))->getStringPtr(), NULL);
+    dMeter2Info_getString(0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju6'))->getStringPtr(), NULL);
+    dMeter2Info_getString(0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju7'))->getStringPtr(), NULL);
+    dMeter2Info_getString(0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju8'))->getStringPtr(), NULL);
+    dMeter2Info_getString(0x62, static_cast<J2DTextBox*>(mpScreen->search('cont_ju9'))->getStringPtr(), NULL);
 
     mpButtonCrossParent->setAlphaRate(0.0f);
     drawButtonCross(g_drawHIO.mButtonCrossOFFPosX, g_drawHIO.mButtonCrossOFFPosY);
@@ -3297,7 +3289,7 @@ char* dMeter2Draw_c::getActionString(u8 i_action, u8 i_type, u8* param_2) {
             if (param_2 != NULL) {
                 *param_2 = mesg_entry.output_type;
 
-                if (g_drawHIO.mButtonATextActionID == 0x3E6) {
+                if (g_drawHIO.mButtonATextActionID == 0x3E6) { // Hint
                     *param_2 = 7;
                 }
             }

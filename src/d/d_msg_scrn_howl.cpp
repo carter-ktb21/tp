@@ -87,10 +87,10 @@ dMsgScrnHowl_c::dMsgScrnHowl_c() {
 #endif
     piStack_19c->setString(0x40, "");
     piStack_19c->setFont(mDoExt_getMesgFont());
-    dMeter2Info_getStringKanji(0x4d4, piStack_19c->getStringPtr(), NULL);
+    dMeter2Info_getStringKanji(0x4d4, piStack_19c->getStringPtr(), NULL); // Pitch
     piStack_1a0->setString(0x40, "");
     piStack_1a0->setFont(mDoExt_getMesgFont());
-    dMeter2Info_getStringKanji(0x4d5, piStack_1a0->getStringPtr(), NULL);
+    dMeter2Info_getStringKanji(0x4d5, piStack_1a0->getStringPtr(), NULL); // Howl
     field_0x2195 = 0;
     for (int i = 0; i < 0x300; i++) {
         field_0x180[i] = 0.0f;

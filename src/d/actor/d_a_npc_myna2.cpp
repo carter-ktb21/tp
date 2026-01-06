@@ -169,9 +169,9 @@ int daNpc_myna2_c::create() {
     field_0xe0d = (fopAcM_GetParam(this) & 0xFF00) >> 8;
 
     if (home.angle.x != 0xFFFF) {
-        field_0xe04 = home.angle.x;
+        mMsgFlowNo = home.angle.x;
     } else {
-        field_0xe04 = -1;
+        mMsgFlowNo = -1;
     }
 
     if (isDelete()) {
@@ -902,7 +902,7 @@ int daNpc_myna2_c::talk(void* param_0) {
     switch (mMode) {
     case 0:
         if (!mIsDamaged) {
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             mTurnMode = 0;
             mAnm_p->setPlaySpeed(1.0f);
             mMode = 2;
@@ -988,7 +988,7 @@ int daNpc_myna2_c::ECut_firstTalk(int i_staffId) {
         case 10:
             break;
         case 20:
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             break;
         }
     }
@@ -1037,7 +1037,7 @@ int daNpc_myna2_c::ECut_gameFailure(int i_staffId) {
         case 20:
             break;
         case 10:
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             break;
         }
     }
@@ -1095,7 +1095,7 @@ int daNpc_myna2_c::ECut_gameGoal(int i_staffId) {
             }
             break;
         case 10:
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             break;
         case 20:
             break;
@@ -1157,7 +1157,7 @@ int daNpc_myna2_c::ECut_gameGoalSuccess(int i_staffId) {
             }
             break;
         case 10:
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             break;
         case 20: {
             int itemNo = 0;
@@ -1167,7 +1167,7 @@ int daNpc_myna2_c::ECut_gameGoalSuccess(int i_staffId) {
             break;
         }
         case 25:
-            initTalk(field_0xe04, NULL);
+            initTalk(mMsgFlowNo, NULL);
             break;
         case 30:
             break;

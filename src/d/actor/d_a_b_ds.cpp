@@ -1362,6 +1362,7 @@ void daB_DS_c::executeOpeningDemo() {
             }
 
             if (mModeTimer == 1) {
+                /* You still live... How astonishing.\nNo wonder some call you "hero."{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
                 setYoMessage(0x1F41);
             }
         } else if (doYoMessage()) {
@@ -1369,6 +1370,7 @@ void daB_DS_c::executeOpeningDemo() {
         }
         break;
     case 16:
+        /* But this is truly a bittersweet\nreunion... Truly!{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
         setYoMessage(0x1F42);
         mMode++;
         break;
@@ -1385,6 +1387,7 @@ void daB_DS_c::executeOpeningDemo() {
     case 18:
         if (cLib_calcTimer(&mModeTimer) != 0) {
             if (mModeTimer == 1) {
+                /* For I fear this is the last time I will\nsee you alive!{Tag - 7 bytes | Group 00 | Name: boxatmost - frame_count = 60} */
                 setYoMessage(0x1F43);
             }
         } else {
@@ -1655,6 +1658,8 @@ void daB_DS_c::executeOpeningDemo() {
 
         if (mpMorf->checkFrame(670.0f)) {
             dCam_getBody()->StartBlure(40, this, 0.8f, 1.2f);
+            /* {Tag - 7 bytes | Group FF | Name: size - pct = 82}Twilit Fossil
+               {Tag - 7 bytes | Group FF | Name: size - pct = 100}\nSTALLORD{Tag - 7 bytes | Group 00 | Name: autobox - frame_count = 90} */
             fopMsgM_messageSetDemo(0x482);
             dComIfGp_getVibration().StartQuake(4, 0x1f, cXyz(0.0f, 1.0f, 0.0f));
             pla->changeDemoMode(34, 0, 0, 0);

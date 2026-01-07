@@ -63,6 +63,9 @@ public:
     void menuShow(int);
     void menuHide(int);
     void screenSet();
+    void initMenuOption(int idx, const char* text); // Modified - Carco: Init menu option helper
+    void updateMenuText(int option, int idx, int size, const char* text); // Modified - Carco: Update menu text helper
+    void screenUpdate(u8 pageNumber); // Modified - Carco: Add screenUpdate function for page toggling
     void setSoundMode(u32);
     void setAttenString();
     void setRubyString();
@@ -193,7 +196,7 @@ private:
     /* 0x3E6 */ u8 field_0x3e6;
     /* 0x3E7 */ u8 field_0x3e7;
     /* 0x3E8 */ u8 field_0x3e8;
-    /* 0x3E9 */ u8 field_0x3e9;
+    /* 0x3E9 */ u8 mSoundMode;
     /* 0x3EA */ u8 field_0x3ea;
     /* 0x3EB */ u8 field_0x3eb;
     /* 0x3EC */ u8 mQuitStatus;
@@ -219,6 +222,11 @@ private:
     /* 0x403 */ u8 field_0x403;
     /* 0x404 */ u8 field_0x404[4];
     /* 0x408 */ u8 field_0x408[4];
+    /* 0x40C */ u8 currentPage; // Modified - Carco: Add flag to indicate current settings page
+    /* 0x40D */ u8 fpsFlag; // Modified - Carco: Add flag for fps selection
+    /* 0x40E */ u8 bloomFlag; // Modified - Carco: Add flag for bloom selection
+    /* 0x40F */ u8 climbSpeedFlag; // Modified - Carco: Add flag for climbing speed selection
+    /* 0x410 */ u8 rupeeCollectAnimFlag; // Modified - Carco: Add flag for rupee collect animation
 };
 
 #endif /* D_MENU_D_MENU_OPTION_H */

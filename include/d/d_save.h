@@ -524,6 +524,15 @@ public:
     void setPointer(bool i_mPointer) { mPointer = i_mPointer; }
     bool getCameraHInvert() { return mCameraHInvert; }  // Boofener: Horizontal camera inversion
     void setCameraHInvert(bool i_invert) { mCameraHInvert = i_invert; }
+    // Modified - Carco: Getter and setter for bloom flag
+    u8 getBloomFlag() { return mBloomFlag; }
+    void setBloomFlag(u8 i_bloomFlag) { mBloomFlag = i_bloomFlag; }
+    // Modified - Carco: Getter and setter for climb speed flag
+    u8 getClimbSpeedFlag() { return mClimbSpeedFlag; }
+    void setClimbSpeedFlag(u8 i_climbSpeedFlag) { mClimbSpeedFlag = i_climbSpeedFlag; }
+    // Modified - Carco: Getter and setter for climb speed flag
+    u8 getRupeeAnimFlag() { return mRupeeAnimFlag; }
+    void setRupeeAnimFlag(u8 i_rupeeAnimFlag) { mRupeeAnimFlag = i_rupeeAnimFlag; }
 
     enum dSv_config_language {
         LANGAUGE_ENGLISH,
@@ -546,7 +555,10 @@ private:
     /* 0xA */ u8 mCameraControl;   // 0 : normal, 1 : inverted
     /* 0xB */ bool mPointer;       // Wii pointer enabled/disabled.
     /* 0xC */ bool mCameraHInvert; // Boofener: Horizontal camera inversion (0 : normal, 1 : inverted)
-};                                 // Size: 0xD
+    /* 0xD */ u8 mBloomFlag;       // Modified - Carco: Added bloom flag field for save file
+    /* 0xE */ u8 mClimbSpeedFlag;  // Modified - Carco: Added climb speed flag for save file
+    /* 0xF */ u8 mRupeeAnimFlag;   // Modified - Carco: Added rupee anim flag for save file
+};                                 // Size: 0x10
 
 class dSv_player_c {
 public:

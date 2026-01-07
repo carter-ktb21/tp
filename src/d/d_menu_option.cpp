@@ -22,6 +22,8 @@
 #include "f_op/f_op_msg_mng.h"
 #include "m_Do/m_Do_controller_pad.h"
 #include "m_Do/m_Do_graphic.h"
+#include "d/actor/d_a_alink.h" // Modified - Carco
+#include "d/d_a_item_static.h" // Modified - Carco
 #include "string.h"
 
 typedef void (dMenu_Option_c::*initFunc)();
@@ -76,6 +78,12 @@ enum SelectType {
     SelectType8,
 };
 
+enum SoundMode {
+    /* 0x0 */ SOUND_MODE_MONO,
+    /* 0x1 */ SOUND_MODE_STEREO,
+    /* 0x2 */ SOUND_MODE_SURROUND,
+};
+
 dMenu_Option_c::dMenu_Option_c(JKRArchive* i_archive, STControl* i_stick) {
     mUseFlag = 0;
     mBarScale[0] = g_drawHIO.mOptionScreen.mBarScale[0];
@@ -100,6 +108,13 @@ void dMenu_Option_c::_create() {
     static const u64 l_tagName10[2] = {'w_no_g', 'w_yes_g'};
     static const u64 l_tagName11[2] = {'w_no_gr', 'w_yes_gr'};
     static const u8 l_msgNum2[2] = {8 /* No */, 7 /* Yes */};
+
+    // Modified - Carco: Default modded values
+    currentPage = 1;
+    bloomFlag = dComIfGs_getBloomFlag();
+    climbSpeedFlag = dComIfGs_getClimbSpeedFlag();
+    fpsFlag = g_targetFramerate == 60.0f;
+    rupeeCollectAnimFlag = dComIfGs_getRupeeAnimFlag();
 
     mpFont = mDoExt_getMesgFont();
     mpString = new dMsgString_c();
@@ -254,7 +269,7 @@ void dMenu_Option_c::_create() {
     }
 
     field_0x403 = 0;
-    screenSet();
+    screenSet(); // Modified - Carco: not nextPage
     field_0x3e0 = 0;
     field_0x3e1 = 10;
     field_0x3e2 = 0xff;
@@ -483,6 +498,23 @@ void dMenu_Option_c::_move() {
     }
 
     if (mDoGph_gInf_c::getFader()->getStatus() == 1) {
+         // Modified - Carco: set next page of menu options when R or L button is pressed
+        if (mDoCPd_c::getTrigR(PAD_1) != 0) {
+            if (currentPage < 3) {
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+                currentPage++;
+                screenUpdate(currentPage);
+            }
+        }
+
+        if (mDoCPd_c::getTrigL(PAD_1) != 0) {
+            if (currentPage > 1) {
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+                currentPage--;
+                screenUpdate(currentPage);
+            }
+        }
+        
         // If the A button is pressed and the confirmation screen has not already appeared, initilize the confirmation
         // screen and execute its process function 
         if (mDoCPd_c::getTrigA(PAD_1) != 0 && mSelection != SelectType3 && field_0x3f3 == 5) {
@@ -720,39 +752,119 @@ void dMenu_Option_c::atten_init() {
 }
 
 void dMenu_Option_c::atten_move() {
-    bool downTrigger = mpStick->checkDownTrigger();
-    bool leftTrigger = checkLeftTrigger();
-    bool rightTrigger = checkRightTrigger();
+    // Modified - Carco: only change atten setting when on page 1
+    switch (currentPage) {
+        case 1: {
+            bool downTrigger = mpStick->checkDownTrigger();
+            bool leftTrigger = checkLeftTrigger();
+            bool rightTrigger = checkRightTrigger();
 
-    if (field_0x3f3 != 5) {
-        (this->*tv_process[field_0x3f3])();
-    } else if (downTrigger) {
-        mSelection = 1;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (leftTrigger) {
-        if (field_0x3e4 == 0) {
-            field_0x3e4 = 1;
-            field_0x3da = -5;
-        } else if (field_0x3e4 == 1) {
-            field_0x3e4 = 0;
-            field_0x3da = -5;
+            if (field_0x3f3 != 5) {
+                (this->*tv_process[field_0x3f3])();
+            } else if (downTrigger) {
+                mSelection = 1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (leftTrigger) {
+                if (field_0x3e4 == 0) {
+                    field_0x3e4 = 1;
+                    field_0x3da = -5;
+                } else if (field_0x3e4 == 1) {
+                    field_0x3e4 = 0;
+                    field_0x3da = -5;
+                }
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (rightTrigger) {
+                if (field_0x3e4 == 0) {
+                    field_0x3e4 = 1;
+                    field_0x3da = 5;
+                } else if (field_0x3e4 == 1) {
+                    field_0x3e4 = 0;
+                    field_0x3da = 5;
+                }
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else {
+                changeTVCheck();
+            }
+            break;
         }
-        mSelection = SelectType3;
-        field_0x3f5 = 0;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (rightTrigger) {
-        if (field_0x3e4 == 0) {
-            field_0x3e4 = 1;
-            field_0x3da = 5;
-        } else if (field_0x3e4 == 1) {
-            field_0x3e4 = 0;
-            field_0x3da = 5;
+
+        case 2: {
+            // Modified - Carco: Add logic for fps selection
+            bool downTrigger = mpStick->checkDownTrigger();
+            bool leftTrigger = checkLeftTrigger();
+            bool rightTrigger = checkRightTrigger();
+
+            if (field_0x3f3 != 5) {
+                (this->*tv_process[field_0x3f3])();
+            } else if (downTrigger) {
+                mSelection = 1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (leftTrigger) {
+                if (!fpsFlag) {
+                    fpsFlag = 1;
+                } else {
+                    fpsFlag = 0;
+                }
+                field_0x3da = -5;
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (rightTrigger) {
+                if (!fpsFlag) {
+                    fpsFlag = 1;
+                } else {
+                    fpsFlag = 0;
+                }
+                field_0x3da = 5;
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else {
+                changeTVCheck();
+            }
+            break;
         }
-        mSelection = SelectType3;
-        field_0x3f5 = 0;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else {
-        changeTVCheck();
+
+        case 3: {
+            // Modified - Carco: Add logic for rupee collection animation selection
+            bool downTrigger = mpStick->checkDownTrigger();
+            bool leftTrigger = checkLeftTrigger();
+            bool rightTrigger = checkRightTrigger();
+
+            if (field_0x3f3 != 5) {
+                (this->*tv_process[field_0x3f3])();
+            } else if (downTrigger) {
+                mSelection = 1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (leftTrigger) {
+                if (!rupeeCollectAnimFlag) {
+                    rupeeCollectAnimFlag = 1;
+                } else {
+                    rupeeCollectAnimFlag = 0;
+                }
+                field_0x3da = -5;
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else if (rightTrigger) {
+                if (!rupeeCollectAnimFlag) {
+                    rupeeCollectAnimFlag = 1;
+                } else {
+                    rupeeCollectAnimFlag = 0;
+                }
+                field_0x3da = 5;
+                mSelection = SelectType3;
+                field_0x3f5 = 0;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+            } else {
+                changeTVCheck();
+            }
+            break;
+        }
     }
 }
 
@@ -815,51 +927,93 @@ void dMenu_Option_c::vib_init() {
 }
 
 void dMenu_Option_c::vib_move() {
-    bool upTrigger = mpStick->checkUpTrigger();
-    bool downTrigger = mpStick->checkDownTrigger();
-    bool leftTrigger = checkLeftTrigger();
-    bool rightTrigger = checkRightTrigger();
+    // Modified - Carco: Only change rumble option when on page 1
+    if (currentPage == 1) {
+        bool upTrigger = mpStick->checkUpTrigger();
+        bool downTrigger = mpStick->checkDownTrigger();
+        bool leftTrigger = checkLeftTrigger();
+        bool rightTrigger = checkRightTrigger();
 
-    if (field_0x3f3 != 5) {
-        (this->*tv_process[field_0x3f3])();
-    } else if (upTrigger) {
-        mSelection = SelectType0;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (downTrigger) {
-        mSelection = SelectType2;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (leftTrigger) {
-        if (isRumbleSupported()) {
-            if (field_0x3ea == 0) {
-                field_0x3ea = 1;
-                mDoCPd_c::startMotorWave(0, &field_0x3e0, JUTGamePad::CRumble::VAL_0, 0x3c);
-                field_0x3da = -5;
-            } else if (field_0x3ea == 1) {
-                field_0x3ea = 0;
-                field_0x3da = -5;
+        if (field_0x3f3 != 5) {
+            (this->*tv_process[field_0x3f3])();
+        } else if (upTrigger) {
+            mSelection = SelectType0;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (downTrigger) {
+            mSelection = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (leftTrigger) {
+            if (isRumbleSupported()) {
+                if (field_0x3ea == 0) {
+                    field_0x3ea = 1;
+                    mDoCPd_c::startMotorWave(0, &field_0x3e0, JUTGamePad::CRumble::VAL_0, 0x3c);
+                    field_0x3da = -5;
+                } else if (field_0x3ea == 1) {
+                    field_0x3ea = 0;
+                    field_0x3da = -5;
+                }
+                mSelection = SelectType3;
+                field_0x3f5 = SelectType1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                        0);
             }
-            mSelection = SelectType3;
-            field_0x3f5 = SelectType1;
-            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
-                                     0);
-        }
-    } else if (rightTrigger) {
-        if (isRumbleSupported()) {
-            if (field_0x3ea == 0) {
-                field_0x3ea = 1;
-                mDoCPd_c::startMotorWave(0, &field_0x3e0, JUTGamePad::CRumble::VAL_0, 0x3c);
-                field_0x3da = 5;
-            } else if (field_0x3ea == 1) {
-                field_0x3ea = 0;
-                field_0x3da = 5;
+        } else if (rightTrigger) {
+            if (isRumbleSupported()) {
+                if (field_0x3ea == 0) {
+                    field_0x3ea = 1;
+                    mDoCPd_c::startMotorWave(0, &field_0x3e0, JUTGamePad::CRumble::VAL_0, 0x3c);
+                    field_0x3da = 5;
+                } else if (field_0x3ea == 1) {
+                    field_0x3ea = 0;
+                    field_0x3da = 5;
+                }
+                mSelection = SelectType3;
+                field_0x3f5 = SelectType1;
+                Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                        0);
             }
-            mSelection = SelectType3;
-            field_0x3f5 = SelectType1;
-            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
-                                     0);
+        } else {
+            changeTVCheck();
         }
     } else {
-        changeTVCheck();
+        // Modified - Carco: Add logic for changing bloom option
+        bool upTrigger = mpStick->checkUpTrigger();
+        bool downTrigger = mpStick->checkDownTrigger();
+        bool leftTrigger = checkLeftTrigger();
+        bool rightTrigger = checkRightTrigger();
+
+        if (field_0x3f3 != 5) {
+            (this->*tv_process[field_0x3f3])();
+        } else if (upTrigger) {
+            mSelection = SelectType0;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (downTrigger) {
+            mSelection = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (leftTrigger) {
+            if (bloomFlag == 2) {
+                bloomFlag = 0;
+            } else {
+                bloomFlag++;
+            }
+            field_0x3da = -5;
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType1;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (rightTrigger) {
+            if (bloomFlag == 0) {
+                bloomFlag = 2;
+            } else {
+                bloomFlag--;
+            }
+            field_0x3da = 5;
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType1;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                    0);
+        } else {
+            changeTVCheck();
+        }
     }
 }
 
@@ -871,70 +1025,108 @@ void dMenu_Option_c::sound_init() {
 }
 
 void dMenu_Option_c::sound_move() {
-    bool upTrigger = mpStick->checkUpTrigger();
-    mpStick->checkDownTrigger();
-    bool leftTrigger = checkLeftTrigger();
-    bool rightTrigger = checkRightTrigger();
+    // Modified - Carco: Only change sound option when on page 1
+    if (currentPage == 1) {
+        bool upTrigger = mpStick->checkUpTrigger();
+        mpStick->checkDownTrigger();
+        bool leftTrigger = checkLeftTrigger();
+        bool rightTrigger = checkRightTrigger();
 
-    if (field_0x3f3 != 5) {
-        (this->*tv_process[field_0x3f3])();
-    } else if (upTrigger) {
-        mSelection = SelectType1;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (leftTrigger) {
-        if (field_0x3e9 == 2) {
-            field_0x3e9 = 0;
+        if (field_0x3f3 != 5) {
+            (this->*tv_process[field_0x3f3])();
+        } else if (upTrigger) {
+            mSelection = SelectType1;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (leftTrigger) {
+            if (mSoundMode == SOUND_MODE_SURROUND) {
+                mSoundMode = SOUND_MODE_MONO;
+            } else {
+                mSoundMode++;
+            }
+            field_0x3da = -5;
+            switch (mSoundMode) {
+            case SOUND_MODE_MONO:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_MONO, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                        0);
+                break;
+            case SOUND_MODE_STEREO:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_STEREO, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+                break;
+            case SOUND_MODE_SURROUND:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_SURROUND, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+                break;
+            }
+            Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[mSoundMode]);
+            setSoundMode(dMo_soundMode[mSoundMode]);
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (rightTrigger) {
+            if (mSoundMode == SOUND_MODE_MONO) {
+                mSoundMode = SOUND_MODE_SURROUND;
+            } else {
+                mSoundMode--;
+            }
+            field_0x3da = 5;
+            switch (mSoundMode) {
+            case SOUND_MODE_MONO:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_MONO, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
+                                        0);
+                break;
+            case SOUND_MODE_STEREO:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_STEREO, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+                break;
+            case SOUND_MODE_SURROUND:
+                Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_SURROUND, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
+                                        -1.0f, 0);
+                break;
+            }
+            Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[mSoundMode]);
+            setSoundMode(dMo_soundMode[mSoundMode]);
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
         } else {
-            field_0x3e9++;
+            changeTVCheck();
         }
-        field_0x3da = -5;
-        switch (field_0x3e9) {
-        case 0:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_MONO, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
-                                     0);
-            break;
-        case 1:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_STEREO, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
-                                     -1.0f, 0);
-            break;
-        case 2:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_SURROUND, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
-                                     -1.0f, 0);
-            break;
-        }
-        Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[field_0x3e9]);
-        setSoundMode(dMo_soundMode[field_0x3e9]);
-        mSelection = SelectType3;
-        field_0x3f5 = SelectType2;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
-    } else if (rightTrigger) {
-        if (field_0x3e9 == 0) {
-            field_0x3e9 = 2;
-        } else {
-            field_0x3e9--;
-        }
-        field_0x3da = 5;
-        switch (field_0x3e9) {
-        case 0:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_MONO, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f,
-                                     0);
-            break;
-        case 1:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_STEREO, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
-                                     -1.0f, 0);
-            break;
-        case 2:
-            Z2GetAudioMgr()->seStart(Z2SE_SY_SOUND_MODE_SURROUND, NULL, 0, 0, 1.0f, 1.0f, -1.0f,
-                                     -1.0f, 0);
-            break;
-        }
-        Z2AudioMgr::mAudioMgrPtr->setOutputMode(dMo_soundMode[field_0x3e9]);
-        setSoundMode(dMo_soundMode[field_0x3e9]);
-        mSelection = SelectType3;
-        field_0x3f5 = SelectType2;
-        Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
     } else {
-        changeTVCheck();
+        // Modified - Carco: Add logic for climb speed change
+        bool upTrigger = mpStick->checkUpTrigger();
+        mpStick->checkDownTrigger();
+        bool leftTrigger = checkLeftTrigger();
+        bool rightTrigger = checkRightTrigger();
+
+        if (field_0x3f3 != 5) {
+            (this->*tv_process[field_0x3f3])();
+        } else if (upTrigger) {
+            mSelection = SelectType1;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_CURSOR_OPTION, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (leftTrigger) {
+            if (climbSpeedFlag == 2) {
+                climbSpeedFlag = 0;
+            } else {
+                climbSpeedFlag++;
+            }
+            field_0x3da = -5;
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else if (rightTrigger) {
+            if (climbSpeedFlag == 0) {
+                climbSpeedFlag = 2;
+            } else {
+                climbSpeedFlag--;
+            }
+            field_0x3da = 5;
+            mSelection = SelectType3;
+            field_0x3f5 = SelectType2;
+            Z2GetAudioMgr()->seStart(Z2SE_SY_OPTION_SWITCH, NULL, 0, 0, 1.0f, 1.0f, -1.0f, -1.0f, 0);
+        } else {
+            changeTVCheck();
+        }
     }
 }
 
@@ -1139,20 +1331,67 @@ void dMenu_Option_c::confirm_close_move() {
                 if (isRumbleSupported()) {
                     dComIfGs_setOptVibration(field_0x3ea);
                 }
-                dComIfGs_setOptSound(field_0x3e9);
+                dComIfGs_setOptSound(mSoundMode);
                 dComIfGp_setNowVibration(field_0x3ea);
                 dComIfGs_setOptCameraControl(field_0x3e5);
                 mpDrawCursor->offPlayAnime(0);
+
+                // Modified - Carco: Add logic for setting new menu changes
+                // FPS Option
+                if (!fpsFlag) {
+                    setTargetFramerate(30.0f);
+                } else {
+                    setTargetFramerate(60.0f);
+                }
+
+                // Bloom Option
+                switch (bloomFlag) {
+                    case 0:
+                        mDoGph_gInf_c::bloomFactor = 1.0f;
+                        break;
+
+                    case 1:
+                        mDoGph_gInf_c::bloomFactor = 0.3f;
+                        break;
+
+                    case 2:
+                        mDoGph_gInf_c::bloomFactor = 0.0f;
+                        break;
+                }
+                dComIfGs_setBloomFlag(bloomFlag);
+
+                // Climbing Speed Option
+                switch (climbSpeedFlag) {
+                    case 0:
+                        daAlink_getAlinkActorClass()->setClimbingSpeedFactor(1.0f);
+                        break;
+
+                    case 1:
+                        daAlink_getAlinkActorClass()->setClimbingSpeedFactor(1.5f);
+                        break;
+
+                    case 2:
+                        daAlink_getAlinkActorClass()->setClimbingSpeedFactor(2.0f);
+                        break;
+                }
+                dComIfGs_setClimbSpeedFlag(climbSpeedFlag);
+
+                // Rupee Collection Animation Option
+                if (rupeeCollectAnimFlag) {
+                    dComIfGs_setRupeeAnimFlag(1);
+                } else {
+                    dComIfGs_setRupeeAnimFlag(0);
+                }
             } else {
                 mpDrawCursor->setParam(1.01f, 0.85f, 0.02f, 0.5f, 0.5f);
                 mSelection = field_0x3f5;
             }
         } else if (field_0x3f9 == 1) {
             mQuitStatus = 3;
-            if (field_0x3e9 != dComIfGs_getOptSound()) {
-                field_0x3e9 = dComIfGs_getOptSound();
-                Z2GetAudioMgr()->setOutputMode(dMo_soundMode[field_0x3e9]);
-                setSoundMode(dMo_soundMode[field_0x3e9]);
+            if (mSoundMode != dComIfGs_getOptSound()) {
+                mSoundMode = dComIfGs_getOptSound();
+                Z2GetAudioMgr()->setOutputMode(dMo_soundMode[mSoundMode]);
+                setSoundMode(dMo_soundMode[mSoundMode]);
             }
             mpDrawCursor->offPlayAnime(0);
         } else {
@@ -1517,8 +1756,16 @@ void dMenu_Option_c::screenSet() {
         field_0x270[i]->setFont(mDoExt_getRubyFont());
         field_0x270[i]->setString(0x40, "");
     }
-    mpString->getString(0x547, field_0x270[0], NULL, NULL, NULL, 0);
-    mpString->getString(0x547, field_0x270[1], NULL, NULL, NULL, 0);
+    // Modified - Carco: Add extra instructions to settings page
+    field_0x270[0]->setString(0x40, "Options - L & R For Page Toggle");
+    field_0x270[1]->setString(0x40, "Options - L & R For Page Toggle");
+    field_0x270[0]->setFontSize(14.0f, 14.0f);
+    field_0x270[1]->setFontSize(14.0f, 14.0f);
+    // Original:
+    // Options
+    // mpString->getString(0x547, field_0x270[0], NULL, NULL, NULL, 0);
+    // mpString->getString(0x547, field_0x270[1], NULL, NULL, NULL, 0);
+    // TV Settings
     mpString->getString(0x55C, field_0x270[2], NULL, NULL, NULL, 0);
     for (int i = 0; i < 5; i++) {
 #if VERSION == VERSION_GCN_JPN
@@ -1763,6 +2010,206 @@ void dMenu_Option_c::screenSet() {
     }
 }
 
+// Modified - Carco: Menu option init helper function
+void dMenu_Option_c::initMenuOption(int idx, const char* text) {
+        // Set label text
+        for (int i = 0; i < 2; i++) {
+            mMenuOptionLabelText[idx][i]->setFont(mpFont);
+            mMenuOptionLabelText[idx][i]->setString(0x40, text);
+        }
+        // Get pane managers for menu option's selections
+        for (int i = 0; i < 6; i++) {
+            ((J2DTextBox*)(mpMenuText[idx][i]->getPanePtr()))->setFont(mpFont);
+            ((J2DTextBox*)(mpMenuText[idx][i]->getPanePtr()))->setString(0x40, "");
+            mpMenuText[idx][i]->getPanePtr()->setBasePosition(J2DBasePosition_4);
+        }
+}
+
+// Modified - Carco: Set string helper function
+void dMenu_Option_c::updateMenuText(int option, int idx, int size, const char* text) {
+    ((J2DTextBox*)(mpMenuText[option][idx]->getPanePtr()))->setString(size, text);
+}
+
+// Modified - Carco: Add screenUpdate function for page navigation
+void dMenu_Option_c::screenUpdate(u8 pageNumber) {
+    switch (pageNumber) {
+        case 1: {
+            currentPage = pageNumber;
+
+            // Set the text for the labels of each menu option
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[0][i]->setFont(mpFont);
+                mMenuOptionLabelText[0][i]->setString(0x40, "");
+                mpString->getString(0x548, mMenuOptionLabelText[0][i], NULL, NULL, NULL, 0);
+            }
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[1][i]->setFont(mpFont);
+                mMenuOptionLabelText[1][i]->setString(0x40, "");
+                mpString->getString(0x54E, mMenuOptionLabelText[1][i], NULL, NULL, NULL, 0);
+            }
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[2][i]->setFont(mpFont);
+                mMenuOptionLabelText[2][i]->setString(0x40, "");
+                mpString->getString(0x54F, mMenuOptionLabelText[2][i], NULL, NULL, NULL, 0);
+            }
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[3][i]->setFont(mpFont);
+                mMenuOptionLabelText[3][i]->setString(0x40, "");
+                mpString->getString(0x54F, mMenuOptionLabelText[3][i], NULL, NULL, NULL, 0);
+            }
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[4][i]->setFont(mpFont);
+                mMenuOptionLabelText[4][i]->setString(0x40, "");
+            }
+            for (int i = 0; i < 2; i++) {
+                mMenuOptionLabelText[5][i]->setFont(mpFont);
+                mMenuOptionLabelText[5][i]->setString(0x40, "");
+                mpString->getString(0x554, mMenuOptionLabelText[5][i], NULL, NULL, NULL, 0);
+            }
+
+            // Get pane managers for each menu option's selections
+            for (int i = 0; i < 6; i++) {
+                ((J2DTextBox*)(mpMenuText[0][i]->getPanePtr()))->setFont(mpFont);
+                ((J2DTextBox*)(mpMenuText[0][i]->getPanePtr()))->setString(0x40, "");
+                mpMenuText[0][i]->getPanePtr()->setBasePosition(J2DBasePosition_4);
+            }
+            for (int i = 0; i < 6; i++) {
+                mpMenuText[1][i]->show();
+                ((J2DTextBox*)(mpMenuText[1][i]->getPanePtr()))->setFont(mpFont);
+                ((J2DTextBox*)(mpMenuText[1][i]->getPanePtr()))->setString(0x40, "");
+                mpMenuText[1][i]->getPanePtr()->setBasePosition(J2DBasePosition_4);
+            }
+            for (int i = 0; i < 6; i++) {
+                mpMenuText[2][i]->show();
+                ((J2DTextBox*)(mpMenuText[2][i]->getPanePtr()))->setFont(mpFont);
+                ((J2DTextBox*)(mpMenuText[2][i]->getPanePtr()))->setString(0x40, "");
+                mpMenuText[2][i]->getPanePtr()->setBasePosition(J2DBasePosition_4);
+            }
+
+            setAttenString();
+            setVibString();
+            setSoundString();
+            break;
+        }
+
+        case 2: {
+            currentPage = pageNumber;
+            
+            // FPS Option
+            initMenuOption(0, "FPS");
+            u8 is60fps = 0;
+            if (fpsFlag != 0) {
+                is60fps = 1;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    if (is60fps) {
+                        updateMenuText(0, i, 0x40, "60");
+                    } else {
+                        updateMenuText(0, i, 0x40, "30");
+                    }
+                } else if (is60fps) {
+                    updateMenuText(0, i, 0x40, "30");
+                } else {
+                    updateMenuText(0, i, 0x40, "60");
+                }
+            }
+
+            // Bloom Option
+            initMenuOption(1, "Bloom");
+            char* option_0, *option_1, *option_2;
+            switch (bloomFlag) {
+                case 0:
+                    option_0 = "On";
+                    option_1 = "Reduced";
+                    option_2 = "Off";
+                    break;
+                
+                case 1:
+                    option_0 = "Reduced";
+                    option_1 = "Off";
+                    option_2 = "On";
+                    break;
+
+                case 2:
+                    option_0 = "Off";
+                    option_1 = "On";
+                    option_2 = "Reduced";
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    updateMenuText(1, i, 0x20, option_0);
+                } else if (i < 4) {
+                    updateMenuText(1, i, 0x20, option_1);
+                } else {
+                    updateMenuText(1, i, 0x20, option_2);
+                }
+            }
+
+            // Climb Speed Option
+            initMenuOption(2, "Climb Speed");
+            char* optionclimbSpeed_0, *optionclimbSpeed_1, *optionclimbSpeed_2;
+            switch (climbSpeedFlag) {
+                case 0:
+                    optionclimbSpeed_0 = "Normal";
+                    optionclimbSpeed_1 = "Faster";
+                    optionclimbSpeed_2 = "Double";
+                    break;
+
+                case 1:
+                    optionclimbSpeed_0 = "Faster";
+                    optionclimbSpeed_1 = "Double";
+                    optionclimbSpeed_2 = "Normal";
+                    break;
+
+                case 2:
+                    optionclimbSpeed_0 = "Double";
+                    optionclimbSpeed_1 = "Normal";
+                    optionclimbSpeed_2 = "Faster";
+                    break;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    updateMenuText(2, i, 0x20, optionclimbSpeed_0);
+                } else if (i < 4) {
+                    updateMenuText(2, i, 0x20, optionclimbSpeed_1);
+                } else {
+                    updateMenuText(2, i, 0x20, optionclimbSpeed_2);
+                }
+            }
+            break;
+        }
+
+        case 3: {
+            currentPage = pageNumber;
+            
+            // Rupee Message Option
+            initMenuOption(0, "Rupee Collect Animation");
+            u8 isRupeeAnimFlag = 0;
+            if (rupeeCollectAnimFlag) {
+                isRupeeAnimFlag = 1;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    if (isRupeeAnimFlag) {
+                        updateMenuText(0, i, 0x20, "On");
+                    } else {
+                        updateMenuText(0, i, 0x20, "Off");
+                    }
+                } else if (isRupeeAnimFlag) {
+                    updateMenuText(0, i, 0x20, "Off");
+                } else {
+                    updateMenuText(0, i, 0x20, "On");
+                }
+            }
+
+            initMenuOption(1, "");
+            initMenuOption(2, "");
+            break;
+        }
+    }
+}
+
 void dMenu_Option_c::setSoundMode(u32 param_0) {
     switch (param_0) {
     case 0:
@@ -1776,23 +2223,73 @@ void dMenu_Option_c::setSoundMode(u32 param_0) {
 }
 
 void dMenu_Option_c::setAttenString() {
-    u16 stringId1;
-    u16 stringId2;
+    // Modified - Carco: Only set atten string if not next page
+    switch (currentPage) {
+        case 1: {
+            u16 stringId1;
+            u16 stringId2;
 
-    if (field_0x3e4 == 0) {
-        stringId1 = 0x549;
-        stringId2 = 0x54A;
-    } else {
-        stringId1 = 0x54A;
-        stringId2 = 0x549;
-    }
-    for (int i = 0; i < 6; i++) {
-        if (i < 2) {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[0][i]->getPanePtr();
-            mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
-        } else {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[0][i]->getPanePtr();
-            mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+            if (field_0x3e4 == 0) {
+                stringId1 = 0x549; // Hold
+                stringId2 = 0x54A; // Switch
+            } else {
+                stringId1 = 0x54A; // Switch
+                stringId2 = 0x549; // Hold
+            }
+
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    J2DTextBox* textBox = (J2DTextBox*)mpMenuText[0][i]->getPanePtr();
+                    mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
+                } else {
+                    J2DTextBox* textBox = (J2DTextBox*)mpMenuText[0][i]->getPanePtr();
+                    mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+                }
+            }
+            break;
+        }
+
+        case 2: {
+            // Modified - Carco: Add logic to switch between 30 and 60 fps strings
+            u8 is60fps = 0;
+            if (fpsFlag != 0) {
+                is60fps = 1;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    if (is60fps) {
+                        updateMenuText(0, i, 0x40, "60");
+                    } else {
+                        updateMenuText(0, i, 0x40, "30");
+                    }
+                } else if (is60fps) {
+                    updateMenuText(0, i, 0x40, "30");
+                } else {
+                    updateMenuText(0, i, 0x40, "60");
+                }
+            }
+            break;
+        }
+
+        case 3: {
+            u8 isRupeeAnimFlag = 0;
+            if (rupeeCollectAnimFlag) {
+                isRupeeAnimFlag = 1;
+            }
+            for (int i = 0; i < 6; i++) {
+                if (i < 2) {
+                    if (isRupeeAnimFlag) {
+                        updateMenuText(0, i, 0x20, "On");
+                    } else {
+                        updateMenuText(0, i, 0x20, "Off");
+                    }
+                } else if (isRupeeAnimFlag) {
+                    updateMenuText(0, i, 0x20, "Off");
+                } else {
+                    updateMenuText(0, i, 0x20, "On");
+                }
+            }
+            break;
         }
     }
 }
@@ -1822,65 +2319,133 @@ void dMenu_Option_c::setRubyString() {
 #endif
 
 void dMenu_Option_c::setVibString() {
-    u16 stringId1;
-    u16 stringId2;
+    // Modified - Carco: Only set vib string when on page 1
+    if (currentPage == 1) {
+        u16 stringId1;
+        u16 stringId2;
 
-    if (field_0x3ea == 0) {
-        stringId1 = 0x54C;
-        stringId2 = 0x54D;
-    } else {
-        stringId1 = 0x54D;
-        stringId2 = 0x54C;
-    }
-    for (int i = 0; i < 6; i++) {
-#if VERSION == VERSION_GCN_JPN
-        const int IDX = 2;
-#else
-        const int IDX = 1;
-#endif
-        if (i < 2) {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
-            mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
+        if (field_0x3ea == 0) {
+            stringId1 = 0x54C;
+            stringId2 = 0x54D;
         } else {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
-            mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+            stringId1 = 0x54D;
+            stringId2 = 0x54C;
+        }
+        for (int i = 0; i < 6; i++) {
+    #if VERSION == VERSION_GCN_JPN
+            const int IDX = 2;
+    #else
+            const int IDX = 1;
+    #endif
+            if (i < 2) {
+                J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
+                mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
+            } else {
+                J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
+                mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+            }
+        }
+    } else {
+        // Modified - Carco: Add logic to switch between bloom on, off, and reduced strings
+        char* option_0, *option_1, *option_2;
+        switch (bloomFlag) {
+            case 0:
+                option_0 = "On";
+                option_1 = "Reduced";
+                option_2 = "Off";
+                break;
+            
+            case 1:
+                option_0 = "Reduced";
+                option_1 = "Off";
+                option_2 = "On";
+                break;
+
+            case 2:
+                option_0 = "Off";
+                option_1 = "On";
+                option_2 = "Reduced";
+        }
+
+        for (int i = 0; i < 6; i++) {
+            if (i < 2) {
+                updateMenuText(1, i, 0x20, option_0);
+            } else if (i < 4) {
+                updateMenuText(1, i, 0x20, option_1);
+            } else {
+                updateMenuText(1, i, 0x20, option_2);
+            }
         }
     }
 }
 
 void dMenu_Option_c::setSoundString() {
-    u16 stringId1;
-    u16 stringId2;
-    u16 stringId3;
+    // Modified - Carco: Only change sound string when on page 1
+    if (currentPage == 1) {
+        u16 stringId1;
+        u16 stringId2;
+        u16 stringId3;
 
-    if (field_0x3e9 == 0) {
-        stringId1 = 0x551;
-        stringId2 = 0x550;
-        stringId3 = 0x552;
-    } else if (field_0x3e9 == 1) {
-        stringId1 = 0x550;
-        stringId2 = 0x552;
-        stringId3 = 0x551;
-    } else {
-        stringId1 = 0x552;
-        stringId2 = 0x551;
-        stringId3 = 0x550;
-    }
-    for (int i = 0; i < 6; i++) {
-#if VERSION == VERSION_GCN_JPN
-        const int IDX = 3;
-#else
-        const int IDX = 2;
-#endif
-        if (i < 2) {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
-            mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
-        } else if (i < 4) {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
-            mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+        if (mSoundMode == SOUND_MODE_MONO) {
+            stringId1 = 0x551; // Mono
+            stringId2 = 0x550; // Stereo
+            stringId3 = 0x552; // Surround
+        } else if (mSoundMode == SOUND_MODE_STEREO) {
+            stringId1 = 0x550; // Stereo
+            stringId2 = 0x552; // Surround
+            stringId3 = 0x551; // Mono
         } else {
-            J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
-            mpString->getString(stringId3, textBox, NULL, NULL, NULL, 0);
+            stringId1 = 0x552; // Surround
+            stringId2 = 0x551; // Mono
+            stringId3 = 0x550; // Stereo
+        }
+        for (int i = 0; i < 6; i++) {
+    #if VERSION == VERSION_GCN_JPN
+            const int IDX = 3;
+    #else
+            const int IDX = 2;
+    #endif
+            if (i < 2) {
+                J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
+                mpString->getString(stringId1, textBox, NULL, NULL, NULL, 0);
+            } else if (i < 4) {
+                J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
+                mpString->getString(stringId2, textBox, NULL, NULL, NULL, 0);
+            } else {
+                J2DTextBox* textBox = (J2DTextBox*)mpMenuText[IDX][i]->getPanePtr();
+                mpString->getString(stringId3, textBox, NULL, NULL, NULL, 0);
+            }
+        }
+    } else {
+        // Modified - Carco: String change logic for climb speed option
+        char* optionclimbSpeed_0, *optionclimbSpeed_1, *optionclimbSpeed_2;
+        switch (climbSpeedFlag) {
+            case 0:
+                optionclimbSpeed_0 = "Normal";
+                optionclimbSpeed_1 = "Faster";
+                optionclimbSpeed_2 = "Double";
+                break;
+
+            case 1:
+                optionclimbSpeed_0 = "Faster";
+                optionclimbSpeed_1 = "Double";
+                optionclimbSpeed_2 = "Normal";
+                break;
+
+            case 2:
+                optionclimbSpeed_0 = "Double";
+                optionclimbSpeed_1 = "Normal";
+                optionclimbSpeed_2 = "Faster";
+                break;
+        }
+        for (int i = 0; i < 6; i++) {
+            if (i < 2) {
+                updateMenuText(2, i, 0x20, optionclimbSpeed_0);
+            } else if (i < 4) {
+                updateMenuText(2, i, 0x20, optionclimbSpeed_1);
+            } else {
+                updateMenuText(2, i, 0x20, optionclimbSpeed_2);
+            }
         }
     }
 }
@@ -2163,7 +2728,9 @@ void dMenu_Option_c::initialize() {
     field_0x3eb = 0;
     field_0x3e6 = 0;
     field_0x3e7 = 0;
-    field_0x3e9 = dComIfGs_getOptSound();
+    mSoundMode = dComIfGs_getOptSound();
+    bloomFlag = dComIfGs_getBloomFlag();
+    climbSpeedFlag = dComIfGs_getClimbSpeedFlag();
     if (isRumbleSupported()) {
         field_0x3ea = dComIfGp_getNowVibration();
     } else {

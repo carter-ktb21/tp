@@ -1235,8 +1235,9 @@ void daAlink_c::setLadderPos(int param_0) {
 
 
 f32 daAlink_c::getLadderMoveAnmSpeed() {
+    // Modified - Melon, Carco: Add climbing speed factor
     return getAnmSpeedStickRate(mpHIO->mLadder.m.mMoveMinASpeed,
-                                mpHIO->mLadder.m.mMoveMaxSpeed);
+                                mpHIO->mLadder.m.mMoveMaxSpeed * climbingSpeedFactor);
 }
 
 int daAlink_c::changeLadderMoveProc(int param_0) {
@@ -1614,13 +1615,15 @@ int daAlink_c::procLadderMove() {
 }
 
 f32 daAlink_c::getClimbMoveUpDownAnmSpeed() {
+    // Modified - Melon, Carco: Add climbing speed factor
     return getAnmSpeedStickRate(mpHIO->mLadder.m.mWallVerticalMinAnmSpeed,
-                                mpHIO->mLadder.m.mWallVerticalMaxAnmSpeed);
+                                mpHIO->mLadder.m.mWallVerticalMaxAnmSpeed * climbingSpeedFactor);
 }
 
 f32 daAlink_c::getClimbMoveSideAnmSpeed() {
+    // Modified - Melon, Carco: Add climbing speed factor
     return getAnmSpeedStickRate(mpHIO->mLadder.m.mWallHorizontalMinAnmSpeed,
-                                mpHIO->mLadder.m.mWallHorizontalMaxAnmSpeed);
+                                mpHIO->mLadder.m.mWallHorizontalMaxAnmSpeed * climbingSpeedFactor);
 }
 
 BOOL daAlink_c::checkClimbCode(cBgS_PolyInfo& i_poly) {

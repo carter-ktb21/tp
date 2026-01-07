@@ -118,6 +118,9 @@ public:
     static const dCcD_SrcCyl m_cyl_src;
     static s32 m_timer_max;
 
+    // Modified - Carco: Add flag for rupee collection animation
+    static u8 rupeeCollectionAnimFlag;
+
     /* 0x92C */ s16 field_0x92c;
     /* 0x92E */ u16 field_0x92e;
     /* 0x930 */ cXyz mItemScale;

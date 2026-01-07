@@ -2063,6 +2063,30 @@ inline void dComIfGs_setOptCameraHInvert(bool i_invert) {
     g_dComIfG_gameInfo.info.getPlayer().getConfig().setCameraHInvert(i_invert);
 }
 
+// Modified - Carco: dComIfG getter and setter for bloom flag
+inline u8 dComIfGs_getBloomFlag() {
+    return g_dComIfG_gameInfo.info.getPlayer().getConfig().getBloomFlag();
+}
+inline void dComIfGs_setBloomFlag(u8 i_bloomFlag) {
+    g_dComIfG_gameInfo.info.getPlayer().getConfig().setBloomFlag(i_bloomFlag);
+}
+
+// Modified - Carco: dComIfG getter and setter for climb speed flag
+inline u8 dComIfGs_getClimbSpeedFlag() {
+    return g_dComIfG_gameInfo.info.getPlayer().getConfig().getClimbSpeedFlag();
+}
+inline void dComIfGs_setClimbSpeedFlag(u8 i_climbSpeedFlag) {
+    g_dComIfG_gameInfo.info.getPlayer().getConfig().setClimbSpeedFlag(i_climbSpeedFlag);
+}
+
+// Modified - Carco: dComIfG getter and setter for rupee anim flag
+inline u8 dComIfGs_getRupeeAnimFlag() {
+    return g_dComIfG_gameInfo.info.getPlayer().getConfig().getRupeeAnimFlag();
+}
+inline void dComIfGs_setRupeeAnimFlag(u8 i_rupeeAnimFlag) {
+    g_dComIfG_gameInfo.info.getPlayer().getConfig().setRupeeAnimFlag(i_rupeeAnimFlag);
+}
+
 inline void dComIfGs_setOptPointer(u8 i_pointer) {
     g_dComIfG_gameInfo.info.getPlayer().getConfig().setPointer(i_pointer);
 }

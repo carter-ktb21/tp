@@ -7613,6 +7613,11 @@ public:
     static daAlink_procFunc m_demoInitTable[];
     static EffParamProc m_fEffParamProc[];
 
+    // Modified - Carco: Add climbing speed factor setter
+    void setClimbingSpeedFactor(f32 factor) {
+        climbingSpeedFactor = factor;
+    }
+
     /* 0x0062C */ request_of_phase_process_class mPhaseReq;
     /* 0x00634 */ const char* mArcName;
     /* 0x00638 */ JKRExpHeap* mpArcHeap;
@@ -8237,6 +8242,7 @@ public:
     /* 0x03848 */ cXyz* field_0x3848;
     /* 0x0384C */ cXyz* field_0x384c;
     /* 0x03850 */ daAlink_procFunc mpProcFunc;
+    /* 0x03858 */ f32 climbingSpeedFactor; // Modified - Carco: Add climbing speed factor
 };  // Size: 0x385C
 
 static bool daAlink_checkLightBallA(fopAc_ac_c* p_actor);

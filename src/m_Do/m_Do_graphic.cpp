@@ -523,6 +523,8 @@ f32 mDoGph_gInf_c::m_widthF = 608.0f;
 f32 mDoGph_gInf_c::m_heightF = 448.0f;
 #endif
 
+f32 mDoGph_gInf_c::bloomFactor = 1.0f;
+
 struct tvSize {
     u16 width;
     u16 height;
@@ -1112,6 +1114,11 @@ void mDoGph_gInf_c::bloom_c::remove() {
 }
 
 void mDoGph_gInf_c::bloom_c::draw() {
+    bloomFactor = dComIfGs_getBloomFlag() != 0 ? (dComIfGs_getBloomFlag() < 2 ? 0.3f : 0.0f) : 1.0f;
+    if (bloomFactor == 0.0f) {
+        return;
+    }
+    
     bool enabled = mEnable && m_buffer != NULL;
     if (mMonoColor.a != 0 || enabled) {
         GXSetViewport(0.0f, 0.0f, FB_WIDTH, FB_HEIGHT, 0.0f, 1.0f);
@@ -1211,7 +1218,8 @@ void mDoGph_gInf_c::bloom_c::draw() {
             GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3c);
             for (int texCoord = (int)GX_TEXCOORD1; texCoord < (int)GX_MAX_TEXCOORD; texCoord++) {
                 GXSetTexCoordGen((GXTexCoordID)texCoord, GX_TG_MTX2x4, GX_TG_TEX0, iVar11);
-                f32 dVar15 = mBlureSize * (1.0f / 6400.0f);
+                // Modified - Carco: added bloom factor
+                f32 dVar15 = mBlureSize * (bloomFactor / 6400.0f);
                 mDoMtx_stack_c::transS((dVar15 * cM_scos(sVar10)) * getInvScale(),
                                        dVar15 * cM_ssin(sVar10), 0.0f);
                 GXLoadTexMtxImm(mDoMtx_stack_c::get(), iVar11, GX_MTX2x4);

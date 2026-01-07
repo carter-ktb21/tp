@@ -4513,6 +4513,9 @@ int daAlink_c::create() {
 
     static int bgWaitFlg = 0;
 
+    // Modified - Carco: get climbing speed factor from save file
+    climbingSpeedFactor = dComIfGs_getClimbSpeedFlag() != 0 ? (dComIfGs_getClimbSpeedFlag() < 2 ? 1.5f : 2.0f) : 1.0f;
+
     u32 sceneMode = getLastSceneMode();
     s32 startMode = getStartMode();
     s16 startPoint = dComIfGp_getStartStagePoint();

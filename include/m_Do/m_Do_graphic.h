@@ -339,6 +339,9 @@ public:
     static f32 m_heightF;
     static f32 m_widthF;
     #endif
+
+    // Modified - Carco: Add bloom factor
+    static f32 bloomFactor;
 };
 
 #endif /* M_DO_M_DO_GRAPHIC_H */

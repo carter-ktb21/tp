@@ -779,7 +779,12 @@ void daItem_c::setTevStr() {
     g_env_light.setLightTevColorType_MAJI(mpModel, &tevStr);
 }
 
+u8 daItem_c::rupeeCollectionAnimFlag = 0;
+
 void daItem_c::itemGetNextExecute() {
+    // Modified - Carco: Get rupee anim flag
+    rupeeCollectionAnimFlag = dComIfGs_getRupeeAnimFlag();
+
     if (!checkFlag(FLAG_DELETE_ITEM_e) && !checkFlag(FLAG_INIT_GET_ITEM_e)) {
         setFlag(FLAG_INIT_GET_ITEM_e);
         BOOL haveItem = false;
@@ -813,7 +818,7 @@ void daItem_c::itemGetNextExecute() {
                 if (!haveItem) {
                     dComIfGs_offItemFirstBit(m_itemNo);
                 }
-            } else if (!checkItemGet(m_itemNo, 1)) {
+            } else if (!checkItemGet(m_itemNo, 1) && rupeeCollectionAnimFlag) { // Modified - Carco, Melon: Rupee anim flag check
                 procInitGetDemoEvent();
             } else {
                 procInitSimpleGetDemo();
